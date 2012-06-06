@@ -16,6 +16,43 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    // we need to specialize this template to allow for automatic conversion of
+    // the vector<naming::gid_type> to a vector<naming::id_type>
+    template <>
+    struct get_remote_result<
+        std::vector<naming::id_type>, std::vector<naming::gid_type> >
+    {
+        static std::vector<naming::id_type>
+        call(std::vector<naming::gid_type> const& rhs)
+        {
+            std::vector<naming::id_type> result;
+            result.reserve(rhs.size());
+            BOOST_FOREACH(naming::gid_type const& r, rhs)
+            {
+                result.push_back(naming::id_type(r, naming::id_type::managed));
+            }
+            return result;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct promise_remote_result<std::vector<naming::id_type> >
+      : boost::mpl::identity<std::vector<naming::gid_type> >
+    {};
+
+    template <>
+    struct promise_local_result<std::vector<naming::gid_type> >
+      : boost::mpl::identity<std::vector<naming::id_type> >
+    {};
+}}
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -78,6 +115,30 @@ namespace hpx { namespace components { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future
             return create_component_async(gid, type, count).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static lcos::future<std::vector<naming::id_type>, std::vector<naming::gid_type> >
+        bulk_create_components_async(
+            naming::id_type const& gid, components::component_type type,
+            std::size_t count = 1)
+        {
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::bulk_create_components_action action_type;
+            return hpx::async<action_type>(gid, type, count);
+        }
+
+        /// Create a new component \a type using the runtime_support with the
+        /// given \a targetgid. Block for the creation to finish.
+        static std::vector<naming::id_type> bulk_create_components(
+            naming::id_type const& gid, components::component_type type,
+            std::size_t count = 1)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future
+            return bulk_create_components_async(gid, type, count).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

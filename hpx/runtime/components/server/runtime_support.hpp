@@ -120,23 +120,24 @@ namespace hpx { namespace components { namespace server
             runtime_support_factory_properties = 0, ///< return whether more than
                                                     ///< one instance of a component
                                                     ///< can be created at once
-            runtime_support_create_component = 1,   ///< create new components
+            runtime_support_create_component = 1,   ///< create new default constructed components
             runtime_support_create_one_component = 2,   ///< create new component with one constructor argument
-            runtime_support_free_component = 3,     ///< delete existing components
-            runtime_support_shutdown = 4,           ///< shut down this runtime instance
-            runtime_support_shutdown_all = 5,       ///< shut down the runtime instances of all localities
-            runtime_support_terminate = 6,          ///< terminate the runtime instances of all localities
-            runtime_support_terminate_all = 7,      ///< terminate the runtime instances of all localities
+            runtime_support_bulk_create_components = 3, ///< create N new default constructed components
+            runtime_support_free_component = 4,     ///< delete existing components
+            runtime_support_shutdown = 5,           ///< shut down this runtime instance
+            runtime_support_shutdown_all = 6,       ///< shut down the runtime instances of all localities
+            runtime_support_terminate = 7,          ///< terminate the runtime instances of all localities
+            runtime_support_terminate_all = 8,      ///< terminate the runtime instances of all localities
 
-            runtime_support_get_config = 8,         ///< get configuration information
-            runtime_support_create_memory_block = 9,  ///< create new memory block
-            runtime_support_load_components = 10,
-            runtime_support_call_startup_functions = 11,
-            runtime_support_call_shutdown_functions = 12,
-            runtime_support_update_agas_cache = 13,
-            runtime_support_garbage_collect = 14,
-            runtime_support_create_performance_counter = 15,
-            runtime_support_get_instance_count = 16
+            runtime_support_get_config = 9,         ///< get configuration information
+            runtime_support_create_memory_block = 10,  ///< create new memory block
+            runtime_support_load_components = 11,
+            runtime_support_call_startup_functions = 12,
+            runtime_support_call_shutdown_functions = 13,
+            runtime_support_update_agas_cache = 14,
+            runtime_support_garbage_collect = 15,
+            runtime_support_create_performance_counter = 16,
+            runtime_support_get_instance_count = 17
         };
 
         static component_type get_component_type()
@@ -174,9 +175,13 @@ namespace hpx { namespace components { namespace server
         ///        instance at once
         int factory_properties(components::component_type type);
 
-        /// \brief Action to create new components
+        /// \brief Action to create new default constructed components
         naming::gid_type create_component(components::component_type type,
             std::size_t count);
+
+        /// \brief Action to create N new default constructed components
+        std::vector<naming::gid_type> bulk_create_components(
+            components::component_type type, std::size_t count);
 
         /// \brief Action to create new component while passing one constructor
         ///        parameter
@@ -300,6 +305,13 @@ namespace hpx { namespace components { namespace server
             components::component_type, constructor_argument const&,
             &runtime_support::create_one_component
         > create_one_component_action;
+
+        typedef hpx::actions::result_action2<
+            runtime_support, std::vector<naming::gid_type>,
+            runtime_support_bulk_create_components,
+            components::component_type, std::size_t,
+            &runtime_support::bulk_create_components
+        > bulk_create_components_action;
 
         typedef hpx::actions::result_action2<
             runtime_support, naming::gid_type, runtime_support_create_memory_block,
@@ -520,6 +532,9 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::create_one_component_action,
     create_one_component_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::bulk_create_components_action,
+    bulk_create_components_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::create_memory_block_action,
     create_memory_block_action)

@@ -11,6 +11,8 @@
 
 #include <boost/mpl/identity.hpp>
 
+#include <vector>
+
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////

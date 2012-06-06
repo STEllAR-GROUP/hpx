@@ -524,7 +524,7 @@ In this section we assume to have a simple application component which exposes
 one member function as a component action. The header file `app_server.hpp`
 declares the C++ type to be exposed as a component. This type has a member
 function `print_greating()` which is exposed as an action (`print_greating_action`).
-We assume the source files fo rthis example are located in a directory
+We assume the source files for this example are located in a directory
 referenced by [teletype]`$APP_ROOT`[c++]:
 
     // file: $APP_ROOT/app_server.hpp

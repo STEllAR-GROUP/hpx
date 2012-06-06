@@ -513,19 +513,19 @@ namespace hpx { namespace naming
         friend bool operator<= (id_type const& lhs, id_type const& rhs)
         {
             // Deduced from <.
-            return !(rhs < lhs); 
+            return !(rhs < lhs);
         }
 
         friend bool operator> (id_type const& lhs, id_type const& rhs)
         {
             // Deduced from <.
-            return rhs < lhs; 
+            return rhs < lhs;
         }
 
         friend bool operator>= (id_type const& lhs, id_type const& rhs)
         {
             // Deduced from <.
-            return !(lhs < rhs); 
+            return !(lhs < rhs);
         }
 
         // access the internal parts of the gid
@@ -605,6 +605,15 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
+    template <>
+    struct get_remote_result<naming::id_type, naming::gid_type>
+    {
+        static naming::id_type call(naming::gid_type const& rhs)
+        {
+            return naming::id_type(rhs, naming::id_type::managed);
+        }
+    };
+
     template <>
     struct promise_remote_result<naming::id_type>
       : boost::mpl::identity<naming::gid_type>
