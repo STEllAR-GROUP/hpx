@@ -10,6 +10,7 @@ set(example_programs
     fibonacci
     fibonacci_one
     fibonacci_futures
+    fractals
     interest_calculator
     non_atomic_rma
     quicksort
