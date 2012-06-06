@@ -52,7 +52,7 @@ using hpx::actions::plain_result_action1;
 using hpx::actions::plain_result_action5;
 using hpx::actions::plain_action3;
 using hpx::actions::plain_action4;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::util::high_resolution_timer;

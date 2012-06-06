@@ -161,7 +161,7 @@ namespace distributed
     std::size_t distribution::get_data_at(std::size_t n)
     {
         // n_pos is ordinal position
-        std::size_t find_component_no, temp = 0, n_pos = n+1, quo, rem;
+        std::size_t temp = 0, n_pos = n+1, quo, rem;
         std::size_t max_elements = comp_instances_.size() * max_comp_size_;
 
         std::vector<hpx::naming::id_type>::iterator itr;

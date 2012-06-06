@@ -139,7 +139,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         // Initialize the data
-        ::init(util::locality_results(blocks), accu);
+        ::init(hpx::util::locality_results(blocks), accu);
 
 
         // Initial Data -----------------------------------------
