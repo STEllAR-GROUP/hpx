@@ -7,7 +7,6 @@
 #define HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM
 
 #include <hpx/traits.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <boost/config.hpp>
 #include <boost/move/move.hpp>

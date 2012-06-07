@@ -21,7 +21,7 @@ namespace hpx { namespace lcos { namespace detail
         virtual ~dataflow_base_impl()
         {}
 
-        dataflow_base_impl(lcos::future<naming::id_type> const & promise)
+        dataflow_base_impl(lcos::future<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
         {}
 
@@ -42,7 +42,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     protected:
-        lcos::future<naming::id_type> gid_promise;
+        lcos::future<naming::id_type, naming::gid_type> gid_promise;
 
     private:
         friend class boost::serialization::access;
@@ -53,7 +53,7 @@ namespace hpx { namespace lcos { namespace detail
             naming::id_type id;
             ar & id;
 
-            lcos::promise<naming::id_type> p;
+            lcos::promise<naming::id_type, naming::gid_type> p;
             p.set_local_data(id);
             gid_promise = p.get_future();
         }

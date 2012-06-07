@@ -25,7 +25,7 @@ namespace hpx { namespace lcos
         dataflow_trigger() {}
 
         // MSVC chokes on having the lambda in the member initializer list below
-        static inline lcos::future<naming::id_type>
+        static inline lcos::future<naming::id_type, naming::gid_type>
         create_component(
             naming::id_type const & id
           , std::vector<dataflow_base<void> > const & trigger

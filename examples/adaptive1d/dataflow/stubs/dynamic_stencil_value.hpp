@@ -8,6 +8,7 @@
 #define HPX_COMPONENTS_AMR_STUBS_STENCIL_VALUE_NOV_02_2008_0447PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 

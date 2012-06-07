@@ -16,43 +16,6 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    // we need to specialize this template to allow for automatic conversion of
-    // the vector<naming::gid_type> to a vector<naming::id_type>
-    template <>
-    struct get_remote_result<
-        std::vector<naming::id_type>, std::vector<naming::gid_type> >
-    {
-        static std::vector<naming::id_type>
-        call(std::vector<naming::gid_type> const& rhs)
-        {
-            std::vector<naming::id_type> result;
-            result.reserve(rhs.size());
-            BOOST_FOREACH(naming::gid_type const& r, rhs)
-            {
-                result.push_back(naming::id_type(r, naming::id_type::managed));
-            }
-            return result;
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <>
-    struct promise_remote_result<std::vector<naming::id_type> >
-      : boost::mpl::identity<std::vector<naming::gid_type> >
-    {};
-
-    template <>
-    struct promise_local_result<std::vector<naming::gid_type> >
-      : boost::mpl::identity<std::vector<naming::id_type> >
-    {};
-}}
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -94,7 +57,7 @@ namespace hpx { namespace components { namespace stubs
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
-        static lcos::future<naming::id_type>
+        static lcos::future<naming::id_type, naming::gid_type>
         create_component_async(
             naming::id_type const& gid, components::component_type type,
             std::size_t count = 1)
@@ -148,7 +111,7 @@ namespace hpx { namespace components { namespace stubs
         /// to obtain the global id of the newly created object. Pass one
         /// generic argument to the constructor.
         template <typename Arg0>
-        static lcos::future<naming::id_type>
+        static lcos::future<naming::id_type, naming::gid_type>
         create_one_component_async(
             naming::id_type const& gid, components::component_type type,
             Arg0 const& arg0)

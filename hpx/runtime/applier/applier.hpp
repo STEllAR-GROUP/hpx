@@ -410,7 +410,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For synchronous operation use the function
     ///             \a applier#create_async.
-    HPX_API_EXPORT lcos::future<naming::id_type>
+    HPX_API_EXPORT lcos::future<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& targetgid,
             components::component_type type, std::size_t count = 1);
 

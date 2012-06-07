@@ -19,7 +19,7 @@
 namespace hpx { namespace applier
 {
     //
-    lcos::future<naming::id_type>
+    lcos::future<naming::id_type, naming::gid_type>
     create_async(naming::id_type const& targetgid,
         components::component_type type, std::size_t count)
     {
