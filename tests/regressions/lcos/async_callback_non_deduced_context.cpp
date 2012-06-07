@@ -23,8 +23,8 @@ HPX_PLAIN_ACTION(test, test_action);
 ///////////////////////////////////////////////////////////////////////////////
 void future_callback(hpx::lcos::future<int> p)
 {
-    HPX_TEST(f.has_value());
-    HPX_TEST_EQ(f.get(), 42);
+    HPX_TEST(p.has_value());
+    HPX_TEST_EQ(p.get(), 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ int hpx_main(boost::program_options::variables_map&)
 
         future<int> p = async_callback(
             do_test,
-            boost::bind(future_callback, _1)
+            boost::bind(future_callback, _1),
             hpx::find_here()
         );
 
@@ -57,6 +57,6 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv, cfg);
+    return hpx::init(cmdline, argc, argv);
 }
 
