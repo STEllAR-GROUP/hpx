@@ -195,6 +195,27 @@ namespace hpx { namespace parcelset
             util::spinlock::scoped_lock l(mtx_);
             pending_parcels_[locality_id].first.push_back(p);
             pending_parcels_[locality_id].second.push_back(f);
+#if defined(HPX_DEBUG)
+            // verify the connection points to the right destination
+            BOOST_FOREACH(parcel const& pp, pending_parcels_[locality_id].first)
+            {
+                const boost::uint32_t parcel_locality_id =
+                    naming::get_locality_id_from_gid(pp.get_destination());
+                BOOST_ASSERT(parcel_locality_id == locality_id);
+                ///FIXME: addr refers to a specific component ... once more than
+                ///       one parcel is cached, this fails ...
+                ///BOOST_ASSERT(pp.get_destination_addr() == addr);
+                BOOST_ASSERT(pp.get_destination_addr().locality_ == addr.locality_);
+                if(client_connection)
+                {
+                    BOOST_ASSERT(parcel_locality_id == client_connection->destination());
+                    BOOST_ASSERT(addr.locality_.get_address() ==
+                        client_connection->socket().remote_endpoint().address().to_string());
+                    BOOST_ASSERT(addr.locality_.get_port() ==
+                        client_connection->socket().remote_endpoint().port());
+                }
+            }
+#endif
         }
 
         if (!client_connection)
@@ -274,8 +295,14 @@ namespace hpx { namespace parcelset
         std::vector<write_handler_type> handlers;
         {
             util::spinlock::scoped_lock l(mtx_);
-            std::swap(parcels, pending_parcels_[locality_id].first);
-            std::swap(handlers, pending_parcels_[locality_id].second);
+            iterator it = pending_parcels_.find(locality_id);
+
+            if(it != pending_parcels_.end())
+            {
+                BOOST_ASSERT(it->first == locality_id);
+                std::swap(parcels, it->second.first);
+                std::swap(handlers, it->second.second);
+            }
         }
 
         // if the parcels didn't get sent by another connection ...
@@ -289,7 +316,10 @@ namespace hpx { namespace parcelset
                     naming::get_locality_id_from_gid(pp.get_destination());
                 BOOST_ASSERT(parcel_locality_id == locality_id);
                 BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-                BOOST_ASSERT(pp.get_destination_addr() == addr);
+                ///FIXME: addr refers to a specific component ... once more than
+                ///       one parcel is cached, this fails ...
+                ///BOOST_ASSERT(pp.get_destination_addr() == addr);
+                BOOST_ASSERT(pp.get_destination_addr().locality_ == addr.locality_);
                 BOOST_ASSERT(addr.locality_.get_address() ==
                     client_connection->socket().remote_endpoint().address().to_string());
                 BOOST_ASSERT(addr.locality_.get_port() ==
