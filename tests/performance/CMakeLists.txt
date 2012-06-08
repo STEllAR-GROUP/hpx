@@ -3,6 +3,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set(subdirs statistical)
+
+foreach(subdir ${subdirs})
+    add_hpx_pseudo_target(tests.${subdir})
+    add_subdirectory(${subdir})
+    add_hpx_pseudo_dependencies(tests tests.${subdir})
+endforeach()
+
 set(benchmarks
     boost_tls_overhead
     native_tls_overhead
@@ -35,8 +43,8 @@ if(QTHREADS_FOUND)
 
   set(benchmarks
       ${benchmarks}
-      qthreads_homogeneous_task_spawn
-      qthreads_heterogeneous_task_spawn
+      #qthreads_homogeneous_task_spawn
+      #qthreads_heterogeneous_task_spawn
      )
 
   set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
