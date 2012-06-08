@@ -62,7 +62,6 @@ if(HDF5_CPP_FOUND)
 
     if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
       set(subdirs ${subdirs}
-          neutron_star
           gtc_optimized
          )
     endif()
