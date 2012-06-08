@@ -96,6 +96,7 @@ if __name__ == '__main__':
     sys.exit(1) 
 
   tests = []
+  all_passed = True
 
   for f in files:
     tests += eval(open(f).read())
@@ -178,6 +179,8 @@ if __name__ == '__main__':
         test_passed = False
         break
 
+    all_passed = test_passed
+
     print "-", ("Passed" if test_passed else "Failed")
 
     if "always" == options.log or ("fail" == options.log and not test_passed):
@@ -204,5 +207,8 @@ if __name__ == '__main__':
           print >> f, ("#" * 80)
 
         print >> f, "" 
+
+  if not all_passed:
+    sys.exit(1)
   # }}}
 
