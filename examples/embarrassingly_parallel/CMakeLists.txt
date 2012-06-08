@@ -19,7 +19,7 @@ foreach(subdir ${subdirs})
   source_group("Source Files" FILES ${sources})
 
   set(dependencies
-#      ${HDF5_FORTRAN_LIBRARY}
+      gfortran
       distributing_factory_component)
 
   # add example executable
