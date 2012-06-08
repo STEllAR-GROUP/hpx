@@ -68,7 +68,7 @@ namespace hpx { namespace performance_counters { namespace server
         {}
 
         // components must contain a typedef for wrapping_type defining the
-        // simple_component type used to encapsulate instances of this
+        // managed_component type used to encapsulate instances of this
         // component
         typedef components::managed_component<base_performance_counter> wrapping_type;
         typedef base_performance_counter base_type_holder;
