@@ -20,25 +20,31 @@ namespace hpx { namespace components { namespace amr { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT functional_component
-      : public simple_component_base<functional_component>
     {
-    private:
-        typedef simple_component_base<functional_component> base_type;
-
     public:
         functional_component()
         {
-            if (component_invalid == base_type::get_component_type()) {
-                // first call to get_component_type, ask AGAS for a unique id
-                base_type::set_component_type(applier::get_applier().
-                    get_agas_client().get_component_id("dataflow_functional_component_type"));
-            }
+            //if (component_invalid == base_type::get_component_type()) {
+            //    // first call to get_component_type, ask AGAS for a unique id
+            //    base_type::set_component_type(applier::get_applier().
+            //        get_agas_client().get_component_id("dataflow_functional_component_type"));
+            //}
         }
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
         // component
-        typedef amr::server::functional_component wrapping_type;
+        typedef managed_component<functional_component> wrapping_type;
+        typedef functional_component base_type_holder;
+
+        static components::component_type get_component_type()
+        {
+            return components::get_component_type<wrapping_type>();
+        }
+        static void set_component_type(components::component_type t)
+        {
+            components::set_component_type<wrapping_type>(t);
+        }
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class

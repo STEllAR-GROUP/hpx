@@ -36,7 +36,7 @@ typedef hpx::components::amr::server::logging dataflow_logging_type;
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    hpx::components::simple_component<dataflow_stencil_type>,
+    hpx::components::managed_component<dataflow_stencil_type>,
     dataflow_stencil, "dataflow_functional_component_type");
 
 /// [hpx.components.had_logging]  # this must match the string below
