@@ -176,7 +176,7 @@ namespace hpx { namespace components { namespace server
         performance_counters::get_counter_type_path_elements(countername, p);
 
         // FIXME: make loop asynchronous
-        std::vector<lcos::future<naming::id_type> > lazy_counts;
+        std::vector<lcos::future<naming::id_type, naming::id_type> > lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)
         {
             std::string name;
@@ -192,7 +192,7 @@ namespace hpx { namespace components { namespace server
         // FIXME: make loop asynchronous
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(lcos::future<naming::id_type> const& f, lazy_counts)
+        BOOST_FOREACH(lcos::future<naming::id_type, naming::id_type> const& f, lazy_counts)
         {
             performance_counters::counter_value value =
                 performance_counters::stubs::performance_counter::get_value(f.get());
