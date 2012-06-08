@@ -179,7 +179,7 @@ if __name__ == '__main__':
         test_passed = False
         break
 
-    all_passed = test_passed
+    all_passed = all_passed and test_passed
 
     print "-", ("Passed" if test_passed else "Failed")
 
