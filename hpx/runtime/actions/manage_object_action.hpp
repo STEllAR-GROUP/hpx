@@ -17,6 +17,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/util/void_cast.hpp>
+#include <hpx/util/static.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -89,6 +90,8 @@ namespace hpx { namespace actions
         {
             return &manage_object_action_base::destruct_;
         }
+
+        struct tag {};
 
         virtual manage_object_action_base const& get_instance() const;
 
@@ -198,11 +201,13 @@ namespace hpx { namespace actions
         }
 
     public:
+        struct tag {};
+
         manage_object_action_base const& get_instance() const
         {
-            static manage_object_action const instance =
-                manage_object_action();
-            return instance;
+            // ensure thread-safe initialization
+            util::static_<manage_object_action, tag> instance;
+            return instance.get();
         }
 
         /// serialization support
@@ -250,9 +255,10 @@ namespace hpx { namespace actions
     inline manage_object_action_base const&
     manage_object_action_base::get_instance() const
     {
-        static manage_object_action<boost::uint8_t> const instance =
-            manage_object_action<boost::uint8_t>();
-        return instance;
+        // ensure thread-safe initialization
+        util::static_<manage_object_action<boost::uint8_t>,
+            manage_object_action_base::tag> instance;
+        return instance.get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -298,11 +304,13 @@ namespace hpx { namespace actions
         }
 
     public:
+        struct tag {};
+
         manage_object_action_base const& get_instance() const
         {
-            static manage_object_action const instance =
-                manage_object_action();
-            return instance;
+            // ensure thread-safe initialization
+            util::static_<manage_object_action, tag> instance;
+            return instance.get();
         }
 
         /// serialization support
