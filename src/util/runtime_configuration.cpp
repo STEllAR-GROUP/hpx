@@ -65,8 +65,8 @@ namespace hpx { namespace util
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_PARCEL_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "max_connections_cache_size = ${HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE) "}",
+            "max_connections = ${HPX_MAX_PARCEL_CONNECTIONS:"
+                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS) "}",
             "max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:"
                 BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY) "}",
 
@@ -304,7 +304,7 @@ namespace hpx { namespace util
         return HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY;
     }
 
-    std::size_t runtime_configuration::get_connection_cache_size() const
+    std::size_t runtime_configuration::get_max_connections() const
     {
         if (has_section("hpx.parcel"))
         {
@@ -313,12 +313,12 @@ namespace hpx { namespace util
             {
                 std::string cfg_max_connections(
                     sec->get_entry("max_connections_cache_size",
-                        HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE));
+                        HPX_MAX_PARCEL_CONNECTIONS));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
             }
         }
-        return HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE;
+        return HPX_MAX_PARCEL_CONNECTIONS;
     }
 
     agas::service_mode runtime_configuration::get_agas_service_mode() const

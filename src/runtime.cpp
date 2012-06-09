@@ -181,7 +181,7 @@ namespace hpx
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
-            ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
+            ini_.get_max_connections(), ini_.get_max_connections_per_loc()),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
             new parcelset::policies::global_parcelhandler_queue),

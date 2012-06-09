@@ -596,9 +596,34 @@ void big_boot_barrier::apply(
 ) { // {{{
     parcelset::parcel p(locality_id, addr, act);
 
-    parcelset::parcelport_connection_ptr client_connection
-        (connection_cache_.get(locality_id));
+    parcelset::parcelport_connection_ptr client_connection;
 
+    bool got_cache_space = false;
+
+    for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
+    {
+        // Get a connection or reserve space for a new connection. 
+        if (connection_cache_.get_or_reserve(locality_id, client_connection))
+        {
+            got_cache_space = true;
+            break;
+        }
+
+        // Wait for a really short amount of time (usually 100 ms).
+        boost::this_thread::sleep(boost::get_system_time() +
+            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+    } 
+
+    // If we didn't get a connection or permission to create one (which is
+    // unlikely), bail.
+    if (!got_cache_space)
+    {
+        HPX_THROW_EXCEPTION(network_error,
+            "big_boot_barrier::apply",
+            "timed out while trying to find room in the connection cache");
+    }
+
+    // Check if we need to create the new connection.
     if (!client_connection)
     {
         // The parcel gets serialized inside the connection constructor, no
@@ -641,7 +666,7 @@ void big_boot_barrier::apply(
             catch (boost::system::error_code const& e)
             {
                 HPX_THROW_EXCEPTION(network_error,
-                    "big_boot_barrier::get_connection", e.message());
+                    "big_boot_barrier::apply", e.message());
             }
         }
 

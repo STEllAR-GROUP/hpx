@@ -58,12 +58,12 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::io_service_pool& io_service_pool,
             naming::locality h
-          , std::size_t max_cache_size
+          , std::size_t max_connections
           , std::size_t max_connections_per_loc)
       : io_service_pool_(io_service_pool),
         acceptor_(NULL),
         parcels_(This()),
-        connection_cache_(max_cache_size, max_connections_per_loc),
+        connection_cache_(max_connections, max_connections_per_loc),
         here_(h)
     {}
 
@@ -187,8 +187,11 @@ namespace hpx { namespace parcelset
         const boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(p.get_destination());
 
-        parcelport_connection_ptr client_connection(
-            connection_cache_.get(locality_id));
+        parcelport_connection_ptr client_connection;
+
+        // Get a connection or reserve space for a new connection. 
+        if (!connection_cache_.get_or_reserve(locality_id, client_connection))
+            return;
 
         // enqueue the incoming parcel ...
         {
@@ -202,11 +205,11 @@ namespace hpx { namespace parcelset
                 const boost::uint32_t parcel_locality_id =
                     naming::get_locality_id_from_gid(pp.get_destination());
                 BOOST_ASSERT(parcel_locality_id == locality_id);
-                ///FIXME: addr refers to a specific component ... once more than
-                ///       one parcel is cached, this fails ...
-                ///BOOST_ASSERT(pp.get_destination_addr() == addr);
+                //FIXME: addr refers to a specific component ... once more than
+                //       one parcel is cached, this fails ...
+                //BOOST_ASSERT(pp.get_destination_addr() == addr);
                 BOOST_ASSERT(pp.get_destination_addr().locality_ == addr.locality_);
-                if(client_connection)
+                if (client_connection)
                 {
                     BOOST_ASSERT(parcel_locality_id == client_connection->destination());
                     BOOST_ASSERT(addr.locality_.get_address() ==
@@ -218,16 +221,14 @@ namespace hpx { namespace parcelset
 #endif
         }
 
+        // Check if we need to create the new connection.
         if (!client_connection)
         {
-            if (connection_cache_.full(locality_id))
-                return;
-
             client_connection.reset(new parcelport_connection(
                 io_service_pool_.get_io_service(), locality_id,
                 connection_cache_, timer_, parcels_sent_));
 
-        // connect to the target locality, retry if needed
+            // Connect to the target locality, retry if needed.
             boost::system::error_code error = boost::asio::error::try_again;
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
             {
@@ -297,7 +298,7 @@ namespace hpx { namespace parcelset
             util::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
-            if(it != pending_parcels_.end())
+            if (it != pending_parcels_.end())
             {
                 BOOST_ASSERT(it->first == locality_id);
                 std::swap(parcels, it->second.first);
@@ -305,8 +306,8 @@ namespace hpx { namespace parcelset
             }
         }
 
-        // if the parcels didn't get sent by another connection ...
-        if(!parcels.empty() && !handlers.empty())
+        // If the parcels didn't get sent by another connection ...
+        if (!parcels.empty() && !handlers.empty())
         {
 #if defined(HPX_DEBUG)
             // verify the connection points to the right destination
@@ -341,7 +342,7 @@ namespace hpx { namespace parcelset
         {
             // ... or re-add the stuff to the cache
             BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.add(locality_id, client_connection);
+            connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 
@@ -362,7 +363,7 @@ namespace hpx { namespace parcelset
             util::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
-            if(it != pending_parcels_.end())
+            if (it != pending_parcels_.end())
             {
                 std::swap(parcels, it->second.first);
                 std::swap(handlers, it->second.second);
@@ -395,7 +396,7 @@ namespace hpx { namespace parcelset
         else
         {
             BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.add(locality_id, client_connection);
+            connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 

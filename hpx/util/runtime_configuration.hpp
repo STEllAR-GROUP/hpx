@@ -58,7 +58,7 @@ namespace hpx { namespace util
 
         // Get the number of maximum concurrent connections per locality
         std::size_t get_max_connections_per_loc() const;
-        std::size_t get_connection_cache_size() const;
+        std::size_t get_max_connections() const;
 
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size() const;

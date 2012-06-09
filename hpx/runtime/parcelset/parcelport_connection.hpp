@@ -143,8 +143,12 @@ namespace hpx { namespace parcelset
             send_data_.serialization_time_ = 0;
             send_data_.num_parcels_ = 0;
 
-            // Check if connection still fits in cache
-            connection_cache_.add(there_, shared_from_this());
+            // FIXME: This seems a bit silly, don't some of our handlers try
+            // to get a connection from the cache? Why not pass the this pointer
+            // to the handler and /then/ return the connection to the cache.
+
+            // Return the connection to the cache.
+            connection_cache_.reclaim(there_, shared_from_this());
 
             // Call post-processing handler, which will send remaining pending parcels
             boost::get<1>(handler)(there_);

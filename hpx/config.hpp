@@ -95,12 +95,12 @@
 /// all other localities). This value can be changed at runtime by setting
 /// the configuration parameter:
 ///
-///   hpx.max_connections_cache_size = ...
+///   hpx.max_connections = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE).
-#if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
-#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 256
+/// HPX_MAX_PARCEL_CONNECTIONS).
+#if !defined(HPX_MAX_PARCEL_CONNECTIONS)
+#  define HPX_MAX_PARCEL_CONNECTIONS 512
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@
 /// (or by setting the corresponding environment variable
 /// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
 #if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
-#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 2
+#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
