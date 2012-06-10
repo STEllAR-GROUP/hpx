@@ -178,6 +178,12 @@ namespace hpx { namespace util
                     check_invariants();
                     return true;
                 }
+
+                // We've reached the maximum number of connections for this
+                // locality, and none of them are checked into the cache, so
+                // we have to give up.
+                check_invariants();
+                return false;
             }
 
             // Key isn't in cache. 
