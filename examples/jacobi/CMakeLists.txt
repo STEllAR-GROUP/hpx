@@ -1,5 +1,4 @@
-
-# Copyright (c) 2012      Thomas Heller
+# Copyright (c) 2012 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,9 +12,10 @@ set(jacobi_programs jacobi)
 set(jacobi_sources
     grid.cpp
     row.cpp
-)
+   )
   
-set(jacobi_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
+set(jacobi_FLAGS DEPENDENCIES
+    dataflow_component iostreams_component remote_object_component)
 
 foreach(jacobi_program ${jacobi_programs})
   set(sources
@@ -28,7 +28,7 @@ foreach(jacobi_program ${jacobi_programs})
                      MODULE jacobi
                      SOURCES ${sources}
                      ${${jacobi_program}_FLAGS}
-                     FOLDER "Examples/BrightFuture")
+                     FOLDER "Examples/Jacobi")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.jacobi.${jacobi_program})
