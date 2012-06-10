@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace server
     // component to hold a pointer to an object, ability to apply arbitrary
     // functions objects on that pointer.
     class HPX_COMPONENT_EXPORT remote_object
-        : public simple_component_base<remote_object>
+        : public managed_component_base<remote_object>
     {
     public:
         remote_object()
