@@ -355,11 +355,9 @@ int hpx_main(variables_map & vm)
         double time_elapsed = t.elapsed();
         cout << nx << "x" << ny << " "
              << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
-
-        finalize();
     }
 
-    return 0;
+    return finalize();
 }
 
 int main(int argc, char **argv)
