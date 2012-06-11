@@ -272,7 +272,7 @@ namespace hpx { namespace util
         }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(function)
+        BOOST_COPYABLE_AND_MOVABLE(function_nonser)
     };
 }}
 

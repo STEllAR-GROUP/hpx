@@ -193,6 +193,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type BOOST_PP_CAT(create_one_component_, N)(                \
             components::component_type type, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
         {                                                                       \
+            component_map_mutex_type::scoped_lock l(cm_mtx_);                   \
             component_map_type::const_iterator it = components_.find(type);     \
             if (it == components_.end()) {                                      \
                 hpx::util::osstream strm;                                       \
@@ -217,9 +218,14 @@ namespace hpx { namespace components { namespace server
                 return naming::invalid_gid;                                     \
             }                                                                   \
                                                                                 \
-            naming::gid_type id = server::create_one_functor<Component>(        \
-                (*it).second.first.get(),                                       \
-                BOOST_PP_ENUM(N, HPX_TO_MOVE_OR_NOT_ARGS, _));                  \
+            naming::gid_type id;                                                \
+            boost::shared_ptr<component_factory_base> factory((*it).second.first);\
+            {                                                                   \
+                util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);\
+                id = server::create_one_functor<Component>(                     \
+                    factory.get(),                                              \
+                    BOOST_PP_ENUM(N, HPX_TO_MOVE_OR_NOT_ARGS, _));              \
+            }                                                                   \
             LRT_(info) << "successfully created component " << id               \
                        << " of type: "                                          \
                        << components::get_component_type_name(type);            \

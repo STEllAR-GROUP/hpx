@@ -114,7 +114,7 @@ namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        void put_parcel(parcel& p, write_handler_type f)
+        void put_parcel(parcel const & p, write_handler_type f)
         {
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
