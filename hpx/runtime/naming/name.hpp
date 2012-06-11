@@ -576,7 +576,9 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////
-    //  Handle conversion to/from locality_id
+    // Handle conversion to/from locality_id
+    // FIXME: these names are confusing, 'id' appears in identifiers far too
+    // frequently.
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
 
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
