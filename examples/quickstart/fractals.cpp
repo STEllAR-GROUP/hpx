@@ -18,8 +18,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#include "EasyBMP/EasyBMP.h"
-
+#include <external/EasyBMP/EasyBMP.h>
+#include <external/EasyBMP/EasyBMP.cpp>
 
 const int sizeY = 256;
 const int sizeX = sizeY;
