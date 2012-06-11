@@ -63,7 +63,7 @@ struct plus
 
     plus(plus const & p) : i(p.i) { ++cctor_counter; }
 
-    int operator()(foo const & f) const
+    int operator()(foo & f) const
     {
         return i + f.i;
     }
@@ -105,7 +105,7 @@ int hpx_main(variables_map &)
         {
             hpx::lcos::wait(o <= output());
             cctor_counter = 0;
-            hpx::util::function<int(foo const &)> f = plus(9);
+            hpx::util::function<int(foo &)> f = plus(9);
             hpx::cout << (o <= f).get() << "\n" << hpx::flush;
             hpx::cout << cctor_counter << "\n" << hpx::flush;
         }
