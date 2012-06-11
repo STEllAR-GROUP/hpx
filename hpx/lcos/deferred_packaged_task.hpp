@@ -11,7 +11,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -100,9 +100,9 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(ec);
         }
 
-        void invalidate(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
-            (*this->impl_)->set_error(e); // set the received error
+            (*this->impl_)->set_exception(e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -113,7 +113,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid)
         {
             util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid);
+            hpx::apply_c<Action>(this->get_gid(), gid);
         }
 
     private:
@@ -150,8 +150,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -189,7 +189,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, Arg0 const& arg0)
         {
             util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::apply_c<Action>(this->get_gid(), gid, arg0);
         }
 
     private:
@@ -222,8 +222,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -301,9 +301,9 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(ec);
         }
 
-        void invalidate(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
-            (*this->impl_)->set_error(e); // set the received error
+            (*this->impl_)->set_exception(e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -322,11 +322,12 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    Action::execute_function(addr.address_));
+                    Action::execute_function(addr.address_,
+                        util::make_argument_pack()));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
+                hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid);
             }
         }
 
@@ -355,8 +356,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -402,11 +403,12 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    Action::execute_function(addr.address_, arg0));
+                    Action::execute_function(addr.address_, 
+                        util::make_argument_pack(boost::forward<Arg0>(arg0))));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+                hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid, arg0);
             }
         }
 
@@ -441,8 +443,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).

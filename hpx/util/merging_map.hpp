@@ -47,11 +47,11 @@ struct mapping
         typename T
     >
     mapping(
-        key_type const& key
-      , BOOST_FWD_REF(T) data
+        key_type const& k
+      , BOOST_FWD_REF(T) d
         )
-      : key_(key)
-      , data_(boost::forward<T>(data))
+      : key_(k)
+      , data_(boost::forward<T>(d))
     {}
 
     template <
@@ -60,10 +60,10 @@ struct mapping
     mapping(
         Key const& lower
       , Key const& upper
-      , BOOST_FWD_REF(T) data
+      , BOOST_FWD_REF(T) d
         )
       : key_(lower, upper) 
-      , data_(boost::forward<T>(data))
+      , data_(boost::forward<T>(d))
     {}
 
     friend bool operator<(
@@ -82,7 +82,7 @@ struct mapping
       , mapping const& b
         )
     {
-        key_type const a_(a, a);
+        key_type const a_(a);
         return boost::icl::exclusive_less(a_, b.key_);
     }
 
@@ -94,7 +94,7 @@ struct mapping
       , T const& b
         )
     {
-        key_type const b_(b, b);
+        key_type const b_(b);
         return boost::icl::exclusive_less(a.key_, b_);
     }
 
@@ -890,10 +890,10 @@ struct merging_map : boost::noncopyable
         merge(map_.insert(*node).first); 
 
         typename std::list<value_type*>::iterator it = save_list.begin()
-                                                , end = save_list.end();
+                                                , e = save_list.end();
 
         // Now, bind the saved entries, placing them "on top" of the baseline.
-        for (; it != end; ++it)
+        for (; it != e; ++it)
             bind(*it);
     } // }}}
 

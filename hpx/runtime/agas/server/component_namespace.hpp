@@ -48,7 +48,7 @@ struct HPX_EXPORT component_namespace :
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 
-    typedef boost::int32_t component_id_type;
+    typedef components::component_type component_id_type;
 
     typedef std::set<boost::uint32_t> prefixes_type;
 
@@ -161,11 +161,11 @@ struct HPX_EXPORT component_namespace :
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::component_namespace::service_action,
-    component_namespace_service_action);
+    component_namespace_service_action)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::component_namespace::bulk_service_action,
-    component_namespace_bulk_service_action);
+    component_namespace_bulk_service_action)
 
 #endif // HPX_A16135FC_AA32_444F_BB46_549AD456A661
 

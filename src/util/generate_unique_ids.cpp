@@ -48,8 +48,8 @@ namespace hpx { namespace util
 
     naming::gid_type unique_ids::get_id(
         naming::locality const& here
-      , naming::resolver_client& resolver
-    ) {
+      , naming::resolver_client& resolver)
+    {
         mutex_type::scoped_lock al(allocation_mtx);
 
         const std::size_t leap_at = step / leapfrog;

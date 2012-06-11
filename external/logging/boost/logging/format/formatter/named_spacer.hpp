@@ -95,7 +95,7 @@ namespace detail {
 
         template<class msg_type> void write(msg_type & msg) const {
             // see type of convert
-            write_with_convert( msg, (convert_type*)0 );
+            write_with_convert( msg, 0 );
         }
 
     private:
@@ -126,7 +126,7 @@ namespace detail {
             while ( true) {
                 size_type found = escaped.find( BOOST_LOG_STR("%%"), idx_start );
                 if ( found != string_type::npos) {
-                    escaped.erase( escaped.begin() + found);
+                    escaped.erase( escaped.begin() + static_cast<typename string_type::difference_type>(found));
                     ++idx_start;
                 }
                 else

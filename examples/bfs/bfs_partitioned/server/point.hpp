@@ -52,7 +52,7 @@ namespace bfs { namespace server
         std::vector<std::size_t> const& neighborlist,
         boost::numeric::ublas::mapped_vector<std::size_t> const& index,std::size_t max_levels);
 
-        /// Traverse the graph. 
+        /// Traverse the graph.
         std::vector<std::size_t> traverse(std::size_t level, std::size_t parent,std::size_t edge);
         std::vector<nodedata> depth_traverse(std::size_t level,std::size_t parent,std::size_t edge);
         std::vector<nodedata> unlocked_depth_traverse(std::size_t level,std::size_t parent,std::size_t edge);
@@ -205,9 +205,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     get_value_action_vector_size_t);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<std::size_t>>::set_result_action,
-    set_result_action_vector_size_t);
-
+    hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_value_action,
+    set_value_action_vector_size_t);
 
 #endif
 

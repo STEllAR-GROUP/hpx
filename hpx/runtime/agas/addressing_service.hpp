@@ -27,7 +27,7 @@
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
@@ -156,7 +156,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
-    typedef boost::lockfree::fifo<lcos::promise<response>*> promise_pool_type;
+    typedef boost::lockfree::fifo<
+        lcos::packaged_action<server::primary_namespace::service_action>*
+    > promise_pool_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
@@ -247,9 +249,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
-    naming::gid_type const& local_locality() const
+    naming::gid_type const& local_locality(error_code& ec = throws) const
     {
-        BOOST_ASSERT(locality_ != naming::invalid_gid);
+        if (locality_ == naming::invalid_gid) {
+            HPX_THROWS_IF(ec, invalid_status,
+                "addressing_service::local_locality",
+                "local locality has not been initialized (yet)");
+        }
         return locality_;
     }
 

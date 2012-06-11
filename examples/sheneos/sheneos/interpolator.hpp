@@ -101,8 +101,7 @@ namespace sheneos
         /// the proper partitions for the actual interpolation using bulk
         /// operations.
         hpx::lcos::future<std::vector<double> >
-        interpolate_one_bulk_async(std::vector<double> const& ye,
-            std::vector<double> const& temp, std::vector<double> const& rho,
+        interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalue) const;
 
         /// Synchronously interpolate the function value for all the given ye,
@@ -110,11 +109,10 @@ namespace sheneos
         /// the proper partition for the actual interpolation using bulk
         /// operations.
         std::vector<double>
-        interpolate_one_bulk(std::vector<double> const& ye,
-            std::vector<double> const temp, std::vector<double> const& rho,
+        interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalue) const
         {
-            return interpolate_one_bulk_async(ye, temp, rho, eosvalue).get();
+            return interpolate_one_bulk_async(coords, eosvalue).get();
         }
 
         /// Asynchronously interpolate the function values for all the given ye,
@@ -122,8 +120,7 @@ namespace sheneos
         /// the proper partition for the actual interpolation using bulk
         /// operations.
         hpx::lcos::future<std::vector<std::vector<double> > >
-        interpolate_bulk_async(std::vector<double> const& ye,
-            std::vector<double> const& temp, std::vector<double> const& rho,
+        interpolate_bulk_async(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalues = server::partition3d::small_api_values) const;
 
         /// Synchronously interpolate the function values for all the given ye,
@@ -131,11 +128,10 @@ namespace sheneos
         /// the proper partition for the actual interpolation using bulk
         /// operations.
         std::vector<std::vector<double> >
-        interpolate_bulk(std::vector<double> const& ye,
-            std::vector<double> const temp, std::vector<double> const& rho,
+        interpolate_bulk(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalues = server::partition3d::small_api_values) const
         {
-            return interpolate_bulk_async(ye, temp, rho, eosvalues).get();
+            return interpolate_bulk_async(coords, eosvalues).get();
         }
 
         /// Find the minimum and maximum values of the given dimension.
@@ -143,8 +139,12 @@ namespace sheneos
 
     private:
         /// Find the GID of the partition that contains the specified value.
-        hpx::naming::id_type const&
-            get_gid(double ye, double temp, double rho) const;
+        hpx::naming::id_type const& get_gid(double ye, double temp, double rho) const;
+
+        hpx::naming::id_type const& get_gid(sheneos_coord const& c) const
+        {
+            return get_gid(c.ye_, c.temp_, c.rho_);
+        }
 
         typedef hpx::components::distributing_factory distributing_factory;
         typedef distributing_factory::async_create_result_type

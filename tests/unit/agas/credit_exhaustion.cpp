@@ -8,7 +8,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -39,7 +39,7 @@ using hpx::agas::garbage_collect;
 
 using hpx::actions::plain_action3;
 
-using hpx::lcos::async;
+using hpx::async;
 
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
@@ -185,7 +185,7 @@ int main(
         , "number of milliseconds to wait for object destruction")
         ;
 
-    // we need to explicitly enable the test components used by this test
+    // We need to explicitly enable the test components used by this test.
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.components.simple_refcnt_checker.enabled = 1";

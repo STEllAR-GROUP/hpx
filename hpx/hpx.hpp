@@ -13,6 +13,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/include/util.hpp>
 
 #endif
 

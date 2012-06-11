@@ -46,7 +46,7 @@ using hpx::naming::get_locality_id_from_gid;
 
 using hpx::lcos::future;
 using hpx::lcos::promise;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::base_lco;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ int monitor(std::string const& name, boost::uint64_t pause)
         }
 
         // Schedule a wakeup.
-        hpx::threads::suspend(milliseconds(pause));
+        hpx::this_thread::suspend(milliseconds(pause));
     }
 
     hpx::agas::unregister_name(stop_flag_name, stop_id);

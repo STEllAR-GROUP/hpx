@@ -638,7 +638,7 @@ namespace boost { namespace cache
 
                     // remove the cache entry
                     store_.erase(sit);
-                    num_free -= (long)entry_size;
+                    num_free -= static_cast<long>(entry_size);
                     current_size_ -= entry_size;
 
                     // update statistics

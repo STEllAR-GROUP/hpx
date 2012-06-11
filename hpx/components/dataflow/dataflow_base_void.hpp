@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #include <hpx/components/dataflow/dataflow_base_fwd.hpp>
 #include <hpx/components/dataflow/dataflow_base_impl.hpp>
 #include <hpx/components/dataflow/stubs/dataflow.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -17,56 +18,35 @@ namespace hpx { namespace lcos
     {
         typedef traits::promise_remote_result<void>::type remote_result_type;
         typedef void result_type;
-        typedef
-            components::client_base<
-                dataflow_base<void>
-              , stubs::dataflow
-            >
-            base_type;
-
-        typedef stubs::dataflow stub_type;
 
         dataflow_base()
         {}
 
-        virtual ~dataflow_base()
-        {}
-
-        dataflow_base(future<naming::id_type> const & promise)
+        dataflow_base(future<naming::id_type, naming::gid_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
+
+        void connect(naming::id_type const & id) const
+        {
+            impl->connect(id);
+        }
 
         future<void> get_future() const
         {
             promise<void> p;
-            connect(p.get_gid());
+            impl->connect(p.get_gid());
             return p.get_future();
         }
 
-//         void get() const
-//         {
-//             get_future().get();
-//         }
-
-        void invalidate()
+        bool valid()
         {
-            impl->invalidate();
+            return impl && impl->get_gid();
         }
-
-        naming::id_type get_gid() const
-        {
-            return impl->get_gid();
-        }
-
-        void connect(naming::id_type const & target) const
-        {
-            stub_type::connect(impl->get_gid(), target);
-        }
-
-        boost::shared_ptr<detail::dataflow_base_impl> impl;
 
     private:
         friend class boost::serialization::access;
+
+        boost::shared_ptr<detail::dataflow_base_impl> impl;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

@@ -4,6 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    bind_action
     function
     merging_map
    )
@@ -21,6 +22,8 @@ foreach(test ${tests})
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/Util/")
+
+  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.util.${test})

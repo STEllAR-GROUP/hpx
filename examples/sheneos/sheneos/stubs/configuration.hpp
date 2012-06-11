@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/configuration.hpp"
@@ -27,7 +27,7 @@ namespace sheneos { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
             typedef sheneos::server::configuration::init_action action_type;
-            return hpx::lcos::async<action_type>(
+            return hpx::async<action_type>(
                 gid, datafile, symbolic_name, num_instances);
         }
 
@@ -45,7 +45,7 @@ namespace sheneos { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
             typedef sheneos::server::configuration::get_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static config_data get(hpx::naming::id_type const& gid)

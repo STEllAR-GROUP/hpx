@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file plain_component_factory.hpp
+
 #if !defined(HPX_PLAIN_COMPONENT_FACTORY_JUN_18_2010_1100AM)
 #define HPX_PLAIN_COMPONENT_FACTORY_JUN_18_2010_1100AM
 
@@ -24,6 +26,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plain_component_factory provides a minimal implementation of a
     /// component's factory usable for plain_actions.
@@ -60,7 +64,7 @@ namespace hpx { namespace components
         /// \brief Return the unique identifier of the component type this
         ///        factory is responsible for
         ///
-        /// \param prefix       [in] The prefix of the locality this factory
+        /// \param locality     [in] The id of the locality this factory
         ///                     is responsible for.
         /// \param agas_client  [in] The AGAS client to use for component id
         ///                     registration (if needed).
@@ -68,22 +72,30 @@ namespace hpx { namespace components
         /// \return Returns the unique identifier of the component type this
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        component_type get_component_type(naming::gid_type const& prefix,
+        component_type get_component_type(naming::gid_type const& locality,
             naming::resolver_client& agas_client)
         {
             typedef server::plain_function<Action> type_holder;
             if (component_invalid == components::get_component_type<type_holder>())
             {
-                // first call to get_component_type, ask AGAS for a unique id
+                // First call to get_component_type, ask AGAS for a unique id.
                 if (isenabled_) {
-                    components::set_component_type<type_holder>(
-                        (component_type) agas_client.register_factory(prefix,
-                            unique_component_name<plain_component_factory>::call()));
+                    component_type const ctype =
+                        agas_client.register_factory(locality, get_component_name());
+
+                    if (component_invalid == ctype)
+                        HPX_THROW_EXCEPTION(duplicate_component_id,
+                            "component_factory::get_component_type",
+                            "the component name " + get_component_name() +
+                            " is already in use");
+
+                    components::set_component_type<type_holder>(ctype);
                 }
                 else {
-                    components::set_component_type<type_holder>(
-                        (component_type) agas_client.get_component_id(
-                            unique_component_name<plain_component_factory>::call()));
+                    component_type const ctype =
+                        agas_client.get_component_id(get_component_name());
+
+                    components::set_component_type<type_holder>(ctype);
                 }
             }
             return components::get_component_type<type_holder>();
@@ -120,7 +132,7 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::gid_type create (std::size_t count)
+        naming::gid_type create (std::size_t /*count*/)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "plain_component_factory::create",
@@ -157,54 +169,57 @@ namespace hpx { namespace components
         ///
         /// \param gid    [in] The gid of the first component instance to
         ///               destroy.
-        void destroy(naming::gid_type const& gid)
+        void destroy(naming::gid_type const& /*gid*/)
         {
         }
 
-        /// \brief Ask whether this factory can be unloaded
+        /// \brief Ask how many instances are alive of the type this factory is
+        ///        responsible for
         ///
-        /// \return Returns whether it is safe to unload this factory and
-        ///         the shared library implementing this factory. This
-        ///         function will return 'true' whenever no more outstanding
-        ///         instances of the managed object type are alive.
-        bool may_unload() const
+        /// \return Returns the number of instances of the managed object type
+        ///         which are currently alive.
+        long instance_count() const
         {
-            return false;   // will never unload
+            return 1;   // there is always exactly one instance
         }
 
     protected:
         bool isenabled_;
     };
+
+    /// \endcond
 }}
 
+/// \cond NOINTERNAL
+
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_PLAIN_ACTION is used create and to
-/// register a minimal factory for plain actions with Boost.Plugin.
+// This macro is used to create and to register a minimal factory for plain
+// actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
-        enable_always)                                                        \
-    BOOST_CLASS_EXPORT_KEY2(plain_action, BOOST_PP_STRINGIZE(plain_action_name))\
-    HPX_REGISTER_ACTION_EX(plain_action, plain_action_name);                  \
+        state)                                                                \
+    BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<plain_action>,      \
+        BOOST_PP_STRINGIZE(plain_action_name))                                \
+    HPX_REGISTER_ACTION_EX(plain_action, plain_action_name)                   \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \
-        plain_action_name);                                                   \
+        plain_action_name)                                                    \
     HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
         hpx::components::plain_component_factory<plain_action>,               \
-        plain_action_name);                                                   \
+        plain_action_name)                                                    \
     template struct hpx::components::plain_component_factory<plain_action>;   \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                               \
         hpx::components::server::plain_function<plain_action>,                \
-        plain_action_name, enable_always);                                    \
+        plain_action_name, state)                                             \
     HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
         hpx::components::server::plain_function<plain_action>)                \
     /**/
 
-#define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action, false)          \
+#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
+    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,            \
+        ::hpx::components::factory_check)                                     \
     /**/
 
-#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name, false)     \
-    /**/
+/// \endcond
 
 #endif
 

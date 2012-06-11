@@ -58,9 +58,9 @@ namespace hpx { namespace components
         {
             // store the configuration settings
             if (NULL != global)
-                global_settings_ = global->clone();
+                global_settings_ = *global;
             if (NULL != local)
-                local_settings_ = local->clone();
+                local_settings_ = *local;
         }
 
         ///
@@ -69,7 +69,7 @@ namespace hpx { namespace components
         /// \brief Return the unique identifier of the component type this
         ///        factory is responsible for
         ///
-        /// \param prefix       [in] The prefix of the locality this factory
+        /// \param locality     [in] The id of the locality this factory
         ///                     is responsible for.
         /// \param agas_client  [in] The AGAS client to use for component id
         ///                     registration (if needed).
@@ -77,22 +77,31 @@ namespace hpx { namespace components
         /// \return Returns the unique identifier of the component type this
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        component_type get_component_type(naming::gid_type const& prefix,
+        component_type get_component_type(naming::gid_type const& locality,
             naming::resolver_client& agas_client)
         {
             typedef typename Component::type_holder type_holder;
             if (component_invalid == components::get_component_type<type_holder>())
             {
-                // first call to get_component_type, ask AGAS for a unique id
+                // First call to get_component_type, ask AGAS for a unique id.
                 if (isenabled_) {
-                    components::set_component_type<type_holder>(
-                        (component_type) agas_client.register_factory(prefix,
-                            unique_component_name<generic_component_factory>::call()));
+                    component_type const ctype =
+                        agas_client.register_factory(locality, get_component_name());
+
+                    if (component_invalid == ctype) {
+                        HPX_THROW_EXCEPTION(duplicate_component_id,
+                            "component_factory::get_component_type",
+                            "the component name " + get_component_name() +
+                            " is already in use");
+                    }
+
+                    components::set_component_type<type_holder>(ctype);
                 }
                 else {
-                    components::set_component_type<type_holder>(
-                        (component_type) agas_client.get_component_id(
-                            unique_component_name<generic_component_factory>::call()));
+                    component_type const ctype =
+                        agas_client.get_component_id(get_component_name());
+
+                    components::set_component_type<type_holder>(ctype);
                 }
             }
             return components::get_component_type<type_holder>();
@@ -199,15 +208,14 @@ namespace hpx { namespace components
             --refcnt_;
         }
 
-        /// \brief Ask whether this factory can be unloaded
+        /// \brief Ask how many instances are alive of the type this factory is
+        ///        responsible for
         ///
-        /// \return Returns whether it is safe to unload this factory and
-        ///         the shared library implementing this factory. This
-        ///         function will return 'true' whenever no more outstanding
-        ///         instances of the managed object type are alive.
-        bool may_unload() const
+        /// \return Returns the number of instances of the managed object type
+        ///         which are currently alive.
+        long instance_count() const
         {
-            return refcnt_ == 0;
+            return refcnt_;
         }
 
     protected:
@@ -221,14 +229,13 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to
-/// register a minimal component factory with Boost.Plugin. This macro may be
-/// used if the registered component factory is the only factory to be exposed
-/// from a particular module. If more than one factories need to be exposed
-/// the \a HPX_REGISTER_COMPONENT_FACTORY and \a HPX_REGISTER_COMPONENT_MODULE
-/// macros should be used instead.
+/// This macro is used create and to register a minimal component factory with
+/// Boost.Plugin. This macro may be used if the registered component factory is
+/// the only factory to be exposed from a particular module. If more than one
+/// factory needs to be exposed the \a HPX_REGISTER_COMPONENT_FACTORY and
+/// \a HPX_REGISTER_COMPONENT_MODULE macros should be used instead.
 #define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
-            ComponentType, componentname, enable_always)                      \
+            ComponentType, componentname, state)                              \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::generic_component_factory<ComponentType>,        \
             componentname);                                                   \
@@ -237,12 +244,14 @@ namespace hpx { namespace components
             componentname)                                                    \
         template struct hpx::components::generic_component_factory<ComponentType>;\
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, enable_always)                      \
+            ComponentType, componentname, state)                              \
     /**/
 
 #define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(ComponentType, componentname) \
         HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
-            ComponentType, componentname, false)                              \
+            ComponentType, componentname, ::hpx::components::factory_check)   \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
     /**/
 
 #endif
+

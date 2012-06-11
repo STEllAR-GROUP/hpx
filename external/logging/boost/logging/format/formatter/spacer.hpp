@@ -51,7 +51,7 @@ namespace detail {
 
     // note: pass original_formatter here - so that original_formatter::operator() gets called, not the spacer_t's operator()
     template<class original_formatter, class convert, class msg_type, class string_type> inline void spacer_write(msg_type & msg, const original_formatter & fmt, const string_type & prefix, const string_type & suffix) {
-        spacer_write_with_convert(msg, fmt, prefix, suffix, (const convert*)0);
+        spacer_write_with_convert(msg, fmt, prefix, suffix, 0);
     }
 }
 

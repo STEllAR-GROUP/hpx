@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -22,8 +22,10 @@ typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cerr>
     create_cerr_action;
 
-HPX_REGISTER_PLAIN_ACTION_EX2(create_cout_action, create_cout_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(create_cerr_action, create_cerr_action, true);
+HPX_REGISTER_PLAIN_ACTION_EX2
+    (create_cout_action, create_cout_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2
+    (create_cerr_action, create_cerr_action, hpx::components::factory_enabled)
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO: Use startup/shutdown functions to properly create hpx::cout and
@@ -88,7 +90,7 @@ namespace hpx { namespace iostreams
                             "stream_raii::stream_raii", "couldn't contact console");
                     }
 
-                    lcos::async<create_cout_action>(console).get();
+                    hpx::async<create_cout_action>(console).get();
 
                     // Try again
                     bool r = agas::resolve_name(cout_name, gid, ec);

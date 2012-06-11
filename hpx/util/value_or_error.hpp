@@ -184,7 +184,6 @@ namespace hpx { namespace util
             return *this;
         }
 
-
         value_or_error& operator=(error_type const& e)
         {
             if (stores_value()) {
@@ -355,7 +354,7 @@ namespace hpx { namespace util
         storage_type data_;         // protected data
         bool has_value_;            // true if T, false if error
 
-        BOOST_COPYABLE_AND_MOVABLE(value_or_error);
+        BOOST_COPYABLE_AND_MOVABLE(value_or_error)
     };
 }}
 

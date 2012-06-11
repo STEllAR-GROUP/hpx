@@ -36,7 +36,7 @@ namespace hpx { namespace components
 
         /// \brief Return any startup function for this component
         ///
-        /// \param shutdown [in, out] The module is expected to fill this
+        /// \param shutdown  [in, out] The module is expected to fill this
         ///                 function object with a reference to a startup
         ///                 function. This function will be executed by the
         ///                 runtime system during system startup.
@@ -48,22 +48,21 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_COMPONENT_REGISTRY is used to register the given
-/// component factory with Boost.Plugin. This macro has to be used for each of
-/// the components.
+/// This macro is used to register the given component factory with
+/// Boost.Plugin. This macro has to be used for each of the components.
 #define HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(RegistryType, componentname)   \
         BOOST_PLUGIN_EXPORT(HPX_COMPONENT_LIB_NAME,                           \
             hpx::components::component_startup_shutdown_base, RegistryType,   \
             componentname, HPX_MANGLE_COMPONENT_NAME(startup_shutdown))       \
     /**/
 
-/// The macro \a HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS is used to define the
-/// required Boost.Plugin entry point for the startup/shutdown registry. This
-/// macro has to be used in not more than one compilation unit of a component
-/// module.
+/// This macro is used to define the required Boost.Plugin entry point for the
+/// startup/shutdown registry. This macro has to be used in not more than one
+/// compilation unit of a component module.
 #define HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                             \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(startup_shutdown));                     \
+            HPX_MANGLE_COMPONENT_NAME(startup_shutdown))                      \
     /**/
 
 #endif
+

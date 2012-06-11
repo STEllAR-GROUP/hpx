@@ -20,7 +20,7 @@ namespace hpx { namespace performance_counters { namespace server
     // given base time interval. The counter relies on querying a steadily
     // growing counter value.
     template <typename Statistic>
-    class HPX_EXPORT aggregating_counter
+    class aggregating_counter
       : public base_performance_counter,
         public components::managed_component_base<
             aggregating_counter<Statistic> >
@@ -38,7 +38,7 @@ namespace hpx { namespace performance_counters { namespace server
         aggregating_counter() {}
         aggregating_counter(counter_info const& info,
             std::string const& base_counter_name,
-            std::size_t base_time_interval);
+            boost::int64_t base_time_interval);
 
         /// Overloads from the base_counter base class.
         void get_counter_value(counter_value& value);

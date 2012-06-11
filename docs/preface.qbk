@@ -16,7 +16,7 @@ ParalleX group was developing a new and experimental execution model for future
 high performance computing architectures called ParalleX.  The first
 implementations were crude at best, and we had to dismiss those designs
 entirely. However, over time we learned quite a bit about how to design a
-parallel runtime system which implements the ideas of ParalleX.
+parallel distributed runtime system which implements the ideas of ParalleX.
 
 Our goal is to create a high quality, freely available, open source
 implementation of the ParalleX model for conventional systems, such as
@@ -26,12 +26,14 @@ runtime system architecture which would allow us to port our
 implementation onto new computer system architectures. We want to use real
 world applications to drive the development of the runtime system, coining out
 required functionalities and converging onto an stable API which will provide a
-smooth migration path for developers.
+smooth migration path for developers. The API exposed by HPX is modelled after
+the interfaces defined by the C++11 ISO standard and adhers to the programming
+guidelines used by the __boost__ collection of C++ libraries.
 
 From the very beginning, this endeavour has been a group effort. In addition to
-a handful of interested researchers, there have always been undergraduate and
-graduate students participating in the discussions, design, and implementation
-of HPX. In 2011 we decide to formalize our collective research efforts by
+a handful of interested researchers, there have always been graduate and
+undergraduate students participating in the discussions, design, and implementation
+of HPX. In 2011 we decided to formalize our collective research efforts by
 creating the __stellar__ group. __stellar__ stands for [*S]ystems
 [*T]echnologies, [*E]mergent Para[*ll]elism, and [*A]lgorithms [*R]esearch,
 which describes the three main focal points we center our work around.
@@ -78,7 +80,7 @@ functions and classes throughout the manual:
 
     [[`foo`]            [The class foo]]
 
-    [[`foo<>`]          [The template class foo]]
+    [[`foo<>`]          [The class template foo]]
 ]
 
 [heading Support]

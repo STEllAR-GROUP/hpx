@@ -154,7 +154,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<graph500::point> points;
 
         // Populate the client vectors.
-        init(hpx::components::server::locality_results(blocks), points);
+        init(hpx::util::locality_results(blocks), points);
 
         // Get the gids of each component
         std::vector<hpx::naming::id_type> point_components;
@@ -238,7 +238,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         if ( hasedgeroot ) {
           std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
           for (int64_t j=1;j<= nglobalverts;j++) {
-            whohasthisedge_phase.push_back(hpx::lcos::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
+            whohasthisedge_phase.push_back(hpx::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
           }
           // put a callback here instead of search_vector
           hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
@@ -266,7 +266,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         kernel2_time.resize(bfs_roots.size());
 
         hpx::util::high_resolution_timer kernel2time;
-#if 0
         {
           std::vector<hpx::lcos::future<void> > bfs_phase;
           for (std::size_t i=0;i<num_pe;i++) {
@@ -276,12 +275,11 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
         {
           std::vector<hpx::lcos::future<void> > resolve_conflict_phase;
-          for (std::size_t i=0;i<num_pe;i++) {
+          for (std::size_t i=0;i<number_partitions;i++) {
             resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
           }
           hpx::lcos::wait(resolve_conflict_phase);
         }
-#endif
 
         double k2time = kernel2time.elapsed();
 
@@ -421,7 +419,7 @@ int main(int argc, char* argv[])
             "overlap factor for additive Schwarz")
         ("schwarzdomains", value<std::size_t>()->default_value(30),
             "number of additive Schwarz domains")
-        ("hasedgeroot", value<bool>()->default_value(false),
+        ("hasedgeroot", value<bool>()->default_value(true),
             "determine the resolve conflict communication from the root node");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.

@@ -28,8 +28,9 @@ namespace hpx { namespace components
         if (!fail_msg.empty())
             fail_msg = "Logging failed due to: " + fail_msg + "\n";
 
-        BOOST_FOREACH(message_type const& msg, msgs)
+        for (std::size_t i = 0; i != msgs.size(); ++i)
         {
+            message_type const& msg = msgs[i];
             switch (at_c<0>(msg)) {
             default:
             case destination_hpx:
@@ -71,7 +72,7 @@ namespace hpx { namespace components
         }
 
         try {
-            applier::apply<server::console_logging_action<> >(prefix, msgs);
+            hpx::apply<server::console_logging_action<> >(prefix, msgs);
         }
         catch (hpx::exception const& e) {
             // if this is not the console locality (or any other error occurs)

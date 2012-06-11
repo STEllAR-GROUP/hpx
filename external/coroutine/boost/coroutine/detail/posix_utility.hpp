@@ -57,6 +57,13 @@
 namespace boost { namespace coroutines { namespace detail { namespace posix {
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-pedantic"
+#endif
 
   inline
   void *
@@ -80,17 +87,17 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     BOOST_ASSERT(size > EXEC_PAGESIZE);
 
     // Fill the bottom 8 bytes of the first page with 1s.
-    void** watermark = (void**) stack + ((size - EXEC_PAGESIZE) / sizeof(void*));
-    *watermark = (void*) ~0;
+    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
+    *watermark = reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull);
   }
 
   inline
   bool reset_stack(void* stack, std::size_t size) {
-    void** watermark = (void**) stack + ((size - EXEC_PAGESIZE) / sizeof(void*));
+    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
 
     // If the watermark has been overwritten, then we've gone past the first
     // page.
-    if(((void*) ~0) != *watermark)
+    if((reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull)) != *watermark)
     {
       // We never free up the first page, as it's initialized only when the
       // stack is created.
@@ -106,6 +113,11 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     ::munmap(stack, size);
   }
 
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
 #else  // non-mmap()
 
   //this should be a fine default.

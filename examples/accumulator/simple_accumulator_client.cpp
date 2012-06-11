@@ -23,7 +23,7 @@ void ignore_whitespace(std::istream& is)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     {
         // Create an accumulator component on this locality.
@@ -56,7 +56,7 @@ int hpx_main(boost::program_options::variables_map&)
                 else if (cmd[0] == "add")
                 {
                     if (cmd.size() != 2)
-                        std::cout << "error: invalid command '" 
+                        std::cout << "error: invalid command '"
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
@@ -73,8 +73,8 @@ int hpx_main(boost::program_options::variables_map&)
                 else if (cmd[0] == "quit")
                     break;
 
-                else 
-                    std::cout << "error: invalid command '" 
+                else
+                    std::cout << "error: invalid command '"
                               << line << "'" << std::endl
                               << help << std::endl;
             }
@@ -92,11 +92,7 @@ int hpx_main(boost::program_options::variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);
 }
 

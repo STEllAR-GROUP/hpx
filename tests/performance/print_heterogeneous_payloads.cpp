@@ -47,7 +47,7 @@ boost::uint64_t shuffler(
 
 ///////////////////////////////////////////////////////////////////////////////
 int app_main(
-    variables_map& vm
+    variables_map&
     )
 {
     ///////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ int app_main(
         throw std::logic_error("incorrect number of tasks generated");
 
     boost::uint64_t const payloads_sum =
-        std::accumulate(payloads.begin(), payloads.end(), 0LLU);
+        std::accumulate(payloads.begin(), payloads.end(), 0ULL);
     if (payloads_sum != total_delay)
         throw std::logic_error("incorrect total delay generated");
 

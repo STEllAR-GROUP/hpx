@@ -25,9 +25,12 @@
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
-
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+
+#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#if defined(HPX_HAVE_STACKTRACES)
+#include <boost/backtrace.hpp>
+#endif
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
 #include <io.h>
@@ -88,9 +91,6 @@ namespace hpx
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(HPX_HAVE_STACKTRACES)
-    #include <boost/backtrace.hpp>
-#endif
 
 namespace hpx
 {
@@ -128,18 +128,37 @@ namespace hpx
 
     char const* get_runtime_mode_name(runtime_mode state)
     {
-        if (state < runtime_mode_invalid || state > runtime_mode_last)
+        if (state < runtime_mode_invalid || state >= runtime_mode_last)
             return "invalid (value out of bounds)";
         return strings::runtime_mode_names[state+1];
     }
 
     runtime_mode get_runtime_mode_from_name(std::string const& mode)
     {
-        for (std::size_t i = 0; i < (runtime_mode_last + 1); ++i) {
+        for (std::size_t i = 0; i < runtime_mode_last; ++i) {
             if (mode == strings::runtime_mode_names[i])
                 return static_cast<runtime_mode>(i-1);
         }
         return runtime_mode_invalid;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    runtime::runtime(naming::resolver_client& agas_client,
+            util::runtime_configuration& rtcfg)
+      : ini_(rtcfg),
+        instance_number_(++instance_number_counter_),
+        stopped_(true)
+    {
+        // initialize thread mapping for external libraries (i.e. PAPI)
+        thread_support_.register_thread("main");
+
+        // initialize our TSS
+        runtime::init_tss();
+
+        // initialize coroutines context switcher
+        boost::coroutines::thread_startup("main");
+
+        counters_.reset(new performance_counters::registry(agas_client));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -152,14 +171,17 @@ namespace hpx
             runtime_mode locality_mode, init_scheduler_type const& init)
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
-        io_pool_(boost::bind(&runtime_impl::init_tss, This(), "io-thread"),
+        io_pool_(rtcfg.get_thread_pool_size("io_pool"),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
-        parcel_pool_(boost::bind(&runtime_impl::init_tss, This(), "parcel-thread"),
+        parcel_pool_(rtcfg.get_thread_pool_size("parcel_pool"),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
-        timer_pool_(boost::bind(&runtime_impl::init_tss, This(), "timer-thread"),
+        timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
-            ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
+            ini_.get_max_connections(), ini_.get_max_connections_per_loc()),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
             new parcelset::policies::global_parcelhandler_queue),
@@ -486,7 +508,7 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
         char const* context)
     {
-        // initialize PAPI
+        // initialize thread mapping for external libraries (i.e. PAPI)
         thread_support_.register_thread(context);
 
         // initialize our TSS
@@ -494,11 +516,17 @@ namespace hpx
 
         // initialize applier TSS
         applier_.init_tss();
+
+        // initialize coroutines context switcher
+        boost::coroutines::thread_startup(context);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
     {
+        // initialize coroutines context switcher
+        boost::coroutines::thread_shutdown();
+
         // reset applier TSS
         applier_.deinit_tss();
 
@@ -549,6 +577,23 @@ namespace hpx
         keep_factory_alive(components::component_type type)
     {
         return runtime_support_.keep_factory_alive(type);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    hpx::util::io_service_pool*
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_pool(char const* name)
+    {
+        std::string service_name(name);
+
+        if (service_name == "io_pool")
+            return &io_pool_;
+        if (service_name == "parcel_pool")
+            return &parcel_pool_;
+        if (service_name == "timer_pool")
+            return &timer_pool_;
+
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -617,6 +662,17 @@ namespace hpx
               &performance_counters::detail::uptime_counter_creator,
               &performance_counters::locality_counter_discoverer,
               "s"    // unit of measure is seconds
+            },
+
+            // component instance counters
+            { "/runtime/component/count", performance_counters::counter_raw,
+              "returns the number of component instances currently alive on "
+              "this locality (the component type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::component_instance_counter_creator,
+              &performance_counters::locality_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(
@@ -672,6 +728,7 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
             return false;
+
         rt->on_exit(f);
         return true;
     }
@@ -685,11 +742,15 @@ namespace hpx
 
     std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
+        if (NULL == get_runtime_ptr())
+            return "";
         return get_runtime().get_config().get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
+        if (NULL == get_runtime_ptr())
+            return "";
         return get_runtime().get_config().get_entry(key, dflt);
     }
 
@@ -697,6 +758,9 @@ namespace hpx
     // Helpers
     naming::id_type find_here()
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return naming::invalid_id;
+
         return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
             naming::id_type::unmanaged);
     }
@@ -705,14 +769,16 @@ namespace hpx
     find_all_localities(components::component_type type)
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids, type);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_localities(locality_ids, type);
         return locality_ids;
     }
 
     std::vector<naming::id_type> find_all_localities()
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_localities(locality_ids);
         return locality_ids;
     }
 
@@ -720,20 +786,25 @@ namespace hpx
     find_remote_localities(components::component_type type)
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_remote_localities(locality_ids, type);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_remote_localities(locality_ids, type);
         return locality_ids;
     }
 
     std::vector<naming::id_type> find_remote_localities()
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_remote_localities(locality_ids);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_remote_localities(locality_ids);
         return locality_ids;
     }
 
     // find a locality supporting the given component
     naming::id_type find_locality(components::component_type type)
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return naming::invalid_id;
+
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type);
 
@@ -751,6 +822,9 @@ namespace hpx
     ///        for the running application.
     boost::uint32_t get_num_localities()
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return 0;
+
         // FIXME: this is overkill
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids);
@@ -759,6 +833,9 @@ namespace hpx
 
     boost::uint32_t get_num_localities(components::component_type type)
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return 0;
+
         // FIXME: this is overkill
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type);
@@ -766,45 +843,67 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::gid_type get_next_id()
+    namespace detail
     {
-        return get_runtime().get_next_id();
+        naming::gid_type get_next_id()
+        {
+            if (NULL == hpx::applier::get_applier_ptr())
+                return naming::invalid_gid;
+
+            return get_runtime().get_next_id();
+        }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t get_os_thread_count()
     {
+        if (NULL == get_runtime_ptr())
+            return 0;
         return get_runtime().get_config().get_os_thread_count();
     }
 
-    std::size_t get_worker_thread_num()
+    std::size_t get_worker_thread_num(bool* numa_sensitive)
     {
-        return get_runtime().get_thread_manager().get_worker_thread_num();
+        if (NULL == get_runtime_ptr())
+            return std::size_t(-1);
+        return get_runtime().get_thread_manager().get_worker_thread_num(numa_sensitive);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_startup_function(HPX_STD_FUNCTION<void()> const& f)
+    void register_startup_function(startup_function_type const& f)
     {
-        get_runtime().add_startup_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_startup_function(f);
     }
 
-    void register_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+    void register_pre_startup_function(startup_function_type const& f)
     {
-        get_runtime().add_pre_shutdown_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_pre_startup_function(f);
     }
 
-    void register_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+    void register_pre_shutdown_function(shutdown_function_type const& f)
     {
-        get_runtime().add_shutdown_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_pre_shutdown_function(f);
+    }
+
+    void register_shutdown_function(shutdown_function_type const& f)
+    {
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_shutdown_function(f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT bool keep_factory_alive(components::component_type type)
+    bool keep_factory_alive(components::component_type type)
     {
-        return get_runtime().keep_factory_alive(type);
+        if (NULL != get_runtime_ptr())
+            return get_runtime().keep_factory_alive(type);
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr()
+    components::server::runtime_support* get_runtime_support_ptr()
     {
         return reinterpret_cast<components::server::runtime_support*>(
             get_runtime().get_runtime_support_lva());
@@ -843,7 +942,22 @@ namespace hpx { namespace threads
     {
         return hpx::applier::get_applier().get_thread_manager();
     }
+
+    // shortcut for runtime_configuration::get_default_stack_size
+    std::ptrdiff_t get_default_stack_size()
+    {
+        return get_runtime().get_config().get_default_stack_size();
+    }
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    boost::uint32_t get_locality_id(error_code& ec)
+    {
+        return agas::get_locality_id(ec);
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice

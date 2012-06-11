@@ -7,11 +7,11 @@
 ===============================================================================/]
 
 [article HPX
-    [quickbook 1.5]
+    [quickbook 1.6]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 0.8.1]
-    [copyright 2011 2012 The STE||AR Group]
+    [version 0.9.0]
+    [copyright 2011 2012 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
         accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
@@ -21,25 +21,29 @@
 
 [/ Definitions which are controlled by commandline macros]
 
-[? __enable_fixme__   [template fixme[s] [*FIXME: [s]]] ]
-[? __disable_fixme__  [template fixme[s] ] ]
+[? __hpx_enable_fixme__   [template fixme[s] [*FIXME: [s]]] ]
+[? __hpx_disable_fixme__  [template fixme[s] ] ]
 
-[/ DEFINITIONS]
+[/ Definitions]
 [def __0_7_0__                  [link hpx.whats_new.hpx_0_7_0 V0.7.0]]
 [def __0_8_0__                  [link hpx.whats_new.hpx_0_8_0 V0.8.0]]
 [def __0_8_1__                  [link hpx.whats_new.hpx_0_8_1 V0.8.1]]
+[def __0_9_0__                  [link hpx.whats_new.hpx_0_9_0 V0.9.0]]
+[def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __0_8_1__]
+[def __version__                __0_9_0__]
 
+[def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
-[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
+[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenet]]
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
 [def __iu__                     [@http://www.iu.edu Indiana University (IU)]]
 [def __crest__                  [@http://pti.iu.edu Center for Research in Extreme Scale Technologies (CREST)]]
 [def __fau__                    [@http://www.fau.de Friedrich-Alexander University Erlangen-Nuremberg (FAU)]]
 [def __inf3__                   [@http://www3.cs.fau.de Chair of Computer Science 3 - Computer Architecture]]
+[def __sandia__                 [@http://www.sandia.gov Sandia National Labs (Albuquerque)]]
 
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
@@ -49,8 +53,9 @@
 
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
+[def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
-[/ external dependencies]
+[/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
 [def __gmake__                  [@http://www.gnu.org/software/make GNU Make (gmake)]]
@@ -72,11 +77,23 @@
 [def __qstat__                  [@http://www.clusterresources.com/torquedocs21/commands/qstat.shtml qstat]]
 [def __pbsdsh__                 [@http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml pbsdsh]]
 
-[/ optional external dependencies]
+[def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
+
+[/ Optional external dependencies]
 [def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
 [def __tbb__                    [@http://threadingbuildingblocks.org/ Intel Threading Building Blocks (TBB)]]
+[def __ppl__                    [@http://msdn.microsoft.com/en-us/library/dd492418.aspx Microsoft Parallel Patterns Library (PPL)]]
+[def __cilk_pp__                [@http://software.intel.com/en-us/articles/intel-cilk-plus/ Cilk++]]
 [def __swarm__                  [@http://www.etinternational.com/index.php/products/swarmbeta/ ETI SWift Adaptive Runtime Machine (SWARM)]]
 [def __qthreads__               [@http://www.cs.sandia.gov/qthreads/ Sandia National Labs Qthreads]]
+[def __mpi__                    [@http://en.wikipedia.org/wiki/Message_Passing_Interface MPI]]
+[def __openmp__                 [@http://openmp.org/wp/ OpenMP]]
+[def __charm_pp__               [@http://charm.cs.uiuc.edu/ Charm++]]
+[def __pgas__                   [@http://www.pgas.org/ PGAS]]
+[def __chapel__                 [@http://chapel.cray.com/ Chapel]]
+[def __x10__                    [@http://x10-lang.org/ X10]]
+[def __upc__                    [@http://upc.lbl.gov/ UPC]]
+[def __fortress__               [@http://labs.oracle.com/projects/plrg/Publications/index.html Fortress]]
 
 [/ Some images]
 [def __note__                   [$./images/note.png]]
@@ -91,7 +108,7 @@
 
 [/ Section link shortcuts]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
-[def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
+[def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build HPX Components with pkg-config]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
@@ -101,9 +118,19 @@
 [def __getting_started__        [link hpx.tutorial.getting_started Getting Started]]
 [def __intro__                  [link hpx.tutorial.intro Introduction]]
 
-[template hpx_cmdline[str]      [link hpx.tutorial.getting_started.commandline [str]]]
 
-[template hpx_link[url txt]     '''<ulink url="file://'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
+[def __configuration__          [link hpx.manual.init.configuration Configure HPX Applications]]
+[def __config_defaults__        [link hpx.manual.init.configuration.config_defaults Built-in Default Configuration Settings]]
+[def __iniformat__              [link hpx.manual.init.configuration.ini_format The HPX INI File Format]]
+[def __loading_ini__            [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
+[def __loading_components__     [link hpx.manual.init.configuration.loading_components Loading Components]]
+[def __component_example__      [link hpx.manual.init.configuration.component_example Application Specific Component Example]]
+[def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
+[def __commandline__            [link hpx.manual.init.commandline HPX Command Line Options]]
+
+[template hpx_cmdline[str] [link hpx.manual.init.commandline [str]]]
+
+[template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 
 [/  fig[ref title label]
     Image element with a title.
@@ -134,8 +161,8 @@ a list of people working in this group and participating in writing this
 documentation see __people__.
 
 This documentation is automatically generated for HPX __version__ (from SVN
-revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
-can be found in the collection of __boost_tools__.
+revision: __hpx_svn_revision__) by the Boost QuickBook documentation tool.
+QuickBook can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
@@ -143,11 +170,29 @@ can be found in the collection of __boost_tools__.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:tutorial Tutorial]
 
-[include gettingstarted.qbk]
-[include introduction.qbk]
-[include examples.qbk]
+[include tutorial/gettingstarted.qbk]
+[include tutorial/introduction.qbk]
+[include tutorial/examples.qbk]
 
 [endsect] [/ Tutorial]
 
+[/////////////////////////////////////////////////////////////////////////////]
+[section:manual Manual]
+
+[include manual/init.qbk]
+[include manual/names.qbk]
+[include manual/applying_actions.qbk]
+[include manual/plain_actions.qbk]
+[include manual/components.qbk]
+[include manual/lcos.qbk]
+[include manual/exceptions.qbk]
+
+[endsect] [/ Manual]
+
+[? __hpx_doxygen__ [xinclude __hpx_docs_dir__/hpx_autodoc.xml]]
+
+[include terminology.qbk]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [include people.qbk]
 

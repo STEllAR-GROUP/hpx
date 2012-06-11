@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,24 +9,24 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
-#include <hpx/components/dataflow/server/detail/dataflow_slot.hpp>
-#include <hpx/components/dataflow/server/detail/component_wrapper.hpp>
+#include <hpx/components/dataflow/server/detail/dataflow_trigger_slot.hpp>
 
 namespace hpx { namespace lcos { namespace server
 {
     /// The dataflow server side representation
     struct HPX_COMPONENT_EXPORT dataflow_trigger
-        : components::managed_component_base<
+        : base_lco
+        , components::managed_component_base<
             dataflow_trigger
           , hpx::components::detail::this_type
           , hpx::traits::construct_with_back_ptr
         >
     {
-        typedef dataflow_trigger wrapped_type;
         typedef
             components::managed_component_base<
                 dataflow_trigger
@@ -34,64 +34,129 @@ namespace hpx { namespace lcos { namespace server
               , hpx::traits::construct_with_back_ptr
             >
             base_type;
-
         typedef hpx::components::managed_component<dataflow_trigger> component_type;
 
-        void init(std::vector<dataflow_base<void> > const & trigger)
+        typedef util::value_or_error<util::unused_type> data_type;
+
+        // disambiguate base classes
+        typedef base_lco base_type_holder;
+        using base_type::finalize;
+        typedef base_type::wrapping_type wrapping_type;
+
+        static components::component_type get_component_type()
         {
-            typedef
-                detail::component_wrapper<
-                    detail::dataflow_slot<
-                        dataflow_base<void>
-                      , -1
-                      , wrapped_type
-                    >
-                >
-                component_type;
-            {
-                lcos::local::spinlock::scoped_lock l(mtx);
-                slots_completed = 0;
-                for(unsigned i = 0; i < trigger.size(); ++i)
-                {
-                    slots_completed |= (1<<i);
-                }
-            }
-            triggers.reserve(trigger.size());
-            for(unsigned i = 0; i < trigger.size(); ++i)
-            {
-                component_type * w = new component_type(this, trigger.at(i), i);
-                (*w)->connect();
-                triggers.push_back(w);
-            }
+            return components::get_component_type<dataflow_trigger>();
+        }
+        static void set_component_type(components::component_type type)
+        {
+            components::set_component_type<dataflow_trigger>(type);
         }
 
-        dataflow_trigger(component_type * back_ptr)
-            : base_type(back_ptr)
-            , all_set(false)
-            , slots_set(0)
-            , slots_completed(~0u)
+        dataflow_trigger()
+            : slots_complete(0)
         {
             BOOST_ASSERT(false);
         }
 
-        dataflow_trigger(component_type * back_ptr, std::vector<dataflow_base<void> > const & trigger)
+        dataflow_trigger(component_type * back_ptr)
             : base_type(back_ptr)
-            , all_set(false)
-            , slots_set(0)
-            , slots_completed(~0u)
+            , slots_complete(0)
         {
-            applier::register_thread(
-                HPX_STD_BIND(&dataflow_trigger::init, this, trigger),
-                "dataflow_trigger::init<>");
+            BOOST_ASSERT(false);
         }
+
+        static boost::uint64_t calc_complete_mask(std::size_t N)
+        {
+            boost::uint64_t r = 0;
+            for(std::size_t i = 0; i < N; ++i)
+            {
+                r |= (std::size_t(1)<<i);
+            }
+            return r;
+        }
+
+        dataflow_trigger(
+            component_type * back_ptr
+          , std::vector<hpx::lcos::dataflow_base<void> > const & trigger
+        )
+          : base_type(back_ptr)
+          , slots_set(0)
+          , slots_complete(calc_complete_mask(trigger.size()))
+        {
+            typedef
+                hpx::lcos::dataflow_base<void>
+                dataflow_type;
+
+            typedef
+                detail::dataflow_trigger_slot<dataflow_type, dataflow_trigger>
+                dataflow_slot_type;
+
+            typedef
+                detail::component_wrapper<dataflow_slot_type>
+                component_type;
+
+            std::size_t slot_idx = 0;
+            future_slots.reserve(trigger.size());
+
+            BOOST_FOREACH(dataflow_type const &d, trigger)
+            {
+                component_type * c
+                    = new component_type(this, d, slot_idx);
+                (*c)->connect_();
+                future_slots.push_back(c);
+                ++slot_idx;
+            }
+        }
+
+        void finalize()
+        {}
 
         ~dataflow_trigger()
         {
-            trigger_targets();
-            BOOST_ASSERT(all_set);
-            BOOST_FOREACH(detail::component_wrapper_base * c, triggers)
+            LLCO_(info)
+                << "hpx::lcos::server::dataflow_trigger: finalize\n";
+            data_type d;
+            data.read(d);
+            std::vector<naming::id_type> tmp;
             {
-                delete c;
+                lcos::local::spinlock::scoped_lock l(mtx);
+                std::swap(tmp, targets);
+            }
+
+            BOOST_FOREACH(naming::id_type const & target, tmp)
+            {
+                typedef hpx::lcos::base_lco::set_event_action action_type;
+                BOOST_ASSERT(target);
+                hpx::apply<action_type>(target);
+            }
+            BOOST_ASSERT(targets.empty());
+        }
+
+        template <typename T>
+        void set_slot(T, std::size_t slot)
+        {
+            bool trigger = false;
+            std::vector<naming::id_type> tmp;
+            {
+                lcos::local::spinlock::scoped_lock l(mtx);
+                if(slots_set != slots_complete)
+                {
+                    slots_set |= (std::size_t(1)<<slot);
+                    trigger = (slots_set == slots_complete);
+                    if(trigger) std::swap(tmp, targets);
+                }
+            }
+
+            if(trigger)
+            {
+                data.set(data_type(util::unused_type()));
+                BOOST_FOREACH(naming::id_type const & target, tmp)
+                {
+                    typedef hpx::lcos::base_lco::set_event_action action_type;
+                    BOOST_ASSERT(target);
+                    hpx::apply<action_type>(target);
+                }
+                BOOST_ASSERT(targets.empty());
             }
         }
 
@@ -101,75 +166,32 @@ namespace hpx { namespace lcos { namespace server
                 "server::dataflow_trigger::connect(" << target << ") {" << get_gid() << "}"
                 ;
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
-                if(all_set)
+                if(!data.is_empty())
                 {
                     typedef hpx::lcos::base_lco::set_event_action action_type;
-                    l.unlock();
                     BOOST_ASSERT(target);
-                    applier::apply<action_type>(target);
+                    hpx::apply<action_type>(target);
                 }
                 else
                 {
+                    lcos::local::spinlock::scoped_lock l(mtx);
                     targets.push_back(target);
                 }
             }
         }
 
-        typedef
-            ::hpx::actions::action1<
-                dataflow_trigger
-              , 0
-              , naming::id_type const &
-              , &dataflow_trigger::connect
-            >
-            connect_action;
-
-        void set_slot(unsigned index)
-        {
-            {
-                lcos::local::spinlock::scoped_lock l(mtx);
-                if(slots_set != slots_completed)
-                {
-                    slots_set |= (1<<index);
-                }
-            }
-            trigger_targets();
-        }
-
-        void trigger_targets()
-        {
-            std::vector<naming::id_type> t;
-            {
-                lcos::local::spinlock::scoped_lock l(mtx);
-                all_set = (slots_set == slots_completed);
-                if(all_set == false) return;
-                std::swap(targets, t);
-            }
-
-            // Note: lco::set_result is a direct action, for this reason,
-            //       the following loop will not be parallelized if the
-            //       targets are local (which is ok)
-            for (std::size_t i = 0; i < t.size(); ++i)
-            {
-                typedef hpx::lcos::base_lco::set_event_action action_type;
-                BOOST_ASSERT(t[i]);
-                applier::apply<action_type>(t[i]);
-            }
-        }
+        void set_event() {}
 
     private:
-        bool all_set;
-        boost::uint32_t slots_set;
-        boost::uint32_t slots_completed;
+        util::full_empty<data_type> data;
+        // TODO: investigate if lockfree fifo would be better that std::vector + spinlock
         lcos::local::spinlock mtx;
-        std::vector<detail::component_wrapper_base *> triggers;
         std::vector<naming::id_type> targets;
+
+        std::vector<detail::component_wrapper_base *> future_slots;
+        boost::uint64_t slots_set;
+        const boost::uint64_t slots_complete;
     };
 }}}
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::server::dataflow_trigger::connect_action
-  , dataflow_trigger_type_connect_action)
 
 #endif

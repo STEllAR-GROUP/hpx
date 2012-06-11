@@ -35,5 +35,4 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::random_mem_access::print_action,
     random_mem_access_print_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::random_mem_access);
 

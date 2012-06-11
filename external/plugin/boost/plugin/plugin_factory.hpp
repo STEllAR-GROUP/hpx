@@ -63,15 +63,15 @@ namespace boost { namespace plugin {
 
                     bool first = true;
                     typename exported_plugins_type::iterator end = e.end();
-                    for (typename exported_plugins_type::iterator it = e.begin();
-                         it != end; ++it)
+                    for (typename exported_plugins_type::iterator jt = e.begin();
+                         jt != end; ++jt)
                     {
                         if (first) {
-                            str << "'" << (*it).first << "'";
+                            str << "'" << (*jt).first << "'";
                             first = false;
                         }
                         else {
-                            str << ", '" << (*it).first << "'";
+                            str << ", '" << (*jt).first << "'";
                         }
                     }
                     str << ".";

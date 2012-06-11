@@ -58,7 +58,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
 
     bool negative = (size < 0) ? true : false;
     if(negative)
-        size = -size;
+        size = static_cast<char>(-size);
 
     if(size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
@@ -68,7 +68,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::intmax_t) - size);
 #endif
-    this->primitive_base_t::load_binary(cptr, size);
+    this->primitive_base_t::load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN
     if(m_flags & endian_little)
@@ -99,6 +99,13 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
     t.t[cn.size()] = '\0';
 }
 
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+
 HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
 {
     if (0 == (flags & boost::archive::no_header))
@@ -123,7 +130,6 @@ HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::unsupported_version));
         }
-
 #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
         this->set_library_version(input_library_version);
         boost::archive::detail::basic_iarchive::set_library_version(
@@ -133,8 +139,14 @@ HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
 
     unsigned char x;
     load(x);
-    m_flags = x << CHAR_BIT;
+    m_flags = static_cast<unsigned int>(x << CHAR_BIT);
 }
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
+
 
 }}
 

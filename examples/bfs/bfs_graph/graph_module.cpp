@@ -26,7 +26,6 @@ typedef hpx::components::managed_component<
 > bfs_graph_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(bfs_graph_type, bfs_graph);
-HPX_DEFINE_GET_COMPONENT_TYPE(bfs_graph_type::wrapped_type);
 
 HPX_REGISTER_ACTION_EX(
     bfs_graph_type::wrapped_type::init_action,
@@ -47,7 +46,6 @@ typedef hpx::components::managed_component<
 > bfs_bgl_graph_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(bfs_bgl_graph_type, bfs_bgl_graph);
-HPX_DEFINE_GET_COMPONENT_TYPE(bfs_bgl_graph_type::wrapped_type);
 
 HPX_REGISTER_ACTION_EX(
     bfs_bgl_graph_type::wrapped_type::init_action,
@@ -69,7 +67,6 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     bfs_concurrent_bgl_graph_type, bfs_concurrent_bgl_graph);
-HPX_DEFINE_GET_COMPONENT_TYPE(bfs_concurrent_bgl_graph_type::wrapped_type);
 
 HPX_REGISTER_ACTION_EX(
     bfs_concurrent_bgl_graph_type::wrapped_type::init_action,

@@ -6,7 +6,6 @@
 #if !defined(HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM)
 #define HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
 
 #include <boost/config.hpp>
@@ -46,15 +45,6 @@ namespace hpx { namespace traits
           return boost::move(rhs);
         }
 #endif
-    };
-
-    template <>
-    struct get_remote_result<naming::id_type, naming::gid_type>
-    {
-        static naming::id_type call(naming::gid_type const& rhs)
-        {
-            return naming::id_type(rhs, naming::id_type::managed);
-        }
     };
 }}
 

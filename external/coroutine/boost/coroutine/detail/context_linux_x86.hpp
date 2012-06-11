@@ -50,6 +50,19 @@ extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace coroutines {
+    
+    namespace very_detail
+    {
+        template <typename TO, typename FROM> 
+        TO nasty_cast(FROM f)
+        {
+            union {
+                FROM f; TO t;
+            } u;
+            u.f = f;
+            return u.t;
+        }
+    }
 
   // some platforms need special preparation of the main thread
   struct prepare_main_thread
@@ -88,14 +101,14 @@ namespace boost { namespace coroutines {
 
         __builtin_prefetch (m_sp, 1, 3);
         __builtin_prefetch (m_sp, 0, 3);
-        __builtin_prefetch ((void**)m_sp+64/sizeof(void*), 1, 3);
-        __builtin_prefetch ((void**)m_sp+64/sizeof(void*), 0, 3);
-        __builtin_prefetch ((void**)m_sp+32/sizeof(void*), 1, 3);
-        __builtin_prefetch ((void**)m_sp+32/sizeof(void*), 0, 3);
-        __builtin_prefetch ((void**)m_sp-32/sizeof(void*), 1, 3);
-        __builtin_prefetch ((void**)m_sp-32/sizeof(void*), 0, 3);
-        __builtin_prefetch ((void**)m_sp-64/sizeof(void*), 1, 3);
-        __builtin_prefetch ((void**)m_sp-64/sizeof(void*), 0, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)+64/sizeof(void*), 1, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)+64/sizeof(void*), 0, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)+32/sizeof(void*), 1, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)+32/sizeof(void*), 0, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)-32/sizeof(void*), 1, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)-32/sizeof(void*), 0, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)-64/sizeof(void*), 1, 3);
+        __builtin_prefetch (static_cast<void**>(m_sp)-64/sizeof(void*), 0, 3);
       }
 
       /**
@@ -139,11 +152,12 @@ namespace boost { namespace coroutines {
           m_stack(0)
       {
         BOOST_ASSERT(0 == (m_stack_size % EXEC_PAGESIZE));
-        m_stack = posix::alloc_stack(m_stack_size);
+        BOOST_ASSERT(m_stack_size >= 0);
+        m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
         BOOST_ASSERT(m_stack);
-        m_sp = ((void**)m_stack + (m_stack_size/sizeof(void*)));
+        m_sp = (static_cast<void**>(m_stack) + static_cast<std::size_t>(m_stack_size)/sizeof(void*));
 
-        posix::watermark_stack(m_stack, m_stack_size);
+        posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
 
         typedef void fun(Functor*);
         fun * funp = trampoline;
@@ -156,7 +170,7 @@ namespace boost { namespace coroutines {
 
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = (void*) funp ;// return addr (here: start addr)
+        *--m_sp = very_detail::nasty_cast<void*>( funp );// return addr (here: start addr)
         *--m_sp = 0;       // rbp
         *--m_sp = 0;       // rbx
         *--m_sp = 0;       // rsi
@@ -168,7 +182,7 @@ namespace boost { namespace coroutines {
 #else
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = (void*) funp ;// return addr (here: start addr)
+        *--m_sp = very_detail::nasty_cast<void*>( funp );// return addr (here: start addr)
         *--m_sp = 0;       // ebp
         *--m_sp = 0;       // ebx
         *--m_sp = 0;       // esi
@@ -179,14 +193,14 @@ namespace boost { namespace coroutines {
       ~x86_linux_context_impl()
       {
         if(m_stack)
-          posix::free_stack(m_stack, m_stack_size);
+          posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
       }
 
       void reset_stack()
       {
         if(m_stack) {
           increment_stack_recycle_count();
-          if(posix::reset_stack(m_stack, m_stack_size))
+          if(posix::reset_stack(m_stack, static_cast<std::size_t>(m_stack_size)))
             increment_stack_unbind_count();
         }
       }
@@ -233,6 +247,16 @@ namespace boost { namespace coroutines {
 
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_to_hint);
+
+      // global functions to be called for each OS-thread after it started
+      // running and before it exits
+      static void thread_startup(char const* thread_type)
+      {
+      }
+
+      static void thread_shutdown()
+      {
+      }
 
     private:
       std::ptrdiff_t m_stack_size;

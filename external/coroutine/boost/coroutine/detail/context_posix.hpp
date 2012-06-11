@@ -223,6 +223,11 @@ namespace boost { namespace coroutines {
                 free_stack(m_stack, m_stack_size);
         }
 
+        // global functions to be called for each OS-thread after it started
+        // running and before it exits
+        static void thread_startup(char const* thread_type) {}
+        static void thread_shutdown() {}
+
     private:
         // declare m_stack_size first so we can use it to initialize m_stack
         std::ptrdiff_t m_stack_size;

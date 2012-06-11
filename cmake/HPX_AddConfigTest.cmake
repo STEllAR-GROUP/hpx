@@ -38,7 +38,7 @@ macro(add_hpx_config_test name variable)
 
     if(${name}_FILE)
       if(${name}_ROOT)
-        set(test_source "${${name}_ROOT}/share/hpx/${${name}_SOURCE}")
+        set(test_source "${${name}_ROOT}/share/hpx-${HPX_VERSION}/${${name}_SOURCE}")
       else()
         set(test_source "${hpx_SOURCE_DIR}/${${name}_SOURCE}")
       endif()
@@ -199,6 +199,15 @@ macro(hpx_check_for_cxx11_std_function variable)
   add_hpx_config_test("cxx11_std_function" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_std_function.cpp
     FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_initializer_list variable)
+  hpx_get_include_directory(include_dir)
+
+  add_hpx_config_test("cxx11_std_initializer_list" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_std_initializer_list.cpp
+    FLAGS "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################

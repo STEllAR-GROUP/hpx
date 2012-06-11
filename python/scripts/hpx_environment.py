@@ -11,10 +11,12 @@ from sys import path, exit
 
 from optparse import OptionParser
 
+from hpx_version import HPX_VERSION
+
 if exists(join(path[0], "../hpx")):
   path.append(join(path[0], ".."))
-if exists(join(path[0], "../share/hpx/python/hpx")):
-  path.append(join(path[0], "../share/hpx/python"))
+if exists(join(path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):
+  path.append(join(path[0], "../share/hpx-"+HPX_VERSION+"/python"))
 
 from hpx.environment import identify
 

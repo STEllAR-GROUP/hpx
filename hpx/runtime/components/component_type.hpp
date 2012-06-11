@@ -19,17 +19,17 @@
 namespace hpx { namespace components
 {
     /// \brief Return the string representation for a given component type id
-    HPX_EXPORT std::string const get_component_type_name(boost::int32_t type);
+    HPX_EXPORT std::string const get_component_type_name(component_type type);
 
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
-    inline component_type get_base_type(boost::int64_t t)
+    inline component_type get_base_type(component_type t)
     {
         return component_type(t & 0xFFFF);
     }
 
     /// The upper short word of the component is the actual component type
-    inline component_type get_derived_type(boost::int64_t t)
+    inline component_type get_derived_type(component_type t)
     {
         return component_type((t >> 16) & 0xFFFF);
     }
@@ -37,13 +37,13 @@ namespace hpx { namespace components
     /// A component derived from a base component exposing the actions needs to
     /// have a specially formatted component type.
     inline component_type
-    derived_component_type(boost::int64_t derived, boost::int64_t base)
+    derived_component_type(component_type derived, component_type base)
     {
         return component_type(derived << 16 | base);
     }
 
     /// \brief Verify the two given component types are matching (compatible)
-    inline bool types_are_compatible(boost::int64_t lhs, boost::int64_t rhs)
+    inline bool types_are_compatible(component_type lhs, component_type rhs)
     {
         // don't compare types if one of them is unknown
         if (component_invalid == rhs || component_invalid == lhs)
@@ -90,7 +90,7 @@ namespace hpx { namespace components
         factory_is_multi_instance = 1,      ///< The factory can be used to
                                             ///< create more than one component
                                             ///< at the same time
-        factory_instance_count_is_size = 2, ///< The component count will be
+        factory_instance_count_is_size = 2  ///< The component count will be
                                             ///< interpreted as the component
                                             ///< size instead
     };

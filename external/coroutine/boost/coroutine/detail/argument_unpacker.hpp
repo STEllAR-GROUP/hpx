@@ -96,9 +96,9 @@ namespace boost { namespace coroutines { namespace detail {
 /**/
 
 BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
-                BOOST_COROUTINE_ARGUMENT_UNPACKER, ~);
+                BOOST_COROUTINE_ARGUMENT_UNPACKER, ~)
 BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
-                BOOST_COROUTINE_ARGUMENT_UNPACKER_EX, ~);
+                BOOST_COROUTINE_ARGUMENT_UNPACKER_EX, ~)
 
   // Somehow VCPP 8.0 chokes if the Trait for unpack[_ex]
   // is explicitly specified. We use an empty dispatch

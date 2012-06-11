@@ -57,6 +57,6 @@ namespace boost { namespace serialization
     void load(Archive& ar, boost::exception_ptr& e, unsigned int);
 }}
 
-BOOST_SERIALIZATION_SPLIT_FREE(boost::exception_ptr);
+BOOST_SERIALIZATION_SPLIT_FREE(boost::exception_ptr)
 
 #endif

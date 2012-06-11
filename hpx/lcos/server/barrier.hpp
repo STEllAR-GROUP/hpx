@@ -14,7 +14,8 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -65,6 +66,23 @@ namespace hpx { namespace lcos { namespace server
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
+        struct reset_queue_entry
+        {
+            reset_queue_entry(barrier_queue_entry& e, queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            barrier_queue_entry& e_;
+            queue_type& q_;
+            queue_type::const_iterator last_;
+        };
+
     public:
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
@@ -92,7 +110,7 @@ namespace hpx { namespace lcos { namespace server
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
                     LERR_(fatal) << "~barrier: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
@@ -118,7 +136,7 @@ namespace hpx { namespace lcos { namespace server
         {
             return components::component_barrier;
         }
-        static void set_component_type(components::component_type type) {}
+        static void set_component_type(components::component_type) {}
 
         // standard LCO action implementations
 
@@ -133,28 +151,14 @@ namespace hpx { namespace lcos { namespace server
             mutex_type::scoped_lock l(mtx_);
 
             if (queue_.size() < number_of_threads_-1) {
-                threads::thread_id_type id = self.get_thread_id();
-
-                barrier_queue_entry e(id);
+                barrier_queue_entry e(self.get_thread_id());
                 queue_.push_back(e);
-                queue_type::const_iterator last = queue_.last();
-                threads::thread_state_ex_enum statex;
 
+                reset_queue_entry r(e, queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self.yield(threads::suspended);
-                }
-
-                if (e.id_)
-                    queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-                    strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(yield_aborted, "barrier::set_event",
-                        hpx::util::osstream_get_string(strm));
-                    return;
+                    this_thread::suspend(threads::suspended,
+                        "barrier::set_event");
                 }
             }
             else {
@@ -184,14 +188,14 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        /// The \a function set_error is called whenever a
-        /// \a set_error_action is applied on an instance of a LCO. This
-        /// function just forwards to the virtual function \a set_error, which
+        /// The \a function set_exception is called whenever a
+        /// \a set_exception_action is applied on an instance of a LCO. This
+        /// function just forwards to the virtual function \a set_exception, which
         /// is overloaded by the derived concrete LCO.
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
             try {
                 mutex_type::scoped_lock l(mtx_);
@@ -209,7 +213,7 @@ namespace hpx { namespace lcos { namespace server
             }
             catch (boost::exception const& be) {
                 // rethrow again, but this time using the native hpx mechanics
-                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_error",
+                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_exception",
                     boost::diagnostic_information(be));
             }
         }

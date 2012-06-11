@@ -41,8 +41,8 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuratio
 project(hpx CXX)
 
 set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 8)
-set(HPX_PATCH_LEVEL   1)
+set(HPX_MINOR_VERSION 9)
+set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
@@ -82,18 +82,16 @@ include(HPX_FortranCompiler)
 ################################################################################
 # search path configuration
 ################################################################################
-# Don't use hpx_link_directories/hpx_include_directories to avoid passing paths
-# from the source tree to FindHPX.cmake
-include_directories(${hpx_SOURCE_DIR})
-include_directories(${hpx_SOURCE_DIR}/external/atomic)
-include_directories(${hpx_SOURCE_DIR}/external/cache)
-include_directories(${hpx_SOURCE_DIR}/external/coroutine)
-include_directories(${hpx_SOURCE_DIR}/external/endian)
-include_directories(${hpx_SOURCE_DIR}/external/logging)
-include_directories(${hpx_SOURCE_DIR}/external/lockfree)
-include_directories(${hpx_SOURCE_DIR}/external/plugin)
-include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+hpx_include_directories(${hpx_SOURCE_DIR})
+hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
+hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
 # Boost configuration
@@ -128,7 +126,7 @@ set(BOOST_LIBRARIES date_time
                     thread)
 
 if(${BOOST_MINOR_VERSION} LESS 49)
-  include_directories(${hpx_SOURCE_DIR}/external/serialization)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
 endif()
 
 # Decide whether to use internal version of Boost.Chrono
@@ -140,9 +138,7 @@ endif()
 if(${HPX_INTERNAL_CHRONO})
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
-  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
-  # paths from the source tree to FindHPX.cmake
-  include_directories(${hpx_SOURCE_DIR}/external/chrono)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
@@ -155,16 +151,14 @@ endif()
 
 if(${HPX_INTERNAL_MOVE})
   add_definitions(-DHPX_INTERNAL_MOVE)
-  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
-  # paths from the source tree to FindHPX.cmake.
-  include_directories(${hpx_SOURCE_DIR}/external/move)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
-hpx_include_directories(SYSTEM ${BOOST_INCLUDE_DIR})
-hpx_link_directories(${BOOST_LIBRARY_DIR})
+hpx_include_sys_directories(${BOOST_INCLUDE_DIR})
+hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
@@ -271,15 +265,15 @@ endif()
 
 add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 
-# Make sure the specified build type is valid
-if(NOT MSVC AND
-   NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
+# Make sure the specified build type is valid.
+if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "Release"))
   hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type, must be Debug, Release, RelWithDebInfo, or MinSizeRel.")
 endif()
 
+# TODO: Move this into a CMake macro.
 if(MSVC)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/bin)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib/hpx)
@@ -302,8 +296,10 @@ endif()
 ################################################################################
 # RPATH configuration
 ################################################################################
-set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
-    CACHE STRING "Base RPATH for linking" FORCE)
+if(NOT MSVC)
+  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+      CACHE STRING "Base RPATH for linking" FORCE)
+endif()
 
 ################################################################################
 # C++11 configuration
@@ -347,6 +343,16 @@ find_package(HPX_HDF5)
 hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
 
 ################################################################################
+# EXODUS libraries
+################################################################################
+find_package(HPX_EXODUS)
+
+################################################################################
+# NETCDF
+################################################################################
+find_package(HPX_NETCDF)
+
+################################################################################
 # PAPI event counters
 ################################################################################
 find_package(HPX_PAPI)
@@ -356,8 +362,8 @@ find_package(HPX_PAPI)
 ################################################################################
 find_package(HPX_Hwloc)
 if(HWLOC_FOUND)
-  hpx_include_directories(${HWLOC_INCLUDE_DIR})
-  hpx_link_directories(${HWLOC_LIBRARY_DIR})
+  hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
+  hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
   add_definitions(-DHPX_HAVE_HWLOC)
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
 endif()
@@ -576,7 +582,7 @@ if(MSVC)
   # Increase the maximum size of object file sections
   hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
 
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} psapi)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} psapi shlwapi)
 
   ##############################################################################
   # Stacktraces
@@ -799,6 +805,13 @@ else()
   # Silence warning about __sync_fetch_and_nand changing semantics
   hpx_use_flag_if_available(-Wno-sync-nand)
 
+  # Silence warnings about deleting polymorphic objects with non-virtual dtors.
+  # These come from within Boost. Detection for this flag fails with GCC 4.4,
+  # 4.5 and 4.6.
+  if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
+    hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
+  endif()
+
   ##############################################################################
   # GCC-only configuration
   ##############################################################################
@@ -893,8 +906,8 @@ else()
     find_package(HPX_GooglePerftools)
     if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
       set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      hpx_include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-      hpx_link_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
+      hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
       add_definitions(-DHPX_GOOGLE_PERFTOOLS)
     else()
       set(GOOGLE_PERFTOOLS_LIBRARY "")
@@ -926,15 +939,15 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        hpx_include_directories(${TCMALLOC_INCLUDE_DIR})
-        hpx_link_directories(${TCMALLOC_LIBRARY_DIR})
+        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+        hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
-        hpx_include_directories(${JEMALLOC_INCLUDE_DIR})
-        hpx_link_directories(${JEMALLOC_LIBRARY_DIR})
+        hpx_include_sys_directories(${JEMALLOC_INCLUDE_DIR})
+        hpx_link_sys_directories(${JEMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_JEMALLOC)
       endif()
 
@@ -975,7 +988,7 @@ hpx_option(HPX_BUILD_EXAMPLES BOOL "Build HPX examples (default: ON)" ON ADVANCE
 
 if(HPX_BUILD_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  include_directories(examples)
+  hpx_include_directories(examples)
   add_subdirectory(examples)
 endif()
 
@@ -987,7 +1000,7 @@ if(HPX_BUILD_TESTS)
   hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
 
   add_hpx_pseudo_target(tests)
-  include_directories(tests)
+  hpx_include_directories(tests)
   add_subdirectory(tests)
 else()
   unset(HPX_BUILD_TESTS_BENCHMARKS CACHE)
@@ -1117,7 +1130,7 @@ if(NOT HPX_NO_INSTALL)
     endif()
 
     install(
-      DIRECTORY ${doc_dir}/share/hpx/docs/
+      DIRECTORY ${doc_dir}/share/hpx-${HPX_VERSION}/docs/
       DESTINATION share/hpx-${HPX_VERSION}/doc
       COMPONENT docs
       OPTIONAL
@@ -1215,4 +1228,61 @@ if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
           DESTINATION lib/pkgconfig)
 endif()
+
+if(DOXYGEN_FOUND)
+  # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
+  set(doxygen_inputs_list
+      "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
+      "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp"
+      "${hpx_SOURCE_DIR}/hpx/exception.hpp"
+      "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
+      "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
+      "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp")
+
+  foreach(doxygen_input ${doxygen_inputs_list})
+    set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
+  endforeach()
+  #hpx_info("doxygen" "${doxygen_inputs}")
+
+  set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
+  set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
+
+  set(doxygen_definition_list
+      "DOXYGEN:=1"
+      "BOOST_SCOPED_ENUM_START(x):=enum x"
+      "BOOST_SCOPED_ENUM_END="
+      "HPX_EXCEPTION_EXPORT="
+      "HPX_EXPORT="
+      "HPX_API_EXPORT="
+      "HPX_STD_FUNCTION=std::function"
+      "extern=")
+
+  foreach(doxygen_predef ${doxygen_definition_list})
+    set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
+  endforeach()
+  #hpx_info("doxygen" "${doxygen_definitions}")
+
+  hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
+  configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
+                 @ONLY)
+endif()
+
+file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
+
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
+           "[\n${HPX_UNIT_TEST_LIST}\n]\n")
+
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regression.tests
+           "[\n${HPX_REGRESSION_TEST_LIST}\n]\n")
+
+if(NOT HPX_NO_INSTALL)
+  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
+          DESTINATION share/hpx-${HPX_VERSION}/tests)
+  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regression.tests
+          DESTINATION share/hpx-${HPX_VERSION}/tests)
+endif()
+
+unset(HPX_UNIT_TEST_LIST CACHE)
+unset(HPX_REGRESSION_TEST_LIST CACHE)
 

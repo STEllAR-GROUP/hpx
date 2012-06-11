@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #define HPX_ACTION_ARGUMENT_LIMIT 6
+#define HPX_FUNCTION_LIMIT 9
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
@@ -41,7 +42,7 @@ using hpx::test::movable_object;
 using hpx::test::non_movable_object;
 
 ///////////////////////////////////////////////////////////////////////////////
-void pass_movable_object_void(movable_object const& obj) {}
+void pass_movable_object_void(movable_object const&) {}
 std::size_t pass_movable_object(movable_object const& obj)
 {
     return obj.get_count();
@@ -55,8 +56,8 @@ typedef plain_result_action1<
     std::size_t, movable_object const&, pass_movable_object
 > pass_movable_object_action;
 
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_action);
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_action);
+HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_action)
+HPX_REGISTER_PLAIN_ACTION(pass_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
 typedef plain_direct_action1<
@@ -66,11 +67,11 @@ typedef plain_direct_result_action1<
     std::size_t, movable_object const&, pass_movable_object
 > pass_movable_object_direct_action;
 
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_direct_action);
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_direct_action);
+HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_direct_action)
+HPX_REGISTER_PLAIN_ACTION(pass_movable_object_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-void pass_non_movable_object_void(non_movable_object const& obj) {}
+void pass_non_movable_object_void(non_movable_object const&) {}
 std::size_t pass_non_movable_object(non_movable_object const& obj)
 {
     return obj.get_count();
@@ -84,8 +85,8 @@ typedef plain_result_action1<
     std::size_t, non_movable_object const&, pass_non_movable_object
 > pass_non_movable_object_action;
 
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_action);
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_action);
+HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_action)
+HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
 typedef plain_direct_action1<
@@ -95,8 +96,8 @@ typedef plain_direct_result_action1<
     std::size_t, non_movable_object const&, pass_non_movable_object
 > pass_non_movable_object_direct_action;
 
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_direct_action);
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_direct_action);
+HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_direct_action)
+HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 non_movable_object return_non_movable_object()
@@ -119,8 +120,8 @@ typedef plain_result_action0<
   , return_non_movable_object
 > return_non_movable_object_action;
 
-HPX_REGISTER_PLAIN_ACTION(return_movable_object_action);
-HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_action);
+HPX_REGISTER_PLAIN_ACTION(return_movable_object_action)
+HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
 typedef plain_direct_result_action0<
@@ -133,8 +134,8 @@ typedef plain_direct_result_action0<
   , return_non_movable_object
 > return_non_movable_object_direct_action;
 
-HPX_REGISTER_PLAIN_ACTION(return_movable_object_direct_action);
-HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_direct_action);
+HPX_REGISTER_PLAIN_ACTION(return_movable_object_direct_action)
+HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
@@ -188,7 +189,7 @@ std::size_t return_move_object(id_type id)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(variables_map&)
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 
@@ -232,7 +233,7 @@ int hpx_main(variables_map& vm)
                 move_object_void<
                     pass_movable_object_void_action, movable_object
                 >()
-            ), 0u);
+            ), 1u);
 
             /* TODO: Make this compile
             HPX_TEST_EQ((
@@ -284,7 +285,7 @@ int hpx_main(variables_map& vm)
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<pass_movable_object_action, movable_object>(id)
-        ), is_local ? 0u : 1u);
+        ), is_local ? 1u : 1u);
 
         /* TODO: Make this compile
         // test for movable object (direct actions)
@@ -323,7 +324,7 @@ int hpx_main(variables_map& vm)
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 8u);
+        ), is_local ? 2u : 7u);
 
         /* TODO: Make this compile
         HPX_TEST_EQ((

@@ -55,14 +55,9 @@ std::size_t hello_world_worker(std::size_t desired)
 }
 
 // Define the boilerplate code necessary for the function 'hello_world_worker'
-// to be invoked as an HPX action (by a HPX future).
-typedef hpx::actions::plain_result_action1<
-    std::size_t,          // return type
-    std::size_t,          // argument
-    hello_world_worker    // wrapped function
-> hello_world_worker_action;
-
-HPX_REGISTER_PLAIN_ACTION(hello_world_worker_action);
+// to be invoked as an HPX action (by a HPX future). This macro defines the
+// type 'hello_world_worker_action'.
+HPX_PLAIN_ACTION(hello_world_worker, hello_world_worker_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,7 +95,7 @@ void hello_world_foreman()
             // future, which we can query to determine if the task has
             // completed.
             typedef hello_world_worker_action action_type;
-            futures.push_back(hpx::lcos::async<action_type>(here, worker));
+            futures.push_back(hpx::async<action_type>(here, worker));
         }
 
         // Wait for all of the futures to finish. The callback version of the
@@ -118,21 +113,16 @@ void hello_world_foreman()
 }
 //]
 
+//[hello_world_action_wrapper
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action.
-//[hello_world_action_wrapper
-typedef hpx::actions::plain_action0<
-    // Wrapped function.
-    hello_world_foreman
-> hello_world_foreman_action;
-
-HPX_REGISTER_PLAIN_ACTION(hello_world_foreman_action);
+HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
 //[hello_world_hpx_main
 //`Here is hpx_main:
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main()
 {
     {
         // Get a list of all available localities.
@@ -149,7 +139,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             // future, which we can query to determine if the task has
             // completed.
             typedef hello_world_foreman_action action_type;
-            futures.push_back(hpx::lcos::async<action_type>(node));
+            futures.push_back(hpx::async<action_type>(node));
         }
 
         // The non-callback version of hpx::lcos::wait takes a single parameter,
@@ -167,19 +157,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 //[hello_world_main
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-
-    // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);       // Initialize and run HPX.
 }
 //` In HPX `main` is used to initialize the runtime system and pass the command
-//` line arguments to the program. If you wish to add command line options to
-//` your program you would add them here using the instance of the Boost
-//` class `options_description`, and invoking the public member function
-//` `.add_options()` (see __boost_doc__ or the __fibonacci_example__
-//` for more details). `hpx::init()` calls `hpx_main` after setting up
-//` HPX, which is where the logic of our program is encoded.
+//` line arguments to the program. `hpx::init()` invokes `hpx_main` as a HPX
+//` thread after setting up HPX, which is where the logic of our program is
+//` encoded.
 //]
 

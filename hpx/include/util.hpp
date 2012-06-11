@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/locality_result.hpp>
 
 #endif
 

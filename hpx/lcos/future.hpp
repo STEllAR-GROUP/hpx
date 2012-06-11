@@ -8,18 +8,59 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/utility/result_of.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/function_types/result_type.hpp>
 
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace local
     {
-        template <typename Result>
-        class promise;
+        template <typename Result> class promise;
+        template <typename Func> class packaged_task;
+        template <typename Func> class futures_factory;
+
+        template <typename ContResult, typename Result>
+        class packaged_continuation;
+
+        namespace detail
+        {
+            template <typename ContResult> struct continuation_base;
+        }
     }
+
+//     namespace detail
+//     {
+//         template <typename Future, typename F, typename Enable = void>
+//         struct future_when_result;
+//
+//         template <typename Future, typename F>
+//         struct future_when_result<
+//             Future, F, typename boost::result_of<F(Future)>::type
+//         >
+//         {
+//             typedef typename boost::result_of<F(Future)>::type result_type;
+//             typedef typename traits::promise_remote_result<result_type>::type remote_type;
+//             typedef lcos::future<typename boost::result_of<F(Future)>::type> type;
+//         };
+//
+//         template <typename Future, typename F>
+//         struct future_when_result<
+//             Future, F,
+//             typename boost::result_of<F(typename Future::result_type)>::type
+//         >
+//         {
+//             typedef typename boost::result_of<F(typename Future::result_type)>::type result_type;
+//             typedef typename traits::promise_remote_result<result_type>::type remote_type;
+//             typedef lcos::future<result_type, remote_type> type;
+//         };
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
@@ -40,9 +81,20 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<Result>;
+        friend class local::packaged_task<Result()>;
+        friend class local::futures_factory<Result()>;
+        template <typename ContResult, typename Result_>
+        friend class local::packaged_continuation;
+        template <typename ContResult>
+        friend struct local::detail::continuation_base;
+
         friend class promise<Result, RemoteResult>;
+        friend class hpx::thread;
+        friend struct detail::future_data<Result, RemoteResult>;
 
     public:
+        typedef Result result_type;
+
         future()
         {}
 
@@ -60,6 +112,16 @@ namespace hpx { namespace lcos
             other.future_data_.reset();
         }
 
+        // extension: init from given value, set future to ready right away
+        future(Result const& init)
+        {
+            lcos::detail::future_data<Result>* p =
+                new lcos::detail::future_data<Result>();
+            p->set_data(boost::move(init));
+            future_data_ = p;
+        }
+
+        // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             future_data_ = other.future_data_;
@@ -81,6 +143,12 @@ namespace hpx { namespace lcos
         // retrieving the value
         Result get(error_code& ec = throws) const
         {
+            if (!future_data_) {
+                HPX_THROWS_IF(ec, future_uninitialized,
+                    "future<Result, Remoteresult>::get",
+                    "this future has not been initialized");
+                return Result();
+            }
             return future_data_->get_data(ec);
         }
 
@@ -89,14 +157,94 @@ namespace hpx { namespace lcos
             return future_data_->move_data(ec);
         }
 
+        // state introspection
         bool is_ready() const
         {
-            return future_data_->is_ready();
+            return future_data_ && future_data_->is_ready();
+        }
+
+        bool has_value() const
+        {
+            return future_data_ && future_data_->has_value();
+        }
+
+        bool has_exception() const
+        {
+            return future_data_ && future_data_->has_exception();
+        }
+
+        BOOST_SCOPED_ENUM(future_status) get_state() const
+        {
+            if (!future_data_)
+                return future_status::uninitialized;
+
+            return future_data_->get_state();
+        }
+
+        // cancellation support
+        bool is_cancelable() const
+        {
+            return future_data_->is_cancelable();
+        }
+
+        void cancel()
+        {
+            future_data_->cancel();
+        }
+
+        // continuation support
+        template <typename F>
+//         typename detail::future_when_result<future, F>::type
+        future<typename boost::result_of<F(future)>::type>
+        when(BOOST_FWD_REF(F) f);
+
+        // reset any pending continuation function
+        void when()
+        {
+            future_data_->reset_on_completed();
+        }
+
+        // wait support
+        void wait() const
+        {
+            future_data_->wait();
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at)
+        {
+            return future_data_->wait_until(at);
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p)
+        {
+            return future_data_->wait_for(p);
+        }
+        template <typename Clock, typename Duration>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) const
+        {
+            return wait_until(util::to_ptime(abs_time));
+        }
+
+        template <typename Rep, typename Period>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::chrono::duration<Rep, Period> const& rel_time) const
+        {
+            return wait_for(util::to_time_duration(rel_time));
         }
 
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
+
+    // extension: create a pre-initialized future object
+    template <typename Result>
+    future<Result> create_value(Result const& init)
+    {
+        return future<Result>(init);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -117,9 +265,31 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<void>;
+        friend class local::packaged_task<void()>;
+        friend class local::futures_factory<void()>;
+        template <typename ContResult, typename Result_>
+        friend class local::packaged_continuation;
+        template <typename ContResult>
+        friend struct local::detail::continuation_base;
+
         friend class promise<void, util::unused_type>;
+        friend class hpx::thread;
+        friend struct detail::future_data<void, util::unused_type>;
+
+        // create_void uses the dummy argument constructor below
+        friend future<void> create_void();
+
+        future(int)
+        {
+            lcos::detail::future_data<void>* p =
+                new lcos::detail::future_data<void>();
+            p->set_data(util::unused);
+            future_data_ = p;
+        }
 
     public:
+        typedef void result_type;
+
         future()
         {}
 
@@ -166,14 +336,99 @@ namespace hpx { namespace lcos
             future_data_->move_data(ec);
         }
 
+        // state introspection
         bool is_ready() const
         {
             return future_data_->is_ready();
         }
 
+        bool has_value() const
+        {
+            return future_data_->has_value();
+        }
+
+        bool has_exception() const
+        {
+            return future_data_->has_exception();
+        }
+
+        BOOST_SCOPED_ENUM(future_status) get_state() const
+        {
+            if (!future_data_)
+                return future_status::uninitialized;
+
+            return future_data_->get_state();
+        }
+
+        // cancellation support
+        bool is_cancelable() const
+        {
+            return future_data_->is_cancelable();
+        }
+
+        void cancel()
+        {
+            future_data_->cancel();
+        }
+
+        bool valid() const BOOST_NOEXCEPT
+        {
+            return future_data_;
+        }
+
+        // continuation support
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+//         typename detail::future_when_result<future, F>::type
+        when(BOOST_FWD_REF(F) f);
+
+        // reset any pending continuation function
+        void when()
+        {
+            future_data_->reset_on_completed();
+        }
+
+        // wait support
+        void wait() const
+        {
+            future_data_->wait();
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at)
+        {
+            return future_data_->wait_until(at);
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p)
+        {
+            return future_data_->wait_for(p);
+        }
+
+        template <typename Clock, typename Duration>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) const
+        {
+            return wait_until(util::to_ptime(abs_time));
+        }
+
+        template <typename Rep, typename Period>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::chrono::duration<Rep, Period> const& rel_time) const
+        {
+            return wait_for(util::to_time_duration(rel_time));
+        }
+
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
+
+    // extension: create a pre-initialized future object
+    inline future<void> create_void()
+    {
+        return future<void>(1);   // dummy argument
+    }
 }}
 
 #endif

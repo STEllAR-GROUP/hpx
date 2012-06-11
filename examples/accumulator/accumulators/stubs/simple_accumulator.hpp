@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include "../server/simple_accumulator.hpp"
 
@@ -28,7 +28,7 @@ namespace examples { namespace stubs
         static void reset_non_blocking(hpx::naming::id_type const& gid)
         {
             typedef server::simple_accumulator::reset_action action_type;
-            hpx::applier::apply<action_type>(gid);
+            hpx::apply<action_type>(gid);
         }
 
         /// Reset the accumulator's value to 0.
@@ -37,7 +37,7 @@ namespace examples { namespace stubs
         static void reset_sync(hpx::naming::id_type const& gid)
         {
             typedef server::simple_accumulator::reset_action action_type;
-            hpx::lcos::async<action_type>(gid).get();
+            hpx::async<action_type>(gid).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ namespace examples { namespace stubs
         add_non_blocking(hpx::naming::id_type const& gid, boost::uint64_t arg)
         {
             typedef server::simple_accumulator::add_action action_type;
-            hpx::applier::apply<action_type>(gid, arg);
+            hpx::apply<action_type>(gid, arg);
         }
 
         /// Add \p arg to the accumulator's value.
@@ -60,7 +60,7 @@ namespace examples { namespace stubs
         add_sync(hpx::naming::id_type const& gid, boost::uint64_t arg)
         {
             typedef server::simple_accumulator::add_action action_type;
-            hpx::lcos::async<action_type>(gid, arg).get();
+            hpx::async<action_type>(gid, arg).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ namespace examples { namespace stubs
         query_async(hpx::naming::id_type const& gid)
         {
             typedef server::simple_accumulator::query_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         /// Query the current value of the accumulator.

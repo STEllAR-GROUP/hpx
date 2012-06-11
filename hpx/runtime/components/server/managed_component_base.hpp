@@ -159,7 +159,7 @@ namespace hpx { namespace components
         struct destroy<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
-            static void call(Component* component)
+            static void call(Component*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -365,8 +365,8 @@ namespace hpx { namespace components
         ///
         /// \param c    [in] The pointer to the wrapped instance. The
         ///             managed_component takes ownership of this pointer.
-        explicit managed_component(Component* c)
-          : component_(c)
+        explicit managed_component(Component* comp)
+          : component_(comp)
         {
             component_->set_back_ptr(this);
         }

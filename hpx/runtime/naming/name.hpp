@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <iostream>
 
+#include <boost/foreach.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
@@ -212,7 +213,7 @@ namespace hpx { namespace naming
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive & ar, const unsigned int /*version*/)
         {
             ar & id_msb_;
             ar & id_lsb_;
@@ -237,11 +238,11 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
-    inline gid_type get_gid_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
+    inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
 
-    inline gid_type get_gid_from_locality_id(boost::uint32_t prefix)
+    inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
     {
-        return gid_type(boost::uint64_t(prefix+1) << 32, 0);
+        return gid_type(boost::uint64_t(locality_id+1) << 32, 0);
     }
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
@@ -271,12 +272,13 @@ namespace hpx { namespace naming
     {
         boost::uint64_t msb = id.get_msb();
         boost::uint32_t c =
-            boost::uint16_t((msb & gid_type::credit_mask) >> 16) + credit;
+            static_cast<boost::uint32_t>(boost::uint16_t((msb & gid_type::credit_mask) >> 16) + credit);
 
         BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
         id.set_msb((msb & ~gid_type::credit_mask) |
             ((c & gid_type::credit_base_mask) << 16));
-        return c;
+        BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
+        return static_cast<boost::uint16_t>(c);
     }
 
     inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb) HPX_SUPER_PURE;
@@ -320,7 +322,8 @@ namespace hpx { namespace naming
     {
         boost::uint64_t msb = id.get_msb();
         boost::uint16_t credits = boost::uint16_t((msb & gid_type::credit_mask) >> 16);
-        boost::uint32_t newcredits = credits / fraction;
+        BOOST_ASSERT(fraction > 0);
+        boost::uint32_t newcredits = static_cast<boost::uint32_t>(credits / fraction);
 
         msb &= ~gid_type::credit_mask;
         id.set_msb(msb | (((credits - newcredits) << 16) & gid_type::credit_mask) | gid_type::was_split_mask);
@@ -497,22 +500,33 @@ namespace hpx { namespace naming
 
         friend bool operator< (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() < rhs.gid_.get();
+            // LHS is null, rhs is not.
+            if (!lhs && rhs)
+                return true;
+
+            // RHS is null.
+            if (!rhs)
+                return false;
+
+            return *lhs.gid_ < *rhs.gid_;
         }
 
         friend bool operator<= (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() <= rhs.gid_.get();
+            // Deduced from <.
+            return !(rhs < lhs);
         }
 
         friend bool operator> (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() > rhs.gid_.get();
+            // Deduced from <.
+            return rhs < lhs;
         }
 
         friend bool operator>= (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() >= rhs.gid_.get();
+            // Deduced from <.
+            return !(lhs < rhs);
         }
 
         // access the internal parts of the gid
@@ -549,7 +563,7 @@ namespace hpx { namespace naming
         void load(Archive & ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-        BOOST_COPYABLE_AND_MOVABLE(id_type);
+        BOOST_COPYABLE_AND_MOVABLE(id_type)
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
     };
@@ -562,12 +576,14 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////
-    //  Handle conversion to/from prefix
-    inline id_type get_id_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
+    // Handle conversion to/from locality_id
+    // FIXME: these names are confusing, 'id' appears in identifiers far too
+    // frequently.
+    inline id_type get_id_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
 
-    inline id_type get_id_from_locality_id(boost::uint32_t prefix)
+    inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(prefix+1) << 32, 0, id_type::unmanaged);
+        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged);
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
@@ -593,23 +609,72 @@ namespace hpx { namespace naming
 namespace hpx { namespace traits
 {
     template <>
-    struct promise_remote_result<naming::id_type>
-      : boost::mpl::identity<naming::gid_type>
-    {};
+    struct get_remote_result<naming::id_type, naming::gid_type>
+    {
+        static naming::id_type call(naming::gid_type const& rhs)
+        {
+            return naming::id_type(rhs, naming::id_type::managed);
+        }
+    };
+
+    //template <>
+    //struct promise_remote_result<naming::id_type>
+    //  : boost::mpl::identity<naming::gid_type>
+    //{};
 
     template <>
     struct promise_local_result<naming::gid_type>
       : boost::mpl::identity<naming::id_type>
     {};
+
+    // we need to specialize this template to allow for automatic conversion of
+    // the vector<naming::gid_type> to a vector<naming::id_type>
+    template <>
+    struct get_remote_result<
+        std::vector<naming::id_type>, std::vector<naming::gid_type> >
+    {
+        static std::vector<naming::id_type>
+        call(std::vector<naming::gid_type> const& rhs)
+        {
+            std::vector<naming::id_type> result;
+            result.reserve(rhs.size());
+            BOOST_FOREACH(naming::gid_type const& r, rhs)
+            {
+                result.push_back(naming::id_type(r, naming::id_type::managed));
+            }
+            return result;
+        }
+    };
+
+    //template <>
+    //struct promise_remote_result<std::vector<naming::id_type> >
+    //  : boost::mpl::identity<std::vector<naming::gid_type> >
+    //{};
+
+    template <>
+    struct promise_local_result<std::vector<naming::gid_type> >
+      : boost::mpl::identity<std::vector<naming::id_type> >
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::naming::gid_type, HPX_GIDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

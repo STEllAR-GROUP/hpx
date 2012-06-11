@@ -9,7 +9,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/generic_component_factory.hpp>
@@ -18,38 +18,25 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/components/dataflow/server/dataflow.hpp>
 #include <hpx/components/dataflow/server/dataflow_trigger.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/components/dataflow/dataflow_base.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <boost/serialization/version.hpp>
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow> dataflow_type;
 
-HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(
-    dataflow_type, bright_future_dataflow, true);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_type::wrapped_type);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::dataflow::connect_action
-  , dataflow_type_connect_action)
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_type, dataflow,
+    "hpx::lcos::server::dataflow")
 
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
     dataflow_trigger_type;
 
-HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(
-    dataflow_trigger_type,
-    bright_future_dataflow_trigger, true);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_trigger_type::wrapped_type);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::dataflow_trigger::connect_action
-  , dataflow_trigger_type_connect_action)
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_trigger_type, dataflow_trigger,
+    "hpx::lcos::server::dataflow")
 
 // HPX_REGISTER_ACTION_EX(
 //     hpx::lcos::server::dataflow_trigger::init_action
@@ -85,7 +72,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     {
         performance_counters::generic_counter_type_data const counter_types[] =
         {
-            { "/lcos/dataflow/constructed", performance_counters::counter_raw,
+            { "/dataflow/count/constructed", performance_counters::counter_raw,
               "returns the number of constructed dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -93,7 +80,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/lcos/dataflow/initialized", performance_counters::counter_raw,
+            { "/dataflow/count/initialized", performance_counters::counter_raw,
               "returns the number of initialized dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -101,7 +88,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/lcos/dataflow/fired", performance_counters::counter_raw,
+            { "/dataflow/count/fired", performance_counters::counter_raw,
               "returns the number of fired dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,

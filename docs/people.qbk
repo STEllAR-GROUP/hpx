@@ -7,8 +7,8 @@
 
 [section People]
 
-The STE||AR Group (pronounced as stellar) stands for "System Technologies,
-Emergent Parallelism, and Algorithms Research". We are a group of faculty,
+The STE||AR Group (pronounced as stellar) stands for "[*S]ystems [*T]echnologies,
+[*E]mergent Para[*ll]elism, and [*A]lgorithms [*R]esearch". We are a group of faculty,
 researchers, and students working at the __cct__ at __lsu__. Everything we
 do is centered around the ParalleX execution model and
 its implementation in our experimental runtime system HPX (High Performance
@@ -47,7 +47,7 @@ We develop High Performence ParalleX (HPX) - a parallel runtime system
 currently targetted at conventional machines, such as classical Linux based
 Beowulf clusters and SMP nodes.
 
-We fully understand that the success of HPX (and ParalleX) is very much the
+We fully understand that the success of __hpx__ (and ParalleX) is very much the
 result of the work of many people. To see a list of who is contributing see
 our tables below.
 
@@ -57,13 +57,14 @@ our tables below.
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
-  [[Vinay C Amatya]       [__cct__, __lsu__]      [[$./images/emails/vamatya.png]]]
-  [[Matthew Anderson]   [__crest__, __iu__]       [[$./images/emails/manderson.png]]]
-  [[Steven Brandt] [__cct__, __lsu__]             [[$./images/emails/sbrandt.png]]]
-  [[Maciej Brodowicz]   [__cct__, __lsu__]        [[$./images/emails/mbrodowicz.png]]]
-  [[Thomas Heller]      [__inf3__, __fau__]       [[$./images/emails/theller.png]]]
-  [[Alex Nagelberg]     [__cct__, __lsu__]        [[$./images/emails/anagelberg.png]]]
-  [[Adrian Serio]       [__cct__, __lsu__]        [[$./images/emails/aserio.png]]]
+  [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
+  [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
+  [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
+  [[Maciej Brodowicz]        [__cct__, __lsu__]   [[$./images/emails/mbrodowicz.png]]]
+  [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
+  [[Alex Nagelberg]          [__cct__, __lsu__]   [[$./images/emails/anagelberg.png]]]
+  [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
+  [[Dylan Stark]             [__sandia__]         [[$./images/emails/dstark.png]]]
 ]
 
 [heading Contributors to this Document]
@@ -72,17 +73,17 @@ our tables below.
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
-  [[Vinay C Amatya]            [__cct__, __lsu__] [[$./images/emails/vamatya.png]]]
+  [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
-  [[Maciej Brodowicz] [__cct__, __lsu__]          [[$./images/emails/mbrodowicz.png]]]
+  [[Maciej Brodowicz]        [__cct__, __lsu__]   [[$./images/emails/mbrodowicz.png]]]
   [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
 ]
 
 [heading Acknowledgements]
 
-In addition to the people who worked directly with HPX development we would
+In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge Thomas Sterling, who was instrumental in the creation
-of HPX as well as the NSF, DARPA, and __cct__ who fund and support our
+of ParalleX as well as the NSF, DOE, DARPA, and __cct__ who fund and support our
 work.
 
 [endsect] [/ People]

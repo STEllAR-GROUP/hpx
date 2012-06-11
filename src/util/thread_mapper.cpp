@@ -16,14 +16,14 @@ namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     // static members
-    boost::uint32_t thread_mapper::invalid_index = (boost::uint32_t)-1;
-    unsigned long thread_mapper::invalid_tid = (unsigned long)-1;
+    boost::uint32_t thread_mapper::invalid_index = static_cast<boost::uint32_t>(-1);
+    long int thread_mapper::invalid_tid = -1;
 
     ///////////////////////////////////////////////////////////////////////////
     // methods
     bool thread_mapper::null_cb(boost::uint32_t) {return true;}
 
-    unsigned long thread_mapper::get_papi_thread_id()
+    long int thread_mapper::get_papi_thread_id()
     {
 #if defined(__linux__)
         // this has been tested only on x86_*
@@ -98,7 +98,7 @@ namespace hpx { namespace util
         return true;
     }
 
-    unsigned long thread_mapper::get_thread_id(boost::uint32_t tix) const
+    long int thread_mapper::get_thread_id(boost::uint32_t tix) const
     {
         mutex_type::scoped_lock m(mtx_);
 

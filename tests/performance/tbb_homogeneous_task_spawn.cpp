@@ -87,7 +87,7 @@ struct worker : tbb::task
     {
         double volatile d = 0.;
         for (boost::uint64_t i = 0; i < delay; ++i)
-            d += 1 / (2. * i + 1);
+            d += 1. / (2. * i + 1.);
 
         return 0;
     }
@@ -98,7 +98,7 @@ struct spawner : tbb::task
 {
     tbb::task* execute()
     {
-        set_ref_count(tasks + 1);
+        set_ref_count(static_cast<int>(tasks + 1));
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
         {
@@ -184,7 +184,7 @@ int main(
     }
 
     // Setup the TBB environment.
-    tbb::task_scheduler_init init(vm["threads"].as<boost::uint64_t>());
+    tbb::task_scheduler_init init(vm["threads"].as<int>());
 
     return tbb_main(vm);
 }

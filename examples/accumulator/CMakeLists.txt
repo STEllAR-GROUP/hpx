@@ -20,7 +20,8 @@ foreach(example ${examples})
   # add example executable
   add_hpx_executable(${example}_client
     SOURCES ${sources}
-    DEPENDENCIES ${example}_component)
+    DEPENDENCIES ${example}_component
+    FOLDER "Examples/Quickstart/Accumulators/${example}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.accumulator.${example})

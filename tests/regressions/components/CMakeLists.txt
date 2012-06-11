@@ -5,9 +5,15 @@
 
 add_subdirectory(components)
 
-set(tests
-    undefined_symbol_at_runtime
-   )
+set(tests)
+
+# Windows requires all symbols to be resolved at link time, this test does
+# not make sense on this platform.
+if(NOT MSVC)
+  set(tests
+      undefined_symbol_at_runtime
+     )
+endif()
 
 foreach(test ${tests})
   set(sources
@@ -20,6 +26,8 @@ foreach(test ${tests})
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      FOLDER "Tests/Regressions/Components")
+
+  add_hpx_regression_test(${test} ${${test}_PARAMETERS})  
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.components.${test})

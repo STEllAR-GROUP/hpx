@@ -8,47 +8,21 @@
 // Naive SMP version implemented with futures.
 
 #include <hpx/hpx.hpp>
-#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/include/util.hpp>
 
 #include <iostream>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
-
-using hpx::find_here;
-
-using hpx::actions::plain_result_action1;
-
-using hpx::lcos::async;
-using hpx::lcos::future;
-
-using hpx::util::high_resolution_timer;
-
-using hpx::init;
-using hpx::finalize;
-
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t factorial(boost::uint64_t m);
 
-typedef plain_result_action1<
-    // result type
-    boost::uint64_t
-    // arguments
-  , boost::uint64_t
-    // function
-  , factorial
-> factorial_action;
-
-HPX_REGISTER_PLAIN_ACTION(factorial_action);
+HPX_PLAIN_ACTION(factorial, factorial_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t factorial(boost::uint64_t n)
@@ -56,36 +30,38 @@ boost::uint64_t factorial(boost::uint64_t n)
     if (0 >= n)
         return 1;
 
-    future<boost::uint64_t> n1 = async<factorial_action>(find_here(), n - 1);
+    hpx::lcos::future<boost::uint64_t> n1 =
+        hpx::async<factorial_action>(hpx::find_here(), n - 1);
     return n * n1.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(boost::program_options::variables_map& vm)
 {
+    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+
     {
-        boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+        hpx::util::high_resolution_timer t;
 
-        high_resolution_timer t;
-
-        boost::uint64_t r = async<factorial_action>(find_here(), n).get();
+        boost::uint64_t r =
+            hpx::async<factorial_action>(hpx::find_here(), n).get();
 
         double elapsed = t.elapsed();
-
         std::cout
             << ( boost::format("factorial(%1%) == %2%\n"
                                "elapsed time == %3% [s]\n")
                % n % r % elapsed);
     }
 
-    finalize();
-
-    return 0;
+    return hpx::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    using boost::program_options::options_description;
+    using boost::program_options::value;
+
     // Configure application-specific options
     options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
@@ -97,6 +73,6 @@ int main(int argc, char* argv[])
         ;
 
     // Initialize and run HPX
-    return init(desc_commandline, argc, argv);
+    return hpx::init(desc_commandline, argc, argv);
 }
 

@@ -71,7 +71,7 @@ public:
         invalid_flags
     };
     portable_binary_oarchive_exception(exception_code c = invalid_flags)
-      : boost::archive::archive_exception((boost::archive::archive_exception::exception_code)c)
+      : boost::archive::archive_exception(static_cast<boost::archive::archive_exception::exception_code>(c))
     {}
     virtual const char *what() const throw()
     {
@@ -91,7 +91,13 @@ public:
 // archive. it addresses integer size and endianness so that binary archives can
 // be passed across systems. Note:floating point types not addressed here
 
-class HPX_ALWAYS_EXPORT portable_binary_oarchive :
+#if defined(BOOST_MSVC)
+#define HPX_SERIALIZATION_EXPORT
+#else
+#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#endif
+
+class HPX_SERIALIZATION_EXPORT portable_binary_oarchive :
     public boost::archive::basic_binary_oprimitive<
         portable_binary_oarchive,
         std::ostream::char_type,
@@ -130,58 +136,58 @@ protected:
 
     // default fall through for any types not specified here
     template<class T>
-    void save(const T & val) {
-        boost::intmax_t t = val;
+    HPX_SERIALIZATION_EXPORT void save(const T & val) {
+        boost::intmax_t t = static_cast<boost::intmax_t>(val);
         save_impl(t, sizeof(T));
     }
-    void save(const std::string & t) {
+    HPX_SERIALIZATION_EXPORT void save(const std::string & t) {
         this->primitive_base_t::save(t);
     }
 #if BOOST_VERSION >= 104400
-    void save(const boost::archive::class_id_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::class_id_type & t) {
         /*boost::int16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
-    void save(const boost::archive::object_id_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::object_id_type & t) {
         /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::tracking_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::tracking_type & t) {
         bool l = t;
         this->primitive_base_t::save(l);
     }
-    void save(const boost::archive::version_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::version_type & t) {
         /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::library_version_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::library_version_type & t) {
         /*boost::uint16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
-    void save(const boost::serialization::item_version_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::serialization::item_version_type & t) {
         boost::intmax_t l = t;
         save_impl(l, sizeof(boost::intmax_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void save(const std::wstring & t) {
+    HPX_SERIALIZATION_EXPORT void save(const std::wstring & t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    void save(const float & t) {
+    HPX_SERIALIZATION_EXPORT void save(const float & t) {
         this->primitive_base_t::save(t);
         // floats not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    void save(const double & t) {
+    HPX_SERIALIZATION_EXPORT void save(const double & t) {
         this->primitive_base_t::save(t);
         // doubles not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    void save(const char & t) {
+    HPX_SERIALIZATION_EXPORT void save(const char & t) {
         this->primitive_base_t::save(t);
     }
-    void save(const unsigned char & t) {
+    HPX_SERIALIZATION_EXPORT void save(const unsigned char & t) {
         this->primitive_base_t::save(t);
     }
 
@@ -234,6 +240,8 @@ public:
         init(flags);
     }
 };
+
+#undef HPX_SERIALIZATION_EXPORT
 
 }}
 

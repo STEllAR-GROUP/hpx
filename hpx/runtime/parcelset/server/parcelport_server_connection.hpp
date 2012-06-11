@@ -44,11 +44,10 @@ namespace hpx { namespace parcelset { namespace server
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 parcelport_queue& handler,
-                util::high_resolution_timer& timer,
-                performance_counters::parcels::gatherer& parcels_received)
+                util::high_resolution_timer& timer)
           : socket_(io_service), in_priority_(0), in_size_(0),
             in_buffer_(new std::vector<char>()), parcels_(handler),
-            timer_(timer), parcels_received_(parcels_received)
+            timer_(timer)
         {
         }
 
@@ -59,8 +58,11 @@ namespace hpx { namespace parcelset { namespace server
         template <typename Handler>
         void async_read(Handler handler)
         {
-            // Increment number of receives started.
-            receive_data_.timer_ = timer_.elapsed_microseconds();
+            // Store the time of the begin of the read operation
+            receive_data_.time_ = timer_.elapsed_microseconds();
+            receive_data_.serialization_time_ = 0;
+            receive_data_.bytes_ = 0;
+            receive_data_.num_parcels_ = 0;
 
             // Issue a read operation to read the parcel priority and size.
             void (parcelport_connection::*f)(boost::system::error_code const&,
@@ -78,12 +80,8 @@ namespace hpx { namespace parcelset { namespace server
 
             boost::asio::async_read(socket_, buffers,
                 boost::bind(f, shared_from_this(),
-                    boost::asio::placeholders::error, boost::make_tuple(handler)));
-        }
-
-        performance_counters::parcels::data_point& get_receive_data()
-        {
-            return receive_data_;
+                    boost::asio::placeholders::error,
+                    boost::make_tuple(handler)));
         }
 
     protected:
@@ -126,10 +124,15 @@ namespace hpx { namespace parcelset { namespace server
                 boost::get<0>(handler)(e);
             }
             else {
+                // complete data point and pass it along
+                receive_data_.time_ =
+                    timer_.elapsed_microseconds() - receive_data_.time_;
+
                 // add parcel data to incoming parcel queue
                 boost::integer::ulittle8_t::value_type priority = in_priority_;
                 parcels_.add_parcel(in_buffer_,
-                    static_cast<threads::thread_priority>(priority));
+                    static_cast<threads::thread_priority>(priority),
+                    receive_data_);
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
@@ -138,6 +141,12 @@ namespace hpx { namespace parcelset { namespace server
                 void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_header<Handler>;
+
+                // Store the time of the begin of the read operation
+                receive_data_.time_ = timer_.elapsed_microseconds();
+                receive_data_.serialization_time_ = 0;
+                receive_data_.bytes_ = 0;
+                receive_data_.num_parcels_ = 0;
 
                 in_buffer_.reset(new std::vector<char>());
                 in_priority_ = 0;
@@ -169,7 +178,6 @@ namespace hpx { namespace parcelset { namespace server
         /// Counters and timers for parcels received.
         util::high_resolution_timer& timer_;
         performance_counters::parcels::data_point receive_data_;
-        performance_counters::parcels::gatherer& parcels_received_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;

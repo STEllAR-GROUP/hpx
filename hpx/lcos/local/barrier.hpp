@@ -6,10 +6,12 @@
 #if !defined(HPX_LCOS_barrier_JUN_23_2008_0530PM)
 #define HPX_LCOS_barrier_JUN_23_2008_0530PM
 
-#include <boost/intrusive/slist.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+
+#include <boost/intrusive/slist.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -54,6 +56,23 @@ namespace hpx { namespace lcos { namespace local
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
+        struct reset_queue_entry
+        {
+            reset_queue_entry(barrier_queue_entry& e, queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            barrier_queue_entry& e_;
+            queue_type& q_;
+            queue_type::const_iterator last_;
+        };
+
     public:
         barrier(std::size_t number_of_threads)
           : number_of_threads_(number_of_threads)
@@ -71,7 +90,7 @@ namespace hpx { namespace lcos { namespace local
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
                     LERR_(fatal) << "~barrier: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
@@ -99,30 +118,14 @@ namespace hpx { namespace lcos { namespace local
 
             mutex_type::scoped_lock l(mtx_);
             if (queue_.size() < number_of_threads_-1) {
-                threads::thread_id_type id = self.get_thread_id();
-
-                threads::set_thread_lco_description(id, "lcos::barrier");
-
-                barrier_queue_entry e(id);
+                barrier_queue_entry e(self.get_thread_id());
                 queue_.push_back(e);
-                queue_type::const_iterator last = queue_.last();
-                threads::thread_state_ex_enum statex;
 
+                reset_queue_entry r(e, queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self.yield(threads::suspended);
-                }
-
-                if (e.id_)
-                    queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-                    strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(yield_aborted, "barrier::wait",
-                        hpx::util::osstream_get_string(strm));
-                    return;
+                    this_thread::suspend(threads::suspended, 
+                        "barrier::wait");
                 }
             }
             else {

@@ -8,6 +8,7 @@
 
 #include <boost/move/move.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/detail/workaround.hpp>
 
 namespace hpx { namespace util {
     namespace detail
@@ -25,8 +26,22 @@ namespace hpx { namespace util {
             typedef T type;
         };
 #else
-        using std::remove_reference;
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
+        // workarounds for VC2010
+        template <typename T>
+        struct remove_reference
+        {
+            typedef typename boost::remove_reference<T>::type type;
+        };
 
+        template <typename T>
+        struct remove_reference<T&&>
+        {
+            typedef T type;
+        };
+#else
+        using std::remove_reference;
+#endif
 #endif
     }
 }}

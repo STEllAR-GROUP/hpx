@@ -1007,7 +1007,7 @@ void primary_namespace::kill_non_blocking(
                 get_runtime_support_ptr());
 
             // FIXME: Priority?
-            applier::apply_l<action_type>
+            hpx::applier::detail::apply_l<action_type>
                 (rts_addr, type_, at_c<1>(e), at_c<2>(e));
         }
 
@@ -1023,7 +1023,7 @@ void primary_namespace::kill_non_blocking(
                 naming::id_type::unmanaged);
 
             // FIXME: Priority?
-            applier::apply_r<action_type>
+            hpx::applier::detail::apply_r<action_type>
                 (rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
         }
     }
@@ -1088,7 +1088,7 @@ void primary_namespace::kill_sync(
         futures.push_back(lcos::promise<void>());
 
         // FIXME: Priority?
-        applier::apply_c<action_type>
+        hpx::apply_c<action_type>
             (futures.back().get_gid(), prefix_, type_, at_c<1>(e), at_c<2>(e));
     }
 

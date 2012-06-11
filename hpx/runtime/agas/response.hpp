@@ -92,14 +92,15 @@ struct response
         )
       : mc(type_)
       , status(status_)
-      , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
+      , data(boost::fusion::make_vector(ctype_))
     {
         // TODO: verification of namespace_action_code
     }
 
+/*
     response(
         namespace_action_code type_
-      , boost::int32_t ctype_
+      , components::component_type ctype_
       , error status_ = success
         )
       : mc(type_)
@@ -108,6 +109,7 @@ struct response
     {
         // TODO: verification of namespace_action_code
     }
+*/
 
     response(
         namespace_action_code type_
@@ -206,7 +208,7 @@ struct response
         return get_data<subtype_prefixes, 0>(ec);
     }
 
-    boost::int32_t get_component_type(
+    components::component_type get_component_type(
         error_code& ec = throws
         ) const
     {
@@ -309,7 +311,7 @@ struct response
         // component_ns_bind_prefix
         // component_ns_bind_name
       , boost::fusion::vector1<
-            boost::int32_t // ctype
+            components::component_type // ctype
         >
         // 0x4
         // primary_ns_localities
@@ -522,12 +524,23 @@ struct get_remote_result<bool, agas::response>
 
 }}
 
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<hpx::agas::response>::set_result_action,
-    set_result_action_agas_response_type);
+    hpx::lcos::base_lco_with_value<hpx::agas::response>::set_value_action,
+    set_value_action_agas_response_type)
 
 namespace hpx { namespace agas { namespace create_result_ns {
     typedef
@@ -541,16 +554,16 @@ namespace hpx { namespace agas { namespace create_result_ns {
         base_lco_vector_response_type;
 }}}
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::agas::create_result_ns::base_lco_bool_response_type::set_result_action,
-    set_result_action_agas_bool_response_type);
+    hpx::agas::create_result_ns::base_lco_bool_response_type::set_value_action,
+    set_value_action_agas_bool_response_type)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::agas::create_result_ns::base_lco_id_type_response_type::set_result_action,
-    set_result_action_agas_id_type_response_type);
+    hpx::agas::create_result_ns::base_lco_id_type_response_type::set_value_action,
+    set_value_action_agas_id_type_response_type)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::agas::create_result_ns::base_lco_vector_response_type::set_result_action,
-    set_result_action_agas_vector_response_type);
+    hpx::agas::create_result_ns::base_lco_vector_response_type::set_value_action,
+    set_value_action_agas_vector_response_type)
 
 #endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 

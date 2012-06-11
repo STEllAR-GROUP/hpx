@@ -12,9 +12,9 @@ namespace hpx { namespace threads { namespace detail
     template <typename T>
     class tagged_thread_state
     {
-        typedef boost::uint32_t tagged_thread_state_type;
-        typedef boost::uint8_t thread_state_type;
-        typedef boost::uint32_t tag_type;
+        typedef boost::int32_t tagged_thread_state_type;
+        typedef boost::int8_t thread_state_type;
+        typedef boost::int32_t tag_type;
 
     private:
         union cast_type
@@ -29,7 +29,7 @@ namespace hpx { namespace threads { namespace detail
         static tag_type
         extract_tag(volatile tagged_thread_state_type const& i)
         {
-            return (tag_type)(i & tag_mask);    // blend out state
+            return i & tag_mask;    // blend out state
         }
 
         static thread_state_type
@@ -41,11 +41,11 @@ namespace hpx { namespace threads { namespace detail
         }
 
         static tagged_thread_state_type
-        pack_state(tagged_thread_state_type state, int tag)
+        pack_state(tagged_thread_state_type state, tag_type tag)
         {
             cast_type ret;
             ret.value = tagged_thread_state_type(tag);
-            ret.tag[state_index] = state;
+            ret.tag[state_index] = thread_state_type(state);
             return ret.value;
         }
 
@@ -57,7 +57,7 @@ namespace hpx { namespace threads { namespace detail
 //           : state_(p.state_)
 //         {}
 
-        explicit tagged_thread_state(T state, int t = 0)
+        explicit tagged_thread_state(T state, tag_type t = 0)
           : state_(pack_state(state, t))
         {}
 
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace detail
 //             return *this;
 //         }
 
-        void set (T state, int t)
+        void set (T state, tag_type t)
         {
             state_ = pack_state(state, t);
         }

@@ -128,7 +128,9 @@ namespace boost { namespace coroutines { namespace detail
     }
 
     boost::int64_t count() const {
-      return m_counter;
+      BOOST_ASSERT(m_counter < static_cast<std::size_t>(
+          (std::numeric_limits<boost::int64_t>::max)()));
+      return static_cast<boost::int64_t>(m_counter);
     }
 
     void acquire() const {
@@ -414,22 +416,22 @@ namespace boost { namespace coroutines { namespace detail
     enum context_state {
       ctx_running,  // context running.
       ctx_ready,    // context at yield point.
-      ctx_waiting,     // context waiting for events.
+      ctx_waiting,  // context waiting for events.
       ctx_exited    // context is finished.
     };
 
     // exit request state
     enum context_exit_state {
       ctx_exit_not_requested,  // exit not requested.
-      ctx_exit_pending,   // exit requested.
-      ctx_exit_signaled,  // exit request delivered.
+      ctx_exit_pending,        // exit requested.
+      ctx_exit_signaled        // exit request delivered.
     };
 
     // exit status
     enum context_exit_status {
       ctx_not_exited,
-      ctx_exited_return,  // process exited by return.
-      ctx_exited_exit,    // process exited by exit().
+      ctx_exited_return,    // process exited by return.
+      ctx_exited_exit,      // process exited by exit().
       ctx_exited_abnormally // process exited uncleanly.
     };
 

@@ -58,7 +58,7 @@ namespace hpx { namespace util
 
         // Get the number of maximum concurrent connections per locality
         std::size_t get_max_connections_per_loc() const;
-        std::size_t get_connection_cache_size() const;
+        std::size_t get_max_connections() const;
 
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size() const;
@@ -89,7 +89,24 @@ namespace hpx { namespace util
         std::string get_cmd_line() const;
 
         // Will return the stack size to use for all HPX-threads.
-        std::size_t get_default_stack_size() const;
+        std::ptrdiff_t get_default_stack_size() const
+        {
+            return default_stacksize;
+        }
+
+        // Return the configured sizes of any of the know thread pools
+        std::size_t get_thread_pool_size(char const* poolname) const;
+
+    private:
+        std::ptrdiff_t init_default_stack_size() const;
+
+        void pre_initialize_ini();
+        void post_initialize_ini(std::string const& hpx_ini_file,
+            std::vector<std::string> const& cmdline_ini_defs);
+
+    private:
+        std::ptrdiff_t default_stacksize;
+        bool need_to_call_pre_initialize;
     };
 }}
 

@@ -26,6 +26,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         virtual base_lco const &operator*() const = 0;
         virtual base_lco * operator->() = 0;
         virtual base_lco const * operator->() const = 0;
+        virtual void finalize() = 0;
     };
 
     template <typename T>
@@ -52,6 +53,11 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     /**/
         BOOST_PP_REPEAT_FROM_TO(1, 10, HPX_LCOS_DATAFLOW_M0, _)
 #undef HPX_LCOS_DATAFLOW_M0
+
+        void finalize()
+        {
+            component_ptr->finalize();
+        }
 
         ~component_wrapper()
         {

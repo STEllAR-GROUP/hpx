@@ -14,6 +14,18 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
+namespace
+{
+    void garbage_collect_non_blocking()
+    {
+        hpx::agas::garbage_collect_non_blocking();
+    }
+    void garbage_collect()
+    {
+        hpx::agas::garbage_collect();
+    }
+}
+
 namespace hpx
 {
 
@@ -46,7 +58,7 @@ find_barrier(char const* symname)
     if (HPX_UNLIKELY(!barrier_id))
     {
         HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier",
-            std::string("couldn't find stage boot barrier ") + symname);
+            std::string("couldn't find boot barrier ") + symname);
     }
     return lcos::barrier(barrier_id);
 }
@@ -82,18 +94,8 @@ inline void register_counter_types()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void garbage_collect_non_blocking()
-{
-    agas::garbage_collect_non_blocking();
-}
-
-void garbage_collect()
-{
-    agas::garbage_collect();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
+bool pre_main(runtime_mode mode);
 bool pre_main(runtime_mode mode)
 {
     using components::stubs::runtime_support;
@@ -102,12 +104,15 @@ bool pre_main(runtime_mode mode)
     util::runtime_configuration const& cfg = get_runtime().get_config();
 
     bool exit_requested = false;
+
+    BOOST_ASSERT(cfg.get_agas_promise_pool_size() <
+        static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+    boost::int64_t const pool_size =
+        static_cast<boost::int64_t>(cfg.get_agas_promise_pool_size());
     if (runtime_mode_connect == mode)
     {
         LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
                       "skipping 2nd and 3rd stage startup synchronization";
-
-        std::size_t const pool_size = cfg.get_agas_promise_pool_size();
 
         // Unblock the AGAS router by adding the initial pool size to the
         // promise pool semaphores.
@@ -133,8 +138,6 @@ bool pre_main(runtime_mode mode)
         // {{{ unblock addressing_service
         if (!agas_client.is_bootstrap())
         {
-            std::size_t const pool_size = cfg.get_agas_promise_pool_size();
-
             // Unblock the local addressing_service by adding the initial pool
             // size to the promise pool semaphores. This ensures that no AGAS
             // requests are sent after first-stage AGAS bootstrap and before
@@ -218,8 +221,8 @@ bool pre_main(runtime_mode mode)
 
     // Register pre-shutdown and shutdown functions to flush pending
     // reference counting operations.
-    register_pre_shutdown_function(&garbage_collect_non_blocking);
-    register_shutdown_function(&garbage_collect);
+    register_pre_shutdown_function(&::garbage_collect_non_blocking);
+    register_shutdown_function(&::garbage_collect);
 
     // Any error in post-command line handling or any explicit --exit command
     // line option will cause the application to terminate at this point.

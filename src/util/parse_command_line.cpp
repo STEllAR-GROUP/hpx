@@ -298,7 +298,7 @@ namespace hpx { namespace util
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
                 ("hpx:agas", value<std::string>(),
-                  "the IP address the AGAS server is running on, "
+                  "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
                 ("hpx:run-agas-server-only", "run only the AGAS server")
@@ -327,7 +327,7 @@ namespace hpx { namespace util
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
-#if defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0)")
@@ -335,23 +335,24 @@ namespace hpx { namespace util
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1)")
 #endif
-                ("hpx:threads", value<std::size_t>(),
-                  "the number of operating system threads to dedicate as "
-                  "shepherd threads for this HPX locality (default: 1)")
+                ("hpx:threads", value<std::string>(),
+                 "the number of operating system threads to spawn for this HPX "
+                 "locality (default: 1, using 'all' will spawn one thread for "
+                 "each processing unit")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "
                   "'hierarchy/h', and 'periodic/pe' (default: priority_local/p)")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
-                   "--queuing=hierarchy only (default: 2)")
+                   "--hpx:queuing=hierarchy only (default: 2)")
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--queuing=priority_local only")
+                  "--hpx:queuing=priority_local only")
                 ("hpx:numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
-                  "--queuing=priority_local only")
+                  "--hpx:queuing=priority_local only")
             ;
 
             options_description config_options("HPX configuration options");
@@ -389,13 +390,13 @@ namespace hpx { namespace util
             counter_options.add_options()
                 ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
                   "print the specified performance counter either repeatedly or "
-                  "before shutting down the system (see option --print-counter-interval)")
+                  "before shutting down the system (see option --hpx:print-counter-interval)")
                 ("hpx:print-counter-interval", value<std::size_t>(),
-                  "print the performance counter(s) specified with --print-counter "
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
                   "(default: 0, which means print once at shutdown)")
                 ("hpx:print-counter-destination", value<std::string>(),
-                  "print the performance counter(s) specified with --print-counter "
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "to the given file (default: console)")
                 ("hpx:list-counters", "list the names of all registered performance "
                   "counters")

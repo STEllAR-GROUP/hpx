@@ -151,10 +151,14 @@ namespace hpx { namespace components { namespace detail
             return true;
         }
 
+#if HPX_DEBUG_WRAPPER_HEAP
         void free(void *p, std::size_t count = 1)
         {
             BOOST_ASSERT(did_alloc(p));
-
+#else
+        void free(void *, std::size_t count = 1)
+        {
+#endif
             scoped_lock l(mtx_);
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
@@ -217,7 +221,7 @@ namespace hpx { namespace components { namespace detail
                     return naming::invalid_gid;
                 }
             }
-            return base_gid_ + (static_cast<value_type*>(p) - addr);
+            return base_gid_ + static_cast<boost::uint64_t>((static_cast<value_type*>(p) - addr));
         }
 
         void set_gid(naming::gid_type const& g)
@@ -267,7 +271,7 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(first_free_ == NULL);
 
             std::size_t s = step_ * heap_size;
-            pool_ = (storage_type*)Allocator::alloc(s);
+            pool_ = static_cast<storage_type*>(Allocator::alloc(s));
             if (NULL == pool_)
                 return false;
 
@@ -346,7 +350,7 @@ namespace hpx { namespace components { namespace detail
             {
                 ::free(p);
             }
-            static void* realloc(std::size_t &size, void *p)
+            static void* realloc(std::size_t &, void *)
             {
                 // normally this should return ::realloc(p, size), but we are
                 // not interested in growing the allocated heaps, so we just
@@ -369,7 +373,7 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit fixed_wrapper_heap(char const* class_name = "<Unknown>",
-                std::size_t count = 0, std::size_t step = (std::size_t)-1)
+                std::size_t count = 0, std::size_t step = std::size_t(-1))
           : base_type(class_name, count, step)
         {}
     };

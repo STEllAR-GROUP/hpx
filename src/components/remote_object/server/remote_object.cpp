@@ -7,10 +7,7 @@
 
 namespace hpx { namespace components { namespace server
 {
-    void remote_object::set_dtor(
-        hpx::util::function<void(void**)> const & f
-      , std::size_t
-    )
+    void remote_object::set_dtor(hpx::util::function<void(void**)> const & f)
     {
         dtor = f;
     }

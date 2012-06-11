@@ -16,7 +16,7 @@ namespace hpx { namespace components
     namespace commandline_options_provider
     {
         boost::program_options::options_description add_commandline_options();
-    };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_startup_shutdown provides a minimal implementation of

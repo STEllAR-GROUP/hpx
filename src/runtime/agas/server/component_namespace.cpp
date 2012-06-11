@@ -11,6 +11,8 @@
 
 #include <boost/foreach.hpp>
 
+// TODO: Remove the use of the name "prefix"
+
 namespace hpx { namespace agas
 {
 
@@ -132,9 +134,9 @@ response component_namespace::bind_prefix(
                 std::make_pair(key, type_counter)), cit)))
         {
             HPX_THROWS_IF(ec, lock_error
-                , "component_namespace::bind_prefix"
-                , "component id table insertion failed due to a locking "
-                  "error or memory corruption")
+              , "component_namespace::bind_prefix"
+              , "component id table insertion failed due to a locking "
+                "error or memory corruption")
             return response();
         }
 
@@ -146,28 +148,58 @@ response component_namespace::bind_prefix(
     factory_table_type::iterator fit = factories_.find(cit->second)
                                , fend = factories_.end();
 
-    if (fit == fend)
+    if (fit != fend)
     {
-        // Instead of creating a temporary and then inserting it, we insert
-        // an empty set, then put the prefix into said set. This should
-        // prevent a copy, though most compilers should be able to optimize
-        // this without our help.
-        if (HPX_UNLIKELY(!util::insert_checked(factories_.insert(
-                std::make_pair(cit->second, prefixes_type())), fit)))
+        prefixes_type::iterator pit = fit->second.find(prefix);
+
+        if (pit != fit->second.end())
         {
-            HPX_THROWS_IF(ec, lock_error
-                , "component_namespace::bind_prefix"
-                , "factory table insertion failed due to a locking "
-                  "error or memory corruption")
+            // Duplicate type registration for this locality.
+            HPX_THROWS_IF(ec, duplicate_component_id
+              , "component_namespace::bind_prefix"
+              , boost::str(boost::format(
+                    "component id is already registered for the given "
+                    "locality, key(%1%), prefix(%2%), ctype(%3%)")
+                    % key % prefix % cit->second))
             return response();
         }
+
+        fit->second.insert(prefix);
+
+        // First registration for this locality, we still return no_success to
+        // convey the fact that another locality already registered this
+        // component type.
+        LAGAS_(info) << (boost::format(
+            "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
+            "ctype(%3%), response(no_success)")
+            % key % prefix % cit->second);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return response(component_ns_bind_prefix
+                      , cit->second
+                      , no_success);
+    }
+
+    // Instead of creating a temporary and then inserting it, we insert
+    // an empty set, then put the prefix into said set. This should
+    // prevent a copy, though most compilers should be able to optimize
+    // this without our help.
+    if (HPX_UNLIKELY(!util::insert_checked(factories_.insert(
+            std::make_pair(cit->second, prefixes_type())), fit)))
+    {
+        HPX_THROWS_IF(ec, lock_error
+            , "component_namespace::bind_prefix"
+            , "factory table insertion failed due to a locking "
+              "error or memory corruption")
+        return response();
     }
 
     fit->second.insert(prefix);
 
     LAGAS_(info) << (boost::format(
-        "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
-        "ctype(%3%)")
+        "component_namespace::bind_prefix, key(%1%), prefix(%2%), ctype(%3%)")
         % key % prefix % cit->second);
 
     if (&ec != &throws)
@@ -327,7 +359,7 @@ response component_namespace::iterate_types(
                                          , end = component_ids_.end();
          it != end; ++it)
     {
-        f(it->first, static_cast<components::component_type>(it->second));
+        f(it->first, it->second);
     }
 
     LAGAS_(info) << "component_namespace::iterate_types";

@@ -120,6 +120,24 @@ namespace hpx { namespace lcos { namespace local
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
+        struct reset_queue_entry
+        {
+            reset_queue_entry(queue_entry& e, queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            queue_entry& e_;
+            queue_type& q_;
+            queue_type::const_iterator last_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         bool try_lock_internal()
         {
             return !interlocked_bit_test_and_set(active_count_, lock_flag_bit);

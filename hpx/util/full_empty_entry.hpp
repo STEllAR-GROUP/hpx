@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
@@ -90,6 +90,23 @@ namespace hpx { namespace util { namespace detail
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
+        struct reset_queue_entry
+        {
+            reset_queue_entry(queue_entry& e, queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            queue_entry& e_;
+            queue_type& q_;
+            typename queue_type::const_iterator last_;
+        };
+
         void log_non_empty_queue(char const* const desc, queue_type& queue)
         {
             mutex_type::scoped_lock l(mtx_);
@@ -99,7 +116,7 @@ namespace hpx { namespace util { namespace detail
                 queue.pop_front();
 
                 // we know that the id is actually the pointer to the thread
-                threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
+                threads::thread_data* thrd = reinterpret_cast<threads::thread_data*>(id);
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
                         << get_thread_state_name(thrd->get_state())
@@ -167,6 +184,15 @@ namespace hpx { namespace util { namespace detail
             return set_full_locked(ec);
         }
 
+        template <typename F>
+        bool peek(F f) const
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (state_ == empty)
+                return false;
+            return f(data_);      // pass the data to the provided function
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation if full/full queue if entry is empty
         template <typename T>
@@ -188,42 +214,23 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
-                typename queue_type::const_iterator last = read_queue_.last();
-                threads::thread_state_ex_enum statex;
-
                 {
                     lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_enqueued_;
                 }
 
+                reset_queue_entry r(f, read_queue_);
+
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_full");
                 }
 
                 {
                     lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_dequeued_;
-                }
-
-                if (f.id_)
-                    read_queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(id, ig);
-
-                    strm << "thread(" << id
-                          << (desc.empty() ? "" : ", " ) << desc
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted,
-                        "full_empty_entry::enqueue_full_full",
-                        hpx::util::osstream_get_string(strm));
-
-                    return;
                 }
             }
 
@@ -253,42 +260,23 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
-                typename queue_type::const_iterator last = read_queue_.last();
-                threads::thread_state_ex_enum statex;
-
                 {
                     lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_enqueued_;
                 }
 
+                reset_queue_entry r(f, read_queue_);
+
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_full");
                 }
 
                 {
                     lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_dequeued_;
-                }
-
-                if (f.id_)
-                    read_queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(id, ig);
-
-                    strm << "thread(" << id
-                          << (desc.empty() ? "" : ", " ) << desc
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted,
-                        "full_empty_entry::enqueue_full_full",
-                        hpx::util::osstream_get_string(strm));
-
-                    return;
                 }
             }
 
@@ -317,32 +305,13 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
-                typename queue_type::const_iterator last = read_and_empty_queue_.last();
-                threads::thread_state_ex_enum statex;
+                reset_queue_entry r(f, read_and_empty_queue_);
 
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
-                }
-
-                if (f.id_)
-                    read_and_empty_queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(id, ig);
-
-                    strm << "thread(" << id
-                          << (desc.empty() ? "" : ", " ) << desc
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted,
-                        "full_empty_entry::enqueue_full_empty",
-                        hpx::util::osstream_get_string(strm));
-
-                    return;
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_empty");
                 }
 
                 // move the data to the destination
@@ -378,32 +347,13 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
-                typename queue_type::const_iterator last = read_and_empty_queue_.last();
-                threads::thread_state_ex_enum statex;
+                reset_queue_entry r(f, read_and_empty_queue_);
 
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
-                }
-
-                if (f.id_)
-                    read_and_empty_queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(id, ig);
-
-                    strm << "thread(" << id
-                          << (desc.empty() ? "" : ", " ) << desc
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted,
-                        "full_empty_entry::enqueue_full_empty",
-                        hpx::util::osstream_get_string(strm));
-
-                    return;
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_empty");
                 }
             }
             else {
@@ -436,32 +386,13 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
-                typename queue_type::const_iterator last = write_queue_.last();
-                threads::thread_state_ex_enum statex;
+                reset_queue_entry r(f, write_queue_);
 
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
-                }
-
-                if (f.id_)
-                    write_queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(id, ig);
-
-                    strm << "thread(" << id
-                          << (desc.empty() ? "" : ", " ) << desc
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted,
-                        "full_empty_entry::enqueue_if_full",
-                        hpx::util::osstream_get_string(strm));
-
-                    return;
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_if_full");
                 }
             }
 
@@ -495,31 +426,13 @@ namespace hpx { namespace util { namespace detail
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
-                typename queue_type::const_iterator last = write_queue_.last();
-                threads::thread_state_ex_enum statex;
+                reset_queue_entry r(f, write_queue_);
 
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
-                }
-
-                if (f.id_)
-                    write_queue_.erase(last);     // remove entry from queue
-
-                if (statex == threads::wait_abort) {
-                    hpx::util::osstream strm;
-
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(id, ig);
-
-                    strm << "thread(" << id
-                          << (desc.empty() ? "" : ", " ) << desc
-                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted,
-                        "full_empty_entry::enqueue_if_full",
-                        hpx::util::osstream_get_string(strm));
-                    return;
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_if_full");
                 }
             }
 

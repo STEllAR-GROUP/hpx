@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file hpx_fwd.hpp
+
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
@@ -24,8 +26,11 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/coroutine/coroutine.hpp>
+#include <boost/detail/scoped_enum_emulation.hpp>
+
 #include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/util/unused.hpp>
@@ -36,12 +41,11 @@
 ///
 /// The namespace \a hpx is the main namespace of the HPX library. All classes
 /// functions and variables are defined inside this namespace.
-
 namespace hpx
 {
+    /// \cond NOINTERNAL
     class error_code;
 
-    // predefined error_code object used as "throw on error" tag
     HPX_EXCEPTION_EXPORT extern error_code throws;
 
     /// \namespace applier
@@ -59,22 +63,6 @@ namespace hpx
         HPX_API_EXPORT applier* get_applier_ptr();
     }
 
-    /// \namespace actions
-    ///
-    /// The namespace \a actions contains all definitions needed for the
-    /// class \a hpx#action_manager#action_manager and its related
-    /// functionality. This namespace is part of the HPX core module.
-    namespace actions
-    {
-        struct HPX_API_EXPORT base_action;
-        typedef boost::shared_ptr<base_action> action_type;
-
-        class HPX_API_EXPORT continuation;
-        typedef boost::shared_ptr<continuation> continuation_type;
-
-        class HPX_API_EXPORT action_manager;
-    }
-
     namespace agas
     {
         struct HPX_API_EXPORT addressing_service;
@@ -83,7 +71,7 @@ namespace hpx
         {
             service_mode_invalid = -1,
             service_mode_bootstrap = 0,
-            service_mode_hosted = 1,
+            service_mode_hosted = 1
         };
     }
 
@@ -166,7 +154,7 @@ namespace hpx
         }
 
         struct HPX_API_EXPORT threadmanager_base;
-        class HPX_API_EXPORT thread;
+        class HPX_API_EXPORT thread_data;
 
         template <
             typename SchedulingPolicy,
@@ -219,7 +207,7 @@ namespace hpx
             wait_signaled = 0,  ///< The thread has been signaled
             wait_timeout = 1,   ///< The thread has been reactivated after a timeout
             wait_terminate = 2, ///< The thread needs to be terminated
-            wait_abort = 3,     ///< The thread needs to be aborted
+            wait_abort = 3      ///< The thread needs to be aborted
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_ex_enum> thread_state_ex;
@@ -227,10 +215,13 @@ namespace hpx
         typedef thread_state_enum thread_function_type(thread_state_ex_enum);
 
         ///////////////////////////////////////////////////////////////////////
+        /// \cond NODETAIL
         namespace detail
         {
             template <typename CoroutineImpl> struct coroutine_allocator;
         }
+        /// \endcond
+
         typedef boost::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
@@ -243,6 +234,10 @@ namespace hpx
         /// The function \a get_self_ptr returns a pointer to the (OS thread
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
+
+        /// The function \a get_ctx_ptr returns a pointer to the internal data
+        /// associated with each coroutine.
+        HPX_API_EXPORT thread_self::impl_type* get_ctx_ptr();
 
         /// The function \a get_self_ptr_checked returns a pointer to the (OS
         /// thread specific) self reference to the current PX thread.
@@ -262,10 +257,10 @@ namespace hpx
         /// PX thread).
         HPX_API_EXPORT std::size_t get_parent_phase();
 
-        /// The function \a get_parent_prefix returns the id of the locality of
+        /// The function \a get_parent_locality_id returns the id of the locality of
         /// the currents thread parent (or zero if the current thread is not a
         /// PX thread).
-        HPX_API_EXPORT boost::uint32_t get_parent_prefix();
+        HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
 
         /// The function \a get_self_component_id returns the lva of the
         /// component the current thread is acting on
@@ -281,7 +276,28 @@ namespace hpx
             thread_state_enum state = unknown);
     }
 
+    /// \namespace actions
+    ///
+    /// The namespace \a actions contains all definitions needed for the
+    /// class \a hpx#action_manager#action_manager and its related
+    /// functionality. This namespace is part of the HPX core module.
+    namespace actions
+    {
+        struct HPX_API_EXPORT base_action;
+        typedef boost::shared_ptr<base_action> action_type;
+
+        class HPX_API_EXPORT continuation;
+        typedef boost::shared_ptr<continuation> continuation_type;
+
+        class HPX_API_EXPORT action_manager;
+
+        template <typename Component, int Action, typename Result,
+            typename Arguments, typename Derived, threads::thread_priority Priority>
+        struct action;
+    }
+
     class HPX_API_EXPORT runtime;
+    class HPX_API_EXPORT thread;
 
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.
@@ -294,7 +310,7 @@ namespace hpx
                                     ///< connecting late
         runtime_mode_default = 3,   ///< The runtime mode will be determined
                                     ///< based on the command line arguments
-        runtime_mode_last = 3
+        runtime_mode_last
     };
 
     /// Get the readable string representing the name of the given runtime_mode
@@ -312,11 +328,15 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// Add a function to be executed inside a HPX thread before hpx_main
+    /// but guaranteed before any startup function is executed (system-wide)
     typedef HPX_STD_FUNCTION<void()> startup_function_type;
+    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const&);
+
+    /// Add a function to be executed inside a HPX thread before hpx_main
     HPX_API_EXPORT void register_startup_function(startup_function_type const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
-    /// but guaranteed before any shutdown function (system-wide)
+    /// but guaranteed before any shutdown function is executed (system-wide)
     typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
     HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
 
@@ -354,12 +374,20 @@ namespace hpx
         destination_hpx = 0,
         destination_timing = 1,
         destination_agas = 2,
-        destination_app = 3,
+        destination_app = 3
     };
 
     /// \namespace components
     namespace components
     {
+        enum factory_state_enum
+        {
+            factory_enabled  = 0,
+            factory_disabled = 1,
+            factory_check    = 2
+        };
+
+        /// \cond NODETAIL
         namespace detail
         {
             struct this_type {};
@@ -367,9 +395,11 @@ namespace hpx
             struct simple_component_tag {};
             struct managed_component_tag {};
         }
+        /// \endcond
 
         ///////////////////////////////////////////////////////////////////////
-        enum component_type
+        typedef boost::int32_t component_type;
+        enum component_enum_type
         {
             component_invalid = -1,
             component_runtime_support = 0,  // runtime support (needed to create components, etc.)
@@ -464,20 +494,12 @@ namespace hpx
             typename RemoteResult =
                 typename traits::promise_remote_result<Result>::type>
         class promise;
-        struct non_signalling_tag {};
-
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
-        class signalling_promise;
-        struct signalling_tag {};
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
-            typename Signalling = non_signalling_tag,
             typename DirectExecute = typename Action::direct_execution>
-        class packaged_task;
+        class packaged_action;
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
@@ -490,7 +512,7 @@ namespace hpx
                 typename traits::promise_remote_result<Result>::type>
         class future;
 
-       template <typename ValueType>
+        template <typename ValueType>
         struct object_semaphore;
 
         namespace stubs
@@ -523,16 +545,20 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the global id representing this locality
-    HPX_API_EXPORT naming::id_type find_here();
+    // Launch policy for \a hpx::async
+    BOOST_SCOPED_ENUM_START(launch)
+    {
+        async = 0x01,
+        deferred = 0x02,
+        all = 0x03        // async | deferred
+    };
+    BOOST_SCOPED_ENUM_END
 
-    /// \brief Return the list of locality ids of the localities supporting the
-    ///        given component type. By default this function will return the
-    ///        list of all localities.
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
-        components::component_type);
-    HPX_API_EXPORT naming::id_type find_locality(components::component_type);
+    inline bool
+    operator&(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
+    {
+        return static_cast<int>(lhs) & static_cast<int>(rhs) ? true : false;
+    }
 
     /// \brief Return the list of locality ids of remote localities supporting
     ///        the given component type. By default this function will return
@@ -546,7 +572,12 @@ namespace hpx
     HPX_API_EXPORT boost::uint32_t get_num_localities();
     HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
 
-    HPX_API_EXPORT naming::gid_type get_next_id();
+    /// \cond NODETAIL
+    namespace detail
+    {
+        HPX_API_EXPORT naming::gid_type get_next_id();
+    }
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
@@ -562,13 +593,117 @@ namespace hpx
     ///         returned by \a get_os_thread_count().
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_worker_thread_num();
+    HPX_API_EXPORT std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.
-    HPX_API_EXPORT boost::uint32_t get_locality_id();
+    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+
+    /// \endcond
 }
+
+namespace hpx
+{
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing this locality
+    ///
+    /// The function \a find_here() can be used to retrieve the global id
+    /// usable to refer to the current locality.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global id representing the locality this function has
+    ///           been called on.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
+    HPX_API_EXPORT naming::id_type find_here();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the list of global ids representing all localities
+    ///        available to this application.
+    ///
+    /// The function \a find_all_localities() can be used to retrieve the
+    /// global ids of all localities currently available to this application.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global ids representing the localities currently
+    ///           available to this application.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the list of global ids representing all localities
+    ///        available to this application which support the given component
+    ///        type.
+    ///
+    /// The function \a find_all_localities() can be used to retrieve the
+    /// global ids of all localities currently available to this application
+    /// which support the creation of instances of the given component type.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \param type  [in] The type of the components for which the function should
+    ///           return the available localities.
+    ///
+    /// \returns  The global ids representing the localities currently
+    ///           available to this application which support the creation of
+    ///           instances of the given component type. If no localities
+    ///           supporting the given component type are currently available,
+    ///           this function will return an empty vector.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+        components::component_type type);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing an arbitrary locality which
+    ///        supports the given component type.
+    ///
+    /// The function \a find_locality() can be used to retrieve the
+    /// global ids of all localities currently available to this application
+    /// which support the creation of instances of the given component type.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \param type  [in] The type of the components for which the function should
+    ///           return any available locality.
+    ///
+    /// \returns  The global id representing an arbitrary locality currently
+    ///           available to this application which supports the creation of
+    ///           instances of the given component type. If no locality
+    ///           supporting the given component type is currently available,
+    ///           this function will return \a hpx::naming::invalid_id.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
+    HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
+}
+
+#include <hpx/lcos/async_fwd.hpp>
 
 #endif
 

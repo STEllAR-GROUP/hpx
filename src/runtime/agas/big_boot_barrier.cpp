@@ -34,16 +34,6 @@
 namespace hpx { namespace agas
 {
 
-typedef lcos::packaged_task<
-    server::primary_namespace::service_action,
-    response
-> allocate_response_future_type;
-
-typedef lcos::packaged_task<
-    server::primary_namespace::service_action,
-    response
-> bind_response_future_type;
-
 typedef components::detail::heap_factory<
     lcos::detail::promise<
         response
@@ -59,22 +49,20 @@ typedef components::detail::heap_factory<
 
 // TODO: Make assertions exceptions
 void early_parcel_sink(
-    parcelset::parcelport&
-  , boost::shared_ptr<std::vector<char> > const& parcel_data
+    boost::shared_ptr<std::vector<char> > parcel_data
     )
 { // {{{
-    parcelset::parcel p;
-
     typedef util::container_device<std::vector<char> > io_device_type;
-    boost::iostreams::stream<io_device_type> io (*parcel_data.get());
+    boost::iostreams::stream<io_device_type> io (*parcel_data);
 
     // De-serialize the parcel data
     util::portable_binary_iarchive archive(io);
 
-    std::size_t count = 0;
-    archive >> count;
-    while(count-- != 0)
+    std::size_t parcel_count = 0;
+    archive >> parcel_count;
+    for(std::size_t i = 0; i < parcel_count; ++i)
     {
+        parcelset::parcel p;
         archive >> p;
 
         // decode the action-type in the parcel
@@ -93,13 +81,9 @@ void early_parcel_sink(
                 (threads::thread_state_ex(threads::wait_signaled));
         }
         catch (...) {
-            try {
-                boost::rethrow_exception(boost::current_exception());
-            }
-            catch (boost::exception const& be) {
-                std::cerr << hpx::diagnostic_information(be) << std::endl;
-                std::abort();
-            }
+            std::cerr << hpx::diagnostic_information(boost::current_exception())
+                      << std::endl;
+            std::abort();
         }
     }
 } // }}}
@@ -325,7 +309,7 @@ void register_console(registration_header const& header)
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
 
     actions::base_action* p =
-        new notify_console_action(
+        new actions::transfer_action<notify_console_action>(
             notification_header(
                 prefix, header.response_heap_address, header.response_heap_ptr,
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
@@ -405,7 +389,8 @@ void notify_console(notification_header const& header)
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
-        promise_pool.enqueue(new lcos::promise<response>);
+        promise_pool.enqueue(
+            new lcos::packaged_action<server::primary_namespace::service_action>);
 }
 
 // remote call to AGAS
@@ -468,7 +453,7 @@ void register_worker(registration_header const& header)
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
 
     actions::base_action* p =
-        new notify_console_action(
+        new actions::transfer_action<notify_console_action>(
             notification_header(
                 prefix, header.response_heap_address, header.response_heap_ptr,
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
@@ -551,7 +536,8 @@ void notify_worker(notification_header const& header)
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
-        promise_pool.enqueue(new lcos::promise<response>);
+        promise_pool.enqueue(
+            new lcos::packaged_action<server::primary_namespace::service_action>);
 }
 // }}}
 
@@ -562,10 +548,14 @@ using hpx::agas::notify_console_action;
 using hpx::agas::register_worker_action;
 using hpx::agas::notify_worker_action;
 
-HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action, register_console_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action, notify_console_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action, register_worker_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action, notify_worker_action, true);
+HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action,
+    register_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action,
+    notify_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action,
+    register_worker_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action,
+    notify_worker_action, hpx::components::factory_enabled)
 
 namespace hpx { namespace agas
 {
@@ -596,25 +586,50 @@ big_boot_barrier::big_boot_barrier(
                : 0)
              : 1)
 {
-    pp_.register_event_handler(boost::bind(&early_parcel_sink, _1, _2));
+    pp_.register_event_handler(boost::bind(&early_parcel_sink, _2));
 }
 
 void big_boot_barrier::apply(
-    boost::uint32_t prefix
+    boost::uint32_t locality_id
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(prefix, addr, act);
+    parcelset::parcel p(locality_id, addr, act);
 
-    parcelset::parcelport_connection_ptr client_connection
-        (connection_cache_.get(prefix));
+    parcelset::parcelport_connection_ptr client_connection;
 
+    bool got_cache_space = false;
+
+    for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
+    {
+        // Get a connection or reserve space for a new connection. 
+        if (connection_cache_.get_or_reserve(locality_id, client_connection))
+        {
+            got_cache_space = true;
+            break;
+        }
+
+        // Wait for a really short amount of time (usually 100 ms).
+        boost::this_thread::sleep(boost::get_system_time() +
+            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+    } 
+
+    // If we didn't get a connection or permission to create one (which is
+    // unlikely), bail.
+    if (!got_cache_space)
+    {
+        HPX_THROW_EXCEPTION(network_error,
+            "big_boot_barrier::apply",
+            "timed out while trying to find room in the connection cache");
+    }
+
+    // Check if we need to create the new connection.
     if (!client_connection)
     {
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
         client_connection.reset(new parcelset::parcelport_connection(
-            io_service_pool_.get_io_service(), prefix,
+            io_service_pool_.get_io_service(), locality_id,
             connection_cache_, pp.timer_, pp.parcels_sent_));
         client_connection->set_parcel(p);
 
@@ -651,7 +666,7 @@ void big_boot_barrier::apply(
             catch (boost::system::error_code const& e)
             {
                 HPX_THROW_EXCEPTION(network_error,
-                    "big_boot_barrier::get_connection", e.message());
+                    "big_boot_barrier::apply", e.message());
             }
         }
 
@@ -666,10 +681,33 @@ void big_boot_barrier::apply(
                 "big_boot_barrier::get_connection",
                 hpx::util::osstream_get_string(strm));
         } // }}}
+#if defined(HPX_DEBUG)
+        else
+        {
+            client_connection->set_locality(addr.locality_);
+
+            std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
+            boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
+            BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
+            BOOST_ASSERT(addr.locality_.get_port() == connection_port);
+        }
+#endif
     }
 
     else
+    {
         client_connection->set_parcel(p);
+
+#if defined(HPX_DEBUG)
+        BOOST_ASSERT(addr.locality_ == client_connection->get_locality());
+        BOOST_ASSERT(locality_id == client_connection->destination());
+
+        std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
+        boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
+        BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
+        BOOST_ASSERT(addr.locality_.get_port() == connection_port);
+#endif
+    }
 
     client_connection->async_write(early_write_handler, early_pending_parcel_handler);
 } // }}}
@@ -692,16 +730,17 @@ void big_boot_barrier::wait()
             // on the bootstrap AGAS node, and sleeping on this node. We'll
             // be woken up by notify_console.
 
-            apply(1, bootstrap_agas, new register_console_action(
-                registration_header
-                    (get_runtime().here(),
-                     HPX_INITIAL_GID_RANGE,
-                     (boost::uint64_t) response_heap_type::block_type::heap_step,
-                     p->get_address(),
-                     (boost::uint64_t) response_heap_type::block_type::heap_size,
-                     (std::size_t) p,
-                     get_runtime().get_runtime_support_lva(),
-                     get_runtime().get_memory_lva())));
+            apply(0, bootstrap_agas,
+                new actions::transfer_action<register_console_action>(
+                    registration_header
+                        (get_runtime().here(),
+                         HPX_INITIAL_GID_RANGE,
+                         response_heap_type::block_type::heap_step,
+                         p->get_address(),
+                         response_heap_type::block_type::heap_size,
+                         reinterpret_cast<std::size_t>(p),
+                         get_runtime().get_runtime_support_lva(),
+                         get_runtime().get_memory_lva())));
             spin();
         }
 
@@ -711,16 +750,17 @@ void big_boot_barrier::wait()
             // we need to contact the bootstrap AGAS node, and then wait
             // for it to signal us.
 
-            apply(1, bootstrap_agas, new register_worker_action(
-                registration_header
-                    (get_runtime().here(),
-                     HPX_INITIAL_GID_RANGE,
-                     (boost::uint64_t) response_heap_type::block_type::heap_step,
-                     p->get_address(),
-                     (boost::uint64_t) response_heap_type::block_type::heap_size,
-                     (std::size_t) p,
-                     get_runtime().get_runtime_support_lva(),
-                     get_runtime().get_memory_lva())));
+            apply(0, bootstrap_agas,
+                new actions::transfer_action<register_worker_action>(
+                    registration_header
+                        (get_runtime().here(),
+                         HPX_INITIAL_GID_RANGE,
+                         response_heap_type::block_type::heap_step,
+                         p->get_address(),
+                         response_heap_type::block_type::heap_size,
+                         reinterpret_cast<std::size_t>(p),
+                         get_runtime().get_runtime_support_lva(),
+                         get_runtime().get_memory_lva())));
             spin();
         }
     }

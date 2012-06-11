@@ -30,7 +30,7 @@ namespace hpx { namespace components
         /// \brief Return the unique identifier of the component type this
         ///        factory is responsible for
         ///
-        /// \param prefix       [in] The prefix of the locality this factory
+        /// \param locality     [in] The id of the locality this factory
         ///                     is responsible for.
         /// \param agas_client  [in] The AGAS client to use for component id
         ///                     registration (if needed).
@@ -39,7 +39,7 @@ namespace hpx { namespace components
         ///         factory instance is responsible for. This function throws
         ///         on any error.
         virtual component_type get_component_type(
-            naming::gid_type const& prefix, naming::resolver_client& agas_client) = 0;
+            naming::gid_type const& locality, naming::resolver_client& agas_client) = 0;
 
         /// \brief Return the name of the component type this factory is
         ///        responsible for
@@ -105,7 +105,17 @@ namespace hpx { namespace components
         ///         the shared library implementing this factory. This
         ///         function will return 'true' whenever no more outstanding
         ///         instances of the managed object type are alive.
-        virtual bool may_unload() const = 0;
+        bool may_unload() const
+        {
+            return instance_count() == 0;
+        }
+
+        /// \brief Ask how many instances are alive of the type this factory is
+        ///        responsible for
+        ///
+        /// \return Returns the number of instances of the managed object type
+        ///         which are currently alive.
+        virtual long instance_count() const = 0;
     };
 
 }}
@@ -140,22 +150,21 @@ namespace boost { namespace plugin
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_COMPONENT_FACTORY is used to register the given
-/// component factory with Boost.Plugin. This macro has to be used for each of
-/// the component factories.
+/// This macro is used to register the given component factory with
+/// Boost.Plugin. This macro has to be used for each of the component factories.
 #define HPX_REGISTER_COMPONENT_FACTORY(FactoryType, componentname)            \
         BOOST_PLUGIN_EXPORT(HPX_COMPONENT_LIB_NAME,                           \
             hpx::components::component_factory_base, FactoryType,             \
             componentname, HPX_MANGLE_COMPONENT_NAME(factory))                \
     /**/
 
-/// The macro \a HPX_REGISTER_COMPONENT_MODULE is used to define the required
-/// Boost.Plugin entry points. This macro has to be used in exactly one
-/// compilation unit of a component module.
+/// This macro is used to define the required Boost.Plugin entry points. This
+/// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(factory));                              \
+            HPX_MANGLE_COMPONENT_NAME(factory))                               \
         HPX_REGISTER_REGISTRY_MODULE()                                        \
     /**/
 
 #endif
+

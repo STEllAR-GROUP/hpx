@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -190,8 +190,8 @@ namespace hpx { namespace threads
                 data.parent_phase = self->get_thread_phase();
             }
         }
-        if (0 == data.parent_prefix)
-            data.parent_prefix = get_locality_id();
+        if (0 == data.parent_locality_id)
+            data.parent_locality_id = get_locality_id();
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -271,8 +271,8 @@ namespace hpx { namespace threads
                 data.parent_phase = self->get_thread_phase();
             }
         }
-        if (0 == data.parent_prefix)
-            data.parent_prefix = get_locality_id();
+        if (0 == data.parent_locality_id)
+            data.parent_locality_id = get_locality_id();
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -298,22 +298,40 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     // thread function registered for set_state if thread is currently active
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_active_state(thread_id_type id,
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority)
+            thread_priority priority, thread_state previous_state)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_active_state",
                 "NULL thread id encountered");
+            return terminated;
+        }
+
+        // make sure that the thread has not been suspended and set active again
+        // in the mean time
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_state current_state = thrd->get_state();
+
+        if (thread_state_enum(current_state) == thread_state_enum(previous_state) &&
+            current_state != previous_state)
+        {
+            LTM_(warning)
+                << "set_active_state: thread is still active, however "
+                      "it was non-active since the original set_state "
+                      "request was issued, aborting state change, thread("
+                << id << "), description("
+                << thrd->get_description() << "), new state("
+                << get_thread_state_name(newstate) << ")";
+            return terminated;
         }
 
         // just retry, set_state will create new thread if target is still active
-        // REVIEW: report errors, at least?
-        //error_code ec;      // do not throw
-        set_state(id, newstate, newstate_ex, priority/*, ec*/);
-        return thread_state(terminated);
+        error_code ec;      // do not throw
+        set_state(id, newstate, newstate_ex, priority, ec);
+        return terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -343,7 +361,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (NULL == thrd->get()) {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -373,14 +391,15 @@ namespace hpx { namespace threads
         if (active == previous_state_val)
         {
             // schedule a new thread to set the state
-            LTM_(warning) << "set_state: thread is currently active, scheduling "
-                           "new thread, thread(" << id << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+            LTM_(warning)
+                << "set_state: thread is currently active, scheduling "
+                    "new thread, thread(" << id << "), description("
+                << thrd->get_description() << "), new state("
+                << get_thread_state_name(new_state) << ")";
 
             thread_init_data data(
                 boost::bind(&threadmanager_impl::set_active_state, this,
-                    id, new_state, new_state_ex, priority),
+                    id, new_state, new_state_ex, priority, previous_state),
                 "set state for active thread", 0, priority);
             register_work(data);
 
@@ -390,10 +409,11 @@ namespace hpx { namespace threads
             return previous_state;     // done
         }
         else if (terminated == previous_state_val) {
-            LTM_(warning) << "set_state: thread is terminated, aborting state "
-                           "change, thread(" << id << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+            LTM_(warning)
+                << "set_state: thread is terminated, aborting state "
+                    "change, thread(" << id << "), description("
+                << thrd->get_description() << "), new state("
+                << get_thread_state_name(new_state) << ")";
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -452,7 +472,7 @@ namespace hpx { namespace threads
         get_state(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_state() : thread_state(terminated);
     }
 
@@ -463,7 +483,7 @@ namespace hpx { namespace threads
         get_phase(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
@@ -475,7 +495,7 @@ namespace hpx { namespace threads
         get_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_description() : "<unknown>";
     }
 
@@ -490,7 +510,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
             thrd->set_description(desc);
     }
@@ -506,7 +526,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_lco_description() : "<unknown>";
     }
 
@@ -521,11 +541,152 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
             thrd->set_lco_description(desc);
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_interruption_enabled(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::get_interruption_enabled",
+                "NULL thread id encountered");
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd->get() ? thrd->interruption_enabled() : false;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_interruption_enabled(thread_id_type id, bool enable, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_interruption_enabled",
+                "NULL thread id encountered");
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd->get())
+            thrd->set_interruption_enabled(enable);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_interruption_requested(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::get_interruption_requested",
+                "NULL thread id encountered");
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd->get() ? thrd->interruption_requested() : false;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        interrupt(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::interrupt",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd->get()) {
+            thrd->interrupt();      // notify thread
+
+            // set thread state to pending, if the thread is currently active,
+            // this will be rescheduled until it calls an interruption point
+            set_thread_state(id, pending, wait_abort,
+                thread_priority_normal, ec);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    run_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::run_thread_exit_callbacks",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd)
+            thrd->run_thread_exit_callbacks();
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    add_thread_exit_callback(thread_id_type id, HPX_STD_FUNCTION<void()> const& f,
+        error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::add_thread_exit_callback",
+                "NULL thread id encountered");
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return (0 != thrd) ? thrd->add_thread_exit_callback(f) : false;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        free_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::free_thread_exit_callbacks",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (0 != thrd)
+            thrd->free_thread_exit_callbacks();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -539,11 +700,13 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (id)");
+            return terminated;
         }
         if (HPX_UNLIKELY(!timer_id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (timer_id)");
+            return terminated;
         }
 
         bool oldvalue = false;
@@ -572,6 +735,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::at_timer",
                 "NULL thread id encountered");
+            return terminated;
         }
 
         // create a new thread in suspended state, which will execute the
@@ -679,10 +843,11 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_thread_gid",
                 "NULL thread id encountered");
+            return naming::invalid_id;
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_gid() : naming::invalid_id;
     }
 
@@ -690,7 +855,7 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (thread* t, thread_state prev_state)
+        switch_status (thread_data* t, thread_state prev_state)
           : thread_(t), prev_state_(prev_state),
             need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
         {}
@@ -736,7 +901,7 @@ namespace hpx { namespace threads
         void disable_restore() { need_restore_state_ = false; }
 
     private:
-        thread* thread_;
+        thread_data* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
         bool need_restore_state_;
@@ -843,7 +1008,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void write_old_state_log(std::size_t num_thread, thread* thrd,
+    inline void write_old_state_log(std::size_t num_thread, thread_data* thrd,
         thread_state_enum state)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
@@ -852,7 +1017,7 @@ namespace hpx { namespace threads
                    << "old state(" << get_thread_state_name(state) << ")";
     }
 
-    inline void write_new_state_log_debug(std::size_t num_thread, thread* thrd,
+    inline void write_new_state_log_debug(std::size_t num_thread, thread_data* thrd,
         thread_state_enum state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
@@ -861,7 +1026,7 @@ namespace hpx { namespace threads
             << "new state(" << get_thread_state_name(state) << "), "
             << info;
     }
-    inline void write_new_state_log_warning(std::size_t num_thread, thread* thrd,
+    inline void write_new_state_log_warning(std::size_t num_thread, thread_data* thrd,
         thread_state_enum state, char const* info)
     {
         // log this in any case
@@ -1227,7 +1392,7 @@ namespace hpx { namespace threads
               ""
             },
 #if !defined(BOOST_WINDOWS)
-            { "/threads/stack-unbinds", performance_counters::counter_raw,
+            { "/threads/count/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator, &performance_counters::locality_counter_discoverer,
@@ -1286,7 +1451,7 @@ namespace hpx { namespace threads
 
         while (true) {
             // Get the next PX thread from the queue
-            thread* thrd = NULL;
+            thread_data* thrd = NULL;
             if (scheduler_.get_next_thread(num_thread,
                     state_.load() == running, idle_loop_count, thrd))
             {
@@ -1544,15 +1709,15 @@ namespace hpx { namespace threads
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         avg_idle_rate() const
     {
-        boost::uint64_t const exec_total =
-            std::accumulate(exec_times.begin(), exec_times.end(), 0ULL);
-        boost::uint64_t const tfunc_total =
-            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0ULL);
+        double const exec_total =
+            std::accumulate(exec_times.begin(), exec_times.end(), 0.);
+        double const tfunc_total =
+            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
-        if (0 == tfunc_total)   // avoid division by zero
+        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
             return 1000LL;
 
-        double const percent = 1. - (double(exec_total) / tfunc_total);
+        double const percent = 1. - (exec_total / tfunc_total);
         return boost::int64_t(1000. * percent);    // 0.1 percent
     }
 
@@ -1563,8 +1728,10 @@ namespace hpx { namespace threads
         if (0 == tfunc_times[num_thread])   // avoid division by zero
             return 1000LL;
 
+        double const exec_time = static_cast<double>(exec_times[num_thread]);
+        double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
         double const percent =
-            1. - (double(exec_times[num_thread]) / tfunc_times[num_thread]);
+            1. - (exec_time / tfunc_time);
         return boost::int64_t(1000. * percent);   // 0.1 percent
     }
 

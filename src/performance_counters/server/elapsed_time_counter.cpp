@@ -20,16 +20,16 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     elapsed_time_counter_type, elapsed_time_counter,
-    "base_performance_counter", true);
+    "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(
-    hpx::performance_counters::server::elapsed_time_counter);
+    hpx::performance_counters::server::elapsed_time_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
       : base_type_holder(info),
-        started_at_(high_resolution_clock::now())
+        started_at_(static_cast<boost::int64_t>(high_resolution_clock::now()))
     {
         if (info.type_ != counter_elapsed_time) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -41,12 +41,12 @@ namespace hpx { namespace performance_counters { namespace server
     void elapsed_time_counter::get_counter_value(counter_value& value)
     {
         // gather the current value
-        boost::uint64_t now = high_resolution_clock::now();
+        boost::int64_t now = static_cast<boost::int64_t>(high_resolution_clock::now());
         value.value_ = now - started_at_;
         value.scaling_ = 1000000000LL;      // coefficient to get seconds
         value.scale_inverse_ = true;
         value.status_ = status_new_data;
-        value.time_ = now;
+        value.time_ = static_cast<boost::uint64_t>(now);
     }
 }}}
 

@@ -28,14 +28,14 @@ namespace examples { namespace server
     ///
     /// Components are first-class objects in HPX. This means that they are
     /// globally addressable; all components have a unique GID.
-    /// 
+    ///
     /// This example demonstrates how to write a managed component. Managed
     /// components are allocated in bulk by HPX. When a component needs to be
     /// created in large quantities, managed components should be used. Because
     /// managed components are allocated in bulk, the creation of a new managed
     /// component usually does not require AGAS requests.
     ///
-    /// This component exposes 3 different actions: reset, add and query.  
+    /// This component exposes 3 different actions: reset, add and query.
     //[managed_accumulator_server_inherit
     class managed_accumulator
       : public hpx::components::managed_component_base<managed_accumulator>
@@ -65,9 +65,9 @@ namespace examples { namespace server
         }
 
         /// Return the current value to the caller.
-        boost::uint64_t query()
+        boost::uint64_t query() const
         {
-            // Get the value of value_. 
+            // Get the value of value_.
             return value_.load();
         }
         //]
@@ -77,47 +77,10 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes. 
-        //[managed_accumulator_action_codes
-        enum actions
-        {
-            accumulator_reset = 0,
-            accumulator_add   = 1,
-            accumulator_query = 2
-        };
-        //]
-
         //[managed_accumulator_action_types
-        typedef hpx::actions::action0<
-            // Component server type.
-            managed_accumulator,
-            // Action code.
-            accumulator_reset,
-            // Method bound to this action.
-            &managed_accumulator::reset
-        > reset_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            managed_accumulator,
-            // Action code.
-            accumulator_add,
-            // Arguments of this action.
-            boost::uint64_t,
-            // Method bound to this action.
-            &managed_accumulator::add
-        > add_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            managed_accumulator,
-            // Return type.
-            boost::uint64_t,
-            // Action code.
-            accumulator_query,
-            // Method bound to this action.
-            &managed_accumulator::query
-        > query_action;
+        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, reset, reset_action);
+        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, add, add_action);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(managed_accumulator, query, query_action);
         //]
 
     //[managed_accumulator_server_data_member

@@ -47,8 +47,8 @@ namespace hpx { namespace util
         /// Not thread-safe
         void set_range(
             naming::gid_type const& lower
-          , naming::gid_type const& upper
-        ) {
+          , naming::gid_type const& upper)
+        {
             lower_ = lower;
             upper_ = upper;
         }

@@ -83,7 +83,7 @@ struct lazy_ostream
             this->base_type::write_async(gid_, next->out_buffer);
 
             // Unlock the mutex before we cleanup.
-            mtx.unlock();
+            l.unlock();
 
             delete next;
             next = 0;

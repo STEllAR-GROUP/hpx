@@ -127,7 +127,7 @@ int main(
         , "number of milliseconds to wait for object destruction")
         ;
 
-    // we need to explicitly enable the test components used by this test
+    // We need to explicitly enable the test components used by this test.
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.components.simple_refcnt_checker.enabled = 1";

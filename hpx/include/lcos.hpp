@@ -8,23 +8,19 @@
 #define HPX_LCOS_JUN_27_2008_0820PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/packaged_task.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/deferred_packaged_task.hpp>
-#include <hpx/lcos/async.hpp>
 
-#include <hpx/lcos/local/barrier.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
-
-#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/barrier.hpp>
 
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/local_lcos.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/lcos/wait_any.hpp>
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/wait_n.hpp>
+
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
 
 #endif
 

@@ -22,7 +22,7 @@
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
-            std::size_t interval, std::string const& dest)
+            boost::int64_t interval, std::string const& dest)
       : names_(names), destination_(dest),
         timer_(boost::bind(&query_counters::evaluate, this_()),
             interval*1000, "query_counters", true),
@@ -53,7 +53,8 @@ namespace hpx { namespace util
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "query_counters::find_counters",
                         boost::str(boost::format(
-                            "unknown performance counter: '%1%'") % name))
+                            "unknown performance counter: '%1%' (%2%)") %
+                            name % ec.get_message()))
                 }
 
                 ids_.push_back(id);
@@ -85,14 +86,14 @@ namespace hpx { namespace util
 
     template <typename Stream>
     void query_counters::print_value(Stream& out, std::string const& name,
-      performance_counters::counter_value& value, std::string const& uom)
+        performance_counters::counter_value& value, std::string const& uom)
     {
         error_code ec;        // do not throw
         double val = value.get_value<double>(ec);
 
         out << name << ",";
         if (!ec) {
-            double elapsed = (value.time_ - started_at_) * 1e-9;
+            double elapsed = static_cast<double>(value.time_ - started_at_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
                 << "[s]," << val;
             if (!uom.empty())

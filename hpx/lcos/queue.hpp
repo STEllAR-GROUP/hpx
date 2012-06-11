@@ -96,7 +96,7 @@ namespace hpx { namespace lcos
         void abort_pending()
         {
             try {
-                HPX_THROW_EXCEPTION(no_success, "queue::set_error",
+                HPX_THROW_EXCEPTION(no_success, "queue::set_exception",
                     "interrupt all pending requests");
             }
             catch (...) {

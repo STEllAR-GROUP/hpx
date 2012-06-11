@@ -24,9 +24,23 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    template<class Archive>
+    // generate unique parcel id
+    naming::gid_type parcel::generate_unique_id()
+    {
+        static boost::atomic<boost::uint64_t> id(0);
+
+        error_code ec;        // ignore all errors
+        boost::uint32_t locality_id = hpx::get_locality_id(ec);
+        naming::gid_type result = naming::get_gid_from_locality_id(locality_id);
+        result.set_lsb(++id);
+        return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Archive>
     void parcel::save(Archive & ar, const unsigned int version) const
     {
+        ar << parcel_id_;
         ar << destination_id_;    // don't increment global refcnt
         ar << destination_addr_;
 
@@ -41,13 +55,13 @@ namespace hpx { namespace parcelset
         bool has_continuations = continuation_;
         ar << has_continuations;
         if (has_continuations)
-            ar << *(continuation_.get());
+            ar << continuation_;
 
         ar << start_time_;
         ar << creation_time_;
     }
 
-    template<class Archive>
+    template <typename Archive>
     void parcel::load(Archive & ar, const unsigned int version)
     {
         if (version > HPX_PARCEL_VERSION)
@@ -60,6 +74,7 @@ namespace hpx { namespace parcelset
         bool has_continuation = false;
         bool has_source_id = false;
 
+        ar >> parcel_id_;
         ar >> destination_id_;
         ar >> destination_addr_;
 
@@ -72,11 +87,8 @@ namespace hpx { namespace parcelset
 
         // Check for a continuation.
         ar >> has_continuation;
-        if (has_continuation) {
-            actions::continuation* c = new actions::continuation;
-            ar >> *c;
-            continuation_.reset(c);
-        }
+        if (has_continuation)
+            ar >> continuation_;
 
         ar >> start_time_;
         ar >> creation_time_;
@@ -98,7 +110,5 @@ namespace hpx { namespace parcelset
            << ":" << p.action_->get_action_name() << ")";
         return os;
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}
 

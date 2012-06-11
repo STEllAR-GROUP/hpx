@@ -42,7 +42,7 @@ namespace hpx { namespace util
             char const *label_;         // label of thread group
             boost::uint32_t instance_;  // number of thread instance within group
 
-            thread_id(): label_(0), instance_(-1) { }
+            thread_id(): label_(0), instance_(static_cast<boost::uint32_t>(-1)) { }
             thread_id(char const *l, boost::uint32_t i):
                 label_(l), instance_(i) { }
         };
@@ -52,12 +52,12 @@ namespace hpx { namespace util
         {
             // associated thread ID that can be passed to PAPI_attach;
             // typically an ID of a kernel thread
-            unsigned long tid_;
+            long int tid_;
             // callback function invoked when unregistering a thread
             callback_type cleanup_;
 
             thread_data(): tid_(invalid_tid), cleanup_(boost::ref(null_cb)) { }
-            thread_data(char const *gr, boost::uint32_t inst, unsigned long tid):
+            thread_data(char const *gr, boost::uint32_t inst, long int tid):
                 thread_id(gr, inst), tid_(tid), cleanup_(boost::ref(null_cb)) { }
         };
 
@@ -100,7 +100,7 @@ namespace hpx { namespace util
 
     protected:
         // retrieve low level ID of caller thread (system dependent)
-        unsigned long get_papi_thread_id();
+        long int get_papi_thread_id();
 
         // unmap thread being unregistered
         bool unmap_thread(thread_map_type::iterator&);
@@ -109,7 +109,7 @@ namespace hpx { namespace util
         // erroneous thread index
         static boost::uint32_t invalid_index;
         // erroneous low-level thread ID
-        static unsigned long invalid_tid;
+        static long int invalid_tid;
 
         thread_mapper() { }
         ~thread_mapper();
@@ -128,7 +128,7 @@ namespace hpx { namespace util
         bool revoke_callback(boost::uint32_t tix);
 
         // returns low level thread id
-        unsigned long get_thread_id(boost::uint32_t tix) const;
+        long int get_thread_id(boost::uint32_t tix) const;
 
         // returns the group label of thread tix
         char const *get_thread_label(boost::uint32_t tix) const;

@@ -38,6 +38,7 @@
 #endif
 #ifdef BOOST_HAVE_UNWIND
 #include <unwind.h>
+#include <boost/cstdint.hpp>
 #endif
 #include <string.h>
 #include <stdlib.h>
@@ -61,30 +62,31 @@ namespace boost {
         struct trace_data
         {
             trace_data(void **array,std::size_t size)
-              : array_(array), size_(size), cfa_(0), count_(-1)
+              : array_(array), size_(size), cfa_(0), count_(std::size_t(-1))
             {}
 
             void **array_;      // storage for the stack trace
             std::size_t size_;  // number of frames
-            _Unwind_Word cfa_;  // canonical frame address
+            boost::uint64_t cfa_;  // canonical frame address
             std::size_t count_;
         };
 
+        _Unwind_Reason_Code trace_callback(_Unwind_Context* ctx,void* ptr);
         _Unwind_Reason_Code trace_callback(_Unwind_Context* ctx,void* ptr)
         {
             if (!ptr)
                 return _URC_NO_REASON;
                 
-            trace_data& d = *((trace_data*) ptr);
+            trace_data& d = *(reinterpret_cast<trace_data*>(ptr));
  
             // First call. 
-            if (1 != d.count_)
+            if (std::size_t(-1) != d.count_)
             {
                 // Get the instruction pointer for this frame.
-                d.array_[d.count_] = (void *) _Unwind_GetIP(ctx);
+                d.array_[d.count_] = reinterpret_cast<void *>(_Unwind_GetIP(ctx));
 
                 // Get the CFA.
-                _Unwind_Word cfa = _Unwind_GetCFA(ctx);
+                boost::uint64_t cfa = _Unwind_GetCFA(ctx);
 
                 // Check if we're at the end of the stack.
                 if ((0 < d.count_) &&
@@ -108,7 +110,7 @@ namespace boost {
             trace_data d(array,n);
 
             if (1 <= n)
-                _Unwind_Backtrace(trace_callback, (void*) &d);
+                _Unwind_Backtrace(trace_callback, reinterpret_cast<void*>(&d));
 
             if ((1 < d.count_) && d.array_[d.count_ - 1])
                 --d.count_;
@@ -170,7 +172,7 @@ namespace boost {
                     res << "???";
                 }
 
-                unsigned offset = (char *)ptr - (char *)info.dli_saddr;
+                std::ptrdiff_t offset = reinterpret_cast<char *>(ptr) - reinterpret_cast<char *>(info.dli_saddr);
                 res << std::hex <<" + 0x" << offset ;
 
                 if(info.dli_fname)

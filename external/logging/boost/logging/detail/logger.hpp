@@ -278,8 +278,8 @@ namespace boost { namespace logging {
             turn_cache_off();
         }
 
-        void set_writer(write_msg* writer) {
-            m_writer = writer;
+        void set_writer(write_msg* w) {
+            m_writer = w;
         }
 
         /**

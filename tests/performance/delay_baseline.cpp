@@ -45,25 +45,25 @@ void worker()
 {
     double volatile d = 0.;
     for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
+        d += 1. / (2. * i + 1.);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    double median
-  , double mean
-  , double sum
+    double median_
+  , double mean_
+  , double sum_
     )
 {
     std::string const delay_str = boost::str(boost::format("%lu,") % delay);
 
     std::cout << ( boost::format("%-21s %10.10s, %10.10s, %10.10s\n")
-                 % delay_str % median % mean % sum);
+                 % delay_str % median_ % mean_ % sum_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int app_main(
-    variables_map& vm
+    variables_map&
     )
 {
     if (0 == tasks)

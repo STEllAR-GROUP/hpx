@@ -28,22 +28,22 @@ using hpx::agas::response;
 using hpx::naming::id_type;
 
 HPX_REGISTER_ACTION_EX(
-    base_lco_with_value<response>::set_result_action,
-    set_result_action_agas_response_type);
+    base_lco_with_value<response>::set_value_action,
+    set_value_action_agas_response_type)
 
 typedef base_lco_with_value<bool, response> base_lco_bool_response_type;
 HPX_REGISTER_ACTION_EX(
-    base_lco_bool_response_type::set_result_action,
-    set_result_action_agas_bool_response_type);
+    base_lco_bool_response_type::set_value_action,
+    set_value_action_agas_bool_response_type)
 
 typedef base_lco_with_value<id_type, response> base_lco_id_type_response_type;
 HPX_REGISTER_ACTION_EX(
-    base_lco_id_type_response_type::set_result_action,
-    set_result_action_agas_id_type_response_type);
+    base_lco_id_type_response_type::set_value_action,
+    set_value_action_agas_id_type_response_type)
 
 typedef base_lco_with_value<std::vector<response> >
     base_lco_vector_response_type;
 HPX_REGISTER_ACTION_EX(
-    base_lco_vector_response_type::set_result_action,
-    set_result_action_agas_vector_response_type);
+    base_lco_vector_response_type::set_value_action,
+    set_value_action_agas_vector_response_type)
 

@@ -54,7 +54,7 @@ namespace hpx { namespace components
 /// component module.
 #define HPX_REGISTER_COMMANDLINE_OPTIONS()                                    \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(commandline_options));                  \
+            HPX_MANGLE_COMPONENT_NAME(commandline_options))                   \
     /**/
 
 #endif

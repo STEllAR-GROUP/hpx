@@ -166,28 +166,28 @@ namespace hpx { namespace util { namespace itt
 
 #else
 
-inline void itt_sync_create(void* addr, const char* objtype, const char* objname) {}
-inline void itt_sync_rename(void* addr, const char* name) {}
-inline void itt_sync_prepare(void* addr) {}
-inline void itt_sync_acquired(void* addr) {}
-inline void itt_sync_cancel(void* addr) {}
-inline void itt_sync_releasing(void* addr) {}
-inline void itt_sync_released(void* addr) {}
-inline void itt_sync_destroy(void* addr) {}
+inline void itt_sync_create(void*, const char*, const char*) {}
+inline void itt_sync_rename(void*, const char*) {}
+inline void itt_sync_prepare(void*) {}
+inline void itt_sync_acquired(void*) {}
+inline void itt_sync_cancel(void*) {}
+inline void itt_sync_releasing(void*) {}
+inline void itt_sync_released(void*) {}
+inline void itt_sync_destroy(void*) {}
 
-inline ___itt_caller* itt_stack_create() { return (___itt_caller*)0; }
-inline void itt_stack_enter(___itt_caller* ctx) {}
-inline void itt_stack_leave(___itt_caller* ctx) {}
-inline void itt_stack_destroy(___itt_caller* ctx) {}
+inline ___itt_caller* itt_stack_create() { return 0; }
+inline void itt_stack_enter(___itt_caller*) {}
+inline void itt_stack_leave(___itt_caller*) {}
+inline void itt_stack_destroy(___itt_caller*) {}
 
-inline __itt_frame_t* itt_frame_create(char const*) { return (__itt_frame_t*)0; }
-inline void itt_frame_begin(__itt_frame_t* frame) {}
-inline void itt_frame_end(__itt_frame_t* frame) {}
-inline void itt_frame_destroy(__itt_frame_t* ctx) {}
+inline __itt_frame_t* itt_frame_create(char const*) { return 0; }
+inline void itt_frame_begin(__itt_frame_t*) {}
+inline void itt_frame_end(__itt_frame_t*) {}
+inline void itt_frame_destroy(__itt_frame_t*) {}
 
 inline int itt_mark_create(char const*) { return 0; }
-inline void itt_mark_off(int mark) {}
-inline void itt_mark(int mark, char const*) {}
+inline void itt_mark_off(int) {}
+inline void itt_mark(int, char const*) {}
 
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
@@ -207,7 +207,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        frame_context(char const* name) {}
+        frame_context(char const*) {}
         ~frame_context() {}
     };
 
@@ -220,7 +220,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
-        mark_context(char const* name) {}
+        mark_context(char const*) {}
         ~mark_context() {}
     };
 

@@ -49,18 +49,18 @@ namespace hpx { namespace util
     boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
     get_random_ports()
     {
-        boost::mt19937 rng((boost::uint32_t)std::time(NULL));
+        boost::mt19937 rng(static_cast<boost::uint32_t>(std::time(NULL)));
         boost::uniform_int<boost::uint16_t>
             port_range(HPX_RANDOM_PORT_MIN, HPX_RANDOM_PORT_MAX-1);
 
         boost::uint16_t p = port_range(rng);
-        return boost::fusion::vector2<boost::uint16_t, boost::uint16_t>(p, p+1);
+        return boost::fusion::vector2<boost::uint16_t, boost::uint16_t>(p, static_cast<boost::uint16_t>(p+1));
     }
 
     boost::uint16_t
     get_random_port()
     {
-        boost::mt19937 rng((boost::uint32_t)std::time(NULL));
+        boost::mt19937 rng(static_cast<boost::uint32_t>(std::time(NULL)));
         boost::uniform_int<boost::uint16_t>
             port_range(HPX_RANDOM_PORT_MIN, HPX_RANDOM_PORT_MAX-1);
 

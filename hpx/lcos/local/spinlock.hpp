@@ -13,9 +13,9 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/config.hpp>
+#include <boost/move/move.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock_w32.hpp>
@@ -30,10 +30,12 @@
 namespace hpx { namespace lcos { namespace local
 {
     /// boost::mutex-compatible spinlock class
-    struct spinlock : boost::noncopyable
+    struct spinlock
     {
     private:
         boost::uint64_t v_;
+
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
         ///////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
@@ -51,7 +53,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if(hpx::threads::get_self_ptr())
                 {
-                    hpx::threads::suspend();
+                    hpx::this_thread::suspend();
                 }
                 else
                 {
@@ -67,7 +69,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::threads::suspend(boost::posix_time::microseconds(1));
+                    hpx::this_thread::suspend(boost::posix_time::microseconds(1));
                 }
                 else
                 {
@@ -96,9 +98,30 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, "test::spinlock", "");
         }
 
+        spinlock(BOOST_RV_REF(spinlock) rhs)
+#if defined(BOOST_WINDOWS)
+          : v_(BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0))
+#else
+          : v_(__sync_lock_test_and_set(&rhs.v_, 0))
+#endif
+        {}
+
         ~spinlock()
         {
             HPX_ITT_SYNC_DESTROY(this);
+        }
+
+        spinlock& operator=(BOOST_RV_REF(spinlock) rhs)
+        {
+            if (this != &rhs) {
+                unlock();
+#if defined(BOOST_WINDOWS)
+                v_ = BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0);
+#else
+                v_ = __sync_lock_test_and_set(&rhs.v_, 0);
+#endif
+            }
+            return *this;
         }
 
         void lock()

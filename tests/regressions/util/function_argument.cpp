@@ -18,7 +18,7 @@ using boost::program_options::options_description;
 
 using hpx::actions::plain_result_action1;
 using hpx::naming::id_type;
-using hpx::lcos::async;
+using hpx::async;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool invoked_f = false;
@@ -37,9 +37,7 @@ bool f(hpx::util::function<bool()> func)
     return result;
 }
 
-typedef plain_result_action1<bool, hpx::util::function<bool()>, &f> f_action;
-
-HPX_REGISTER_PLAIN_ACTION(f_action);
+HPX_PLAIN_ACTION(f, f_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct g

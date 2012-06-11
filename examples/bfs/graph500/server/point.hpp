@@ -323,8 +323,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     get_value_action_vector_size_t);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<std::size_t>>::set_result_action,
-    set_result_action_vector_size_t);
+    hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_value_action,
+    set_value_action_vector_size_t);
 
 #endif
 

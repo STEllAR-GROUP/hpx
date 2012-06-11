@@ -72,7 +72,7 @@ public:
         incompatible_integer_size
     };
     portable_binary_iarchive_exception(exception_code c = incompatible_integer_size )
-      : boost::archive::archive_exception((boost::archive::archive_exception::exception_code)c)
+      : boost::archive::archive_exception(static_cast<boost::archive::archive_exception::exception_code>(c))
     {}
     virtual const char *what() const throw()
     {
@@ -91,7 +91,13 @@ public:
 // "Portable" input binary archive.  It addresses integer size and endianness so
 // that binary archives can be passed across systems. Note:floating point types
 // not addressed here
-class HPX_ALWAYS_EXPORT portable_binary_iarchive :
+#if defined(BOOST_MSVC)
+#define HPX_SERIALIZATION_EXPORT
+#else
+#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#endif
+
+class HPX_SERIALIZATION_EXPORT portable_binary_iarchive :
     public boost::archive::basic_binary_iprimitive<
         portable_binary_iarchive,
         std::istream::char_type,
@@ -126,6 +132,12 @@ protected:
     load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
     template<class T>
     void load(T & t) {
         boost::intmax_t l = 0;
@@ -133,6 +145,11 @@ protected:
         // use cast to avoid compile time warning
         t = static_cast<T>(l);
     }
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
     void load(std::string & t) {
         this->primitive_base_t::load(t);
     }
@@ -145,7 +162,7 @@ protected:
     void load(boost::archive::object_id_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
-        t = boost::archive::object_id_type((unsigned int)(l));
+        t = boost::archive::object_id_type(static_cast<unsigned int>(l));
     }
     void load(boost::archive::tracking_type & t) {
         bool l = false;
@@ -155,17 +172,17 @@ protected:
     void load(boost::archive::version_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
-        t = boost::archive::version_type((unsigned int)(l));
+        t = boost::archive::version_type(static_cast<unsigned int>(l));
     }
     void load(boost::archive::library_version_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint16_t));
-        t = boost::archive::library_version_type((unsigned int)(l));
+        t = boost::archive::library_version_type(static_cast<unsigned int>(l));
     }
     void load(boost::serialization::item_version_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::intmax_t));
-        t = boost::serialization::item_version_type((unsigned int)(l));
+        t = boost::serialization::item_version_type(static_cast<unsigned int>(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
@@ -239,6 +256,7 @@ public:
     }
 };
 
+#undef HPX_SERIALIZATION_EXPORT
 }}
 
 // required by export in boost version > 1.34

@@ -68,7 +68,7 @@ namespace hpx { namespace util
         namespace fs = boost::filesystem;
 
         // fall back: use compile time prefix
-        std::string ini_path(ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
+        std::string ini_path(ini.get_entry("hpx.master_ini_path"));
         bool result = handle_ini_file (ini, ini_path + "/hpx.ini");
 
         // look in the current directory first
@@ -97,11 +97,8 @@ namespace hpx { namespace util
         namespace fs = boost::filesystem;
 
         // now merge all information into one global structure
-        std::string ini_path(HPX_DEFAULT_INI_PATH);
+        std::string ini_path(ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
         std::vector <std::string> ini_paths;
-
-        if (ini.has_entry("hpx.ini_path"))
-            ini_path = ini.get_entry("hpx.ini_path");
 
         // split of the separate paths from the given path list
         typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;

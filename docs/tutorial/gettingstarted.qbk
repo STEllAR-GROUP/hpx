@@ -1,0 +1,533 @@
+[/==============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2011 Bryce Lelbach
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:getting_started Getting Started]
+
+[heading Welcome]
+
+Welcome to the HPX runtime system libraries! By the time you've completed this
+tutorial, you'll be at least somewhat comfortable with HPX and how to go about
+using it.
+
+[heading What's Here]
+
+This document is designed to be an extremely gentle introduction, so we
+included a fair amount of material that may already be very familiar to you.
+To keep things simple, we also left out some information intermediate and
+advanced users will probably want. At the end of this document, we'll refer
+you to resources that can help you pursue these topics further.
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:prereqs Prerequisites]
+
+[heading Supported Platforms]
+
+At this time, HPX supports only the following platforms. Other platforms may
+work, but we do not test HPX with other platforms, so please be warned.
+
+[table Supported Platforms for HPX
+    [[Name   ][Recommended Version][Minimum Version][Architectures ]]
+    [[Linux  ][3.2                ][2.6            ][x86-32, x86-64]]
+    [[Windows][7, Server 2008 R2  ][Any NT system  ][x86-64]        ]
+]
+
+[heading Software and Libraries]
+
+In the simplest case, HPX depends on one set of libraries: __boost__. So,
+before you read further, please make sure you have a recent version of
+__boost__ installed on your target machine. HPX currently requires at least
+Boost V1.47.0 to work properly. It may build and run with older versions, but
+we do not test HPX with those versions, so please be warned.
+
+Installing the Boost libraries is described in detail in Boost's own
+__boost_getting_started__ document. It is often possible to download the Boost
+libraries using the package manager of your distribution. Please refer to the
+corresponding documentation for your system for more information.
+
+Currently, HPX only supports two compilers: GCC and MSVC. HPX uses CMake as
+a build system.
+
+[table Software Prerequisites for HPX on Linux systems
+    [[Name                       ][Recommended Version][Minimum Version ]]
+
+    [[[*Compilers]]]
+    [[__gcc__                    ][4.6.3              ][4.4.5           ]]
+
+    [[[*Build System]]]
+    [[__cmake__                  ][2.8.4              ][2.8.4           ]]
+    [[__gmake__                  ][3.81               ][3.80            ]]
+
+    [[[*Required Libraries]]]
+    [[__boost_libraries__        ][1.48.0             ][1.47.0          ]]
+    [[__eglibc__ (Debian, Ubuntu)][2.11               ][2.7             ]]
+    [[__glibc__ (Redhat)         ][2.11               ][2.7             ]]
+    [[__libstdcxx__              ][4.6.3              ][4.4.5           ]]
+]
+
+[table Software Prerequisites for HPX on Windows systems
+    [[Name                       ][Recommended Version][Minimum Version ]]
+
+    [[[*Compilers]]]
+    [[__visual_cxx__ (x64)       ][2010               ][2010            ]]
+
+    [[[*Build System]]]
+    [[__cmake__                  ][2.8.4              ][2.8.4           ]]
+
+    [[[*Required Libraries]]]
+    [[__boost__                  ][1.48.0             ][1.43.0          ]]
+]
+
+Depending on the options you chose while building and installing HPX,
+you will find that HPX may depend on several other libraries such as those
+listed below.
+
+[table Highly Recommended Optional Software Prerequisites for HPX on Linux systems
+    [[Name                       ][Recommended Version][Minimum Version ][Notes]]
+
+    [[__hwloc__                  ][1.4                ][1.2             ]
+        [Used for OS-thread pinning and NUMA awareness.]]
+    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
+        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+         and interpolate3d applications. See important note below.]]
+    [[__google_perftools__       ][1.7.1              ][1.7.1           ]
+        [Used as a replacement for the system allocator, and for allocation
+         diagnostics.]]
+    [[__libunwind__              ][0.99               ][0.97            ]
+        [Dependency of google-perftools on x86-64, used for stack unwinding.]]
+]
+
+[table Optional Software Prerequisites for HPX on Linux systems
+    [[Name                       ][Recommended Version][Minimum Version ][Notes]]
+
+    [[__papi__                   ][                   ][                ]
+        [Used for accessing hardware performance data.]]
+    [[__lapack__                 ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__blas__                   ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__gsl__                    ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__lorene__                 ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__rnpl__                   ][1.11               ][1.11            ]
+        [Used for data I/O in the adaptive1d and neutron_star applications.]]
+    [[__jemalloc__               ][2.1.2              ][2.1.0           ]
+        [Used as a replacement for the system allocator.]]
+]
+
+[table Highly Recommended Optional Software Prerequisites for HPX on Windows systems
+    [[Name                       ][Recommended Version][Minimum Version ][Notes]]
+
+    [[__hwloc__                  ][1.4.2              ][1.4.2           ]
+        [Used for OS-thread pinning and NUMA awareness.]]
+    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
+        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+         and interpolate3d applications. See important note below.]]
+]
+
+[important The C++ HDF5 libraries must be compiled with enabled threadsafety
+           support. This has to be explicitly specified while configuring
+           the HDF5 libraries as it is not the default. Additionally, you must
+           set the following environment variables before configuring the HDF5
+           libraries (this part only needs to be done on Linux):
+
+           [teletype]
+           ``
+               $ export CFLAGS='-DHDatexit=""'
+               $ export CPPFLAGS='-DHDatexit=""'
+           ``
+           ]
+
+[endsect] [/ Prerequisites]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:unix_installation How to Install HPX on Unix Variants]
+
+[teletype]
+
+* Create a build directory. HPX requires an out-of-tree build. This means you
+  will be unable to run CMake in the HPX source tree.
+
+``
+    $ cd hpx
+    $ mkdir my_hpx_build
+    $ cd my_hpx_build
+``
+
+* Invoke CMake from your build directory, pointing the CMake driver to the root
+  of your HPX source tree.
+
+``
+    $ cmake [CMake variable definitions] /path/to/source/tree
+``
+
+[:for instance:]
+
+``
+    $ cmake -DBOOST_ROOT=~/packages/boost -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.8.0
+``
+
+* Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag to
+  your make invocation, where N is the number of nodes on your machine plus one.
+
+``
+    $ gmake -j17
+``
+
+* To complete the build and install HPX:
+
+``
+    $ gmake install
+``
+
+[c++]
+
+[endsect] [/ How to Install HPX on Unix Variants]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:windows_installation How to Install HPX on Windows]
+
+[heading Installation]
+
+* Create a build folder. HPX requires an out-of-tree-build. This means that you
+  will be unable to run CMake in the HPX source folder.
+* Open up the CMake GUI. In the input box labelled "Where is the source code:",
+  enter the full path to the source folder. In the input box labelled
+  "Where to build the binaries:", enter the full path to the build folder you
+  created before.
+* Add CMake variable definitions (if any) by clicking the "Add Entry" button.
+  The only required variable you need to define is [^BOOST_ROOT]. This variable
+  needs to be set to point to the root folder of your Boost
+  installation. It is recommended to set the variable [^CMAKE_INSTALL_PREFIX] as
+  well. This allows to control where the built HPX libraries will be installed.
+* Press the "Configure" button. A window will pop up asking you which compilers
+  to use. Select the Visual Studio 10 (64Bit) compilers (they are usually
+  the default if available).
+* Press "Configure" again. Repeat this step until the "Generate" button becomes
+  clickable (and until no variable definitions are marked red anymore).
+* Press "Generate".
+* Open up the build folder, and double-click hpx.sln.
+* Build the INSTALL target.
+
+[endsect] [/ How to Install HPX on Windows]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:unix_apps_pkg_config How to Build HPX Applications with pkg-config]
+
+After you are done installing HPX, you should be able to build the following
+program. It prints [^Hello HPX World!] on the locality you run it on.
+
+[c++]
+
+[import ../../examples/quickstart/simplest_hello_world.cpp]
+
+[simplest_hello_world_getting_started]
+
+Copy the text of this program into a file called hello_world.cpp.
+
+Now, in the directory where you put hello_world.cpp, issue the following commands
+(where [^$HPX_LOCATION] is the [^CMAKE_INSTALL_PREFIX] you used while building HPX):
+
+[teletype]
+
+``
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
+``
+
+[important When using pkg-config with HPX, the pkg-config flags must go after
+           the [^-o] flag.]
+
+To test the program, type:
+
+``
+    $ ./hello_world
+``
+
+which should print [^Hello HPX World!] and exit.
+
+[endsect] [/ How to Build HPX Applications with pkg-config]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:unix_comps_pkg_config How to Build HPX Components with pkg-config]
+
+Let's try a more complex example involving an HPX component. An HPX component is
+a class which exposes HPX actions. HPX components are compiled into dynamically
+loaded modules called component libraries. Here's the source code:
+
+[c++]
+
+[import ../../examples/hello_world_component/hello_world_component.hpp]
+
+[*hello_world_component.cpp]
+
+[import ../../examples/hello_world_component/hello_world_component.cpp]
+
+[hello_world_cpp_getting_started]
+
+[*hello_world_component.hpp]
+
+[hello_world_hpp_getting_started]
+
+[*hello_world_client.cpp]
+
+[import ../../examples/hello_world_component/hello_world_client.cpp]
+
+[hello_world_client_getting_started]
+
+Copy the three source files above into three files (called hello_world_component.cpp,
+hello_world_component.hpp and hello_world_client.cpp respectively).
+
+Now, in the directory where you put the files, run the following command to
+build the component library. (where [^$HPX_LOCATION] is the
+[^CMAKE_INSTALL_PREFIX] you used while building HPX):
+
+[teletype]
+
+``
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    $ c++ -o libhpx_component_hello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+    $ mv libhpx_component_hello_world.so $HPX_LOCATION/lib/hpx/libhpx_component_hello_world.so
+``
+
+Now, to build the application that uses this component (hello_world_client.cpp),
+we do:
+
+``
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -lhpx_component_hello_world
+``
+
+[important When using pkg-config with HPX, the pkg-config flags must go after
+           the [^-o] flag.]
+
+To test the program, type:
+
+``
+    $ ./hello_world_client
+``
+
+which should print [^Hello HPX World!] and exit.
+
+[endsect] [/ How to Build HPX Components with pkg-config]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:existing_apps Integrating HPX into existing applications]
+
+Having your application work with __hpx__ is unfortunately not as simple as just
+linking against it. However it can be rather straightforward or rather complex
+based on the type of application that is trying to be integrated. The complexity
+derives from the overall design of the application. If the application was
+designed to be parallel, then integrating should be relatively straightforward.
+However HPX is not some magic wand that will make your application work in
+parallel. Applications that are serial or that rely too heavily on global
+variables will have a more difficult time in integrating. Most parallel
+applications have already identified the sections of code that do the most
+work and have abstracted them out to use the parallel library of their choice.
+
+One of the big advantages of __hpx__ is the concept of moving work to data.
+Data-heavy applications can use components to create remote objects that
+encapsulate that data, and call methods on these component-objects.
+Computation-heavy applications do not care so much about moving work to data,
+but instead try to get as much parallel computation done as possible. __hpx__
+futures provide a nice tool for accomplishing this. Using futures, one can
+set up a lot of work to be done, fire it off and wait for them to be finished.
+__hpx__ takes care of creating the threads, moving the work across node
+boundaries, and making sure the calling thread suspends when it wants the
+value from a future that is still executing. A lot of boring code that you do not
+need to write. The one caveat is that for any function you wrap with a
+future, any parameters of those functions need to be serializable. This can be
+a rather complicated procedure if the data structures are complex.
+__hpx__ uses __boost_serialization__ for the serialization of the data to be
+used in futures. That really is the hardest part, because once the serialization
+functions are completed, you can use futures anywhere in your code. If you
+plan on only running on an SMP machine, then __hpx__ never calls the
+serialization functions and they may be blank (but the signatures are still
+required).
+
+The next stumbling block to integrating __hpx__ is having it actually link
+against your program. If your application uses a CMake build system, you can
+set the CMake Module Path to the path where __hpx__ has the `FindHPX.cmake`
+module. Here is a code snippet demonstrating this. It adds the preprocessor
+definition `HPX_ENABLED` to the compiler command line if __hpx__ is found.
+
+[teletype]
+``
+    # This adds the HPX cmake configuration directory to the search path.
+    set(CMAKE_MODULE_PATH
+        $(CMAKE_MODULE_PATH)
+        ${HPX_INSTALL_DIR}/share/cmake-2.8/Modules)
+
+    # Instruct cmake to find the HPX installation
+    find_package(HPX)
+    IF(HPX_FOUND)
+        # Add a special option to you compiler command line.
+        MESSAGE("HPX was found.")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D HPX_ENABLED")
+    ENDIF()
+``
+
+Now to actually build the application you should have a code snippet similar
+to this in your CMakeLists.txt file:
+
+``
+    IF(HPX_FOUND)
+        # build your application using HPX
+        add_hpx_executable(your_app
+            ESSENTIAL
+            SOURCES ${your_app_SRCS})
+    ELSE()
+        # build your application with out using HPX
+        add_executable(your_app ${your_app_SRCS})
+    ENDIF()
+``
+[c++]
+
+When you configure your application, all you need to do is set the
+HPX_INSTALL_DIR variable to point to the installation of __hpx__! Now all you
+have to do is type `make` and the application should build using the __hpx__
+installation you specified.
+
+If you do not use CMake, you can still build against __hpx__ but you should refer
+to the section on __pkg_config__.
+
+Those two things, the serialization and actually integrating with __hpx__,
+are the biggest stumbling blocks that you should encountered when trying to
+integrate your application with __hpx__. For an idea on how to integrate __hpx__
+constructs into your application, you should take a look at some of the examples
+that __hpx__ includes.
+
+[endsect] [/ Integrating HPX into existing applications]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:unix_pbs How to Use HPX Applications with PBS]
+
+[teletype]
+
+Most HPX applications are executed on parallel computers.  These platforms
+typically provide integrated job management services that facilitate the
+allocation of computing resources for each parallel program. HPX includes out of
+the box support for one of the most common job management systems, the Portable
+Batch System (PBS).
+
+All PBS jobs require a script to specify the resource requirements and other
+parameters associated with a parallel job. The PBS script is basically a shell
+script with PBS directives placed within commented sections at the beginning of
+the file. The remaining (not commented-out) portions of the file executes just
+like any other regular shell script. While the description of all available PBS
+options is outside the scope of this tutorial (the interested reader may refer
+to in-depth [@http://www.clusterresources.com/torquedocs21/ documentation] for
+more information), below is a minimal example to illustrate the approach. As a
+test application we will use the multithreaded [^hello_world] program, explained
+in the section __hello_world_example__.
+
+```
+    #!/bin/bash
+    #
+    #PBS -l nodes=2:ppn=4
+
+    APP_PATH=~/packages/hpx/bin/hello_world
+    APP_OPTIONS=
+
+    __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+```
+
+The [^#PBS -l nodes=2:ppn=4] directive will cause two compute nodes to be
+allocated for the application, as specified int the option [^nodes]. Each of the
+nodes will dedicate four cores to the program, as per the option [^ppn], short
+for "processors per node" (PBS does not distinguish between processors and
+cores). Note that requesting more cores per node than physically available is
+pointless and may prevent PBS from accepting the script.
+
+[^APP_PATH] and [^APP_OPTIONS] are shell variables that respectively specify
+the correct path to the executable ([^hello_world] in this case) and the
+command line options. Since the [^hello_world] application doesn't need any
+command line options, [^APP_OPTIONS] has been left empty. Unlike in other
+execution environments, there is no need to use the [hpx_cmdline
+[^--hpx:threads]] option to indicate the required number of OS threads per
+node; the HPX library will derive this parameter automatically from PBS.
+
+Finally, __pbsdsh__ is a PBS command that starts tasks to the resources allocated
+to the current job. It is recommended to leave this line as shown and modify
+only the PBS options and shell variables as needed for a specific application.
+
+All that remains now is submitting the job to the queuing system. Assuming that
+the contents of the PBS script were saved in file [^pbs_hello_world.sh] in the
+current directory, this is accomplished by typing:
+
+``
+    $ __qsub__ ./pbs_hello_world_pbs.sh
+``
+
+If the job is accepted, __qsub__ will print out the assigned job ID, which may
+look like:
+
+``
+    $ 42.supercomputer.some.university.edu
+``
+
+To check the status of your job, issue the following command:
+
+``
+    $ __qstat__ 42.supercomputer.some.university.edu
+``
+
+and look for a single-letter job status symbol. The common cases include:
+
+* *Q* - signifies that the job is queued and awaiting its turn to be executed.
+* *R* - indicates that the job is currently running.
+* *C* - means that the job has completed.
+
+The example __qstat__ output below shows a job waiting for execution resources
+to become available:
+
+``
+    Job id                    Name             User            Time Use S Queue
+    ------------------------- ---------------- --------------- -------- - -----
+    42.supercomputer          ...ello_world.sh joe_user               0 Q batch
+``
+
+After the job completes, PBS will place two files, [^pbs_hello_world.sh.o42] and
+[^pbs_hello_world.sh.e42], in the directory where the job was submitted. The
+first contains the standard output and the second contains the standard error
+from all the nodes on which the application executed. In our example, the error
+output file should be empty and standard output file should contain something
+similar to:
+
+``
+    hello world from OS-thread 3 on locality 0
+    hello world from OS-thread 2 on locality 0
+    hello world from OS-thread 1 on locality 1
+    hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 3 on locality 1
+    hello world from OS-thread 2 on locality 1
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 1
+``
+
+Congratulations! You have just run your first distributed HPX application!
+
+[c++]
+
+[endsect] [/ How to Use HPX Applications with PBS]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
+
+[endsect] [/ Getting Started]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+
+

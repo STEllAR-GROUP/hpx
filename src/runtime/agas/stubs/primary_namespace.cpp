@@ -18,7 +18,7 @@ void primary_namespace::service_non_blocking(
     )
 {
     typedef server_type::service_action action_type;
-    applier::apply_p<action_type>(gid, priority, req);
+    hpx::apply_p<action_type>(gid, priority, req);
 }
 
 void primary_namespace::bulk_service_non_blocking(
@@ -28,7 +28,7 @@ void primary_namespace::bulk_service_non_blocking(
     )
 {
     typedef server_type::bulk_service_action action_type;
-    applier::apply_p<action_type>(gid, priority, reqs);
+    hpx::apply_p<action_type>(gid, priority, reqs);
 }
 
 }}}

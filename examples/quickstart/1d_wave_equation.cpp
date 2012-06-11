@@ -23,9 +23,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
@@ -41,7 +40,7 @@ using hpx::naming::invalid_id;
 using hpx::actions::plain_result_action2;
 
 using hpx::lcos::future;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::wait;
 
 using hpx::util::high_resolution_timer;
@@ -87,13 +86,6 @@ struct data{
     , u_value(other.u_value)
     , computed(other.computed)
   {}
-
-  data & operator=(data const & other)
-  {
-      u_value = other.u_value;
-      computed = other.computed;
-      return *this;
-  }
 
   hpx::lcos::local::mutex mtx;
   double u_value;

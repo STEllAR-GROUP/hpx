@@ -15,7 +15,6 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/util/static.hpp>

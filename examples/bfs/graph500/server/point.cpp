@@ -6,8 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/include/async.hpp>
 
 #include "../make_graph.hpp"
 #include "../stubs/point.hpp"
@@ -15,6 +14,7 @@
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/random/linear_congruential.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -50,6 +50,9 @@ namespace graph500 { namespace server
       uint64_t userseed2 = 1;
       make_mrg_seed(userseed1, userseed2, seed);
 
+      boost::rand48 random_numbers;
+      random_numbers.seed(boost::int64_t(objectid));
+
       int64_t M = INT64_C(16) << log_numverts;
 
       if ( objectid < number_partitions ) {
@@ -83,7 +86,7 @@ namespace graph500 { namespace server
         int64_t edge;
         for ( std::size_t i=0;i<edges.size();i++) {
           while(1) {
-            edge = rand() % end_idx;
+            edge = random_numbers() % end_idx;
             found = false;
             // make sure it's not a duplicate
             for (std::size_t j=0;j<i;j++) {

@@ -23,7 +23,7 @@ namespace hpx { namespace lcos
     template <typename T1, typename TR1, typename F>
     inline std::size_t
     wait (std::vector<lcos::dataflow_base<T1, TR1> > const& dataflows, F const& f,
-        std::size_t suspend_for = 10)
+        boost::int64_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(dataflows.size());
         std::size_t handled_count = 0;
@@ -52,7 +52,7 @@ namespace hpx { namespace lcos
 
                     // give thread-manager a chance to look for more work while
                     // waiting
-                    threads::suspend();
+                    this_thread::suspend();
                     suspended = true;
                 }
             }
@@ -60,7 +60,7 @@ namespace hpx { namespace lcos
             // suspend after one full loop over all values, 10ms should be fine
             // (default parameter)
             if (!suspended)
-                threads::suspend(boost::posix_time::milliseconds(suspend_for));
+                this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
         }
         return handled.count();
     }
@@ -97,7 +97,7 @@ namespace hpx { namespace lcos
 
                     // give thread-manager a chance to look for more work while
                     // waiting
-                    threads::suspend();
+                    this_thread::suspend();
                     suspended = true;
                 }
             }
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos
             // suspend after one full loop over all values, 10ms should be fine
             // (default parameter)
             if (!suspended)
-                threads::suspend(boost::posix_time::milliseconds(suspend_for));
+                this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
         }
         return handled.count();
     }

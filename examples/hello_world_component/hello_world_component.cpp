@@ -25,8 +25,6 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(hello_world_type, hello_world);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(hello_world_type::wrapped_type);
-
 HPX_REGISTER_ACTION_EX(
     examples::server::hello_world::invoke_action, hello_world_invoke_action);
 //]

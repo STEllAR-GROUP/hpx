@@ -1,10 +1,12 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser, Richard D Guidry Jr.
-//  Copyright (c)      2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2007-2012 Hartmut Kaiser,
+//  Copyright (c) 2007 Richard D Guidry Jr.
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/actions.hpp>
 
 #include "accumulators/managed_accumulator.hpp"
 
@@ -13,8 +15,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-char const* const help
-    = "commands: reset, add [amount], query, help, quit";
+char const* const help = "commands: reset, add [amount], query, help, quit";
 
 void ignore_whitespace(std::istream& is)
 {
@@ -23,7 +24,7 @@ void ignore_whitespace(std::istream& is)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     {
         // Create an accumulator component on this locality.
@@ -53,10 +54,13 @@ int hpx_main(boost::program_options::variables_map&)
                 if (cmd[0] == "reset")
                     accu.reset_sync();
 
+                if (cmd[0] == "reset")
+                    accu.reset_sync();
+
                 else if (cmd[0] == "add")
                 {
                     if (cmd.size() != 2)
-                        std::cout << "error: invalid command '" 
+                        std::cout << "error: invalid command '"
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
@@ -73,8 +77,8 @@ int hpx_main(boost::program_options::variables_map&)
                 else if (cmd[0] == "quit")
                     break;
 
-                else 
-                    std::cout << "error: invalid command '" 
+                else
+                    std::cout << "error: invalid command '"
                               << line << "'" << std::endl
                               << help << std::endl;
             }
@@ -90,11 +94,7 @@ int hpx_main(boost::program_options::variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);
 }
 

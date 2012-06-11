@@ -1,0 +1,6 @@
+08 June 2012
+Code maintained by Matt Anderson (matt@phys.lsu.edu)
+
+This is a new way of doing adaptive dataflow implicitly
+without using hpx::dataflow.  It permits adaptivity (so that the entire workflow tree
+does not need to be known a priori, as in the dataflow example).

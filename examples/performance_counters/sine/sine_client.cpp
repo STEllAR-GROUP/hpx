@@ -53,7 +53,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
     boost::uint32_t const prefix = hpx::get_locality_id();
     boost::format sine_explicit("/sine{locality#%d/instance#%d}/immediate/explicit");
     boost::format sine_implicit("/sine{locality#%d/total}/immediate/implicit");
-    boost::format sine_average("/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average#100");
+    boost::format sine_average("/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average@100");
 
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;
@@ -112,7 +112,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
         // give up control to the thread manager, we will be resumed after
         // 'pause' ms
-        hpx::threads::suspend(boost::posix_time::milliseconds(pause));
+        hpx::this_thread::suspend(boost::posix_time::milliseconds(pause));
     }
     return 0;
 }

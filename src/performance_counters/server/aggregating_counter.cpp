@@ -77,7 +77,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     aggregating_counter<Statistic>::aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::size_t base_time_interval)
+            boost::int64_t base_time_interval)
       : base_type_holder(info),
         timer_(boost::bind(&aggregating_counter::evaluate, this_()),
             1000 * base_time_interval, info.fullname_, true),
@@ -226,8 +226,8 @@ template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     average_count_counter_type, average_count_counter,
-    "base_performance_counter", true);
-HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type);
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max
@@ -238,8 +238,8 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     max_count_counter_type, max_count_counter,
-    "base_performance_counter", true);
-HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type);
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Min
@@ -250,8 +250,8 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     min_count_counter_type, min_count_counter,
-    "base_performance_counter", true);
-HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type);
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail
@@ -279,12 +279,12 @@ namespace hpx { namespace performance_counters { namespace detail
                 get_counter_name(paths.parentinstancename_, base_name, ec);
                 if (ec) return naming::invalid_gid;
 
-                std::size_t interval = 1000;
+                boost::int64_t interval = 1000;
                 if (!paths.parameters_.empty()) {
                     // try to interpret the additional parameter as interval
                     // time (ms)
                     try {
-                        interval = boost::lexical_cast<std::size_t>(paths.parameters_);
+                        interval = boost::lexical_cast<boost::int64_t>(paths.parameters_);
                     }
                     catch (boost::bad_lexical_cast const& e) {
                         HPX_THROWS_IF(ec, bad_parameter,

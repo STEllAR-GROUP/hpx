@@ -58,7 +58,7 @@ boost::uint64_t total_trials = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    boost::uint64_t cores
+    int cores
   , double walltime
     )
 {
@@ -84,12 +84,12 @@ void worker()
 {
     double volatile d = 0.;
     for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
+        d += 1. / (2. * i + 1.);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int omp_main(
-    variables_map& vm
+    variables_map&
     )
 {
     // Validate command line.
@@ -131,7 +131,7 @@ int main(
         , "print out program usage (this message)")
         
         ( "threads,t"
-        , value<boost::uint32_t>()->default_value(1),
+        , value<int>()->default_value(1),
          "number of OS-threads to use")
 
         ( "tasks"
@@ -164,7 +164,7 @@ int main(
     }
 
     // Setup the OMP environment.
-    omp_set_num_threads(vm["threads"].as<boost::uint32_t>());
+    omp_set_num_threads(vm["threads"].as<int>());
 
     return omp_main(vm);
 }

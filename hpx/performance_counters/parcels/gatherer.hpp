@@ -26,19 +26,25 @@ namespace hpx { namespace performance_counters { namespace parcels
         gatherer()
           : overall_bytes_(0),
             overall_time_(0),
-            gatherer_size_(0)
+            serialization_time_(0),
+            num_parcels_(0),
+            num_messages_(0)
         {}
 
         void add_data(data_point const& x);
 
-        boost::int64_t size() const;
-        boost::int64_t total_bytes() const;
+        std::size_t num_parcels() const;
+        std::size_t num_messages() const;
+        std::size_t total_bytes() const;
         boost::int64_t total_time() const;
+        boost::int64_t total_serialization_time() const;
 
     private:
-        boost::int64_t overall_bytes_;
+        std::size_t overall_bytes_;
         boost::int64_t overall_time_;
-        boost::int64_t gatherer_size_;
+        boost::int64_t serialization_time_;
+        std::size_t num_parcels_;
+        std::size_t num_messages_;
 
         // Create mutex for accumulator functions.
         mutable mutex_type acc_mtx;
@@ -49,14 +55,22 @@ namespace hpx { namespace performance_counters { namespace parcels
         mutex_type::scoped_lock mtx(acc_mtx);
 
         overall_bytes_ += x.bytes_;
-        overall_time_ += x.timer_;
-        ++gatherer_size_;
+        overall_time_ += x.time_;
+        serialization_time_ += x.serialization_time_;
+        num_parcels_ += x.num_parcels_;
+        ++num_messages_;
     }
 
-    inline boost::int64_t gatherer::size() const
+    inline std::size_t gatherer::num_parcels() const
     {
         mutex_type::scoped_lock mtx(acc_mtx);
-        return gatherer_size_;
+        return num_parcels_;
+    }
+
+    inline std::size_t gatherer::num_messages() const
+    {
+        mutex_type::scoped_lock mtx(acc_mtx);
+        return num_messages_;
     }
 
     inline boost::int64_t gatherer::total_time() const
@@ -65,7 +79,13 @@ namespace hpx { namespace performance_counters { namespace parcels
         return overall_time_;
     }
 
-    inline boost::int64_t gatherer::total_bytes() const
+    inline boost::int64_t gatherer::total_serialization_time() const
+    {
+        mutex_type::scoped_lock mtx(acc_mtx);
+        return serialization_time_;
+    }
+
+    inline std::size_t gatherer::total_bytes() const
     {
         mutex_type::scoped_lock mtx(acc_mtx);
         return overall_bytes_;

@@ -149,7 +149,7 @@ public:
     }
 
     build_arithmeticops() {}
-    explicit build_arithmeticops(integral_type i) : Base(i) {}
+    explicit build_arithmeticops(integral_type i_) : Base(i_) {}
 };
 
 /*
@@ -188,7 +188,7 @@ public:
     }
 
     build_logicops() {}
-    build_logicops(integral_type i) : Base(i) {}
+    build_logicops(integral_type i_) : Base(i_) {}
 };
 
 /*
@@ -253,7 +253,7 @@ public:
     typedef typename super::integral_type integral_type;
 
     build_atomic_from_add(void) {}
-    build_atomic_from_add(typename super::integral_type i) : super(i) {}
+    build_atomic_from_add(typename super::integral_type i_) : super(i_) {}
 };
 
 /*
@@ -274,7 +274,7 @@ public:
     typedef typename super::integral_type integral_type;
 
     build_atomic_from_exchange(void) {}
-    build_atomic_from_exchange(typename super::integral_type i) : super(i) {}
+    build_atomic_from_exchange(typename super::integral_type i_) : super(i_) {}
 };
 
 
@@ -334,19 +334,19 @@ private:
 
     const Base &get_base(void) const volatile
     {
-        intptr_t address=(intptr_t)this;
+        intptr_t address=(intptr_t)this; //static_cast<intptr_t>(this);
         address&=~(sizeof(larger_integral_type)-1);
         return *reinterpret_cast<const Base *>(address);
     }
     Base &get_base(void) volatile
     {
-        intptr_t address=(intptr_t)this;
+        intptr_t address=(intptr_t)this; //static_cast<intptr_t>(this);
         address&=~(sizeof(larger_integral_type)-1);
         return *reinterpret_cast<Base *>(address);
     }
     intptr_t get_offset(void) const volatile
     {
-        intptr_t address=(intptr_t)this;
+        intptr_t address=(intptr_t)this; //static_cast<intptr_t>(this);
         address&=(sizeof(larger_integral_type)-1);
         return address;
     }
@@ -370,7 +370,7 @@ private:
     larger_integral_type insert(larger_integral_type target, integral_type source) const volatile
     {
         larger_integral_type tmp=source;
-        larger_integral_type mask=(larger_integral_type)-1;
+        larger_integral_type mask=larger_integral_type(-1);
 
         mask=~(mask<<(8*sizeof(integral_type)));
 

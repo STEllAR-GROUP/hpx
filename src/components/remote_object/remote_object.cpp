@@ -17,24 +17,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 typedef hpx::components::server::remote_object remote_object_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
-    hpx::components::simple_component<remote_object_type>,
-    remote_object, true);
+    hpx::components::managed_component<remote_object_type>,
+    remote_object, hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the remote_object actions
+/*
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::remote_object_apply_action<void>,
     remote_object_apply_action_void);
+*/
 HPX_REGISTER_ACTION_EX(
     remote_object_type::set_dtor_action,
-    remote_object_set_dtor_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type);
+    remote_object_set_dtor_action)
 
 HPX_REGISTER_PLAIN_ACTION_EX(
     hpx::components::remote_object::new_impl_action,
-    remote_object_new_impl_action);
+    remote_object_new_impl_action)

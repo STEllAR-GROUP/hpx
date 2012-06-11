@@ -20,19 +20,15 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
-namespace hpx { namespace threads
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // global variable defining the stack size to use for all HPX-threads
-    extern std::size_t default_stacksize;
-}}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     // pre-initialize entries with compile time based values
-    void pre_initialize_ini(section& ini)
+    void runtime_configuration::pre_initialize_ini()
     {
+        if (!need_to_call_pre_initialize)
+            return;
+
         using namespace boost::assign;
         std::vector<std::string> lines;
         lines +=
@@ -42,13 +38,13 @@ namespace hpx { namespace util
             // create system and application instance specific entries
             "[system]",
             "pid = " + boost::lexical_cast<std::string>(getpid()),
-            "prefix = " + util::find_prefix(),
+            "prefix = " + find_prefix(),
 
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx",
-            "ini_path = $[hpx.location]/share/hpx/ini",
+            "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
 #if HPX_USE_ITT == 1
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
@@ -57,12 +53,20 @@ namespace hpx { namespace util
             "default_stack_size = ${HPX_DEFAULT_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE) "}",
 
+            "[hpx.threadpools]",
+            "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
+                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_THREADS) "}",
+            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:"
+                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_THREADS) "}",
+            "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
+                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
+
             "[hpx.parcel]",
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_PARCEL_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "max_connections_cache_size = ${HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE) "}",
+            "max_connections = ${HPX_MAX_PARCEL_CONNECTIONS:"
+                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS) "}",
             "max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:"
                 BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY) "}",
 
@@ -132,19 +136,26 @@ namespace hpx { namespace util
             "enabled = 1"
         ;
         // don't overload user overrides
-        ini.parse("static defaults", lines);
+        this->parse("static defaults", lines);
+
+        need_to_call_pre_initialize = false;
     }
 
-    void post_initialize_ini(section& ini, std::string const& hpx_ini_file,
+    void runtime_configuration::post_initialize_ini(
+        std::string const& hpx_ini_file,
         std::vector<std::string> const& cmdline_ini_defs)
     {
         // add explicit configuration information if its provided
-        if (!hpx_ini_file.empty())
-            util::init_ini_data_base(ini, hpx_ini_file);
+        if (!hpx_ini_file.empty()) {
+            util::init_ini_data_base(*this, hpx_ini_file);
+            need_to_call_pre_initialize = true;
+        }
 
         // let the command line override the config file.
-        if (!cmdline_ini_defs.empty())
-            ini.parse("command line definitions", cmdline_ini_defs);
+        if (!cmdline_ini_defs.empty()) {
+            this->parse("command line definitions", cmdline_ini_defs);
+            need_to_call_pre_initialize = true;
+        }
     }
 
     void runtime_configuration::load_components()
@@ -156,9 +167,6 @@ namespace hpx { namespace util
             get_entry("hpx.component_path", HPX_DEFAULT_COMPONENT_PATH));
         util::init_ini_data_default(component_path, *this);
 
-        // merge all found ini files of all components
-        util::merge_component_inis(*this);
-
         // read system and user ini files _again_, to allow the user to
         // overwrite the settings from the default component ini's.
         util::init_ini_data_base(*this, hpx_ini_file);
@@ -166,18 +174,25 @@ namespace hpx { namespace util
         // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
             parse("command line definitions", cmdline_ini_defs);
+
+        // merge all found ini files of all components
+        util::merge_component_inis(*this);
+
+        need_to_call_pre_initialize = true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
+      : default_stacksize(HPX_DEFAULT_STACK_SIZE),
+        need_to_call_pre_initialize(true)
     {
-        pre_initialize_ini(*this);
+        pre_initialize_ini();
 
         // set global config options
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        threads::default_stacksize = get_default_stack_size();
+        default_stacksize = init_default_stack_size();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -186,20 +201,20 @@ namespace hpx { namespace util
     {
         hpx_ini_file = hpx_ini_file_;
 
-        pre_initialize_ini(*this);
+        pre_initialize_ini();
 
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
+        post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        threads::default_stacksize = get_default_stack_size();
+        default_stacksize = init_default_stack_size();
     }
 
     void runtime_configuration::reconfigure(
@@ -207,20 +222,20 @@ namespace hpx { namespace util
     {
         cmdline_ini_defs = cmdline_ini_defs_;
 
-        pre_initialize_ini(*this);
+        pre_initialize_ini();
 
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
+        post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        threads::default_stacksize = get_default_stack_size();
+        default_stacksize = init_default_stack_size();
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -289,7 +304,7 @@ namespace hpx { namespace util
         return HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY;
     }
 
-    std::size_t runtime_configuration::get_connection_cache_size() const
+    std::size_t runtime_configuration::get_max_connections() const
     {
         if (has_section("hpx.parcel"))
         {
@@ -298,12 +313,12 @@ namespace hpx { namespace util
             {
                 std::string cfg_max_connections(
                     sec->get_entry("max_connections_cache_size",
-                        HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE));
+                        HPX_MAX_PARCEL_CONNECTIONS));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
             }
         }
-        return HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE;
+        return HPX_MAX_PARCEL_CONNECTIONS;
     }
 
     agas::service_mode runtime_configuration::get_agas_service_mode() const
@@ -463,15 +478,28 @@ namespace hpx { namespace util
         return "";
     }
 
+    // Return the configured sizes of any of the know thread pools
+    std::size_t runtime_configuration::get_thread_pool_size(char const* poolname) const
+    {
+        if (has_section("hpx.threadpools")) {
+            util::section const* sec = get_section("hpx.threadpools");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry(std::string(poolname) + "_size", "2"));
+            }
+        }
+        return 2;     // the default size for all pools is 2
+    }
+
     // Will return the stack size to use for all HPX-threads.
-    std::size_t runtime_configuration::get_default_stack_size() const
+    std::ptrdiff_t runtime_configuration::init_default_stack_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 std::string entry = sec->get_entry("default_stack_size",
                     BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE));
-                std::size_t val = HPX_DEFAULT_STACK_SIZE;
+                std::ptrdiff_t val = HPX_DEFAULT_STACK_SIZE;
 
                 namespace qi = boost::spirit::qi;
                 qi::parse(entry.begin(), entry.end(),

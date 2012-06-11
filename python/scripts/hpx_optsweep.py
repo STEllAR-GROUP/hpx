@@ -11,20 +11,22 @@ Perform parameter sweep runs of an application.
 """
 
 import sys, os, getopt, time, string
+import os.path as osp
 from re import compile
 from types import *
 from operator import *
 from datetime import datetime
 from pickle import dump
- 
-if os.path.exists(os.path.join(sys.path[0], "../hpx")):
-  sys.path.append(os.path.join(sys.path[0], ".."))
-if os.path.exists(os.path.join(sys.path[0], "../share/hpx/python/hpx")):
-  sys.path.append(os.path.join(sys.path[0], "../share/hpx/python"))
+from hpx_version import HPX_VERSION
+
+if osp.exists(osp.join(sys.path[0], "../hpx")):
+  sys.path.append(osp.join(sys.path[0], ".."))
+if osp.exists(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):
+  sys.path.append(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python"))
 
 from hpx.process import process
 
-VERSION = 0x10 # version (mostly for version tracking in pickle output)
+OPTSWEEP_VERSION = 0x10 # version (mostly for version tracking in pickle output)
 
 # print usage info and exit with an error code
 def usage(rc = 2):
@@ -245,7 +247,7 @@ if __name__ == '__main__':
       results['schema']['keys'] = tuple(optnames)
       results['schema']['values'] = ('wall_time','return_code')
 
-      results['header']['version'] = VERSION
+      results['header']['version'] = OPTSWEEP_VERSION
       results['header']['start_date'] = start_date
       results['header']['command'] = tuple(sys.argv)
 

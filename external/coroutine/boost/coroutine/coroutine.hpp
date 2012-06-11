@@ -201,14 +201,14 @@ namespace boost { namespace coroutines {
 
     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
                     BOOST_COROUTINE_generate_argument_n_type,
-                    arg_slot_traits);
+                    arg_slot_traits)
 
     static const int arity = arg_slot_traits::length;
 
     struct yield_traits {
       BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
                       BOOST_COROUTINE_generate_argument_n_type,
-                      result_slot_traits);
+                      result_slot_traits)
       static const int arity = result_slot_traits::length;
     };
 

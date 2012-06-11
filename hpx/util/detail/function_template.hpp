@@ -55,7 +55,7 @@ namespace hpx { namespace util
         struct is_empty_function_impl
         {
             // in the general case the functor is not empty
-            static bool call(Functor const& f, boost::mpl::false_)
+            static bool call(Functor const&, boost::mpl::false_)
             {
                 return false;
             }
@@ -112,7 +112,7 @@ namespace hpx { namespace util
                         >::type
                     >::type
                 >::type
-            >::type * dummy = 0
+            >::type * = 0
         )
             : base_type(boost::forward<Functor>(f))
         {}
@@ -138,7 +138,7 @@ namespace hpx { namespace util
         }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(function);
+        BOOST_COPYABLE_AND_MOVABLE(function)
 
         friend class boost::serialization::access;
 
@@ -172,7 +172,7 @@ namespace hpx { namespace util
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     };
 
@@ -196,7 +196,7 @@ namespace hpx { namespace util
                         >::type
                     >::type
                 >::type
-            >::type * dummy = 0
+            >::type * = 0
         )
             : base_type(boost::forward<Functor>(f))
         {}
@@ -222,7 +222,7 @@ namespace hpx { namespace util
         }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(function);
+        BOOST_COPYABLE_AND_MOVABLE(function)
     };
 
 
@@ -246,7 +246,7 @@ namespace hpx { namespace util
                         >::type
                     >::type
                 >::type
-            >::type * dummy = 0
+            >::type * = 0
         )
             : base_type(boost::forward<Functor>(f))
         {}
@@ -272,7 +272,7 @@ namespace hpx { namespace util
         }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(function);
+        BOOST_COPYABLE_AND_MOVABLE(function_nonser)
     };
 }}
 

@@ -35,32 +35,32 @@
 // Initialization support for the performance counter actions
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
-    performance_counter_get_counter_info_action);
+    performance_counter_get_counter_info_action)
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
-    performance_counter_get_counter_value_action);
+    performance_counter_get_counter_value_action)
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
-    performance_counter_set_counter_value_action);
+    performance_counter_set_counter_value_action)
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
-    performance_counter_reset_counter_value_action);
+    performance_counter_reset_counter_value_action)
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::start_action,
-    performance_counter_start_action);
+    performance_counter_start_action)
 HPX_REGISTER_ACTION_EX(
     hpx::performance_counters::server::base_performance_counter::stop_action,
-    performance_counter_stop_action);
+    performance_counter_stop_action)
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_result_action,
-    set_result_action_counter_info);
+    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_value_action,
+    set_value_action_counter_info)
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_result_action,
-    set_result_action_counter_value);
+    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_value_action,
+    set_value_action_counter_value)
 
 HPX_DEFINE_GET_COMPONENT_TYPE(
-    hpx::performance_counters::server::base_performance_counter);
+    hpx::performance_counters::server::base_performance_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -109,7 +109,7 @@ namespace hpx { namespace performance_counters
         }
 
         if (!path.parameters_.empty()) {
-            result += "#";
+            result += "@";
             result += path.parameters_;
         }
 
@@ -178,7 +178,7 @@ namespace hpx { namespace performance_counters
         instance_name() : index_(-1), basename_(false) {}
 
         std::string name_;
-        boost::uint32_t index_;
+        boost::int64_t index_;
         bool basename_;
     };
 
@@ -200,15 +200,15 @@ namespace hpx { namespace performance_counters
 BOOST_FUSION_ADAPT_STRUCT(
     hpx::performance_counters::instance_name,
     (std::string, name_)
-    (boost::uint32_t, index_)
+    (boost::int64_t, index_)
     (bool, basename_)
-);
+)
 
 BOOST_FUSION_ADAPT_STRUCT(
     hpx::performance_counters::instance_elements,
     (hpx::performance_counters::instance_name, parent_)
     (hpx::performance_counters::instance_name, child_)
-);
+)
 
 BOOST_FUSION_ADAPT_STRUCT(
     hpx::performance_counters::path_elements,
@@ -216,7 +216,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (hpx::performance_counters::instance_elements, instance_)
     (std::string, counter_)
     (std::string, parameters_)
-);
+)
 
 namespace hpx { namespace performance_counters
 {
@@ -233,8 +233,8 @@ namespace hpx { namespace performance_counters
           : path_parser::base_type(start)
         {
           start = -qi::lit(counter_prefix)
-                >> '/' >> +~qi::char_("/{#") >> -instance
-                >> -('/' >>  +~qi::char_("#}")) >> -('#' >> +qi::char_);
+                >> '/' >> +~qi::char_("/{#@") >> -instance
+                >> -('/' >>  +~qi::char_("#}@")) >> -('@' >> +qi::char_);
             instance = '{' >> parent >> -('/' >> child) >> '}';
             parent =
                     &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)  // base counter
@@ -471,7 +471,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::size_t base_time_interval, error_code& ec)
+            boost::int64_t base_time_interval, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
@@ -506,7 +506,7 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "no create function for performance counter found: " +
-                        info.fullname_);
+                    info.fullname_ + " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
 
@@ -516,10 +516,11 @@ namespace hpx { namespace performance_counters
 
             if (paths.parentinstancename_ == "locality" &&
                 paths.parentinstanceindex_ !=
-                    static_cast<boost::int32_t>(hpx::get_locality_id()))
+                    static_cast<boost::int64_t>(hpx::get_locality_id()))
             {
-                HPX_THROWS_IF(ec, hpx::bad_parameter, "create_counter_local",
-                    "attempt to create counter on wrong locality");
+                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                    "attempt to create counter on wrong locality ("
+                     + ec.get_message() + ")");
                 return hpx::naming::invalid_gid;
             }
 
@@ -528,7 +529,7 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "couldn't create performance counter: " +
-                        info.fullname_);
+                    info.fullname_ + " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
 
@@ -577,8 +578,9 @@ namespace hpx { namespace performance_counters
                 // create the new performance counter
                 using namespace components::stubs;
                 naming::gid_type gid = runtime_support::create_performance_counter(
-                    naming::get_id_from_locality_id(p.parentinstanceindex_),
-                    complemented_info);
+                    naming::get_id_from_locality_id(static_cast<boost::uint32_t>(p.parentinstanceindex_)),
+                    complemented_info, ec);
+                if (ec) return naming::invalid_id;
 
                 id = naming::id_type(gid, naming::id_type::managed);
             }

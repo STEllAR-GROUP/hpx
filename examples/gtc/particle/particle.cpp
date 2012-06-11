@@ -24,7 +24,6 @@ typedef hpx::components::managed_component<
 > gtc_particle_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(gtc_particle_type, gtc_particle);
-HPX_DEFINE_GET_COMPONENT_TYPE(gtc_particle_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(

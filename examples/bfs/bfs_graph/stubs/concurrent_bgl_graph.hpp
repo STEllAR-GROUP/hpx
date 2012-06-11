@@ -23,7 +23,7 @@ namespace bfs { namespace stubs
             std::vector<std::pair<std::size_t, std::size_t> > const& edgelist)
         {
             typedef server::concurrent_bgl_graph::init_action action_type;
-            return hpx::lcos::async<action_type>(gid, idx, grainsize,
+            return hpx::async<action_type>(gid, idx, grainsize,
                 edgelist);
         }
 
@@ -39,7 +39,7 @@ namespace bfs { namespace stubs
         bfs_async(hpx::naming::id_type const& gid, std::size_t root)
         {
             typedef server::concurrent_bgl_graph::bfs_action action_type;
-            return hpx::lcos::async<action_type>(gid, root);
+            return hpx::async<action_type>(gid, root);
         }
 
         static double
@@ -53,7 +53,7 @@ namespace bfs { namespace stubs
         get_parents_async(hpx::naming::id_type const& gid)
         {
             typedef server::concurrent_bgl_graph::get_parents_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<std::size_t>
@@ -67,7 +67,7 @@ namespace bfs { namespace stubs
         reset_async(hpx::naming::id_type const& gid)
         {
             typedef server::concurrent_bgl_graph::reset_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static void

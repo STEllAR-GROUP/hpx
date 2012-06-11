@@ -8,14 +8,15 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/base_object.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 
-#include <vector>
-
-#include <boost/shared_ptr.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
 #include <boost/move/move.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -25,21 +26,44 @@
 #define HPX_CONTINUATION_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace applier {
-
-    template <typename Action, typename Arg0>
-    inline bool
-    apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
-
-    template <typename Action>
-    inline bool apply(naming::id_type const& gid);
-}
-
-namespace actions
+namespace hpx { namespace actions
 {
-    // parcel continuations are simply lists of global ids of LCO's to call
-    // set_event on
-    class HPX_API_EXPORT continuation
+    namespace detail
+    {
+        template <typename Target>
+        void guid_initialization(boost::mpl::false_) {}
+
+        template <typename Target>
+        void guid_initialization(boost::mpl::true_)
+        {
+            // force serialization self registration to happen
+            using namespace boost::archive::detail::extra_detail;
+            init_guid<Target>::g.initialize();
+        }
+
+        template <typename Target>
+        void guid_initialization()
+        {
+            guid_initialization<Target>(
+                typename traits::needs_guid_initialization<Target>::type());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Helper to invoke the registration code for serialization at startup
+        template <typename Target>
+        struct register_base_helper
+        {
+            register_base_helper()
+            {
+                Target::register_base();
+            }
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // Parcel continuations are polymorphic objects encapsulating the
+    // id_type of the destination where the result has to be sent.
+    class HPX_EXPORT continuation
     {
     public:
         continuation()
@@ -49,28 +73,21 @@ namespace actions
           : gid_(gid)
         {}
 
-        ///
-        void trigger();
+        virtual ~continuation() {}
+
+        //
+        virtual void trigger() const;
 
         template <typename Arg0>
-        void trigger(BOOST_FWD_REF(Arg0) arg0)
+        inline void trigger(BOOST_FWD_REF(Arg0) arg0) const;
+
+        //
+        virtual void trigger_error(boost::exception_ptr const& e) const;
+        virtual void trigger_error(BOOST_RV_REF(boost::exception_ptr) e) const;
+
+        naming::id_type const& get_gid() const
         {
-            typedef typename
-                lcos::template base_lco_with_value<Arg0>::set_result_action
-            action_type;
-
-            LLCO_(info) << "continuation::trigger(" << gid_ << ")";
-
-            applier::apply<action_type>(gid_, boost::forward<Arg0>(arg0));
-        }
-
-        ///
-        void trigger_error(boost::exception_ptr const& e);
-        void trigger_error(BOOST_RV_REF(boost::exception_ptr) e);
-
-        naming::gid_type const& get_raw_gid()
-        {
-            return gid_.get_gid();
+            return gid_;
         }
 
     private:
@@ -83,14 +100,77 @@ namespace actions
             ar & gid_;
         }
 
+    protected:
         naming::id_type gid_;
     };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    struct typed_continuation : continuation
+    {
+        typed_continuation()
+        {}
+
+        explicit typed_continuation(naming::id_type const& gid)
+          : continuation(gid)
+        {}
+
+        ~typed_continuation()
+        {
+            detail::guid_initialization<typed_continuation>();
+        }
+
+        virtual void trigger_value(BOOST_RV_REF(Result)) const = 0;
+
+        static void register_base()
+        {
+            util::void_cast_register_nonvirt<
+                typed_continuation, continuation>();
+        }
+
+    private:
+        /// serialization support
+        friend class boost::serialization::access;
+        typedef continuation base_type;
+
+        template <class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & util::base_object_nonvirt<base_type>(*this);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename Arg0>
+    void continuation::trigger(BOOST_FWD_REF(Arg0) arg0) const
+    {
+        // The static_cast is safe as we know that Arg0 is the result type
+        // of the executed action (see apply.hpp).
+        static_cast<typed_continuation<Arg0> const*>(this)->trigger_value(
+            boost::forward<Arg0>(arg0));
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::actions::continuation, HPX_CONTINUATION_VERSION)
-BOOST_CLASS_TRACKING(hpx::actions::continuation, boost::serialization::track_never)
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
+
+// registration code for serialization
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Result>),
+    (hpx::actions::typed_continuation<Result>)
+)
 
 #include <hpx/config/warnings_suffix.hpp>
 

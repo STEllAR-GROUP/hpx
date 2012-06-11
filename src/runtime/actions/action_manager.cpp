@@ -24,10 +24,11 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_parcel(
-        parcelset::parcelhandler& parcel_handler, naming::address const& dest)
+        parcelset::parcelhandler& parcel_handler,
+        naming::gid_type const& parcel_id, naming::address const& dest)
     {
         parcelset::parcel p;
-        if (parcel_handler.get_parcel(p))  // if new parcel is found
+        if (parcel_handler.get_parcel(p, parcel_id))
         {
             while (threads::threadmanager_is(starting))
             {
@@ -61,12 +62,11 @@ namespace hpx { namespace actions
 
             // make sure the component_type of the action matches the component
             // type in the destination address
-/*
             if (HPX_UNLIKELY(!components::types_are_compatible(
                 dest.type_, act->get_component_type())))
             {
                 hpx::util::osstream strm;
-                strm << "types are not compatible: destination_type("
+                strm << " types are not compatible: destination_type("
                      << dest.type_ << ") action_type("
                      << act->get_component_type()
                      << ") parcel ("  << p << ")";
@@ -74,7 +74,6 @@ namespace hpx { namespace actions
                     "action_manager::fetch_parcel",
                     hpx::util::osstream_get_string(strm));
             }
-*/
 
             // either directly execute the action or create a new thread
             if (actions::base_action::direct_action == act->get_action_type())
@@ -116,10 +115,9 @@ namespace hpx { namespace actions
     // Invoked by the Thread Manager when it is running out of work-items
     // and needs something to execute on a specific starving resources
     // specified as the argument
-    void action_manager::fetch_parcel (naming::id_type const& resourceID)
-    {
-
-    }
+//     void action_manager::fetch_parcel (naming::id_type const& resourceID)
+//     {
+//     }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

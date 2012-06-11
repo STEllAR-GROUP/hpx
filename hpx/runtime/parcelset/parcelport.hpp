@@ -65,7 +65,7 @@ namespace parcelset
         > write_handler_type;
 
         typedef HPX_STD_FUNCTION<
-            void(parcelport& pp, boost::shared_ptr<std::vector<char> > const&,
+            void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
                  threads::thread_priority)
         > read_handler_type;
 
@@ -114,7 +114,7 @@ namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        void put_parcel(parcel& p, write_handler_type f)
+        void put_parcel(parcel const & p, write_handler_type f)
         {
             // send the parcel to its destination
             send_parcel(p, p.get_destination_addr(), f);
@@ -172,16 +172,28 @@ namespace parcelset
             id_range_.set_range(lower, upper);
         }
 
-        /// number of messages sent
-        boost::int64_t get_send_count() const
+        /// number of parcels sent
+        std::size_t get_parcel_send_count() const
         {
-            return parcels_sent_.size();
+            return parcels_sent_.num_parcels();
         }
 
-        /// number of messages received 
-        boost::int64_t get_receive_count() const
+        /// number of messages sent
+        std::size_t get_message_send_count() const
         {
-            return parcels_received_.size();
+            return parcels_sent_.num_messages();
+        }
+
+        /// number of parcels received
+        std::size_t get_parcel_receive_count() const
+        {
+            return parcels_received_.num_parcels();
+        }
+
+        /// number of messages received
+        std::size_t get_message_receive_count() const
+        {
+            return parcels_received_.num_messages();
         }
 
         /// the total time it took for all sends, from async_write to the
@@ -198,16 +210,36 @@ namespace parcelset
             return parcels_received_.total_time() * 1000;
         }
 
+        /// the total time it took for all sender-side serialization operations
+        /// (nanoseconds)
+        boost::int64_t get_sending_serialization_time() const
+        {
+            return parcels_sent_.total_serialization_time() * 1000;
+        }
+
+        /// the total time it took for all receiver-side serialization
+        /// operations (nanoseconds)
+        boost::int64_t get_receiving_serialization_time() const
+        {
+            return parcels_received_.total_serialization_time() * 1000;
+        }
+
         /// total data received (bytes)
-        boost::int64_t get_data_sent() const
+        std::size_t get_data_sent() const
         {
             return parcels_sent_.total_bytes();
         }
 
         /// total data received (bytes)
-        boost::int64_t get_data_received() const
+        std::size_t get_data_received() const
         {
             return parcels_received_.total_bytes();
+        }
+
+        void add_received_data(
+            performance_counters::parcels::data_point const& data)
+        {
+            parcels_received_.add_data(data);
         }
 
     protected:
@@ -223,7 +255,8 @@ namespace parcelset
 
         /// helper function to send remaining pending parcels
         void send_pending_parcels_trampoline(boost::uint32_t prefix);
-        void send_pending_parcels(parcelport_connection_ptr client_connection, std::vector<parcel> const & parcels, std::vector<write_handler_type> const &);
+        void send_pending_parcels(parcelport_connection_ptr client_connection,
+            std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
     private:
         /// The site current range of ids to be used for id_type instances

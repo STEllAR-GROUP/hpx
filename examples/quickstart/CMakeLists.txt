@@ -5,8 +5,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+    error_handling
     factorial
     fibonacci
+    fibonacci_one
+    fibonacci_futures
+    fractals
+    interest_calculator
     non_atomic_rma
     quicksort
     timed_wake
@@ -20,9 +25,11 @@ if(HPX_CXX11_LAMBDAS)
      )
 endif()
 
+set(error_handling_FLAGS DEPENDENCIES iostreams_component)
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
+set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 
 foreach(example_program ${example_programs})
   set(sources

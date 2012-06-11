@@ -13,7 +13,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
@@ -211,7 +211,7 @@ struct object_semaphore
 
             LLCO_(info) << "object_semapohre::wait: waiting for " << id;
 
-            applier::apply<action_type>(id);
+            hpx::apply<action_type>(id);
         }
     } // }}}
 

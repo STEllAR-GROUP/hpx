@@ -25,7 +25,6 @@ typedef hpx::components::managed_component<
 > graph500_point_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(graph500_point_type, graph500_point);
-HPX_DEFINE_GET_COMPONENT_TYPE(graph500_point_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
@@ -81,5 +80,5 @@ HPX_REGISTER_ACTION_EX(
     get_value_action_vector_size_t);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_result_action,
-    set_result_action_vector_size_t);
+    hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_value_action,
+    set_value_action_vector_size_t);

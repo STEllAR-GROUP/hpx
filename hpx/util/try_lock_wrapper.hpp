@@ -24,7 +24,7 @@ struct try_lock_wrapper : public boost::detail::try_lock_wrapper<Mutex>
 {
     typedef boost::detail::try_lock_wrapper<Mutex> base;
 
-    explicit try_lock_wrapper(Mutex& m) : base(m, boost::try_to_lock) {}
+    explicit try_lock_wrapper(Mutex& m_) : base(m_, boost::try_to_lock) {}
 
     void lock()
     { base::try_lock(); } // this is different

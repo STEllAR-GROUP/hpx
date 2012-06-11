@@ -8,6 +8,8 @@ set(tests
     unhandled_exception
    )
 
+set(unhandled_exception_PARAMETERS FAILURE_EXPECTED)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -19,6 +21,8 @@ foreach(test ${tests})
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/Diagnostics")
+
+  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.diagnostics.${test})

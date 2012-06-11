@@ -9,6 +9,9 @@ set(tests
 
 set(remote_object_FLAGS
     DEPENDENCIES iostreams_component remote_object_component)
+set(remote_object_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})
   set(sources
@@ -21,6 +24,8 @@ foreach(test ${tests})
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/Components")
+
+  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.components.${test})

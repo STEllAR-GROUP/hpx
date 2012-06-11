@@ -11,7 +11,7 @@
 #include <memory>
 
 #include <hpx/util/block_profiler.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
 #include <boost/thread/mutex.hpp>
@@ -27,7 +27,7 @@
 namespace hpx { namespace threads { namespace policies
 {
 
-typedef boost::lockfree::deque<thread*> work_item_deque_type;
+typedef boost::lockfree::deque<thread_data*> work_item_deque_type;
 
 template <typename Queue, typename Value>
 inline void enqueue(Queue& workqueue, Value val)
@@ -65,7 +65,7 @@ struct thread_deque
 
     // this is the type of a map holding all threads (except depleted ones)
     typedef boost::ptr_map<
-        thread_id_type, thread, std::less<thread_id_type>, heap_clone_allocator
+        thread_id_type, thread_data, std::less<thread_id_type>, heap_clone_allocator
     > thread_map_type;
 
     // this is the type of the queue of new tasks not yet converted to
@@ -95,8 +95,8 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = HPX_STD_GET(1, *task);
-            HPX_STD_UNIQUE_PTR<threads::thread> thrd(
-                new (memory_pool_) threads::thread(
+            HPX_STD_UNIQUE_PTR<threads::thread_data> thrd(
+                new (memory_pool_) threads::thread_data(
                     HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
@@ -114,7 +114,7 @@ struct thread_deque
             }
 
             // transfer ownership to map
-            threads::thread* t = thrd.release();
+            threads::thread_data* t = thrd.release();
 
             // only insert the thread into the work-items queue if it is in
             // pending state
@@ -151,8 +151,8 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = HPX_STD_GET(1, *task);
-            HPX_STD_UNIQUE_PTR<threads::thread> thrd(
-                new (memory_pool_) threads::thread(
+            HPX_STD_UNIQUE_PTR<threads::thread_data> thrd(
+                new (memory_pool_) threads::thread_data(
                     HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
@@ -170,7 +170,7 @@ struct thread_deque
             }
 
             // transfer ownership to map
-            threads::thread* t = thrd.release();
+            threads::thread_data* t = thrd.release();
 
             // only insert the thread into the work-items queue if it is in
             // pending state
@@ -290,8 +290,8 @@ struct thread_deque
         if (run_now) {
             mutex_type::scoped_lock lk(mtx_);
 
-            HPX_STD_UNIQUE_PTR<threads::thread> thrd(
-                new (memory_pool_) threads::thread(
+            HPX_STD_UNIQUE_PTR<threads::thread_data> thrd(
+                new (memory_pool_) threads::thread_data(
                     data, memory_pool_, initial_state));
 
             // add a new entry in the map for this thread
@@ -331,7 +331,7 @@ struct thread_deque
         return invalid_thread_id; // thread has not been created yet
     }
 
-    bool get_next_thread(threads::thread*& thrd)
+    bool get_next_thread(threads::thread_data*& thrd)
     {
         if (dequeue(work_items_, thrd)) {
             --work_items_count_;
@@ -340,7 +340,7 @@ struct thread_deque
         return false;
     }
 
-    bool steal_next_thread(threads::thread*& thrd)
+    bool steal_next_thread(threads::thread_data*& thrd)
     {
         if (steal(work_items_, thrd)) {
             --work_items_count_;
@@ -350,24 +350,24 @@ struct thread_deque
     }
 
     // Schedule the passed thread
-    void schedule_thread(threads::thread* thrd)
+    void schedule_thread(threads::thread_data* thrd)
     {
         enqueue(work_items_, thrd);
         ++work_items_count_;
     }
 
-    void schedule_thread_last(threads::thread* thrd)
+    void schedule_thread_last(threads::thread_data* thrd)
     {
         enqueue_last(work_items_, thrd);
         ++work_items_count_;
     }
 
     // Destroy the passed thread as it has been terminated
-    bool destroy_thread(threads::thread* thrd)
+    bool destroy_thread(threads::thread_data* thrd)
     {
         if (thrd->is_created_from(&memory_pool_)) {
             thread_id_type id = thrd->get_thread_id();
-            reinterpret_cast<thread*>(id)->reset();     // reset bound function object
+            reinterpret_cast<thread_data*>(id)->reset();     // reset bound function object
             terminated_items_.enqueue(id);
             return true;
         }

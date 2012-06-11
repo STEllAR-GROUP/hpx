@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 
 namespace hpx { namespace lcos { namespace stubs
@@ -28,7 +28,7 @@ struct object_semaphore : components::stubs::stub_base<
       , boost::uint64_t count)
     {
         typedef typename server_type::signal_action action_type;
-        return lcos::async<action_type>(gid, val, count);
+        return hpx::async<action_type>(gid, val, count);
     }
 
     static void signal_sync(
@@ -53,7 +53,7 @@ struct object_semaphore : components::stubs::stub_base<
     {
         typedef typename server_type::get_action action_type;
         lcos::promise<ValueType> lco;
-        applier::apply<action_type>(gid, lco.get_gid());
+        hpx::apply<action_type>(gid, lco.get_gid());
         return lco.get_future();
     }
 
@@ -73,7 +73,7 @@ struct object_semaphore : components::stubs::stub_base<
       , error ec)
     {
         typedef typename server_type::abort_pending_action action_type;
-        return lcos::async<action_type>(gid, ec);
+        return hpx::async<action_type>(gid, ec);
     }
 
     static void abort_pending_sync(
@@ -95,7 +95,7 @@ struct object_semaphore : components::stubs::stub_base<
         naming::id_type const& gid)
     {
         typedef typename server_type::wait_action action_type;
-        return lcos::async<action_type>(gid);
+        return hpx::async<action_type>(gid);
     }
 
     static void wait_sync(naming::id_type const& gid)

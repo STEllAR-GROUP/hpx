@@ -12,7 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         template <typename T, typename Config>
-        static lcos::future<naming::id_type>
+        static lcos::future<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& targetgid, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_memory_block_action action_type;
-            return lcos::async<action_type>(targetgid, count, act);
+            return hpx::async<action_type>(targetgid, count, act);
         }
 
         /// Create a new component \a type using the runtime_support with the
@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::detail::memory_block::get_action action_type;
-            return lcos::async<action_type>(targetgid);
+            return hpx::async<action_type>(targetgid);
         }
 
         static components::memory_block_data get(
@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::detail::memory_block::get_config_action action_type;
-            return lcos::async<action_type>(targetgid, cfg);
+            return hpx::async<action_type>(targetgid, cfg);
         }
 
         static components::memory_block_data get(
@@ -103,7 +103,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::detail::memory_block::checkout_action action_type;
-            return lcos::async<action_type>(targetgid);
+            return hpx::async<action_type>(targetgid);
         }
 
         static components::memory_block_data checkout(
@@ -122,7 +122,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::detail::memory_block::clone_action action_type;
-            return lcos::async<action_type>(targetgid);
+            return hpx::async<action_type>(targetgid);
         }
 
         static naming::id_type clone(naming::id_type const& targetgid)
@@ -142,7 +142,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::detail::memory_block::checkin_action action_type;
-            return lcos::async<action_type>(targetgid, data.get_memory_block());
+            return hpx::async<action_type>(targetgid, data.get_memory_block());
         }
 
         template <typename T>

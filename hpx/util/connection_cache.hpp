@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2012 Thomas Heller
+//  Copyright (c)      2012 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Regex library
 //  Copyright (c) 2004 John Maddock
@@ -23,7 +24,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -32,7 +32,8 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    // This class implements an LRU cache to hold connections.
+    /// This class implements an LRU cache to hold connections. It includes
+    /// entries checked out from the cache in its cache size.
     // TODO: investigate usage of boost.cache.
     template <typename Connection, typename Key>
     class connection_cache
@@ -44,182 +45,351 @@ namespace hpx { namespace util
         typedef std::deque<connection_type> value_type;
         typedef Key key_type;
         typedef std::list<key_type> key_tracker_type;
-        typedef
-            std::map<
-                key_type
-              , boost::tuple<
-                    value_type
-                  , std::size_t
-                  , typename key_tracker_type::iterator
-                >
-            >
-            cache_type;
+        typedef boost::tuple<
+            value_type, std::size_t, typename key_tracker_type::iterator
+        > cache_value_type;
+        typedef std::map<key_type, cache_value_type> cache_type;
         typedef typename cache_type::size_type size_type;
 
         connection_cache(
-            size_type max_cache_size
+            size_type max_connections
           , size_type max_connections_per_locality
         )
-          : max_cache_size_(max_cache_size < 2 ? 2 : max_cache_size)
+          : max_connections_(max_connections < 2 ? 2 : max_connections)
           , max_connections_per_locality_(max_connections_per_locality)
-          , cache_size_(0)
+          , connections_(0)
         {
-            if(max_connections_per_locality_ > max_cache_size)
+            if (max_connections_per_locality_ > max_connections_)
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "connection_cache ctor",
-                    "max_connections_per_locality_ > max_cache_size");
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "connection_cache::connection_cache",
+                    "the maximum number of connections per locality cannot "
+                    "excede the overall maximum number of connections");
             }
         }
 
+        /// Try to get a connection to \a l from the cache.
+        ///
+        /// \returns A usable connection to \a l if a connection could be
+        ///          found, otherwise a default constructed connection. 
+        ///
+        /// \note    The connection must be returned to the cache by calling
+        ///          \a reclaim().
         connection_type get(key_type const& l)
         {
             mutex_type::scoped_lock lock(mtx_);
 
-            // Check if entry already exists ...
-            const typename cache_type::iterator it = cache_.find(l);
+            // Check if this key already exists in the cache.
+            typename cache_type::iterator const it = cache_.find(l);
 
-            // If it does ...
-            if(it != cache_.end())
+            // Check if this key already exists in the cache.
+            if (it != cache_.end())
             {
-                // .. update LRU meta data
+                // Key exists in cache.
+
+                // Update LRU meta data.
                 key_tracker_.splice(
                     key_tracker_.end()
                   , key_tracker_
                   , boost::get<2>(it->second)
                 );
 
-                // remove the oldest from that prefix and return it.
-                if(!boost::get<0>(it->second).empty())
+                // If connections to the locality are available in the cache,
+                // remove the oldest one and return it.
+                if (!boost::get<0>(it->second).empty())
                 {
                     connection_type result = boost::get<0>(it->second).front();
                     boost::get<0>(it->second).pop_front();
-                    --boost::get<1>(it->second);
-                    --cache_size_;
 
+                    check_invariants();
                     return result;
                 }
             }
 
             // If we get here then the item is not in the cache.
+            check_invariants();
             return connection_type();
         }
 
-        // returns true if insertion was successful, which means maximum cache
-        // size has not been exceeded
-        void add(key_type const& l, connection_type const& conn)
+        /// Try to get a connection to \a l from the cache, or reserve space for
+        /// a new connection to \a l. This function may evict entries from the
+        /// cache.
+        ///
+        /// \returns If a connection was found in the cache, its value is
+        ///          assigned to \a conn and this function returns true. If a
+        ///          connection was not found but space was reserved, \a conn is
+        ///          set such that conn.get() == 0, and this function returns
+        ///          true. If a connection could not be found and space could
+        ///          not be returned, \a conn is unmodified and this function
+        ///          returns false. 
+        ///
+        /// \note    The connection must be returned to the cache by calling
+        ///          \a reclaim().
+        bool get_or_reserve(key_type const& l, connection_type& conn)
         {
             mutex_type::scoped_lock lock(mtx_);
 
-            const typename cache_type::iterator jt = cache_.find(l);
+            typename cache_type::iterator const it = cache_.find(l);
 
-            if(jt != cache_.end() && boost::get<1>(jt->second) >= max_connections_per_locality_)
+            // Check if this key already exists in the cache.
+            if (it != cache_.end())
             {
+                // Key exists in cache.
+
+                // Update LRU meta data.
                 key_tracker_.splice(
                     key_tracker_.end()
                   , key_tracker_
-                  , boost::get<2>(jt->second)
+                  , boost::get<2>(it->second)
                 );
-                return;
-            }
 
-            if(key_tracker_.empty())
-            {
-                BOOST_ASSERT(cache_.size() == 0);
-            }
-            // eviction strategy implemented here ...
-            else
-            {
-                // If we reached maximum capacity, evict one entry ...
-                // Find the least recently used key entry
-                typename key_tracker_type::iterator it = key_tracker_.begin();
-
-                while(cache_size_ >= max_cache_size_)
+                // If connections to the locality are available in the cache,
+                // remove the oldest one and return it.
+                if (!boost::get<0>(it->second).empty())
                 {
-                    // find it ...
-                    const typename cache_type::iterator kt = cache_.find(*it);
-                    BOOST_ASSERT(kt != cache_.end());
+                    conn = boost::get<0>(it->second).front();
+                    boost::get<0>(it->second).pop_front();
 
-                    // remove it if it is empty, doesn't affect cache size
-                    if(boost::get<0>(kt->second).empty())
+                    check_invariants();
+                    return true;
+                }
+
+                // Otherwise, if we have less connections for this locality
+                // than the maximum, try to reserve space in the cache for a new
+                // connection.
+                if (boost::get<1>(it->second) < max_connections_per_locality_)
+                {
+                    // See if we have enough space or can make space available.
+                    // If we can't find or make space, give up. 
+                    if (!free_space())
                     {
-                        cache_.erase(kt);
-                        key_tracker_.erase(it);
-                        it = key_tracker_.begin();
-                        BOOST_ASSERT(it != key_tracker_.end());
-                        continue;
+                        check_invariants();
+                        return false; 
                     }
 
-                    // just remove the oldest connection.
-                    boost::get<0>(kt->second).pop_front();
-                    --boost::get<1>(kt->second);
-                    --cache_size_;
-                    break;
+                    // Make sure the input connection shared_ptr doesn't hold
+                    // anything.
+                    conn.reset();
+
+                    // Increase the per-locality and overall connection counts.
+                    ++boost::get<1>(it->second);
+                    ++connections_;
+
+                    check_invariants();
+                    return true;
                 }
+
+                // We've reached the maximum number of connections for this
+                // locality, and none of them are checked into the cache, so
+                // we have to give up.
+                check_invariants();
+                return false;
             }
 
+            // Key isn't in cache. 
 
-            // If we reach here, we can safely add a new entry ...
-            if(jt == cache_.end())
+            // See if we have enough space or can make space available.
+            // If we can't find or make space, give up. 
+            if (!free_space())
             {
-                // cache doesn't hold the key yet ... insert
-                typename key_tracker_type::iterator it =
-                    key_tracker_.insert(key_tracker_.end(), l);
-                cache_.insert(
-                    std::make_pair(
-                        l
-                      , boost::make_tuple(value_type(1, conn), 1, it)
-                    )
-                );
+                check_invariants();
+                return false; 
             }
-            else
-            {
-                BOOST_ASSERT(!key_tracker_.empty());
 
-                // add it to our vector of connections for this prefix
-                boost::get<0>(jt->second).push_back(conn);
-                ++boost::get<1>(jt->second);
-                // updating LRU info ... this key has just been used.
-                key_tracker_.splice(
-                    key_tracker_.end()
-                  , key_tracker_
-                  , boost::get<2>(jt->second)
+            // Update LRU meta data.
+            typename key_tracker_type::iterator kt =
+                key_tracker_.insert(key_tracker_.end(), l);
+
+            cache_.insert(
+                std::make_pair(l, boost::make_tuple(value_type(), 1, kt)));
+
+            // Make sure the input connection shared_ptr doesn't hold anything.
+            conn.reset();
+
+            // Increase the overall connection counts.
+            ++connections_;
+   
+            check_invariants();
+            return true; 
+        }
+
+        /// Returns a connection for \a l to the cache.
+        /// 
+        /// \note The cache must already be aware of the connection, through
+        ///       a prior call to \a get() or \a get_or_reserve().
+        void reclaim(key_type const& l, connection_type const& conn)
+        {
+            mutex_type::scoped_lock lock(mtx_);
+
+            // Search for an entry for this key.
+            typename cache_type::iterator const ct = cache_.find(l);
+
+            // Key should already exist in the cache. FIXME: This should
+            // probably throw as could easily be triggered by caller error. 
+            BOOST_ASSERT(ct != cache_.end());
+
+            // Update LRU meta data.
+            key_tracker_.splice(
+                key_tracker_.end()
+              , key_tracker_
+              , boost::get<2>(ct->second)
                 );
-            }
-            ++cache_size_;
+
+            // Add the connection to the entry.
+            boost::get<0>(ct->second).push_back(conn);
+
+            // FIXME: Again, this should probably throw instead of asserting,
+            // as invariants could be invalidated here due to caller error.
+            check_invariants();
         }
 
-        bool full()
+        /// Returns true if the overall connection count is equal to or larger
+        /// than the maximum number of overall connections, and false otherwise.
+        bool full() const
         {
             mutex_type::scoped_lock lock(mtx_);
-            return (cache_size_ >= max_cache_size_);
+            return (connections_ >= max_connections_);
         }
 
-        bool full(key_type const & l)
+        /// Returns true if the connection count for \a l is equal to or larger
+        /// than the maximum connection count per locality, and false otherwise.
+        bool full(key_type const& l) const
         {
             mutex_type::scoped_lock lock(mtx_);
-            return cache_.count(l) && boost::get<1>(cache_[l]) >= max_connections_per_locality_;
+
+            if (!cache_.count(l))
+                return false || (connections_ >= max_connections_);
+
+            typename cache_type::const_iterator ct = cache_.find(l);
+            BOOST_ASSERT(ct != cache_.end());
+            return (boost::get<1>(ct->second) >= max_connections_per_locality_)
+                || (connections_ >= max_connections_);
         }
 
-        bool contains(key_type const & l)
-        {
-            mutex_type::scoped_lock lock(mtx_);
-            return cache_.count(l) && boost::get<0>(cache_[l]).size();
-        }
-
+        /// Destroys all connections in the cache, and resets all counts.
+        ///
+        /// \note Calling this function while connections are still checked out
+        ///       of the cache is a bad idea, and will violate this classes
+        ///       invariants.
         void clear()
         {
             mutex_type::scoped_lock lock(mtx_);
+            key_tracker_.clear();
             cache_.clear();
-            cache_size_ = 0;
+            connections_ = 0;
+
+            // FIXME: This should probably throw instead of asserting, as it
+            // can be triggered by caller error. 
+            check_invariants();
         }
 
     private:
-        mutex_type mtx_;
-        size_type const max_cache_size_;
+        /// Verify class invariants
+        void check_invariants() const
+        {
+#if defined(HPX_DEBUG)
+            typedef typename cache_type::const_iterator const_iterator;
+
+            size_type in_cache_count = 0, total_count = 0;
+            const_iterator end = cache_.end();
+            for (const_iterator ct = cache_.begin(); ct != end; ++ct)
+            {
+                cache_value_type const& val = ct->second;
+
+                // The separate item counter has to properly count all the
+                // existing the elements, not only those in the cache entry.
+                BOOST_ASSERT(boost::get<0>(val).size() <= boost::get<1>(val));
+
+                // The overall number of connections in each entry (for each
+                // locality) should not be larger than the allowed number.
+                BOOST_ASSERT(boost::get<1>(val) <= max_connections_per_locality_);
+
+                // Count all connections (both those in the cache and those 
+                // checked out of the cache).
+                in_cache_count += boost::get<0>(val).size();
+                total_count += boost::get<1>(val);
+            }
+
+            // Overall connection count should be larger than or equal to the
+            // number of entries in the cache.
+            BOOST_ASSERT(in_cache_count <= connections_);
+
+            // Overall connection count should be equal to the sum of connection
+            // counts for all localities. 
+            BOOST_ASSERT(total_count == connections_);
+
+            // Check that we do not hold too many elements.
+            BOOST_ASSERT(connections_ <= max_connections_);
+
+            // The list of key trackers should have the same size as the cache.
+            BOOST_ASSERT(key_tracker_.size() == cache_.size());
+#endif
+        }
+
+        /// Evict the least recently used removable entry from the cache if the
+        /// cache is full.
+        ///
+        /// \returns Returns true if an entry was evicted or if the cache is not
+        ///          full, and false if nothing could be evicted.
+        bool free_space()
+        {
+            // If the cache isn't full, just return true.
+            if (connections_ < max_connections_)
+                return true;
+ 
+            // Find the least recently used key.
+            typename key_tracker_type::iterator kt = key_tracker_.begin();
+
+            while (connections_ >= max_connections_)
+            {
+                // Find the least recent used keys data.
+                const typename cache_type::iterator ct = cache_.find(*kt);
+                BOOST_ASSERT(ct != cache_.end());
+
+                // If the entry is empty, ignore it and try the next least
+                // recently used entry. 
+                if (boost::get<0>(ct->second).empty())
+                {
+                    // Remove the key if its connection count is zero. 
+                    if (0 == boost::get<1>(ct->second)) 
+                    {
+                        cache_.erase(ct);
+                        key_tracker_.erase(kt);
+                        kt = key_tracker_.begin();
+                    }
+
+                    else
+                        // REVIEW: Should we reorder key_tracker_ to speed up
+                        // the eviction?
+                        ++kt; 
+
+                    // If we've gone through key_tracker_ and haven't found
+                    // anything evictable, then all the entries must be checked
+                    // out. 
+                    if (key_tracker_.end() == kt)
+                        return false;
+                    else
+                        continue;
+                }
+
+                // Remove the oldest connection.
+                boost::get<0>(ct->second).pop_front();
+
+                // Adjust the overall and per-locality connection count.
+                --boost::get<1>(ct->second);
+                --connections_;
+                break;
+            }
+
+            return true;
+        }
+
+        mutable mutex_type mtx_;
+        size_type const max_connections_;
         size_type const max_connections_per_locality_;
         key_tracker_type key_tracker_;
         cache_type cache_;
-        size_type cache_size_;
+        size_type connections_;
     };
 }}
 

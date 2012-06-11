@@ -20,6 +20,8 @@
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -101,6 +103,8 @@ HPX_EXPORT void destroy_big_boot_barrier();
 HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 

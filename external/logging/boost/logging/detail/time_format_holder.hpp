@@ -121,7 +121,7 @@ public:
             std::basic_ostringstream<char_type> cur_sprintf_format;
             cur_sprintf_format << BOOST_LOG_STR("%0") << begin->size << BOOST_LOG_STR("d");
             m_format += cur_sprintf_format.str();
-            prev_idx = begin->src_idx + begin->advance_size + 1;
+            prev_idx = static_cast<boost::logging::detail::time_format_holder::index_info::uint>(begin->src_idx + static_cast<boost::logging::detail::time_format_holder::index_info::uint>(begin->advance_size) + 1ul);
             ++idx;
         }
 

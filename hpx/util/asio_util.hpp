@@ -24,13 +24,13 @@ namespace hpx { namespace util
     HPX_EXPORT boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
     get_random_ports();
 
-    HPX_EXPORT boost::uint16_t get_random_port();
+    HPX_API_EXPORT boost::uint16_t get_random_port();
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
     HPX_API_EXPORT boost::asio::ip::tcp::endpoint
-    resolve_hostname(std::string const& hostname,
-        boost::uint16_t port, boost::asio::io_service& io_service);
+    resolve_hostname(std::string const& hostname, boost::uint16_t port,
+        boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]

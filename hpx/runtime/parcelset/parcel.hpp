@@ -33,39 +33,41 @@ namespace hpx { namespace parcelset
     {
     public:
         parcel()
-          : destination_id_(), destination_addr_(), source_id_(), action_(),
-            continuation_(), start_time_(0), creation_time_(0)
-        {
-        }
-
-        parcel(naming::gid_type apply_to)
-          : destination_id_(apply_to), destination_addr_(), source_id_(),
+          : parcel_id_(), destination_id_(), destination_addr_(), source_id_(),
             action_(), continuation_(), start_time_(0), creation_time_(0)
         {
         }
 
+        parcel(naming::gid_type apply_to)
+          : parcel_id_(), destination_id_(apply_to), destination_addr_(),
+            source_id_(), action_(), continuation_(), start_time_(0),
+            creation_time_(0)
+        {
+        }
+
         parcel(naming::gid_type apply_to, actions::base_action* act)
-          : destination_id_(apply_to), destination_addr_(), source_id_(),
-            action_(act), continuation_(), start_time_(0), creation_time_(0)
+          : parcel_id_(), destination_id_(apply_to), destination_addr_(),
+            source_id_(), action_(act), continuation_(), start_time_(0),
+            creation_time_(0)
         {}
 
         parcel(naming::gid_type apply_to, actions::base_action* act,
                actions::continuation* do_after)
-          : destination_id_(apply_to), destination_addr_(), source_id_(),
-            action_(act), continuation_(do_after), start_time_(0),
+          : parcel_id_(), destination_id_(apply_to), destination_addr_(),
+            source_id_(), action_(act), continuation_(do_after), start_time_(0),
             creation_time_(0)
         {}
 
         parcel(naming::gid_type apply_to, actions::base_action* act,
                actions::continuation_type do_after)
-          : destination_id_(apply_to), destination_addr_(), source_id_(),
-            action_(act), continuation_(do_after), start_time_(0),
+          : parcel_id_(), destination_id_(apply_to), destination_addr_(),
+            source_id_(), action_(act), continuation_(do_after), start_time_(0),
             creation_time_(0)
         {}
 
         parcel(boost::uint32_t prefix, naming::address addr,
             actions::base_action* act)
-          : destination_id_(naming::get_gid_from_locality_id(prefix)),
+          : parcel_id_(), destination_id_(naming::get_gid_from_locality_id(prefix)),
             destination_addr_(addr), source_id_(), action_(act),
             continuation_(), start_time_(0), creation_time_(0)
         {}
@@ -120,7 +122,7 @@ namespace hpx { namespace parcelset
         void set_start_time(double starttime)
         {
             start_time_ = starttime;
-            if (creation_time_ == 0)
+            if (std::abs(creation_time_) < 1e-10)
                 creation_time_ = starttime;
         }
         double get_start_time() const
@@ -138,6 +140,18 @@ namespace hpx { namespace parcelset
             return action_->get_thread_priority();
         }
 
+        // generate unique parcel id
+        static naming::gid_type generate_unique_id();
+
+        naming::gid_type get_parcel_id() const
+        {
+            return parcel_id_;
+        }
+        void set_parcel_id(naming::gid_type const& id)
+        {
+            parcel_id_ = id;
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);
 
@@ -153,6 +167,7 @@ namespace hpx { namespace parcelset
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
+        naming::gid_type parcel_id_;
         naming::gid_type destination_id_;
         naming::address destination_addr_;
         naming::id_type source_id_;
@@ -168,8 +183,19 @@ namespace hpx { namespace parcelset
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -9,7 +9,7 @@
 #define HPX_5D993B14_5B65_4231_A84E_90AD1807EB8F
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 
 namespace hpx { namespace agas { namespace stubs
@@ -30,8 +30,10 @@ struct HPX_EXPORT primary_namespace
         )
     {
         typedef server_type::service_action action_type;
-        return lcos::packaged_task<action_type, Result>(
-            gid, priority, req).get_future();
+
+        lcos::packaged_action<action_type, Result> p;
+        p.apply_p(gid, priority, req);
+        return p.get_future();
     }
 
     /// Fire-and-forget semantics.
@@ -61,7 +63,10 @@ struct HPX_EXPORT primary_namespace
         )
     {
         typedef server_type::bulk_service_action action_type;
-        return lcos::async<action_type>(gid, priority, reqs);
+
+        lcos::packaged_action<action_type> p;
+        p.apply_p(gid, priority, reqs);
+        return p.get_future();
     }
 
     /// Fire-and-forget semantics.
@@ -86,12 +91,15 @@ struct HPX_EXPORT primary_namespace
     ///////////////////////////////////////////////////////////////////////////
     static lcos::future<bool> route_async(
         naming::id_type const& gid
-      , parcelset::parcel const& p
+      , parcelset::parcel const& pcl
       , threads::thread_priority priority = threads::thread_priority_default
         )
     {
         typedef server_type::route_action action_type;
-        return lcos::async<action_type>(gid, priority, p);
+
+        lcos::packaged_action<action_type> p;
+        p.apply_p(gid, priority, pcl);
+        return p.get_future();
     }
 
     static bool route(

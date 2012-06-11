@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/foreach.hpp>
@@ -27,7 +27,7 @@ std::size_t pass_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::lcos::async<Action>(test.get_gid(), obj).get();
+    return hpx::async<Action>(test.get_gid(), obj).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ std::size_t move_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::lcos::async<Action>(test.get_gid(), boost::move(obj)).get();
+    return hpx::async<Action>(test.get_gid(), boost::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ std::size_t return_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
 
-    Object obj(hpx::lcos::async<Action>(test.get_gid()).get());
+    Object obj(hpx::async<Action>(test.get_gid()).get());
     return obj.get_count();
 }
 
@@ -63,12 +63,12 @@ std::size_t return_move_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
 
-    Object obj(boost::move(hpx::lcos::async<Action>(test.get_gid()).move_out()));
+    Object obj(boost::move(hpx::async<Action>(test.get_gid()).move_out()));
     return obj.get_count();
 }
 
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(boost::program_options::variables_map&)
 {
     using hpx::test::server::action_move_semantics;
 
@@ -153,13 +153,13 @@ int hpx_main(boost::program_options::variables_map& vm)
             return_object<
                 action_move_semantics::return_test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 7u);
+        ), is_local ? 3u : 6u);
 
         HPX_TEST_EQ((
             return_object<
                 action_move_semantics::return_test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
+        ), is_local ? 2u : 6u);
     }
 
     hpx::finalize();
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
     // we need to explicitly enable the test components used by this test
     using namespace boost::assign;
     std::vector<std::string> cfg;
-    cfg += "hpx.components.test_action_move_semantics.enabled = 1";
+    cfg += "hpx.components.action_move_semantics.enabled = 1";
 
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv, cfg);

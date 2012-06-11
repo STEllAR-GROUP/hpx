@@ -31,7 +31,7 @@ int hpx_main(variables_map& vm)
     thrown_exception = false;
 
     try {
-        hpx::lcos::wait(hpx::lcos::async<throw_exception_action>(hpx::find_here()));
+        hpx::lcos::wait(hpx::async<throw_exception_action>(hpx::find_here()));
     }
     catch (hpx::exception const&) {
         caught_exception = true;

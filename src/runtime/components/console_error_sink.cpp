@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
@@ -26,12 +26,12 @@ namespace hpx { namespace components
         {
             if (threads::get_self_ptr())
             {
-                lcos::async<server::console_error_sink_action>(dst, e).get();
+                hpx::async<server::console_error_sink_action>(dst, e).get();
             }
             else
             {
                 // FIXME: This should use a sync_put_parcel.
-                applier::apply<server::console_error_sink_action>(dst, e);
+                hpx::apply<server::console_error_sink_action>(dst, e);
             }
         }
     }
@@ -54,7 +54,7 @@ namespace hpx { namespace components
         // Report the error only if the thread-manager is up.
         if (threads::threadmanager_is(running))
         {
-            lcos::async<server::console_error_sink_action>(dst, e).get();
+            hpx::async<server::console_error_sink_action>(dst, e).get();
         }
     }
 }}

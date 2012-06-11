@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace stubs
             // to call get() on the return value to obtain the result
             typedef server::distributing_factory::create_components_action
                 action_type;
-            return lcos::async<action_type>(targetgid, type, count);
+            return hpx::async<action_type>(targetgid, type, count);
         }
 
         /// Create a number of new components of the given \a type distributed
@@ -54,17 +54,16 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// Free components
-        static void free_components(naming::id_type const& factory,
-            result_type const& gids)
+        static void free_components(naming::id_type const& /*factory*/,
+            result_type const& /*gids*/)
         {
         }
 
-        static void free_components_sync(naming::id_type const& factory,
-            result_type const& gids)
+        static void free_components_sync(naming::id_type const& /*factory*/,
+            result_type const& /*gids*/)
         {
         }
     };
-
 }}}
 
 #endif

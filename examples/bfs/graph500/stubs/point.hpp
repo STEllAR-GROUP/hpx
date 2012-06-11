@@ -21,7 +21,7 @@ namespace graph500 { namespace stubs
                    std::size_t number_partitions,double overlap)
         {
             typedef server::point::init_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid,scale,
+            return hpx::async<action_type>(gid,objectid,scale,
                                              number_partitions,overlap);
         }
 
@@ -38,7 +38,7 @@ namespace graph500 { namespace stubs
         root_async(hpx::naming::id_type const& gid,std::vector<int64_t> const& bfs_roots)
         {
             typedef server::point::root_action action_type;
-            return hpx::lcos::async<action_type>(gid,bfs_roots);
+            return hpx::async<action_type>(gid,bfs_roots);
         }
 
         static void root(hpx::naming::id_type const& gid,std::vector<int64_t> const& bfs_roots)
@@ -53,7 +53,7 @@ namespace graph500 { namespace stubs
                                  std::vector<std::size_t> const& duplicateid)
         {
             typedef server::point::receive_duplicates_action action_type;
-            return hpx::lcos::async<action_type>(gid,j,duplicate_components,duplicateid);
+            return hpx::async<action_type>(gid,j,duplicate_components,duplicateid);
         }
 
         static void receive_duplicates(hpx::naming::id_type const& gid,
@@ -70,7 +70,7 @@ namespace graph500 { namespace stubs
                                  std::vector<hpx::naming::id_type> const& point_components)
         {
             typedef server::point::ppedge_action action_type;
-            return hpx::lcos::async<action_type>(gid,start,stop,point_components);
+            return hpx::async<action_type>(gid,start,stop,point_components);
         }
 
         static void ppedge(hpx::naming::id_type const& gid,
@@ -84,7 +84,7 @@ namespace graph500 { namespace stubs
         bfs_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::bfs_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static void bfs(hpx::naming::id_type const& gid)
@@ -98,7 +98,7 @@ namespace graph500 { namespace stubs
         resolve_conflict_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::resolve_conflict_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static void resolve_conflict(hpx::naming::id_type const& gid)
@@ -112,7 +112,7 @@ namespace graph500 { namespace stubs
         distributed_validate_async(hpx::naming::id_type const& gid,std::size_t scale)
         {
             typedef server::point::distributed_validate_action action_type;
-            return hpx::lcos::async<action_type>(gid,scale);
+            return hpx::async<action_type>(gid,scale);
         }
 
         static std::vector<int> distributed_validate(hpx::naming::id_type const& gid,std::size_t scale)
@@ -127,7 +127,7 @@ namespace graph500 { namespace stubs
            std::vector<hpx::naming::id_type> const& point_components)
         {
             typedef server::point::findwhohasthisedge_action action_type;
-            return hpx::lcos::async<action_type>(gid,edge,point_components);
+            return hpx::async<action_type>(gid,edge,point_components);
         }
 
         static std::vector<bool> findwhohasthisedge(hpx::naming::id_type const& gid,
@@ -143,7 +143,7 @@ namespace graph500 { namespace stubs
         get_numedges_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_numedges_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<int64_t> get_numedges(hpx::naming::id_type const& gid)
@@ -157,7 +157,7 @@ namespace graph500 { namespace stubs
         has_edge_async(hpx::naming::id_type const& gid,int64_t edge)
         {
             typedef server::point::has_edge_action action_type;
-            return hpx::lcos::async<action_type>(gid,edge);
+            return hpx::async<action_type>(gid,edge);
         }
 
         static bool has_edge(hpx::naming::id_type const& gid,int64_t edge)
@@ -171,7 +171,7 @@ namespace graph500 { namespace stubs
         get_parent_async(hpx::naming::id_type const& gid,int64_t edge)
         {
             typedef server::point::get_parent_action action_type;
-            return hpx::lcos::async<action_type>(gid,edge);
+            return hpx::async<action_type>(gid,edge);
         }
 
         static resolvedata get_parent(hpx::naming::id_type const& gid,int64_t edge)

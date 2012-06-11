@@ -9,7 +9,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -438,7 +438,7 @@ components::component_type addressing_service::get_component_id(
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
 
-        return (components::component_type) rep.get_component_type();
+        return rep.get_component_type();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -493,10 +493,10 @@ components::component_type addressing_service::register_factory(
         else
             rep = hosted->component_ns_.service(req, action_priority_, ec);
 
-        if (ec || (success != rep.get_status()))
+        if (ec || (success != rep.get_status() && no_success != rep.get_status()))
             return components::component_invalid;
 
-        return (components::component_type) rep.get_component_type();
+        return rep.get_component_type();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -541,7 +541,7 @@ struct lock_semaphore
     lcos::local::counting_semaphore& sem_;
 };
 
-template <typename Pool, typename Future, typename Promise>
+template <typename Pool, typename Promise>
 struct checkout_promise
 {
     checkout_promise(Pool& pool, Promise*& promise)
@@ -559,7 +559,6 @@ struct checkout_promise
             pool_.enqueue(promise_);
     }
 
-    Future* operator->() { return reinterpret_cast<Future*>(promise_); }
     void set_ok() { result_ok_ = true; }
 
 private:
@@ -577,10 +576,10 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::packaged_task<server::primary_namespace::service_action>
+    typedef lcos::packaged_action<server::primary_namespace::service_action>
         future_type;
 
-    lcos::promise<response>* f = 0;
+    future_type* f = 0;
 
     try {
         request req(primary_ns_allocate, ep, count);
@@ -601,14 +600,13 @@ bool addressing_service::get_id_range(
             typedef checkout_promise<
                 promise_pool_type
               , future_type
-              , lcos::promise<response>
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get_future().get(ec);
+            f->apply(bootstrap_primary_namespace_id(), req);
+            rep = f->get_future().get(ec);
 
             cf.set_ok();
         }
@@ -633,8 +631,8 @@ bool addressing_service::get_id_range(
         // future for the pool, and let the old future stay in memory.
         if (!is_bootstrap() && f)
         {
-            hosted->promise_pool_.enqueue(new lcos::promise<response>);
-            f->invalidate(boost::current_exception());
+            hosted->promise_pool_.enqueue(new future_type);
+            f->set_exception(boost::current_exception());
         }
 
         if (&ec == &throws) {
@@ -658,10 +656,10 @@ bool addressing_service::bind_range(
   , error_code& ec
     )
 { // {{{ bind_range implementation
-    typedef lcos::packaged_task<server::primary_namespace::service_action>
+    typedef lcos::packaged_action<server::primary_namespace::service_action>
         future_type;
 
-    lcos::promise<response>* f = 0;
+    future_type* f = 0;
 
     try {
         naming::locality const& ep = baseaddr.locality_;
@@ -688,14 +686,13 @@ bool addressing_service::bind_range(
             typedef checkout_promise<
                 promise_pool_type
               , future_type
-              , lcos::promise<response>
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get_future().get(ec);
+            f->apply(bootstrap_primary_namespace_id(), req);
+            rep = f->get_future().get(ec);
 
             cf.set_ok();
         }
@@ -729,8 +726,8 @@ bool addressing_service::bind_range(
         // explanation.
         if (!is_bootstrap() && f)
         {
-            hosted->promise_pool_.enqueue(new lcos::promise<response>);
-            f->invalidate(boost::current_exception());
+            hosted->promise_pool_.enqueue(new future_type);
+            f->set_exception(boost::current_exception());
         }
 
         if (&ec == &throws) {
@@ -1392,7 +1389,7 @@ void addressing_service::register_counter_types()
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {
-        { "/agas/cache/hits", performance_counters::counter_raw,
+        { "/agas/count/cache-hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -1400,7 +1397,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/cache/misses", performance_counters::counter_raw,
+        { "/agas/count/cache-misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -1408,7 +1405,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/cache/evictions", performance_counters::counter_raw,
+        { "/agas/count/cache-evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -1416,7 +1413,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/cache/insertions", performance_counters::counter_raw,
+        { "/agas/count/cache-insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -1494,7 +1491,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
         {
             typedef server::primary_namespace::bulk_service_action
                 action_type;
-            applier::apply_l_p<action_type>
+            hpx::applier::detail::apply_l_p<action_type>
                 (primary_ns_addr_, action_priority_, requests);
         }
 

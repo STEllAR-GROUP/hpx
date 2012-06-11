@@ -17,6 +17,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/util/void_cast.hpp>
+#include <hpx/util/static.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -54,15 +55,15 @@ namespace hpx { namespace actions
         static void destruct_(void*) {}
 
         static void save_(boost::uint8_t const* data, std::size_t size,
-            oarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+            oarchive_type& ar, const unsigned int,
+            boost::uint8_t const*)
         {
             using boost::serialization::make_array;
             ar << make_array(data, size);
         }
         static void load_(boost::uint8_t* data, std::size_t size,
-            iarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+            iarchive_type& ar, const unsigned int,
+            boost::uint8_t const*)
         {
             using boost::serialization::make_array;
             ar >> make_array(data, size);
@@ -90,6 +91,8 @@ namespace hpx { namespace actions
             return &manage_object_action_base::destruct_;
         }
 
+        struct tag {};
+
         virtual manage_object_action_base const& get_instance() const;
 
         // serialization support
@@ -107,7 +110,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) {}
+        void serialize(Archive&, const unsigned int) {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -121,17 +124,29 @@ namespace hpx { namespace actions
         ~manage_object_action() {}
 
     private:
+#ifdef NDEBUG
+        static void construct_(void* memory, std::size_t)
+#else
         static void construct_(void* memory, std::size_t size)
+#endif
         {
             BOOST_ASSERT(size == sizeof(T));
             new (memory) T;
         }
+#ifdef NDEBUG
+        static void clone_(void* dest, void const* src, std::size_t)
+#else
         static void clone_(void* dest, void const* src, std::size_t size)
+#endif
         {
             BOOST_ASSERT(size == sizeof(T));
             new (dest) T (*reinterpret_cast<T const*>(src));
         }
+#ifdef NDEBUG
+        static void assign_(void* dest, void const* src, std::size_t)
+#else
         static void assign_(void* dest, void const* src, std::size_t size)
+#endif
         {
             BOOST_ASSERT(size == sizeof(T));
             // do not overwrite ourselves
@@ -143,15 +158,15 @@ namespace hpx { namespace actions
             reinterpret_cast<T*>(memory)->~T();
         }
 
-        static void save_(boost::uint8_t const* data, std::size_t size,
-            oarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+        static void save_(boost::uint8_t const* data, std::size_t /*size*/,
+            oarchive_type& ar, const unsigned int /*version*/,
+            boost::uint8_t const* /*config*/)
         {
             ar << *reinterpret_cast<T const*>(data);
         }
-        static void load_(boost::uint8_t* data, std::size_t size,
-            iarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+        static void load_(boost::uint8_t* data, std::size_t /*size*/,
+            iarchive_type& ar, const unsigned int /*version*/,
+            boost::uint8_t const* /*config*/)
         {
             ar >> *reinterpret_cast<T*>(data);
         }
@@ -186,11 +201,13 @@ namespace hpx { namespace actions
         }
 
     public:
-        manage_object_action_base const& get_instance() const
+        struct tag {};
+
+        virtual manage_object_action_base const& get_instance() const
         {
-            static manage_object_action const instance =
-                manage_object_action();
-            return instance;
+            // ensure thread-safe initialization
+            util::static_<manage_object_action, tag> instance;
+            return instance.get();
         }
 
         /// serialization support
@@ -206,8 +223,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            using namespace boost::serialization;
-            ar & base_object<manage_object_action_base>(*this);
+            ar & util::base_object_nonvirt<manage_object_action_base>(*this);
         }
     };
 
@@ -230,17 +246,17 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            using namespace boost::serialization;
-            ar & base_object<manage_object_action_base>(*this);
+            ar & util::base_object_nonvirt<manage_object_action_base>(*this);
         }
     };
 
     inline manage_object_action_base const&
     manage_object_action_base::get_instance() const
     {
-        static manage_object_action<boost::uint8_t> const instance =
-            manage_object_action<boost::uint8_t>();
-        return instance;
+        // ensure thread-safe initialization
+        util::static_<manage_object_action<boost::uint8_t>,
+            manage_object_action_base::tag> instance;
+        return instance.get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -259,14 +275,14 @@ namespace hpx { namespace actions
             serialize_load_function;
 
     private:
-        static void save_(boost::uint8_t const* data, std::size_t size,
+        static void save_(boost::uint8_t const* data, std::size_t /*size*/,
             oarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
             reinterpret_cast<T const*>(data)->save(ar, version,
                 reinterpret_cast<Config const*>(config));
         }
-        static void load_(boost::uint8_t* data, std::size_t size,
+        static void load_(boost::uint8_t* data, std::size_t /*size*/,
             iarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
@@ -286,11 +302,13 @@ namespace hpx { namespace actions
         }
 
     public:
+        struct tag {};
+
         manage_object_action_base const& get_instance() const
         {
-            static manage_object_action const instance =
-                manage_object_action();
-            return instance;
+            // ensure thread-safe initialization
+            util::static_<manage_object_action, tag> instance;
+            return instance.get();
         }
 
         /// serialization support
@@ -307,8 +325,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            using namespace boost::serialization;
-            ar & base_object<manage_object_action_base>(*this);
+            ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
         }
     };
 }}

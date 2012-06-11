@@ -69,6 +69,11 @@ struct topology
             ec = make_success_code();
     }
 
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
     void set_thread_affinity(
         std::size_t num_thread
       , bool numa_sensitive
@@ -90,15 +95,21 @@ struct topology
         #endif
 
         else
+        {
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::set_thread_affinity"
               , "failed to set thread affinity");
+        }
 
         if (ec)
             return;
         else if (&ec != &throws)
             ec = make_success_code();
     }
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
+#endif
 
     std::size_t get_thread_affinity_mask_from_lva(
         naming::address::address_type lva

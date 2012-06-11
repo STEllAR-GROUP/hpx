@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,56 +20,35 @@ namespace hpx { namespace lcos
     {
         typedef RemoteResult remote_result_type;
         typedef Result       result_type;
-        typedef
-            components::client_base<
-                dataflow_base<Result, RemoteResult>
-              , stubs::dataflow
-            >
-            base_type;
-
-        typedef stubs::dataflow stub_type;
 
         dataflow_base()
         {}
 
-        virtual ~dataflow_base()
-        {}
-
-        dataflow_base(future<naming::id_type> const & promise)
+        dataflow_base(future<naming::id_type, naming::gid_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
+
+        void connect(naming::id_type const & id) const
+        {
+            impl->connect(id);
+        }
         
         future<Result, remote_result_type> get_future() const
         {
             promise<Result, remote_result_type> p;
-            connect(p.get_gid());
+            impl->connect(p.get_gid());
             return p.get_future();
         }
 
-//         Result get() const
-//         {
-//             return get_future()get();
-//         }
-
-        void invalidate()
+        bool valid()
         {
-            impl->invalidate();
+            return impl && impl->get_gid();
         }
-
-        naming::id_type get_gid() const
-        {
-            return impl->get_gid();
-        }
-
-        void connect(naming::id_type const & target) const
-        {
-            stub_type::connect(impl->get_gid(), target);
-        }
-
-        boost::shared_ptr<detail::dataflow_base_impl> impl;
 
     private:
         friend class boost::serialization::access;
+
+        boost::shared_ptr<detail::dataflow_base_impl> impl;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

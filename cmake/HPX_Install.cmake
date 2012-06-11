@@ -14,7 +14,7 @@ hpx_include(ParseArguments
 macro(hpx_symlink source destination)
   if(NOT HPX_NO_INSTALL)
     install(CODE
-      "set(symlink_root \"${HPX_PREFIX}\")
+      "set(symlink_root \"${CMAKE_INSTALL_PREFIX}\")
        execute_process(
          COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
                  \"${source}\" \"${destination}\"
@@ -26,14 +26,22 @@ macro(hpx_executable_install name)
   if(NOT HPX_NO_INSTALL)
     hpx_get_target_location(location ${name})
 
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/bin")
+
     set(install_code
-        "file(INSTALL FILES ${location}
-              DESTINATION ${HPX_PREFIX}/bin
+        "file(INSTALL FILES \"${location}\"
+              DESTINATION \"${target_directory}\"
               TYPE EXECUTABLE
               OPTIONAL
               PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
                           GROUP_READ GROUP_EXECUTE
                           WORLD_READ WORLD_EXECUTE)")
+
+    hpx_debug("hpx_executable_install.${name}"
+      "installing: ${location} to ${target_directory}")
+    hpx_debug("hpx_executable_install.${name}"
+      "install code: ${install_code}")
+
     install(CODE "${install_code}")
   endif()
 endmacro()
@@ -49,15 +57,23 @@ macro(hpx_library_install name)
       set(targets ${lib})
     endif()
 
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/lib/hpx")
+
     foreach(target ${targets})
       set(install_code
-        "file(INSTALL FILES ${output_dir}/${target}
-              DESTINATION ${HPX_PREFIX}/lib/hpx
+        "file(INSTALL FILES \"${output_dir}/${target}\"
+              DESTINATION \"${target_directory}\"
               TYPE SHARED_LIBRARY
               OPTIONAL
               PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
                           GROUP_READ GROUP_EXECUTE
                           WORLD_READ WORLD_EXECUTE)")
+
+      hpx_debug("hpx_library_install.${name}"
+        "installing: ${output_dir}/${target} to ${target_directory}")
+      hpx_debug("hpx_library_install.${name}"
+        "install code: ${install_code}")
+
       install(CODE "${install_code}")
     endforeach()
   endif()
@@ -67,28 +83,42 @@ macro(hpx_archive_install name)
   if(NOT HPX_NO_INSTALL)
     hpx_get_target_location(location ${name})
 
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/lib/hpx")
+
     set(install_code
-      "file(INSTALL FILES ${location}
-            DESTINATION ${HPX_PREFIX}/lib/hpx
+      "file(INSTALL FILES \"${location}\"
+            DESTINATION \"${target_directory}\"
             OPTIONAL
             PERMISSIONS OWNER_READ OWNER_READ OWNER_READ
                         GROUP_READ GROUP_READ
                         WORLD_READ WORLD_READ)")
+
+      hpx_debug("hpx_archive_install.${name}"
+        "installing: ${location} to ${target_directory}")
+      hpx_debug("hpx_archive_install.${name}"
+        "install code: ${install_code}")
+
     install(CODE "${install_code}")
   endif()
 endmacro()
 
-macro(hpx_ini_install name ini)
+macro(hpx_ini_install ini)
   if(NOT HPX_NO_INSTALL)
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/ini")
+
     set(install_code
-        "if(EXISTS \"${name}\")
-            file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
-                 DESTINATION ${HPX_PREFIX}/share/hpx-${HPX_VERSION}/ini
-                 OPTIONAL
-                 PERMISSIONS OWNER_READ OWNER_WRITE
-                             GROUP_READ
-                             WORLD_READ)
-         endif()")
+        "file(INSTALL FILES \"${CMAKE_CURRENT_SOURCE_DIR}/${ini}\"
+              DESTINATION \"${target_directory}\"
+              OPTIONAL
+              PERMISSIONS OWNER_READ OWNER_WRITE
+                          GROUP_READ
+                          WORLD_READ)")
+
+      hpx_debug("hpx_ini_install.${name}"
+        "installing: ${CMAKE_CURRENT_SOURCE_DIR}/${ini} to ${target_directory}")
+      hpx_debug("hpx_ini_install.${name}"
+        "install code: ${install_code}")
+
     install(CODE "${install_code}")
   endif()
 endmacro()

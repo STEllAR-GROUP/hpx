@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_deque.hpp>
 
@@ -167,7 +167,7 @@ struct abp_queue_scheduler : boost::noncopyable
     // Return the next thread to be executed, return false if none is available
     // TODO: shouldn't we try to fill the queue before stealing?
     bool get_next_thread(std::size_t num_thread, bool running,
-                         std::size_t& idle_loop_count, threads::thread*& thrd)
+                         std::size_t& idle_loop_count, threads::thread_data*& thrd)
     {
         BOOST_ASSERT(num_thread < queues_.size());
 
@@ -187,7 +187,7 @@ struct abp_queue_scheduler : boost::noncopyable
     }
 
     /// Schedule the passed thread
-    void schedule_thread(threads::thread* thrd, std::size_t num_thread,
+    void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
         thread_priority /*priority*/ = thread_priority_normal)
     {
         if (std::size_t(-1) != num_thread) {
@@ -199,7 +199,7 @@ struct abp_queue_scheduler : boost::noncopyable
         }
     }
 
-    void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+    void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
         thread_priority /*priority*/ = thread_priority_normal)
     {
         if (std::size_t(-1) != num_thread) {
@@ -212,7 +212,7 @@ struct abp_queue_scheduler : boost::noncopyable
     }
 
     /// Destroy the passed thread as it has been terminated
-    bool destroy_thread(threads::thread* thrd)
+    bool destroy_thread(threads::thread_data* thrd)
     {
         for (std::size_t i = 0; i < queues_.size(); ++i) {
             if (queues_[i]->destroy_thread(thrd))

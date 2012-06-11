@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,7 +25,7 @@ namespace hpx { namespace lcos
         dataflow_trigger() {}
 
         // MSVC chokes on having the lambda in the member initializer list below
-        static inline lcos::future<naming::id_type>
+        static inline lcos::future<naming::id_type, naming::gid_type>
         create_component(
             naming::id_type const & id
           , std::vector<dataflow_base<void> > const & trigger
@@ -45,6 +45,7 @@ namespace hpx { namespace lcos
                 );
         }
         
+        /*
         static inline lcos::future<naming::id_type>
         create_component(
             naming::id_type const & id
@@ -54,7 +55,7 @@ namespace hpx { namespace lcos
             typedef
                 hpx::components::server::create_one_component_action1<
                     components::managed_component<server::dataflow_trigger>
-                  , std::vector<dataflow_base<void> > &&
+                  , std::vector<dataflow_base<void> >
                 >::type
                 create_component_action;
             return
@@ -64,6 +65,7 @@ namespace hpx { namespace lcos
                   , boost::move(trigger)
                 );
         }
+        */
 
         dataflow_trigger(
             naming::id_type const & id
@@ -72,12 +74,14 @@ namespace hpx { namespace lcos
             : base_type(create_component(id, trigger))
         {}
 
+        /*
         dataflow_trigger(
             naming::id_type const & id
           , BOOST_RV_REF(std::vector<dataflow_base<void> >) trigger
         )
             : base_type(create_component(id, boost::move(trigger)))
         {}
+        */
 
         ~dataflow_trigger()
         {

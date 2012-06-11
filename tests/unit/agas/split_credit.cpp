@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
 
@@ -29,7 +29,7 @@ using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::lcos::async;
+using hpx::async;
 
 using hpx::test::simple_object;
 using hpx::test::managed_object;
@@ -114,7 +114,13 @@ int main(
         , "number of milliseconds to wait for object destruction")
         ;
 
+    // We need to explicitly enable the test components used by this test.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.components.simple_refcnt_checker.enabled = 1";
+    cfg += "hpx.components.managed_refcnt_checker.enabled = 1";
+
     // Initialize and run HPX.
-    return init(cmdline, argc, argv);
+    return init(cmdline, argc, argv, cfg);
 }
 

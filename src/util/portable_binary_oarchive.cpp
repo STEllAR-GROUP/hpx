@@ -77,9 +77,15 @@ portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
     if(m_flags & endian_big)
         reverse_bytes(size, cptr);
 #endif
-    this->primitive_base_t::save_binary(cptr, size);
+    this->primitive_base_t::save_binary(cptr, static_cast<std::size_t>(size));
 }
 
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
 HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
 {
     if (m_flags == (endian_big | endian_little)) {
@@ -100,6 +106,11 @@ HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
     }
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 }
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 }}
 

@@ -8,6 +8,7 @@
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
 #include <hpx/version.hpp>
+#include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
 
@@ -81,17 +82,25 @@
 #  error "The specified HPX_FUNCTION_LIMIT (default is 7) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
 #endif
 
+#if !defined(HPX_TUPLE_LIMIT)
+#   define HPX_TUPLE_LIMIT HPX_FUNCTION_LIMIT
+#endif
+
+#if HPX_TUPLE_LIMIT < HPX_FUNCTION_LIMIT
+#   error "The specified HPX_TUPLE_LIMIT (default is 10) has to be bigger or equal than HPX_FUNCTION_LIMIT."
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
 /// all other localities). This value can be changed at runtime by setting
 /// the configuration parameter:
 ///
-///   hpx.max_connections_cache_size = ...
+///   hpx.max_connections = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE).
-#if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
-#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 256
+/// HPX_MAX_PARCEL_CONNECTIONS).
+#if !defined(HPX_MAX_PARCEL_CONNECTIONS)
+#  define HPX_MAX_PARCEL_CONNECTIONS 512
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,7 +113,7 @@
 /// (or by setting the corresponding environment variable
 /// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
 #if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
-#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 2
+#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -133,6 +142,19 @@
 /// object.
 #if !defined(HPX_INITIAL_GLOBALCREDIT)
 #  define HPX_INITIAL_GLOBALCREDIT 255
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the default number of OS-threads created for the different
+/// internal thread pools
+#if !defined(HPX_NUM_IO_POOL_THREADS)
+#define HPX_NUM_IO_POOL_THREADS 2
+#endif
+#if !defined(HPX_NUM_PARCEL_POOL_THREADS)
+#define HPX_NUM_PARCEL_POOL_THREADS 2
+#endif
+#if !defined(HPX_NUM_TIMER_POOL_THREADS)
+#define HPX_NUM_TIMER_POOL_THREADS 2
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -347,7 +369,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// make sure Chrono is handled properly
+// Older Boost versions do not have BOOST_NOEXCEPT defined
+#if !defined(BOOST_NOEXCEPT)
+#define BOOST_NOEXCEPT
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Make sure Chrono is handled properly
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
 #  define BOOST_CHRONO_NO_LIB
 #endif

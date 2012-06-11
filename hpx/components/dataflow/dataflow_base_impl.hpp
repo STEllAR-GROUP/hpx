@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,8 @@
 #define HPX_LCOS_DATAFLOW_BASE_IMPL_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/base_lco.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 
 namespace hpx { namespace lcos { namespace detail
@@ -16,18 +18,22 @@ namespace hpx { namespace lcos { namespace detail
         dataflow_base_impl()
         {}
 
-        ~dataflow_base_impl()
+        virtual ~dataflow_base_impl()
         {}
 
-        dataflow_base_impl(lcos::future<naming::id_type> const & promise)
+        dataflow_base_impl(lcos::future<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
         {}
 
-        void invalidate()
+        void connect(naming::id_type const & id) const
         {
-            /*
-            gid_promise.reset();
-            */
+            typedef
+                hpx::lcos::base_lco::connect_action
+                action_type;
+
+            BOOST_ASSERT(gid_promise.get_state() != hpx::lcos::future_status::uninitialized);
+
+            hpx::apply<action_type>(gid_promise.get(), id);
         }
 
         naming::id_type get_gid() const
@@ -36,7 +42,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     protected:
-        lcos::future<naming::id_type> gid_promise;
+        lcos::future<naming::id_type, naming::gid_type> gid_promise;
 
     private:
         friend class boost::serialization::access;
@@ -47,7 +53,7 @@ namespace hpx { namespace lcos { namespace detail
             naming::id_type id;
             ar & id;
 
-            lcos::promise<naming::id_type> p;
+            lcos::promise<naming::id_type, naming::gid_type> p;
             p.set_local_data(id);
             gid_promise = p.get_future();
         }
@@ -59,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail
             ar & id;
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 }}}
 

@@ -23,19 +23,19 @@
 //  HPX_VERSION_FULL & 0x00FF00 is the minor version
 //  HPX_VERSION_FULL & 0xFF0000 is the major version
 //
-#define HPX_VERSION_FULL         0x000801
+#define HPX_VERSION_FULL         0x000900
 
 #define HPX_VERSION_MAJOR        0
-#define HPX_VERSION_MINOR        8
-#define HPX_VERSION_SUBMINOR     1
+#define HPX_VERSION_MINOR        9
+#define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20120420
+#define HPX_VERSION_DATE         20120601
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x21
 #endif
 
-#define HPX_VERSION_TAG          ""
+#define HPX_VERSION_TAG          "-trunk"
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
@@ -83,11 +83,27 @@ namespace hpx
     // Returns the Boost version string.
     HPX_EXPORT std::string boost_version();
 
+    // Returns the Boost platform string.
+    HPX_EXPORT std::string boost_platform();
+
+    // Returns the Boost compiler string.
+    HPX_EXPORT std::string boost_compiler();
+
+    // Returns the Boost standard library string.
+    HPX_EXPORT std::string boost_stdlib();
+
     // Returns the copyright string.
     HPX_EXPORT std::string copyright();
 
     // Returns the full version string.
     HPX_EXPORT std::string complete_version();
+
+    // Returns the HPX build type ('Debug', 'Release', etc.)
+    HPX_EXPORT std::string build_type();
+
+    // Returns the HPX build date and time
+    HPX_EXPORT std::string build_date_time();
+
 
     // Helper data structures allowing to automatically detect version problems
     // between applications and the core libraries.

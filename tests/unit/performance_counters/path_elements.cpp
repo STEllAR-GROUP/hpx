@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace test
@@ -30,7 +31,7 @@ namespace test
                 "instancename",
                 2, 1, false)
         },
-        {   "/objectname{parentinstancename#2/instancename#1}/countername#parameter",
+        {   "/objectname{parentinstancename#2/instancename#1}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -50,7 +51,7 @@ namespace test
                 "",
                 -1, -1, true)
         },
-        {   "/objectname{/objectname{parentinstancename#2/instancename#1}/countername}/countername#parameter",
+        {   "/objectname{/objectname{parentinstancename#2/instancename#1}/countername}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -70,7 +71,7 @@ namespace test
                 "instancename",
                 2, 1, false)
         },
-        {   "/objectname{parentinstancename#2/instancename#1}/countername/morecountername#parameter",
+        {   "/objectname{parentinstancename#2/instancename#1}/countername/morecountername@parameter",
             "/objectname/countername/morecountername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -90,7 +91,7 @@ namespace test
                 "instancename",
                 -1, 1, false)
         },
-        {   "/objectname{parentinstancename/instancename#1}/countername#parameter",
+        {   "/objectname{parentinstancename/instancename#1}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -110,7 +111,7 @@ namespace test
                 "moreparent/instancename",
                 -1, 1, false)
         },
-        {   "/objectname{parentinstancename/moreparent/instancename#1}/countername#parameter",
+        {   "/objectname{parentinstancename/moreparent/instancename#1}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -130,7 +131,7 @@ namespace test
                 "instancename",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename/instancename}/countername#parameter",
+        {   "/objectname{parentinstancename/instancename}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -150,7 +151,7 @@ namespace test
                 "moreparent/instancename",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename/moreparent/instancename}/countername#parameter",
+        {   "/objectname{parentinstancename/moreparent/instancename}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -170,7 +171,7 @@ namespace test
                 "",
                 1, -1, false)
         },
-        {   "/objectname{parentinstancename#1}/countername#parameter",
+        {   "/objectname{parentinstancename#1}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -190,7 +191,7 @@ namespace test
                 "",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename}/countername#parameter",
+        {   "/objectname{parentinstancename}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -210,7 +211,7 @@ namespace test
                 "",
                 -1, -1, false)
         },
-        {   "/objectname/countername#parameter",
+        {   "/objectname/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -230,7 +231,7 @@ namespace test
                 "",
                 -1, -1, false)
         },
-        {   "/objectname#parameter",
+        {   "/objectname@parameter",
             "/objectname",
             hpx::performance_counters::counter_path_elements(
                 "objectname",

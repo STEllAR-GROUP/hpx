@@ -20,8 +20,6 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<
         startup_shutdown::server::startup_shutdown_component>,
     startup_shutdown_component);
-HPX_DEFINE_GET_COMPONENT_TYPE(
-    startup_shutdown::server::startup_shutdown_component);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_accumulator actions

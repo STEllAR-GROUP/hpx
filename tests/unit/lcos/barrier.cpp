@@ -11,6 +11,8 @@
 
 #include <boost/atomic.hpp>
 
+// TODO: Modernize this and make it test barrier in distributed.
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -39,10 +41,10 @@ void barrier_test(id_type const& id, boost::atomic<std::size_t>& c,
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    std::size_t num_threads = 1;
+//    std::size_t num_threads = 1;
 
-    if (vm.count("threads"))
-        num_threads = vm["threads"].as<std::size_t>();
+//    if (vm.count("threads"))
+//        num_threads = vm["threads"].as<std::size_t>();
 
     std::size_t pxthreads = 0;
 
@@ -91,8 +93,14 @@ int main(int argc, char* argv[])
             "the number of times to repeat the test") 
         ;
 
+    // We force this test to use several threads by default.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,
+    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,
       "HPX main exited with non-zero status");
     return report_errors();
 }

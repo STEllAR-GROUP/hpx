@@ -55,7 +55,11 @@ HPX_EXPORT std::size_t hardware_concurrency();
 
 HPX_EXPORT topology const& get_topology();
 
-}}
+}
+
+using threads::hardware_concurrency;
+
+}
 
 #if defined(HPX_HAVE_HWLOC)
     #include <hpx/runtime/threads/policies/hwloc_topology.hpp>

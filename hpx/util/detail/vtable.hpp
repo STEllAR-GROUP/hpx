@@ -133,7 +133,19 @@ namespace hpx { namespace util { namespace detail {
                     *reinterpret_cast<Functor const *>(f);
             }
 
-            static R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            static R
+            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            {
+                return invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
+            }
+
+            static R
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
+            {
+                return (*reinterpret_cast<Functor*>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
+            }
+            static R
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
@@ -208,7 +220,22 @@ namespace hpx { namespace util { namespace detail {
                     *reinterpret_cast<Functor const *>(f);
             }
 
-            static void invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            static
+            void
+            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            {
+                invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
+            }
+
+            static
+            void
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
+            {
+                (*reinterpret_cast<Functor*>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
+            }
+            static
+            void
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
@@ -289,7 +316,19 @@ namespace hpx { namespace util { namespace detail {
                     **reinterpret_cast<Functor * const *>(f);
             }
 
-            static R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            static R
+            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            {
+                return invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
+            }
+
+            static R
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
+            {
+                return (**reinterpret_cast<Functor**>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
+            }
+            static R
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
             {
                 return (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
@@ -364,7 +403,22 @@ namespace hpx { namespace util { namespace detail {
                     **reinterpret_cast<Functor * const *>(f);
             }
 
-            static void invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            static
+            void
+            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            {
+                invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
+            }
+
+            static
+            void
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
+            {
+                (**reinterpret_cast<Functor**>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
+            }
+            static
+            void
+            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
             {
                 (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }

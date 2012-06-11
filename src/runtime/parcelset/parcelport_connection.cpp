@@ -24,25 +24,43 @@ namespace hpx { namespace parcelset
         // we choose the highest priority of all parcels for this message
         threads::thread_priority priority = threads::thread_priority_default;
 
+#if defined(HPX_DEBUG)
+        BOOST_FOREACH(parcel const& p, pv)
+        {
+            const boost::uint32_t locality_id =
+                naming::get_locality_id_from_gid(p.get_destination());
+            BOOST_ASSERT(locality_id == destination());
+        }
+#endif
+
         // guard against serialization errors
         try {
             // create a special io stream on top of out_buffer_
             out_buffer_.clear();
 
-            typedef util::container_device<std::vector<char> > io_device_type;
-            boost::iostreams::stream<io_device_type> io(out_buffer_);
+            // mark start of serialization
+            send_data_.serialization_time_ = timer_.elapsed_microseconds();
 
-            // Serialize the data
-            util::portable_binary_oarchive archive(io);
-
-            std::size_t count = pv.size();
-            archive << count;
-
-            BOOST_FOREACH(parcel const & p, pv)
             {
-                priority = (std::max)(p.get_thread_priority(), priority);
-                archive << p;
+                typedef util::container_device<std::vector<char> > io_device_type;
+                boost::iostreams::stream<io_device_type> io(out_buffer_);
+
+                // Serialize the data
+                util::portable_binary_oarchive archive(io);
+
+                std::size_t count = pv.size();
+                archive << count;
+
+                BOOST_FOREACH(parcel const & p, pv)
+                {
+                    priority = (std::max)(p.get_thread_priority(), priority);
+                    archive << p;
+                }
             }
+
+            // store the time required for serialization
+            send_data_.serialization_time_ =
+                timer_.elapsed_microseconds() - send_data_.serialization_time_;
         }
         catch (boost::archive::archive_exception const& e) {
             // We have to repackage all exceptions thrown by the
@@ -75,6 +93,9 @@ namespace hpx { namespace parcelset
 
         out_priority_ = boost::integer::ulittle8_t(priority);
         out_size_ = out_buffer_.size();
+
+        send_data_.num_parcels_ = pv.size();
+        send_data_.bytes_ = out_buffer_.size();
     }
 }}
 

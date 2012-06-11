@@ -12,6 +12,7 @@
 using hpx::naming::gid_type;
 
 // TODO: Subtraction tests.
+// TODO: Comparison tests.
 
 int main()
 {

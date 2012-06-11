@@ -96,8 +96,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(sheneos::server::configuration::init_action,
 HPX_REGISTER_ACTION_DECLARATION_EX(sheneos::server::configuration::get_action,
     sheneos_configuration_get_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<sheneos::config_data>::set_result_action,
-    set_result_action_sheneos_config_data);
+    hpx::lcos::base_lco_with_value<sheneos::config_data>::set_value_action,
+    set_value_action_sheneos_config_data);
 
 #endif
 

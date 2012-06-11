@@ -31,7 +31,22 @@ namespace hpx { namespace components
 
             invoke_apply_fun() {}
 
-            invoke_apply_fun(BOOST_RV_REF(F) f) : f(boost::move(f)) {}
+            template <typename Functor>
+            invoke_apply_fun(
+                BOOST_FWD_REF(Functor) f_
+              , typename ::boost::disable_if<
+                    typename boost::is_same<
+                        invoke_apply_fun
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<
+                                Functor
+                            >::type
+                        >::type
+                    >::type
+                >::type * = 0
+            )
+                : f(boost::forward<Functor>(f_))
+            {}
 
             invoke_apply_fun(invoke_apply_fun const & other)
                 : f(other.f)
@@ -58,16 +73,26 @@ namespace hpx { namespace components
                 return f(*reinterpret_cast<T *>(*p));
             }
 
+            template <typename A>
+            result_type operator()(void ** p, BOOST_FWD_REF(A) a) const
+            {
+                return f(*reinterpret_cast<T *>(*p), boost::forward<A>(a));
+            }
+
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
                 ar & f;
             }
 
-            hpx::util::function<result_type(T &)> f;
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    F
+                >::type
+            >::type f;
 
             private:
-                BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun);
+                BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun)
         };
     }
 
@@ -83,6 +108,19 @@ namespace hpx { namespace components
             typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
         >
         operator<=(BOOST_FWD_REF(F) f) const
+        {
+            return
+                stubs::remote_object::apply_async(
+                    gid_
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                );
+        }
+
+        template <typename F>
+        lcos::future<
+            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+        >
+        apply(BOOST_FWD_REF(F) f) const
         {
             return
                 stubs::remote_object::apply_async(

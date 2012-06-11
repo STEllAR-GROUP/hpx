@@ -13,7 +13,8 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
@@ -70,6 +71,23 @@ namespace hpx { namespace lcos { namespace server
             boost::intrusive::constant_time_size<false>
         > thread_queue_type;
 
+        struct reset_queue_entry
+        {
+            reset_queue_entry(queue_thread_entry& e, thread_queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            queue_thread_entry& e_;
+            thread_queue_type& q_;
+            typename thread_queue_type::const_iterator last_;
+        };
+
         // queue holding the values to process
         struct queue_value_entry
         {
@@ -115,7 +133,7 @@ namespace hpx { namespace lcos { namespace server
                     thread_queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
                     LERR_(fatal) << "~queue: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
@@ -150,7 +168,7 @@ namespace hpx { namespace lcos { namespace server
         // standard LCO action implementations
 
         /// Add a value to the queue.
-        void set_result (BOOST_RV_REF(RemoteType) result)
+        void set_value (BOOST_RV_REF(RemoteType) result)
         {
             // push back the new value onto the queue
             HPX_STD_UNIQUE_PTR<queue_value_entry> node(
@@ -172,12 +190,12 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        /// The \a function set_error is called whenever a
-        /// \a set_error_action is applied on an instance of a LCO.
+        /// The \a function set_exception is called whenever a
+        /// \a set_exception_action is applied on an instance of a LCO.
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& /*e*/)
         {
             mutex_type::scoped_lock l(mtx_);
 
@@ -202,27 +220,15 @@ namespace hpx { namespace lcos { namespace server
             if (value_queue_.empty()) {
                 // suspend this thread until a new value is placed into the
                 // value queue
-                threads::thread_id_type id = self.get_thread_id();
-
-                queue_thread_entry e (id);
+                queue_thread_entry e(self.get_thread_id());
                 thread_queue_.push_back(e);
-                typename thread_queue_type::const_iterator last = thread_queue_.last();
 
+                reset_queue_entry r(e, thread_queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
-                    if (statex == threads::wait_abort) {
-                        hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                             << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(yield_aborted, "queue::get_value",
-                            hpx::util::osstream_get_string(strm));
-                        return ValueType();
-                    }
+                    this_thread::suspend(threads::suspended,
+                        "queue::get_value");
                 }
-
-                if (e.id_)
-                    thread_queue_.erase(last);     // remove entry from queue
             }
 
             // get the first value from the value queue and return it to the

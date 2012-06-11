@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,7 +12,9 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
+
+#include <boost/move/move.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -24,7 +26,7 @@ namespace hpx { namespace lcos
             typedef Action type;
 
             template <typename Archive>
-            void serialize(Archive & ar, unsigned)
+            void serialize(Archive &, unsigned)
             {}
         };
     }
@@ -83,9 +85,11 @@ namespace hpx { namespace lcos
             BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
     /**/
 
-#define HPX_A(z, n, _)                                                 \
+#define HPX_A(z, n, _)                                                        \
         BOOST_PP_COMMA_IF(n)                                                  \
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type && \
+            typename boost::remove_const<                                     \
+                typename hpx::util::detail::remove_reference<                 \
+                    BOOST_PP_CAT(A, n)>::type>::type const &                  \
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
@@ -156,7 +160,7 @@ namespace hpx { namespace lcos
         }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
           , boost::mpl::true_
@@ -186,11 +190,11 @@ namespace hpx { namespace lcos
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
         dataflow(
             naming::id_type const & target
-          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)//BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
         )
             : base_type(
                 create_component(target
-                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                  , BOOST_PP_ENUM_PARAMS(N, a)//BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
                   , typename Action::direct_execution()
                 )
             )

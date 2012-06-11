@@ -69,7 +69,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         //  accu[i].create(prefix);
         //}
 
-        ::init(locality_results(mem_blocks), accu);
+        ::init(hpx::util::locality_results(mem_blocks), accu);
 
         // initialize the array
         for (std::size_t i=0;i<array_size;i++) {

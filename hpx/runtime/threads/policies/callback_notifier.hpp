@@ -23,8 +23,8 @@ namespace hpx { namespace threads { namespace policies
     public:
         callback_notifier(on_startstop_type start = on_startstop_type(),
             on_startstop_type stop = on_startstop_type(),
-            on_error_type on_error = on_error_type())
-          : on_start_thread_(start), on_stop_thread_(stop), on_error_(on_error)
+            on_error_type on_err = on_error_type())
+          : on_start_thread_(start), on_stop_thread_(stop), on_error_(on_err)
         {}
 
         void on_start_thread(std::size_t num_thread)

@@ -11,19 +11,17 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <tests/regressions/components/components/server/undefined_symbol.hpp>
+#include "server/undefined_symbol.hpp"
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
-using hpx::test::server::undefined_symbol;
-
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::managed_component<undefined_symbol>,
-    test_undefined_symbol_component);
+HPX_REGISTER_DISABLED_COMPONENT_FACTORY(
+    hpx::components::managed_component<
+        hpx::test::server::undefined_symbol
+    >,
+    undefined_symbol)
 
 HPX_REGISTER_ACTION_EX(
-    undefined_symbol::break_action,
-    test_undefined_symbol_break_action);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(undefined_symbol);
+    hpx::test::server::undefined_symbol::break_action,
+    test_undefined_symbol_break_action)
 

@@ -74,6 +74,22 @@ namespace hpx { namespace components
             return this->base_type::create_one_component(gid_, type, arg0);
         }
 
+        /// Asynchronously create N new default constructed components using
+        /// the runtime_support
+        std::vector<naming::id_type> bulk_create_components(
+            components::component_type type, std::size_t count = 1)
+        {
+            return this->base_type::bulk_create_components(gid_, type, count);
+        }
+
+        /// Asynchronously create a new component using the runtime_support
+        lcos::future<std::vector<naming::id_type>, std::vector<naming::gid_type> >
+        bulk_create_components_async(components::component_type type,
+            std::size_t count = 1)
+        {
+            return this->base_type::bulk_create_components_async(gid_, type, count);
+        }
+
         /// Asynchronously create a new component using the runtime_support.
         /// Pass one generic argument to the constructor.
         template <typename Arg0>
@@ -176,6 +192,11 @@ namespace hpx { namespace components
             this->base_type::get_config(gid_, ini);
         }
 
+        void get_instance_count(components::component_type type)
+        {
+            this->base_type::get_instance_count(gid_, type);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         naming::id_type const& get_gid() const
         {
@@ -185,7 +206,6 @@ namespace hpx { namespace components
     private:
         naming::id_type gid_;
     };
-
 }}
 
 #endif

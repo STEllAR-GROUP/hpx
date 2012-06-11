@@ -29,7 +29,15 @@ macro(add_hpx_component name)
     hpx_debug("add_component.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
 
     if(NOT ${name}_SOURCE_GLOB)
-      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp")
+      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp"
+                              "${${name}_SOURCE_ROOT}/*.f"
+                              "${${name}_SOURCE_ROOT}/*.F"
+                              "${${name}_SOURCE_ROOT}/*.f77"
+                              "${${name}_SOURCE_ROOT}/*.F77"
+                              "${${name}_SOURCE_ROOT}/*.f90"
+                              "${${name}_SOURCE_ROOT}/*.F90"
+                              "${${name}_SOURCE_ROOT}/*.f95"
+                              "${${name}_SOURCE_ROOT}/*.F95")
     endif()
     hpx_debug("add_component.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
@@ -92,13 +100,19 @@ macro(add_hpx_component name)
 
   hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
 
+  if(HPX_FOUND AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(hpx_libs hpx${CMAKE_DEBUG_POSTFIX} hpx_serialization${CMAKE_DEBUG_POSTFIX})
+  else()
+    set(hpx_libs hpx hpx_serialization)
+  endif()
+
   if(NOT MSVC)
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
+      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
     set(prefix "hpx_component_")
   else()
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
+      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
   endif()
 
   # set properties of generated shared library
@@ -116,14 +130,18 @@ macro(add_hpx_component name)
 
   if(HPX_FLAGS)
     set_property(TARGET ${name}_component APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
-    set_property(TARGET ${name}_component APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+    if(NOT MSVC)
+      set_property(TARGET ${name}_component APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+    endif()
   endif()
 
-  set_target_properties(${name}_component 
-                        PROPERTIES SKIP_BUILD_RPATH TRUE
-                                   BUILD_WITH_INSTALL_RPATH TRUE
-                                   INSTALL_RPATH_USE_LINK_PATH TRUE 
-                                   INSTALL_RPATH ${HPX_RPATH})
+  if(NOT MSVC)
+    set_target_properties(${name}_component
+                          PROPERTIES SKIP_BUILD_RPATH TRUE
+                                     BUILD_WITH_INSTALL_RPATH TRUE
+                                     INSTALL_RPATH_USE_LINK_PATH TRUE
+                                     INSTALL_RPATH ${HPX_RPATH})
+  endif()
 
   if(${name}_FOLDER)
     set_target_properties(${name}_component PROPERTIES FOLDER ${${name}_FOLDER})
@@ -139,7 +157,8 @@ macro(add_hpx_component name)
     hpx_library_install(${name}_component)
 
     foreach(target ${${name}_INI})
-      hpx_ini_install(${install_target} ${target})
+      hpx_debug("add_component.${name}" "installing ini: ${prefix}${name}")
+      hpx_ini_install(${target})
     endforeach()
   endif()
 endmacro()

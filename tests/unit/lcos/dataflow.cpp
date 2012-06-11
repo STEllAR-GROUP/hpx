@@ -26,10 +26,11 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
+// TODO: Make this test run in distributed.
+
 ///////////////////////////////////////////////////////////////////////////////
 int f(int i, int j)
 {
-//     hpx::cout << "f\n" << hpx::flush;
     return i + j;
 }
 typedef hpx::actions::plain_result_action2<int, int, int, &f> f_action;
@@ -37,7 +38,6 @@ HPX_REGISTER_PLAIN_ACTION(f_action);
 
 int h(int i, int j)
 {
-//     hpx::cout << "h\n" << hpx::flush;
     return i + j;
 }
 typedef hpx::actions::plain_result_action2<int, int, int, &h> h_action;
@@ -45,8 +45,7 @@ HPX_REGISTER_PLAIN_ACTION(h_action);
 
 int g()
 {
-    static int i = 9000;
-//     hpx::cout << "g\n" << hpx::flush;
+    int i = 9000;
     return ++i;
 }
 typedef hpx::actions::plain_result_action0<int, &g> g_action;
@@ -56,13 +55,13 @@ bool called_trigger = false;
 void trigger()
 {
     called_trigger = true;
-//     hpx::cout << "trigger!\n" << hpx::flush;
 }
 typedef hpx::actions::plain_action0<&trigger> trigger_action;
 HPX_REGISTER_PLAIN_ACTION(trigger_action);
 
 boost::uint64_t id(boost::uint64_t i)
 {
+    //std::cout << i << "\n";
     return i;
 }
 typedef hpx::actions::plain_result_action1<boost::uint64_t, boost::uint64_t, &id> id_action;
@@ -70,6 +69,7 @@ HPX_REGISTER_PLAIN_ACTION(id_action);
 
 boost::uint64_t add(boost::uint64_t n1, boost::uint64_t n2)
 {
+    //std::cout << n1 << " + " << n2 << "\n";
     return n1 + n2;
 }
 typedef hpx::actions::plain_result_action2<
@@ -111,7 +111,8 @@ int hpx_main(variables_map & vm)
 
         // blocks until the result is delivered! (constructs a future and sets
         // this as the target of the dataflow)
-        HPX_TEST_EQ(18003, c.get_future().get());
+        HPX_TEST_EQ(18002, c.get_future().get());
+
 
         HPX_TEST_EQ(55u, fib(n).get_future().get());
 
@@ -120,8 +121,8 @@ int hpx_main(variables_map & vm)
         HPX_TEST_EQ(n, d.get_future().get());
 
         HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get_future().get());
-        HPX_TEST_EQ(9007, hpx::lcos::dataflow<h_action>(here, 5, b).get_future().get());
-        HPX_TEST_EQ(9003, hpx::lcos::dataflow<g_action>(here,
+        HPX_TEST_EQ(9006, hpx::lcos::dataflow<h_action>(here, 5, b).get_future().get());
+        HPX_TEST_EQ(9001, hpx::lcos::dataflow<g_action>(here,
             hpx::lcos::dataflow<trigger_action>(here)).get_future().get());
         HPX_TEST(called_trigger);
         called_trigger = false;
@@ -136,6 +137,49 @@ int hpx_main(variables_map & vm)
         trigger.push_back(hpx::lcos::dataflow<f7action>(here));
         trigger.push_back(hpx::lcos::dataflow<f8action>(here));
 
+        hpx::lcos::dataflow_trigger(here, trigger).get_future().get();
+        HPX_TEST(called_f1);
+        HPX_TEST(called_f2);
+        HPX_TEST(called_f3);
+        HPX_TEST(called_f4);
+        HPX_TEST(called_f5);
+        HPX_TEST(called_f6);
+        HPX_TEST(called_f7);
+        HPX_TEST(called_f8);
+        called_f1 = false;
+        called_f2 = false;
+        called_f3 = false;
+        called_f4 = false;
+        called_f5 = false;
+        called_f6 = false;
+        called_f7 = false;
+        called_f8 = false;
+        hpx::lcos::future<void> f1 = hpx::lcos::dataflow<f1action>(here).get_future();
+        hpx::lcos::future<void> f2 = hpx::lcos::dataflow<f2action>(here).get_future();
+        hpx::lcos::future<void> f3 = hpx::lcos::dataflow<f3action>(here).get_future();
+        hpx::lcos::future<void> f4 = hpx::lcos::dataflow<f4action>(here).get_future();
+        hpx::lcos::future<void> f5 = hpx::lcos::dataflow<f5action>(here).get_future();
+        hpx::lcos::future<void> f6 = hpx::lcos::dataflow<f6action>(here).get_future();
+        hpx::lcos::future<void> f7 = hpx::lcos::dataflow<f7action>(here).get_future();
+        hpx::lcos::future<void> f8 = hpx::lcos::dataflow<f8action>(here).get_future();
+        f1.get();
+        f2.get();
+        f3.get();
+        f4.get();
+        f5.get();
+        f6.get();
+        f7.get();
+        f8.get();
+        HPX_TEST(called_f1);
+        HPX_TEST(called_f2);
+        HPX_TEST(called_f3);
+        HPX_TEST(called_f4);
+        HPX_TEST(called_f5);
+        HPX_TEST(called_f6);
+        HPX_TEST(called_f7);
+        HPX_TEST(called_f8);
+
+        /*
         hpx::lcos::dataflow<f9action>(
             here, hpx::lcos::dataflow_trigger(here, trigger)).get_future().get();
         HPX_TEST(called_f1);
@@ -147,6 +191,7 @@ int hpx_main(variables_map & vm)
         HPX_TEST(called_f7);
         HPX_TEST(called_f8);
         HPX_TEST(called_f9);
+        */
 
         //hpx::cout << "entering destruction test scope\n" << hpx::flush;
         {
@@ -180,5 +225,13 @@ int hpx_main(variables_map & vm)
 int main(int argc, char ** argv)
 {
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-    return hpx::init(cmdline, argc, argv);
+
+    // We force this test to use several threads by default.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+
+    // Initialize and run HPX
+    return hpx::init(cmdline, argc, argv, cfg);
 }

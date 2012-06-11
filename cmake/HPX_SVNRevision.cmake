@@ -20,11 +20,8 @@ else()
 endif()
 
 if("${SVN_REVISION}" STREQUAL "None")
-  set(SVN_REVISION "")
-endif()
- 
-if("${SVN_REVISION}" STREQUAL "")
-  hpx_warn("svn.revision" "SVN revision not found.")
+  hpx_warn("svn.revision" "SVN revision not found (set to 'unknown').")
+  set(SVN_REVISION "unknown")
 else()
   hpx_info("svn.revision" "SVN revision is ${SVN_REVISION}.")
   add_definitions("-DHPX_SVN_REVISION=\"${SVN_REVISION}\"")

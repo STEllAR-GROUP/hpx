@@ -9,12 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/pbs_environment.hpp>
+#include <hpx/util/batch_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/util/parse_command_line.hpp>
+#include <hpx/util/manage_config.hpp>
+#include <hpx/util/bind_action.hpp>
 
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -49,68 +51,20 @@ namespace hpx
 namespace hpx { namespace detail
 {
     // forward declarations only
-    void console_print(std::string const& name);
-    void list_symbolic_name(std::string const& name, naming::gid_type const& gid);
-    void list_component_type(std::string const& name, components::component_type);
+    void console_print(std::string const&);
+    void list_symbolic_name(std::string const&, naming::gid_type const&);
+    void list_component_type(std::string const&, components::component_type);
 }}
 
-typedef hpx::actions::plain_action1<
-    std::string const&, hpx::detail::console_print
-> console_print_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(console_print_action, console_print_action, true);
-
-typedef hpx::actions::plain_action2<
-    std::string const&, hpx::naming::gid_type const&,
-    hpx::detail::list_symbolic_name
-> list_symbolic_name_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(list_symbolic_name_action, list_symbolic_name_action, true);
-
-typedef hpx::actions::plain_action2<
-    std::string const&, hpx::components::component_type,
-    hpx::detail::list_component_type
-> list_component_type_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(list_component_type_action, list_component_type_action, true);
+HPX_PLAIN_ACTION_EX(hpx::detail::console_print,
+    console_print_action, hpx::components::factory_enabled)
+HPX_PLAIN_ACTION_EX(hpx::detail::list_symbolic_name,
+    list_symbolic_name_action, hpx::components::factory_enabled)
+HPX_PLAIN_ACTION_EX(hpx::detail::list_component_type,
+    list_component_type_action, hpx::components::factory_enabled)
 
 namespace hpx { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Functional wrapper for any action2
-    template <typename Action>
-    struct action_wrapper2
-    {
-        typedef typename boost::add_const<
-            typename Action::arguments_type
-        >::type arguments_type;
-
-        typedef typename
-            boost::fusion::result_of::at_c<arguments_type, 0>::type
-        arg1_type;
-        typedef typename
-            boost::fusion::result_of::at_c<arguments_type, 1>::type
-        arg2_type;
-
-        // default constructor is required for serialization
-        action_wrapper2()
-        {}
-
-        action_wrapper2(naming::id_type const& target)
-          : target_(target)
-        {}
-
-        void operator() (arg1_type s, arg2_type t) const
-        {
-            applier::apply<Action>(target_, s, t);
-        }
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned /*version*/)
-        {
-            ar & target_;
-        }
-
-        naming::id_type target_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     // print string on the console
     void console_print(std::string const& name)
@@ -123,7 +77,7 @@ namespace hpx { namespace detail
         naming::id_type console(agas::get_console_locality(ec));
         if (ec) return;
 
-        lcos::async<console_print_action>(console, name).get(ec);
+        hpx::async<console_print_action>(console, name).get(ec);
         if (ec) return;
 
         if (&ec != &throws)
@@ -207,9 +161,12 @@ namespace hpx { namespace detail
         print(std::string("List of all registered symbolic names:"));
         print(std::string(78, '-'));
 
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
         naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_ids(
-            action_wrapper2<list_symbolic_name_action>(console));
+            hpx::util::bind<list_symbolic_name_action>(console, _1, _2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -225,9 +182,12 @@ namespace hpx { namespace detail
         print(std::string("List of all registered component types:"));
         print(std::string(78, '-'));
 
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
         naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_types(
-            action_wrapper2<list_component_type_action>(console));
+            hpx::util::bind<list_component_type_action>(console, _1, _2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -243,9 +203,9 @@ namespace hpx
 {
     // Print stack trace and exit.
 #if defined(BOOST_WINDOWS)
-    BOOL termination_handler(DWORD ctrl_type);
+    extern BOOL termination_handler(DWORD ctrl_type);
 #else
-    void termination_handler(int signum);
+    extern void termination_handler(int signum);
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -381,22 +341,22 @@ namespace hpx
         }
 
         // helper function testing option compatibility
-        void ensure_queueing_option_compatibility(
+        void ensure_queuing_option_compatibility(
             boost::program_options::variables_map const& vm)
         {
             if (vm.count("hpx:high-priority-threads")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:high-priority-threads, valid for "
-                    "--hpx:queueing=priority_local only");
+                    "--hpx:queuing=priority_local only");
             }
             if (vm.count("hpx:numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:numa-sensitive, valid for "
-                    "--hpx:queueing=priority_local or priority_abp only");
+                    "--hpx:queuing=priority_local or priority_abp only");
             }
             if (vm.count("hpx:hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queueing=hierarchy only.");
+                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
             }
         }
 
@@ -406,11 +366,11 @@ namespace hpx
 #if defined(HPX_HAVE_HWLOC)
             if (vm.count("hpx:pu-offset")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:pu-offset, valid for --hpx:queueing=priority_local only.");
+                    "--hpx:pu-offset, valid for --hpx:queuing=priority_local only.");
             }
             if (vm.count("hpx:pu-step")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:pu-step, valid for --hpx:queueing=priority_local only.");
+                    "--hpx:pu-step, valid for --hpx:queuing=priority_local only.");
             }
 #endif
         }
@@ -424,7 +384,7 @@ namespace hpx
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
-            ensure_queueing_option_compatibility(vm);
+            ensure_queuing_option_compatibility(vm);
             ensure_hwloc_compatibility(vm);
 
             // scheduling policy
@@ -451,7 +411,7 @@ namespace hpx
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
-            ensure_queueing_option_compatibility(vm);
+            ensure_queuing_option_compatibility(vm);
 
             // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler
@@ -487,12 +447,12 @@ namespace hpx
 
             if (vm.count("hpx:hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queueing=hierarchy only.");
+                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
             }
 
             std::size_t pu_offset = 0;
             std::size_t pu_step = 1;
-#if defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
             if (vm.count("hpx:pu-offset")) {
                 pu_offset = vm["hpx:pu-offset"].as<std::size_t>();
                 if (pu_offset >= hpx::threads::hardware_concurrency()) {
@@ -536,7 +496,7 @@ namespace hpx
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
-            ensure_queueing_option_compatibility(vm);
+            ensure_queuing_option_compatibility(vm);
             ensure_hwloc_compatibility(vm);
 
             // scheduling policy
@@ -573,7 +533,7 @@ namespace hpx
                 numa_sensitive = true;
             if (vm.count("hpx:hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queueing=hierarchy only.");
+                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
             }
 
             ensure_hwloc_compatibility(vm);
@@ -606,12 +566,12 @@ namespace hpx
             if (vm.count("hpx:high-priority-threads")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:high-priority-threads, valid for "
-                    "--hpx:queueing=priority_local only.");
+                    "--hpx:queuing=priority_local only.");
             }
             if (vm.count("hpx:numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:numa-sensitive, valid for "
-                    "--hpx:queueing=priority_local or priority_abp only");
+                    "--hpx:queuing=priority_local or priority_abp only");
             }
 
             ensure_hwloc_compatibility(vm);
@@ -652,7 +612,7 @@ namespace hpx
                 numa_sensitive = true;
             if (vm.count("hpx:hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queueing=hierarchy only.");
+                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
             }
 
             ensure_hwloc_compatibility(vm);
@@ -733,6 +693,7 @@ namespace hpx
             // load basic ini configuration information to allow for command-
             // line option aliases
             util::runtime_configuration rtcfg;
+            util::manage_config cfgmap(ini_config);
 
             // Initial analysis of the command line options. This is
             // preliminary as it will not take into account any aliases as
@@ -759,8 +720,10 @@ namespace hpx
                 // Make sure any aliases defined on the command line get used
                 // for the option analysis below.
                 std::vector<std::string> cfg;
-                if (prevm.count("hpx:ini"))
+                if (prevm.count("hpx:ini")) {
                     cfg = prevm["hpx:ini"].as<std::vector<std::string> >();
+                    cfgmap.add(cfg);
+                }
                 std::copy(ini_config.begin(), ini_config.end(), std::back_inserter(cfg));
 
                 rtcfg.reconfigure(cfg);
@@ -827,7 +790,7 @@ namespace hpx
             }
 
             // Check command line arguments.
-            util::pbs_environment env(debug_clp);
+            util::batch_environment env(debug_clp);
 
             if (vm.count("hpx:iftransform")) {
                 util::sed_transform iftransform(vm["hpx:iftransform"].as<std::string>());
@@ -857,6 +820,9 @@ namespace hpx
                 ini_config += "hpx.nodes=" + env.init_from_nodelist(
                     vm["hpx:nodes"].as<std::vector<std::string> >(), agas_host);
             }
+            else if (env.found_batch_environment()) {
+                ini_config += "hpx.nodes=" + env.init_from_environment(agas_host);
+            }
 
             // let the PBS environment decide about the AGAS host
             agas_host = env.agas_host_name(
@@ -864,13 +830,94 @@ namespace hpx
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
-            std::size_t num_threads = env.retrieve_number_of_threads();
+
+            // handle number of threads
+            std::size_t batch_threads = env.retrieve_number_of_threads();
+
+            {
+                std::string threads_str
+                    = cfgmap.get_value<std::string>("hpx.os_threads", ""); 
+
+                if ("all" == threads_str)
+                    cfgmap.config_["hpx.os_threads"] =
+                        boost::lexical_cast<std::string>(
+                            thread::hardware_concurrency());
+            }
+
+            std::size_t num_threads = cfgmap.get_value<std::size_t>(
+                "hpx.os_threads", batch_threads);
+
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                  num_threads > batch_threads)
+            {
+                std::cerr << "hpx::init: command line warning: "
+                       "--hpx:ini=hpx.os_threads used when running with "
+                    << env.get_batch_name()
+                    << ", requesting a larger number of threads than cores have "
+                       "been assigned by "
+                    << env.get_batch_name()
+                    << ", the application might not run properly."
+                    << std::endl;
+            }
+
+            if (vm.count("hpx:threads")) {
+                std::string threads_str = vm["hpx:threads"].as<std::string>();
+
+                std::size_t threads = 0;
+
+                if ("all" == threads_str)
+                    threads = thread::hardware_concurrency();
+                else
+                    threads = boost::lexical_cast<std::size_t>(threads_str);
+
+                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                      num_threads > threads)
+                {
+                    std::cerr << "hpx::init: command line warning: --hpx:threads "
+                            "used when running with "
+                        << env.get_batch_name() << ", requesting a larger "
+                           "number of threads than cores have been assigned by "
+                        << env.get_batch_name()
+                        << ", the application might not run properly."
+                        << std::endl;
+                }
+                num_threads = threads;
+            }
+
+            // handling number of localities
+            std::size_t batch_localities = env.retrieve_number_of_localities();
+            std::size_t num_localities = cfgmap.get_value<std::size_t>(
+                "hpx.localities", batch_localities);
+
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                    batch_localities != num_localities)
+            {
+                std::cerr << "hpx::init: command line warning: "
+                        "--hpx:ini=hpx.localities used when running with "
+                    << env.get_batch_name()
+                    << ", requesting a different number of localities than have "
+                       "been assigned by " << env.get_batch_name()
+                    << ", the application might not run properly."
+                    << std::endl;
+            }
+
+            if (vm.count("hpx:localities")) {
+                std::size_t localities = vm["hpx:localities"].as<std::size_t>();
+                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                        localities != num_localities)
+                {
+                    std::cerr << "hpx::init: command line warning: --hpx:localities "
+                            "used when running with " << env.get_batch_name()
+                        << ", requesting a different "
+                            "number of localities than have been assigned by "
+                        << env.get_batch_name()
+                        << ", the application might not run properly."
+                        << std::endl;
+                }
+                num_localities = localities;
+            }
+
             bool run_agas_server = vm.count("hpx:run-agas-server") ? true : false;
-
-            std::size_t num_localities = env.retrieve_number_of_localities();
-            if (vm.count("hpx:localities"))
-                num_localities = vm["hpx:localities"].as<std::size_t>();
-
             std::size_t node = env.retrieve_node_number();
 
             // we initialize certain settings if --node is specified (or data
@@ -896,7 +943,7 @@ namespace hpx
                 }
                 else {
                     // each node gets an unique port
-                    hpx_port += static_cast<boost::uint16_t>(node);
+                    hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
                     mode = hpx::runtime_mode_worker;
 
                     // do not execute any explicit hpx_main except if asked
@@ -918,20 +965,9 @@ namespace hpx
             if (vm.count("hpx:hpx"))
                 util::split_ip_address(vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port);
 
-            if (vm.count("hpx:threads")) {
-                std::size_t threads = vm["hpx:threads"].as<std::size_t>();
-                if (env.run_with_pbs() && threads > num_threads) {
-                    std::cerr  << "hpx::init: command line warning: --hpx:threads "
-                        "used when running with PBS, requesting a larger "
-                        "number of threads than cores have been assigned by PBS, "
-                        "the application might not run properly." << std::endl;
-                }
-                num_threads = threads;
-            }
-
-            std::string queueing("priority_local");
-            if (vm.count("hpx:queueing"))
-                queueing = vm["hpx:queueing"].as<std::string>();
+            std::string queuing("priority_local");
+            if (vm.count("hpx:queuing"))
+                queuing = vm["hpx:queuing"].as<std::string>();
 
             // If the user has not specified an explicit runtime mode we
             // retrieve it from the command line.
@@ -993,7 +1029,7 @@ namespace hpx
                 agas_host = hpx_host;
                 agas_port = hpx_port;
             }
-            else if (env.run_with_pbs()) {
+            else if (env.run_with_pbs() || env.run_with_slurm()) {
                 // in PBS mode, if the network addresses are different and we
                 // should not run the AGAS server we assume to be in worker mode
                 mode = hpx::runtime_mode_worker;
@@ -1015,12 +1051,14 @@ namespace hpx
                 if (vm.count("hpx:run-agas-server-only"))
                     ini_config += "hpx.components.load_external=0";
             }
-            else if (vm.count("hpx:run-agas-server-only") && !env.run_with_pbs()) {
-                throw std::logic_error("Command line option --run-agas-server-only "
+            else if (vm.count("hpx:run-agas-server-only") &&
+                  !(env.run_with_pbs() || env.run_with_slurm()))
+            {
+                throw std::logic_error("Command line option --hpx:run-agas-server-only "
                     "can be specified only for the node running the AGAS server.");
             }
             if (1 == num_localities && vm.count("hpx:run-agas-server-only")) {
-                std::cerr  << "hpx::init: command line warning: --run-agas-server-only "
+                std::cerr << "hpx::init: command line warning: --hpx:run-agas-server-only "
                     "used for single locality execution, application might "
                     "not run properly." << std::endl;
             }
@@ -1093,81 +1131,81 @@ namespace hpx
             rtcfg.reconfigure(ini_config);
 
             // Initialize and start the HPX runtime.
-            if (0 == std::string("global").find(queueing)) {
+            if (0 == std::string("global").find(queuing)) {
 #if defined(HPX_GLOBAL_SCHEDULER)
                 result = detail::run_global(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --hpx:queueing=global "
+                throw std::logic_error("Command line option --hpx:queuing=global "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_GLOBAL_SCHEDULER=ON'.");
 #endif
             }
-            else if (0 == std::string("local").find(queueing)) {
+            else if (0 == std::string("local").find(queuing)) {
 #if defined(HPX_LOCAL_SCHEDULER)
                 result = detail::run_local(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --hpx:queueing=local "
+                throw std::logic_error("Command line option --hpx:queuing=local "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_LOCAL_SCHEDULER=ON'.");
 #endif
             }
-            else if (0 == std::string("priority_local").find(queueing)) {
+            else if (0 == std::string("priority_local").find(queuing)) {
                 // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
                 result = detail::run_priority_local(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
             }
-            else if (0 == std::string("abp").find(queueing)) {
+            else if (0 == std::string("abp").find(queuing)) {
                 // abp scheduler: local dequeues for each OS thread, with work
                 // stealing from the "bottom" of each.
 #if defined(HPX_ABP_SCHEDULER)
                 result = detail::run_abp(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --hpx:queueing=abp "
+                throw std::logic_error("Command line option --hpx:queuing=abp "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_ABP_SCHEDULER=ON'.");
 #endif
             }
-            else if (0 == std::string("priority_abp").find(queueing)) {
+            else if (0 == std::string("priority_abp").find(queuing)) {
                 // priority abp scheduler: local priority dequeues for each
                 // OS thread, with work stealing from the "bottom" of each.
 #if defined(HPX_ABP_PRIORITY_SCHEDULER)
                 result = detail::run_priority_abp(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --hpx:queueing=priority_abp "
+                throw std::logic_error("Command line option --hpx:queuing=priority_abp "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_ABP_PRIORITY_SCHEDULER=ON'.");
 #endif
             }
-            else if (0 == std::string("hierarchy").find(queueing)) {
+            else if (0 == std::string("hierarchy").find(queuing)) {
 #if defined(HPX_HIERARCHY_SCHEDULER)
                 // hierarchy scheduler: tree of queues, with work
                 // stealing from the parent queue in that tree.
                 result = detail::run_hierarchy(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --hpx:queueing=hierarchy "
+                throw std::logic_error("Command line option --hpx:queuing=hierarchy "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_HIERARCHY_SCHEDULER=ON'.");
 #endif
             }
-            else if (0 == std::string("periodic").find(queueing)) {
+            else if (0 == std::string("periodic").find(queuing)) {
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
                 result = detail::run_periodic(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --hpx:queueing=periodic "
+                throw std::logic_error("Command line option --hpx:queuing=periodic "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_PERIODIC_PRIORITY_SCHEDULER=ON'.");
 #endif
             }
             else {
                 throw std::logic_error("Bad value for command line option "
-                    "--hpx:queueing");
+                    "--hpx:queuing");
             }
         }
         catch (std::exception& e) {
@@ -1205,10 +1243,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int finalize(double shutdown_timeout, double localwait)
     {
-        if (localwait == -1.0)
+        if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-
-        if (localwait != -1.0) {
+        else
+        {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
@@ -1217,7 +1255,7 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
-        if (shutdown_timeout == -1.0)
+        if (std::abs(shutdown_timeout - 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::stubs::runtime_support::shutdown_all(
@@ -1230,10 +1268,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void disconnect(double shutdown_timeout, double localwait)
     {
-        if (localwait == -1.0)
+        if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-
-        if (localwait != -1.0) {
+        else
+        {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
@@ -1242,7 +1280,7 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
-        if (shutdown_timeout == -1.0)
+        if (std::abs(shutdown_timeout - 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p =

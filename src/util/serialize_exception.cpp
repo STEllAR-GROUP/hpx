@@ -30,13 +30,13 @@ namespace boost { namespace serialization
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        int err_value(0);
+        int err_value = hpx::success;
         std::string err_message;
 
         boost::uint32_t throw_locality_ = 0;
         std::string throw_hostname_;
         boost::int64_t throw_pid_ = -1;
-        boost::int64_t throw_shepherd_ = -1;
+        std::size_t throw_shepherd_ = 0;
         std::size_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
         std::string throw_function_;
@@ -56,7 +56,7 @@ namespace boost { namespace serialization
             }
             else {
                 std::string const* s =
-                    boost::get_error_info<hpx::throw_function>(e);
+                    boost::get_error_info<hpx::detail::throw_function>(e);
                 if (s)
                     throw_function_ = *s;
             }
@@ -68,7 +68,7 @@ namespace boost { namespace serialization
             }
             else {
                 std::string const* s =
-                    boost::get_error_info<hpx::throw_file>(e);
+                    boost::get_error_info<hpx::detail::throw_file>(e);
                 if (s)
                     throw_file_ = *s;
             }
@@ -80,44 +80,44 @@ namespace boost { namespace serialization
             }
 
             boost::uint32_t const* locality =
-                boost::get_error_info<hpx::throw_locality>(e);
+                boost::get_error_info<hpx::detail::throw_locality>(e);
             if (locality) {
                 throw_locality_ = *locality;
             }
 
             std::string const* hostname_ =
-                boost::get_error_info<hpx::throw_hostname>(e);
+                boost::get_error_info<hpx::detail::throw_hostname>(e);
             if (hostname_) {
                 throw_hostname_ = *hostname_;
             }
 
             boost::int64_t const* pid_ =
-                boost::get_error_info<hpx::throw_pid>(e);
+                boost::get_error_info<hpx::detail::throw_pid>(e);
             if (pid_) {
                 throw_pid_ = *pid_;
             }
 
-            boost::int64_t const* shepherd =
-                boost::get_error_info<hpx::throw_shepherd>(e);
+            std::size_t const* shepherd =
+                boost::get_error_info<hpx::detail::throw_shepherd>(e);
             if (shepherd) {
                 throw_shepherd_ = *shepherd;
             }
 
             std::size_t const* thread_id =
-                boost::get_error_info<hpx::throw_thread_id>(e);
+                boost::get_error_info<hpx::detail::throw_thread_id>(e);
             if (thread_id) {
                 throw_thread_id_ = *thread_id;
             }
 
             std::string const* thread_name =
-                boost::get_error_info<hpx::throw_thread_name>(e);
+                boost::get_error_info<hpx::detail::throw_thread_name>(e);
             if (thread_name) {
                 throw_thread_name_ = *thread_name;
             }
 
 #if defined(HPX_HAVE_STACKTRACES)
             std::string const* back_trace =
-                boost::get_error_info<hpx::throw_stacktrace>(e);
+                boost::get_error_info<hpx::detail::throw_stacktrace>(e);
             if (back_trace)
                 back_trace_ = *back_trace;
 #endif
@@ -203,13 +203,13 @@ namespace boost { namespace serialization
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        int err_value(0);
+        int err_value = hpx::success;
         std::string err_message;
 
         boost::uint32_t throw_locality_ = 0;
         std::string throw_hostname_;
         boost::int64_t throw_pid_ = -1;
-        boost::int64_t throw_shepherd_ = -1;
+        std::size_t throw_shepherd_ = 0;
         std::size_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
         std::string throw_function_;
@@ -313,7 +313,8 @@ namespace boost { namespace serialization
             // hpx::exception
             case hpx::util::hpx_exception:
                 hpx::detail::rethrow_exception(
-                    hpx::exception((hpx::error)err_value, what, hpx::rethrow),
+                    hpx::exception(static_cast<hpx::error>(err_value),
+                        what, hpx::rethrow),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);

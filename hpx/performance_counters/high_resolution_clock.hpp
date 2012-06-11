@@ -19,7 +19,8 @@ namespace hpx { namespace performance_counters
         {
             boost::chrono::nanoseconds ns =
                 boost::chrono::high_resolution_clock::now().time_since_epoch();
-            return ns.count();
+            BOOST_ASSERT(ns.count() >= 0);
+            return static_cast<boost::uint64_t>(ns.count());
         }
     };
 }}

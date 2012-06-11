@@ -70,6 +70,23 @@ namespace hpx { namespace lcos { namespace local
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
+        struct reset_queue_entry
+        {
+            reset_queue_entry(queue_entry& e, queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            queue_entry& e_;
+            queue_type& q_;
+            queue_type::const_iterator last_;
+        };
+
     public:
         /// \brief Construct a new counting semaphore
         ///
@@ -131,7 +148,7 @@ namespace hpx { namespace lcos { namespace local
         boost::int64_t signal_all()
         {
             mutex_type::scoped_lock l(mtx_);
-            boost::int64_t count = queue_.size();
+            boost::int64_t count = static_cast<boost::int64_t>(queue_.size());
             signal_locked(count, l);
             return count;
         }

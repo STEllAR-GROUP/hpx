@@ -23,7 +23,7 @@ using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
 
-using hpx::threads::suspend;
+using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 
 using hpx::util::high_resolution_timer;
@@ -43,7 +43,7 @@ void worker()
 {
     double volatile d = 0.;
     for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
+        d += 1. / (2. * i + 1.);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void print_results(
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
-    variables_map& vm
+    variables_map&
     )
 {
     {

@@ -13,13 +13,13 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
 {
     //
-    lcos::future<naming::id_type>
+    lcos::future<naming::id_type, naming::gid_type>
     create_async(naming::id_type const& targetgid,
         components::component_type type, std::size_t count)
     {
@@ -29,7 +29,7 @@ namespace hpx { namespace applier
         typedef
             components::server::runtime_support::create_component_action
         action_type;
-        return lcos::async<action_type>(targetgid, type, count);
+        return hpx::async<action_type>(targetgid, type, count);
     }
 
     //
@@ -327,13 +327,4 @@ namespace hpx { namespace applier
         return appl ? (*appl)->get_locality_id() : naming::invalid_locality_id;
     }
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    HPX_API_EXPORT boost::uint32_t get_locality_id()
-    {
-        return hpx::applier::get_locality_id();
-    }
-}
 

@@ -31,13 +31,8 @@ namespace hpx { namespace components { namespace server
     // implementation of this console error sink
     void console_error_sink(boost::exception_ptr const& e)
     {
-        try {
-            boost::rethrow_exception(e);
-        }
-        catch (boost::exception const& be) {
-            // dispatch this error to registered functions
-            get_error_dispatcher()(hpx::detail::diagnostic_information(be));
-        }
+        // dispatch this error to registered functions
+        get_error_dispatcher()(hpx::diagnostic_information(e));
     }
 }}}
 
@@ -45,5 +40,5 @@ namespace hpx { namespace components { namespace server
 // This must be in global namespace
 HPX_REGISTER_PLAIN_ACTION_EX2(
     hpx::components::server::console_error_sink_action,
-    console_error_sink_action, true);
+    console_error_sink_action, hpx::components::factory_enabled)
 

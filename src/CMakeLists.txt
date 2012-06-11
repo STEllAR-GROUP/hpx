@@ -64,7 +64,7 @@ add_hpx_library_sources(hpx_serialization
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE ".*hpx_init.cpp")
+  EXCLUDE ".*(hpx_main|hpx_init)[.]cpp")
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
   APPEND)
@@ -81,7 +81,7 @@ add_hpx_library_sources(hpx
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp")
 
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 
@@ -113,7 +113,7 @@ else()
       COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj /nologo /c ${switch_to_fiber_source}
       DEPENDS ${switch_to_fiber_source})
     set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
-      CACHE INTERNAL "Object files for libhpx_external." FORCE)
+      CACHE INTERNAL "External object files for HPX." FORCE)
     add_definitions(-DHPX_EMULATE_SWAP_CONTEXT)
   endif()
 endif()
@@ -200,14 +200,16 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-add_library(hpx_serialization SHARED 
+add_library(hpx_serialization SHARED
   ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 
-set_target_properties(hpx_serialization
-                      PROPERTIES SKIP_BUILD_RPATH TRUE
-                                 BUILD_WITH_INSTALL_RPATH TRUE
-                                 INSTALL_RPATH_USE_LINK_PATH TRUE 
-                                 INSTALL_RPATH ${HPX_RPATH})
+if(NOT MSVC)
+  set_target_properties(hpx_serialization
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE
+                                   INSTALL_RPATH ${HPX_RPATH})
+endif()
 
 set_target_properties(hpx_serialization PROPERTIES
   VERSION ${HPX_VERSION}
@@ -247,7 +249,7 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED 
+add_library(hpx SHARED
   ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
 set_target_properties(hpx PROPERTIES
@@ -261,11 +263,13 @@ set_target_properties(hpx PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
   RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
-set_target_properties(hpx
-                      PROPERTIES SKIP_BUILD_RPATH TRUE
-                                 BUILD_WITH_INSTALL_RPATH TRUE
-                                 INSTALL_RPATH_USE_LINK_PATH TRUE 
-                                 INSTALL_RPATH ${HPX_RPATH})
+if(NOT MSVC)
+  set_target_properties(hpx
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE
+                                   INSTALL_RPATH ${HPX_RPATH})
+endif()
 
 if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
   set_target_properties(hpx PROPERTIES LINK_FLAGS "/EXPORT:switch_to_fiber")
@@ -293,7 +297,7 @@ endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC 
+add_library(hpx_init STATIC
   ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 
 set_property(TARGET hpx_init APPEND

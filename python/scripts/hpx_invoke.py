@@ -8,8 +8,6 @@
 
 from os.path import exists, join
 
-from sys import path
-
 from datetime import datetime
 
 from string import letters, digits
@@ -18,18 +16,18 @@ from types import StringType
 
 from optparse import OptionParser
 
+from hpx_version import HPX_VERSION
+
 if exists(join(path[0], "../hpx")):
   path.append(join(path[0], ".."))
-if exists(join(path[0], "../share/hpx/python/hpx")):
-  path.append(join(path[0], "../share/hpx/python"))
+if exists(join(path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):
+  path.append(join(path[0], "../share/hpx-"+HPX_VERSION+"/python"))
 
 from hpx.process import process
 
 def run(cmd, timeout=3600):
-  start = datetime.now() 
   proc = process(cmd)
   (timed_out, returncode) = proc.wait(timeout)
-  now = datetime.now()
 
   output = ''
 
@@ -41,7 +39,7 @@ def run(cmd, timeout=3600):
     else:
       break
 
-  return (returncode, output, timed_out)
+  return (timed_out, returncode, output)
 
 def rstrip_last(s, chars):
   if s[-1] in chars:
@@ -70,7 +68,7 @@ if None == options.program:
   print "No program specified"
   exit(1)
 
-(returncode, output, timed_out) = run(options.program, options.timeout)
+(timed_out, returncode, output) = run(options.program, options.timeout)
 
 if not 0 == len(output):
   print rstrip_last(output, '\n')

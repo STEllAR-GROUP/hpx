@@ -13,6 +13,7 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -180,12 +181,35 @@ namespace hpx { namespace threads
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-//     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
-
-    ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
     HPX_API_EXPORT std::size_t get_numa_node_number();
 
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT bool get_thread_interruption_enabled(thread_id_type id,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT void set_thread_interruption_enabled(thread_id_type id,
+        bool enable, error_code& ec = throws);
+
+    HPX_API_EXPORT bool get_thread_interruption_requested(thread_id_type id,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT void interrupt_thread(thread_id_type id,
+        error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT void run_thread_exit_callbacks(thread_id_type id,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT bool add_thread_exit_callback(thread_id_type id,
+        HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
+
+    HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type id,
+        error_code& ec = throws);
+}}
+
+namespace hpx { namespace this_thread
+{
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
@@ -203,9 +227,9 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(
-        thread_state_enum state = pending,
-        char const* description = "threads::suspend",
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
+        threads::thread_state_enum state = threads::pending,
+        char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -225,9 +249,9 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
         boost::posix_time::ptime const&,
-        char const* description = "threads::suspend",
+        char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -247,9 +271,9 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
         boost::posix_time::time_duration const&,
-        char const* description = "threads::suspend",
+        char const* description = "this_thread::suspend",
         error_code& ec = throws);
 }}
 
