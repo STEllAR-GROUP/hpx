@@ -1,4 +1,4 @@
-# Copyright (c) 2011      Thomas Heller
+# Copyright (c) 2011 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,6 +25,7 @@ if(HPX_CXX11_LAMBDAS)
         jacobi_hpx
         jacobi_hpx_simple
         jacobi_hpx_distributed_simple
+        jacobi_hpx_distributed_local_deps
         jacobi_hpx_distributed_simple_2
         jacobi_nonuniform_hpx
       )
