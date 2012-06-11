@@ -6,10 +6,12 @@
 set(benchmarks
     general_pa_analysis
     general_apply_analysis
+    get_gid_analysis
    )
 
 set(general_pa_analysis_FLAGS DEPENDENCIES iostreams_component)
 set(general_apply_analysis_FLAGS DEPENDENCIES iostreams_component)
+set(get_gid_analysis_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(benchmark ${benchmarks})
   set(sources
