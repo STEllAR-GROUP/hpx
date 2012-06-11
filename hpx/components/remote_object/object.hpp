@@ -116,6 +116,19 @@ namespace hpx { namespace components
                 );
         }
 
+        template <typename F>
+        lcos::future<
+            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+        >
+        apply(BOOST_FWD_REF(F) f) const
+        {
+            return
+                stubs::remote_object::apply_async(
+                    gid_
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                );
+        }
+
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
