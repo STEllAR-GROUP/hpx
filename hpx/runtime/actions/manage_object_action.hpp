@@ -203,7 +203,7 @@ namespace hpx { namespace actions
     public:
         struct tag {};
 
-        manage_object_action_base const& get_instance() const
+        virtual manage_object_action_base const& get_instance() const
         {
             // ensure thread-safe initialization
             util::static_<manage_object_action, tag> instance;
@@ -223,8 +223,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            using namespace boost::serialization;
-            ar & base_object<manage_object_action_base>(*this);
+            ar & util::base_object_nonvirt<manage_object_action_base>(*this);
         }
     };
 
@@ -247,8 +246,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            using namespace boost::serialization;
-            ar & base_object<manage_object_action_base>(*this);
+            ar & util::base_object_nonvirt<manage_object_action_base>(*this);
         }
     };
 
@@ -327,8 +325,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            using namespace boost::serialization;
-            ar & base_object<manage_object_action_base>(*this);
+            ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
         }
     };
 }}
