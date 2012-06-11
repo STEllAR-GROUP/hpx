@@ -6,14 +6,20 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+/*
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/components/remote_object/distributed_new.hpp>
 #include <hpx/components/dataflow/dataflow_trigger.hpp>
+*/
 
 #include <hpx/include/iostreams.hpp>
 
-#include "grid.hpp"
+/*
 #include "row.hpp"
+*/
+
+#include "grid.hpp"
+#include "solver.hpp"
 
 #include <vector>
 
@@ -29,6 +35,7 @@ using hpx::finalize;
 using hpx::cout;
 using hpx::flush;
 
+#if 0
 namespace jacobi
 {
     void stencil_row_update(row_range dst, row_range src_top, row_range src_center, row_range src_bottom)
@@ -145,7 +152,7 @@ namespace jacobi
                         ).get_future().get();
                 }
                 else
-                    */
+                */
                 {
                     return
                         //s.center_[idx_].apply(
@@ -256,6 +263,7 @@ namespace jacobi
         };
     };
 }
+#endif
 
 int hpx_main(variables_map & vm)
 {
@@ -263,6 +271,14 @@ int hpx_main(variables_map & vm)
         std::size_t nx = vm["nx"].as<std::size_t>();
         std::size_t ny = vm["ny"].as<std::size_t>();
         std::size_t max_iterations = vm["max_iterations"].as<std::size_t>();
+        std::size_t line_block = vm["line_block"].as<std::size_t>();
+
+        jacobi::grid u(nx, ny, 1.0);
+
+        jacobi::solver solver(u, nx, line_block);
+
+        solver.run(max_iterations);
+#if 0
 
         std::vector<jacobi::grid> u(2, jacobi::grid(nx, ny, 1.0));
 
@@ -355,9 +371,12 @@ int hpx_main(variables_map & vm)
         double time_elapsed = t.elapsed();
         cout << nx << "x" << ny << " "
              << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+#endif
+
+        finalize();
     }
 
-    return finalize();
+    return 0;
 }
 
 int main(int argc, char **argv)

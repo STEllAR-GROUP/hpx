@@ -7,7 +7,10 @@
 #ifndef JACOBI_ROW_RANGE_HPP
 #define JACOBI_ROW_RANGE_HPP
 
+#include <boost/serialization/split_member.hpp>
 #include <boost/smart_ptr/shared_array.hpp>
+#include <boost/range/iterator.hpp>
+#include <boost/range/mutable_iterator.hpp>
 
 namespace jacobi
 {
@@ -25,7 +28,9 @@ namespace jacobi
             : begin_(b)
             , end_(e)
             , values_(values)
-        {}
+        {
+            BOOST_ASSERT(end_ > begin_);
+        }
 
         double * begin()
         {
@@ -54,13 +59,29 @@ namespace jacobi
         template <typename Archive>
         void load(Archive & ar, unsigned)
         {
-            BOOST_ASSERT(false);
+            std::vector<double> tmp;
+            ar & tmp;
+            values_.reset(new double[tmp.size()]);
+            for(std::size_t x = 0; x < tmp.size(); ++x)
+            {
+                values_[x] = tmp[x];
+            }
+            begin_ = 0;
+            end_ = tmp.size();
+            BOOST_ASSERT(end_ > begin_);
         }
 
         template <typename Archive>
         void save(Archive & ar, unsigned) const
         {
-            BOOST_ASSERT(false);
+            BOOST_ASSERT(values_);
+            std::vector<double> tmp;
+            tmp.reserve(end_-begin_);
+            for(std::ptrdiff_t x = begin_; x < end_; ++x)
+            {
+                tmp.push_back(values_[x]);
+            }
+            ar & tmp;
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()

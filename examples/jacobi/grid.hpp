@@ -7,7 +7,7 @@
 #ifndef JACOBI_GRID_HPP
 #define JACOBI_GRID_HPP
 
-#include <hpx/components/dataflow/dataflow_object.hpp>
+#include "row.hpp"
 
 #include <vector>
 
@@ -17,15 +17,20 @@ namespace jacobi
 
     struct grid
     {
+        grid() {}
         grid(std::size_t nx, std::size_t ny, double value);
 
         typedef 
-            std::vector<
-                hpx::components::dataflow_object<row>
-            >
+            std::vector<row>
             rows_type;
 
         rows_type rows;
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & rows;
+        }
     };
 }
 
