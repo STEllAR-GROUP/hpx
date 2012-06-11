@@ -45,6 +45,7 @@ namespace jacobi
             solver(component_type * back_ptr, grid const & g, std::size_t nx, std::size_t line_block)
                 : base_type(back_ptr)
                 , ny(g.rows.size())
+                , nx(nx)
                 //, stencil_iterators(g.rows.size())
             {
                 stencil_iterators.reserve(ny);
@@ -114,6 +115,7 @@ namespace jacobi
             HPX_DEFINE_COMPONENT_ACTION(solver, solver::run, run_action);
 
             std::size_t ny;
+            std::size_t nx;
             std::vector<jacobi::stencil_iterator> stencil_iterators;
         };
     }
