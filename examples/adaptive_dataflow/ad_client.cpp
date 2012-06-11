@@ -62,8 +62,10 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Create ne point components with distributing factory.
         // These components will be evenly distributed among all available
         // localities supporting the component type.
+        std::cout << " BEFORE DISTRIBUTING FACTORY " << std::endl;
         hpx::components::distributing_factory::result_type blocks =
             factory.create_components(block_type, np);
+        std::cout << " AFTER DISTRIBUTING FACTORY " << std::endl;
 
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
@@ -119,15 +121,15 @@ int hpx_main(boost::program_options::variables_map &vm)
           rtime += rhstime.elapsed();
 
           // regrid -- remove some components
-          hpx::util::high_resolution_timer regridtime;
-          {
-            std::vector<hpx::lcos::future<void> > regrid_phase;
-            for (std::size_t i=0;i<np;i++) {
-              regrid_phase.push_back(points[i].remove_item_async(step,step+1));
-            }
-            hpx::lcos::wait(regrid_phase);
-          }
-          regtime += regridtime.elapsed();
+          //hpx::util::high_resolution_timer regridtime;
+          //{
+          //  std::vector<hpx::lcos::future<void> > regrid_phase;
+          //  for (std::size_t i=0;i<np;i++) {
+          //    regrid_phase.push_back(points[i].remove_item_async(step,step+1));
+          //  }
+          //  hpx::lcos::wait(regrid_phase);
+          //}
+          //regtime += regridtime.elapsed();
           
         }
 

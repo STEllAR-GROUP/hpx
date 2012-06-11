@@ -38,6 +38,7 @@ namespace ad { namespace server
 
       neighbors_.push_back(left);
       neighbors_.push_back(right);
+      std::cout << " Initial " << item_ << std::endl;
     }
 
     void point::compute(std::vector<hpx::naming::id_type> const& point_components)
@@ -47,26 +48,34 @@ namespace ad { namespace server
       for (std::size_t i=0;i<neighbors_.size();i++) {
         lazy_results_.push_back( stubs::point::get_item_async(point_components[neighbors_[i]]) );
       }
+      std::cout << " Compute " << item_ << std::endl;
     }
 
     void point::calcrhs()
     {
+      std::cout << " Calcrhs " << item_ << std::endl;
       //hpx::util::spinlock::scoped_lock l(mtx_);
       if ( !active_ ) return;
       std::vector<std::size_t> n;
-      bool block = true;
-      for (std::size_t i=0;i<neighbors_.size();i++) {
-        if ( !(lazy_results_[i].is_ready()) ) {
-          block = false;
+
+      while( 1 ) {
+        bool ready = true;
+        for (std::size_t i=0;i<neighbors_.size();i++) {
+          if ( !(lazy_results_[i].is_ready()) ) {
+            ready = false;
+            break;
+          } 
+        }
+        
+        if ( ready ) {
+          std::cout << " READY " << item_ << std::endl;
+          hpx::lcos::wait(lazy_results_,n);  
           break;
-        } 
-      }
-      
-      if ( block ) {
-        hpx::lcos::wait(lazy_results_,n);  
-      } else {
-        // reschedule the calling thread and put it at the end of the thread queue
-        hpx::this_thread::suspend();
+        } else {
+          std::cout << " SUSPEND AGAIN " << item_ << std::endl;
+          // reschedule the calling thread and put it at the end of the thread queue
+          hpx::this_thread::suspend();
+        }
       }
 
       sum_ = item_ + n[0] + n[1];
@@ -75,6 +84,7 @@ namespace ad { namespace server
 
     std::size_t point::get_item()
     {
+      std::cout << " Get_item " << item_ << std::endl;
       //hpx::util::spinlock::scoped_lock l(mtx_);
       if ( !active_ ) return 0;
       return item_;
@@ -82,6 +92,7 @@ namespace ad { namespace server
 
     void point::remove_item(std::size_t replace,std::size_t substitute)
     {
+      std::cout << " Remove_item " << item_ << std::endl;
       //hpx::util::spinlock::scoped_lock l(mtx_);
       if ( item_ == replace ) {
         active_ = false;
