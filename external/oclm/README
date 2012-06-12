@@ -1,0 +1,5 @@
+
+oclm -- OpenCl Manager
+
+oclm is based on oclLib and attempts to ease the managemen of opencl compute resources and kernels.
+The goals are to provide a thin wrapper on top of the OpenCL C++ wrapper.
