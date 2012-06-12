@@ -1,16 +1,21 @@
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
+# Copyright (c) 2012 Daniel Kogler
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
-    general_pa_analysis
+    apply_scheduling_analysis
+    check_address_analysis
     general_apply_analysis
+    general_pa_analysis
     get_gid_analysis
    )
 
-set(general_pa_analysis_FLAGS DEPENDENCIES iostreams_component)
+set(apply_scheduling_analysis_FLAGS DEPENDENCIES iostreams_component)
+set(check_address_analysis_FLAGS DEPENDENCIES iostreams_component)
 set(general_apply_analysis_FLAGS DEPENDENCIES iostreams_component)
+set(general_pa_analysis_FLAGS DEPENDENCIES iostreams_component)
 set(get_gid_analysis_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(benchmark ${benchmarks})

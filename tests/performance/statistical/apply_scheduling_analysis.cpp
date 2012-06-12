@@ -1,3 +1,4 @@
+//  Copyright (c)      2012 Daniel Kogler
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,40 +19,42 @@ void create_packages(Vector& packages, uint64_t num, double ot){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//this runs a series of tests for a packaged_action.apply()
-template <typename Vector, typename Package, typename Action, typename T>
+//this runs a test of checking if a gid is local
+template <typename Vector, typename Package, typename Action>
 void run_tests(uint64_t);
 
 ///////////////////////////////////////////////////////////////////////////////
 //all of the measured tests are declared in this section
 
-//measure how long it takes to obtain gid from a packaged_action 
-template <typename Vector>
-void test_get_gid(Vector packages, uint64_t num, double ot){
+//measure how long it takes to register work with the thread_manager
+template <typename Vector, typename Action>
+void register_work(Vector packages, uint64_t num, double ot){
+    using namespace hpx;
     uint64_t i = 0;
-    string message = "Measuring total time required to get package gids:";
+    string message = "Measuring time required to register work with the "
+                     "thread manager:";
     vector<double> time;
     time.reserve(num);
 
+    naming::address addr;
+    agas::is_local_address(find_here(), addr);
+    naming::address::address_type lva = addr.address_;
+    util::tuple0<> env;
+    BOOST_RV_REF(HPX_STD_FUNCTION<
+        threads::thread_function_type>) func = 
+        Action::construct_thread_function(
+        lva, boost::forward<util::tuple0<> >(env));
+    applier::applier* app = applier::get_applier_ptr();
+    threads::thread_priority priority = actions::action_priority<Action>();
+    threads::thread_init_data data(boost::move(func), "<unknown>", 
+        lva, priority, std::size_t(-1));
+    threads::threadmanager_base& base = app->get_thread_manager();
+    threads::thread_state_enum state = threads::pending;
+    error_code ec = hpx::throws;
+
     for(; i < num; i++){
         high_resolution_timer t1;
-        packages[i]->get_gid();
-        time.push_back(t1.elapsed());
-    }
-    printout(time, ot, message);
-}
-
-//measure how long it takes to run get_base_gid()
-template <typename Vector>
-void test_get_base_gid(Vector packages, uint64_t num, double ot){
-    uint64_t i = 0;
-    string message = "Measuring total time required to get base gids:";
-    vector<double> time;
-    time.reserve(num);
-
-    for(; i < num; i++){
-        high_resolution_timer t1;
-        packages[i]->get_base_gid();
+        base.register_work(data, state, ec);
         time.push_back(t1.elapsed());
     }
     printout(time, ot, message);
@@ -60,7 +63,7 @@ void test_get_base_gid(Vector packages, uint64_t num, double ot){
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm){
     uint64_t num = vm["number-spawned"].as<uint64_t>();
-    run_tests<vector<void_package0*>, void_package0, void_action0, void> (num);
+    run_tests<vector<void_package0*>, void_package0, void_action0>(num);
     return hpx::finalize();
 }
 
@@ -82,17 +85,15 @@ int main(int argc, char* argv[]){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//this tests how long it takes to perform get_gid()
-template <typename Vector, typename Package, typename Action, typename T>
+
+//this tests how long is required to check if an address is local
+template <typename Vector, typename Package, typename Action>
 void run_tests(uint64_t num){
-    //uint64_t i = 0;
     double ot = timer_overhead(num);
     string message;
     vector<double> time;
     Vector packages;
     create_packages<Vector, Package>(packages, num, ot);
 
-    test_get_base_gid<Vector>(packages, num, ot);
-    test_get_gid<Vector>(packages, num, ot);
+    register_work<Vector, Action>(packages, num, ot);
 }
-
