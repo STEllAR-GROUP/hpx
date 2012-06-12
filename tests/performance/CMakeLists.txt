@@ -43,8 +43,8 @@ if(QTHREADS_FOUND)
 
   set(benchmarks
       ${benchmarks}
-      #qthreads_homogeneous_task_spawn
-      #qthreads_heterogeneous_task_spawn
+      qthreads_homogeneous_task_spawn
+      qthreads_heterogeneous_task_spawn
      )
 
   set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS

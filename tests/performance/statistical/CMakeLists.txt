@@ -6,7 +6,6 @@
 
 set(benchmarks
     apply_scheduling_analysis
-    check_address_analysis
     general_apply_analysis
     general_pa_analysis
     get_gid_analysis
