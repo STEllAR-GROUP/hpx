@@ -66,7 +66,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::distributing_factory::result_type blocks =
             factory.create_components(block_type, np);
         std::cout << " AFTER DISTRIBUTING FACTORY " << std::endl;
-
+#if 0
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
         // components we just created.
@@ -141,6 +141,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
+#endif
     } // Ensure things go out of scope before hpx::finalize is called.
 
     hpx::finalize();
