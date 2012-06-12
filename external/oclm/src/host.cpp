@@ -13,6 +13,7 @@
 namespace {
     std::vector<cl_platform_id> acquire_platforms()
     {
+        std::vector<cl_platform_id> platforms;
         /*
         cl_uint n = 0;
         cl_int err = ::clGetPlatformIDs(0, NULL, &n);
@@ -22,18 +23,18 @@ namespace {
 
         err = ::clGetPlatformIDs(n, &platforms[0], NULL);
         OCLM_THROW_IF_EXCEPTION(err, "clGetPlatformIDs");
+        */
 
         return platforms;
-        */
     }
 
     std::map<cl_platform_id, std::vector<cl_device_id> >
         acquire_devices(std::vector<cl_platform_id> const & platforms)
     {
+        std::map<cl_platform_id, std::vector<cl_device_id> > devs;
         /*
         typedef std::vector<cl_platform_id>::const_iterator platform_iterator;
 
-        std::map<cl_platform_id, std::vector<cl_device_id> > devs;
 
         for(platform_iterator it = platforms.begin(); it != platforms.end(); ++it)
         {
@@ -48,8 +49,8 @@ namespace {
             devs.insert(std::make_pair(*it, boost::move(devices)));
         }
 
-        return devs;
         */
+        return devs;
     }
 }
 

@@ -118,6 +118,12 @@ else()
   endif()
 endif()
 
+if(OPENCL_FOUND)
+  add_hpx_library_sources(hpx_external
+    GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/external/oclm/src/*.cpp"
+    APPEND)
+endif()
+
 ################################################################################
 # gather headers
 

@@ -369,6 +369,17 @@ if(HWLOC_FOUND)
 endif()
 
 ################################################################################
+# hwloc
+################################################################################
+find_package(OpenCL)
+if(OPENCL_FOUND)
+  hpx_include_sys_directories(${OPENCL_INCLUDE_DIRS})
+  hpx_include_sys_directories(external/oclm/include)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${OPENCL_LIBRARIES})
+endif()
+
+
+################################################################################
 # Qthreads (for benchmark comparisons)
 ################################################################################
 find_package(HPX_Qthreads)
