@@ -13,41 +13,53 @@ namespace jacobi
         void stencil_iterator::run(std::size_t max_iterations)
         {
             //std::cout << "beginning to run ...\n";
-            hpx::lcos::dataflow<next_action>(
+
+            hpx::apply<next_action>(
                 this->get_gid()
               , 0
               , max_iterations
-            ).get_future().get();
-
-            hpx::cout << y << ": building of dataflow tree complete ...\n" << hpx::flush;
-            for(std::size_t iter = 0; iter < max_iterations; ++iter)
+            );
+            
+            //for(std::size_t iter = 0; iter < max_iterations; ++iter)
             {
                 for(std::size_t x = 1; x < nx-1; x += line_block)
                 {
-                    std::size_t x_end = std::min(nx, x + line_block);
-                    get_dep(iter, x, x_end).get_future().get();
-                    hpx::cout << iter << ": (" << x << " " << y << "): finished\n" << hpx::flush;
+                    std::size_t x_end = std::min(nx-1, x + line_block);
+                    get_dep(max_iterations-1, x, x_end).get_future().get();
+                    //hpx::cout << iter << ": (" << x << " " << y << "): finished\n" << hpx::flush;
                 }
             }
         }
             
         hpx::lcos::dataflow_base<void> stencil_iterator::get_dep(std::size_t iter, std::size_t begin, std::size_t end)
         {
-            iteration_deps_type::mapped_type::iterator dep;
+            BOOST_ASSERT(y > 0);
+            BOOST_ASSERT(y < ny-1);
+            std::pair<std::size_t, std::size_t> range(begin, end);
             bool calc_iter_dep = false;
             {
                 hpx::util::spinlock::scoped_lock l(mtx);
-                dep = iteration_deps[iter].find(std::make_pair(begin, end));
+                iteration_deps_type::mapped_type::iterator dep
+                    = iteration_deps[iter].find(range);
 
                 if(dep == iteration_deps[iter].end())
                 {
-                    calc_iter_dep = true;
+                    auto calculated_iter = calculating_dep[iter].find(range);
+                    if(calculated_iter == calculating_dep[iter].end())
+                    {
+                        calculating_dep[iter].insert(range);
+                        calc_iter_dep = true;
+                    }
+                }
+                else
+                {
+                    return dep->second;
                 }
             }
-            hpx::lcos::dataflow_base<void> d;
             if(calc_iter_dep)
             {
                 BOOST_ASSERT(this->get_gid());
+                hpx::lcos::dataflow_base<void> d;
                 if(iter>0)
                 {
                     d =
@@ -75,15 +87,39 @@ namespace jacobi
                 {
                     hpx::util::spinlock::scoped_lock l(mtx);
                     iter_pair =
-                        iteration_deps[iter].insert(std::make_pair(std::make_pair(begin, end), d));
+                        iteration_deps[iter].insert(std::make_pair(range, d));
 
+                    BOOST_ASSERT(iter_pair.second);
+
+                    calculating_dep[iter].erase(range);
+                    /*
+                    BOOST_FOREACH(hpx::threads::thread_id_type & id, iteration_deps_wait_list[iter][range])
+                    {
+                        hpx::threads::set_thread_state(id, hpx::threads::pending);
+                    }
+                    {
+                        std::vector<hpx::threads::thread_id_type> tmp;
+                        std::swap(iteration_deps_wait_list[iter][range], tmp);
+                    }
+                    */
                 }
-                BOOST_ASSERT(iter_pair.second);
-                dep = iter_pair.first;
+                
+                return d;
             }
-            d = dep->second;
-
-            return d;
+            else
+            {
+                /*
+                {
+                    hpx::util::spinlock::scoped_lock l(mtx);
+                    iteration_deps_wait_list[iter][range].push_back(hpx::threads::get_self().get_thread_id());
+                }
+                hpx::this_thread::suspend(boost::posix_time::milliseconds(1), "example::jacobi::server::stencil_iterator::get_dep");
+                */
+                hpx::this_thread::suspend(boost::posix_time::milliseconds(1));
+                return get_dep(iter, begin, end);
+            }
+            BOOST_ASSERT(false);
+            return hpx::lcos::dataflow_base<void>();
         }
 
         void stencil_iterator::next(
@@ -101,7 +137,7 @@ namespace jacobi
             BOOST_ASSERT(bottom.id);
             for(std::size_t x = 1, x_dep = 0; x < nx-1; x += line_block, ++x_dep)
             {
-                std::size_t end = std::min(nx, x + line_block);
+                std::size_t end = std::min(nx - 1, x + line_block);
 
                 get_dep(iter, x, end);
             }
@@ -119,16 +155,15 @@ namespace jacobi
             BOOST_ASSERT(center.id);
             if(y > 0 && y < ny-1 && iter > 0)
             {
-                return
-                    hpx::lcos::dataflow<server::row::get_action>(
-                        center.id
-                      , begin
-                      , end
-                      , get_dep(iter-1, begin, end)
-                    ).get_future().get();
+                //get_dep(iter-1, begin, end).get_future().get();
             }
 
-            return center.get(begin, end).get_future().get();
+            return
+                hpx::async<server::row::get_action>(
+                    center.id
+                  , begin
+                  , end
+                ).get();
         }
     }
 }

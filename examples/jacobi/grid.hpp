@@ -15,7 +15,7 @@ namespace jacobi
 {
     struct row;
 
-    struct grid
+    struct HPX_COMPONENT_EXPORT grid
     {
         grid() {}
         grid(std::size_t nx, std::size_t ny, double value);

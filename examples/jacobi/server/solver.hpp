@@ -42,6 +42,15 @@ namespace jacobi
                 BOOST_ASSERT(false);
             }
 
+            ~solver()
+            {
+                BOOST_ASSERT(stencil_iterators.size() == ny);
+                for(std::size_t y = 0; y < ny; ++y)
+                {
+                    BOOST_ASSERT(stencil_iterators[y].id);
+                }
+            }
+
             solver(component_type * back_ptr, grid const & g, std::size_t nx, std::size_t line_block)
                 : base_type(back_ptr)
                 , ny(g.rows.size())
@@ -66,6 +75,7 @@ namespace jacobi
                 std::size_t y = 0;
                 BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(si_allocated))
                 {
+                    std::cout << y << " " << id << "\n";
                     jacobi::stencil_iterator r; r.id = id;
                     init_futures.push_back(r.init(g.rows[y], y, nx, ny, line_block));
                     stencil_iterators.push_back(r);
@@ -92,11 +102,14 @@ namespace jacobi
                         }
                     }
                 );
+                BOOST_ASSERT(stencil_iterators[0].id);
                 hpx::lcos::wait(boundary_futures);
+                BOOST_ASSERT(stencil_iterators[0].id);
             }
 
             void run(std::size_t max_iterations)
             {
+                BOOST_ASSERT(stencil_iterators[0].id);
 
                 std::vector<hpx::lcos::future<void> > run_futures;
                 run_futures.reserve(ny-2);
@@ -106,10 +119,12 @@ namespace jacobi
                 {
                     run_futures.push_back(stencil_iterators[y].run(max_iterations));
                 }
+                BOOST_ASSERT(stencil_iterators[0].id);
                 hpx::lcos::wait(run_futures);
+                BOOST_ASSERT(stencil_iterators[0].id);
                 double time_elapsed = t.elapsed();
                 hpx::cout << nx << "x" << ny << " "
-                     << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << hpx::flush;
+                     << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS\n" << hpx::flush;
             }
 
             HPX_DEFINE_COMPONENT_ACTION(solver, solver::run, run_action);

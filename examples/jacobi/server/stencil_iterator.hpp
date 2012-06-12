@@ -82,6 +82,7 @@ namespace jacobi
 
             void update(row_range dst, row_range src, row_range top, row_range bottom)
             {
+                /*
                 double * dst_ptr = dst.begin();
                 double * src_ptr = src.begin();
                 double * top_ptr = top.begin();
@@ -92,13 +93,14 @@ namespace jacobi
                     *dst_ptr
                         =(
                             *(src_ptr + 1) + *(src_ptr - 1)
-                          + *(top_ptr) + *(bottom_ptr - 1)
+                          + *(top_ptr) + *(bottom_ptr)
                         ) * 0.25;
                     ++dst_ptr;
                     ++src_ptr;
                     ++top_ptr;
                     ++bottom_ptr;
                 }
+                */
             }
 
 
@@ -127,6 +129,19 @@ namespace jacobi
                 >
                 iteration_deps_type;
             iteration_deps_type iteration_deps;
+            
+            typedef
+                std::map<
+                    std::size_t
+                  , std::map<
+                        std::pair<std::size_t, std::size_t>
+                      , std::vector<hpx::threads::thread_id_type>
+                    >
+                >
+                iteration_deps_wait_list_type;
+            iteration_deps_wait_list_type iteration_deps_wait_list;
+
+            std::map<std::size_t, std::set<std::pair<std::size_t, std::size_t> > > calculating_dep;
         };
     }
 }

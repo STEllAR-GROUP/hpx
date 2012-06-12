@@ -3,6 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(HPX_CXX11_LAMBDAS)
+
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_FUNCTION_LIMIT=15)
@@ -54,3 +56,5 @@ add_hpx_pseudo_dependencies(examples.jacobi
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.jacobi.jacobi
                             jacobi_exe)
+
+endif()

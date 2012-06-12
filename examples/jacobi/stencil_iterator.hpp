@@ -17,9 +17,11 @@ namespace jacobi
 {
     struct row;
 
-    struct stencil_iterator
+    struct HPX_COMPONENT_EXPORT stencil_iterator
     {
         stencil_iterator() {}
+
+        ~stencil_iterator() { BOOST_ASSERT(id); }
 
         hpx::lcos::future<void> init(
             jacobi::row const & r
