@@ -102,9 +102,8 @@ namespace jacobi
                         std::swap(iteration_deps_wait_list[iter][range], tmp);
                     }
                     */
+		    return d;
                 }
-                
-                return d;
             }
             else
             {
@@ -115,7 +114,7 @@ namespace jacobi
                 }
                 hpx::this_thread::suspend(boost::posix_time::milliseconds(1), "example::jacobi::server::stencil_iterator::get_dep");
                 */
-                hpx::this_thread::suspend(boost::posix_time::milliseconds(1));
+                //hpx::this_thread::suspend(boost::posix_time::milliseconds(1));
                 return get_dep(iter, begin, end);
             }
             BOOST_ASSERT(false);
@@ -156,6 +155,13 @@ namespace jacobi
             if(y > 0 && y < ny-1 && iter > 0)
             {
                 //get_dep(iter-1, begin, end).get_future().get();
+		    return
+			hpx::lcos::dataflow<server::row::get_action>(
+			    center.id
+			  , begin
+			  , end
+			  , get_dep(iter-1, begin, end)
+			);
             }
 
             return

@@ -12,6 +12,7 @@ namespace jacobi
     {
         void row::init(std::size_t nx, double init)
         {
+	    /*
             values.reset(new double[nx]);
             //std::cout << this->get_gid() << "constructing row ...\n";
             // TODO: replace with hpx::for_each
@@ -19,7 +20,7 @@ namespace jacobi
             BOOST_FOREACH(double & v, range)
             {
                 v = init;
-            }
+            }*/
         }
     }
 }

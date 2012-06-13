@@ -19,7 +19,7 @@ namespace jacobi
         std::ptrdiff_t begin_;
         std::ptrdiff_t end_;
 
-        boost::shared_array<double> values_;
+        //boost::shared_array<double> values_;
 
         row_range()
         {}
@@ -27,7 +27,7 @@ namespace jacobi
         row_range(boost::shared_array<double> values, std::ptrdiff_t b, std::ptrdiff_t e)
             : begin_(b)
             , end_(e)
-            , values_(values)
+            //, values_(values)
         {
             BOOST_ASSERT(end_ > begin_);
         }
@@ -35,30 +35,35 @@ namespace jacobi
         double * begin()
         {
             BOOST_ASSERT(values_);
-            return &values_[begin_];
+            //return &values_[begin_];
+            return 0;
         }
         
         double const * begin() const
         {
             BOOST_ASSERT(values_);
-            return &values_[begin_];
+            //return &values_[begin_];
+            return 0;
         }
 
         double * end()
         {
             BOOST_ASSERT(values_);
-            return &values_[begin_] + end_;
+            //return &values_[begin_] + end_;
+            return 0;
         }
         
         double const * end() const
         {
             BOOST_ASSERT(values_);
-            return &values_[begin_] + end_;
+            //return &values_[begin_] + end_;
+            return 0;
         }
 
         template <typename Archive>
         void load(Archive & ar, unsigned)
         {
+	    /*
             std::vector<double> tmp;
             ar & tmp;
             values_.reset(new double[tmp.size()]);
@@ -69,11 +74,13 @@ namespace jacobi
             begin_ = 0;
             end_ = tmp.size();
             BOOST_ASSERT(end_ > begin_);
+            */
         }
 
         template <typename Archive>
         void save(Archive & ar, unsigned) const
         {
+            /*
             BOOST_ASSERT(values_);
             std::vector<double> tmp;
             tmp.reserve(end_-begin_);
@@ -82,6 +89,7 @@ namespace jacobi
                 tmp.push_back(values_[x]);
             }
             ar & tmp;
+            */
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()

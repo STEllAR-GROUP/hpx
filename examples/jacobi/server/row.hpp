@@ -39,14 +39,15 @@ namespace jacobi {
 
             void init(std::size_t nx, double value = 0.0);
 
-            typedef boost::shared_array<double> values_type;
+            //typedef boost::shared_array<double> values_type;
+	    typedef double * values_type;
 
             values_type values;
 
             row_range get(std::size_t begin, std::size_t end)
             {
                 //std::cout << this->get_gid() << "row::get ...\n";
-                return row_range(values, begin, end);
+                return row_range();//(values, begin, end);
             }
 
             HPX_DEFINE_COMPONENT_ACTION(row, row::get, get_action);
