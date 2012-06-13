@@ -8,15 +8,15 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/components/distributing_factory/stubs/binpacking_factory.hpp>
+#include <hpx/components/binpacking_factory/stubs/binpacking_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The \a distributing_factory class is the client side representation of a
+    // The \a binpacking_factory class is the client side representation of a
     // concrete \a server#binpacking_factory component
-    class distributing_factory
+    class binpacking_factory
       : public client_base<binpacking_factory, stubs::binpacking_factory>
     {
     private:
