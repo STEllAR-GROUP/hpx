@@ -189,10 +189,6 @@ namespace hpx { namespace parcelset
 
         parcelport_connection_ptr client_connection;
 
-        // Get a connection or reserve space for a new connection. 
-        if (!connection_cache_.get_or_reserve(locality_id, client_connection))
-            return;
-
         // enqueue the incoming parcel ...
         {
             util::spinlock::scoped_lock l(mtx_);
@@ -209,17 +205,13 @@ namespace hpx { namespace parcelset
                 //       one parcel is cached, this fails ...
                 //BOOST_ASSERT(pp.get_destination_addr() == addr);
                 BOOST_ASSERT(pp.get_destination_addr().locality_ == addr.locality_);
-                if (client_connection)
-                {
-                    BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-                    BOOST_ASSERT(addr.locality_.get_address() ==
-                        client_connection->socket().remote_endpoint().address().to_string());
-                    BOOST_ASSERT(addr.locality_.get_port() ==
-                        client_connection->socket().remote_endpoint().port());
-                }
             }
 #endif
         }
+
+        // Get a connection or reserve space for a new connection. 
+        if (!connection_cache_.get_or_reserve(locality_id, client_connection))
+            return;
 
         // Check if we need to create the new connection.
         if (!client_connection)
@@ -280,8 +272,8 @@ namespace hpx { namespace parcelset
         }
 #if defined(HPX_DEBUG)
         else {
-//                 LPT_(info) << "parcelport: reusing existing connection to: "
-//                            << addr.locality_;
+            //LPT_(info) << "parcelport: reusing existing connection to: "
+            //           << addr.locality_;
             BOOST_ASSERT(addr.locality_ == client_connection->get_locality());
             BOOST_ASSERT(locality_id == client_connection->destination());
 
@@ -294,49 +286,21 @@ namespace hpx { namespace parcelset
 
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
-        {
-            util::spinlock::scoped_lock l(mtx_);
-            iterator it = pending_parcels_.find(locality_id);
 
-            if (it != pending_parcels_.end())
-            {
-                BOOST_ASSERT(it->first == locality_id);
-                std::swap(parcels, it->second.first);
-                std::swap(handlers, it->second.second);
-            }
+        util::spinlock::scoped_lock l(mtx_);
+        iterator it = pending_parcels_.find(locality_id);
+
+        if (it != pending_parcels_.end())
+        {
+            BOOST_ASSERT(it->first == locality_id);
+            std::swap(parcels, it->second.first);
+            std::swap(handlers, it->second.second);
         }
 
         // If the parcels didn't get sent by another connection ...
         if (!parcels.empty() && !handlers.empty())
         {
-#if defined(HPX_DEBUG)
-            // verify the connection points to the right destination
-            BOOST_FOREACH(parcel const& pp, parcels)
-            {
-                const boost::uint32_t parcel_locality_id =
-                    naming::get_locality_id_from_gid(pp.get_destination());
-                BOOST_ASSERT(parcel_locality_id == locality_id);
-                BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-                ///FIXME: addr refers to a specific component ... once more than
-                ///       one parcel is cached, this fails ...
-                ///BOOST_ASSERT(pp.get_destination_addr() == addr);
-                BOOST_ASSERT(pp.get_destination_addr().locality_ == addr.locality_);
-                BOOST_ASSERT(addr.locality_.get_address() ==
-                    client_connection->socket().remote_endpoint().address().to_string());
-                BOOST_ASSERT(addr.locality_.get_port() ==
-                    client_connection->socket().remote_endpoint().port());
-            }
-#endif
-            // store parcels in connection
-            // The parcel gets serialized inside set_parcel, no
-            // need to keep the original parcel alive after this call returned.
-            client_connection->set_parcel(parcels);
-
-            // ... start an asynchronous write operation now.
-            client_connection->async_write(
-                detail::call_for_each(handlers),
-                boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1)
-            );
+            send_pending_parcels(client_connection, parcels, handlers);
         }
         else
         {
@@ -357,36 +321,20 @@ namespace hpx { namespace parcelset
 
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
+
+        typedef pending_parcels_map::iterator iterator;
+        
+        util::spinlock::scoped_lock l(mtx_);
+        iterator it = pending_parcels_.find(locality_id);
+
+        if (it != pending_parcels_.end())
         {
-            typedef pending_parcels_map::iterator iterator;
-
-            util::spinlock::scoped_lock l(mtx_);
-            iterator it = pending_parcels_.find(locality_id);
-
-            if (it != pending_parcels_.end())
-            {
-                std::swap(parcels, it->second.first);
-                std::swap(handlers, it->second.second);
-            }
+            std::swap(parcels, it->second.first);
+            std::swap(handlers, it->second.second);
         }
 
         if (!parcels.empty() && !handlers.empty())
         {
-#if defined(HPX_DEBUG)
-            // verify the connection points to the right destination
-            BOOST_FOREACH(parcel const& p, parcels)
-            {
-                const boost::uint32_t parcel_locality_id =
-                    naming::get_locality_id_from_gid(p.get_destination());
-                BOOST_ASSERT(parcel_locality_id == locality_id);
-                BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-                BOOST_ASSERT(p.get_destination_addr().locality_.get_address() ==
-                    client_connection->socket().remote_endpoint().address().to_string());
-                BOOST_ASSERT(p.get_destination_addr().locality_.get_port() ==
-                    client_connection->socket().remote_endpoint().port());
-            }
-#endif
-
             // create a new thread which sends parcels that might still be pending
             hpx::applier::register_thread_nullary(
                 HPX_STD_BIND(&parcelport::send_pending_parcels, this,
