@@ -54,10 +54,10 @@ void frob(char * begin, size_t len) {
 class thread {
 public:
   thread(acceptor_type* acceptor,
-	 endpoint_type* endpoint,
-	 int index,
-	 int counter,
-	 int token_size) :
+     endpoint_type* endpoint,
+     int index,
+     int counter,
+     int token_size) :
     m_sink(acceptor->io_service()),
     m_source(acceptor->io_service()),
     m_index(index),
@@ -67,46 +67,46 @@ public:
     for(int i=0; i<token_size; i++) m_token[i] = 0;
     //std::cout <<"[Thread "<<m_index<<"]: Accept or connect in progress...\n";
     acceptor->async_accept(m_sink,
-			   boost::bind(&thread::ready,
-				       this,
-				       &m_accept_error,
-				       error));
+               boost::bind(&thread::ready,
+                       this,
+                       &m_accept_error,
+                       error));
 
     m_source.async_connect(*endpoint,
-			   boost::bind(&thread::ready,
-				       this,
-				       &m_connect_error,
-				       error));
+               boost::bind(&thread::ready,
+                       this,
+                       &m_connect_error,
+                       error));
   }
 
   void ready(error_type* to, error_type from) {
     *to = from;
     if(m_accept_error && m_connect_error) {
       if(*m_accept_error || *m_connect_error) {
-	//std::cout <<"[Thread "<<m_index<<"]: Accept/connect error\n";
-	m_source.io_service().interrupt();
+    //std::cout <<"[Thread "<<m_index<<"]: Accept/connect error\n";
+    m_source.io_service().interrupt();
       } else {
 
-	//std::cout<<"[Thread "<<m_index<<"] :receiving token"<<std::endl;
-	boost::asio::async_read(m_source,
-				boost::asio::buffer(m_token, m_token_size),
-				boost::bind(&thread::main,
-					    this,
-					    &m_read_error,
-					    error,
-					    bytes_transferred));
+    //std::cout<<"[Thread "<<m_index<<"] :receiving token"<<std::endl;
+    boost::asio::async_read(m_source,
+                boost::asio::buffer(m_token, m_token_size),
+                boost::bind(&thread::main,
+                        this,
+                        &m_read_error,
+                        error,
+                        bytes_transferred));
 
-	//std::cout<<"[Thread "<<m_index<<"] :sending token"<<std::endl;
-	boost::asio::async_write(m_sink,
-				 boost::asio::buffer(m_token, m_token_size),
-				 boost::bind(&thread::main,
-					     this,
-					     &m_write_error,
-					     error,
-					     bytes_transferred));
+    //std::cout<<"[Thread "<<m_index<<"] :sending token"<<std::endl;
+    boost::asio::async_write(m_sink,
+                 boost::asio::buffer(m_token, m_token_size),
+                 boost::bind(&thread::main,
+                         this,
+                         &m_write_error,
+                         error,
+                         bytes_transferred));
 
-	//std::cout <<"[Thread "<<m_index<<"]: Accept and connect completed\n";
-	main(&m_read_error, error_type(), size_t());
+    //std::cout <<"[Thread "<<m_index<<"]: Accept and connect completed\n";
+    main(&m_read_error, error_type(), size_t());
       }
     }
   }
@@ -118,8 +118,8 @@ public:
 
     if(m_write_error) {
       if(*m_write_error) {
-	//std::cout<<"[Thread "<<m_index<<"] :error while writing, exiting..."<<std::endl;
-	m_source.io_service().interrupt();
+    //std::cout<<"[Thread "<<m_index<<"] :error while writing, exiting..."<<std::endl;
+    m_source.io_service().interrupt();
       }
       //std::cout<<"[Thread "<<m_index<<"] :token sent"<<std::endl;
       m_write_error = error_type();
@@ -128,31 +128,31 @@ public:
 
       //std::cout<<"[Thread "<<m_index<<"] :sending token"<<std::endl;
       boost::asio::async_write(m_sink,
-			       boost::asio::buffer(m_token, m_token_size),
-			       boost::bind(&thread::main,
-					   this,
-					   &m_write_error,
-					   error,
-					   bytes_transferred));
+                   boost::asio::buffer(m_token, m_token_size),
+                   boost::bind(&thread::main,
+                       this,
+                       &m_write_error,
+                       error,
+                       bytes_transferred));
       m_counter --;
     }
 
     if(m_read_error) {
       if(*m_read_error) {
-	//std::cout<<"[Thread "<<m_index<<"] :error while readin, exiting..."<<std::endl;
-	m_source.io_service().interrupt();
+    //std::cout<<"[Thread "<<m_index<<"] :error while readin, exiting..."<<std::endl;
+    m_source.io_service().interrupt();
       }
       //std::cout<<"[Thread "<<m_index<<"] :token read"<<std::endl;
       m_read_error = error_type();
 
       //std::cout<<"[Thread "<<m_index<<"] :receiving token"<<std::endl;
       boost::asio::async_read(m_source,
-			      boost::asio::buffer(m_token, m_token_size),
-			      boost::bind(&thread::main,
-					  this,
-					  &m_read_error,
-					  error,
-					  bytes_transferred));
+                  boost::asio::buffer(m_token, m_token_size),
+                  boost::bind(&thread::main,
+                      this,
+                      &m_read_error,
+                      error,
+                      bytes_transferred));
 
     }
   }
@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
     endpoint_vector.push_back
       (endpoint_type
        (boost::asio::ip::address_v4::from_string("127.0.0.1"),
-	base_port + i));
+    base_port + i));
     acceptor_vector.push_back
       (boost::shared_ptr<acceptor_type>
        (new acceptor_type(demuxer)));
@@ -202,18 +202,18 @@ int main(int argc, char** argv) {
   }
 
   thread_vector.push_back(boost::shared_ptr<thread>
-			  (new thread(&*acceptor_vector.back(),
-				      &endpoint_vector.back(),
-				      0,
-				      count,
-				      token_size)));
+              (new thread(&*acceptor_vector.back(),
+                      &endpoint_vector.back(),
+                      0,
+                      count,
+                      token_size)));
   for(int i=1; i< count_2; i++) {
     thread_vector.push_back(boost::shared_ptr<thread>
-			    (new thread(&*acceptor_vector.at(i-1),
-					&endpoint_vector.at(i-1),
-					i,
-					count,
-					token_size)));
+                (new thread(&*acceptor_vector.at(i-1),
+                    &endpoint_vector.at(i-1),
+                    i,
+                    count,
+                    token_size)));
   }
   demuxer.run();
 }

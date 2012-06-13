@@ -53,9 +53,9 @@ namespace coro = boost::coroutines;
 
 typedef boost::asio::error error_type;
 void thread(thread_type::self& self,
-	    acceptor_type* acceptor,
-	    endpoint_type* endpoint,
-	    int index, int counter, int token_size){
+        acceptor_type* acceptor,
+        endpoint_type* endpoint,
+        int index, int counter, int token_size){
   // std::cout<<"running\n";
   boost::shared_ptr<char> token_(new char[token_size]);
   char * token = token_.get();
@@ -66,10 +66,10 @@ void thread(thread_type::self& self,
   coro::future<error_type> connect_error(self);
 
   acceptor->async_accept(sink,
-			 coro::make_callback(accept_error));
+             coro::make_callback(accept_error));
 
   source.async_connect(*endpoint,
-		       coro::make_callback(connect_error));
+               coro::make_callback(connect_error));
 
   coro::wait_all(connect_error, accept_error);
 
@@ -81,20 +81,20 @@ void thread(thread_type::self& self,
   coro::future<error_type, std::size_t> write_error(self);
 
   boost::asio::async_read(source,
-			  boost::asio::buffer(token, token_size),
-			  coro::make_callback(read_error));
+              boost::asio::buffer(token, token_size),
+              coro::make_callback(read_error));
 
   boost::asio::async_write(sink,
-			   boost::asio::buffer(token, token_size),
-			   coro::make_callback(write_error));
+               boost::asio::buffer(token, token_size),
+               coro::make_callback(write_error));
 
   while(counter) {
     //   std::cout<<counter<<std::endl;
 
     if(write_error) {
       if(write_error->get<0>()) {
-	// std::cout<<"[Thread "<<index<<"] :error while writing, exiting..."<<std::endl;
-	break;
+    // std::cout<<"[Thread "<<index<<"] :error while writing, exiting..."<<std::endl;
+    break;
       }
       // std::cout<<"[Thread "<<index<<"] :token sent"<<std::endl;
       write_error = boost::none;
@@ -102,23 +102,23 @@ void thread(thread_type::self& self,
       frob(token, token_size);
       // std::cout<<"[Thread "<<index<<"] :sending token"<<std::endl;
       boost::asio::async_write(sink,
-			       boost::asio::buffer(token, token_size),
-			       coro::make_callback(write_error));
+                   boost::asio::buffer(token, token_size),
+                   coro::make_callback(write_error));
       counter--;
 
     }
 
     if(read_error) {
       if(read_error->get<0>()) {
-	// std::cout<<"[Thread "<<index<<"] :error while readin, exiting..."<<std::endl;
-	break;
+    // std::cout<<"[Thread "<<index<<"] :error while readin, exiting..."<<std::endl;
+    break;
       }
       // std::cout<<"[Thread "<<index<<"] :token read"<<std::endl;
       read_error = boost::none;
       // std::cout<<"[Thread "<<index<<"] :reading token"<<std::endl;
       boost::asio::async_read(source,
-			      boost::asio::buffer(token, token_size),
-			      coro::make_callback(read_error));
+                  boost::asio::buffer(token, token_size),
+                  coro::make_callback(read_error));
     }
 
     BOOST_ASSERT(!(read_error || write_error));
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
     endpoint_vector.push_back
       (endpoint_type
        (boost::asio::ip::address_v4::from_string("127.0.0.1"),
-	base_port + i));
+    base_port + i));
     acceptor_vector.push_back
       (boost::shared_ptr<acceptor_type>
        (new acceptor_type(demuxer)));
@@ -162,29 +162,29 @@ int main(int argc, char** argv) {
 
   // not for the faint of heart:
   demuxer.post(boost::bind                  // bind the std::nothrow object...
-	       (thread_type                 // ... to the operator() of shared_coroutine ...
-		(boost::bind                // ... constructed from ...
-		 (thread,                   // ... the 'thread' function ...
-		  _1,                       // ... that takes a self paramter ...
-		  &*acceptor_vector.back(), // ... and whose acceptor, ...
-		  &endpoint_vector.back(),  // ... endpoint, ...
-		  0,                        // ... id, ...
-		  count,                    // ... count ...
-		  token_size)),             // ... and token_size arguments, are bound to local objects.
-		std::nothrow));
+           (thread_type                 // ... to the operator() of shared_coroutine ...
+        (boost::bind                // ... constructed from ...
+         (thread,                   // ... the 'thread' function ...
+          _1,                       // ... that takes a self paramter ...
+          &*acceptor_vector.back(), // ... and whose acceptor, ...
+          &endpoint_vector.back(),  // ... endpoint, ...
+          0,                        // ... id, ...
+          count,                    // ... count ...
+          token_size)),             // ... and token_size arguments, are bound to local objects.
+        std::nothrow));
 
   for(int i=1; i< count_2; i++) {
     demuxer.post(boost::bind
-		 (thread_type
-		  (boost::bind
-		   (thread,
-		    _1,
-		    &*acceptor_vector.at(i-1),
-		    &endpoint_vector.at(i-1),
-		    i,
-		    count,
-		    token_size)),
-		  std::nothrow));
+         (thread_type
+          (boost::bind
+           (thread,
+            _1,
+            &*acceptor_vector.at(i-1),
+            &endpoint_vector.at(i-1),
+            i,
+            count,
+            token_size)),
+          std::nothrow));
   }
   demuxer.run();
  }

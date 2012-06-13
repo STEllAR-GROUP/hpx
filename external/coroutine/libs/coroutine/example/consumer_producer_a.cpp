@@ -85,6 +85,6 @@ int main() {
        _1,
        generator_type
        (boost::bind
-	(producer, _1, std::string("hello"))))));
+    (producer, _1, std::string("hello"))))));
 
 }

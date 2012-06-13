@@ -8,24 +8,24 @@ public:
 
 int foo()
 {
-	std::cerr << boost::trace() << std::endl;
-	return 10;
+    std::cerr << boost::trace() << std::endl;
+    return 10;
 }
 
 int bar()
 {
-	return foo()+20;
+    return foo()+20;
 }
 
 
 int main()
 {
-	try {
-		std::cout << bar() << std::endl;
-	}
-	catch(my_exception const &e)
-	{
-		std::cerr << e.what() << std::endl;
-		std::cerr << boost::trace(e) << std::endl;
-	}
+    try {
+        std::cout << bar() << std::endl;
+    }
+    catch(my_exception const &e)
+    {
+        std::cerr << e.what() << std::endl;
+        std::cerr << boost::trace(e) << std::endl;
+    }
 }

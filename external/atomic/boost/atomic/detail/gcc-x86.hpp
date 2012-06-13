@@ -365,12 +365,12 @@ public:
         memory_order failure_order) volatile
     {
 #ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
-		T prev = __sync_val_compare_and_swap_8(&i, expected, desired);
-		bool success=(prev==expected);
-		if (success) fence_after(success_order);
-		else fence_after(failure_order);
-		expected=prev;
-		return success;
+        T prev = __sync_val_compare_and_swap_8(&i, expected, desired);
+        bool success=(prev==expected);
+        if (success) fence_after(success_order);
+        else fence_after(failure_order);
+        expected=prev;
+        return success;
 #else
         long scratch;
         fence_before(success_order);
@@ -395,7 +395,7 @@ public:
             "lock; cmpxchg8b 0(%4)\n"
             "movl %1, %%ebx\n"
             : "=A" (prev), "=m" (scratch)
-			: "D" ((long)desired), "c" ((long)((boost::uint64_t)desired>>32)), "S" (&i), "0" (prev)
+            : "D" ((long)desired), "c" ((long)((boost::uint64_t)desired>>32)), "S" (&i), "0" (prev)
             : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);

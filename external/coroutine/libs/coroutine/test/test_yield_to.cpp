@@ -39,9 +39,9 @@ struct my_parm {};
 typedef coroutine<my_result(my_parm)> coroutine_type;
 
 my_result coro(coroutine_type& other,
-	       int id,
-	       coroutine_type::self& self,
-	       my_parm parm) {
+           int id,
+           coroutine_type::self& self,
+           my_parm parm) {
   int i = 10;
   my_result t;
   while(--i) {

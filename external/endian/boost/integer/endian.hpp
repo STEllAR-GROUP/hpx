@@ -151,7 +151,7 @@ namespace boost
         operator T() const
           { return detail::load_big_endian<T, n_bits/8>(bytes); }
       private:
-  	    char bytes[n_bits/8];
+          char bytes[n_bits/8];
     };
 
     template <typename T, std::size_t n_bits>
@@ -166,7 +166,7 @@ namespace boost
         operator T() const
           { return detail::load_little_endian<T, n_bits/8>(bytes); }
       private:
-  	    char bytes[n_bits/8];
+          char bytes[n_bits/8];
     };
 
     template <typename T, std::size_t n_bits>
@@ -187,7 +187,7 @@ namespace boost
           { return detail::load_little_endian<T, n_bits/8>(bytes); }
 #     endif
       private:
-  	    char bytes[n_bits/8];
+          char bytes[n_bits/8];
     };
 
     //  Specializations that mimic built-in integer types.
@@ -211,7 +211,7 @@ namespace boost
           { return detail::load_big_endian<T, sizeof(T)>(&integer); }
     #endif
       private:
-  	    T integer;
+          T integer;
     };
 
     template <typename T, std::size_t n_bits>
@@ -233,7 +233,7 @@ namespace boost
           { return detail::load_little_endian<T, sizeof(T)>(&integer); }
     #endif
       private:
-  	    T integer;
+          T integer;
     };
 
   //  naming convention typedefs  --------------------------------------------//

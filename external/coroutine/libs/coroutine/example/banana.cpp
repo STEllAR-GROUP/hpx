@@ -49,9 +49,9 @@ bool match(Iter first, Iter last, std::string match) {
 template<typename BidirectionalIterator>
 BidirectionalIterator
 match_substring(BidirectionalIterator begin,
-		BidirectionalIterator end,
-		std::string xmatch,
-		BOOST_DEDUCED_TYPENAME coroutine<BidirectionalIterator(void)>::self& self) {
+        BidirectionalIterator end,
+        std::string xmatch,
+        BOOST_DEDUCED_TYPENAME coroutine<BidirectionalIterator(void)>::self& self) {
   BidirectionalIterator begin_ = begin;
   for(; begin != end; ++begin)
     if(match(begin, end, xmatch)) {
@@ -68,16 +68,16 @@ int main(int, char**) {
   std::string::iterator end = buffer.end();
 
   typedef std::string::iterator signature(std::string::iterator,
-					  std::string::iterator,
-					  std::string,
-					  coroutine_type::self&);
+                      std::string::iterator,
+                      std::string,
+                      coroutine_type::self&);
 
   coroutine<std::string::iterator(void)> matcher
       (boost::bind(static_cast<signature*>(match_substring),
-		   begin,
-		   end,
-		   match,
-		   _1));
+           begin,
+           end,
+           match,
+           _1));
 
   std::string::iterator i = matcher();
   while(matcher && i != buffer.end()) {

@@ -41,8 +41,8 @@ typedef coroutine<void(const std::string&)> consumer_type;
 typedef coroutine<void()> producer_type;
 
 void producer_body(producer_type::self& self,
-		   std::string base,
-		   consumer_type& consumer) {
+           std::string base,
+           consumer_type& consumer) {
   std::sort(base.begin(), base.end());
   do {
     self.yield_to(consumer, base);
@@ -50,8 +50,8 @@ void producer_body(producer_type::self& self,
 }
 
 void consumer_body(consumer_type::self& self,
-		   const std::string& value,
-		   producer_type& producer) {
+           const std::string& value,
+           producer_type& producer) {
   std::cout << value << "\n";
   while(true) {
     std::cout << self.yield_to(producer) << "\n";
@@ -69,16 +69,16 @@ int main() {
     producer = producer_type
       (boost::bind
        (producer_body,
-	_1,
-	"hello",
-	boost::ref(consumer)));
+    _1,
+    "hello",
+    boost::ref(consumer)));
 
     consumer = consumer_type
       (boost::bind
        (consumer_body,
-	_1,
-	_2,
-	boost::ref(producer)));
+    _1,
+    _2,
+    boost::ref(producer)));
 
     producer();
   }
@@ -90,16 +90,16 @@ int main() {
     consumer = consumer_type
       (boost::bind
        (consumer_body,
-	_1,
-	_2,
-	boost::ref(producer)));
+    _1,
+    _2,
+    boost::ref(producer)));
 
     producer = producer_type
       (boost::bind
        (producer_body,
-	_1,
-	"hello",
-	boost::ref(consumer)));
+    _1,
+    "hello",
+    boost::ref(consumer)));
 
     consumer(std::string());
   }

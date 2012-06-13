@@ -140,6 +140,6 @@ int test_main(int, char *[]) {
     std::cout << "running test for " << g_run_test_secs << " secs " << std::endl;
     do_sleep( g_run_test_secs * 1000 );
     std::cout << "done " << std::endl;
-	return 0;
+    return 0;
 }
 

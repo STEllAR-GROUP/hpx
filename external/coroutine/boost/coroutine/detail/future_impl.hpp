@@ -92,7 +92,7 @@ namespace boost { namespace coroutines { namespace detail {
       m_optional = val;
       p->count_down();
       if(waited() && p->signal())
-	p->wake_up();
+    p->wake_up();
     }
 
     void mark_pending() {

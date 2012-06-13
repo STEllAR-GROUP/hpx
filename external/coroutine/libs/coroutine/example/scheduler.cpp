@@ -51,7 +51,7 @@ public:
     while(!m_queue.empty()) {
       current()(std::nothrow);
       if(current())
-	add(current());
+    add(current());
       m_queue.pop();
     }
   }
