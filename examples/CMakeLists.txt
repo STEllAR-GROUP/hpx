@@ -9,6 +9,7 @@ set(subdirs
     1d_hydro
     accumulator
     adaptive1d
+    adaptive_dataflow
     async_io
     balancing
     bfs
