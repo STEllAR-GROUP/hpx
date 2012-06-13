@@ -15,7 +15,7 @@
 
 namespace jacobi
 {
-    struct row
+    struct HPX_API_EXPORT row
     {
         row() {}
         
