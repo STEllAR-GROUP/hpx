@@ -148,8 +148,8 @@ namespace jacobi
               , max_iterations
             );
         }
-        
-        row_range stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
+            
+        hpx::lcos::dataflow_base<row_range> stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
         {
             BOOST_ASSERT(this->get_gid());
             BOOST_ASSERT(center.id);
@@ -159,11 +159,11 @@ namespace jacobi
             }
 
             return
-                hpx::async<server::row::get_action>(
+                hpx::lcos::dataflow<server::row::get_action>(
                     center.id
                   , begin
                   , end
-                ).get();
+                );
         }
     }
 }

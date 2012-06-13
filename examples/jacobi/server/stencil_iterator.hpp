@@ -78,9 +78,17 @@ namespace jacobi
 
             hpx::lcos::dataflow_base<void> get_dep(std::size_t iter, std::size_t begin, std::size_t end);
             
-            row_range get(std::size_t iter, std::size_t begin, std::size_t end);
+            hpx::lcos::dataflow_base<row_range> get(std::size_t iter, std::size_t begin, std::size_t end);
 
-            void update(row_range dst, row_range src, row_range top, row_range bottom)
+            void get_neighbors(
+                hpx::lcos::dataflow_base<row_range> const & top
+              , hpx::lcos::dataflow_base<row_range> const & bottom
+              , std::size_t iter
+              , std::size_t begin
+              , std::size_t end
+            );
+
+            void update(row_range dst, row_range src, hpx::lcos::dataflow_base<row_range> top, hpx::lcos::dataflow_base<row_range> bottom)
             {
                 /*
                 double * dst_ptr = dst.begin();

@@ -34,7 +34,7 @@ namespace jacobi
 
         hpx::lcos::future<void> run(std::size_t max_iterations);
 
-        hpx::lcos::dataflow_base<row_range> get(std::size_t iter, std::size_t begin, std::size_t end);
+        hpx::lcos::dataflow_base<hpx::lcos::dataflow_base<row_range> > get(std::size_t iter, std::size_t begin, std::size_t end);
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
