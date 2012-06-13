@@ -38,16 +38,16 @@ bool matcher(coroutine<bool(char)>::self& self, char c) {
     if(c == 'h') {
       c = self.yield(false);
       if(c == 'e') {
-	c = self.yield(false);
-	if(c == 'l') {
-	  c = self.yield(false);
-	  if(c == 'l') {
-	    c = self.yield(false);
-	    if(c == 'o') {
-	      c = self.yield(true);
-	    } continue;
-	  } else continue;
-	} else continue;
+    c = self.yield(false);
+    if(c == 'l') {
+      c = self.yield(false);
+      if(c == 'l') {
+        c = self.yield(false);
+        if(c == 'o') {
+          c = self.yield(true);
+        } continue;
+      } else continue;
+    } else continue;
       } else continue;
     } c = self.yield(false);
   }

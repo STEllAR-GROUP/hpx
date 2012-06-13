@@ -43,11 +43,11 @@ namespace boost { namespace coroutines {
     template<typename Category, typename ValueType>
     struct make_std_iterator {
       typedef std::iterator<Category,
-			    ValueType,
-			    std::ptrdiff_t,
-			    BOOST_DEDUCED_TYPENAME boost::remove_reference<ValueType>::type *, //pointer
-			    BOOST_DEDUCED_TYPENAME boost::remove_reference<ValueType>::type & //reference
-			    > type;
+                ValueType,
+                std::ptrdiff_t,
+                BOOST_DEDUCED_TYPENAME boost::remove_reference<ValueType>::type *, //pointer
+                BOOST_DEDUCED_TYPENAME boost::remove_reference<ValueType>::type & //reference
+                > type;
     };
   }
 
@@ -56,11 +56,11 @@ namespace boost { namespace coroutines {
   // interface. It also models to the AdaptableGenerator concept.
   // Finally it is ConvertibleToBool.
   template<typename ValueType,
-	   typename Coroutine =
-	   shared_coroutine<ValueType()> >
+       typename Coroutine =
+       shared_coroutine<ValueType()> >
   class generator : public boost::mpl::eval_if<boost::is_same<ValueType, void>,
-					       boost::mpl::identity<detail::empty>,
-					       detail::make_std_iterator<
+                           boost::mpl::identity<detail::empty>,
+                           detail::make_std_iterator<
     std::input_iterator_tag,
     typename Coroutine::result_type> >::type {
     typedef void(generator::*safe_bool)();
@@ -133,8 +133,8 @@ namespace boost { namespace coroutines {
 
     typedef BOOST_DEDUCED_TYPENAME
     boost::mpl::if_<boost::is_same<value_type, void>,
-		    optional_void,
-		    boost::optional<value_type> >::type optional_type;
+            optional_void,
+            boost::optional<value_type> >::type optional_type;
 
     template<typename T>
     optional_type assign(detail::tag<T>) {

@@ -97,7 +97,7 @@ bool is_leaf(const tree_element& x) {
 template<typename Left, typename Right>
 tree_element make_tree(meta::node<Left, Right> const&) {
   return tree_element(node(make_tree(Left()),
-			   make_tree(Right())));
+               make_tree(Right())));
 }
 
 template<int A>

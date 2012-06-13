@@ -94,7 +94,7 @@ namespace meta {
 namespace boost {
   template<typename Element>
   std::ostream& operator<<(std::ostream& out,
-			   const std::pair<Element, Element>& x) {
+               const std::pair<Element, Element>& x) {
     out << "("<< x.first << ", " << x.second<<")";
     return out;
   }
@@ -103,8 +103,8 @@ namespace boost {
 
 typedef int leaf;
 typedef boost::make_recursive_variant<leaf,
-				      std::pair<boost::recursive_variant_,
-						boost::recursive_variant_>
+                      std::pair<boost::recursive_variant_,
+                        boost::recursive_variant_>
 >::type element;
 typedef std::pair<element, element> node;
 
@@ -116,7 +116,7 @@ bool is_leaf(const element& x) {
 template<typename Left, typename Right>
 element make_tree(meta::node<Left, Right> const&) {
   return node(make_tree(Left()),
-	      make_tree(Right()));
+          make_tree(Right()));
 }
 
 template<int A>

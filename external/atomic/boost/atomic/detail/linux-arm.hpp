@@ -67,7 +67,7 @@ static inline void fence_after(memory_order order)
 template<typename T>
 class atomic_linux_arm_4 {
 
-	typedef int (kernel_cmpxchg_t)(T oldval, T newval, volatile T *ptr);
+    typedef int (kernel_cmpxchg_t)(T oldval, T newval, volatile T *ptr);
 #    define BOOST_ATOMIC_KERNEL_CMPXCHG (*(kernel_cmpxchg_t *)0xffff0fc0)
     // Returns 0 if *ptr was changed.
 
@@ -96,7 +96,7 @@ public:
         // Also it seems that when an ll/sc implementation is used the kernel
         // loops until the store succeeds.
         bool success = BOOST_ATOMIC_KERNEL_CMPXCHG(expected,desired,&i)==0;
-		if (!success) expected = load(memory_order_relaxed);
+        if (!success) expected = load(memory_order_relaxed);
         return success;
     }
     bool compare_exchange_weak(

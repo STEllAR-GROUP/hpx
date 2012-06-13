@@ -196,9 +196,9 @@ v0.9.0, 28 oct 2007
   - filters are declared with BOOST_DECLARE_LOG_FILTER, and defined with BOOST_DEFINE_LOG_FILTER
   - filters are now used with operator->, instead of "."
   - Example:
-		BOOST_DEFINE_LOG_LEVEL(g_log_level(), level::holder )
-		...
-		g_log_level()->set_enabled(level::error);
+        BOOST_DEFINE_LOG_LEVEL(g_log_level(), level::holder )
+        ...
+        g_log_level()->set_enabled(level::error);
   - rationale: filters, same as levels, could be used before main
 
 

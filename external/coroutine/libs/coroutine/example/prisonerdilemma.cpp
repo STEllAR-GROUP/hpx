@@ -68,8 +68,8 @@ void add_score(score_type& x, option a, option b) {
 }
 
 score_type play(coroutine_type plr1,
-		coroutine_type plr2,
-		size_t iterations) {
+        coroutine_type plr2,
+        size_t iterations) {
   score_type score(0,0);
   option a = cooperate;
   option b = cooperate;
@@ -127,27 +127,27 @@ int main() {
   (void)scores;
   const int rounds = 100;
   std::cout << play(coroutine_type(always_cooperate),
-		    coroutine_type(always_cooperate),
-		    rounds)<<"\n";
+            coroutine_type(always_cooperate),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(always_cooperate),
-		    coroutine_type(always_defect),
-		    rounds)<<"\n";
+            coroutine_type(always_defect),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(always_defect),
-		    coroutine_type(always_defect),
-		    rounds)<<"\n";
+            coroutine_type(always_defect),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(always_cooperate),
-		    coroutine_type(random_result),
-		    rounds)<<"\n";
+            coroutine_type(random_result),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(always_defect),
-		    coroutine_type(random_result),
-		    rounds)<<"\n";
+            coroutine_type(random_result),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(tit_for_tat),
-		    coroutine_type(always_cooperate),
-		    rounds)<<"\n";
+            coroutine_type(always_cooperate),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(tit_for_tat),
-		    coroutine_type(always_defect),
-		    rounds)<<"\n";
+            coroutine_type(always_defect),
+            rounds)<<"\n";
   std::cout << play(coroutine_type(tit_for_tat),
-		    coroutine_type(random_result),
-		    rounds)<<"\n";
+            coroutine_type(random_result),
+            rounds)<<"\n";
 }

@@ -141,6 +141,6 @@ int main(int argc, char * argv[])
 
     dir_spec spec(dir, ext);
     spec.iterate();
-	return 0;
+    return 0;
 }
 

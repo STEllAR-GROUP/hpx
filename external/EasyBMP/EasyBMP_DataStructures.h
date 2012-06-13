@@ -62,12 +62,14 @@ inline ebmpDWORD FlipDWORD( ebmpDWORD in )
 // at once (as we can count on them being continuous 
 // in memory
 
-typedef struct RGBApixel {
-	ebmpBYTE Blue;
-	ebmpBYTE Green;
-	ebmpBYTE Red;
-	ebmpBYTE Alpha;
-} RGBApixel; 
+struct RGBApixel {
+ RGBApixel(): Blue(0), Green(0), Red(0), Alpha(0) {}
+
+ ebmpBYTE Blue;
+ ebmpBYTE Green;
+ ebmpBYTE Red;
+ ebmpBYTE Alpha;
+}; 
 
 class BMFH{
 public:

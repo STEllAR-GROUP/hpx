@@ -295,7 +295,7 @@ int test_main(int, char *[]) {
     thread t(&get_snapshot_thread);
 
     do_sleep(g_run_period_secs * 1000);
-	return 0;
+    return 0;
 }
 
 

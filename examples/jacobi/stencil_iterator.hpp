@@ -17,7 +17,7 @@ namespace jacobi
 {
     struct row;
 
-    struct stencil_iterator
+    struct HPX_API_EXPORT stencil_iterator
     {
         stencil_iterator() {}
 

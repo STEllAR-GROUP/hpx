@@ -42,31 +42,31 @@ void fsm_regexp(coroutine_type::self& self, char) {
       std::cout << '0';
       self.yield();
       if(self.result() == '1') {
-	std::cout << '0';
-	self.yield();
-	while(self.result() == '1') {
-	  std::cout << '0';
-	  self.yield();
-	}
-	std::cout <<'0';
-	self.yield();
-	if(self.result() == '1') {
-	  std::cout << '0';
-	  self.yield();
-	  if(self.result() == '0') {
-	    std::cout << '1';
-	    self.yield();
-	  } else {
-	    std::cout <<'0';
-	    self.yield();
-	  }
-	} else {
-	  std::cout <<'0';
-	  self.yield();
-	}
+    std::cout << '0';
+    self.yield();
+    while(self.result() == '1') {
+      std::cout << '0';
+      self.yield();
+    }
+    std::cout <<'0';
+    self.yield();
+    if(self.result() == '1') {
+      std::cout << '0';
+      self.yield();
+      if(self.result() == '0') {
+        std::cout << '1';
+        self.yield();
       } else {
-	std::cout << '0';
-	self.yield();
+        std::cout <<'0';
+        self.yield();
+      }
+    } else {
+      std::cout <<'0';
+      self.yield();
+    }
+      } else {
+    std::cout << '0';
+    self.yield();
       }
     } else {
       std::cout <<'0';

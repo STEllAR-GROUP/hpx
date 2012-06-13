@@ -32,6 +32,6 @@ int main(int argc, char* argv[])
     write_to_dll_logs();
 
     L_EXE_ << "end of exe log " << ++i;
-	return 0;
+    return 0;
 }
 
