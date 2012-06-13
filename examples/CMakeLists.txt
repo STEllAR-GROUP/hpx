@@ -17,7 +17,6 @@ set(subdirs
     nbody
     performance_counters
     quickstart
-    throttle
    )
 
 if(HDF5_CPP_FOUND)
