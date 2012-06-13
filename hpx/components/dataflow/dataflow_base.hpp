@@ -11,7 +11,7 @@
 #include <hpx/components/dataflow/dataflow_base_impl.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 #include <hpx/components/dataflow/stubs/dataflow.hpp>
-#include <boost/serialization/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 namespace hpx { namespace lcos 
 {
@@ -48,7 +48,7 @@ namespace hpx { namespace lcos
     private:
         friend class boost::serialization::access;
 
-        boost::shared_ptr<detail::dataflow_base_impl> impl;
+        boost::intrusive_ptr<detail::dataflow_base_impl> impl;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

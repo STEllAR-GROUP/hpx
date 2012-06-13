@@ -16,6 +16,7 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_base_impl
     {
         dataflow_base_impl()
+            : count_(0)
         {}
 
         virtual ~dataflow_base_impl()
@@ -23,6 +24,7 @@ namespace hpx { namespace lcos { namespace detail
 
         dataflow_base_impl(lcos::future<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
+            , count_(0)
         {}
 
         void connect(naming::id_type const & id) const
@@ -46,6 +48,8 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         friend class boost::serialization::access;
+        
+        boost::detail::atomic_count count_;
 
         template <typename Archive>
         void load(Archive & ar, unsigned)
@@ -66,6 +70,16 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
+    
+    friend void intrusive_ptr_add_ref(dataflow_base_impl * p)
+    {
+        ++p->count_;
+    }
+    friend void intrusive_ptr_release(dataflow_base_impl * p)
+    {
+        if (0 == --p->count_)
+            delete p;
+    }
     };
 }}}
 

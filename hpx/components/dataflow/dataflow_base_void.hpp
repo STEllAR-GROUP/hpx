@@ -46,7 +46,7 @@ namespace hpx { namespace lcos
     private:
         friend class boost::serialization::access;
 
-        boost::shared_ptr<detail::dataflow_base_impl> impl;
+        boost::intrusive_ptr<detail::dataflow_base_impl> impl;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
