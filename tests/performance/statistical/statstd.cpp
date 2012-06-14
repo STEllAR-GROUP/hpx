@@ -29,7 +29,7 @@ double timer_overhead(uint64_t iterations){
     }
     for(uint64_t i = 0; i < iterations; i++) total += record[i];
     if(!csv){
-        cout<<"Using "<< num <<" iterations:\n";
+        cout<<"Using "<<iterations<<" iterations:\n";
         cout<<"\nAverage overhead of taking timed measurements: "<<
             total/iterations*1e9<<" ns\n";
         cout<<"NOTE - this value will be subtracted from all subsequent timings.\n";

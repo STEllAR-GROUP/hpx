@@ -56,7 +56,7 @@ void register_work(Vector packages, uint64_t num, double ot){
     threads::thread_init_data data(boost::move(func), "<unknown>", 
         lva, priority, std::size_t(-1));
     threads::threadmanager_base& base = app->get_thread_manager();
-    threads::thread_state_enum state = threads::pending;
+    threads::thread_state_enum state = threads::suspended;
     error_code ec = hpx::throws;
 
     high_resolution_timer t;
@@ -67,6 +67,9 @@ void register_work(Vector packages, uint64_t num, double ot){
         base.register_work(data, state, ec);
         time.push_back(t1.elapsed());
     }
+    printf("before_abort\n");
+    base.abort_all_suspended_threads();
+    printf("after_abort\n");
     printout(time, ot, mean, message);
 }
 
