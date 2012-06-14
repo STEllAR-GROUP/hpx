@@ -45,15 +45,17 @@ namespace ad { namespace server
     {
      // hpx::util::spinlock::scoped_lock l(mtx_);
       if ( !active_ ) return;
+      typedef std::vector<hpx::lcos::future< std::size_t > > lazy_results_type;
+      lazy_results_type lazy_results;
+
       for (std::size_t i=0;i<neighbors_.size();i++) {
-        lazy_results_.push_back( stubs::point::get_item_async(point_components[neighbors_[i]]) );
+        lazy_results.push_back( stubs::point::get_item_async(point_components[neighbors_[i]]) );
       }
 
       std::vector<std::size_t> n;
-      hpx::lcos::wait(lazy_results_,n);  
+      hpx::lcos::wait(lazy_results,n);  
 
       sum_ = item_ + n[0] + n[1];
-      lazy_results_.resize(0);
 
       //std::cout << " Compute " << item_ << std::endl;
     }
@@ -72,7 +74,6 @@ namespace ad { namespace server
       //hpx::util::spinlock::scoped_lock l(mtx_);
       if ( item_ == replace ) {
         active_ = false;
-        lazy_results_.resize(0);
         neighbors_.resize(0);
       }
       for (std::size_t i=0;i<neighbors_.size();i++) {

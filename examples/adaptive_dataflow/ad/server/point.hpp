@@ -100,8 +100,6 @@ namespace ad { namespace server
         std::size_t item_;
         std::vector<std::size_t> neighbors_;
         std::size_t sum_;
-        typedef std::vector<hpx::lcos::future< std::size_t > > lazy_results_type;
-        lazy_results_type lazy_results_;
     };
 }}
 
