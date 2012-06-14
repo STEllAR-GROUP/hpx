@@ -40,9 +40,5 @@ HPX_REGISTER_ACTION_EX(
     ad_point_get_item_action);
 
 HPX_REGISTER_ACTION_EX(
-    ad_point_type::wrapped_type::calcrhs_action,
-    ad_point_calcrhs_action);
-
-HPX_REGISTER_ACTION_EX(
     ad_point_type::wrapped_type::remove_item_action,
     ad_point_remove_item_action);

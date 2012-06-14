@@ -44,20 +44,6 @@ namespace ad { namespace stubs
         }
 
         static hpx::lcos::future<void>
-        calcrhs_async(hpx::naming::id_type const& gid)
-        {
-            typedef server::point::calcrhs_action action_type;
-            return hpx::async<action_type>(gid);
-        }
-
-        static void calcrhs(hpx::naming::id_type const& gid)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the future.
-            calcrhs_async(gid).get();
-        }
-
-        static hpx::lcos::future<void>
         compute_async(hpx::naming::id_type const& gid,
                 std::vector<hpx::naming::id_type> const& point_components)
         {

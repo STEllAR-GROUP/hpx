@@ -85,7 +85,6 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         double gtime = 0.0;
         double ctime = 0.0;
-        double rtime = 0.0;
         double regtime = 0.0;
 
         std::vector<std::size_t> available_components;
@@ -108,16 +107,6 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
           ctime += computetime.elapsed();
 
-          hpx::util::high_resolution_timer rhstime;
-          {
-            std::vector<hpx::lcos::future<void> > rhs_phase;
-            for (std::size_t i=0;i<np;i++) {
-              rhs_phase.push_back(points[i].calcrhs_async());
-            }
-            hpx::lcos::wait(rhs_phase);
-          }
-          rtime += rhstime.elapsed();
-
           // regrid -- remove some components
           //hpx::util::high_resolution_timer regridtime;
           //{
@@ -134,7 +123,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << " init time: " << k1time << std::endl;
         std::cout << " gid  time: " << gtime << std::endl;
         std::cout << " compute time: " << ctime << std::endl;
-        std::cout << " rhs time: " << rtime << std::endl;
         std::cout << " remove time: " << regtime << std::endl;
 
         // Print the total walltime that the computation took.

@@ -58,18 +58,6 @@ namespace ad
             this->base_type::remove_item(gid_,scale,np);
         }
 
-        hpx::lcos::future<void> calcrhs_async()
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::calcrhs_async(gid_);
-        }
-
-        void calcrhs()
-        {
-            BOOST_ASSERT(gid_);
-            this->base_type::calcrhs(gid_);
-        }
-
         hpx::lcos::future<void> compute_async(
                   std::vector<hpx::naming::id_type> const& point_components)
         {

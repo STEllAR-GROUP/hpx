@@ -48,38 +48,14 @@ namespace ad { namespace server
       for (std::size_t i=0;i<neighbors_.size();i++) {
         lazy_results_.push_back( stubs::point::get_item_async(point_components[neighbors_[i]]) );
       }
-      //std::cout << " Compute " << item_ << std::endl;
-    }
 
-    void point::calcrhs()
-    {
-      //std::cout << " Calcrhs " << item_ << std::endl;
-      //hpx::util::spinlock::scoped_lock l(mtx_);
-      if ( !active_ ) return;
       std::vector<std::size_t> n;
-
-      while( 1 ) {
-        bool ready = true;
-        for (std::size_t i=0;i<neighbors_.size();i++) {
-          if ( !(lazy_results_[i].is_ready()) ) {
-            ready = false;
-            break;
-          } 
-        }
-        
-        if ( ready ) {
-          //std::cout << " READY " << item_ << std::endl;
-          hpx::lcos::wait(lazy_results_,n);  
-          break;
-        } else {
-          //std::cout << " SUSPEND AGAIN " << item_ << std::endl;
-          // reschedule the calling thread and put it at the end of the thread queue
-          hpx::this_thread::suspend();
-        }
-      }
+      hpx::lcos::wait(lazy_results_,n);  
 
       sum_ = item_ + n[0] + n[1];
       lazy_results_.resize(0);
+
+      //std::cout << " Compute " << item_ << std::endl;
     }
 
     std::size_t point::get_item()

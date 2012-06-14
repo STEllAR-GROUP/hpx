@@ -29,7 +29,6 @@ namespace ad { namespace server
         // Exposed functionality of this component.
 
         void init(std::size_t item,std::size_t np);
-        void calcrhs();
         void compute(std::vector<hpx::naming::id_type> const& point_components);
         std::size_t get_item();
         void remove_item(std::size_t replace,std::size_t substitute);
@@ -44,8 +43,7 @@ namespace ad { namespace server
             point_init = 0,
             point_compute = 1,
             point_get_item = 2,
-            point_calcrhs = 3,
-            point_remove_item = 4
+            point_remove_item = 3
         };
 
         typedef hpx::actions::action2<
@@ -71,16 +69,6 @@ namespace ad { namespace server
             // Method bound to this action.
             &point::remove_item
         > remove_item_action;
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            point,
-            // Action code.
-            point_calcrhs,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::calcrhs
-        > calcrhs_action;
 
         typedef hpx::actions::action1<
             // Component server type.
@@ -129,10 +117,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     ad::server::point::get_item_action,
     ad_point_get_item_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    ad::server::point::calcrhs_action,
-    ad_point_calcrhs_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     ad::server::point::remove_item_action,
