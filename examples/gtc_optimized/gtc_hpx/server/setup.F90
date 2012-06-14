@@ -764,6 +764,8 @@ end subroutine broadcast_input_params
 
 ! particle domain communicator (for communications between the particle
 ! domains WITHIN the same toroidal domain)
+  !print*,' TEST toroidal location ', toroidal_domain_location,mype
+  !print*,' TEST particle location ', particle_domain_location
 !*  call MPI_COMM_SPLIT(MPI_COMM_WORLD,toroidal_domain_location,&
 !*                      particle_domain_location,partd_comm,ierror)
 
@@ -782,16 +784,29 @@ end subroutine broadcast_input_params
 !       ' myrank_toroidal=',myrank_toroidal,'  nproc_partd=',nproc_partd,&
 !       ' myrank_partd=',myrank_partd
 
-  if(nproc_partd/=npartdom)then
-    write(0,*)'*** nproc_partd=',nproc_partd,' NOT EQUAL to npartdom=',npartdom
-!    call MPI_ABORT(MPI_COMM_WORLD,1,ierror)
-  endif
+  ! component ids for communications between the particle
+  ! domains WITHIN the same toroidal domain
 
-  if(nproc_toroidal/=ntoroidal)then
-    write(0,*)'*** nproc_toroidal=',nproc_toroidal,' NOT EQUAL to ntoroidal=',&
-              ntoroidal
+  ! component ids for for communications BETWEEN toroidal domains of same
+  ! particle domain number
+
+  myrank_toroidal = toroidal_domain_location
+  myrank_partd = particle_domain_location
+
+  if ( myrank_toroidal .gt. particle_domain_location ) then
+    myrank_toroidal = particle_domain_location
+  end if
+
+!  if(nproc_partd/=npartdom)then
+!    write(0,*)'*** nproc_partd=',nproc_partd,' NOT EQUAL to npartdom=',npartdom
 !    call MPI_ABORT(MPI_COMM_WORLD,1,ierror)
-  endif
+!  endif
+
+!  if(nproc_toroidal/=ntoroidal)then
+!    write(0,*)'*** nproc_toroidal=',nproc_toroidal,' NOT EQUAL to ntoroidal=',&
+!              ntoroidal
+!    call MPI_ABORT(MPI_COMM_WORLD,1,ierror)
+!  endif
 
 ! We now find the toroidal neighbors of the current toroidal domain and
 ! store that information in 2 easily accessible variables. This information
@@ -803,5 +818,7 @@ end subroutine broadcast_input_params
 
   left_pe=mod(myrank_toroidal-1+ntoroidal,ntoroidal)
   right_pe=mod(myrank_toroidal+1,ntoroidal)
+  !print*,' TEST left_pe ', left_pe
+  !print*,' TEST right_pe ',right_pe
 
 end subroutine set_particle_decomp

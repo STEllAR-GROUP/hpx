@@ -19,6 +19,7 @@
 #include <fstream>
 
 extern "C" {void FNAME(setup)(int *,int *); }
+extern "C" {void FNAME(load)(); }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
@@ -28,6 +29,8 @@ namespace gtc { namespace server
       int t1 = numberpe;
       int t2 = mype;
       FNAME(setup)(&t1,&t2);
+
+      FNAME(load)();
     }
 }}
 

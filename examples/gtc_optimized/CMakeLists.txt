@@ -5,7 +5,7 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 
-set(CMAKE_Fortran_FLAGS "-fdefault-real-8 -DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
+set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
 
 add_subdirectory(gtc_hpx)
 
