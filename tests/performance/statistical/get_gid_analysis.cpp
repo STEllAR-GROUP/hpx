@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Vector, typename Package>
-void create_packages(Vector& packages, uint64_t num, double ot){
+void create_packages(Vector& packages, uint64_t num){
     uint64_t i = 0;
     packages.reserve(num);
 
@@ -29,37 +29,48 @@ void run_tests(uint64_t);
 template <typename Vector>
 void test_get_gid(Vector packages, uint64_t num, double ot){
     uint64_t i = 0;
+    double mean;
     string message = "Measuring total time required to get package gids:";
     vector<double> time;
     time.reserve(num);
 
-    for(; i < num; i++){
+    high_resolution_timer t;
+    for(; i < num; ++i)
+        packages[i]->get_gid();
+    mean = t.elapsed()/num;
+    for(i = 0; i < num; i++){
         high_resolution_timer t1;
         packages[i]->get_gid();
         time.push_back(t1.elapsed());
     }
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
 }
 
 //measure how long it takes to run get_base_gid()
 template <typename Vector>
 void test_get_base_gid(Vector packages, uint64_t num, double ot){
     uint64_t i = 0;
+    double mean;
     string message = "Measuring total time required to get base gids:";
     vector<double> time;
     time.reserve(num);
 
-    for(; i < num; i++){
+    high_resolution_timer t;
+    for(; i < num; i++)
+        packages[i]->get_base_gid();
+    mean = t.elapsed()/num;
+    for(i = 0; i < num; i++){
         high_resolution_timer t1;
         packages[i]->get_base_gid();
         time.push_back(t1.elapsed());
     }
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm){
     uint64_t num = vm["number-spawned"].as<uint64_t>();
+    csv = (vm.count("csv") ? true : false);
     run_tests<vector<void_package0*>, void_package0, void_action0, void> (num);
     return hpx::finalize();
 }
@@ -74,7 +85,10 @@ int main(int argc, char* argv[]){
         ("number-spawned,N",
             boost::program_options::value<uint64_t>()
                 ->default_value(500000),
-            "number of packaged_actions created and run");
+            "number of packaged_actions created and run")
+        ("csv",
+            "output results as csv "
+            "(format:count,mean,accurate mean,variance,min,max)");
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
@@ -90,7 +104,7 @@ void run_tests(uint64_t num){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     test_get_base_gid<Vector>(packages, num, ot);
     test_get_gid<Vector>(packages, num, ot);

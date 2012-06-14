@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Vector, typename Package>
-void create_packages(Vector& packages, uint64_t num, double ot){
+void create_packages(Vector& packages, uint64_t num){
     uint64_t i = 0;
     packages.reserve(num);
 
@@ -35,57 +35,25 @@ void run_tests(bool, uint64_t, T, T, T, T);
 
 //base case, just call apply.  used as control to validate other results
 
-//first measure the time it takes to apply the logger. It's mostly here for 
-//completion's sake, as the impact is very small
-void apply_profiler(uint64_t num, double ot, hpx::naming::id_type const& gid){
-    struct tag{};
-    uint64_t i = 0;
-    string message = "Measuring time to apply profiler logger for each action:";
-    vector<double> time;
-    time.reserve(num);
-    hpx::util::block_profiler<tag> apply_logger_ = "packaged_action";
-    
-    for(; i < num; i++){
-        high_resolution_timer t1;
-        hpx::util::block_profiler_wrapper<tag> bp(apply_logger_);
-        time.push_back(t1.elapsed());
-    }
-    printout(time, ot, message);
-}
-
-//next measure how long it takes to extract type information from the action
-template <typename Action>
-void apply_extraction(uint64_t num, double ot){
-    uint64_t i = 0;
-    string message = "Measuring time required to extract type information:";
-    vector<double> time;
-    time.reserve(num);
-    typedef typename hpx::actions::extract_action<Action>::type action_type;
-
-    for(; i < num; i++){
-        high_resolution_timer t1;
-        typedef 
-            typename hpx::actions::extract_action<action_type>::result_type
-            result_type;
-        time.push_back(t1.elapsed());
-    }
-    printout(time, ot, message);
-}
-
 //next measure how long it takes to obtain gids of packages
 template <typename Vector>
 void apply_get_gid(Vector packages, uint64_t num, double ot){
     uint64_t i = 0;
+    double mean;
     string message = "Measuring time required to get package gids:";
     vector<double> time;
     time.reserve(num);
 
-    for(; i < num; i++){
+    high_resolution_timer t;
+    for(; i < num; i++)
+        packages[i]->get_gid();
+    mean = t.elapsed()/num;
+    for(i = 0; i < num; i++){
         high_resolution_timer t1;
         packages[i]->get_gid();
         time.push_back(t1.elapsed());
     }
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
 }
 
 //here measures the time it takes to create continuations
@@ -94,18 +62,27 @@ void apply_create_continuations(VectorP packages, VectorC& continuations,
                                 uint64_t num, double ot){
     typedef hpx::actions::base_lco_continuation<Result> rc_type;
     uint64_t i = 0;
+    double mean;
     string message = "Measuring time required to create continuations:";
     vector<double> time;
+    vector<hpx::naming::id_type> cgids;
+    rc_type* temp;
+    for(; i < num; i++)
+        cgids.push_back(packages[i]->get_gid());
+    high_resolution_timer t;
+    for(i = 0; i < num; i++)
+        temp = new rc_type(cgids[i]);
+    mean = t.elapsed()/num;
+    cgids.clear();
     time.reserve(num);
     continuations.reserve(num);
-
-    for(; i < num; ++i){
+    for(i = 0; i < num; ++i){
         const hpx::naming::id_type cgid = packages[i]->get_gid();
         high_resolution_timer t1;
         continuations.push_back(new rc_type(cgid));
         time.push_back(t1.elapsed());
     }
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
 }
 
 
@@ -134,6 +111,7 @@ int hpx_main(variables_map& vm){
     bool rtype = (vm.count("result-action") ? true : false);
     string atype = vm["arg-type"].as<string>();
     int c = vm["argc"].as<int>();
+    csv = (vm.count("csv") ? true : false);
     parse_arg(atype, rtype, num, c);
     return hpx::finalize();
 }
@@ -161,7 +139,10 @@ int main(int argc, char* argv[]){
         ("argc,C",
             boost::program_options::value<int>()
                 ->default_value(2),
-            "the number of arguments each action takes");
+            "the number of arguments each action takes")
+        ("csv",
+            "output results as csv "
+            "(format:count,mean,accurate mean,variance,min,max)");
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
@@ -297,29 +278,28 @@ void run_tests(bool empty, uint64_t num){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
     hpx::naming::id_type lid = hpx::find_here();
-    time.reserve(num);
     //first measure base case
-    for(; i < num; ++i){
+    high_resolution_timer t;
+    for(; i < num; ++i) packages[i]->apply(lid);
+    double mean = t.elapsed()/num;
+    packages.clear();
+    create_packages<Vector, Package>(packages, num);
+    time.reserve(num);
+    for(i = 0; i < num; ++i){
         high_resolution_timer t1;
         packages[i]->apply(lid);
         time.push_back(t1.elapsed());
     }
     message = "Measuring time required to apply packaged_actions by calling "
               "packaged_action.apply():";
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
     time.clear();
 
     //now we begin measuring the individual components
     packages.clear();
-    create_packages<Vector, Package>(packages, num, ot);
-
-    //first measures applying profiler logger
-    apply_profiler(num, ot, lid);
-
-    //second measures extracting type information
-    apply_extraction<Action>(num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     //third measures getting gid's from packages
     apply_get_gid<Vector>(packages, num, ot);
@@ -336,29 +316,35 @@ void run_tests(bool empty, uint64_t num){
         apply_create_continuations<Vector, vector<rc_type*>, result_type>
             (packages, continuations, num, ot);
 
-        time.reserve(num);
-        i = 0;
-        message = "Measuring time required to apply continuations directly:";
         //finally apply the continuations directly
-        for(; i < num; i++){
+        high_resolution_timer tt;
+        for(i = 0; i < num; i++) 
+            hpx::apply<action_type>(lid);
+        mean = tt.elapsed()/num;
+        time.reserve(num);
+        message = "Measuring time required to apply continuations directly:";
+
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<action_type>(lid);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
     else{
         //next test applies actions directly, skipping get_gid stage
+        high_resolution_timer tt;
+        for(i = 0; i < num; ++i)
+            hpx::apply<Action>(lid);
+        mean = tt.elapsed()/num;
         time.reserve(num);
-        i = 0;
         message = "Measuring time required to apply actions directly:";
-
-        for(; i < num; i++){
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<Action>(lid);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
 }
 template <typename Vector, typename Package, typename Action, typename T>
@@ -368,29 +354,28 @@ void run_tests(bool empty, uint64_t num, T a1){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
     hpx::naming::id_type lid = hpx::find_here();
-    time.reserve(num);
     //first measure base case
-    for(; i < num; ++i){
+    high_resolution_timer t;
+    for(; i < num; ++i) packages[i]->apply(lid, a1);
+    double mean = t.elapsed()/num;
+    packages.clear();
+    create_packages<Vector, Package>(packages, num);
+    time.reserve(num);
+    for(i = 0; i < num; ++i){
         high_resolution_timer t1;
         packages[i]->apply(lid, a1);
         time.push_back(t1.elapsed());
     }
     message = "Measuring time required to apply packaged_actions by calling "
               "packaged_action.apply():";
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
     time.clear();
 
     //now we begin measuring the individual components
     packages.clear();
-    create_packages<Vector, Package>(packages, num, ot);
-
-    //first measures applying profiler logger
-    apply_profiler(num, ot, lid);
-
-    //second measures extracting type information
-    apply_extraction<Action>(num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     //third measures getting gid's from packages
     apply_get_gid<Vector>(packages, num, ot);
@@ -407,29 +392,35 @@ void run_tests(bool empty, uint64_t num, T a1){
         apply_create_continuations<Vector, vector<rc_type*>, result_type>
             (packages, continuations, num, ot);
 
-        time.reserve(num);
-        i = 0;
-        message = "Measuring time required to apply continuations directly:";
         //finally apply the continuations directly
-        for(; i < num; i++){
+        high_resolution_timer tt;
+        for(i = 0; i < num; i++) 
+            hpx::apply<action_type>(lid, a1);
+        mean = tt.elapsed()/num;
+        time.reserve(num);
+        message = "Measuring time required to apply continuations directly:";
+
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<action_type>(lid, a1);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
     else{
         //next test applies actions directly, skipping get_gid stage
+        high_resolution_timer tt;
+        for(i = 0; i < num; ++i)
+            hpx::apply<Action>(lid, a1);
+        mean = tt.elapsed()/num;
         time.reserve(num);
-        i = 0;
         message = "Measuring time required to apply actions directly:";
-
-        for(; i < num; i++){
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<Action>(lid, a1);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
 }
 template <typename Vector, typename Package, typename Action, typename T>
@@ -439,29 +430,28 @@ void run_tests(bool empty, uint64_t num, T a1, T a2){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
     hpx::naming::id_type lid = hpx::find_here();
-    time.reserve(num);
     //first measure base case
-    for(; i < num; ++i){
+    high_resolution_timer t;
+    for(; i < num; ++i) packages[i]->apply(lid, a1, a2);
+    double mean = t.elapsed()/num;
+    packages.clear();
+    create_packages<Vector, Package>(packages, num);
+    time.reserve(num);
+    for(i = 0; i < num; ++i){
         high_resolution_timer t1;
         packages[i]->apply(lid, a1, a2);
         time.push_back(t1.elapsed());
     }
     message = "Measuring time required to apply packaged_actions by calling "
               "packaged_action.apply():";
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
     time.clear();
 
     //now we begin measuring the individual components
     packages.clear();
-    create_packages<Vector, Package>(packages, num, ot);
-
-    //first measures applying profiler logger
-    apply_profiler(num, ot, lid);
-
-    //second measures extracting type information
-    apply_extraction<Action>(num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     //third measures getting gid's from packages
     apply_get_gid<Vector>(packages, num, ot);
@@ -478,29 +468,35 @@ void run_tests(bool empty, uint64_t num, T a1, T a2){
         apply_create_continuations<Vector, vector<rc_type*>, result_type>
             (packages, continuations, num, ot);
 
-        time.reserve(num);
-        i = 0;
-        message = "Measuring time required to apply continuations directly:";
         //finally apply the continuations directly
-        for(; i < num; i++){
+        high_resolution_timer tt;
+        for(i = 0; i < num; i++) 
+            hpx::apply<action_type>(lid, a1, a2);
+        mean = tt.elapsed()/num;
+        time.reserve(num);
+        message = "Measuring time required to apply continuations directly:";
+
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<action_type>(lid, a1, a2);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
     else{
         //next test applies actions directly, skipping get_gid stage
+        high_resolution_timer tt;
+        for(i = 0; i < num; ++i)
+            hpx::apply<Action>(lid, a1, a2);
+        mean = tt.elapsed()/num;
         time.reserve(num);
-        i = 0;
         message = "Measuring time required to apply actions directly:";
-
-        for(; i < num; i++){
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<Action>(lid, a1, a2);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
 }
 template <typename Vector, typename Package, typename Action, typename T>
@@ -510,29 +506,28 @@ void run_tests(bool empty, uint64_t num, T a1, T a2, T a3){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
     hpx::naming::id_type lid = hpx::find_here();
-    time.reserve(num);
     //first measure base case
-    for(; i < num; ++i){
+    high_resolution_timer t;
+    for(; i < num; ++i) packages[i]->apply(lid, a1, a2, a3);
+    double mean = t.elapsed()/num;
+    packages.clear();
+    create_packages<Vector, Package>(packages, num);
+    time.reserve(num);
+    for(i = 0; i < num; ++i){
         high_resolution_timer t1;
         packages[i]->apply(lid, a1, a2, a3);
         time.push_back(t1.elapsed());
     }
     message = "Measuring time required to apply packaged_actions by calling "
               "packaged_action.apply():";
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
     time.clear();
 
     //now we begin measuring the individual components
     packages.clear();
-    create_packages<Vector, Package>(packages, num, ot);
-
-    //first measures applying profiler logger
-    apply_profiler(num, ot, lid);
-
-    //second measures extracting type information
-    apply_extraction<Action>(num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     //third measures getting gid's from packages
     apply_get_gid<Vector>(packages, num, ot);
@@ -549,29 +544,35 @@ void run_tests(bool empty, uint64_t num, T a1, T a2, T a3){
         apply_create_continuations<Vector, vector<rc_type*>, result_type>
             (packages, continuations, num, ot);
 
-        time.reserve(num);
-        i = 0;
-        message = "Measuring time required to apply continuations directly:";
         //finally apply the continuations directly
-        for(; i < num; i++){
+        high_resolution_timer tt;
+        for(i = 0; i < num; i++) 
+            hpx::apply<action_type>(lid, a1, a2, a3);
+        mean = tt.elapsed()/num;
+        time.reserve(num);
+        message = "Measuring time required to apply continuations directly:";
+
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<action_type>(lid, a1, a2, a3);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
     else{
         //next test applies actions directly, skipping get_gid stage
+        high_resolution_timer tt;
+        for(i = 0; i < num; ++i)
+            hpx::apply<Action>(lid, a1, a2, a3);
+        mean = tt.elapsed()/num;
         time.reserve(num);
-        i = 0;
         message = "Measuring time required to apply actions directly:";
-
-        for(; i < num; i++){
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<Action>(lid, a1, a2, a3);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
 }
 template <typename Vector, typename Package, typename Action, typename T>
@@ -581,29 +582,28 @@ void run_tests(bool empty, uint64_t num, T a1, T a2, T a3, T a4){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
     hpx::naming::id_type lid = hpx::find_here();
-    time.reserve(num);
     //first measure base case
-    for(; i < num; ++i){
+    high_resolution_timer t;
+    for(; i < num; ++i) packages[i]->apply(lid, a1, a2, a3, a4);
+    double mean = t.elapsed()/num;
+    packages.clear();
+    create_packages<Vector, Package>(packages, num);
+    time.reserve(num);
+    for(i = 0; i < num; ++i){
         high_resolution_timer t1;
         packages[i]->apply(lid, a1, a2, a3, a4);
         time.push_back(t1.elapsed());
     }
     message = "Measuring time required to apply packaged_actions by calling "
               "packaged_action.apply():";
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
     time.clear();
 
     //now we begin measuring the individual components
     packages.clear();
-    create_packages<Vector, Package>(packages, num, ot);
-
-    //first measures applying profiler logger
-    apply_profiler(num, ot, lid);
-
-    //second measures extracting type information
-    apply_extraction<Action>(num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     //third measures getting gid's from packages
     apply_get_gid<Vector>(packages, num, ot);
@@ -620,28 +620,34 @@ void run_tests(bool empty, uint64_t num, T a1, T a2, T a3, T a4){
         apply_create_continuations<Vector, vector<rc_type*>, result_type>
             (packages, continuations, num, ot);
 
-        time.reserve(num);
-        i = 0;
-        message = "Measuring time required to apply continuations directly:";
         //finally apply the continuations directly
-        for(; i < num; i++){
+        high_resolution_timer tt;
+        for(i = 0; i < num; i++) 
+            hpx::apply<action_type>(lid, a1, a2, a3, a4);
+        mean = tt.elapsed()/num;
+        time.reserve(num);
+        message = "Measuring time required to apply continuations directly:";
+
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<action_type>(lid, a1, a2, a3, a4);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
     else{
         //next test applies actions directly, skipping get_gid stage
+        high_resolution_timer tt;
+        for(i = 0; i < num; ++i)
+            hpx::apply<Action>(lid, a1, a2, a3, a4);
+        mean = tt.elapsed()/num;
         time.reserve(num);
-        i = 0;
         message = "Measuring time required to apply actions directly:";
-
-        for(; i < num; i++){
+        for(i = 0; i < num; i++){
             high_resolution_timer t1;
             hpx::apply<Action>(lid, a1, a2, a3, a4);
             time.push_back(t1.elapsed());
         }
-        printout(time, ot, message);
+        printout(time, ot, mean, message);
     }
 }

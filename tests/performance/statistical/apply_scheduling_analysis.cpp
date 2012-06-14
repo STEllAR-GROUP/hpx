@@ -9,7 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Vector, typename Package>
-void create_packages(Vector& packages, uint64_t num, double ot){
+void create_packages(Vector& packages, uint64_t num){
     uint64_t i = 0;
     packages.reserve(num);
 
@@ -23,6 +23,12 @@ void create_packages(Vector& packages, uint64_t num, double ot){
 template <typename Vector, typename Package, typename Action>
 void run_tests(uint64_t);
 
+namespace hpx { namespace threads {
+    std::ptrdiff_t get_default_stack_size(){
+        return get_runtime().get_config().get_default_stack_size();
+    }
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 //all of the measured tests are declared in this section
 
@@ -31,6 +37,7 @@ template <typename Vector, typename Action>
 void register_work(Vector packages, uint64_t num, double ot){
     using namespace hpx;
     uint64_t i = 0;
+    double mean;
     string message = "Measuring time required to register work with the "
                      "thread manager:";
     vector<double> time;
@@ -52,17 +59,21 @@ void register_work(Vector packages, uint64_t num, double ot){
     threads::thread_state_enum state = threads::pending;
     error_code ec = hpx::throws;
 
-    for(; i < num; i++){
+    high_resolution_timer t;
+    for(; i < num; ++i) base.register_work(data, state, ec);
+    mean = t.elapsed()/num;
+    for(i = 0; i < num; i++){
         high_resolution_timer t1;
         base.register_work(data, state, ec);
         time.push_back(t1.elapsed());
     }
-    printout(time, ot, message);
+    printout(time, ot, mean, message);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm){
     uint64_t num = vm["number-spawned"].as<uint64_t>();
+    csv = (vm.count("csv") ? true : false);
     run_tests<vector<void_package0*>, void_package0, void_action0>(num);
     return hpx::finalize();
 }
@@ -77,7 +88,10 @@ int main(int argc, char* argv[]){
         ("number-spawned,N",
             boost::program_options::value<uint64_t>()
                 ->default_value(500000),
-            "number of packaged_actions created and run");
+            "number of packaged_actions created and run")
+        ("csv",
+            "output results as csv "
+            "(format:count,mean,accurate mean,variance,min,max)");
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
@@ -93,7 +107,7 @@ void run_tests(uint64_t num){
     string message;
     vector<double> time;
     Vector packages;
-    create_packages<Vector, Package>(packages, num, ot);
+    create_packages<Vector, Package>(packages, num);
 
     register_work<Vector, Action>(packages, num, ot);
 }
