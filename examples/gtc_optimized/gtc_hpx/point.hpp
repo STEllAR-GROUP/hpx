@@ -34,16 +34,30 @@ namespace gtc
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        hpx::lcos::future<void> setup_async(std::size_t numberpe,std::size_t mype)
+        hpx::lcos::future<void> setup_async(std::size_t numberpe,std::size_t mype,
+                              std::vector<hpx::naming::id_type> const& point_components)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::setup_async(gid_,numberpe,mype);
+            return this->base_type::setup_async(gid_,numberpe,mype,point_components);
         }
 
-        void setup(std::size_t numberpe,std::size_t mype)
+        void setup(std::size_t numberpe,std::size_t mype,
+                   std::vector<hpx::naming::id_type> const& point_components)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::setup(gid_,numberpe,mype);
+            this->base_type::setup(gid_,numberpe,mype,point_components);
+        }
+
+        hpx::lcos::future<void> chargei_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::chargei_async(gid_);
+        }
+
+        void chargei()
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::chargei(gid_);
         }
     };
 }

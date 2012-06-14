@@ -28,7 +28,9 @@ namespace gtc { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void setup(std::size_t numberpe,std::size_t mype);
+        void setup(std::size_t numberpe,std::size_t mype,
+                   std::vector<hpx::naming::id_type> const& point_components);
+        void chargei();
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -37,10 +39,11 @@ namespace gtc { namespace server
         /// Action codes.
         enum actions
         {
-            point_setup = 0
+            point_setup = 0,
+            point_chargei = 1
         };
 
-        typedef hpx::actions::action2<
+        typedef hpx::actions::action3<
             // Component server type.
             point,
             // Action code.
@@ -48,13 +51,24 @@ namespace gtc { namespace server
             // Arguments of this action.
             std::size_t,
             std::size_t,
+            std::vector<hpx::naming::id_type> const&,
             // Method bound to this action.
             &point::setup
         > setup_action;
 
+        typedef hpx::actions::action0<
+            // Component server type.
+            point,
+            // Action code.
+            point_chargei,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::chargei
+        > chargei_action;
+
     private:
         hpx::lcos::local::mutex mtx_;
-        double sum_;
+        std::size_t item_;
     };
 }}
 
@@ -62,5 +76,9 @@ namespace gtc { namespace server
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::setup_action,
     gtc_point_setup_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::chargei_action,
+    gtc_point_chargei_action);
 #endif
 

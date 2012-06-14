@@ -20,17 +20,25 @@
 
 extern "C" {void FNAME(setup)(int *,int *); }
 extern "C" {void FNAME(load)(); }
+extern "C" {void FNAME(chargei)(); }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-    void point::setup(std::size_t numberpe,std::size_t mype)
+    void point::setup(std::size_t numberpe,std::size_t mype,
+                      std::vector<hpx::naming::id_type> const& point_components)
     {
+      item_ = mype;
       int t1 = numberpe;
       int t2 = mype;
       FNAME(setup)(&t1,&t2);
 
       FNAME(load)();
+    }
+
+    void point::chargei()
+    {
+      //FNAME(chargei)();
     }
 }}
 

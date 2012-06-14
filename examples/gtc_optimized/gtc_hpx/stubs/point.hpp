@@ -16,17 +16,33 @@ namespace gtc { namespace stubs
     struct point : hpx::components::stub_base<server::point>
     {
         static hpx::lcos::future<void>
-        setup_async(hpx::naming::id_type const& gid,std::size_t numberpe,std::size_t mype)
+        setup_async(hpx::naming::id_type const& gid,std::size_t numberpe,std::size_t mype,
+                    std::vector<hpx::naming::id_type> const& point_components)
         {
             typedef server::point::setup_action action_type;
-            return hpx::async<action_type>(gid,numberpe,mype);
+            return hpx::async<action_type>(gid,numberpe,mype,point_components);
         }
 
-        static void setup(hpx::naming::id_type const& gid,std::size_t numberpe,std::size_t mype)
+        static void setup(hpx::naming::id_type const& gid,std::size_t numberpe,std::size_t mype,
+                          std::vector<hpx::naming::id_type> const& point_components)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
-            setup_async(gid,numberpe,mype).get();
+            setup_async(gid,numberpe,mype,point_components).get();
+        }
+
+        static hpx::lcos::future<void>
+        chargei_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::chargei_action action_type;
+            return hpx::async<action_type>(gid);
+        }
+
+        static void chargei(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future.
+            chargei_async(gid).get();
         }
     };
 }}

@@ -30,3 +30,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(gtc_point_type, gtc_point);
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::setup_action,
     gtc_point_setup_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::chargei_action,
+    gtc_point_chargei_action);

@@ -65,13 +65,29 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<gtc::point> points;
         // Populate the client vectors.
         init(hpx::util::locality_results(blocks), points);
+
+        std::vector<hpx::naming::id_type> point_components;
+        for (std::size_t i=0;i<num_partitions;i++) {
+          point_components.push_back(points[i].get_gid());
+        }
+
         {
           std::vector<hpx::lcos::future<void> > setup_phase;
           for (std::size_t i=0;i<num_partitions;i++) {
-            setup_phase.push_back(points[i].setup_async(num_partitions,i));
+            setup_phase.push_back(points[i].setup_async(num_partitions,i,point_components));
           }
           hpx::lcos::wait(setup_phase);
         }
+
+        {
+          std::vector<hpx::lcos::future<void> > chargei_phase;
+          for (std::size_t i=0;i<num_partitions;i++) {
+            chargei_phase.push_back(points[i].chargei_async());
+          }
+          hpx::lcos::wait(chargei_phase);
+        }
+
+
     } // Ensure things go out of scope before hpx::finalize is called.
 
     hpx::finalize();

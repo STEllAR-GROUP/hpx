@@ -101,7 +101,7 @@ end module particle_decomp
      pmarke(0:mpsi),phi00(0:mpsi),phip00(0:mpsi),&
      hfluxpsi(0:mpsi),zonali(0:mpsi),zonale(0:mpsi),gradt(mpsi),&
      eigenmode(m_poloidal,num_mode,mpsi),STAT=mtest)
-  if (mtest /= 0) then
+  if (mtest /= 0 .and. mtest /= 5014) then
 ! hjw
 !    write(0,*)mype,'*** Cannot allocate qtinv: mtest=',mtest
      write(0,*)mype,'*** qtinv: Allocate Error: ',nmem, ' words mtest= ',mtest
@@ -174,7 +174,7 @@ end module particle_decomp
      jtp1(2,mgrid,mzeta),jtp2(2,mgrid,mzeta),wtp1(2,mgrid,mzeta),&
      wtp2(2,mgrid,mzeta),dtemper(mgrid,mzeta),heatflux(mgrid,mzeta),&
      STAT=mtest)
-  if (mtest /= 0) then
+  if (mtest /= 0 .and. mtest /= 5014) then
 ! hjw
      nmem= &
      ((4*mgrid)+(4*mgrid)+(mzeta*mgrid)+&
@@ -251,7 +251,7 @@ end module particle_decomp
   allocate(zion(nparam,mimax),zion0(nparam,mimax),jtion0(4,mimax),&
      jtion1(4,mimax),kzion(mimax),wzion(mimax),wpion(4,mimax),&
      wtion0(4,mimax),wtion1(4,mimax),STAT=mtest)
-  if (mtest /= 0) then
+  if (mtest /= 0 .and. mtest /= 5014) then
 ! hjw
   nmem=((nparam*mimax)+(nparam*mimax)+(4*mimax)+&
      (4*mimax)+(mimax)+(mimax)+(4*mimax)+&
