@@ -34,28 +34,28 @@ namespace jacobi
 
         double * begin()
         {
-            BOOST_ASSERT(values_);
+            //BOOST_ASSERT(values_);
             //return &values_[begin_];
             return 0;
         }
         
         double const * begin() const
         {
-            BOOST_ASSERT(values_);
+            //BOOST_ASSERT(values_);
             //return &values_[begin_];
             return 0;
         }
 
         double * end()
         {
-            BOOST_ASSERT(values_);
+            //BOOST_ASSERT(values_);
             //return &values_[begin_] + end_;
             return 0;
         }
         
         double const * end() const
         {
-            BOOST_ASSERT(values_);
+            //BOOST_ASSERT(values_);
             //return &values_[begin_] + end_;
             return 0;
         }

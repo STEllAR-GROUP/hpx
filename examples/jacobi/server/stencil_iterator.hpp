@@ -12,8 +12,7 @@
 
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/components/dataflow/dataflow.hpp>
-#include <hpx/components/dataflow/dataflow_trigger.hpp>
+#include <hpx/include/lcos.hpp>
 
 #include <vector>
 
@@ -76,20 +75,21 @@ namespace jacobi
               , std::size_t max_iterations
             );
 
-            hpx::lcos::dataflow_base<void> get_dep(std::size_t iter, std::size_t begin, std::size_t end);
+            hpx::lcos::future<void> get_dep(std::size_t iter, std::size_t begin, std::size_t end);
             
-            hpx::lcos::dataflow_base<row_range> get(std::size_t iter, std::size_t begin, std::size_t end);
+            row_range get(std::size_t iter, std::size_t begin, std::size_t end);
 
-            void get_neighbors(
-                hpx::lcos::dataflow_base<row_range> const & top
-              , hpx::lcos::dataflow_base<row_range> const & bottom
-              , std::size_t iter
-              , std::size_t begin
-              , std::size_t end
-            );
-
-            void update(row_range dst, row_range src, hpx::lcos::dataflow_base<row_range> top, hpx::lcos::dataflow_base<row_range> bottom)
+            void update(
+                hpx::lcos::future<row_range> dst
+              , hpx::lcos::future<row_range> src
+              , hpx::lcos::future<row_range> top
+              , hpx::lcos::future<row_range> bottom
+            )
             {
+                dst.get();
+                src.get();
+                top.get();
+                bottom.get();
                 /*
                 double * dst_ptr = dst.begin();
                 double * src_ptr = src.begin();
@@ -115,7 +115,6 @@ namespace jacobi
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, init, init_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, setup_boundary, setup_boundary_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, run, run_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, update, update_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, next, next_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get, get_action);
 
@@ -132,7 +131,7 @@ namespace jacobi
                     std::size_t
                   , std::map<
                         std::pair<std::size_t, std::size_t>
-                      , hpx::lcos::dataflow_base<void>
+                      , hpx::lcos::future<void>
                     >
                 >
                 iteration_deps_type;
@@ -167,11 +166,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     jacobi::server::stencil_iterator::run_action
   , jacobi_server_stencil_iterator_run_action
-)
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    jacobi::server::stencil_iterator::update_action
-  , jacobi_server_stencil_iterator_update_action
 )
 
 HPX_REGISTER_ACTION_DECLARATION_EX(

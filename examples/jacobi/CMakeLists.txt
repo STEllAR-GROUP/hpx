@@ -5,9 +5,9 @@
 
 if(HPX_CXX11_LAMBDAS)
 
-add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_FUNCTION_LIMIT=15)
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=5)
+add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=5)
+add_definitions(-DHPX_FUNCTION_LIMIT=8)
 
 set(jacobi_sources
     jacobi.cpp
@@ -24,8 +24,7 @@ set(jacobi_component_sources
    )
   
 set(jacobi_FLAGS
-    DEPENDENCIES dataflow_component
-                 iostreams_component
+    DEPENDENCIES iostreams_component
                  jacobi_component
                  distributing_factory_component
 )

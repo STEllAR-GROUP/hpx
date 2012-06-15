@@ -11,7 +11,7 @@
 #include "server/row.hpp"
 
 #include <hpx/include/naming.hpp>
-#include <hpx/components/dataflow/dataflow.hpp>
+#include <hpx/include/lcos.hpp>
 
 namespace jacobi
 {
@@ -26,9 +26,9 @@ namespace jacobi
 
         hpx::naming::id_type id;
 
-        hpx::lcos::dataflow_base<row_range> get(std::size_t begin, std::size_t end)
+        hpx::lcos::future<row_range> get(std::size_t begin, std::size_t end)
         {
-            return hpx::lcos::dataflow<server::row::get_action>(id, begin, end);
+            return hpx::async<server::row::get_action>(id, begin, end);
         }
     
         template <typename Archive>

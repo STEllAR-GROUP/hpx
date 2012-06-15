@@ -5,11 +5,44 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "stencil_iterator.hpp"
+#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 namespace jacobi
 {
     namespace server
     {
+        namespace detail
+        {
+            template <typename F, typename A, int N>
+            struct lambda_fun_wrapper_impl;
+
+            template <typename F, typename A>
+            struct lambda_fun_wrapper_impl<F, A, 1>
+            {
+                template <typename T>
+                lambda_fun_wrapper_impl(BOOST_FWD_REF(T) t)
+                    : f(boost::forward<T>(t))
+                {}
+
+                typename hpx::util::detail::remove_reference<F>::type f;
+
+                typedef decltype(std::declval<F>()(std::declval<A>())) result_type;
+
+                template <typename T>
+                auto operator()(BOOST_FWD_REF(T) a) -> decltype(f(a))
+                {
+                    return f(a);
+                }
+            };
+
+            template <typename T, typename F>
+            lambda_fun_wrapper_impl<F, T, 1> lambda_fun_wrapper(BOOST_FWD_REF(F) f)
+            {
+                return lambda_fun_wrapper_impl<F, T, 1>(boost::forward<F>(f));
+            }
+        }
+
         void stencil_iterator::run(std::size_t max_iterations)
         {
             //std::cout << "beginning to run ...\n";
@@ -25,13 +58,13 @@ namespace jacobi
                 for(std::size_t x = 1; x < nx-1; x += line_block)
                 {
                     std::size_t x_end = std::min(nx-1, x + line_block);
-                    get_dep(max_iterations-1, x, x_end).get_future().get();
+                    get_dep(max_iterations-1, x, x_end).get();
                     //hpx::cout << iter << ": (" << x << " " << y << "): finished\n" << hpx::flush;
                 }
             }
         }
             
-        hpx::lcos::dataflow_base<void> stencil_iterator::get_dep(std::size_t iter, std::size_t begin, std::size_t end)
+        hpx::lcos::future<void> stencil_iterator::get_dep(std::size_t iter, std::size_t begin, std::size_t end)
         {
             BOOST_ASSERT(y > 0);
             BOOST_ASSERT(y < ny-1);
@@ -59,35 +92,38 @@ namespace jacobi
             if(calc_iter_dep)
             {
                 BOOST_ASSERT(this->get_gid());
-                hpx::lcos::dataflow_base<void> d;
+                hpx::lcos::future<void> f;
                 if(iter>0)
                 {
-                    d =
-                        hpx::lcos::dataflow<update_action>(
-                            this->get_gid()
-                          , center.get(begin, end)
-                          , center.get(begin, end)
-                          , top.get(iter, begin, end)
-                          , bottom.get(iter, begin, end)
-                          , get_dep(iter-1, begin, end)
-                        );
+                    f = get_dep(iter-1, begin, end).when(detail::lambda_fun_wrapper<hpx::lcos::future<void> >(
+                        [this, iter, begin, end](hpx::lcos::future<void> d)
+                        {
+                            d.get();
+                            update(
+                                center.get(begin, end)
+                              , center.get(begin, end)
+                              , top.get(iter, begin, end)
+                              , bottom.get(iter, begin, end)
+                            );
+                        })
+                    );
                 }
                 else
                 {
-                    d =
-                        hpx::lcos::dataflow<update_action>(
-                            this->get_gid()
+                    f =
+                        hpx::async(HPX_STD_BIND(&server::stencil_iterator::update,
+                            this
                           , center.get(begin, end)
                           , center.get(begin, end)
                           , top.get(iter, begin, end)
-                          , bottom.get(iter, begin, end)
+                          , bottom.get(iter, begin, end))
                         );
                 }
                 std::pair<iteration_deps_type::mapped_type::iterator, bool> iter_pair;
                 {
                     hpx::util::spinlock::scoped_lock l(mtx);
                     iter_pair =
-                        iteration_deps[iter].insert(std::make_pair(range, d));
+                        iteration_deps[iter].insert(std::make_pair(range, f));
 
                     BOOST_ASSERT(iter_pair.second);
 
@@ -102,7 +138,7 @@ namespace jacobi
                         std::swap(iteration_deps_wait_list[iter][range], tmp);
                     }
                     */
-		    return d;
+                    return f;
                 }
             }
             else
@@ -118,7 +154,7 @@ namespace jacobi
                 return get_dep(iter, begin, end);
             }
             BOOST_ASSERT(false);
-            return hpx::lcos::dataflow_base<void>();
+            return hpx::lcos::future<void>();
         }
 
         void stencil_iterator::next(
@@ -148,28 +184,29 @@ namespace jacobi
             );
         }
             
-        hpx::lcos::dataflow_base<row_range> stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
+        row_range stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
         {
             BOOST_ASSERT(this->get_gid());
             BOOST_ASSERT(center.id);
+            hpx::lcos::future<row_range> f;
             if(y > 0 && y < ny-1 && iter > 0)
             {
-                //get_dep(iter-1, begin, end).get_future().get();
-		    return
-			hpx::lcos::dataflow<server::row::get_action>(
-			    center.id
-			  , begin
-			  , end
-			  , get_dep(iter-1, begin, end)
-			);
+                f = get_dep(iter-1, begin, end).when(
+                    detail::lambda_fun_wrapper<hpx::lcos::future<void> >(
+                        [this, iter, begin, end](hpx::lcos::future<void> d)
+                        {
+                            d.get();
+                            return center.get(begin, end).get();
+                        }
+                    )
+                );
+            }
+            else
+            {
+                f = center.get(begin, end);
             }
 
-            return
-                hpx::lcos::dataflow<server::row::get_action>(
-                    center.id
-                  , begin
-                  , end
-                );
+            return f.get();
         }
     }
 }
@@ -194,11 +231,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     jacobi::server::stencil_iterator::run_action
   , jacobi_server_stencil_iterator_run_action
-)
-
-HPX_REGISTER_ACTION_EX(
-    jacobi::server::stencil_iterator::update_action
-  , jacobi_server_stencil_iterator_update_action
 )
 
 HPX_REGISTER_ACTION_EX(

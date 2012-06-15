@@ -42,9 +42,9 @@ namespace jacobi
             hpx::async<server::stencil_iterator::run_action>(id, max_iterations);
     }
     
-    hpx::lcos::dataflow_base<hpx::lcos::dataflow_base<row_range> > stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
+    hpx::lcos::future<row_range> stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
     {
         BOOST_ASSERT(id);
-        return hpx::lcos::dataflow<server::stencil_iterator::get_action>(id, iter, begin, end);
+        return hpx::async<server::stencil_iterator::get_action>(id, iter, begin, end);
     }
 }
