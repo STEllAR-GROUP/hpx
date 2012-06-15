@@ -442,6 +442,31 @@ namespace hpx { namespace lcos
 
         return p->get_future();
     }
+    
+    template <typename F>
+//     inline typename detail::future_when_result<future<Result, RemoteResult>, F>::type
+    inline future<
+        typename boost::result_of<F(future<void, util::unused_type>)>::type
+    >
+    future<void, util::unused_type>::when(BOOST_FWD_REF(F) f)
+    {
+        typedef typename boost::result_of<F(future)>::type result_type;
+
+        // create continuation
+        typedef local::packaged_continuation<result_type, void> cont_type;
+        boost::shared_ptr<cont_type> p(
+            boost::make_shared<cont_type>(
+                util::bind(boost::forward<F>(f), util::placeholders::_1)
+            )
+        );
+
+        // bind a on_completed handler to this future which will invoke the
+        // continuation
+        future_data_->set_on_completed(
+            util::bind(&cont_type::on_value_ready, p, util::placeholders::_1));
+
+        return p->get_future();
+    }
 }}
 
 #endif

@@ -45,6 +45,8 @@ add_hpx_executable(jacobi
   ${jacobi_FLAGS}
   FOLDER "Examples/Jacobi")
 
+set_target_properties(jacobi_component PROPERTIES COMPILE_FLAGS "-fPIC")
+
 # add a custom target for this example
 add_hpx_pseudo_target(examples.jacobi.jacobi)
 

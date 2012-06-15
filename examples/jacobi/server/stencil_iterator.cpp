@@ -18,7 +18,7 @@ namespace jacobi
             struct lambda_fun_wrapper_impl;
 
             template <typename F, typename A>
-            struct lambda_fun_wrapper_impl<F, A, 1>
+            struct HPX_COMPONENT_EXPORT lambda_fun_wrapper_impl<F, A, 1>
             {
                 template <typename T>
                 lambda_fun_wrapper_impl(BOOST_FWD_REF(T) t)
@@ -37,7 +37,7 @@ namespace jacobi
             };
 
             template <typename T, typename F>
-            lambda_fun_wrapper_impl<F, T, 1> lambda_fun_wrapper(BOOST_FWD_REF(F) f)
+            inline lambda_fun_wrapper_impl<F, T, 1> lambda_fun_wrapper(BOOST_FWD_REF(F) f)
             {
                 return lambda_fun_wrapper_impl<F, T, 1>(boost::forward<F>(f));
             }
@@ -47,29 +47,33 @@ namespace jacobi
         {
             //std::cout << "beginning to run ...\n";
 
+            /*
             hpx::apply<next_action>(
                 this->get_gid()
               , 0
               , max_iterations
             );
+            */
             
             //for(std::size_t iter = 0; iter < max_iterations; ++iter)
             {
+                /*
                 for(std::size_t x = 1; x < nx-1; x += line_block)
                 {
                     std::size_t x_end = std::min(nx-1, x + line_block);
                     get_dep(max_iterations-1, x, x_end).get();
                     //hpx::cout << iter << ": (" << x << " " << y << "): finished\n" << hpx::flush;
                 }
+                */
             }
         }
+
             
         hpx::lcos::future<void> stencil_iterator::get_dep(std::size_t iter, std::size_t begin, std::size_t end)
         {
             BOOST_ASSERT(y > 0);
             BOOST_ASSERT(y < ny-1);
             std::pair<std::size_t, std::size_t> range(begin, end);
-            bool calc_iter_dep = false;
             {
                 hpx::util::spinlock::scoped_lock l(mtx);
                 iteration_deps_type::mapped_type::iterator dep
@@ -77,51 +81,43 @@ namespace jacobi
 
                 if(dep == iteration_deps[iter].end())
                 {
+                    /*
                     auto calculated_iter = calculating_dep[iter].find(range);
                     if(calculated_iter == calculating_dep[iter].end())
                     {
                         calculating_dep[iter].insert(range);
                         calc_iter_dep = true;
                     }
-                }
-                else
-                {
-                    return dep->second;
-                }
-            }
-            if(calc_iter_dep)
-            {
-                BOOST_ASSERT(this->get_gid());
-                hpx::lcos::future<void> f;
-                if(iter>0)
-                {
-                    f = get_dep(iter-1, begin, end).when(detail::lambda_fun_wrapper<hpx::lcos::future<void> >(
-                        [this, iter, begin, end](hpx::lcos::future<void> d)
-                        {
-                            d.get();
-                            update(
-                                center.get(begin, end)
+                    */
+                    BOOST_ASSERT(this->get_gid());
+                    hpx::lcos::future<void> f;
+                    if(iter>0)
+                    {
+                        f = get_dep(iter-1, begin, end).when(detail::lambda_fun_wrapper<hpx::lcos::future<void> >(
+                            [this, iter, begin, end](hpx::lcos::future<void> d)
+                            {
+                                d.get();
+                                update(
+                                    center.get(begin, end)
+                                  , center.get(begin, end)
+                                  , top.get(iter, begin, end)
+                                  , bottom.get(iter, begin, end)
+                                );
+                            })
+                        );
+                    }
+                    else
+                    {
+                        f =
+                            hpx::async(HPX_STD_BIND(&server::stencil_iterator::update,
+                                this
+                              , center.get(begin, end)
                               , center.get(begin, end)
                               , top.get(iter, begin, end)
-                              , bottom.get(iter, begin, end)
+                              , bottom.get(iter, begin, end))
                             );
-                        })
-                    );
-                }
-                else
-                {
-                    f =
-                        hpx::async(HPX_STD_BIND(&server::stencil_iterator::update,
-                            this
-                          , center.get(begin, end)
-                          , center.get(begin, end)
-                          , top.get(iter, begin, end)
-                          , bottom.get(iter, begin, end))
-                        );
-                }
-                std::pair<iteration_deps_type::mapped_type::iterator, bool> iter_pair;
-                {
-                    hpx::util::spinlock::scoped_lock l(mtx);
+                    }
+                    std::pair<iteration_deps_type::mapped_type::iterator, bool> iter_pair;
                     iter_pair =
                         iteration_deps[iter].insert(std::make_pair(range, f));
 
@@ -138,23 +134,13 @@ namespace jacobi
                         std::swap(iteration_deps_wait_list[iter][range], tmp);
                     }
                     */
-                    return f;
+                    return iter_pair.first->second;
                 }
-            }
-            else
-            {
-                /*
+                else
                 {
-                    hpx::util::spinlock::scoped_lock l(mtx);
-                    iteration_deps_wait_list[iter][range].push_back(hpx::threads::get_self().get_thread_id());
+                    return dep->second;
                 }
-                hpx::this_thread::suspend(boost::posix_time::milliseconds(1), "example::jacobi::server::stencil_iterator::get_dep");
-                */
-                //hpx::this_thread::suspend(boost::posix_time::milliseconds(1));
-                return get_dep(iter, begin, end);
             }
-            BOOST_ASSERT(false);
-            return hpx::lcos::future<void>();
         }
 
         void stencil_iterator::next(
