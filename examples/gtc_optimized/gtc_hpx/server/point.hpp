@@ -31,6 +31,7 @@ namespace gtc { namespace server
         void setup(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei();
+        void partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -69,6 +70,8 @@ namespace gtc { namespace server
     private:
         hpx::lcos::local::mutex mtx_;
         std::size_t item_;
+        std::vector<hpx::naming::id_type> toroidal_comm_,partd_comm_;
+        std::size_t left_pe_,right_pe_;
     };
 }}
 

@@ -13,7 +13,8 @@ end module particle_decomp
 
 !========================================================================
 
-    Subroutine setup(hpx_numberpe,hpx_mype)
+    Subroutine setup(hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
+                     hpx_left_pe, hpx_right_pe)
 
 !========================================================================
 
@@ -26,7 +27,8 @@ end module particle_decomp
   implicit none
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_numberpe,hpx_mype
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   CHARACTER(LEN=10) date, time
@@ -68,7 +70,7 @@ end module particle_decomp
   rw=1.0_wp/(rw*(a1-a0))
 
 ! Set up the particle decomposition within each toroidal domain
-  call set_particle_decomp
+  call set_particle_decomp(hpx_npartdom,hpx_ntoroidal,hpx_left_pe,hpx_right_pe)
 
 ! equilibrium unit: length (unit=cm) and time (unit=second) unit
   ulength=r0
@@ -656,7 +658,8 @@ end subroutine broadcast_input_params
 
 !=============================================================================
 
-    Subroutine set_particle_decomp
+    Subroutine set_particle_decomp(hpx_npartdom,hpx_ntoroidal, &
+                              hpx_left_pe,hpx_right_pe)
 
 !=============================================================================
 
@@ -669,6 +672,8 @@ end subroutine broadcast_input_params
   implicit none
 
   integer  :: i,j,k,pe_number,mtest,ierror
+  integer  :: hpx_npartdom, hpx_ntoroidal
+  integer  :: hpx_left_pe, hpx_right_pe
 
 ! ----- First we verify the consistency of ntoroidal and npartdom -------
 ! The number of toroidal domains (ntoroidal) times the number of particle
@@ -687,6 +692,8 @@ end subroutine broadcast_input_params
     write(stdout,*)'*******************************************************'
     write(stdout,*)
   endif
+  hpx_npartdom = npartdom
+  hpx_ntoroidal = ntoroidal
 
 ! make sure that mzetamax is a multiple of ntoroidal
   mzetamax=ntoroidal*max(1,int(real(mzetamax)/real(ntoroidal)+0.5_wp))
@@ -818,6 +825,8 @@ end subroutine broadcast_input_params
 
   left_pe=mod(myrank_toroidal-1+ntoroidal,ntoroidal)
   right_pe=mod(myrank_toroidal+1,ntoroidal)
+  hpx_left_pe = left_pe
+  hpx_right_pe = right_pe
   !print*,' TEST left_pe ', left_pe
   !print*,' TEST right_pe ',right_pe
 

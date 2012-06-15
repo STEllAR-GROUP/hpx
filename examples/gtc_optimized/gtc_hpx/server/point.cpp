@@ -18,9 +18,17 @@
 #include <iostream>
 #include <fstream>
 
-extern "C" {void FNAME(setup)(int *,int *); }
-extern "C" {void FNAME(load)(); }
-extern "C" {void FNAME(chargei)(); }
+extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *); 
+            void FNAME(load)(); 
+            void FNAME(chargei)(void* opaque_ptr_to_class); 
+            void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,
+                               double *densityi,int *mgrid,int *mzetap1) {
+                    // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
+                    // derived from point, then the world will end.
+                    gtc::server::point *ptr_to_class = static_cast<gtc::server::point*>(pfoo); 
+                    ptr_to_class->partd_allreduce(dnitmp,densityi,mgrid,mzetap1);
+                    return; };
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
@@ -31,14 +39,51 @@ namespace gtc { namespace server
       item_ = mype;
       int t1 = numberpe;
       int t2 = mype;
-      FNAME(setup)(&t1,&t2);
+      int npartdom,ntoroidal;
+      int hpx_left_pe, hpx_right_pe;
+      FNAME(setup)(&t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
 
       FNAME(load)();
+
+      // Figure out the communicators: toroidal_comm and partd_comm
+      int my_pdl = mype%npartdom;
+      int my_tdl = mype/npartdom;
+      for (std::size_t i=0;i<numberpe;i++) {
+        int particle_domain_location= i%npartdom;
+        int toroidal_domain_location= i/npartdom;
+        if ( toroidal_domain_location == my_tdl ) {
+          partd_comm_.push_back( point_components[i] );  
+        } 
+        if ( particle_domain_location == my_pdl ) {
+          // record the left gid
+          if ( particle_domain_location == hpx_left_pe ) left_pe_ = toroidal_comm_.size(); 
+          
+          // record the right gid
+          if ( particle_domain_location == hpx_right_pe ) right_pe_ = toroidal_comm_.size(); 
+
+          toroidal_comm_.push_back( point_components[i] );  
+        }
+      }
+
+      if ( partd_comm_.size() != (std::size_t) npartdom ) {
+        std::cerr << " PROBLEM: partd_comm " << partd_comm_.size() 
+                     << " != npartdom " << npartdom << std::endl;
+      }
+      if ( toroidal_comm_.size() != (std::size_t) ntoroidal ) {
+        std::cerr << " PROBLEM: toroidal_comm " << toroidal_comm_.size() 
+                     << " != ntoroidal " << ntoroidal << std::endl;
+      }
     }
 
     void point::chargei()
     {
-      //FNAME(chargei)();
+      FNAME(chargei)(static_cast<void*>(this));
+    }
+
+    void point::partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1)
+    {
+      // sum_allreduce(input,output,size,gids)
+      std::cout << " HELLO WORLD FROM ALL REDUCE " << std::endl;
     }
 }}
 
