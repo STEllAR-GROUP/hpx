@@ -52,10 +52,24 @@ namespace jacobi
             )
             {
                 y = y_;
-                center = r;
+                rows[0] = r;
+                jacobi::row tmp;
+                hpx::components::component_type
+                    type = hpx::components::get_component_type<
+                        server::row
+                    >();
+                tmp.id = hpx::async<hpx::components::server::runtime_support::create_component_action>(
+                    hpx::naming::get_locality_from_id(r.id)
+                  , type
+                  , 1
+                  ).get();
+                tmp.init(nx_).get();
+                rows[1] = tmp;
                 nx = nx_;
                 ny = ny_;
                 line_block = l;
+                src = 0;
+                dst = 1;
             }
 
 
@@ -68,87 +82,33 @@ namespace jacobi
                 bottom = b;
             }
 
-            void run(std::size_t max_iterations);
+            void step();
             
-            void next(
-                std::size_t iter
-              , std::size_t max_iterations
-            );
-
-            hpx::lcos::future<void> get_dep(std::size_t iter, std::size_t begin, std::size_t end);
-            
-            row_range get(std::size_t iter, std::size_t begin, std::size_t end);
+            row_range get_range(std::size_t begin, std::size_t end);
 
             void update(
                 hpx::lcos::future<row_range> dst
               , hpx::lcos::future<row_range> src
               , hpx::lcos::future<row_range> top
               , hpx::lcos::future<row_range> bottom
-            )
-            {
-                dst.get();
-                src.get();
-                top.get();
-                bottom.get();
-                /*
-                double * dst_ptr = dst.begin();
-                double * src_ptr = src.begin();
-                double * top_ptr = top.begin();
-                double * bottom_ptr = bottom.begin();
-
-                while(dst_ptr != dst.end())
-                {
-                    *dst_ptr
-                        =(
-                            *(src_ptr + 1) + *(src_ptr - 1)
-                          + *(top_ptr) + *(bottom_ptr)
-                        ) * 0.25;
-                    ++dst_ptr;
-                    ++src_ptr;
-                    ++top_ptr;
-                    ++bottom_ptr;
-                }
-                */
-            }
-
+            );
 
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, init, init_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, setup_boundary, setup_boundary_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, run, run_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, next, next_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get, get_action);
+            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, step, step_action);
+            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get_range, get_range_action);
 
             std::size_t y;
             std::size_t ny;
             std::size_t nx;
             std::size_t line_block;
+            std::size_t src;
+            std::size_t dst;
             jacobi::stencil_iterator top;
-            jacobi::row center;
+            jacobi::row rows[2];
             jacobi::stencil_iterator bottom;
-            hpx::util::spinlock mtx;
-            typedef
-                std::map<
-                    std::size_t
-                  , std::map<
-                        std::pair<std::size_t, std::size_t>
-                      , hpx::lcos::future<void>
-                    >
-                >
-                iteration_deps_type;
-            iteration_deps_type iteration_deps;
-            
-            typedef
-                std::map<
-                    std::size_t
-                  , std::map<
-                        std::pair<std::size_t, std::size_t>
-                      , std::vector<hpx::threads::thread_id_type>
-                    >
-                >
-                iteration_deps_wait_list_type;
-            iteration_deps_wait_list_type iteration_deps_wait_list;
 
-            std::map<std::size_t, std::set<std::pair<std::size_t, std::size_t> > > calculating_dep;
+
         };
     }
 }
@@ -164,18 +124,13 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 )
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    jacobi::server::stencil_iterator::run_action
-  , jacobi_server_stencil_iterator_run_action
+    jacobi::server::stencil_iterator::step_action
+  , jacobi_server_stencil_iterator_step_action
 )
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    jacobi::server::stencil_iterator::next_action
-  , jacobi_server_stencil_iterator_next_action
-)
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    jacobi::server::stencil_iterator::get_action
-  , jacobi_server_stencil_iterator_get_action
+    jacobi::server::stencil_iterator::get_range_action
+  , jacobi_server_stencil_iterator_get_range_action
 )
 
 #endif

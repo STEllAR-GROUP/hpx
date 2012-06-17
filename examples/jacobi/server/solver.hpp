@@ -111,10 +111,10 @@ namespace jacobi
             {
                 BOOST_ASSERT(stencil_iterators[0].id);
 
-                std::vector<hpx::lcos::future<void> > run_futures;
-                run_futures.reserve(ny-2);
                 hpx::util::high_resolution_timer t;
+
                 t.restart();
+                /*
                 for(std::size_t y = 1; y < ny-1; ++y)
                 {
                     run_futures.push_back(stencil_iterators[y].run(max_iterations));
@@ -122,6 +122,21 @@ namespace jacobi
                 BOOST_ASSERT(stencil_iterators[0].id);
                 hpx::lcos::wait(run_futures);
                 BOOST_ASSERT(stencil_iterators[0].id);
+                */
+
+                for(std::size_t iter = 0; iter < max_iterations; ++iter)
+                {
+                    std::vector<hpx::lcos::future<void> > run_futures;
+                    run_futures.reserve(ny-2);
+                    for(std::size_t y = 1; y < ny-1; ++y)
+                    {
+                        run_futures.push_back(
+                            stencil_iterators[y].step()
+                        );
+                    }
+                    hpx::lcos::wait(run_futures);
+                }
+
                 double time_elapsed = t.elapsed();
                 hpx::cout << nx << "x" << ny << " "
                      << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS\n" << hpx::flush;

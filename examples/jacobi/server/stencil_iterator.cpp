@@ -8,191 +8,91 @@
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
+#include <boost/make_shared.hpp>
+
 namespace jacobi
 {
     namespace server
     {
-        namespace detail
+        void stencil_iterator::step()
         {
-            template <typename F, typename A, int N>
-            struct lambda_fun_wrapper_impl;
-
-            template <typename F, typename A>
-            struct HPX_COMPONENT_EXPORT lambda_fun_wrapper_impl<F, A, 1>
-            {
-                template <typename T>
-                lambda_fun_wrapper_impl(BOOST_FWD_REF(T) t)
-                    : f(boost::forward<T>(t))
-                {}
-
-                typename hpx::util::detail::remove_reference<F>::type f;
-
-                typedef decltype(std::declval<F>()(std::declval<A>())) result_type;
-
-                template <typename T>
-                auto operator()(BOOST_FWD_REF(T) a) -> decltype(f(a))
-                {
-                    return f(a);
-                }
-            };
-
-            template <typename T, typename F>
-            inline lambda_fun_wrapper_impl<F, T, 1> lambda_fun_wrapper(BOOST_FWD_REF(F) f)
-            {
-                return lambda_fun_wrapper_impl<F, T, 1>(boost::forward<F>(f));
-            }
-        }
-
-        void stencil_iterator::run(std::size_t max_iterations)
-        {
-            //std::cout << "beginning to run ...\n";
-
-            /*
-            hpx::apply<next_action>(
-                this->get_gid()
-              , 0
-              , max_iterations
-            );
-            */
-            
-            //for(std::size_t iter = 0; iter < max_iterations; ++iter)
-            {
-                /*
-                for(std::size_t x = 1; x < nx-1; x += line_block)
-                {
-                    std::size_t x_end = std::min(nx-1, x + line_block);
-                    get_dep(max_iterations-1, x, x_end).get();
-                    //hpx::cout << iter << ": (" << x << " " << y << "): finished\n" << hpx::flush;
-                }
-                */
-            }
-        }
-
-            
-        hpx::lcos::future<void> stencil_iterator::get_dep(std::size_t iter, std::size_t begin, std::size_t end)
-        {
-            BOOST_ASSERT(y > 0);
-            BOOST_ASSERT(y < ny-1);
-            std::pair<std::size_t, std::size_t> range(begin, end);
-            {
-                hpx::util::spinlock::scoped_lock l(mtx);
-                iteration_deps_type::mapped_type::iterator dep
-                    = iteration_deps[iter].find(range);
-
-                if(dep == iteration_deps[iter].end())
-                {
-                    /*
-                    auto calculated_iter = calculating_dep[iter].find(range);
-                    if(calculated_iter == calculating_dep[iter].end())
-                    {
-                        calculating_dep[iter].insert(range);
-                        calc_iter_dep = true;
-                    }
-                    */
-                    BOOST_ASSERT(this->get_gid());
-                    hpx::lcos::future<void> f;
-                    if(iter>0)
-                    {
-                        f = get_dep(iter-1, begin, end).when(detail::lambda_fun_wrapper<hpx::lcos::future<void> >(
-                            [this, iter, begin, end](hpx::lcos::future<void> d)
-                            {
-                                d.get();
-                                update(
-                                    center.get(begin, end)
-                                  , center.get(begin, end)
-                                  , top.get(iter, begin, end)
-                                  , bottom.get(iter, begin, end)
-                                );
-                            })
-                        );
-                    }
-                    else
-                    {
-                        f =
-                            hpx::async(HPX_STD_BIND(&server::stencil_iterator::update,
-                                this
-                              , center.get(begin, end)
-                              , center.get(begin, end)
-                              , top.get(iter, begin, end)
-                              , bottom.get(iter, begin, end))
-                            );
-                    }
-                    std::pair<iteration_deps_type::mapped_type::iterator, bool> iter_pair;
-                    iter_pair =
-                        iteration_deps[iter].insert(std::make_pair(range, f));
-
-                    BOOST_ASSERT(iter_pair.second);
-
-                    calculating_dep[iter].erase(range);
-                    /*
-                    BOOST_FOREACH(hpx::threads::thread_id_type & id, iteration_deps_wait_list[iter][range])
-                    {
-                        hpx::threads::set_thread_state(id, hpx::threads::pending);
-                    }
-                    {
-                        std::vector<hpx::threads::thread_id_type> tmp;
-                        std::swap(iteration_deps_wait_list[iter][range], tmp);
-                    }
-                    */
-                    return iter_pair.first->second;
-                }
-                else
-                {
-                    return dep->second;
-                }
-            }
-        }
-
-        void stencil_iterator::next(
-            std::size_t iter
-          , std::size_t max_iterations
-        )
-        {
-            if(iter == max_iterations)
-            {
-                return;
-            }
-            BOOST_ASSERT(this->get_gid());
-            BOOST_ASSERT(center.id);
             BOOST_ASSERT(top.id);
             BOOST_ASSERT(bottom.id);
-            for(std::size_t x = 1, x_dep = 0; x < nx-1; x += line_block, ++x_dep)
-            {
-                std::size_t end = std::min(nx - 1, x + line_block);
+            BOOST_ASSERT(top.id != bottom.id);
+            BOOST_ASSERT(this->get_gid() != top.id);
+            BOOST_ASSERT(this->get_gid() != bottom.id);
+            //std::cout << "beginning to run ...\n";
 
-                get_dep(iter, x, end);
-            }
-
-            hpx::apply<next_action>(
-                this->get_gid()
-              , ++iter
-              , max_iterations
-            );
-        }
-            
-        row_range stencil_iterator::get(std::size_t iter, std::size_t begin, std::size_t end)
-        {
-            BOOST_ASSERT(this->get_gid());
-            BOOST_ASSERT(center.id);
-            hpx::lcos::future<row_range> f;
-            if(y > 0 && y < ny-1 && iter > 0)
+            std::vector<hpx::lcos::future<void> > fs;
+            for(std::size_t x = 1; x < nx-1; x += line_block)
             {
-                f = get_dep(iter-1, begin, end).when(
-                    detail::lambda_fun_wrapper<hpx::lcos::future<void> >(
-                        [this, iter, begin, end](hpx::lcos::future<void> d)
-                        {
-                            d.get();
-                            return center.get(begin, end).get();
-                        }
+                std::size_t x_end = std::min(nx-1, x + line_block);
+                fs.push_back(
+                    hpx::async(
+                        HPX_STD_BIND(
+                            &stencil_iterator::update
+                          , this
+                          , rows[dst].get(x, x_end)
+                          , rows[src].get(x-1, x_end+1)
+                          , top.get_range(x, x_end)
+                          , bottom.get_range(x, x_end)
+                        )
                     )
                 );
             }
-            else
-            {
-                f = center.get(begin, end);
-            }
+            hpx::lcos::wait(fs);
+            std::swap(src, dst);
+        }
 
-            return f.get();
+        void stencil_iterator::update(
+            hpx::lcos::future<row_range> dst
+          , hpx::lcos::future<row_range> src
+          , hpx::lcos::future<row_range> top
+          , hpx::lcos::future<row_range> bottom
+        )
+        {
+            row_range d = dst.get();
+            row_range s = src.get();
+            row_range t = top.get();
+            row_range b = bottom.get();
+            
+            std::vector<double>::iterator dst_ptr = d.begin();
+            std::vector<double>::iterator src_ptr = s.begin();
+            std::vector<double>::iterator top_ptr = t.begin();
+            std::vector<double>::iterator bottom_ptr = b.begin();
+
+            BOOST_ASSERT(
+                d.end() - d.begin() + 2 == s.end() - s.begin()
+            );
+            BOOST_ASSERT(
+                d.end() - d.begin() == t.end() - t.begin()
+            );
+            BOOST_ASSERT(
+                d.end() - d.begin() == b.end() - b.begin()
+            );
+
+            ++src_ptr;
+            while(dst_ptr < d.end())
+            {
+                BOOST_ASSERT(dst_ptr < d.end());
+                BOOST_ASSERT(src_ptr < s.end());
+                BOOST_ASSERT(top_ptr < t.end());
+                BOOST_ASSERT(bottom_ptr < b.end());
+                *dst_ptr
+                    =(
+                        *(src_ptr - 1) + *(src_ptr + 1)
+                      + *top_ptr + *bottom_ptr
+                    ) * 0.25;
+                ++dst_ptr;
+                ++src_ptr;
+                ++top_ptr;
+                ++bottom_ptr;
+            }
+        }
+            
+        row_range stencil_iterator::get_range(std::size_t begin, std::size_t end)
+        {
+            return rows[src].get(begin, end).get();
         }
     }
 }
@@ -215,16 +115,11 @@ HPX_REGISTER_ACTION_EX(
 )
 
 HPX_REGISTER_ACTION_EX(
-    jacobi::server::stencil_iterator::run_action
-  , jacobi_server_stencil_iterator_run_action
+    jacobi::server::stencil_iterator::step_action
+  , jacobi_server_stencil_iterator_step_action
 )
 
 HPX_REGISTER_ACTION_EX(
-    jacobi::server::stencil_iterator::next_action
-  , jacobi_server_stencil_iterator_next_action
-)
-            
-HPX_REGISTER_ACTION_EX(
-    jacobi::server::stencil_iterator::get_action
-  , jacobi_server_stencil_iterator_get_action
+    jacobi::server::stencil_iterator::get_range_action
+  , jacobi_server_stencil_iterator_get_range_action
 )

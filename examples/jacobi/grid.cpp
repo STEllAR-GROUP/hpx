@@ -41,46 +41,5 @@ namespace jacobi
         }
 
         hpx::lcos::wait(init_futures);
-        
-        /*
-        // get list of locality prefixes
-        std::vector<hpx::naming::id_type> localities = hpx::find_all_localities(type);
-
-        typedef
-            hpx::components::server::create_one_component_action2<
-                hpx::components::managed_component<server::row>
-              , std::size_t
-              , double
-            >::type
-            create_component_action;
-
-        std::size_t objs_per_loc = ny / localities.size();
-        std::size_t lid = 0;
-        std::size_t count = 0;
-
-        for(std::size_t y = 0; y < ny; ++y)
-        {
-            rows[y].id
-              = hpx::naming::id_type(
-                    hpx::async<create_component_action>(
-                        localities[lid]
-                      , type
-                      , nx
-                      , value
-                    ).get();
-                    hpx::naming::id_type::managed
-                )
-
-            if(count == objs_per_loc)
-            {
-                count = 0;
-                lid = (lid + 1) % localities.size();
-            }
-            else
-            {
-                ++count;
-            }
-        }
-        */
     }
 }

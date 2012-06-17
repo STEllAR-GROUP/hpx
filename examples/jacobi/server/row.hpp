@@ -16,6 +16,7 @@
 namespace jacobi { 
     namespace server
     {
+
         struct HPX_COMPONENT_EXPORT row
             : hpx::components::managed_component_base<
                 row
@@ -39,13 +40,14 @@ namespace jacobi {
 
             void init(std::size_t nx, double value = 0.0);
 
-            typedef boost::shared_array<double> values_type;
+            typedef boost::intrusive_ptr<value_holder> values_type;
 
             values_type values;
 
             row_range get(std::size_t begin, std::size_t end)
             {
                 //std::cout << this->get_gid() << "row::get ...\n";
+                BOOST_ASSERT(values);
                 return row_range(values, begin, end);
             }
 

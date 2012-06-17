@@ -31,9 +31,9 @@ namespace jacobi
         );
         hpx::lcos::future<void> setup_boundary(stencil_iterator const & top, stencil_iterator const & bottom);
 
-        hpx::lcos::future<void> run(std::size_t max_iterations);
+        hpx::lcos::future<void> step();
 
-        hpx::lcos::future<row_range> get(std::size_t iter, std::size_t begin, std::size_t end);
+        hpx::lcos::future<row_range> get_range(std::size_t begin, std::size_t end);
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
