@@ -2,8 +2,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "simple_declarations.cpp"
 #include "statstd.cpp"
+
+void void_thread(){
+}
+
+typedef hpx::actions::plain_action0<void_thread> void_action0;
+typedef hpx::lcos::packaged_action<void_action0> void_package0;
+HPX_REGISTER_PLAIN_ACTION(void_action0);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

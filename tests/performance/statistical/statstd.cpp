@@ -3,8 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef STANDARD_STATISTICAL_FUNCTIONS
+#define STANDARD_STATISTICAL_FUNCTIONS
 #include <vector>
 #include <string>
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/lcos.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/iostreams.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 using std::vector;
 using std::string;
@@ -94,4 +102,5 @@ void printout(vector<double> time, double ot, double mean, string message){
     }
     cout << flush;
 }
+#endif
 
