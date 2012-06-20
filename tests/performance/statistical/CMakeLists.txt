@@ -45,26 +45,27 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
-add_hpx_component(sender
-    SOURCES "sender.cpp"
-    FOLDER "Benchmarks/parcel_sr_dis")
-   # SOURCE_GLOB "sender.cpp")
+#add_hpx_component(sender
+#    SOURCES "sender.cpp"
+#    FOLDER "Benchmarks/parcel_sr_dis")
+#   # SOURCE_GLOB "sender.cpp")
 
-add_hpx_component(receiver
-    SOURCES "receiver.cpp"
-    HEADERS "receiver.hpp"
+#add_hpx_component(receiver
+#    SOURCES "receiver.cpp"
+#    HEADERS "receiver.hpp"
     #SOURCE_GLOB "receiver.cpp"
     #HEADER_GLOB "receiver.hpp"
-    FOLDER "Benchmarks/parcel_sr_dis")
+#    FOLDER "Benchmarks/parcel_sr_dis")
     #AUTOGLOB)
 
-add_hpx_executable(parcel_sr_dis_analysis
-    SOURCES parcel_sr_dis_analysis.cpp
-    DEPENDENCIES iostreams_component sender_component receiver_component
-    FOLDER "Benchmarks/parcel_sr_dis")
+#add_hpx_executable(parcel_sr_dis_analysis
+#    SOURCES parcel_sr_dis_analysis.cpp
+#    DEPENDENCIES iostreams_component sender_component receiver_component
+#    FOLDER "Benchmarks/parcel_sr_dis")
 
-add_hpx_pseudo_target(tests.performance.statistical.parcel_sr_dis_analysis)
-add_hpx_pseudo_dependencies(tests.performance.statistical 
-                            tests.performance.statistical.parcel_sr_dis_analysis)
-add_hpx_pseudo_dependencies(tests.performance.statistical.parcel_sr_dis_analysis
-                            parcel_sr_dis_analysis_exe)
+#add_hpx_pseudo_target(tests.performance.statistical.parcel_sr_dis_analysis)
+#add_hpx_pseudo_dependencies(tests.performance.statistical 
+#                            tests.performance.statistical.parcel_sr_dis_analysis)
+#add_hpx_pseudo_dependencies(tests.performance.statistical.parcel_sr_dis_analysis
+#                            parcel_sr_dis_analysis_exe)
+
