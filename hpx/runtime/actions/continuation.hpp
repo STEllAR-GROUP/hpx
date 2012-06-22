@@ -115,7 +115,7 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
-        ~typed_continuation()
+        virtual ~typed_continuation()
         {
             detail::guid_initialization<typed_continuation>();
         }
