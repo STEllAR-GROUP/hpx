@@ -23,6 +23,7 @@ void create_packages(Vector& packages, uint64_t num, double ot){
     double mean;
     string message = "Measuring time required to create packaged_actions:";
     vector<double> time;
+    time.reserve(num);
     packages.reserve(num);
 
     //the first measurement is of the amount of time it takes to generate
@@ -32,7 +33,6 @@ void create_packages(Vector& packages, uint64_t num, double ot){
         packages.push_back(new Package());
     mean = t.elapsed()/num;
     packages.clear();
-    time.reserve(num);
     packages.reserve(num);
     for(i = 0; i < num; ++i){
         high_resolution_timer t1;
@@ -96,59 +96,6 @@ void get_results(Vector1 packages, Vector2 futures, uint64_t num, double ot){
     printout(time, ot, mean, message);
 }
 
-//test destroys packages
-template <typename Vector, typename Package>
-void destroy_packages(uint64_t num, double ot){
-    uint64_t i = 0;
-    double mean;
-    string message = "Measuring time required to destroy packaged_actions:";
-    vector<double> time;
-    Vector packages;
-
-    create_packages<Vector, Package>(packages, num);
-    high_resolution_timer t;
-    for(; i < num; ++i) packages.pop_back();
-    mean = t.elapsed()/num;
-    create_packages<Vector, Package>(packages, num);
-    time.reserve(num);
-    for(i = 0; i < num; ++i){
-        high_resolution_timer t1;
-        packages.pop_back();
-        time.push_back(t1.elapsed());
-    }
-    printout(time, ot, mean, message);
-}
-
-//the third test collects the generated futures
-template <typename Vector1, typename Vector2, typename Package>
-void destroy_futures(uint64_t num, double ot){
-    uint64_t i = 0;
-    double mean;
-    string message = "Measuring time required to destroy futures:";
-    vector<double> time;
-    time.reserve(num);
-    Vector1 packages, packages2;
-    Vector2 futures, futures2;
-    create_packages<Vector1, Package>(packages2, num);
-
-    for(; i < num; ++i)
-        futures2.push_back(packages2[i]->get_future());
-    high_resolution_timer t;
-    for(i = 0; i < num; ++i)
-        futures2.pop_back();
-    mean = t.elapsed()/num;
-    packages2.clear();
-    create_packages<Vector1, Package>(packages, num);
-
-    for(i = 0; i < num; ++i)
-        futures.push_back(packages[i]->get_future());
-    for(i = 0; i < num; ++i){
-        high_resolution_timer t1;
-        futures.pop_back();
-        time.push_back(t1.elapsed());
-    }
-    printout(time, ot, mean, message);
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 //this runs a series of tests for a plain_result_action
@@ -403,10 +350,6 @@ void run_empty(uint64_t num){
     //fourth test
     get_results<Vector, vector<hpx::lcos::future<T> >, Package>
         (packages,futures, num, ot);
-
-    //final test
-    destroy_futures<Vector, vector<hpx::lcos::future<T> >, Package>(num, ot); 
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_empty(uint64_t num, T a1){
@@ -438,8 +381,6 @@ void run_empty(uint64_t num, T a1){
     packages.clear();
     get_results<Vector, vector<hpx::lcos::future<T> >, Package>
         (packages, futures, num, ot);
-    destroy_futures<Vector, vector<hpx::lcos::future<T> >, Package>(num, ot); 
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_empty(uint64_t num, T a1, T a2){
@@ -471,8 +412,6 @@ void run_empty(uint64_t num, T a1, T a2){
     packages.clear();
     get_results<Vector, vector<hpx::lcos::future<T> >, Package>
         (packages, futures, num, ot);
-    destroy_futures<Vector, vector<hpx::lcos::future<T> >, Package>(num, ot); 
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_empty(uint64_t num, T a1, T a2, T a3){
@@ -504,8 +443,6 @@ void run_empty(uint64_t num, T a1, T a2, T a3){
     packages.clear();
     get_results<Vector, vector<hpx::lcos::future<T> >, Package>
         (packages, futures, num, ot);
-    destroy_futures<Vector, vector<hpx::lcos::future<T> >, Package>(num, ot); 
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_empty(uint64_t num, T a1, T a2, T a3, T a4){
@@ -537,8 +474,6 @@ void run_empty(uint64_t num, T a1, T a2, T a3, T a4){
     packages.clear();
     get_results<Vector, vector<hpx::lcos::future<T> >, Package>
         (packages, futures, num, ot);
-    destroy_futures<Vector, vector<hpx::lcos::future<T> >, Package>(num, ot); 
-    //destroy_packages<Vector, Package>(num, ot);
 }
 
 //this runs a series of tests for a plain_action
@@ -569,7 +504,6 @@ void run_void(uint64_t num){
     }
     message = "Measuring time required to apply packaged_actions:";
     printout(time, ot, mean, message);
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_void(uint64_t num, T a1){
@@ -594,7 +528,6 @@ void run_void(uint64_t num, T a1){
     }
     message = "Measuring time required to apply packaged_actions:";
     printout(time, ot, mean, message);
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_void(uint64_t num, T a1, T a2){
@@ -619,7 +552,6 @@ void run_void(uint64_t num, T a1, T a2){
     }
     message = "Measuring time required to apply packaged_actions:";
     printout(time, ot, mean, message);
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_void(uint64_t num, T a1, T a2, T a3){
@@ -644,7 +576,6 @@ void run_void(uint64_t num, T a1, T a2, T a3){
     }
     message = "Measuring time required to apply packaged_actions:";
     printout(time, ot, mean, message);
-    //destroy_packages<Vector, Package>(num, ot);
 }
 template <typename Vector, typename Package, typename Action, typename T>
 void run_void(uint64_t num, T a1, T a2, T a3, T a4){
@@ -669,5 +600,4 @@ void run_void(uint64_t num, T a1, T a2, T a3, T a4){
     }
     message = "Measuring time required to apply packaged_actions:";
     printout(time, ot, mean, message);
-    //destroy_packages<Vector, Package>(num, ot);
 }
