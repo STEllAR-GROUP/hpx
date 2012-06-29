@@ -8,5 +8,6 @@
 
 namespace oclm
 {
-    const context_info<CL_CONTEXT_DEVICES, std::vector<cl_device_id> >    context_devices = {};
+    const context_info<CL_CONTEXT_DEVICES, std::vector<cl_device_id> > context_devices =
+        context_info<CL_CONTEXT_DEVICES, std::vector<cl_device_id> >();
 }

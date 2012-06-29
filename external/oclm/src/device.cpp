@@ -9,14 +9,20 @@
 
 namespace oclm
 {
-    const device_type<CL_DEVICE_TYPE_ACCELERATOR> device::accelerator = {};
-    const device_type<CL_DEVICE_TYPE_ALL> device::all = {};
-    const device_type<CL_DEVICE_TYPE_CPU> device::cpu = {};
+    const device_type<CL_DEVICE_TYPE_ACCELERATOR> device::accelerator =
+        device_type<CL_DEVICE_TYPE_ACCELERATOR>();
+    const device_type<CL_DEVICE_TYPE_ALL> device::all =
+        device_type<CL_DEVICE_TYPE_ALL>();
+    const device_type<CL_DEVICE_TYPE_CPU> device::cpu =
+        device_type<CL_DEVICE_TYPE_CPU>();
 #ifdef CL_VERSION_1_2
-    const device_type<CL_DEVICE_TYPE_CUSTOM> device::custom = {};
+    const device_type<CL_DEVICE_TYPE_CUSTOM> device::custom =
+        device_type<CL_DEVICE_TYPE_CUSTOM>();
 #endif
-    const device_type<CL_DEVICE_TYPE_DEFAULT> device::default_ = {};
-    const device_type<CL_DEVICE_TYPE_GPU> device::gpu = {};
+    const device_type<CL_DEVICE_TYPE_DEFAULT> device::default_ =
+        device_type<CL_DEVICE_TYPE_DEFAULT>();
+    const device_type<CL_DEVICE_TYPE_GPU> device::gpu =
+        device_type<CL_DEVICE_TYPE_GPU>();
 
     std::vector<device> init_devices(cl_platform_id platform_id)
     {

@@ -25,7 +25,7 @@ namespace oclm
           , Name
         >
     {};
-    
+
     template <typename>
     struct is_context_info
         : boost::mpl::false_

@@ -57,7 +57,7 @@ namespace
             cl_context ctx
                 = ::clCreateContext(
                     props.get()       // properties array
-                  , device_ids.size() // number of devices
+                  , static_cast<cl_uint>(device_ids.size()) // number of devices
                   , &device_ids[0]    // address of first device id
                   , NULL              // error notification callback
                   , NULL              // user info to be passed to the callback
@@ -101,18 +101,18 @@ namespace oclm
     {
         return create_context(context_manager::get().default_properties);
     }
-    
+
     context create_context(std::map<int, cl_context_properties> const &props)
     {
         return create_context(props, get_device());
     }
-    
+
     template <cl_device_type Type>
     context create_context(device_type<Type> const & type)
     {
         return create_context(context_manager::get().default_properties, type);
     }
-    
+
     context create_context(std::map<int, cl_context_properties> const & props, device const & d)
     {
         //TODO: error handling
@@ -120,7 +120,7 @@ namespace oclm
         cl_context id = ::clCreateContext(ps.get(), 1, &d.id(), NULL, NULL, NULL);
         return context(id);
     }
-    
+
     template <cl_device_type Type>
     context create_context(
         std::map<int, cl_context_properties> const & props, device_type<Type> const & type)
