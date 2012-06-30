@@ -281,8 +281,8 @@ namespace hpx { namespace lcos
 
         future(int)
         {
-            lcos::detail::future_data<void>* p =
-                new lcos::detail::future_data<void>();
+            lcos::detail::future_data<void, util::unused_type>* p =
+                new lcos::detail::future_data<void, util::unused_type>();
             p->set_data(util::unused);
             future_data_ = p;
         }

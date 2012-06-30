@@ -91,7 +91,7 @@ public:
 // "Portable" input binary archive.  It addresses integer size and endianness so
 // that binary archives can be passed across systems. Note:floating point types
 // not addressed here
-#if defined(BOOST_MSVC)
+#if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
 #define HPX_SERIALIZATION_EXPORT
 #else
 #define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT

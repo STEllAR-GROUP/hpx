@@ -836,7 +836,7 @@ namespace hpx
 
             {
                 std::string threads_str
-                    = cfgmap.get_value<std::string>("hpx.os_threads", ""); 
+                    = cfgmap.get_value<std::string>("hpx.os_threads", "");
 
                 if ("all" == threads_str)
                     cfgmap.config_["hpx.os_threads"] =

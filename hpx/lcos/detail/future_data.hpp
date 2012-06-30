@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
         typedef
-            HPX_STD_FUNCTION<void(future<Result, RemoteResult>)>
+            HPX_STD_FUNCTION<void(lcos::future<Result, RemoteResult>)>
         completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
@@ -204,6 +204,8 @@ namespace hpx { namespace lcos { namespace detail
         template <typename R, typename RR> friend class future;
 
     protected:
+        friend class lcos::future<void, util::unused_type>;
+
         future_data() : set_on_completed_(false) {}
 
         future_data(completed_callback_type const& data_sink)
@@ -309,7 +311,7 @@ namespace hpx { namespace lcos { namespace detail
                     typename mutex_type::scoped_lock l(this->mtx_);
                     if (!on_completed_.empty()) {
                         // this future instance coincidentally keeps us alive
-                        future<Result, RemoteResult> f(this);
+                        lcos::future<Result, RemoteResult> f(this);
                         data_.set(boost::move(get_remote_result_type::call(
                             boost::forward<T>(result))));
 
@@ -338,7 +340,7 @@ namespace hpx { namespace lcos { namespace detail
                 typename mutex_type::scoped_lock l(this->mtx_);
                 if (!on_completed_.empty()) {
                     // this future coincidentally instance keeps us alive
-                    future<Result, RemoteResult> f(this);
+                    lcos::future<Result, RemoteResult> f(this);
                     data_.set(e);
 
                     // invoke the callback (continuation) function
@@ -417,7 +419,7 @@ namespace hpx { namespace lcos { namespace detail
             on_completed_ = boost::move(data_sink);
             if (!on_completed_.empty() && this->is_ready()) {
                 // this future coincidentally instance keeps us alive
-                future<Result, RemoteResult> f(this);
+                lcos::future<Result, RemoteResult> f(this);
 
                 // invoke the callback (continuation) function
                 on_completed_(f);
