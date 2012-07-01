@@ -115,8 +115,8 @@ namespace hpx { namespace lcos
         // extension: init from given value, set future to ready right away
         future(Result const& init)
         {
-            lcos::detail::future_data<Result>* p =
-                new lcos::detail::future_data<Result>();
+            lcos::detail::future_data<Result, RemoteResult>* p =
+                new lcos::detail::future_data<Result, RemoteResult>();
             p->set_data(boost::move(init));
             future_data_ = p;
         }
