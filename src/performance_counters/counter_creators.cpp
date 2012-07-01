@@ -83,6 +83,13 @@ namespace hpx { namespace performance_counters
 
         p.parentinstancename_ = "locality#<*>";
         p.parentinstanceindex_ = -1;
+        p.instancename_ = "total";
+        p.instanceindex_ = -1;
+
+        status = get_counter_name(p, i.fullname_, ec);
+        if (!status_is_valid(status) || !f(i, ec) || ec)
+            return false;
+
         p.instancename_ = "worker-thread#<*>";
         p.instanceindex_ = -1;
 
