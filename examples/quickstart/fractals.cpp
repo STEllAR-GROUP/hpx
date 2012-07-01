@@ -21,7 +21,7 @@
 #include <external/EasyBMP/EasyBMP.h>
 #include <external/EasyBMP/EasyBMP.cpp>
 
-const int sizeY = 64;
+const int sizeY = 256;
 const int sizeX = sizeY;
 
 //[fib_action
@@ -90,9 +90,9 @@ int hpx_main()
             for (int k = 0; k < 2; k++)
             {
             RGBApixel pix;
-            pix.Blue = it;//(it*255)/max_iteration;
-            pix.Red = it;//(it*255)/max_iteration;
-            pix.Green = it;//(it*255)/max_iteration;
+            pix.Blue = (it*255)/max_iteration;
+            pix.Red = (it*255)/max_iteration;
+            pix.Green = (it*255)/max_iteration;
             SetImage.SetPixel(i * 2 + k,j,pix);
             }
         }
