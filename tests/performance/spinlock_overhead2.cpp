@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
@@ -142,6 +143,7 @@ namespace test
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
+            hpx::util::register_lock(this);
         }
 
         bool try_lock()
@@ -157,6 +159,7 @@ namespace test
 
             if (r == 0) {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                hpx::util::register_lock(this);
                 return true;
             }
 
@@ -176,6 +179,7 @@ namespace test
 #endif
 
             HPX_ITT_SYNC_RELEASED(this);
+            hpx::util::unregister_lock(this);
         }
 
         typedef boost::unique_lock<local_spinlock> scoped_lock;

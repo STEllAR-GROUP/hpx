@@ -117,6 +117,9 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+
+                // verify that there are no more registered locks for this OS-thread
+                util::verify_no_locks();
                 return threads::terminated;
             }
         };
@@ -289,9 +292,11 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+
+                // verify that there are no more registered locks for this OS-thread
+                util::verify_no_locks();
                 return threads::terminated;
             }
-
         };
 
     public:

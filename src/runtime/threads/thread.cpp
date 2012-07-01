@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/util/register_locks.hpp>
 
 namespace hpx
 {
@@ -74,9 +75,19 @@ namespace hpx
             func();
         }
         catch (hpx::exception const& e) {
-            if (e.get_error() != hpx::thread_interrupted)
+            if (e.get_error() != hpx::thread_interrupted) {
+                // verify that there are no more registered locks for this OS-thread
+                util::verify_no_locks();
+
+                // run all callbacks attached to the exit event for this thread
+                run_thread_exit_callbacks();
+
                 throw;    // rethrow any exception except 'thread_interrupted'
+            }
         }
+
+        // verify that there are no more registered locks for this OS-thread
+        util::verify_no_locks();
 
         // run all callbacks attached to the exit event for this thread
         run_thread_exit_callbacks();

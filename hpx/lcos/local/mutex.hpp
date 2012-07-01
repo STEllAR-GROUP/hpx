@@ -24,6 +24,7 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/xtime.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <hpx/util/register_locks.hpp>
 
 // Disable warning C4275: non dll-interface class used as base for dll-interface
 // class
@@ -198,6 +199,7 @@ namespace hpx { namespace lcos { namespace local
             bool got_lock = try_lock_internal();
             if (got_lock) {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                util::register_lock(this);
             }
             else {
                 HPX_ITT_SYNC_CANCEL(this);
@@ -217,6 +219,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_PREPARE(this);
             if (try_lock_internal()) {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                util::register_lock(this);
                 return;
             }
 
@@ -235,6 +238,7 @@ namespace hpx { namespace lcos { namespace local
                 } while (!lock_acquired);
             }
             HPX_ITT_SYNC_ACQUIRED(this);
+            util::register_lock(this);
         }
 
         /// Attempts to acquire ownership of the \a mutex. Suspends the
@@ -286,6 +290,7 @@ namespace hpx { namespace lcos { namespace local
                 set_event();
             }
             HPX_ITT_SYNC_RELEASED(this);
+            util::unregister_lock(this);
         }
 
         typedef boost::unique_lock<mutex> scoped_lock;

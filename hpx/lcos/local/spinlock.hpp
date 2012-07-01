@@ -11,6 +11,7 @@
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/thread/locks.hpp>
@@ -134,6 +135,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
+            util::register_lock(this);
         }
 
         bool try_lock()
@@ -149,6 +151,7 @@ namespace hpx { namespace lcos { namespace local
 
             if (r == 0) {
                 HPX_ITT_SYNC_ACQUIRED(this);
+                util::register_lock(this);
                 return true;
             }
 
@@ -168,6 +171,7 @@ namespace hpx { namespace lcos { namespace local
 #endif
 
             HPX_ITT_SYNC_RELEASED(this);
+            util::unregister_lock(this);
         }
 
         typedef boost::unique_lock<spinlock> scoped_lock;

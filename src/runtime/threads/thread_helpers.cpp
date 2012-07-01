@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/register_locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -338,6 +339,10 @@ namespace hpx { namespace this_thread
 
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
+            // verify that there are no more registered locks for this OS-thread
+            util::verify_no_locks();
+
+            // suspend the HPX-thread
             detail::reset_lco_description desc(id, description, ec);
             statex = self.yield(state);
         }
@@ -377,6 +382,10 @@ namespace hpx { namespace this_thread
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
+            // verify that there are no more registered locks for this OS-thread
+            util::verify_no_locks();
+
+            // suspend the HPX-thread
             detail::reset_lco_description desc(id, description, ec);
             statex = self.yield(threads::suspended);
         }
@@ -417,6 +426,10 @@ namespace hpx { namespace this_thread
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
+            // verify that there are no more registered locks for this OS-thread
+            util::verify_no_locks();
+
+            // suspend the HPX-thread
             detail::reset_lco_description desc(id, description, ec);
             statex = self.yield(threads::suspended);
         }

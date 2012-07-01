@@ -98,6 +98,7 @@ namespace hpx { namespace lcos { namespace local
         HPX_ITT_SYNC_PREPARE(this);
         if (try_lock_internal()) {
             HPX_ITT_SYNC_ACQUIRED(this);
+            util::register_lock(this);
             return true;
         }
 
@@ -122,6 +123,7 @@ namespace hpx { namespace lcos { namespace local
             } while (!lock_acquired);
         }
         HPX_ITT_SYNC_ACQUIRED(this);
+        util::register_lock(this);
         return true;
     }
 }}}

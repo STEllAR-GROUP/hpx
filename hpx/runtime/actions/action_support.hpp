@@ -48,6 +48,7 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/base_object.hpp>
 #include <hpx/util/void_cast.hpp>
+#include <hpx/util/register_locks.hpp>
 
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>

@@ -13,6 +13,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,14 +44,24 @@ namespace hpx { namespace applier
     static inline threads::thread_state_enum thread_function(
         HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> const& func)
     {
+        // execute the actual thread function
         func(threads::wait_signaled);
+
+        // verify that there are no more registered locks for this OS-thread
+        util::verify_no_locks();
+
         return threads::terminated;
     }
 
     static inline threads::thread_state_enum thread_function_nullary(
         HPX_STD_FUNCTION<void()> const& func)
     {
+        // execute the actual thread function
         func();
+
+        // verify that there are no more registered locks for this OS-thread
+        util::verify_no_locks();
+
         return threads::terminated;
     }
 
