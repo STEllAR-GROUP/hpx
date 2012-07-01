@@ -78,12 +78,12 @@ struct lazy_ostream
             // Swap the current buffer for the next one.
             boost::swap(next, data);
 
+            // Unlock the mutex before we cleanup.
+            l.unlock();
+
             // Perform the write operation, then destroy the old buffer and
             // stream.
             this->base_type::write_async(gid_, next->out_buffer);
-
-            // Unlock the mutex before we cleanup.
-            l.unlock();
 
             delete next;
             next = 0;
@@ -108,12 +108,12 @@ struct lazy_ostream
             // Swap the current buffer for the next one.
             boost::swap(next, data);
 
+            // Unlock the mutex before we cleanup.
+            l.unlock();
+
             // Perform the write operation, then destroy the old buffer and
             // stream.
             this->base_type::write_sync(gid_, next->out_buffer);
-
-            // Unlock the mutex before we cleanup.
-            l.unlock();
 
             delete next;
             next = 0;
