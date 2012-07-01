@@ -11,6 +11,7 @@ set(example_programs
     fibonacci_one
     fibonacci_futures
     fractals
+    fractals_oclm
     interest_calculator
     non_atomic_rma
     quicksort
