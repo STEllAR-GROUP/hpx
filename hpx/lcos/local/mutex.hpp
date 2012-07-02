@@ -277,10 +277,14 @@ namespace hpx { namespace lcos { namespace local
         /// Release ownership of the \a mutex.
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
-        ///         releasing the mutex. Throws \a hpx#null_thread_id if called
-        ///         outside of a HPX-thread.
+        ///         releasing the mutex.
         void unlock()
         {
+            // We unregister ourselves before the actual unlock is executed as
+            // the spinlock below might be contented and the HPX-thread
+            // executing this unlock will be suspended.
+            util::unregister_lock(this);
+
             HPX_ITT_SYNC_RELEASING(this);
             {
                 mutex_type::scoped_lock l(mtx_);
@@ -290,7 +294,6 @@ namespace hpx { namespace lcos { namespace local
                 set_event();
             }
             HPX_ITT_SYNC_RELEASED(this);
-            util::unregister_lock(this);
         }
 
         typedef boost::unique_lock<mutex> scoped_lock;
