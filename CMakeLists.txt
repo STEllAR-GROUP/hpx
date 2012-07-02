@@ -1099,12 +1099,22 @@ if(NOT HPX_NO_INSTALL)
               external/lockfree/boost
               external/logging/boost
               external/plugin/boost
-              external/serialization/boost
     DESTINATION include
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
+
+  if(${BOOST_MINOR_VERSION} LESS 49)
+    # install Boost Serialization patch for older Boost versions only
+    install(
+      DIRECTORY external/serialization/boost
+      DESTINATION include
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+  endif()
 
   if(HPX_INTERNAL_MOVE)
     install( # install external dependencies
