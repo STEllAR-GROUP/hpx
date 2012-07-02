@@ -14,7 +14,7 @@ namespace hpx { namespace util
 #if defined(HPX_DEBUG)
     struct register_locks
     {
-        typedef boost::ptr_map<void const*, util::register_lock_data const>
+        typedef boost::ptr_map<void const*, util::register_lock_data>
             held_locks_map;
 
         struct tls_tag {};
@@ -37,7 +37,7 @@ namespace hpx { namespace util
         register_locks::held_locks_;
 
     ///////////////////////////////////////////////////////////////////////////
-    bool register_lock(void const* lock, util::register_lock_data const* data)
+    bool register_lock(void const* lock, util::register_lock_data* data)
     {
         if (0 != threads::get_self_ptr())
         {

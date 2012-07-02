@@ -14,11 +14,11 @@ namespace hpx { namespace util
 
 #if defined(HPX_DEBUG)
     HPX_API_EXPORT bool register_lock(void const* lock,
-        register_lock_data const* data = 0);
+        register_lock_data* data = 0);
     HPX_API_EXPORT bool unregister_lock(void const* lock);
     HPX_API_EXPORT void verify_no_locks();
 #else
-    inline bool register_lock(void const*, util::register_lock_data const* = 0)
+    inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
         return true;
     }

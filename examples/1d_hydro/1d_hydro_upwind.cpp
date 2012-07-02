@@ -60,50 +60,6 @@ double dx = 0.0;
 double cfl_factor = 0.0;
 double cfl_predict_factor = 0.0;
 
-
-// this is a single element of a "time array" that will be 1D array
-// containing information about timestep size. the index will be
-// the integer timestep number, so time_array[timestep].dt will be
-// the timestep size at that timestep
-struct time_element{
-  // default constructor
-  time_element()
-    : mtx()
-    , dt(0.0)
-    , elapsed_time(0.0)
-    , computed(false)
-  {}
-
-  // copy constructor
-  time_element(
-       time_element const& other
-       )
-    : mtx()
-    , dt(other.dt)                     // timestep size
-    , elapsed_time(other.elapsed_time) // elapsed time
-    , computed(other.computed)
-  {}
-
-  time_element& operator=(time_element const& rhs)
-  {
-    if (this != &rhs) 
-    {
-      dt = rhs.dt;
-      elapsed_time = rhs.elapsed_time;
-      computed = rhs.computed;
-    }
-    return *this;
-  }
-
-  hpx::lcos::local::mutex mtx;
-  double dt;
-  double elapsed_time;
-  bool computed;
-};
-// declaring time_array
-std::vector<time_element> time_array;
-
-
 // this is the fundimental element of the hydrodynamics code, the
 // individual cell.  It stores all of the variables that the code
 // tracks their changes in time.
@@ -164,6 +120,94 @@ struct cell{
   double tau;
   bool computed;
 };
+// this is a single element of a "time array" that will be 1D array
+// containing information about timestep size. the index will be
+// the integer timestep number, so time_array[timestep].dt will be
+// the timestep size at that timestep
+struct time_element{
+  // default constructor
+  time_element()
+    : mtx()
+    , dt(0.0)
+    , elapsed_time(0.0)
+    , computed(false){}
+  time_element(boost::uint64_t NumberofCells)
+  {
+      fluid=new std::vector<hpx::lcos::future<cell> >(NumberofCells);
+  }
+
+  // copy constructor
+  time_element(
+       time_element const& other
+       )
+    : mtx()
+    , dt(other.dt)                     // timestep size
+    , elapsed_time(other.elapsed_time) // elapsed time
+    , computed(other.computed)
+  {fluid=new std::vector<hpx::lcos::future<cell> >(0); }
+   
+  time_element& operator=(time_element const& rhs)
+  {
+    if (this != &rhs) 
+    {
+      dt = rhs.dt;
+      elapsed_time = rhs.elapsed_time;
+      computed = rhs.computed;
+    }
+    return *this;
+  }
+  void set_up_cells(std::vector<cell> &values)
+  {
+
+  }
+  hpx::lcos::local::mutex mtx;
+  double dt;
+  double elapsed_time;
+  bool computed;
+  std::vector<hpx::lcos::future<cell> > * fluid;
+};
+// declaring time_array
+std::vector<time_element> time_array;
+
+
+
+// Object to store the Fluid seperated in cell and computed by a Time Zone of tie Steps
+// Will store the 2d grid created by the division of the fluid into cells and the computation over time
+// Will be able to Retrieve,remove,add a timestep to the grid
+
+class One_Dimension_Grid
+{
+public:
+    One_Dimension_Grid():number_t_steps(0),number_of_cells(0)
+    {
+            fluid_grid=new std::vector<time_element>(number_t_steps);
+    }
+    One_Dimension_Grid(boost::uint64_t num_cells,boost::uint64_t num_time_steps)
+    {
+        number_t_steps=num_time_steps;
+        number_of_cells=num_cells;
+    }
+    
+    ~One_Dimension_Grid();
+    std::vector<time_element> set_time_step_vector(boost::uint64_t time_step_row);//returns the oject in the position you specify
+    void remove_bottom_time_step();//takes t he timesteps positio  n in the vector
+    void add_new_time_step(const std::vector<cell>&);
+
+
+private:
+    std::vector<time_element> * fluid_grid;//pointer to the Grid we will create whden the user starts a simulation
+   boost::uint64_t number_t_steps;
+   boost::uint64_t number_of_cells;
+    
+};
+void One_Dimension_Grid::remove_bottom_time_step()
+{
+    fluid_grid->pop_back();
+}
+void One_Dimension_Grid::add_new_time_step(const std::vector<cell> &new_time_step)
+{
+    //fluid_Grid->insert(fluid_Grid->front().back(),newTimeStep,newTimeStep);
+}
 
 // declaring grid of all cells for all timesteps
 std::vector<std::vector<cell> > grid;
@@ -190,7 +234,7 @@ typedef plain_result_action2<
 // This generates the required boilerplate we need for remote invocation.
 HPX_REGISTER_PLAIN_ACTION(compute_action);
 
-typedef future<cell> compute_future;
+typedef hpx::lcos::future<cell> compute_future;
 
 // this will return the timestep size.  The timestep index will refer to the
 // timestep where it will be USED rather than the timestep where it was
@@ -205,15 +249,13 @@ double timestep_size(boost::uint64_t timestep)
     return time_array[timestep].dt;
 
   //  cout << (boost::format("calculating timestep, ts=%1% \n") % timestep) << flush;
-
-
   // if the current timestep is less than n_predict, then we manually
   // decide the timestep
   if (timestep < n_predict)
     {
       time_array[timestep].computed = true;
       time_array[timestep].dt = dx*0.033;// this should be fine unless
-      // the initial conditions are changed
+        // the initial conditions are changed
       return time_array[timestep].dt;
     }
 
