@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "general_declarations.cpp"
-#include "statstd.cpp"
+#include "general_declarations.hpp"
+#include "statstd.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Vector, typename Package>

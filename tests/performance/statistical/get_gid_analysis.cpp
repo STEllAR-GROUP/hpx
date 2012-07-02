@@ -1,9 +1,16 @@
+//  Copyright (c)      2012 Daniel Kogler
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "simple_declarations.cpp"
-#include "statstd.cpp"
+#include "statstd.hpp"
+
+void void_thread(){
+}
+
+typedef hpx::actions::plain_action0<void_thread> void_action0;
+typedef hpx::lcos::packaged_action<void_action0> void_package0;
+HPX_REGISTER_PLAIN_ACTION(void_action0);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,7 +76,7 @@ void test_get_base_gid(Vector packages, uint64_t num, double ot){
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm){
-    uint64_t num = vm["number-spawned"].as<uint64_t>();
+    uint64_t num = vm["number-created"].as<uint64_t>();
     csv = (vm.count("csv") ? true : false);
     run_tests<vector<void_package0*>, void_package0, void_action0, void> (num);
     return hpx::finalize();
@@ -82,10 +89,10 @@ int main(int argc, char* argv[]){
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("number-spawned,N",
+        ("number-created,N",
             boost::program_options::value<uint64_t>()
                 ->default_value(500000),
-            "number of packaged_actions created and run")
+            "number of packaged_actions used in testing")
         ("csv",
             "output results as csv "
             "(format:count,mean,accurate mean,variance,min,max)");

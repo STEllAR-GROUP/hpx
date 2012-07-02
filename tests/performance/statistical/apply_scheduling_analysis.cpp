@@ -3,8 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "simple_declarations.cpp"
-#include "statstd.cpp"
+#include "statstd.hpp"
+
+void void_thread(){
+}
+
+typedef hpx::actions::plain_action0<void_thread> void_action0;
+typedef hpx::lcos::packaged_action<void_action0> void_package0;
+HPX_REGISTER_PLAIN_ACTION(void_action0);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,18 +73,17 @@ void register_work(Vector packages, uint64_t num, double ot){
         base.register_work(data, state, ec);
         time.push_back(t1.elapsed());
     }
-    printf("before_abort\n");
     base.abort_all_suspended_threads();
-    printf("after_abort\n");
     printout(time, ot, mean, message);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm){
-    uint64_t num = vm["number-spawned"].as<uint64_t>();
+    uint64_t num = vm["number"].as<uint64_t>();
     csv = (vm.count("csv") ? true : false);
     run_tests<vector<void_package0*>, void_package0, void_action0>(num);
-    return hpx::finalize();
+    hpx::finalize();
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,16 +93,17 @@ int main(int argc, char* argv[]){
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("number-spawned,N",
+        ("number,N",
             boost::program_options::value<uint64_t>()
                 ->default_value(500000),
-            "number of packaged_actions created and run")
+            "number of packages to create which will register work")
         ("csv",
             "output results as csv "
             "(format:count,mean,accurate mean,variance,min,max)");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    hpx::init(desc_commandline, argc, argv);
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

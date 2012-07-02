@@ -6,9 +6,9 @@
 set(subdirs statistical)
 
 foreach(subdir ${subdirs})
-    add_hpx_pseudo_target(tests.${subdir})
+    add_hpx_pseudo_target(tests.performance.${subdir})
     add_subdirectory(${subdir})
-    add_hpx_pseudo_dependencies(tests tests.${subdir})
+    add_hpx_pseudo_dependencies(tests tests.performance.${subdir})
 endforeach()
 
 set(benchmarks
