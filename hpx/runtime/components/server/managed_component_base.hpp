@@ -651,8 +651,8 @@ namespace hpx { namespace components
 
     public:
         // reference counting
-        template<typename Component, typename Derived> friend void intrusive_ptr_add_ref(managed_component<Component, Derived>* p);
-        template<typename Component, typename Derived> friend void intrusive_ptr_release(managed_component<Component, Derived>* p);
+        template<typename C, typename D> friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
+        template<typename C, typename D> friend void intrusive_ptr_release(managed_component<C, D>* p);
 
     protected:
         Component* component_;
