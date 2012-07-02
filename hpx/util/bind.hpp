@@ -346,8 +346,8 @@ namespace hpx { namespace util {
 
 #else  // !BOOST_PP_IS_ITERATING
 
-#define N BOOST_PP_ITERATION()
-#define NN BOOST_PP_ITERATION()
+#define N BOOST_PP_FRAME_ITERATION(1)
+#define NN BOOST_PP_FRAME_ITERATION(1)
 
 #define HPX_UTIL_BIND_INIT_MEMBER(Z, N, D)                                      \
     BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
@@ -574,44 +574,18 @@ namespace hpx { namespace util {
                     (get_pointer(detail::eval(env, arg0))->*f)
                         (BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
             }
+#define BOOST_PP_ITERATION_PARAMS_2                                             \
+    (                                                                           \
+        3                                                                       \
+      , (                                                                       \
+            1                                                                   \
+          , HPX_FUNCTION_LIMIT                                                  \
+          , <hpx/util/detail/bind_functor_operator.hpp>                         \
+        )                                                                       \
+    )                                                                           \
+ /**/
+#include BOOST_PP_ITERATE()
 
-#define HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR(Z, N, D)                          \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _))   \
-    {                                                                           \
-        using detail::get_pointer;                                              \
-        typedef                                                                 \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
-            >                                                                   \
-            env_type;                                                           \
-        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
-        return                                                                  \
-            (get_pointer(detail::eval(env, arg0))->*f)                          \
-                (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
-    }                                                                           \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
-    {                                                                           \
-        using detail::get_pointer;                                              \
-        typedef                                                                 \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
-            >                                                                   \
-            env_type;                                                           \
-        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
-        return                                                                  \
-            (get_pointer(detail::eval(env, arg0))->*f)                          \
-                (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
-    }                                                                           \
-/**/
-
-            BOOST_PP_REPEAT_FROM_TO(
-                1
-              , HPX_FUNCTION_LIMIT
-              , HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR, _
-            )
-#undef HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR
             BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MEMBER, _)
         };
 

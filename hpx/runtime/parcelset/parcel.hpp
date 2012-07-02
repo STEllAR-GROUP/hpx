@@ -183,7 +183,7 @@ namespace hpx { namespace parcelset
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
@@ -191,7 +191,7 @@ namespace hpx { namespace parcelset
 #endif
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

@@ -132,7 +132,7 @@ protected:
     load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
@@ -145,7 +145,7 @@ protected:
         // use cast to avoid compile time warning
         t = static_cast<T>(l);
     }
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

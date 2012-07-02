@@ -57,12 +57,13 @@
 namespace boost { namespace coroutines { namespace detail { namespace posix {
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
-#ifdef __GNUG__
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-pedantic"
+
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
+#   if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#       pragma GCC diagnostic push
+#   endif
+#   pragma GCC diagnostic ignored "-Wold-style-cast"
+#   pragma GCC diagnostic ignored "-pedantic"
 #endif
 
   inline
@@ -113,7 +114,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     ::munmap(stack, size);
   }
 
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

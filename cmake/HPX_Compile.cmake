@@ -65,7 +65,8 @@ macro(hpx_compile name)
       COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
               ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
-      RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_QUIET)
+              RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_VARIABLE ${name}_ERROR_OUTPUT)
+      message(${${name}_ERROR_OUTPUT})
   else()
     hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         "${${name}_FLAGS} ${${name}_SOURCE}"
@@ -75,8 +76,25 @@ macro(hpx_compile name)
               "${${name}_SOURCE}"
               ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT
-      OUTPUT_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout
-      ERROR_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr)
+      #OUTPUT_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout
+      #ERROR_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr
+      ERROR_VARIABLE ${name}_STDERR
+      OUTPUT_VARIABLE ${name}_STDOUT
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_STRIP_TRAILING_WHITESPACE
+      )
+      if(${name}_STDERR)
+          if("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Intel")
+              string(REGEX MATCH ".*command line warning #.*" ${name}_HAS_COMMAND_LINE_WARNING ${${name}_STDERR})
+            if(${name}_HAS_COMMAND_LINE_WARNING)
+              set(${name}_RESULT "1")
+            endif()
+          endif()
+          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr ${name}_STDERR)
+      endif()
+      if(${name}_STDOUT)
+          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout ${name}_STDOUT)
+      endif()
   endif()
 endmacro()
 

@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace server
 {
     namespace detail
     {
-#if !BOOST_NO_RVALUE_REFERENCES
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
         template <typename T, bool IsRvalueRef =
             std::is_rvalue_reference<T>::type::value>
 #else

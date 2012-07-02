@@ -615,7 +615,7 @@ struct request
 
 }}
 
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
@@ -623,7 +623,7 @@ struct request
 #endif
 BOOST_CLASS_VERSION(hpx::agas::request, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::request, boost::serialization::track_never)
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

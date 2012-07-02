@@ -99,7 +99,7 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
     t.t[cn.size()] = '\0';
 }
 
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
@@ -141,7 +141,7 @@ HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
     load(x);
     m_flags = static_cast<unsigned int>(x << CHAR_BIT);
 }
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

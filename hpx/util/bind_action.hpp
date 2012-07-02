@@ -104,7 +104,7 @@ namespace boost { namespace serialization
 
 #else  // !BOOST_PP_IS_ITERATING
 
-#define N BOOST_PP_ITERATION()
+#define N BOOST_PP_FRAME_ITERATION(1)
 #define NN N
 
 #define HPX_UTIL_BIND_INIT_MEMBER(Z, N, D)                                    \
@@ -321,42 +321,17 @@ namespace hpx { namespace util
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();
             }
 
-#define HPX_UTIL_BIND_ACTION_OPERATOR(Z, N, D)                                \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) \
-    {                                                                         \
-        typedef                                                               \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
-            >                                                                 \
-            env_type;                                                         \
-        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));          \
-        return hpx::async<Action>(                                            \
-            hpx::util::detail::eval(env, arg0)                                \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();      \
-    }                                                                         \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
-    {                                                                         \
-        typedef                                                               \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
-            >                                                                 \
-            env_type;                                                         \
-        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));          \
-        return hpx::async<Action>(                                            \
-            hpx::util::detail::eval(env, arg0)                                \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();      \
-    }                                                                         \
-/**/
-            BOOST_PP_REPEAT_FROM_TO(
-                1
-              , HPX_FUNCTION_LIMIT
-              , HPX_UTIL_BIND_ACTION_OPERATOR, _
-            )
-#undef HPX_UTIL_BIND_ACTION_OPERATOR
+#define BOOST_PP_ITERATION_PARAMS_2                                             \
+    (                                                                           \
+        3                                                                       \
+      , (                                                                       \
+            1                                                                   \
+          , HPX_FUNCTION_LIMIT                                                  \
+          , <hpx/util/detail/bind_action_functor_operator.hpp>                  \
+        )                                                                       \
+    )                                                                           \
+ /**/
+#include BOOST_PP_ITERATE()
 
             BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MEMBER, _)
         };

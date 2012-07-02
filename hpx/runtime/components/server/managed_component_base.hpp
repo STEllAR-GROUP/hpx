@@ -327,6 +327,21 @@ namespace hpx { namespace components
             }
         };
     }
+    // reference counting
+    template <typename Component, typename Derived>
+    void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
+    {
+        detail_adl_barrier::destroy<
+	    typename traits::managed_component_dtor_policy<Component>::type
+        >::addref(p->component_);
+    }
+    template <typename Component, typename Derived>
+    void intrusive_ptr_release(managed_component<Component, Derived>* p)
+    {
+        detail_adl_barrier::destroy<
+	    typename traits::managed_component_dtor_policy<Component>::type
+        >::release(p->component_);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// The managed_component template is used as a indirection layer
@@ -634,21 +649,12 @@ namespace hpx { namespace components
             return heap_type::get_gid(const_cast<managed_component*>(this));
         }
 
-    protected:
+    public:
         // reference counting
-        friend void intrusive_ptr_add_ref(managed_component* p)
-        {
-            detail_adl_barrier::destroy<
-                typename traits::managed_component_dtor_policy<Component>::type
-            >::addref(p->component_);
-        }
-        friend void intrusive_ptr_release(managed_component* p)
-        {
-            detail_adl_barrier::destroy<
-                typename traits::managed_component_dtor_policy<Component>::type
-            >::release(p->component_);
-        }
+        template<typename Component, typename Derived> friend void intrusive_ptr_add_ref(managed_component<Component, Derived>* p);
+        template<typename Component, typename Derived> friend void intrusive_ptr_release(managed_component<Component, Derived>* p);
 
+    protected:
         Component* component_;
     };
 

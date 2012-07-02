@@ -153,14 +153,14 @@ namespace hpx { namespace actions
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 BOOST_CLASS_VERSION(hpx::actions::continuation, HPX_CONTINUATION_VERSION)
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

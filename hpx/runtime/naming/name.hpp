@@ -458,6 +458,26 @@ namespace hpx { namespace naming
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
         }
 
+        id_type(id_type const & o)
+            : gid_(o.gid_)
+        {}
+
+        id_type(BOOST_RV_REF(id_type) o)
+            : gid_(boost::move(o.gid_))
+        {}
+
+        id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o)
+        {
+            gid_ = o.gid_;
+            return *this;
+        }
+
+        id_type & operator=(BOOST_RV_REF(id_type) o)
+        {
+            gid_ = boost::move(o.gid_);
+            return *this;
+        }
+
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
 
@@ -659,7 +679,7 @@ namespace hpx { namespace traits
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
@@ -670,7 +690,7 @@ BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

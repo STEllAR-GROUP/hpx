@@ -524,7 +524,7 @@ struct get_remote_result<bool, agas::response>
 
 }}
 
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
@@ -532,7 +532,7 @@ struct get_remote_result<bool, agas::response>
 #endif
 BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
