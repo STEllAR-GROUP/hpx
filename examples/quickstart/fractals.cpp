@@ -71,22 +71,22 @@ int hpx_main()
     vector<fractals_action> fAct;//[sizeX * sizeY];
     vector<future<int>> iteration;
     iteration.reserve(sizeX*sizeY);
-    for (int i = 0; i < sizeX * sizeY; i++)
+    for (int i = 0; i < sizeX; i++)
+        for (int j = 0; j < sizeY; j++)
         {
             hpx::naming::id_type const locality_id = hpx::find_here();
-            float x0 = ((float) (i / sizeX)) * 3.5 / sizeX - 2.5;
-            float y0 = ((float) (i % sizeY)) * 2 / sizeY - 1;
+            float x0 = (float)i * 3.5 / (float)sizeX - 2.5;
+            float y0 = (float)j * 2.0 / (float)sizeY - 1.0;
             //int it = iteration.get();
             fractals_action temp;
             iteration.push_back(async(temp, locality_id, x0, y0, max_iteration));
             fAct.push_back(temp);
         }
     wait_all(iteration);
-    
     for (int i = 0; i < sizeX; i++)
         for (int j = 0; j < sizeY; j++)
         {
-            int it = iteration[i].get();
+            int it = iteration[i*sizeX + j].get();
             for (int k = 0; k < 2; k++)
             {
             RGBApixel pix;
@@ -97,7 +97,6 @@ int hpx_main()
             }
         }
     }
-    
     SetImage.WriteToFile("out.bmp");
 
     return hpx::finalize(); // Handles HPX shutdown
