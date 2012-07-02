@@ -62,6 +62,7 @@ int hpx_main()
     BMP SetImage;
     SetImage.SetBitDepth(24);
     SetImage.SetSize(sizeX * 2,sizeY);
+    hpx::util::high_resolution_timer t;
     {
         int max_iteration = 255;
         using hpx::lcos::future;
@@ -71,6 +72,8 @@ int hpx_main()
     vector<fractals_action> fAct;//[sizeX * sizeY];
     vector<future<int>> iteration;
     iteration.reserve(sizeX*sizeY);
+    std::cout << "Initial setup completed in " << t.elapsed() << "s. Initializing and running futures...\n";
+    t.restart();
     for (int i = 0; i < sizeX; i++)
         for (int j = 0; j < sizeY; j++)
         {
@@ -83,10 +86,14 @@ int hpx_main()
             fAct.push_back(temp);
         }
     wait_all(iteration);
+    //int total = 0;
+    std::cout << sizeX*sizeY << " calculations run in " << t.elapsed() << "s. Transferring from futures to general memory...\n";
+    t.restart();
     for (int i = 0; i < sizeX; i++)
         for (int j = 0; j < sizeY; j++)
         {
             int it = iteration[i*sizeX + j].get();
+            //total += it;
             for (int k = 0; k < 2; k++)
             {
             RGBApixel pix;
@@ -97,7 +104,11 @@ int hpx_main()
             }
         }
     }
+    std::cout << "Transfer process completed in " << t.elapsed() << "s. Writing to hard disk...\n";
+    t.restart();
     SetImage.WriteToFile("out.bmp");
+    
+    std::cout << "Fractal image written to file \"out.bmp\" from memory in " << t.elapsed() << "s.\nInitializing shutdown process.\n";
 
     return hpx::finalize(); // Handles HPX shutdown
 }
@@ -105,5 +116,7 @@ int hpx_main()
 
 int main()
 {
-    return hpx::init();
+    int code = hpx::init();
+    system("Pause");
+    return code;
 }
