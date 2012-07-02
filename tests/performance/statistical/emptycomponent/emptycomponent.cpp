@@ -8,7 +8,9 @@
 #include "server/emptycomponent.hpp"
 
 HPX_REGISTER_COMPONENT_MODULE();
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::simple_component<
-        hpx::components::server::emptycomponent>, emptycomponent);
+        hpx::components::server::emptycomponent>, emptycomponent,
+        hpx::components::factory_disabled)
 
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::server::emptycomponent)

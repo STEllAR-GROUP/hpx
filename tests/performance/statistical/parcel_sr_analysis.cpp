@@ -61,7 +61,10 @@ int main(int argc, char* argv[]){
             "(format:count,mean,accurate mean,variance,min,max)");
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    vector<string> cfg;
+    cfg.push_back("hpx.components.parcelsender.enabled = 1");
+    cfg.push_back("hpx.components.parcelreceiver.enabled = 1");
+    return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
