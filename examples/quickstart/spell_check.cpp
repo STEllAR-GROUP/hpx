@@ -43,7 +43,7 @@ std::string search(int start, int end, std::string &word)
         size = word.length();
     for (int i = 0; i < size; i++)
     {
-        char check_char = check[i];
+        char check_char = tolower(check[i]);
         char word_char = word[i];
         if (check_char != word_char)
         {
@@ -56,7 +56,7 @@ std::string search(int start, int end, std::string &word)
     if (check.length() == word.length())
         return word + " was found in this dictionary.\n";
     else
-        return search(start, (start+end-1)/2, word);
+        return search((start+end+1)/2, end, word);
 }
 int hpx_main()
 {
@@ -127,7 +127,7 @@ int hpx_main()
                     }
                     //remove any garbage characters
                     if (toupper(temp[i][j]) >= 'A' && toupper(temp[i][j]) <= 'Z')
-                        holder.push_back(temp[i][j]);
+                        holder.push_back(tolower(temp[i][j]));
                 }
                 if (holder.size() > 0)
                 {
