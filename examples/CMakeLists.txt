@@ -29,6 +29,7 @@ set(subdirs
     queue
     quickstart
     random_mem_access
+    spell_check
     startup_shutdown
     throttle
    )

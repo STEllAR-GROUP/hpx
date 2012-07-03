@@ -16,8 +16,6 @@ set(example_programs
     non_atomic_rma
     quicksort
     simplest_hello_world
-    spell_check
-    spell_check_file
     timed_wake
    )
 
