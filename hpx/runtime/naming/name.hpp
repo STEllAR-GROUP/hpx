@@ -463,8 +463,10 @@ namespace hpx { namespace naming
         {}
 
         id_type(BOOST_RV_REF(id_type) o)
-            : gid_(boost::move(o.gid_))
-        {}
+            : gid_(o.gid_)
+        {
+            o.gid_.reset();
+        }
 
         id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o)
         {
@@ -474,7 +476,8 @@ namespace hpx { namespace naming
 
         id_type & operator=(BOOST_RV_REF(id_type) o)
         {
-            gid_ = boost::move(o.gid_);
+            gid_ = o.gid_;
+            o.gid_.reset();
             return *this;
         }
 
