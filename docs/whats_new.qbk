@@ -10,6 +10,11 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_0 HPX V0.9.0]
 
+We have had roughly 500 commits since the last release and we have closed
+approximately 80 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
 * Renamed `hpx::lcos::packaged_task<>` to `hpx::lcos::packaged_action<>` to
   reflect the semantic differences to a packaged_task as defined by the C++11
   standard.
@@ -104,6 +109,99 @@
   `hpx::get_line_number`, `hpx::get_os_thread`, `hpx::get_thread_id`, and
   `hpx::get_thread_description`.
 
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release:
+
+* #71 - GIDs that are not serialized via handle_gid should raise an exception
+* #74 - hpx_pbs.py needs documentation
+* #75 - hpx_invoke.py needs documentation
+* #105 - Allow for hpx::util::functions to be registered in the AGAS symbolic
+         namespace
+* #107 - Nasty threadmanger race condition (reproducable in sheneos_test)
+* #108 - Add millisecond resolution to HPX logs on Linux
+* #110 - Shutdown hang in distributed with release build
+* #116 - Don't use TSS for the applier and runtime pointers
+* #162 - Move local synchronous execution shortcut from hpx::function to the
+         applier
+* #172 - Cache sources in CMake and check if they change manually
+* #178 - Add an INI option to turn off ranged-based AGAS caching
+* #187 - Support for disabling performance counter deployment
+* #194 - Implement bulk decrement operations
+* #195 - Implement decrement request merging
+* #199 - --dump-config --exit should be supported
+* #202 - Support for sending performance counter data to a specific file
+* #218 - boost.coroutines allows different stack sizes, but stack pool is
+         unaware of this
+* #231 - Implement movable boost::bind
+* #232 - Implement movable boost::function
+* #236 - Allow binding hpx::util::functions to actions
+* #239 - Replace hpx::function with hpx::util::function
+* #240 - Can't specify RemoteResult with lcos::async
+* #242 - REGISTER_TEMPLATE support for plain actions
+* #243 - handle_gid<> support for hpx::util::function
+* #245 - *_c_cache code throws an exception if the queried GID is not in the
+         local cache
+* #246 - Undefined references in dataflow/adaptive1d example
+* #250 - configure error: dataflow
+* #252 - Problems configuring sheneos with CMake
+* #254 - lifetime of components doesn't end when client goes out of scope
+* #259 - CMake does not detect that MSVC10 has lambdas
+* #260 - io_service_pool segfault
+* #261 - Late parcel executed outside of pxthread
+* #263 - Cannot select allocator with cmake
+* #264 - Fix allocator select
+* #267 - runtime error for hello_world
+* #268 - undefined reference to `hpx::iostreams::cout()`
+* #269 - pthread_affinity_np test fails to compile
+* #270 - Compiler noise due to -Wcast-qual
+* #275 - Problem with configuration tests/include paths on Gentoo
+* #278 - hpx::init: std::exception caught: Invalid command line option
+         --hierarchy-arity, valid for --queueing=hierarchy only.
+* #325 - Sheneos is 200-400 times slower than the fortran equivalent
+* #331 - hpx::init() and hpx_main() should not depend on program_options
+* #333 - Add doxygen support to cmake for doc toolchain
+* #340 - Performance counters for parcels
+* #346 - Component loading error when running hello_world in distributed on
+         MSVC2010
+* #362 - missing initializer error
+* #363 - parcel port serialization error -- graph500
+* #366 - parcel buffering leads to types incompatible exception
+* #368 - scalable alternative to rand() needed for HPX
+* #369 - IB over IP is substantially slower than just using standard TCP/IP
+* #370 - distributed reliability issues
+* #372 - HermioneBot erroneously fails during configure
+* #374 - hpx::lcos::wait should work with dataflows and arbitrary classes
+         meeting the future interface
+* #375 - Conflicting/ambigious overloads of hpx::lcos::wait
+* #376 - Find_HPX.cmake should set CMake variable HPX_FOUND for out of tree builds
+* #377 - shen interpolate bulk and interpolate_one_bulk are broken
+* #379 - Add support for distributed runs under SLURM
+* #380 - neutron_star
+* #382 - _Unwind_Word not declared in boost.backtrace
+* #387 - Doxygen should look only at list of specified files
+* #388 - Running 'make install' on an out-of-tree application is broken
+* #391 - Out-of-tree application segfaults when running in qsub
+* #392 - Remove HPX_NO_INSTALL option from cmake build system
+* #396 - pragma related warnings when compiling with older gcc versions
+* #399 - Out of Tree Component build problems
+* #400 - Out of source builds on Windows: linker should not receive compiler flags
+* #401 - Out of source builds on Windows: components need to be linked with
+         hpx_serialization
+* #402 - Launching a component
+* #403 - new segfault in embarrassingly parallel example
+* #404 - gfortran fails to link automatically when fortran files are present
+* #405 - Inability to specify linking order for external libraries
+* #406 - Revert commit [8018]: adapting action limits such that dataflow
+         applications work without additional defines
+* #408 - linking issue
+* #409 - Running on 2k cores runs AGAS server out of memory
+* #414 - distributed failures with dataflow
+* #415 - error: `locality_results` is not a member of `hpx::components::server`
+* #416 - sheneos isn't compiling
+* #425 - Breaking changes to traits::*result wrt std::vector<id_type>
+* #426 - AUTOGLOB needs to be updated to support fortran
+
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -122,7 +220,8 @@ Here is a list of the important tickets we closed for this point release:
 * #295 - Don't require install path to be known at compile time.
 * #371 - Add hpx iostreams to standard build.
 * #384 - Fix compilation with GCC 4.7.
-* #390 - Remove keep_factory_alive startup call from ShenEOS; add shutdown call to H5close.
+* #390 - Remove keep_factory_alive startup call from ShenEOS; add shutdown call
+         to H5close.
 * #393 - Thread affinity control is broken.
 
 [heading Bug Fixes (Commits)]
