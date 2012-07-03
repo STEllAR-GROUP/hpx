@@ -15,6 +15,7 @@ set(subdirs
     nbody
     performance_counters
     quickstart
+    random_mem_access
    )
 
 if(HDF5_CPP_FOUND)
