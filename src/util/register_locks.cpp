@@ -4,11 +4,19 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/ptr_container/ptr_map.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace detail
+{
+    std::string backtrace();
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
 #if defined(HPX_DEBUG)
@@ -85,8 +93,21 @@ namespace hpx { namespace util
             register_locks::held_locks_map const& held_locks =
                 register_locks::get_lock_map();
 
-            // simply assert if there are still registered locks for this OS-thread
-            BOOST_ASSERT(held_locks.empty());
+            // we create a log message if there are still registered locks for
+            // this OS-thread
+            if (!held_locks.empty()) {
+                std::string back_trace(hpx::detail::backtrace());
+                if (back_trace.empty()) {
+                    LERR_(debug)
+                        << "suspending thread while at least one lock is being held "
+                           "(stack backtrace was disabled at compile time)";
+                }
+                else {
+                    LERR_(debug)
+                        << "suspending thread while at least one lock is being held, "
+                        << "stack backtrace: " << back_trace;
+                }
+            }
         }
     }
 #endif
