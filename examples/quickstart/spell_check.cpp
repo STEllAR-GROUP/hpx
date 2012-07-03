@@ -31,10 +31,49 @@ std::string search(int start, int end, std::string &word)
     //lowest value is 'a' at 97
     //start is where our word check is located.
     //end is where the end if this thread's search is.
-    std::string check = words[(start+end)/2];
+    int mid = (start+end);
+    std::string check = words[mid/2];
     //first we check if there is no definitive match
     if (start == end && word != check)
-        return word + " was not found in this dictionary, " + check + " was the closest match.\n";
+    {
+        //just a quick check, because the list is not perfectly symmetrical
+        {
+            int pos = mid/2;
+            
+            int size;
+            //if our value is lower than start, we disregard it.
+            if (word.length() >= check.length())
+                size = check.length();
+            else
+                size = word.length();
+            std::string part;
+            bool sub = true;
+            for (int i = 0; i < size; i++)
+            {
+                char check_char = tolower(check[i]);
+                char word_char = word[i];
+                if (word_char != check_char)
+                {
+                    if (word_char >=check_char)
+                        sub = false;
+                    break;
+                }
+                else
+                    part.push_back(word_char);
+            }
+            while(check != word)
+            {
+                check = words[pos];
+                if (sub)
+                    pos--;
+                else
+                    pos++;
+                if (check.find(part) == std::string::npos)
+                    return word + " was not found in this dictionary, " + check + " was the closest match.\n";
+            }
+            return word + " was found in this dictionary.\n";
+        }
+    }
     int size;
     //if our value is lower than start, we disregard it.
     if (word.length() >= check.length())
@@ -48,9 +87,9 @@ std::string search(int start, int end, std::string &word)
         if (check_char != word_char)
         {
             if (word_char > check_char)
-                return search((start+end+1)/2, end, word);
+                return search((mid+1)/2, end, word);
             else
-                return search(start, (start+end-1)/2, word);
+                return search(start, (mid-1)/2, word);
         }
     }
     if (check.length() == word.length())
@@ -107,7 +146,7 @@ int hpx_main()
         vector<string> strs;
         {
             vector<string> temp;
-            boost::split(temp, word, boost::is_any_of("\n\t "));
+            boost::split(temp, word, boost::is_any_of("\n\t -"));
             for (int i = 0; i < temp.size(); i++)
             {
                 bool isContraction = false;
