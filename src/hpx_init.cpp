@@ -976,8 +976,8 @@ namespace hpx
                 // started with --worker/-w.
                 mode = hpx::runtime_mode_console;
                 if (vm.count("hpx:console") + vm.count("hpx:worker") +
-                    vm.count("hpx:connect") > 1
-                ) {
+                    vm.count("hpx:connect") > 1)
+                {
                     throw std::logic_error("Ambiguous command line options. "
                         "Do not specify more than one of --hpx:console, "
                         "--hpx:worker, or --hpx:connect");
@@ -1008,19 +1008,20 @@ namespace hpx
             agas_host = mapnames.map(agas_host, agas_port);
 
             // sanity checks
-            if (num_localities == 1 && !vm.count("hpx:agas") && !vm.count("hpx:node")) {
+            if (num_localities == 1 && !vm.count("hpx:agas") && !vm.count("hpx:node"))
+            {
                 // We assume we have to run the AGAS server if the number of
                 // localities to run on is not specified (or is '1')
                 // and no additional option (--hpx:agas or --hpx:node) has been
                 // specified. That simplifies running small standalone
                 // applications on one locality.
-                run_agas_server = true;
+                run_agas_server = (mode != runtime_mode_connect) ? true : false;
             }
 
             if (hpx_host == agas_host && hpx_port == agas_port) {
                 // we assume that we need to run the agas server if the user
                 // asked for the same network addresses for HPX and AGAS
-                run_agas_server = true;
+                run_agas_server = (mode != runtime_mode_connect) ? true : false;
             }
             else if (run_agas_server) {
                 // otherwise, if the user instructed us to run the AGAS server,
@@ -1061,6 +1062,12 @@ namespace hpx
                 std::cerr << "hpx::init: command line warning: --hpx:run-agas-server-only "
                     "used for single locality execution, application might "
                     "not run properly." << std::endl;
+            }
+
+            // we can't run the AGAS server while connecting
+            if (run_agas_server && mode == runtime_mode_connect) {
+                throw std::logic_error("Command line option error: can't run AGAS server"
+                    "while connecting to a running application.");
             }
 
             // Set whether the AGAS server is running as a dedicated runtime.

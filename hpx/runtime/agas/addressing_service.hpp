@@ -276,6 +276,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         return runtime_type == runtime_mode_console;
     }
 
+    /// \brief Returns whether this addressing_service is connecting to a
+    ///        running application
+    bool is_connecting() const
+    {
+        return runtime_type == runtime_mode_connect;
+    }
+
     /// \brief Register performance counter types exposing properties from the
     ///        local cache.
     void register_counter_types();

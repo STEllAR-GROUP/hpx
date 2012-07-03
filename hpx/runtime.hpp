@@ -560,11 +560,11 @@ namespace hpx
         util::io_service_pool parcel_pool_;
         util::io_service_pool timer_pool_;
         parcelset::parcelport parcel_port_;
-        naming::resolver_client agas_client_;
-        parcelset::parcelhandler parcel_handler_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
         threadmanager_type thread_manager_;
+        naming::resolver_client agas_client_;
+        parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
         components::server::memory memory_;
         applier::applier applier_;

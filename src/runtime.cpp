@@ -182,14 +182,14 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
             ini_.get_max_connections(), ini_.get_max_connections_per_loc()),
-        agas_client_(parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
-            new parcelset::policies::global_parcelhandler_queue),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
+        agas_client_(parcel_port_, ini_, mode_),
+        parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
+            new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
@@ -940,7 +940,7 @@ namespace hpx { namespace threads
     // shortcut for get_applier().get_thread_manager()
     threadmanager_base& get_thread_manager()
     {
-        return hpx::applier::get_applier().get_thread_manager();
+        return get_runtime().get_thread_manager();
     }
 
     // shortcut for runtime_configuration::get_default_stack_size

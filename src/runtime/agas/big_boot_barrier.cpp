@@ -402,11 +402,18 @@ void register_worker(registration_header const& header)
 
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
+    if (HPX_UNLIKELY(agas_client.is_connecting()))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+            , "agas::register_worker"
+            , "runtime_mode_connect can't find running application.");
+    }
+
     if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
-            , "registration parcel received by non-bootstrap locality");
+            , "registration parcel received by non-bootstrap locality.");
     }
 
     naming::gid_type prefix
@@ -602,7 +609,7 @@ void big_boot_barrier::apply(
 
     for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
-        // Get a connection or reserve space for a new connection. 
+        // Get a connection or reserve space for a new connection.
         if (connection_cache_.get_or_reserve(locality_id, client_connection))
         {
             got_cache_space = true;
@@ -612,7 +619,7 @@ void big_boot_barrier::apply(
         // Wait for a really short amount of time (usually 100 ms).
         boost::this_thread::sleep(boost::get_system_time() +
             boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-    } 
+    }
 
     // If we didn't get a connection or permission to create one (which is
     // unlikely), bail.
