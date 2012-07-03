@@ -12,8 +12,6 @@ set(subdirs
     bfs
     cancelable_action
     gtc
-    heartbeat
-    jacobi
     nbody
     performance_counters
     quickstart
