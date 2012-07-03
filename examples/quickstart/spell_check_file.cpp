@@ -134,7 +134,7 @@ int hpx_main()
                 word.push_back(' ');
                 fileLines++;
             }
-            cout << fileLines << " lines loaded in " << t.elapsed() << "s.\n";
+            cout << fileLines << " words loaded in " << t.elapsed() << "s.\n";
         }
         else
         {
