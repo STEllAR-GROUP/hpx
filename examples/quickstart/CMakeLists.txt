@@ -15,8 +15,9 @@ set(example_programs
     interest_calculator
     non_atomic_rma
     quicksort
-    timed_wake
     simplest_hello_world
+    spell_check
+    timed_wake
    )
 
 if(HPX_CXX11_LAMBDAS)
