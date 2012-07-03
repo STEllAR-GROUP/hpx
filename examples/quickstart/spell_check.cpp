@@ -101,10 +101,41 @@ int hpx_main()
         }
         fin.close();
         char* word = new char[1024];
-        cout << "Enter the words you would like to spellcheck and then press \"Enter\".\n";
+        cout << "Enter the words you would like to spellcheck, separated by a \"Space\", and then press \"Enter\".\n";
         cin.getline(word,1024, '\n');
-        std::vector<std::string> strs;
-        boost::split(strs, word, boost::is_any_of("\n\t "));
+        vector<bool> contraction;
+        vector<string> strs;
+        {
+            vector<string> temp;
+            boost::split(temp, word, boost::is_any_of("\n\t "));
+            for (int i = 0; i < temp.size(); i++)
+            {
+                bool isContraction = false;
+                string holder;
+                for (int j = 0; j < temp[i].size(); j++)
+                {
+                    //a size check to avoid errors
+                    if (temp[i].size() - j - 1 == 2)
+                    {
+                    //if this is a contraction, ignore the rest of it...
+                        if (temp[i][j+1] == '\'' && temp[i][j] == 'n' && temp[i][j+2] == 't')
+                        {
+                            //but label this as a contraction
+                            isContraction = true;
+                            break;
+                        }
+                    }
+                    //remove any garbage characters
+                    if (toupper(temp[i][j]) >= 'A' && toupper(temp[i][j]) <= 'Z')
+                        holder.push_back(temp[i][j]);
+                }
+                if (holder.size() > 0)
+                {
+                    contraction.push_back(isContraction);
+                    strs.push_back(holder);
+                }
+            }
+        }
         t.restart();
         {
             using hpx::lcos::future;
@@ -126,6 +157,9 @@ int hpx_main()
             cout << "Search completed in " << t.elapsed() << "s.\n";
             for (int i = 0; i < strs.size(); i++)
             {
+                cout << "Word number " << i + 1 << ":\n";
+                if (contraction[i])
+                    cout << "Note: This word seems to be a contraction.\nThe last two letters have been ignored.\n";
                 cout << wordRun[i].get();
             }
         }
