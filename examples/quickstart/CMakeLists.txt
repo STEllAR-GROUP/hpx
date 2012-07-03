@@ -17,6 +17,7 @@ set(example_programs
     quicksort
     simplest_hello_world
     spell_check
+    spell_check_file
     timed_wake
    )
 
