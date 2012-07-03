@@ -97,7 +97,7 @@ int hpx_main()
         else
         {
             cout << "Error: Unable to open file.\n";
-            return 1;
+            return hpx::finalize();
         }
         fin.close();
         char* word = new char[1024];
