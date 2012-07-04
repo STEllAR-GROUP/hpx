@@ -1,4 +1,4 @@
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,9 +20,19 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::naming::id_type a = hpx::find_here();
 
         test_action act;
-        hpx::async(act, hpx::find_here(), a);
+        hpx::lcos::future<void> f = hpx::async(act, hpx::find_here(), a);
+        f.get();
 
-        HPX_TEST_EQ(hpx::find_here(), a); 
+        HPX_TEST_EQ(hpx::find_here(), a);
+    }
+
+    {
+        hpx::naming::id_type a = hpx::find_here();
+
+        test_action act;
+        act(hpx::find_here(), a);
+
+        HPX_TEST_EQ(hpx::find_here(), a);
     }
 
     hpx::finalize();

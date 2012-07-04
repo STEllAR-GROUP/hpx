@@ -16,7 +16,7 @@ namespace hpx
 {
     template <typename Action, typename Arg0>
     inline bool
-    apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
+    apply(naming::id_type const& gid, Arg0 arg0);
 
     namespace actions
     {
