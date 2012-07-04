@@ -29,6 +29,10 @@
     boost::forward<BOOST_PP_CAT(D, N)>(BOOST_PP_CAT(a, N))                    \
 /**/
 
+#define HPX_UTIL_BIND_MOVE_PARAMS(Z, N, _)                                    \
+    boost::move(BOOST_PP_CAT(a, N))                                           \
+/**/
+
 #define HPX_UTIL_BIND_EVAL(Z, N, D)                                           \
     hpx::util::detail::eval(env, BOOST_PP_CAT(arg, N))                        \
 /**/
@@ -81,6 +85,7 @@
 #include BOOST_PP_ITERATE()
 
 #undef HPX_UTIL_BIND_FWD_REF_PARAMS
+#undef HPX_UTIL_BIND_MOVE_PARAMS
 #undef HPX_UTIL_BIND_FWD_PARAMS
 #undef HPX_UTIL_BIND_EVAL
 #undef HPX_UTIL_BIND_REMOVE_REFERENCE
@@ -375,7 +380,7 @@ namespace hpx { namespace util
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
     >
     bind(
-        BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+        BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
     )
     {
         return
@@ -383,7 +388,7 @@ namespace hpx { namespace util
                 Action
               BOOST_PP_COMMA_IF(N)
                   BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-            > (BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
+            > (BOOST_PP_ENUM(N, HPX_UTIL_BIND_MOVE_PARAMS, A));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -399,7 +404,7 @@ namespace hpx { namespace util
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
     )
     {
         return
@@ -407,7 +412,7 @@ namespace hpx { namespace util
                 Derived
               BOOST_PP_COMMA_IF(N)
                   BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-            > (BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
+            > (BOOST_PP_ENUM(N, HPX_UTIL_BIND_MOVE_PARAMS, A));
     }
 }}
 
