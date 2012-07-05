@@ -1,4 +1,4 @@
-/////////////////////////// Interest Calculator //////////////////////////////////
+/////////////////////////// Interest Calculator ///////////////////////////////
 //  Copyright (c) 2012 Adrian Serio
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -68,49 +68,51 @@ HPX_PLAIN_ACTION(identity, identity_action);
 //[interest_hpx_main
 int hpx_main(variables_map & vm)
 {
-    using hpx::lcos::dataflow;
-    using hpx::lcos::dataflow_base;
-    hpx::naming::id_type here = hpx::find_here();
-
-    double p=vm["principal"].as<double>(); //Initial principal
-    double i_rate=vm["rate"].as<double>(); //Interest rate
-    int cp=vm["cp"].as<int>(); //Length of a compound period
-    int t=vm["time"].as<int>(); //Length of time money is invested
-      
-    i_rate/=100; //Rate is a % and must be converted
-    t/=cp; //Determine how many times to iterate interest calculation:
-           //How many full compund periods can fit in the time invested
-
-    // In non-dataflow terms the implemented algorithm would look like:
-    //
-    // int t = 5;    // number of time periods to use
-    // double principal = p;
-    // double rate = i_rate;
-    //
-    // for (int i = 0; i < t; ++i)
-    // {
-    //     double interest = calc(principal, rate);
-    //     principal = add(principal, interest);
-    // }
-    //
-    // Please note the similarity with the code below!
-
-    dataflow_base<double> principal = dataflow<identity_action>(here, p);
-    dataflow_base<double> rate = dataflow<identity_action>(here, i_rate);
-
-    for (int i = 0; i < t; ++i)
     {
-        dataflow_base<double> interest = dataflow<calc_action>(here, principal, rate);
-        principal = dataflow<add_action>(here, principal, interest);
+        using hpx::lcos::dataflow;
+        using hpx::lcos::dataflow_base;
+        hpx::naming::id_type here = hpx::find_here();
+    
+        double init_principal=vm["principal"].as<double>(); //Initial principal
+        double init_rate=vm["rate"].as<double>(); //Interest rate
+        int cp=vm["cp"].as<int>(); //Length of a compound period
+        int t=vm["time"].as<int>(); //Length of time money is invested
+          
+        init_rate/=100; //Rate is a % and must be converted
+        t/=cp; //Determine how many times to iterate interest calculation:
+               //How many full compund periods can fit in the time invested
+    
+        // In non-dataflow terms the implemented algorithm would look like:
+        //
+        // int t = 5;    // number of time periods to use
+        // double principal = init_principal;
+        // double rate = init_rate;
+        //
+        // for (int i = 0; i < t; ++i)
+        // {
+        //     double interest = calc(principal, rate);
+        //     principal = add(principal, interest);
+        // }
+        //
+        // Please note the similarity with the code below!
+    
+        dataflow_base<double> principal = dataflow<identity_action>(here, init_principal);
+        dataflow_base<double> rate = dataflow<identity_action>(here, init_rate);
+    
+        for (int i = 0; i < t; ++i)
+        {
+            dataflow_base<double> interest = dataflow<calc_action>(here, principal, rate);
+            principal = dataflow<add_action>(here, principal, interest);
+        }
+    
+        // wait for the dataflow execution graph to be finished calculating our
+        // overall interest
+        double result = principal.get_future().get();
+    
+        std::cout << "Final amount: " << result << std::endl;
+        std::cout << "Amount made: " << result-init_principal << std::endl;
     }
 
-    // wait for the dataflow execution graph to be finished calculating our
-    // overall interest
-    double result = principal.get_future().get();
-
-
-    std::cout << "Final amount: " << result << std::endl;
-    std::cout << "Amount made: " << result-p << std::endl;
     return hpx::finalize();
 }
 //]
@@ -122,10 +124,10 @@ int main(int argc, char ** argv)
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
-        ("principal", value<double>(), "The principal [$]")
-        ("rate", value<double>(), "The interest rate [%]")
-        ("cp", value<int>(), "The compound period [months]")
-        ("time", value<int>(), "The time money is invested [months]")
+        ("principal", value<double>()->default_value(1000), "The principal [$]")
+        ("rate", value<double>()->default_value(7), "The interest rate [%]")
+        ("cp", value<int>()->default_value(12), "The compound period [months]")
+        ("time", value<int>()->default_value(12*30), "The time money is invested [months]")
     ;
 
     return hpx::init(cmdline, argc, argv);
