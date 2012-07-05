@@ -114,6 +114,5 @@ int main()
 	        SetImage.WriteToFile("out.bmp");
 	    }
     }
-    system("Pause");
     return 0;
 }
