@@ -167,6 +167,10 @@ namespace hpx { namespace util {
     boost::forward<BOOST_PP_CAT(D, N)>(BOOST_PP_CAT(a, N))                      \
 /**/
 
+#define HPX_UTIL_BIND_MOVE_PARAMS(Z, N, _)                                      \
+    boost::move(BOOST_PP_CAT(a, N))                                             \
+  /**/
+
 #define HPX_UTIL_BIND_EVAL(Z, N, D)                                             \
     ::hpx::util::detail::eval(env, BOOST_PP_CAT(arg, N))                        \
 /**/
@@ -334,6 +338,7 @@ namespace hpx { namespace util {
 #include BOOST_PP_ITERATE()
 
 #undef HPX_UTIL_BIND_FWD_REF_PARAMS
+#undef HPX_UTIL_BIND_MOVE_PARAMS
 #undef HPX_UTIL_BIND_FWD_PARAMS
 #undef HPX_UTIL_BIND_EVAL
 #undef HPX_UTIL_BIND_REMOVE_REFERENCE
@@ -489,7 +494,7 @@ namespace hpx { namespace util {
     >
     bind(
         R(*f)(BOOST_PP_ENUM_PARAMS(N, T))
-      , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
     )
     {
         return
@@ -498,7 +503,7 @@ namespace hpx { namespace util {
               , BOOST_PP_ENUM_PARAMS(N, T)
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >
-            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
+            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_MOVE_PARAMS, A));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -779,7 +784,7 @@ namespace hpx { namespace util {
     >
     bind(
         R(C::*f)(BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T))
-      , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
     )
     {
         return
@@ -790,7 +795,7 @@ namespace hpx { namespace util {
               BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
                   BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >
-            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
+            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_MOVE_PARAMS, A));
     }
 
     template <
@@ -808,7 +813,7 @@ namespace hpx { namespace util {
     >
     bind(
         R(C::*f)(BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)) const
-      , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
     )
     {
         return
@@ -819,7 +824,7 @@ namespace hpx { namespace util {
               BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
                   BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >
-            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
+            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_MOVE_PARAMS, A));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -924,7 +929,7 @@ namespace hpx { namespace util {
     >::type
     bind(
         BOOST_FWD_REF(F) f
-      , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
     )
     {
         return
@@ -933,7 +938,7 @@ namespace hpx { namespace util {
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >(
                 boost::forward<F>(f)
-              , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A)
+              , BOOST_PP_ENUM(N, HPX_UTIL_BIND_MOVE_PARAMS, A)
             );
     }
 
