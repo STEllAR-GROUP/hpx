@@ -13,26 +13,47 @@
 void test(hpx::naming::id_type id) {}
 HPX_PLAIN_ACTION(test, test_action);
 
+hpx::naming::id_type test_return() { return hpx::find_here(); }
+HPX_PLAIN_ACTION(test_return, test_return_action);
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map&)
 {
+    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
+
+    BOOST_FOREACH(hpx::naming::id_type const & id, localities)
     {
-        hpx::naming::id_type a = hpx::find_here();
+        {
+            hpx::naming::id_type a = id;
 
-        test_action act;
-        hpx::lcos::future<void> f = hpx::async(act, hpx::find_here(), a);
-        f.get();
+            test_action act;
+            hpx::lcos::future<void> f = hpx::async(act, id, a);
+            f.get();
 
-        HPX_TEST_EQ(hpx::find_here(), a);
-    }
+            HPX_TEST_EQ(id, a);
+        }
 
-    {
-        hpx::naming::id_type a = hpx::find_here();
+        {
+            hpx::naming::id_type a = id;
 
-        test_action act;
-        act(hpx::find_here(), a);
+            test_action act;
+            act(id, a);
 
-        HPX_TEST_EQ(hpx::find_here(), a);
+            HPX_TEST_EQ(id, a);
+        }
+        
+        {
+
+            test_return_action act;
+            hpx::lcos::future<hpx::naming::id_type> f = hpx::async(act, id);
+
+            HPX_TEST_EQ(id, f.get());
+        }
+
+        {
+            test_return_action act;
+            HPX_TEST_EQ(act(id), id);
+        }
     }
 
     hpx::finalize();
