@@ -38,23 +38,25 @@ if(OPENMP_FOUND)
       DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-# GCC 4.7 chokes on Qthreads headers.
-if(QTHREADS_FOUND AND (040700 GREATER ${GCC_VERSION}))
-  include_directories(${QTHREADS_INCLUDE_DIR})
+if(unix)
+  # GCC 4.7 chokes on Qthreads headers.
+  if(QTHREADS_FOUND AND (040700 GREATER ${GCC_VERSION}))
+    include_directories(${QTHREADS_INCLUDE_DIR})
 
-  set(benchmarks
-      ${benchmarks}
-      qthreads_homogeneous_task_spawn
-      qthreads_heterogeneous_task_spawn
-     )
+    set(benchmarks
+        ${benchmarks}
+        qthreads_homogeneous_task_spawn
+        qthreads_heterogeneous_task_spawn
+       )
 
-  set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                   ${QTHREADS_LIBRARY})
+    set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
+        DEPENDENCIES ${boost_library_dependencies}
+                     ${QTHREADS_LIBRARY})
 
-  set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                   ${QTHREADS_LIBRARY})
+    set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
+        DEPENDENCIES ${boost_library_dependencies}
+                     ${QTHREADS_LIBRARY})
+  endif()
 endif()
 
 if(TBB_FOUND)
