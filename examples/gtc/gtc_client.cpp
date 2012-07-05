@@ -73,7 +73,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         par->irun = false;
         // TEST
         //par->mstep = 1500;
-        par->mstep = 4;
+        par->mstep = 2;
         par->msnap = 1;
         par->ndiag = 4;
         par->nonlinear = 1.0;
@@ -150,7 +150,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // number of "processors"
         //par->numberpe = 40;
-        par->numberpe = 1;
+        par->numberpe = 8;
 
         id_type rt_id = get_applier().get_runtime_support_gid();
 
