@@ -87,6 +87,15 @@ struct data{
     , computed(other.computed)
   {}
 
+  data& operator=(
+      data const& other
+      )
+  {
+    u_value = other.u_value;
+    computed = other.computed;
+    return *this;
+  } 
+
   hpx::lcos::local::mutex mtx;
   double u_value;
   bool computed;
