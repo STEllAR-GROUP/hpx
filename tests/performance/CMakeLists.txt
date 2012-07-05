@@ -38,7 +38,7 @@ if(OPENMP_FOUND)
       DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-if(unix)
+if(UNIX)
   # GCC 4.7 chokes on Qthreads headers.
   if(QTHREADS_FOUND AND (040700 GREATER ${GCC_VERSION}))
     include_directories(${QTHREADS_INCLUDE_DIR})
