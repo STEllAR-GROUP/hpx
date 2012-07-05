@@ -44,7 +44,7 @@ namespace hpx
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_any)
 
-            static const std::size_t index_error = std::size_t(-1);
+            enum { index_error = std::size_t(-1) };
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
@@ -171,7 +171,7 @@ namespace hpx
                 };
             };
 
-            static const std::size_t index_error = std::size_t(-1);
+            enum { index_error = std::size_t(-1) };
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
