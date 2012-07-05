@@ -23,8 +23,8 @@ in the sequence they are found into one single internal database holding
 all configuration properties. This database is used during the execution of the
 application to configure different aspects of the runtime system.
 
-In addition to the ini files any application can supply its own configuration
-files which will be merged with the configuration database as well. Moreover,
+In addition to the ini files, any application can supply its own configuration
+files, which will be merged with the configuration database as well. Moreover,
 the user can specify additional configuration parameters on the command
 line when executing an application. The __hpx__ runtime system will merge all
 command line configuration options (see the description of the
@@ -90,7 +90,7 @@ variable `FOO`. If `FOO` is not set or empty the overall expression will evaluat
 to an empty string. A property value `$[section.key:default]` refers to the value
 held by the property `section.key` if it exists and `default` otherwise. No
 default has to be specified. Therefore `$[section.key]` refers to the property
-`section.key`. If the property `section.key` is not set or empty the overall
+`section.key`. If the property `section.key` is not set or empty, the overall
 expression will evaluate to an empty string.
 
 [note Any property `$[section.key:default]` is evaluated whenever it is queried
@@ -237,7 +237,7 @@ by section basis below.
     [[`hpx.components.load_external`]
      [This entry defines whether external components will be loaded on this
       locality.]
-     [This entry normally is set to `1` and usuallay there is no need to directly
+     [This entry normally is set to `1` and usually there is no need to directly
       change this value. It is automatically set to `0` for a dedicated AGAS
       server locality.]
     ]
@@ -245,7 +245,7 @@ by section basis below.
 
 Additionally, the section `hpx.components` will be populated with the
 information gathered from all found components. The information loaded for each
-of the components will contain at least the folowing properties:
+of the components will contain at least the following properties:
 
 [teletype]
 ``
@@ -297,7 +297,7 @@ sections, one for each component.
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.parcel.address`]
      [This property defines the default IP address to be used for the parcel
-      layer to listen on. This IP address will be used as long as no other
+      layer to listen to. This IP address will be used as long as no other
       values are specified (for instance using the [hpx_cmdline `--hpx:hpx`]
       command line option). The expected format is any valid IP address or
       domain name format which can be resolved into an IP address.]
@@ -305,7 +305,7 @@ sections, one for each component.
       constant `HPX_INITIAL_IP_ADDRESS` (`"127.0.0.1"`)]]
     [[`hpx.parcel.port`]
      [This property defines the default IP port to be used for the parcel
-      layer to listen on. This IP port will be used as long as no other
+      layer to listen to. This IP port will be used as long as no other
       values are specified (for instance using the [hpx_cmdline `--hpx:hpx`]
       command line option). ]
      [static information, the default depends on the compile time preprocessor
@@ -452,7 +452,7 @@ __iniformat__.
   [hpx_cmdline `--hpx:app-config`]. Note that this file will be merged as the
   content for a top level section `[application]`.
 
-[note Any changes made to the configuration dabase caused by one of the files
+[note Any changes made to the configuration database caused by one of the files
       will influence the loading process for all subsequent files. For instance,
       if one of the ini files loaded changes the property `hpx.ini_path`, this
       will influence the directories searched in step 9 as described above.]
@@ -661,8 +661,8 @@ invoking HPX API functionality.
 Generally, logging can be customized either using environment variable settings
 or using by an ini configuration file. Logging is generated in several
 categories, each of which can be customized independently. All customizable
-configuration parameters have resonable defaults, allowing to use logging
-without any additional configuration effort. The follwoing table lists the
+configuration parameters have reasonable defaults, allowing to use logging
+without any additional configuration effort. The following table lists the
 available categories.
 
 [table Logging categories
@@ -717,7 +717,7 @@ output is saved on the console instance of an application to
 `hpx.CATEGORY.PID.log` (where CATEGORY and PID are placeholders for the category
 shortcut and the OS process id). The output for
 the general logging category is saved to `hpx.PID.log`. The default settings for
-the general logging category are show here (the syntax is described in the
+the general logging category are shown here (the syntax is described in the
 section __iniformat__):
 
 [teletype]
@@ -731,11 +731,11 @@ section __iniformat__):
 
 The logging level is taken from the environment variable `HPX_LOGLEVEL` and
 defaults to zero, e.g. no logging. The default logging destination is read from
-the environment vaiable `HPX_LOGDESTINATION`. On any of the localities it
+the environment variable `HPX_LOGDESTINATION`. On any of the localities it
 defaults to `console` which redirects all generated logging output to the
 console instance of an application. The following table lists the possible
 destinations for any logging output. It is possible to specify more than one
-destination separaneted by whitespace.
+destination separated by whitespace.
 
 [table Logging destinations
     [[Logging destination]      [Description]]
@@ -822,7 +822,7 @@ instance of the application). The level defaults to the same values as the
 corresponding settings in the general logging configuration shown before. The
 destination on the console instance is set to be a file which name is generated
 based from its OS process id. Setting the environment variable
-`HPX_CONSOLE_LOGDESTINATION` allows to customize the naming scheme for the
+`HPX_CONSOLE_LOGDESTINATION` allows customization of the naming scheme for the
 output file. The logging format is set to leave the original logging output
 unchanged, as received from one of the localities the application runs on.
 

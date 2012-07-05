@@ -27,7 +27,7 @@ Domain are assumed to be cache coherent for those processor cores that
 incorporate transparent caches. The Active Global Address Space used by
 __hpx__ differs from research __pgas__ models. Partitioned Global Address
 Space is passive in their means of address translation. Copy semantics,
-distributed compound operations and affinity relationships are some of the
+distributed compound operations, and affinity relationships are some of the
 global functionality supported by AGAS.
 
 [heading:process Process]
@@ -58,7 +58,7 @@ predating active messages include
 [@http://en.wikipedia.org/wiki/J%E2%80%93Machine J-machine's] support for
 remote method instantiation, and at the coarse grained variations of Unix
 remote procedure calls, among others. This enables work to be moved to the
-data as well as performing the more common get action of bringing data to
+data as well as performing the more common action of bringing data to
 the work. A parcel can cause actions to occur remotely and asynchronously,
 among which are the creation of threads at different system nodes or
 synchronous domains.
@@ -77,8 +77,8 @@ classes of synchronization constructs, each with many possible variations and
 multiple instances. The LCO is sufficiently general that it can subsume the
 functionality of conventional synchronization primitives such as spinlocks,
 mutexes, semaphores, and global barriers. However due to the rich concept
-and LCO can represent powerful synchronization and control
-functionality not widely employed, such as dataflow and futures among others
+an LCO can represent powerful synchronization and control
+functionality not widely employed, such as dataflow and futures (among others),
 which open up enormous opportunities for rich diversity of distributed
 control and operation.
 

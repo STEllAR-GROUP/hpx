@@ -11,8 +11,8 @@
 [section:action_type_definition Action Type Definition]
 
 Actions are special types we use to describe possibly remote operations. For
-every global function and every member function which have to be invoked
-distantly a special type must be defined. For any global function the special
+every global function and every member function which has to be invoked
+distantly, a special type must be defined. For any global function the special
 macro [macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`] can be used to define
 the action type. Here is an example demonstrating this:
 
@@ -67,7 +67,7 @@ The shown code defines an action type `some_global_action` inside the namespace
 `app`.
 
 [important If the action type definition is split between two macros as shown
-           above the name of the action type to create has to be the same for
+           above, the name of the action type to create has to be the same for
            both macro invocations (here `some_global_action`).]
 
 For member functions of objects which have been registered with AGAS (e.g.
@@ -99,7 +99,7 @@ demonstrating this. The first snippet has to go into the header file:
     //       C++ identifiers
     ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action);
 
-The next snippet belongs into the source file:
+The next snippet belongs to the source file:
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION() macro invocation above
@@ -119,7 +119,7 @@ member function.
 
 The process of invoking a global function with the help of the associated
 action is called 'applying the action'. Actions can have arguments, which will
-be supplied while the action is applied. At the minimum one parameter
+be supplied while the action is applied. At the minimum, one parameter
 is required to apply any action - the id of the locality the associated
 function should be invoked on. __hpx__ provides three ways to apply an
 action:
@@ -202,8 +202,8 @@ straightforward:
 
 While this call looks just like a normal synchronous function invocation, the
 function wrapped by the action will be scheduled to run on a new thread and the
-calling thread will be suspended. After the new thread has executed  the
-wrapped global function the waiting thread will resume and return from the
+calling thread will be suspended. After the new thread has executed the
+wrapped global function, the waiting thread will resume and return from the
 synchronous call.
 
 Equivalently, any action wrapping a component member function can be invoked
@@ -234,11 +234,11 @@ communication latencies.
       actions are remote.
       If the target for applying an action is local, a new thread is
       automatically created and scheduled. Once this thread is scheduled and
-      run it will execute the function encapsulated by that action. If the
+      run, it will execute the function encapsulated by that action. If the
       target is remote, __hpx__ will send a parcel to the remote locality which
       encapsulates the action and its parameters. Once the parcel is received
       on the remote locality __hpx__ will create and schedule a new thread
-      there. Once this thread runs on the remote locality it will execute the
+      there. Once this thread runs on the remote locality, it will execute the
       function encapsulated by the action.]
 
 [endsect] [/ Action Invocation]
