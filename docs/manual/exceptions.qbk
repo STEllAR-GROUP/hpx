@@ -46,7 +46,7 @@ Additionally, this example demonstrates how an exception thrown by an (possibly
 remote) action can be handled. It shows the use of
 [funcref hpx::diagnostic_information `hpx::diagnostic_information()`] which
 retrieves all available diagnostic information from the exception as a
-formatted string. This includes for instance the name of the source file and
+formatted string. This includes, for instance, the name of the source file and
 line number, the sequence number of the OS-thread and the HPX-thread id, the
 locality id and the stack backtrace of the point where the original exception
 was thrown.
