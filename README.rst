@@ -2,14 +2,12 @@
  HPX Build Instructions 
 ************************
 
-For SVN access, email gopx@cct.lsu.edu.
-
 Linux
 -----
 
-1) Download the latest Subversion revision of HPX (or a stable tag):::
+1) Clone the master HPX git repository (or a stable tag):::
 
-    $ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx
+    $ git clone https://github.com/STEllAR-GROUP/hpx.git 
 
 2) Create a build directory. HPX requires an out-of-tree build. This means you
    will be unable to run CMake in the HPX source directory.::
@@ -27,7 +25,7 @@ Linux
    add the -jN flag to your make invocation, where N is the number of nodes
    on your machine plus one.::
 
-    $ gmake -j17
+    $ gmake -j5
  
 5) To complete the build and install HPX:::
 
@@ -36,11 +34,11 @@ Linux
 Windows
 -------
 
-1) Download the latest Subversion revision of HPX (or a stable tag). You can
-   use TortoiseSVN, or the subversion client that Cygwin provides. The latest
-   subversion revision can be found at:::
+1) Clone the master HPX git repository (or a stable tag). You can use
+   TortoiseGIT, or the git client that Cygwin provides. The git repository can
+   be found at:::
 
-    https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx
+    https://github.com/STEllAR-GROUP/hpx.git 
 
 2) Create a build folder. HPX requires an out-of-tree-build. This means that you
    will be unable to run CMake in the HPX source folder.
