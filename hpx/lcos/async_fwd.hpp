@@ -31,25 +31,12 @@ namespace hpx
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
-    /**/
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/lcos/async_fwd.hpp"))                                                \
     /**/
 
 #include BOOST_PP_ITERATE()
-
-#undef HPX_FWD_ARGS
-#undef HPX_FORWARD_ARGS
 
 #endif
 
@@ -70,7 +57,8 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
-        > /*act*/, naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _));
+        > /*act*/, naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg));
 }
 
 #undef N

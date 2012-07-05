@@ -12,17 +12,8 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_PP_CAT(arg, n)                                              \
-    /**/
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
 #define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::move(BOOST_PP_CAT(arg, n))                                 \
+        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(arg, n))                \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -32,8 +23,6 @@
 
 #include BOOST_PP_ITERATE()
 
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_ARGS
 #undef HPX_MOVE_ARGS
 
 #endif
@@ -54,11 +43,11 @@
             boost::is_same<IdType, naming::id_type> >,
         typename traits::promise_local_result<Result>::type
     >::type
-    operator()(IdType const& id, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _),
+    operator()(IdType const& id, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg),
         error_code& ec = throws) const
     {
         return hpx::async(*this, id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get(ec);
+          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _)).get(ec);
     }
 
 #undef N

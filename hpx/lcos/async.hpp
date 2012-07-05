@@ -153,14 +153,8 @@ namespace hpx
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+#define HPX_MOVE_ARGS(z, n, _)                                                \
+        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(arg, n))                \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -170,8 +164,7 @@ namespace hpx
 
 #include BOOST_PP_ITERATE()
 
-#undef HPX_FWD_ARGS
-#undef HPX_FORWARD_ARGS
+#undef HPX_MOVE_ARGS
 
 #include <hpx/runtime/actions/define_function_operators.hpp>
 
@@ -195,7 +188,7 @@ namespace hpx
         typename hpx::actions::extract_action<Action>::result_type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -206,7 +199,7 @@ namespace hpx
 
         packaged_action_type p;
         if (policy & launch::async)
-            p.apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            p.apply(gid, BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
         return p.get_future();
     }
 
@@ -217,10 +210,10 @@ namespace hpx
         >::type,
         typename hpx::actions::extract_action<Action>::result_type
     >
-    async (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    async (naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return async<Action>(launch::all, gid,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -231,10 +224,11 @@ namespace hpx
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
-        > /*act*/, naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        > /*act*/, naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return async<Derived>(policy, gid,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Component, int Action, typename Result,
@@ -244,10 +238,11 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
-        > /*act*/, naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        > /*act*/, naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return async<Derived>(launch::all, gid,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -262,7 +257,7 @@ namespace hpx
         HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
         >::type>)> const& data_sink, naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -273,7 +268,7 @@ namespace hpx
 
         packaged_action_type p(data_sink);
         if (policy & launch::async)
-            p.apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            p.apply(gid, BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
         return p.get_future();
     }
 
@@ -288,10 +283,10 @@ namespace hpx
         HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
         >::type>)> const& data_sink, naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return async_callback<Action>(launch::all, data_sink, gid,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -307,10 +302,10 @@ namespace hpx
             lcos::future<typename traits::promise_local_result<Result>::type>
         )> const& data_sink,
         naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return async_callback<Derived>(policy, data_sink, gid,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Component, int Action, typename Result,
@@ -325,10 +320,10 @@ namespace hpx
             lcos::future<typename traits::promise_local_result<Result>::type>
         )> const& data_sink,
         naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return async_callback<Derived>(launch::all, data_sink, gid,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 }
 

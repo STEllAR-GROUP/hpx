@@ -14,12 +14,28 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+#define HPX_MOVE_ARGS(z, n, _)                                                \
+        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(arg, n))                \
+    /**/
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/applier/apply_implementations.hpp"))                         \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#undef HPX_MOVE_ARGS
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 
 #endif
 
@@ -29,15 +45,6 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
-
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
-    /**/
 
 namespace hpx
 {
@@ -136,26 +143,27 @@ namespace hpx
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             return applier::detail::apply_l_p<Action>(addr, priority,
-                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
         }
 
         // apply remotely
         return applier::detail::apply_r_p<Action>(addr, gid, priority,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
-    apply (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    apply (naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return apply_p<Action>(gid, actions::action_priority<Action>(),
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Component, int Action, typename Result,
@@ -167,10 +175,10 @@ namespace hpx
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/,
         naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     namespace applier
@@ -307,27 +315,28 @@ namespace hpx
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_p(actions::continuation* c, naming::id_type const& gid,
-        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        threads::thread_priority priority,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, addr, priority,
-                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
         }
 
         // apply remotely
         return applier::detail::apply_r_p<Action>(addr, c, gid, priority,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (actions::continuation* c, naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Component, int Action, typename Result,
@@ -339,10 +348,10 @@ namespace hpx
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/,
         naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     namespace applier
@@ -442,7 +451,8 @@ namespace hpx
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
-        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        threads::thread_priority priority,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         typedef
             typename hpx::actions::extract_action<Action>::result_type
@@ -450,13 +460,13 @@ namespace hpx
 
         return apply_p<Action>(
             new actions::base_lco_continuation<result_type>(contgid),
-            gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            gid, priority, BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c (naming::id_type const& contgid, naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
     {
         typedef
             typename hpx::actions::extract_action<Action>::result_type
@@ -465,7 +475,7 @@ namespace hpx
         return apply_p<Action>(
             new actions::base_lco_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
     }
 
     namespace applier
@@ -502,9 +512,6 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#undef HPX_APPLY_BIND_REFERENCE
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_ARGS
 #undef N
 
 #endif
