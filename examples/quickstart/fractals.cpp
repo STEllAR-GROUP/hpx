@@ -116,7 +116,5 @@ int hpx_main()
 
 int main()
 {
-    int code = hpx::init();
-    system("Pause");
-    return code;
+    return hpx::init();
 }
