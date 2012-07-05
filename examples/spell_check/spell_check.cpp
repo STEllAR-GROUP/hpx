@@ -209,6 +209,5 @@ int main()
 {
     int code = hpx::init();
     std::cout << std::endl;
-    system("Pause");
     return code;
 }
