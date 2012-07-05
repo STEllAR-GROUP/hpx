@@ -3,6 +3,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set(subdirs statistical)
+
+foreach(subdir ${subdirs})
+    add_hpx_pseudo_target(tests.performance.${subdir})
+    add_subdirectory(${subdir})
+    add_hpx_pseudo_dependencies(tests tests.performance.${subdir})
+endforeach()
+
 set(benchmarks
     boost_tls_overhead
     native_tls_overhead
@@ -30,22 +38,25 @@ if(OPENMP_FOUND)
       DEPENDENCIES ${boost_library_dependencies})
 endif()
 
-if(QTHREADS_FOUND)
-  include_directories(${QTHREADS_INCLUDE_DIR})
+if(UNIX)
+  # GCC 4.7 chokes on Qthreads headers.
+  if(QTHREADS_FOUND AND (040700 GREATER ${GCC_VERSION}))
+    include_directories(${QTHREADS_INCLUDE_DIR})
 
-  set(benchmarks
-      ${benchmarks}
-      qthreads_homogeneous_task_spawn
-      qthreads_heterogeneous_task_spawn
-     )
+    set(benchmarks
+        ${benchmarks}
+        qthreads_homogeneous_task_spawn
+        qthreads_heterogeneous_task_spawn
+       )
 
-  set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                   ${QTHREADS_LIBRARY})
+    set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
+        DEPENDENCIES ${boost_library_dependencies}
+                     ${QTHREADS_LIBRARY})
 
-  set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies}
-                   ${QTHREADS_LIBRARY})
+    set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
+        DEPENDENCIES ${boost_library_dependencies}
+                     ${QTHREADS_LIBRARY})
+  endif()
 endif()
 
 if(TBB_FOUND)
