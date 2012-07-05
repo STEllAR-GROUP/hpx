@@ -8,7 +8,6 @@ set(subdirs
     agas
     actions
     components
-    lcos
     util
    )
 
