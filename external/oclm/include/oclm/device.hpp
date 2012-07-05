@@ -18,11 +18,13 @@
 #include <vector>
 #include <string>
 
+#include <oclm/config.hpp>
 #include <oclm/exception.hpp>
 #include <oclm/get_info.hpp>
 #include <oclm/device_info.hpp>
 
-#include <CL/cl.h>
+
+#include <hpx/config.hpp>
 
 namespace oclm
 {
@@ -34,14 +36,14 @@ namespace oclm
 
     struct device
     {
-        static const device_type<CL_DEVICE_TYPE_ACCELERATOR> accelerator;
-        static const device_type<CL_DEVICE_TYPE_ALL> all;
-        static const device_type<CL_DEVICE_TYPE_CPU> cpu;
+        static const HPX_EXPORT device_type<CL_DEVICE_TYPE_ACCELERATOR> accelerator;
+        static const HPX_EXPORT device_type<CL_DEVICE_TYPE_ALL> all;
+        static const HPX_EXPORT device_type<CL_DEVICE_TYPE_CPU> cpu;
 #ifdef CL_VERSION_1_2
-        static const device_type<CL_DEVICE_TYPE_CUSTOM> custom;
+        static const HPX_EXPORT device_type<CL_DEVICE_TYPE_CUSTOM> custom;
 #endif
-        static const device_type<CL_DEVICE_TYPE_DEFAULT> default_;
-        static const device_type<CL_DEVICE_TYPE_GPU> gpu;
+        static const HPX_EXPORT device_type<CL_DEVICE_TYPE_DEFAULT> default_;
+        static const HPX_EXPORT device_type<CL_DEVICE_TYPE_GPU> gpu;
 
         //FIXME: add reference counting
 

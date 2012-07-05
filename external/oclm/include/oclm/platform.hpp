@@ -111,7 +111,7 @@ namespace oclm
 
         platform_manager();
 
-        static platform_manager & get();
+        static HPX_EXPORT platform_manager & get();
 
         platform default_platform;
         device default_device;

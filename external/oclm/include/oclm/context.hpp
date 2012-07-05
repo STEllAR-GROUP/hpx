@@ -126,7 +126,7 @@ namespace oclm
     context create_context(device_type<Type> const & type);
     */
 
-    context create_context(device const & d);
+    HPX_EXPORT context create_context(device const & d);
 
 }
 

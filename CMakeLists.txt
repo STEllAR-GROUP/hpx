@@ -620,6 +620,11 @@ if(MSVC)
     if(HPX_CXX11_AUTO)
       add_definitions(-DHPX_HAVE_CXX11_AUTO)
     endif()
+    
+    hpx_option(HPX_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
+    if(HPX_CXX11_DECLTYPE)
+      add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)
+    endif()
 
     hpx_option(HPX_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
     if(HPX_CXX11_UNIQUE_PTR)
@@ -760,6 +765,8 @@ else()
       DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
 
     hpx_check_for_cxx11_auto(HPX_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
+
+    hpx_check_for_cxx11_decltype(HPX_CXX11_DECLTYPE DEFINITIONS HPX_HAVE_CXX11_DECLTYPE)
 
     hpx_check_for_cxx11_std_unique_ptr(HPX_CXX11_STD_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
