@@ -108,7 +108,7 @@
 
 [/ Section link shortcuts]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
-[def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build HPX Components with pkg-config]]
+[def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
@@ -119,14 +119,14 @@
 [def __intro__                  [link hpx.tutorial.intro Introduction]]
 
 
-[def __configuration__          [link hpx.manual.init.configuration Configure HPX Applications]]
+[def __configuration__          [link hpx.manual.init.configuration Configure __hpx__ Applications]]
 [def __config_defaults__        [link hpx.manual.init.configuration.config_defaults Built-in Default Configuration Settings]]
-[def __iniformat__              [link hpx.manual.init.configuration.ini_format The HPX INI File Format]]
+[def __iniformat__              [link hpx.manual.init.configuration.ini_format The __hpx__ INI File Format]]
 [def __loading_ini__            [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 [def __loading_components__     [link hpx.manual.init.configuration.loading_components Loading Components]]
 [def __component_example__      [link hpx.manual.init.configuration.component_example Application Specific Component Example]]
 [def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
-[def __commandline__            [link hpx.manual.init.commandline HPX Command Line Options]]
+[def __commandline__            [link hpx.manual.init.commandline __hpx__ Command Line Options]]
 
 [template hpx_cmdline[str] [link hpx.manual.init.commandline [str]]]
 
@@ -160,7 +160,7 @@ and [*A]lgorithms [*R]esearch) is a research group at __lsu__'s __cct__. For
 a list of people working in this group and participating in writing this
 documentation see __people__.
 
-This documentation is automatically generated for HPX __version__ (from SVN
+This documentation is automatically generated for __hpx__ __version__ (from SVN
 revision: __hpx_svn_revision__) by the Boost QuickBook documentation tool.
 QuickBook can be found in the collection of __boost_tools__.
 

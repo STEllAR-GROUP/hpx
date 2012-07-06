@@ -8,7 +8,7 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_9_0 HPX V0.9.0]
+[section:hpx_0_9_0 __hpx__ V0.9.0]
 
 We have had roughly 500 commits since the last release and we have closed
 approximately 80 tickets (bugs, feature requests, etc.).
@@ -18,9 +18,9 @@ approximately 80 tickets (bugs, feature requests, etc.).
 * Renamed `hpx::lcos::packaged_task<>` to `hpx::lcos::packaged_action<>` to
   reflect the semantic differences to a packaged_task as defined by the C++11
   standard.
-* HPX now exposes `hpx::thread` which is compliant to the C++11 std::thread
-  type except that it (purely locally) represents an HPX thread. This new type
-  does not expose any of the remote capabilities of the underlying HPX-thread
+* __hpx__ now exposes `hpx::thread` which is compliant to the C++11 std::thread
+  type except that it (purely locally) represents an __hpx__ thread. This new type
+  does not expose any of the remote capabilities of the underlying __hpx__-thread
   implementation.
 * The type `hpx::lcos::future<>` is now compliant to the C++11 std::future<>
   type. This type can be used to synchronize both, local and remote operations.
@@ -36,14 +36,14 @@ approximately 80 tickets (bugs, feature requests, etc.).
   The member function `hpx::lcos::future::when()` allows to sequentially
   compose futures, while the helper functions `hpx::wait_all`, `hpx::wait_any`,
   and `hpx::wait_n` can be used to wait for more than one future at a time.
-* HPX now exposes `hpx::apply()` and `hpx::async()` as the preferred way of
+* __hpx__ now exposes `hpx::apply()` and `hpx::async()` as the preferred way of
   creating (or invoking) any deferred work. These functions are usable with
   various types of functions, function objects, and actions and provide a
   uniform way to spawn deferred tasks.
-* HPX now allows to utilize `hpx::util::bind` to (partially) bind no only
+* __hpx__ now allows to utilize `hpx::util::bind` to (partially) bind no only
   local functions and function objects, but also actions. Remote bound actions
   can have placeholders as well.
-* HPX continuations are now fully polymorphic. The class
+* __hpx__ continuations are now fully polymorphic. The class
   `hpx::actions::forwarding_continuation` is an example of how the user can
   write is own types of continuations. It can be used to execute any function
   as an continuation of a particular action.
@@ -53,7 +53,7 @@ approximately 80 tickets (bugs, feature requests, etc.).
   instantiated as they do not have any members anymore.
 * Reworked the lazy action invocation API. Actions can now be directly bound
   using `hpx::util::bind()` by passing an action instance as the first argument.
-* A minimal HPX program now looks like this:
+* A minimal __hpx__ program now looks like this:
 ``
       #include <hpx/hpx_init.hpp>
 
@@ -69,7 +69,7 @@ approximately 80 tickets (bugs, feature requests, etc.).
 ``
   This removes the immediate dependency on the __boost_program_options__ library.
 
-[note This minimal version of an HPX program does not support any of the
+[note This minimal version of an __hpx__ program does not support any of the
       default command line arguments (such as --help, or command line options
       related to PBS). It is suggested to always pass `argc` and `argv` to
       __hpx__ as shown in the example below.]
@@ -119,7 +119,7 @@ Here is a list of the important tickets we closed for this release:
 * #105 - Allow for hpx::util::functions to be registered in the AGAS symbolic
          namespace
 * #107 - Nasty threadmanger race condition (reproducable in sheneos_test)
-* #108 - Add millisecond resolution to HPX logs on Linux
+* #108 - Add millisecond resolution to __hpx__ logs on Linux
 * #110 - Shutdown hang in distributed with release build
 * #116 - Don't use TSS for the applier and runtime pointers
 * #162 - Move local synchronous execution shortcut from hpx::function to the
@@ -167,7 +167,7 @@ Here is a list of the important tickets we closed for this release:
 * #362 - missing initializer error
 * #363 - parcel port serialization error -- graph500
 * #366 - parcel buffering leads to types incompatible exception
-* #368 - scalable alternative to rand() needed for HPX
+* #368 - scalable alternative to rand() needed for __hpx__
 * #369 - IB over IP is substantially slower than just using standard TCP/IP
 * #370 - distributed reliability issues
 * #372 - HermioneBot erroneously fails during configure
@@ -205,13 +205,13 @@ Here is a list of the important tickets we closed for this release:
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_8_1 HPX V0.8.1]
+[section:hpx_0_8_1 __hpx__ V0.8.1]
 
 This is a point release including important bug fixes for __0_8_0__.
 
 [heading General Changes]
 
-* HPX does not need to be installed anymore to be functional.
+* __hpx__ does not need to be installed anymore to be functional.
 
 [heading Bug Fixes (Closed Tickets)]
 
@@ -241,7 +241,7 @@ Here is a list of the important commits included in this point release:
 [/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_8_0 HPX V0.8.0]
+[section:hpx_0_8_0 __hpx__ V0.8.0]
 
 We have had roughly 1000 commits since the last release and we have closed
 approximately 70 tickets (bugs, feature requests, etc.).
@@ -268,11 +268,11 @@ approximately 70 tickets (bugs, feature requests, etc.).
   of the capabilities of the new infrastructure.
 * Added a buildbot-based continuous build system which gives instant, automated
   feedback on each commit to SVN.
-* Added more automated tests to verify proper functioning of HPX.
-* Started to create documentation for HPX and its API.
+* Added more automated tests to verify proper functioning of __hpx__.
+* Started to create documentation for __hpx__ and its API.
 * Added documentation toolchain to the build system.
 * Added dataflow LCO.
-* Changed default HPX command line options to have [^hpx:] prefix. For
+* Changed default __hpx__ command line options to have [^hpx:] prefix. For
   instance, the former option [^--threads] is now [hpx_cmdline [^--hpx:threads]].
   This has been done to make ambiguities with possible application specific
   command line options as unlikely as possible. See the section __commandline__
@@ -289,7 +289,7 @@ approximately 70 tickets (bugs, feature requests, etc.).
 * Improved support for Windows builds with CMake.
 * Added support for components to register their own command line options.
 * Added the possibility to register custom startup/shutdown functions for
-  any component. These functions are guaranteed to be executed by an HPX
+  any component. These functions are guaranteed to be executed by an __hpx__
   thread.
 * Added two new experimental thread schedulers: hierarchy_scheduler and
   periodic_priority_scheduler. These can be activated by using the command line
@@ -308,10 +308,10 @@ approximately 70 tickets (bugs, feature requests, etc.).
   partitioning of large read-only data structures and exposing an interpolation
   API.
 * Sine performance counter demo.
-* Accumulator examples demonstrating how to write and use HPX components.
+* Accumulator examples demonstrating how to write and use __hpx__ components.
 * Quickstart examples (like hello_world, fibonacci, quicksort, factorial, etc.)
-  demonstrating simple HPX concepts which introduce some of the concepts in
-  HPX.
+  demonstrating simple __hpx__ concepts which introduce some of the concepts in
+  __hpx__.
 * Load balancing and work stealing demos.
 
 [heading API Changes]
@@ -402,7 +402,7 @@ Here is a list of the important tickets we closed for this release:
 [/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_0_7_0 HPX V0.7.0]
+[section:hpx_0_7_0 __hpx__ V0.7.0]
 
 We have had roughly 1000 commits since the last release and we have closed
 approximately 120 tickets (bugs, feature requests, etc.).
@@ -415,12 +415,12 @@ approximately 120 tickets (bugs, feature requests, etc.).
   for more details).
 * Revamped and unified performance counter framework, added a lot of new
   performance counter instances for monitoring of a diverse set of internal
-  HPX parameters (queue lengths, access statistics, etc.).
+  __hpx__ parameters (queue lengths, access statistics, etc.).
 * Improved general error handling and logging support.
 * Fixed several race conditions, improved overall stability, decreased memory
   footprint, improved overall performance (major optimizations include native
   TLS support and ranged-based AGAS caching).
-* Added support for running HPX applications with PBS.
+* Added support for running __hpx__ applications with PBS.
 * Many updates to the build system, added support for gcc 4.5.x and 4.6.x,
   added C++11 support.
 * Many updates to default command line options.
@@ -463,7 +463,7 @@ approximately 120 tickets (bugs, feature requests, etc.).
 
 Here is a list of the important tickets we closed for this release:
 
-*  #28 - Integrate Windows/Linux CMake code for HPX core
+*  #28 - Integrate Windows/Linux CMake code for __hpx__ core
 *  #32 - hpx::cout() should be hpx::cout
 *  #33 - AGAS V2 legacy client does not properly handle error_code
 *  #60 - AGAS: allow for registerid to optionally take ownership of the gid
