@@ -701,6 +701,9 @@ namespace hpx
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
     HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
+
+    using naming::id_type;
+    using lcos::future;
 }
 
 #include <hpx/lcos/async_fwd.hpp>
