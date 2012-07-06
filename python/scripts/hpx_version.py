@@ -9,5 +9,5 @@
 Define current version string for HPX.
 """
 
-HPX_VERSION = "0.9.0"
+HPX_VERSION = "1.0.0"
 
