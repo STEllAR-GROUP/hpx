@@ -1,0 +1,59 @@
+06 July 2012
+Code maintained by Matt Anderson (andersmw@indiana.edu)
+
+This compares HPX allgather with MPI allgather.  Allgather combines a gather and a broadcast
+in a single call, i.e.
+
+          sendbuff
+          ########
+          #      #
+        0 #  AA  #
+          #      #
+          ########
+     T    #      #
+        1 #  BB  #
+     a    #      #
+          ########
+     s    #      #
+        2 #  CC  #                                   BEFORE
+     k    #      #
+          ########
+     s    #      #
+        3 #  DD  #
+          #      #
+          ########
+          #      #
+        4 #  EE  #
+          #      #
+          ########
+
+            <---------- recvbuff ---------->
+          ####################################
+          #      #      #      #      #      #
+        0 #  AA  #  BB  #  CC  #  DD  #  EE  #
+          #      #      #      #      #      #
+          ####################################
+     T    #      #      #      #      #      #
+        1 #  AA  #  BB  #  CC  #  DD  #  EE  #
+     a    #      #      #      #      #      #
+          ####################################
+     s    #      #      #      #      #      #
+        2 #  AA  #  BB  #  CC  #  DD  #  EE  #       AFTER
+     k    #      #      #      #      #      #
+          ####################################
+     s    #      #      #      #      #      #
+        3 #  AA  #  BB  #  CC  #  DD  #  EE  #
+          #      #      #      #      #      #
+          ####################################
+          #      #      #      #      #      #
+        4 #  AA  #  BB  #  CC  #  DD  #  EE  #
+          #      #      #      #      #      #
+          ####################################
+
+Some simple comparisons:
+
+./ag_client --np 8 -t 8      This does the allgather on 8 vector elements 
+
+  and is the same as running the MPI code like this:
+
+  mpirun -np 8 ./a.out 1
