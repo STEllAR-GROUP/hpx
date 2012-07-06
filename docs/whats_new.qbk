@@ -118,7 +118,7 @@ Here is a list of the important tickets we closed for this release:
 * #71  - GIDs that are not serialized via `handle_gid<>` should raise an exception
 * #105 - Allow for [classref hpx::util::function]s to be registered in the AGAS symbolic
          namespace
-* #107 - Nasty threadmanger race condition (reproducable in sheneos_test)
+* #107 - Nasty threadmanger race condition (reproducible in sheneos_test)
 * #108 - Add millisecond resolution to __hpx__ logs on Linux
 * #110 - Shutdown hang in distributed with release build
 * #116 - Don't use TSS for the applier and runtime pointers
@@ -145,7 +145,7 @@ Here is a list of the important tickets we closed for this release:
 * #259 - CMake does not detect that MSVC10 has lambdas
 * #260 - io_service_pool segfault
 * #261 - Late parcel executed outside of pxthread
-* #263 - Cannot select allocator with cmake
+* #263 - Cannot select allocator with CMake
 * #264 - Fix allocator select
 * #267 - Runtime error for hello_world
 * #269 - pthread_affinity_np test fails to compile
@@ -164,7 +164,7 @@ Here is a list of the important tickets we closed for this release:
 * #369 - IB over IP is substantially slower than just using standard TCP/IP
 * #374 - [funcref hpx::lcos::wait] should work with dataflows and arbitrary classes
          meeting the future interface
-* #375 - Conflicting/ambigious overloads of hpx::lcos::wait
+* #375 - Conflicting/ambiguous overloads of hpx::lcos::wait
 * #376 - Find_HPX.cmake should set CMake variable HPX_FOUND for out of tree builds
 * #377 - ShenEOS interpolate bulk and interpolate_one_bulk are broken
 * #379 - Add support for distributed runs under SLURM
