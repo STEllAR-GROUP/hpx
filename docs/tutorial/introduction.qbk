@@ -48,16 +48,16 @@ systems and their usage from application algorithms and their programming
 languages to system architecture and hardware design together with their
 supporting compilers and operating system software.
 
-[heading What is HPX]
+[heading What is __hpx__]
 
-High Performance ParalleX (HPX) is the first runtime system implementation of
-the ParalleX execution model. The HPX runtime software package is a modular,
+High Performance ParalleX (__hpx__) is the first runtime system implementation of
+the ParalleX execution model. The __hpx__ runtime software package is a modular,
 feature-complete, and performance oriented representation of the ParalleX
 execution model targeted at conventional parallel computing architectures such
 as SMP nodes and commodity clusters. It is academically developed and freely
-available under an open source license. We provide HPX to the community for
+available under an open source license. We provide __hpx__ to the community for
 experimentation and application to achieve high efficiency and scalability for
-dynamic adaptive and irregular computational problems. HPX is a C++ library
+dynamic adaptive and irregular computational problems. __hpx__ is a C++ library
 that supports a set of critical mechanisms for dynamic adaptive resource
 management and lightweight task scheduling within the context of a global
 address space. It is solidly based on many years of experience in writing
@@ -75,11 +75,11 @@ information.
 The ParalleX execution model replaces CSP to provide a new computing paradigm
 embodying the governing principles for organizing and conducting highly
 efficient scalable computations greatly exceeding the capabilities of today's
-problems. HPX is the first practical, reliable, and performance-oriented
+problems. __hpx__ is the first practical, reliable, and performance-oriented
 runtime system incorporating the principal concepts of the ParalleX model
 publicly provided in open source release form.
 
-HPX is designed by the __stellar__ Group ([*S]ystems [*T]echnologies,
+__hpx__ is designed by the __stellar__ Group ([*S]ystems [*T]echnologies,
 [*E]mergent Para[*ll]elism, and [*A]lgorithms [*R]esearch) at __lsu__'s __cct__
 to enable developers to exploit the full processing power of many-core systems
 with an unprecedented degree of parallelism. __stellar__ is a research group
@@ -99,15 +99,14 @@ reached by any application. This is particularly true for highly parallel
 hardware. The more hardware parallelism we provide to an application, the
 better the application must scale in order to efficiently use all the
 resources of the machine. Roughly speaking, we distinguish two forms of
-scalability: strong scaling (see also
-[@http://en.wikipedia.org/wiki/Amdahl%27s_law Amdahl's Law]) and weak scaling
-(see also [@http://en.wikipedia.org/wiki/Gustafson%27s_law Gustafson's Law]).
+scalability: strong scaling (see [@http://en.wikipedia.org/wiki/Amdahl%27s_law Amdahl's Law]) and weak scaling
+(see [@http://en.wikipedia.org/wiki/Gustafson%27s_law Gustafson's Law]).
 Strong scaling is defined as how the solution time
-varies with the number of processors for a fixed total problem size. It
+varies with the number of processors for a fixed [*total] problem size. It
 gives an estimate of how much faster can we solve a particular problem by
 throwing more resources at it. Weak scaling is defined as how the solution
-time varies with the number of processors for a fixed problem size per
-processor. In other words, it defines how much more data can we process by
+time varies with the number of processors for a fixed problem size [*per processor].
+In other words, it defines how much more data can we process by
 using more hardware resources.
 
 In order to utilize as much hardware parallelism as possible an application
@@ -118,24 +117,24 @@ N processors it either runs N times faster or it can handle N times more data.
 Both cases imply 100% of the work is executed on all available processors in
 parallel. However, this is just a theoretical limit. Unfortunately, there are
 more things which limit scalability, mostly inherent to the hardware
-architectures and the programming models we use: there are four fundamental
-factors which make our systems *SLOW*:
+architectures and the programming models we use. We break these limitations
+into four fundamental factors which make our systems *SLOW*:
 
-* ['[*S]tarvation] means to have insufficient concurrent work available to
+* ['[*S]tarvation] occurs when there is insufficient concurrent work available to
   maintain high utilization of all resources.
 * ['[*L]atencies] are imposed by the time-distance delay intrinsic to accessing
-  remote resources and services
+  remote resources and services.
 * ['[*O]verhead] is work required for the management of parallel actions and
   resources on the critical execution path which is not necessary in a
-  sequential variant
-* ['[*W]aiting] for Contention resolution is caused by delays due to the lack of
-  availability of oversubscribed shared resources
+  sequential variant.
+* ['[*W]aiting] for contention resolution is the delay due to the lack of
+  availability of oversubscribed shared resources.
 
 Each of those four factors manifests itself in multiple and different ways; each
 of the hardware architectures and programming models expose specific forms.
 However the interesting part is that all of them are limiting the scalability
-of applications no matter what part of the hardware jungle we look at -
-hand-helds, PCs, supercomputers, or the cloud, all suffer from the reign of the
+of applications no matter what part of the hardware jungle we look at.
+Hand-helds, PCs, supercomputers, or the cloud, all suffer from the reign of the
 4 horsemen: [*S]tarvation, [*L]atency, [*O]verhead, and [*C]ontention. This
 realization is very important as it allows us to derive the criteria for
 solutions to the scalability problem from first principles, it allows us to
@@ -156,7 +155,7 @@ systems we use currently. But apparently a new response is required in the
 light of the demands created by today's technology.
 
 So, what are the overarching objectives for designing systems allowing for
-applications to scale as they should? In our oppinion, the main objectives are:
+applications to scale as they should? In our opinion, the main objectives are:
 
 * ['Performance]: as mentioned, scalable and efficiency are the main criteria
   people are interested in

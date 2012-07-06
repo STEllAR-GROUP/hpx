@@ -47,12 +47,12 @@ remote) action can be handled. It shows the use of
 [funcref hpx::diagnostic_information `hpx::diagnostic_information()`] which
 retrieves all available diagnostic information from the exception as a
 formatted string. This includes, for instance, the name of the source file and
-line number, the sequence number of the OS-thread and the HPX-thread id, the
+line number, the sequence number of the OS-thread and the __hpx__-thread id, the
 locality id and the stack backtrace of the point where the original exception
 was thrown.
 
 Under certain circumstances it is desireable to output only some of the
-diagnostics, or to output those using different formatting. For this case, HPX
+diagnostics, or to output those using different formatting. For this case, __hpx__
 exposes a set of lower level functions as demonstrated in the following code
 snippet:
 

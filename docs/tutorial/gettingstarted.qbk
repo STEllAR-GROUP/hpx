@@ -11,8 +11,8 @@
 
 [heading Welcome]
 
-Welcome to the HPX runtime system libraries! By the time you've completed this
-tutorial, you'll be at least somewhat comfortable with HPX and how to go about
+Welcome to the __hpx__ runtime system libraries! By the time you've completed this
+tutorial, you'll be at least somewhat comfortable with __hpx__ and how to go about
 using it.
 
 [heading What's Here]
@@ -32,10 +32,10 @@ you to resources that can help you pursue these topics further.
 
 [heading Supported Platforms]
 
-At this time, HPX supports only the following platforms. Other platforms may
-work, but we do not test HPX with other platforms, so please be warned.
+At this time, __hpx__ supports only the following platforms. Other platforms may
+work, but we do not test __hpx__ with other platforms, so please be warned.
 
-[table Supported Platforms for HPX
+[table Supported Platforms for __hpx__
     [[Name   ][Recommended Version][Minimum Version][Architectures ]]
     [[Linux  ][3.2                ][2.6            ][x86-32, x86-64]]
     [[Windows][7, Server 2008 R2  ][Any NT system  ][x86-64]        ]
@@ -43,21 +43,21 @@ work, but we do not test HPX with other platforms, so please be warned.
 
 [heading Software and Libraries]
 
-In the simplest case, HPX depends on one set of libraries: __boost__. So,
+In the simplest case, __hpx__ depends on one set of libraries: __boost__. So,
 before you read further, please make sure you have a recent version of
-__boost__ installed on your target machine. HPX currently requires at least
+__boost__ installed on your target machine. __hpx__ currently requires at least
 Boost V1.47.0 to work properly. It may build and run with older versions, but
-we do not test HPX with those versions, so please be warned.
+we do not test __hpx__ with those versions, so please be warned.
 
 Installing the Boost libraries is described in detail in Boost's own
 __boost_getting_started__ document. It is often possible to download the Boost
 libraries using the package manager of your distribution. Please refer to the
 corresponding documentation for your system for more information.
 
-Currently, HPX only supports two compilers: GCC and MSVC. HPX uses CMake as
+Currently, __hpx__ only supports two compilers: GCC and MSVC. __hpx__ uses CMake as
 a build system.
 
-[table Software Prerequisites for HPX on Linux systems
+[table Software Prerequisites for __hpx__ on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ]]
 
     [[[*Compilers]]]
@@ -74,7 +74,7 @@ a build system.
     [[__libstdcxx__              ][4.6.3              ][4.4.5           ]]
 ]
 
-[table Software Prerequisites for HPX on Windows systems
+[table Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ]]
 
     [[[*Compilers]]]
@@ -87,11 +87,11 @@ a build system.
     [[__boost__                  ][1.48.0             ][1.43.0          ]]
 ]
 
-Depending on the options you chose while building and installing HPX,
-you will find that HPX may depend on several other libraries such as those
+Depending on the options you chose while building and installing __hpx__,
+you will find that __hpx__ may depend on several other libraries such as those
 listed below.
 
-[table Highly Recommended Optional Software Prerequisites for HPX on Linux systems
+[table Highly Recommended Optional Software Prerequisites for __hpx__ on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[__hwloc__                  ][1.4                ][1.2             ]
@@ -106,7 +106,7 @@ listed below.
         [Dependency of google-perftools on x86-64, used for stack unwinding.]]
 ]
 
-[table Optional Software Prerequisites for HPX on Linux systems
+[table Optional Software Prerequisites for __hpx__ on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[__papi__                   ][                   ][                ]
@@ -125,7 +125,7 @@ listed below.
         [Used as a replacement for the system allocator.]]
 ]
 
-[table Highly Recommended Optional Software Prerequisites for HPX on Windows systems
+[table Highly Recommended Optional Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[__hwloc__                  ][1.4.2              ][1.4.2           ]
@@ -151,12 +151,12 @@ listed below.
 [endsect] [/ Prerequisites]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:unix_installation How to Install HPX on Unix Variants]
+[section:unix_installation How to Install __hpx__ on Unix Variants]
 
 [teletype]
 
-* Create a build directory. HPX requires an out-of-tree build. This means you
-  will be unable to run CMake in the HPX source tree.
+* Create a build directory. __hpx__ requires an out-of-tree build. This means you
+  will be unable to run CMake in the __hpx__ source tree.
 
 ``
     $ cd hpx
@@ -165,7 +165,7 @@ listed below.
 ``
 
 * Invoke CMake from your build directory, pointing the CMake driver to the root
-  of your HPX source tree.
+  of your __hpx__ source tree.
 
 ``
     $ cmake [CMake variable definitions] /path/to/source/tree
@@ -184,7 +184,7 @@ listed below.
     $ gmake -j17
 ``
 
-* To complete the build and install HPX:
+* To complete the build and install __hpx__:
 
 ``
     $ gmake install
@@ -192,15 +192,15 @@ listed below.
 
 [c++]
 
-[endsect] [/ How to Install HPX on Unix Variants]
+[endsect] [/ How to Install __hpx__ on Unix Variants]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:windows_installation How to Install HPX on Windows]
+[section:windows_installation How to Install __hpx__ on Windows]
 
 [heading Installation]
 
-* Create a build folder. HPX requires an out-of-tree-build. This means that you
-  will be unable to run CMake in the HPX source folder.
+* Create a build folder. __hpx__ requires an out-of-tree-build. This means that you
+  will be unable to run CMake in the __hpx__ source folder.
 * Open up the CMake GUI. In the input box labelled "Where is the source code:",
   enter the full path to the source folder. In the input box labelled
   "Where to build the binaries:", enter the full path to the build folder you
@@ -209,7 +209,7 @@ listed below.
   The only required variable you need to define is [^BOOST_ROOT]. This variable
   needs to be set to point to the root folder of your Boost
   installation. It is recommended to set the variable [^CMAKE_INSTALL_PREFIX] as
-  well. This allows to control where the built HPX libraries will be installed.
+  well. This allows to control where the built __hpx__ libraries will be installed.
 * Press the "Configure" button. A window will pop up asking you which compilers
   to use. Select the Visual Studio 10 (64Bit) compilers (they are usually
   the default if available).
@@ -219,12 +219,12 @@ listed below.
 * Open up the build folder, and double-click hpx.sln.
 * Build the INSTALL target.
 
-[endsect] [/ How to Install HPX on Windows]
+[endsect] [/ How to Install __hpx__ on Windows]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:unix_apps_pkg_config How to Build HPX Applications with pkg-config]
+[section:unix_apps_pkg_config How to Build __hpx__ Applications with pkg-config]
 
-After you are done installing HPX, you should be able to build the following
+After you are done installing __hpx__, you should be able to build the following
 program. It prints [^Hello HPX World!] on the locality you run it on.
 
 [c++]
@@ -236,7 +236,7 @@ program. It prints [^Hello HPX World!] on the locality you run it on.
 Copy the text of this program into a file called hello_world.cpp.
 
 Now, in the directory where you put hello_world.cpp, issue the following commands
-(where [^$HPX_LOCATION] is the [^CMAKE_INSTALL_PREFIX] you used while building HPX):
+(where [^$HPX_LOCATION] is the [^CMAKE_INSTALL_PREFIX] you used while building __hpx__):
 
 [teletype]
 
@@ -245,7 +245,7 @@ Now, in the directory where you put hello_world.cpp, issue the following command
     $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
-[important When using pkg-config with HPX, the pkg-config flags must go after
+[important When using pkg-config with __hpx__, the pkg-config flags must go after
            the [^-o] flag.]
 
 To test the program, type:
@@ -256,13 +256,13 @@ To test the program, type:
 
 which should print [^Hello HPX World!] and exit.
 
-[endsect] [/ How to Build HPX Applications with pkg-config]
+[endsect] [/ How to Build __hpx__ Applications with pkg-config]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:unix_comps_pkg_config How to Build HPX Components with pkg-config]
+[section:unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]
 
-Let's try a more complex example involving an HPX component. An HPX component is
-a class which exposes HPX actions. HPX components are compiled into dynamically
+Let's try a more complex example involving an __hpx__ component. An __hpx__ component is
+a class which exposes __hpx__ actions. __hpx__ components are compiled into dynamically
 loaded modules called component libraries. Here's the source code:
 
 [c++]
@@ -290,7 +290,7 @@ hello_world_component.hpp and hello_world_client.cpp respectively).
 
 Now, in the directory where you put the files, run the following command to
 build the component library. (where [^$HPX_LOCATION] is the
-[^CMAKE_INSTALL_PREFIX] you used while building HPX):
+[^CMAKE_INSTALL_PREFIX] you used while building __hpx__):
 
 [teletype]
 
@@ -317,7 +317,7 @@ the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
 	path = ${HOME}/my_hpx_libs
 ``
 
-[note For additional details about ini file configuration and HPX, see [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
+[note For additional details about ini file configuration and __hpx__, see [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 
 In addition, you'll need this in your home directory:
 
@@ -335,7 +335,7 @@ we do:
     $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -lhpx_component_hello_world
 ``
 
-[important When using pkg-config with HPX, the pkg-config flags must go after
+[important When using pkg-config with __hpx__, the pkg-config flags must go after
            the [^-o] flag.]
 
 
@@ -349,17 +349,17 @@ To run the program, type:
 
 which should print [^Hello HPX World!] and exit.
 
-[endsect] [/ How to Build HPX Components with pkg-config]
+[endsect] [/ How to Build __hpx__ Components with pkg-config]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:existing_apps Integrating HPX into existing applications]
+[section:existing_apps Integrating __hpx__ into existing applications]
 
 Having your application work with __hpx__ is unfortunately not as simple as just
 linking against it. However it can be rather straightforward or rather complex
 based on the type of application that is trying to be integrated. The complexity
 derives from the overall design of the application. If the application was
 designed to be parallel, then integrating should be relatively straightforward.
-However HPX is not some magic wand that will make your application work in
+However __hpx__ is not some magic wand that will make your application work in
 parallel. Applications that are serial or that rely too heavily on global
 variables will have a more difficult time in integrating. Most parallel
 applications have already identified the sections of code that do the most
@@ -437,16 +437,16 @@ integrate your application with __hpx__. For an idea on how to integrate __hpx__
 constructs into your application, you should take a look at some of the examples
 that __hpx__ includes.
 
-[endsect] [/ Integrating HPX into existing applications]
+[endsect] [/ Integrating __hpx__ into existing applications]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:unix_pbs How to Use HPX Applications with PBS]
+[section:unix_pbs How to Use __hpx__ Applications with PBS]
 
 [teletype]
 
-Most HPX applications are executed on parallel computers.  These platforms
+Most __hpx__ applications are executed on parallel computers.  These platforms
 typically provide integrated job management services that facilitate the
-allocation of computing resources for each parallel program. HPX includes out of
+allocation of computing resources for each parallel program. __hpx__ includes out of
 the box support for one of the most common job management systems, the Portable
 Batch System (PBS).
 
@@ -485,7 +485,7 @@ command line options. Since the [^hello_world] application doesn't need any
 command line options, [^APP_OPTIONS] has been left empty. Unlike in other
 execution environments, there is no need to use the [hpx_cmdline
 [^--hpx:threads]] option to indicate the required number of OS threads per
-node; the HPX library will derive this parameter automatically from PBS.
+node; the __hpx__ library will derive this parameter automatically from PBS.
 
 Finally, __pbsdsh__ is a PBS command that starts tasks to the resources allocated
 to the current job. It is recommended to leave this line as shown and modify
@@ -545,11 +545,11 @@ similar to:
     hello world from OS-thread 0 on locality 1
 ``
 
-Congratulations! You have just run your first distributed HPX application!
+Congratulations! You have just run your first distributed __hpx__ application!
 
 [c++]
 
-[endsect] [/ How to Use HPX Applications with PBS]
+[endsect] [/ How to Use __hpx__ Applications with PBS]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]

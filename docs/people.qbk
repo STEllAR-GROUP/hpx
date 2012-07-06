@@ -11,8 +11,8 @@ The STE||AR Group (pronounced as stellar) stands for "[*S]ystems [*T]echnologies
 [*E]mergent Para[*ll]elism, and [*A]lgorithms [*R]esearch". We are a group of faculty,
 researchers, and students working at the __cct__ at __lsu__. Everything we
 do is centered around the ParalleX execution model and
-its implementation in our experimental runtime system HPX (High Performance
-ParalleX). We use HPX for a broad range of scientific applications, helping
+its implementation in our experimental runtime system __hpx__ (High Performance
+ParalleX). We use __hpx__ for a broad range of scientific applications, helping
 scientists and developers to write code which scales better and shows better
 performance if compared to more conventional programming models such as MPI.
 
@@ -43,7 +43,7 @@ The ParalleX model has been devised to address these challenges by enabling a
 new computing dynamic through the application of message-driven computation in
 a global address space context with lightweight synchronization. The work of
 our group is centered around implementing the concepts as defined by ParalleX.
-We develop High Performence ParalleX (HPX) - a parallel runtime system
+We develop __hpx__ - a parallel runtime system
 currently targetted at conventional machines, such as classical Linux based
 Beowulf clusters and SMP nodes.
 
@@ -60,10 +60,11 @@ our tables below.
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
-  [[Maciej Brodowicz]        [__cct__, __lsu__]   [[$./images/emails/mbrodowicz.png]]]
+  [[Andrew Kemp]             [__cct__, __lsu__]   [[$./images/emails/akemp.png]]]
+  [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
-  [[Alex Nagelberg]          [__cct__, __lsu__]   [[$./images/emails/anagelberg.png]]]
   [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
+  [[Alex Nagelberg]          [__cct__, __lsu__]   [[$./images/emails/anagelberg.png]]]
   [[Dylan Stark]             [__sandia__]         [[$./images/emails/dstark.png]]]
 ]
 
