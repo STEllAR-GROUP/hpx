@@ -10,6 +10,7 @@ set(subdirs
     accumulator
     adaptive1d
     adaptive_dataflow
+    allgather
     async_io
     balancing
     bfs
