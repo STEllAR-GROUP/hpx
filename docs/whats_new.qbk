@@ -10,49 +10,51 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_0 __hpx__ V0.9.0]
 
-We have had roughly 500 commits since the last release and we have closed
+We have had roughly 800 commits since the last release and we have closed
 approximately 80 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
-* Renamed `hpx::lcos::packaged_task<>` to `hpx::lcos::packaged_action<>` to
+* Significant improvements made to the usability of __hpx__ in large-scale,
+  distributed environments.
+* Renamed [classref hpx::lcos::packaged_task]`<>` to [classref hpx::lcos::packaged_action]`<>` to
   reflect the semantic differences to a packaged_task as defined by the C++11
   standard.
-* __hpx__ now exposes `hpx::thread` which is compliant to the C++11 std::thread
+* __hpx__ now exposes [classref hpx::thread] which is compliant to the C++11 std::thread
   type except that it (purely locally) represents an __hpx__ thread. This new type
   does not expose any of the remote capabilities of the underlying __hpx__-thread
   implementation.
-* The type `hpx::lcos::future<>` is now compliant to the C++11 std::future<>
+* The type [classref hpx::lcos::future]`<>` is now compliant to the C++11 std::future<>
   type. This type can be used to synchronize both, local and remote operations.
   In both cases the control flow will 'return' to the future in order to
   trigger any continuation.
-* The types `hpx::lcos::local::promise<>` and `hpx::lcos::local::packaged_task<>`
+* The types [classref hpx::lcos::local::promise]`<>` and [classref hpx::lcos::local::packaged_task]`<>`
   are now compliant to the C++11 `std::promise<>`  and `std::packaged_task<>` types.
   These can be used to create a future representing local work only. Use the
-  types `hpx::lcos::promise<>` and `hpx::lcos::packaged_action<>` to wrap any
+  types [classref hpx::lcos::promise]`<>` and [classref hpx::lcos::packaged_action]`<>` to wrap any
   (possibly remote) action into a future.
-* `hpx::thread` and `hpx::lcos::future` are now cancelable.
-* Added support for sequential and logic composition of `hpx::future`'s.
-  The member function `hpx::lcos::future::when()` allows to sequentially
-  compose futures, while the helper functions `hpx::wait_all`, `hpx::wait_any`,
-  and `hpx::wait_n` can be used to wait for more than one future at a time.
-* __hpx__ now exposes `hpx::apply()` and `hpx::async()` as the preferred way of
+* [classref hpx::thread] and [classref hpx::lcos::future]`<>` are now cancelable.
+* Added support for sequential and logic composition of [classref hpx::lcos::future]`<>`'s.
+  The member function [memberref hpx::lcos::future::when]`()` allows to sequentially
+  compose futures, while the helper functions [funcref hpx::wait_all], [funcref hpx::wait_any],
+  and [funcref hpx::wait_n] can be used to wait for more than one future at a time.
+* __hpx__ now exposes [funcref hpx::apply]`()` and [funcref hpx::async]`()` as the preferred way of
   creating (or invoking) any deferred work. These functions are usable with
   various types of functions, function objects, and actions and provide a
   uniform way to spawn deferred tasks.
-* __hpx__ now allows to utilize `hpx::util::bind` to (partially) bind no only
+* __hpx__ now allows to utilize [funcref hpx::util::bind] to (partially) bind no only
   local functions and function objects, but also actions. Remote bound actions
   can have placeholders as well.
 * __hpx__ continuations are now fully polymorphic. The class
-  `hpx::actions::forwarding_continuation` is an example of how the user can
+  [classref hpx::actions::forwarding_continuation] is an example of how the user can
   write is own types of continuations. It can be used to execute any function
   as an continuation of a particular action.
-* Reworked the action invocation API to be fullyconformant to normal functions.
-  Actions can now be invoked using `hpx::apply()`, `hpx::async`, or using the
-  operator() implemented on actions. Actions themselves can now be cheaply
+* Reworked the action invocation API to be fully conformant to normal functions.
+  Actions can now be invoked using [funcref hpx::apply]`()`, [funcref hpx::async]`()`, or using the
+  `operator()` implemented on actions. Actions themselves can now be cheaply
   instantiated as they do not have any members anymore.
 * Reworked the lazy action invocation API. Actions can now be directly bound
-  using `hpx::util::bind()` by passing an action instance as the first argument.
+  using [funcref hpx::util::bind]`()` by passing an action instance as the first argument.
 * A minimal __hpx__ program now looks like this:
 ``
       #include <hpx/hpx_init.hpp>
@@ -79,7 +81,7 @@ approximately 80 tickets (bugs, feature requests, etc.).
 ``
       #include <hpx/hpx_init.hpp>
 
-      // The arguments for hpx_main can be left off, whihc very similar to the
+      // The arguments for hpx_main can be left off, which very similar to the
       // behavior of `main()` as defined by C++.
       int hpx_main(int argc, char* argv[])
       {
@@ -97,26 +99,24 @@ approximately 80 tickets (bugs, feature requests, etc.).
   the number of parcels sent and received, the number of bytes sent and
   received, the overall time required to send and receive data, and the overall
   time required to serialize and deserialize the data.
-* Added a new component: binpacking_factory which is equivalent to the existing
-  distributing_factory component, except that it equalizes the overall
+* Added a new component: [classref hpx::components::binpacking_factory] which is equivalent to the existing
+  [classref hpx::components::distributing_factory] component, except that it equalizes the overall
   population of the components to create. It exposes two factory methods, one
   based on the number of existing instances of the component type to create,
   and one based on an arbitrary performance counter which will be queried for
   all relevant localities.
 * Added API functions allowing to access elements of the diagnostic information
-  embedded in the given exception: `hpx::get_locality_id`, `hpx::get_host_name`,
-  `hpx::get_pid`, `hpx::get_function_name`, `hpx::get_file_name`,
-  `hpx::get_line_number`, `hpx::get_os_thread`, `hpx::get_thread_id`, and
-  `hpx::get_thread_description`.
+  embedded in the given exception: [funcref hpx::get_locality_id]`()`, [funcref hpx::get_host_name]`()`,
+  [funcref hpx::get_pid]`()`, [funcref hpx::get_function_name]`()`, [funcref hpx::get_file_name]`()`,
+  [funcref hpx::get_line_number]`()`, [funcref hpx::get_os_thread]`()`, [funcref hpx::get_thread_id]`()`, and
+  [funcref hpx::get_thread_description]`()`.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release:
 
-* #71 - GIDs that are not serialized via handle_gid should raise an exception
-* #74 - hpx_pbs.py needs documentation
-* #75 - hpx_invoke.py needs documentation
-* #105 - Allow for hpx::util::functions to be registered in the AGAS symbolic
+* #71  - GIDs that are not serialized via `handle_gid<>` should raise an exception
+* #105 - Allow for [classref hpx::util::function]s to be registered in the AGAS symbolic
          namespace
 * #107 - Nasty threadmanger race condition (reproducable in sheneos_test)
 * #108 - Add millisecond resolution to __hpx__ logs on Linux
@@ -127,79 +127,62 @@ Here is a list of the important tickets we closed for this release:
 * #172 - Cache sources in CMake and check if they change manually
 * #178 - Add an INI option to turn off ranged-based AGAS caching
 * #187 - Support for disabling performance counter deployment
-* #194 - Implement bulk decrement operations
-* #195 - Implement decrement request merging
-* #199 - --dump-config --exit should be supported
 * #202 - Support for sending performance counter data to a specific file
 * #218 - boost.coroutines allows different stack sizes, but stack pool is
          unaware of this
-* #231 - Implement movable boost::bind
-* #232 - Implement movable boost::function
-* #236 - Allow binding hpx::util::functions to actions
-* #239 - Replace hpx::function with hpx::util::function
+* #231 - Implement movable `boost::bind`
+* #232 - Implement movable `boost::function`
+* #236 - Allow binding [classref hpx::util::functions] to actions
+* #239 - Replace [^hpx::function] with [classref hpx::util::function]
 * #240 - Can't specify RemoteResult with lcos::async
 * #242 - REGISTER_TEMPLATE support for plain actions
-* #243 - handle_gid<> support for hpx::util::function
-* #245 - *_c_cache code throws an exception if the queried GID is not in the
+* #243 - `handle_gid<>` support for [classref hpx::util::function]
+* #245 - `*_c_cache code` throws an exception if the queried GID is not in the
          local cache
 * #246 - Undefined references in dataflow/adaptive1d example
-* #250 - configure error: dataflow
 * #252 - Problems configuring sheneos with CMake
-* #254 - lifetime of components doesn't end when client goes out of scope
+* #254 - Lifetime of components doesn't end when client goes out of scope
 * #259 - CMake does not detect that MSVC10 has lambdas
 * #260 - io_service_pool segfault
 * #261 - Late parcel executed outside of pxthread
 * #263 - Cannot select allocator with cmake
 * #264 - Fix allocator select
-* #267 - runtime error for hello_world
-* #268 - undefined reference to `hpx::iostreams::cout()`
+* #267 - Runtime error for hello_world
 * #269 - pthread_affinity_np test fails to compile
 * #270 - Compiler noise due to -Wcast-qual
 * #275 - Problem with configuration tests/include paths on Gentoo
-* #278 - hpx::init: std::exception caught: Invalid command line option
-         --hierarchy-arity, valid for --queueing=hierarchy only.
 * #325 - Sheneos is 200-400 times slower than the fortran equivalent
-* #331 - hpx::init() and hpx_main() should not depend on program_options
-* #333 - Add doxygen support to cmake for doc toolchain
+* #331 - [funcref hpx::init]`()` and hpx_main() should not depend on program_options
+* #333 - Add doxygen support to CMake for doc toolchain
 * #340 - Performance counters for parcels
 * #346 - Component loading error when running hello_world in distributed on
          MSVC2010
-* #362 - missing initializer error
-* #363 - parcel port serialization error -- graph500
-* #366 - parcel buffering leads to types incompatible exception
-* #368 - scalable alternative to rand() needed for __hpx__
+* #362 - Missing initializer error
+* #363 - Parcel port serialization error
+* #366 - Parcel buffering leads to types incompatible exception
+* #368 - Scalable alternative to rand() needed for __hpx__
 * #369 - IB over IP is substantially slower than just using standard TCP/IP
-* #370 - distributed reliability issues
-* #372 - HermioneBot erroneously fails during configure
-* #374 - hpx::lcos::wait should work with dataflows and arbitrary classes
+* #374 - [funcref hpx::lcos::wait] should work with dataflows and arbitrary classes
          meeting the future interface
 * #375 - Conflicting/ambigious overloads of hpx::lcos::wait
 * #376 - Find_HPX.cmake should set CMake variable HPX_FOUND for out of tree builds
-* #377 - shen interpolate bulk and interpolate_one_bulk are broken
+* #377 - ShenEOS interpolate bulk and interpolate_one_bulk are broken
 * #379 - Add support for distributed runs under SLURM
-* #380 - neutron_star
 * #382 - _Unwind_Word not declared in boost.backtrace
 * #387 - Doxygen should look only at list of specified files
-* #388 - Running 'make install' on an out-of-tree application is broken
+* #388 - Running `make install` on an out-of-tree application is broken
 * #391 - Out-of-tree application segfaults when running in qsub
 * #392 - Remove HPX_NO_INSTALL option from cmake build system
-* #396 - pragma related warnings when compiling with older gcc versions
-* #399 - Out of Tree Component build problems
+* #396 - Pragma related warnings when compiling with older gcc versions
+* #399 - Out of tree component build problems
 * #400 - Out of source builds on Windows: linker should not receive compiler flags
 * #401 - Out of source builds on Windows: components need to be linked with
          hpx_serialization
-* #402 - Launching a component
-* #403 - new segfault in embarrassingly parallel example
 * #404 - gfortran fails to link automatically when fortran files are present
 * #405 - Inability to specify linking order for external libraries
-* #406 - Revert commit [8018]: adapting action limits such that dataflow
-         applications work without additional defines
-* #408 - linking issue
-* #409 - Running on 2k cores runs AGAS server out of memory
-* #414 - distributed failures with dataflow
-* #415 - error: `locality_results` is not a member of `hpx::components::server`
-* #416 - sheneos isn't compiling
-* #425 - Breaking changes to traits::*result wrt std::vector<id_type>
+* #406 - Adapt action limits such that dataflow applications work without additional defines
+* #415 - `locality_results` is not a member of `hpx::components::server`
+* #425 - Breaking changes to `traits::*result` wrt `std::vector<id_type>`
 * #426 - AUTOGLOB needs to be updated to support fortran
 
 [endsect]
