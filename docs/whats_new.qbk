@@ -164,7 +164,7 @@ Here is a list of the important tickets we closed for this release:
 * #369 - IB over IP is substantially slower than just using standard TCP/IP
 * #374 - [funcref hpx::lcos::wait] should work with dataflows and arbitrary classes
          meeting the future interface
-* #375 - Conflicting/ambiguous overloads of hpx::lcos::wait
+* #375 - Conflicting/ambiguous overloads of [funcref hpx::lcos::wait]
 * #376 - Find_HPX.cmake should set CMake variable HPX_FOUND for out of tree builds
 * #377 - ShenEOS interpolate bulk and interpolate_one_bulk are broken
 * #379 - Add support for distributed runs under SLURM
