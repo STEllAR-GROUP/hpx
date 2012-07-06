@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_VERSION_JUN_11_2012)
-#define HPX_VERSION_JUN_11_2012
+#if !defined(HPX_VERSION_JUL_05_2012)
+#define HPX_VERSION_JUL_05_2012
 
 #include <string>
 
@@ -29,13 +29,13 @@
 #define HPX_VERSION_MINOR        9
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20120611
+#define HPX_VERSION_DATE         20120705
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x21
 #endif
 
-#define HPX_VERSION_TAG          "-release"
+#define HPX_VERSION_TAG          ""
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
