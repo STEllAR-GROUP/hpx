@@ -4,11 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    async_io)
-
-set(async_io_FLAGS DEPENDENCIES iostreams_component)
+    async_io
+    async_io_action)
 
 foreach(example_program ${example_programs})
+
+  set(${example_program}_FLAGS DEPENDENCIES iostreams_component)
+
   set(sources ${example_program}.cpp)
 
   source_group("Source Files" FILES ${sources})
