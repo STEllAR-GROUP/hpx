@@ -165,6 +165,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct bootstrap_data_type
     { // {{{
+
+        void register_counter_types(char const* servicename)
+        {
+//             primary_ns_server.register_counter_types(servicename);
+            component_ns_server.register_counter_types(servicename);
+//             symbol_ns_server.register_counter_types(servicename);
+        }
+
         server::primary_namespace primary_ns_server;
         server::component_namespace component_ns_server;
         server::symbol_namespace symbol_ns_server;
@@ -1242,6 +1250,13 @@ public:
 
     bool route_parcel(
         parcelset::parcel const& arg0
+      , error_code& ec = throws
+        );
+
+    /// \brief Retrieve statistics performance counter
+    bool retrieve_statistics_counter(
+        std::string const& counter_name
+      , naming::gid_type& counter
       , error_code& ec = throws
         );
 };

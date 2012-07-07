@@ -172,6 +172,36 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
+    /// \brief Create a name of a counter instance from the contents of the
+    ///        given \a counter_path_elements instance.
+    counter_status get_counter_instance_name(
+        counter_path_elements const& path, std::string& result,
+        error_code& ec)
+    {
+        if (path.parentinstancename_.empty()) {
+            HPX_THROWS_IF(ec, bad_parameter, "get_counter_instance_name",
+                "empty counter instance name");
+            return status_invalid_data;
+        }
+
+        if (path.parentinstance_is_basename_) {
+            result = path.parentinstancename_;
+        }
+        else {
+            result = "/";
+            result += path.parentinstancename_;
+
+            if (!path.instancename_.empty()) {
+                result += "/";
+                result += path.instancename_;
+            }
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return status_valid_data;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     struct instance_name
     {
@@ -369,7 +399,7 @@ namespace hpx { namespace performance_counters
         get_counter_type(type_name, info, ec);
         if (!status_is_valid(status)) return status;
 
-        // last, set ful counter name
+        // last, set full counter name
         return get_counter_name(p, info.fullname_, ec);
     }
 
@@ -565,9 +595,11 @@ namespace hpx { namespace performance_counters
                     if (ec) return naming::invalid_id;
                 }
 
-                if (p.parentinstancename_ != "locality" ||
-                    p.parentinstanceindex_ < 0 ||
-                    p.parentinstanceindex_ >= static_cast<boost::int32_t>(get_num_localities()))
+                if (p.parentinstancename_ == "locality" &&
+                        (   p.parentinstanceindex_ < 0 ||
+                            p.parentinstanceindex_ >= static_cast<boost::int32_t>(get_num_localities())
+                        )
+                    )
                 {
                     HPX_THROWS_IF(ec, bad_parameter, "get_counter",
                         "attempt to create counter on non-existing locality");
@@ -577,9 +609,16 @@ namespace hpx { namespace performance_counters
                 // use the runtime_support component of the target locality to
                 // create the new performance counter
                 using namespace components::stubs;
-                naming::gid_type gid = runtime_support::create_performance_counter(
-                    naming::get_id_from_locality_id(static_cast<boost::uint32_t>(p.parentinstanceindex_)),
-                    complemented_info, ec);
+                naming::gid_type gid;
+                if (p.parentinstanceindex_ >= 0) {
+                    gid = runtime_support::create_performance_counter(
+                        naming::get_id_from_locality_id(static_cast<boost::uint32_t>(p.parentinstanceindex_)),
+                        complemented_info, ec);
+                }
+                else {
+                    gid = runtime_support::create_performance_counter(
+                        find_here(), complemented_info, ec);
+                }
                 if (ec) return naming::invalid_id;
 
                 id = naming::id_type(gid, naming::id_type::managed);

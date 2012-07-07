@@ -1348,6 +1348,111 @@ void addressing_service::update_cache(
     }
 } // }}}
 
+namespace detail
+{
+    // get action code from counter type
+    namespace_action_code retrieve_action_code(
+        std::string const& name
+      , error_code& ec
+        )
+    {
+        performance_counters::counter_path_elements p;
+        performance_counters::get_counter_path_elements(name, p, ec);
+        if (ec) return invalid_request;
+
+        if (p.objectname_ != "agas")
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
+                "unknown performance counter (unrelated to AGAS)");
+            return invalid_request;
+        }
+
+        for (std::size_t i = 0;
+             i < sizeof(counter_services)/sizeof(counter_services[0]);
+             ++i)
+        {
+            if (p.countername_ == counter_services[i].name_)
+                return counter_services[i].code_;
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
+            "unknown performance counter (unrelated to AGAS)");
+        return invalid_request;
+    }
+
+    // get service action code from counter type
+    namespace_action_code retrieve_action_service_code(
+        std::string const& name
+      , error_code& ec
+        )
+    {
+        performance_counters::counter_path_elements p;
+        performance_counters::get_counter_path_elements(name, p, ec);
+        if (ec) return invalid_request;
+
+        if (p.objectname_ != "agas")
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",
+                "unknown performance counter (unrelated to AGAS)");
+            return invalid_request;
+        }
+
+        for (std::size_t i = 0;
+             i < sizeof(counter_services)/sizeof(counter_services[0]);
+             ++i)
+        {
+            if (p.countername_ == counter_services[i].name_)
+                return counter_services[i].service_code_;
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",
+            "unknown performance counter (unrelated to AGAS)");
+        return invalid_request;
+    }
+}
+
+bool addressing_service::retrieve_statistics_counter(
+    std::string const& counter_name
+  , naming::gid_type& counter
+  , error_code& ec
+    )
+{
+    try {
+        // retrieve counter type
+        namespace_action_code code =
+            detail::retrieve_action_code(counter_name, ec);
+        if (invalid_request == code) return false;
+
+        // compose request
+        request req(code, counter_name);
+        response rep;
+
+        if (is_bootstrap())
+            rep = bootstrap->symbol_ns_server.service(req, ec);
+        else
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+
+        if (!ec && (success == rep.get_status()))
+        {
+            counter = rep.get_statistics_counter();
+            return true;
+        }
+        return false;
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::query_statistics"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+
+        return false;
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
 std::size_t addressing_service::get_cache_hits() const
@@ -1424,6 +1529,12 @@ void addressing_service::register_counter_types()
     };
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+
+    // now install counters for services
+    if (is_bootstrap()) {
+        // always register as root server, for now
+        bootstrap->register_counter_types("root");
+    }
 } // }}}
 
 void addressing_service::garbage_collect_non_blocking(

@@ -147,7 +147,6 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-
     explicit response(
         namespace_action_code type_
       , error status_ = success
@@ -159,6 +158,7 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     response(
         response const& other
@@ -262,6 +262,13 @@ struct response
         return get_data<subtype_gid_gid_prefix, 1>(ec);
     }
 
+    naming::gid_type get_statistics_counter(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_gid, 0>(ec);
+    }
+
     namespace_action_code get_action_code() const
     {
         return mc;
@@ -285,6 +292,7 @@ struct response
       , subtype_gid             = 0x5
       , subtype_prefix          = 0x6
       , subtype_void            = 0x7
+      // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
     };
 
     // The order of the variant types is significant, and should not be changed
@@ -322,6 +330,9 @@ struct response
         // 0x5
         // symbol_ns_unbind
         // symbol_ns_resolve
+        // primary_ns_statistics
+        // component_ns_statistics
+        // symbol_ns_statistics
       , boost::fusion::vector1<
             naming::gid_type // gid
         >

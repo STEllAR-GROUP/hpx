@@ -201,6 +201,7 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     request(
         request const& other
@@ -371,6 +372,13 @@ struct request
         return mc;
     }
 
+    std::string get_statistics_counter_name(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_name, 0>(ec);
+    }
+
   private:
     friend class boost::serialization::access;
 
@@ -389,8 +397,11 @@ struct request
       , subtype_iterate_names_function  = 0xa
       , subtype_iterate_types_function  = 0xb
       , subtype_void                    = 0xc
+      // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
     };
 
+    // The types listed for any of the services represent the argument types
+    // for this particular service.
     // The order of the variant types is significant, and should not be changed
     typedef boost::variant<
         // 0x0
@@ -451,6 +462,9 @@ struct request
         // component_ns_unbind
         // symbol_ns_resolve
         // symbol_ns_unbind
+        // component_ns_statistics
+        // primary_ns_statistics
+        // symbol_ns_statistics
       , boost::fusion::vector1<
             std::string // name
         >

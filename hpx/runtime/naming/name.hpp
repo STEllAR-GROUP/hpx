@@ -459,11 +459,11 @@ namespace hpx { namespace naming
         }
 
         id_type(id_type const & o)
-            : gid_(o.gid_)
+          : gid_(o.gid_)
         {}
 
         id_type(BOOST_RV_REF(id_type) o)
-            : gid_(o.gid_)
+          : gid_(o.gid_)
         {
             o.gid_.reset();
         }

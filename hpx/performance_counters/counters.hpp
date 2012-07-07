@@ -253,6 +253,12 @@ namespace hpx { namespace performance_counters
         counter_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
+    /// \brief Create a name of a counter instance from the contents of the
+    ///        given \a counter_path_elements instance.
+    HPX_API_EXPORT counter_status get_counter_instance_name(
+        counter_path_elements const& path, std::string& result,
+        error_code& ec = throws);
+
     /// \brief Fill the given \a counter_type_path_elements instance from the
     ///        given full name of a counter type
     HPX_API_EXPORT counter_status get_counter_type_path_elements(
