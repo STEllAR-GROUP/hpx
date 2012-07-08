@@ -18,11 +18,11 @@ namespace ag { namespace server
 {
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_COMPONENT_EXPORT point
-      : public hpx::components::managed_component_base<point>
+    class HPX_COMPONENT_EXPORT allgather
+      : public hpx::components::managed_component_base<allgather>
     {
     public:
-        point()
+        allgather()
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -40,55 +40,55 @@ namespace ag { namespace server
         /// Action codes.
         enum actions
         {
-            point_init = 0,
-            point_compute = 1,
-            point_get_item = 2,
-            point_print = 3
+            allgather_init = 0,
+            allgather_compute = 1,
+            allgather_get_item = 2,
+            allgather_print = 3
         };
 
         typedef hpx::actions::action2<
             // Component server type.
-            point,
+            allgather,
             // Action code.
-            point_init,
+            allgather_init,
             // Arguments of this action.
             std::size_t,
             std::size_t,
             // Method bound to this action.
-            &point::init
+            &allgather::init
         > init_action;
 
         typedef hpx::actions::action1<
             // Component server type.
-            point,
+            allgather,
             // Action code.
-            point_compute,
+            allgather_compute,
             // Arguments of this action.
             std::vector<hpx::naming::id_type> const&,
             // Method bound to this action.
-            &point::compute
+            &allgather::compute
         > compute_action;
 
         typedef hpx::actions::action0<
             // Component server type.
-            point,
+            allgather,
             // Action code.
-            point_print,
+            allgather_print,
             // Arguments of this action.
             // Method bound to this action.
-            &point::print
+            &allgather::print
         > print_action;
 
         typedef hpx::actions::result_action0<
             // Component server type.
-            point,
+            allgather,
             // Return type
             double,
             // Action code.
-            point_get_item,
+            allgather_get_item,
             // Arguments of this action.
             // Method bound to this action.
-            &point::get_item
+            &allgather::get_item
         > get_item_action;
 
     private:
@@ -102,19 +102,19 @@ namespace ag { namespace server
 
 // Declaration of serialization support for the actions
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    ag::server::point::init_action,
-    ag_point_init_action);
+    ag::server::allgather::init_action,
+    allgather_init_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    ag::server::point::compute_action,
-    ag_point_compute_action);
+    ag::server::allgather::compute_action,
+    allgather_compute_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    ag::server::point::get_item_action,
-    ag_point_get_item_action);
+    ag::server::allgather::get_item_action,
+    allgather_get_item_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    ag::server::point::print_action,
-    ag_point_print_action);
+    ag::server::allgather::print_action,
+    allgather_print_action);
 #endif
 

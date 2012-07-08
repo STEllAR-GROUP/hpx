@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include "ag/point.hpp"
+#include "ag/allgather.hpp"
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 /// This function initializes a vector of \a ag::point clients,
@@ -17,11 +17,11 @@
 /// \a hpx::components::distributing_factory.
 inline void
 init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<ag::point>& p)
+    std::vector<ag::allgather>& p)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
-        p.push_back(ag::point(id));
+        p.push_back(ag::allgather(id));
     }
 }
 
@@ -51,7 +51,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Get the component type for our point component.
         hpx::components::component_type block_type =
-            hpx::components::get_component_type<ag::server::point>();
+            hpx::components::get_component_type<ag::server::allgather>();
 
         std::vector<hpx::naming::id_type> localities = hpx::find_all_localities(block_type);
         std::size_t numloc = localities.size();
@@ -66,7 +66,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
         // components we just created.
-        std::vector<ag::point> points;
+        std::vector<ag::allgather> points;
 
         // Populate the client vectors.
         init(hpx::util::locality_results(blocks), points);

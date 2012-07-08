@@ -8,8 +8,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
-#include "../stubs/point.hpp"
-#include "point.hpp"
+#include "../stubs/allgather.hpp"
+#include "allgather.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
@@ -22,14 +22,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server
 {
-    void point::init(std::size_t item,std::size_t np)
+    void allgather::init(std::size_t item,std::size_t np)
     {
       //hpx::util::spinlock::scoped_lock l(mtx_);
       item_ = item; 
       value_ = item*3.14159;  
     }
 
-    void point::compute(std::vector<hpx::naming::id_type> const& point_components)
+    void allgather::compute(std::vector<hpx::naming::id_type> const& point_components)
     {
      // hpx::util::spinlock::scoped_lock l(mtx_);
       typedef std::vector<hpx::lcos::future< double > > lazy_results_type;
@@ -42,14 +42,14 @@ namespace ag { namespace server
       hpx::lcos::wait(lazy_results,n_);  
     }
 
-    double point::get_item()
+    double allgather::get_item()
     {
       //std::cout << " Get_item " << item_ << std::endl;
       //hpx::util::spinlock::scoped_lock l(mtx_);
       return value_;
     }
 
-    void point::print()
+    void allgather::print()
     {
       std::cout << " location: " << item_ << " n size : " << n_.size() << std::endl;
       for ( std::size_t i=0;i<n_.size();i++) {

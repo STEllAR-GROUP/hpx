@@ -8,26 +8,26 @@
 
 #include <hpx/runtime/components/client_base.hpp>
 
-#include "stubs/point.hpp"
+#include "stubs/allgather.hpp"
 
 namespace ag
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The client side representation of a \a ag::server::point components.
-    class point : public hpx::components::client_base<point, stubs::point>
+    class allgather : public hpx::components::client_base<allgather, stubs::point>
     {
-        typedef hpx::components::client_base<point, stubs::point>
+        typedef hpx::components::client_base<allgather, stubs::point>
             base_type;
 
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
-        point()
+        allgather()
         {}
 
         /// Create a client side representation for the existing
         /// \a ag::server::point instance with the given GID.
-        point(hpx::naming::id_type const& gid)
+        allgather(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
 

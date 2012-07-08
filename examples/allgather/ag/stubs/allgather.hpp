@@ -8,17 +8,17 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
-#include "../server/point.hpp"
+#include "../server/allgather.hpp"
 
 namespace ag { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct point : hpx::components::stub_base<server::point>
+    struct point : hpx::components::stub_base<server::allgather>
     {
         static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid,std::size_t scale,std::size_t np)
         {
-            typedef server::point::init_action action_type;
+            typedef server::allgather::init_action action_type;
             return hpx::async<action_type>(gid,scale,np);
         }
 
@@ -33,7 +33,7 @@ namespace ag { namespace stubs
         compute_async(hpx::naming::id_type const& gid,
                 std::vector<hpx::naming::id_type> const& point_components)
         {
-            typedef server::point::compute_action action_type;
+            typedef server::allgather::compute_action action_type;
             return hpx::async<action_type>(gid,point_components);
         }
 
@@ -48,7 +48,7 @@ namespace ag { namespace stubs
         static hpx::lcos::future<void>
         print_async(hpx::naming::id_type const& gid)
         {
-            typedef server::point::print_action action_type;
+            typedef server::allgather::print_action action_type;
             return hpx::async<action_type>(gid);
         }
 
@@ -62,7 +62,7 @@ namespace ag { namespace stubs
         static hpx::lcos::future<double>
         get_item_async(hpx::naming::id_type const& gid)
         {
-            typedef server::point::get_item_action action_type;
+            typedef server::allgather::get_item_action action_type;
             return hpx::async<action_type>(gid);
         }
 

@@ -13,7 +13,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "server/point.hpp"
+#include "server/allgather.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -21,24 +21,24 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<
-    ag::server::point
-> ag_point_type;
+    ag::server::allgather
+> allgather_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ag_point_type, ag_point);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(allgather_type, ag_allgather);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
-    ag_point_type::wrapped_type::init_action,
-    ag_point_init_action);
+    allgather_type::wrapped_type::init_action,
+    allgather_init_action);
 
 HPX_REGISTER_ACTION_EX(
-    ag_point_type::wrapped_type::compute_action,
-    ag_point_compute_action);
+    allgather_type::wrapped_type::compute_action,
+    allgather_compute_action);
 
 HPX_REGISTER_ACTION_EX(
-    ag_point_type::wrapped_type::print_action,
-    ag_point_print_action);
+    allgather_type::wrapped_type::print_action,
+    allgather_print_action);
 
 HPX_REGISTER_ACTION_EX(
-    ag_point_type::wrapped_type::get_item_action,
-    ag_point_get_item_action);
+    allgather_type::wrapped_type::get_item_action,
+    allgather_get_item_action);
