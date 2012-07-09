@@ -1,5 +1,8 @@
 # Boost Subversion auto-props adapted for git
 
+# Defaults
+* text=auto
+
 # Script formats
 *.bat             text
 *.bsh             text
@@ -129,4 +132,6 @@ Jamroot       text
 Jamfile.v2    text
 Jamrules      text
 *.java        text
+*.glsl        text
+*.cl          text
 
