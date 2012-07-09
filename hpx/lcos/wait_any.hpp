@@ -265,7 +265,8 @@ namespace hpx
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
                     // set callback functions to execute when future is ready
-                    boost::fusion::accumulate(lazy_values_, index_error,
+                    std::size_t tmp = index_error;
+                    boost::fusion::accumulate(lazy_values_, tmp,
                         init_when(*this, threads::get_self_id()));
                 }
 
