@@ -1,0 +1,132 @@
+# Boost Subversion auto-props adapted for git
+
+# Script formats
+*.bat             text
+*.bsh             text
+*.cgi             text
+*.cmd             text
+*.js              text
+*.php             text
+*.pl              text
+*.pm              text
+*.py              text
+*.sh              text eol=lf
+*.cmake           text
+CMakeLists.txt    text 
+Makefile*         text eol=lf 
+configure         text eol=lf
+
+# Image formats
+*.bmp         binary 
+*.gif         binary 
+*.ico         binary 
+*.jpeg        binary 
+*.jpg         binary 
+*.png         binary 
+*.tif         binary 
+*.tiff        binary 
+*.svg         text 
+
+# Archive formats
+*.tar         binary
+*.gz          binary
+*.tgz         binary 
+*.bz2         binary
+*.tbz         binary
+*.tbz2        binary
+*.tb2         binary
+*.zip         binary
+*.7z          binary
+
+# Data formats
+*.pdf         binary
+*.avi         binary
+*.doc         binary
+*.dsp         text eol=crlf
+*.dsw         text eol=crlf
+*.eps         binary
+*.mov         binary
+*.mp3         binary
+*.mpeg        binary
+*.mpg         binary
+*.ppt         binary
+*.ps          binary
+*.psd         binary
+*.swf         binary
+*.rdf         text
+*.rss         text
+*.rtf         text
+*.sln         text
+*.vcproj      text
+*.vsprops     text
+*.wav         binary 
+
+# Text formats
+*.tex             text
+*.sty             text
+*.cls             text
+*.bib             text
+.htaccess         text
+*.bbk             text
+*.css             text
+*.dtd             text
+*.htm             text
+*.html            text
+*.ini             text
+*.log             text
+*.mak             text
+*.qbk             text
+*.rst             text
+*.sql             text
+*.txt             text
+*.xhtml           text
+*.xml             text
+*.dbk             text
+*.docbook         text
+*.xsd             text
+*.xsl             text
+*.xslt            text
+*.xul             text
+*.yml             text
+boost-no-inspect  text
+CHANGES           text
+COPYING           text
+INSTALL           text
+README            text
+TODO              text
+
+# Source code formats
+*.py          text
+*.c           text
+*.h           text
+*.c++         text
+*.cpp         text
+*.cxx         text
+*.cc          text
+*.C           text
+*.h++         text
+*.hpp         text
+*.hxx         text
+*.hh          text
+*.H           text
+*.ipp         text
+*.tpp         text
+*.f           text
+*.F           text
+*.f77         text
+*.F77         text
+*.f90         text
+*.F90         text
+*.for         text
+*.For         text
+*.FOR         text
+*.f95         text
+*.F95         text
+*.fpp         text
+*.jam         text
+Jamfile       text
+Jamroot       text
+Jamfile.v2    text
+Jamrules      text
+*.java        text
+
