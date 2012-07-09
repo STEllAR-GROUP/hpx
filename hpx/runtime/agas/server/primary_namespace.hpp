@@ -19,6 +19,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -160,6 +161,11 @@ struct HPX_EXPORT primary_namespace :
         return bulk_service(reqs, throws);
     }
 
+    // register all performance counter types exposed by this component
+    void register_counter_types(
+        char const* servicename
+      , error_code& ec = throws);
+
     /// Maps \a service over \p reqs in parallel.
     std::vector<response> bulk_service(
         std::vector<request> const& reqs
@@ -211,6 +217,11 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
+    response statistics_counter(
+        request const& req
+      , error_code& ec = throws
+        );
+
   private:
     boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
         naming::gid_type const& gid
@@ -227,7 +238,7 @@ struct HPX_EXPORT primary_namespace :
     /// TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
     /// table after it's been decremented to 0 and destroyed? How do we do this
     /// efficiently?
-    /// 
+    ///
     /// The new decrement algorithm (decrement_sweep handles 0-2,
     /// kill_non_blocking or kill_sync handles 3):
     ///
@@ -270,20 +281,21 @@ struct HPX_EXPORT primary_namespace :
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service                       = BOOST_BINARY_U(1000000)
-      , namespace_bulk_service                  = BOOST_BINARY_U(1000001)
-      , namespace_route                         = BOOST_BINARY_U(1000010)
+        namespace_service                       = primary_ns_service
+      , namespace_bulk_service                  = primary_ns_bulk_service
+      , namespace_route                         = primary_ns_route
 
         // Pseudo-actions
-      , namespace_allocate                      = BOOST_BINARY_U(1000011)
-      , namespace_bind_gid                      = BOOST_BINARY_U(1000100)
-      , namespace_resolve_gid                   = BOOST_BINARY_U(1000101)
-      , namespace_resolve_locality              = BOOST_BINARY_U(1000110)
-      , namespace_free                          = BOOST_BINARY_U(1000111)
-      , namespace_unbind_gid                    = BOOST_BINARY_U(1001000)
-      , namespace_change_credit_non_blocking    = BOOST_BINARY_U(1001001)
-      , namespace_change_credit_sync            = BOOST_BINARY_U(1001010)
-      , namespace_localities                    = BOOST_BINARY_U(1001011)
+      , namespace_allocate                      = primary_ns_allocate
+      , namespace_bind_gid                      = primary_ns_bind_gid
+      , namespace_resolve_gid                   = primary_ns_resolve_gid
+      , namespace_resolve_locality              = primary_ns_resolve_locality
+      , namespace_free                          = primary_ns_free
+      , namespace_unbind_gid                    = primary_ns_unbind_gid
+      , namespace_change_credit_non_blocking    = primary_ns_change_credit_non_blocking
+      , namespace_change_credit_sync            = primary_ns_change_credit_sync
+      , namespace_localities                    = primary_ns_localities
+      , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 
     typedef hpx::actions::result_action1<

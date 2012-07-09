@@ -56,7 +56,7 @@ response component_namespace::service(
         case component_ns_iterate_types:
             counter_data_.increment_iterate_types_count();
             return iterate_types(req, ec);
-        case component_ns_statistics:
+        case component_ns_statistics_counter:
             return statistics_counter(req, ec);
 
         case primary_ns_allocate:
@@ -528,7 +528,7 @@ response component_namespace::statistics_counter(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(component_ns_statistics, gid);
+    return response(component_ns_statistics_counter, gid);
 } // }}}
 
 // access current counter values

@@ -1419,12 +1419,12 @@ bool addressing_service::retrieve_statistics_counter(
 {
     try {
         // retrieve counter type
-        namespace_action_code code =
-            detail::retrieve_action_code(counter_name, ec);
-        if (invalid_request == code) return false;
+        namespace_action_code service_code =
+            detail::retrieve_action_service_code(counter_name, ec);
+        if (invalid_request == service_code) return false;
 
         // compose request
-        request req(code, counter_name);
+        request req(service_code, counter_name);
         response rep;
 
         if (is_bootstrap())

@@ -16,6 +16,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
@@ -70,6 +72,11 @@ struct HPX_EXPORT symbol_namespace :
       , error_code& ec
         );
 
+    // register all performance counter types exposed by this component
+    void register_counter_types(
+        char const* servicename
+      , error_code& ec = throws);
+
     /// Maps \a service over \p reqs in parallel.
     std::vector<response> bulk_service(
         std::vector<request> const& reqs
@@ -104,17 +111,23 @@ struct HPX_EXPORT symbol_namespace :
       , error_code& ec = throws
         );
 
+    response statistics_counter(
+        request const& req
+      , error_code& ec = throws
+        );
+
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service       = BOOST_BINARY_U(0010000)
-      , namespace_bulk_service  = BOOST_BINARY_U(0010001)
+        namespace_service            = symbol_ns_service
+      , namespace_bulk_service       = symbol_ns_bulk_service
 
         // Pseudo-actions
-      , namespace_bind          = BOOST_BINARY_U(0010010)
-      , namespace_resolve       = BOOST_BINARY_U(0010011)
-      , namespace_unbind        = BOOST_BINARY_U(0010100)
-      , namespace_iterate_names = BOOST_BINARY_U(0010101)
+      , namespace_bind               = symbol_ns_bind
+      , namespace_resolve            = symbol_ns_resolve
+      , namespace_unbind             = symbol_ns_unbind
+      , namespace_iterate_names      = symbol_ns_iterate_names
+      , namespace_statistics_counter = symbol_ns_statistics_counter
     }; // }}}
 
     typedef hpx::actions::result_action1<

@@ -168,9 +168,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
         void register_counter_types(char const* servicename)
         {
-//             primary_ns_server.register_counter_types(servicename);
+            primary_ns_server.register_counter_types(servicename);
             component_ns_server.register_counter_types(servicename);
-//             symbol_ns_server.register_counter_types(servicename);
+            symbol_ns_server.register_counter_types(servicename);
         }
 
         server::primary_namespace primary_ns_server;

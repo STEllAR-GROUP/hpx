@@ -28,7 +28,7 @@ enum namespace_action_code
     primary_ns_change_credit_non_blocking   = BOOST_BINARY_U(1001001),
     primary_ns_change_credit_sync           = BOOST_BINARY_U(1001010),
     primary_ns_localities                   = BOOST_BINARY_U(1001011),
-    primary_ns_statistics                   = BOOST_BINARY_U(1001100),
+    primary_ns_statistics_counter           = BOOST_BINARY_U(1001100),
     component_ns_service                    = BOOST_BINARY_U(0100000),
     component_ns_bulk_service               = BOOST_BINARY_U(0100001),
     component_ns_bind_prefix                = BOOST_BINARY_U(0100010),
@@ -36,14 +36,14 @@ enum namespace_action_code
     component_ns_resolve_id                 = BOOST_BINARY_U(0100100),
     component_ns_unbind                     = BOOST_BINARY_U(0100101),
     component_ns_iterate_types              = BOOST_BINARY_U(0100110),
-    component_ns_statistics                 = BOOST_BINARY_U(0100111),
+    component_ns_statistics_counter         = BOOST_BINARY_U(0100111),
     symbol_ns_service                       = BOOST_BINARY_U(0010000),
     symbol_ns_bulk_service                  = BOOST_BINARY_U(0010001),
     symbol_ns_bind                          = BOOST_BINARY_U(0010010),
     symbol_ns_resolve                       = BOOST_BINARY_U(0010011),
     symbol_ns_unbind                        = BOOST_BINARY_U(0010100),
     symbol_ns_iterate_names                 = BOOST_BINARY_U(0010101),
-    symbol_ns_statistics                    = BOOST_BINARY_U(0010110)
+    symbol_ns_statistics_counter            = BOOST_BINARY_U(0010110)
 };
 
 namespace detail
@@ -59,19 +59,19 @@ namespace detail
     {
         {   "count/bind_prefix"
           , component_ns_bind_prefix
-          , component_ns_statistics }
+          , component_ns_statistics_counter }
       , {   "count/bind_name"
           , component_ns_bind_name
-          , component_ns_statistics }
+          , component_ns_statistics_counter }
       , {   "count/resolve_id"
           , component_ns_resolve_id
-          , component_ns_statistics }
+          , component_ns_statistics_counter }
       , {   "count/unbind"
           , component_ns_unbind
-          , component_ns_statistics }
+          , component_ns_statistics_counter }
       , {   "count/iterate_types"
           , component_ns_iterate_types
-          , component_ns_statistics }
+          , component_ns_statistics_counter }
     };
 
     ///////////////////////////////////////////////////////////////////////////

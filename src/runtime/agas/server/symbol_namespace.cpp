@@ -27,7 +27,7 @@ naming::id_type bootstrap_symbol_namespace_id()
 namespace server
 {
 
-// TODO: This isn't scalable, we have to update it every time we add a new 
+// TODO: This isn't scalable, we have to update it every time we add a new
 // AGAS request/response type.
 response symbol_namespace::service(
     request const& req
@@ -44,6 +44,8 @@ response symbol_namespace::service(
             return unbind(req, ec);
         case symbol_ns_iterate_names:
             return iterate(req, ec);
+        case symbol_ns_statistics_counter:
+            return statistics_counter(req, ec);
 
         case primary_ns_allocate:
         case primary_ns_bind_gid:
@@ -88,6 +90,14 @@ response symbol_namespace::service(
         }
     };
 } // }}}
+
+// register all performance counter types exposed by this component
+void symbol_namespace::register_counter_types(
+    char const* servicename
+  , error_code& ec
+    )
+{
+}
 
 // TODO: do/undo semantics (e.g. transactions)
 std::vector<response> symbol_namespace::bulk_service(
@@ -308,6 +318,15 @@ response symbol_namespace::iterate(
 
     return response(symbol_ns_iterate_names);
 } // }}}
+
+response symbol_namespace::statistics_counter(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ iterate implementation
+    LAGAS_(info) << "symbol_namespace::statistics_counter";
+    return response();
+}
 
 }}}
 

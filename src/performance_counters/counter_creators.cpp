@@ -7,6 +7,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
+#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 
@@ -171,20 +173,25 @@ namespace hpx { namespace performance_counters
             agas::response rep;
 
             switch (service_code) {
-            case agas::component_ns_statistics:
-                rep = agas::stubs::component_namespace::service(agas_id, req);
-                if (!ec)
-                    id = rep.get_statistics_counter();
+            case agas::component_ns_statistics_counter:
+                rep = agas::stubs::component_namespace::service(
+                    agas_id, req, threads::thread_priority_default, ec);
                 break;
-            case agas::primary_ns_statistics:
+            case agas::primary_ns_statistics_counter:
+                rep = agas::stubs::primary_namespace::service(
+                    agas_id, req, threads::thread_priority_default, ec);
+                break;
             case agas::symbol_ns_service:
-                // not implemented yet
+                rep = agas::stubs::symbol_namespace::service(
+                    agas_id, req, threads::thread_priority_default, ec);
+                break;
             default:
                 HPX_THROWS_IF(ec, bad_parameter, "retrieve_statistics_counter",
                     "unknown counter agas counter name: " + name);
                 break;
             }
-
+            if (!ec)
+                id = rep.get_statistics_counter();
             return id;
         }
     }
@@ -215,25 +222,29 @@ namespace hpx { namespace performance_counters
             return naming::invalid_gid;
         }
 
-        std::string::size_type p = paths.instancename_.find("total");
-        if (p == paths.instancename_.size() - 5 && paths.instanceindex_ == -1)
+        if (service_name == paths.parentinstancename_ && paths.parentinstanceindex_ == -1)
         {
-            // find the referenced AGAS instance and dispatch the request there
-            std::string agas_instance;
-            performance_counters::get_counter_instance_name(paths, agas_instance, ec);
-            if (ec) return naming::invalid_gid;
+            // counter instance name: /<agas_service_name>/<agas_instance_name>/total
+            // for instance: /component_namespace/root/total
+            std::string::size_type p = paths.instancename_.find("total");
+            if (p == paths.instancename_.size() - 5 && paths.instanceindex_ == -1)
+            {
+                // find the referenced AGAS instance and dispatch the request there
+                std::string agas_instance;
+                performance_counters::get_counter_instance_name(paths, agas_instance, ec);
+                if (ec) return naming::invalid_gid;
 
-            naming::id_type id;
-            bool result = agas::resolve_name(
-                agas_instance.substr(0, agas_instance.size() - 6), id, ec);
-            if (!result) {
-                HPX_THROWS_IF(ec, not_implemented,
-                    "agas_raw_counter_creator",
-                    "invalid counter instance name: " + agas_instance);
-                return naming::invalid_gid;
+                naming::id_type id;
+                bool result = agas::resolve_name(
+                    agas_instance.substr(0, agas_instance.size() - 6), id, ec);
+                if (!result) {
+                    HPX_THROWS_IF(ec, not_implemented,
+                        "agas_raw_counter_creator",
+                        "invalid counter instance name: " + agas_instance);
+                    return naming::invalid_gid;
+                }
+                return detail::retrieve_statistics_counter(info.fullname_, id, ec);
             }
-
-            return detail::retrieve_statistics_counter(info.fullname_, id, ec);
         }
 
         HPX_THROWS_IF(ec, not_implemented, "agas_raw_counter_creator",
@@ -250,8 +261,28 @@ namespace hpx { namespace performance_counters
     bool agas_counter_discoverer(counter_info const& info,
         HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
     {
-        HPX_THROWS_IF(ec, not_implemented, "objectinstance_counter_discoverer",
-            "function not implemented (yet)");
+        performance_counters::counter_info i_ = info;
+
+        // compose the counter names
+        performance_counters::counter_path_elements p;
+        performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        p.parentinstancename_ = "agas";
+        p.parentinstanceindex_ = -1;
+        p.instanceindex_ = -1;
+
+        // list all counter related to agas
+        for (std::size_t i = 0;
+             i < sizeof(agas::detail::counter_services)/sizeof(agas::detail::counter_services[0]);
+             ++i)
+        {
+            p.instancename_ = agas::detail::counter_services[i].name_;
+            status = get_counter_name(p, i_.fullname_, ec);
+            if (!status_is_valid(status) || !f(i_, ec) || ec)
+                return false;
+        }
         return true;
     }
 }}

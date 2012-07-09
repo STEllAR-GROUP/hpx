@@ -191,7 +191,7 @@ struct HPX_EXPORT component_namespace :
       , namespace_resolve_id    = component_ns_resolve_id
       , namespace_unbind        = component_ns_unbind
       , namespace_iterate_types = component_ns_iterate_types
-      , namespace_statistics    = component_ns_statistics
+      , namespace_statistics    = component_ns_statistics_counter
     }; // }}}
 
     typedef hpx::actions::result_action1<

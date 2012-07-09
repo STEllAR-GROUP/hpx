@@ -57,6 +57,8 @@ response primary_namespace::service(
             return change_credit_sync(req, ec);
         case primary_ns_localities:
             return localities(req, ec);
+        case primary_ns_statistics_counter:
+            return statistics_counter(req, ec);
 
         case component_ns_bind_prefix:
         case component_ns_bind_name:
@@ -97,6 +99,14 @@ response primary_namespace::service(
         }
     };
 } // }}}
+
+// register all performance counter types exposed by this component
+void primary_namespace::register_counter_types(
+    char const* servicename
+  , error_code& ec
+    )
+{
+}
 
 // TODO: do/undo semantics (e.g. transactions)
 std::vector<response> primary_namespace::bulk_service(
@@ -1211,6 +1221,15 @@ primary_namespace::resolve_gid_locked(
     return boost::fusion::vector2<naming::gid_type, gva>
         (naming::invalid_gid, gva());
 } // }}}
+
+response primary_namespace::statistics_counter(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ iterate implementation
+    LAGAS_(info) << "primary_namespace::statistics_counter";
+    return response();
+}
 
 }}}
 
