@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/get_pointer.hpp>
@@ -128,8 +129,7 @@ namespace hpx { namespace util {
 /**/
 
 #define HPX_UTIL_BIND_REMOVE_REFERENCE(Z, N, D)                                 \
-    typename boost::remove_const<                                               \
-        typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type>::type      \
+        typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type             \
 /**/
 
 #define HPX_UTIL_BIND_REFERENCE(Z, N, D)                                        \
@@ -138,7 +138,7 @@ namespace hpx { namespace util {
 
 #define HPX_UTIL_BIND_FUNCTOR_OPERATOR(Z, N, D)                                 \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const                     \
+    result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const                    \
     {                                                                           \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
@@ -309,7 +309,7 @@ namespace hpx { namespace util {
     BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
 /**/
 #define HPX_UTIL_BIND_MEMBER(Z, N, D)                                           \
-    BOOST_PP_CAT(Arg, N) BOOST_PP_CAT(arg, N);                                  \
+    typename boost::remove_const<typename decay<BOOST_PP_CAT(Arg, N)>::type>::type BOOST_PP_CAT(arg, N);            \
 /**/
 
 #define HPX_UTIL_BIND_INIT_COPY_MEMBER(Z, N, D)                                 \

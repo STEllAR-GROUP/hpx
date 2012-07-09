@@ -21,7 +21,7 @@ void void_thread(){
 }
 typedef hpx::actions::plain_action0<void_thread> void_action;
 typedef hpx::lcos::packaged_action<void_action> Package;
-typedef typename hpx::actions::extract_action<void_action>::type action_type;
+typedef hpx::actions::extract_action<void_action>::type action_type;
 
 HPX_REGISTER_PLAIN_ACTION(void_action);
 

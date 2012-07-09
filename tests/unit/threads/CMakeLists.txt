@@ -6,12 +6,15 @@
 set(tests
     set_thread_state
     thread
-    thread_affinity
     thread_id
     thread_launching
     thread_mf
     thread_rescheduling
    )
+
+if(HPX_CXX11_LAMBDAS)
+  set(tests ${tests} thread_affinity)
+endif()
 
 set(thread_affinity_FLAGS
     DEPENDENCIES iostreams_component)
