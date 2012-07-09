@@ -9,7 +9,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
-#include <boost/move/move.hpp>
+#include <hpx/util/move.hpp>
 
 #include <hpx/util/full_empty_entry.hpp>
 

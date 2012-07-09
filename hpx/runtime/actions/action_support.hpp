@@ -12,6 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -32,7 +33,6 @@
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/and.hpp>
-#include <boost/move/move.hpp>
 #if defined(BOOST_NO_DECLTYPE)
 #  include <boost/typeof/typeof.hpp>
 #endif

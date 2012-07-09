@@ -9,14 +9,14 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/move/move.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 
 #define M0(Z, N, D)                                                             \
     typedef BOOST_PP_CAT(A, N) BOOST_PP_CAT(member_type, N);                    \
@@ -36,71 +36,88 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
+#if defined(BOOST_NO_RVALUE_REFERENCES)
         template <typename T>
-        struct argument_pack_value_type
+        struct env_value_type
         {
-            typedef T* type;
+            typedef T type;
+        }
+        
+        template <typename T>
+        struct env_value_type<T const>
+        {
+            typedef T const type;
+        }
+
+        template <typename T>
+        struct env_value_type<T &>
+        {
+            typedef typename hpx::util::detail::remove_reference<T>::type & type;
         };
 
         template <typename T>
-        struct argument_pack_value_type<T &>
-          : argument_pack_value_type<T>
-        {};
-
-        template <typename T>
-        struct argument_pack_value_type<T const &>
-          : argument_pack_value_type<T const>
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct get_argument_from_pack
+        struct env_value_type<T const &>
         {
-            typedef T& result_type;
+            typedef typename hpx::util::detail::remove_reference<T>::type const & type;
+        };
+#else
+        template <typename T, bool IsRvalue = std::is_rvalue_reference<T>::value>
+        struct env_value_type
+        {
+            typedef typename hpx::util::detail::remove_reference<T>::type type;
+        };
 
-            template <int N, typename ArgumentPack>
-            static T& call(BOOST_FWD_REF(ArgumentPack) args)
+        template <typename T>
+        struct env_value_type<T, false>
+        {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct env_value_type<T const, false>
+        {
+            typedef T const type;
+        };
+
+        template <typename T>
+        struct env_value_type<T const &, false>
+        {
+            typedef T const & type;
+        };
+        
+        template <typename T>
+        struct env_value_type<T &, false>
+        {
+            typedef T & type;
+        };
+#endif
+
+        template <typename A>
+        struct move_if_no_ref
+        {
+            static A call(A & a)
             {
-                return boost::fusion::at_c<N>(boost::forward<ArgumentPack>(args));
+                return boost::move(a);
             }
         };
 
-        template <typename T>
-        struct get_argument_from_pack<T&>
-          : get_argument_from_pack<T>
-        {};
-
-        template <typename T>
-        struct get_argument_from_pack<T*>
+        template <typename A>
+        struct move_if_no_ref<A &>
         {
-            typedef T& result_type;
-
-            template <int N, typename ArgumentPack>
-            static T& call(BOOST_FWD_REF(ArgumentPack) args)
+            static A & call(A & a)
             {
-                return *boost::fusion::at_c<N>(boost::forward<ArgumentPack>(args));
+                return a;
             }
         };
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <int N, typename ArgumentPack>
-    typename detail::get_argument_from_pack<
-        typename boost::fusion::result_of::at_c<
-            typename boost::remove_reference<ArgumentPack>::type, N
-        >::type
-    >::result_type
-    get_argument_from_pack(BOOST_FWD_REF(ArgumentPack) args)
-    {
-        typedef
-            typename boost::fusion::result_of::at_c<
-                typename boost::remove_reference<ArgumentPack>::type, N
-            >::type
-        argument_type;
-
-        return detail::get_argument_from_pack<argument_type>::
-            template call<N>(boost::forward<ArgumentPack>(args));
+        
+        template <typename A>
+        struct move_if_no_ref<A const &>
+        {
+            static A const & call(A const & a)
+            {
+                return a;
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -136,7 +153,7 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 
-    inline tuple0<> make_argument_pack()
+    inline tuple0<> forward_as_tuple()
     {
         return tuple0<>();
     }
@@ -220,26 +237,20 @@ namespace boost {
 
 #define HPX_UTIL_TUPLE_NAME BOOST_PP_CAT(tuple, N)
 
-#define HPX_UTIL_TUPLE_FWD_REF_PARAMS(Z, N, D)                                  \
-    BOOST_FWD_REF(BOOST_PP_CAT(Arg, N)) BOOST_PP_CAT(arg, N)                    \
-
-#define HPX_UTIL_TUPLE_FORWARD_PARAMS(Z, N, D)                                  \
-    boost::forward<BOOST_PP_CAT(Arg, N)>(BOOST_PP_CAT(arg, N))                  \
-
 #define HPX_UTIL_TUPLE_INIT_MEMBER(Z, N, D)                                     \
-    BOOST_PP_CAT(a, N)(HPX_UTIL_TUPLE_FORWARD_PARAMS(Z, N, D))                  \
+    BOOST_PP_CAT(a, N)(HPX_FORWARD_ARGS(Z, N, D))                               \
 
 #define HPX_UTIL_TUPLE_INIT_COPY_MEMBER(Z, N, D)                                \
     BOOST_PP_CAT(a, N)(BOOST_PP_CAT(other.a, N))                                \
 
 #define HPX_UTIL_TUPLE_INIT_MOVE_MEMBER(Z, N, D)                                \
-    BOOST_PP_CAT(a, N)(boost::move(BOOST_PP_CAT(other.a, N)))                   \
+    BOOST_PP_CAT(a, N)(detail::move_if_no_ref<BOOST_PP_CAT(D, N)>::call(BOOST_PP_CAT(other.a, N)))        \
 
 #define HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER(Z, N, D)                              \
     BOOST_PP_CAT(a, N) = BOOST_PP_CAT(other.a, N);                              \
 
 #define HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER(Z, N, D)                              \
-    BOOST_PP_CAT(a, N) = boost::move(BOOST_PP_CAT(other.a, N));                 \
+    BOOST_PP_CAT(a, N) = detail::move_if_no_ref<BOOST_PP_CAT(D, N)>::call(BOOST_PP_CAT(other.a, N));      \
 
 #define HPX_UTIL_TUPLE_SERIALIZE(Z, N, D)                                       \
     this->do_serialize(ar, BOOST_PP_CAT(a, N));                                 \
@@ -254,12 +265,13 @@ namespace hpx { namespace util
 
         HPX_UTIL_TUPLE_NAME() {}
 
+//#ifdef BOOST_NO_RVALUE_REFERENCES
         HPX_UTIL_TUPLE_NAME(HPX_UTIL_TUPLE_NAME const& other)
           : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_COPY_MEMBER, _)
         {}
 
         HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(HPX_UTIL_TUPLE_NAME) other)
-          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, _)
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, A)
         {}
 
         HPX_UTIL_TUPLE_NAME & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_TUPLE_NAME) other)
@@ -270,15 +282,23 @@ namespace hpx { namespace util
 
         HPX_UTIL_TUPLE_NAME & operator=(BOOST_RV_REF(HPX_UTIL_TUPLE_NAME) other)
         {
-            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, _)
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, A)
             return *this;
         }
+/*
+#else
+        HPX_UTIL_TUPLE_NAME(HPX_UTIL_TUPLE_NAME const& other) = default;
+        HPX_UTIL_TUPLE_NAME(HPX_UTIL_TUPLE_NAME && other) = default;
+        HPX_UTIL_TUPLE_NAME & operator=(HPX_UTIL_TUPLE_NAME const & other) = default;
+        HPX_UTIL_TUPLE_NAME & operator=(HPX_UTIL_TUPLE_NAME && other) = default;
+#endif
+*/
 
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        HPX_UTIL_TUPLE_NAME & operator=(BOOST_FWD_REF(
+        HPX_UTIL_TUPLE_NAME & operator=(BOOST_RV_REF(
                 HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>) other)
         {
-            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, _)
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, T)
             return *this;
         }
 
@@ -290,20 +310,19 @@ namespace hpx { namespace util
         {}
 
         template <typename Arg0>
-        explicit tuple1(BOOST_FWD_REF(tuple1<Arg0>) arg0,
-                typename boost::enable_if<is_tuple<Arg0> >::type* = 0)
-          : a0(boost::move(arg0.a0))
+        explicit tuple1(BOOST_RV_REF(tuple1<Arg0>) arg0)
+          : a0(detail::move_if_no_ref<Arg0>::call(arg0.a0))
         {}
 #else
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        HPX_UTIL_TUPLE_NAME(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FWD_REF_PARAMS, _))
-          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MEMBER, _)
+        HPX_UTIL_TUPLE_NAME(HPX_ENUM_FWD_ARGS(N, Arg, arg))
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MEMBER, (Arg, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        HPX_UTIL_TUPLE_NAME(BOOST_FWD_REF(
+        HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(
                 HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>) other)
-          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, _)
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, T)
         {}
 #endif
 
@@ -319,20 +338,24 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
 #define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
-    typename detail::argument_pack_value_type<BOOST_PP_CAT(D, N)>::type       \
+    typename detail::env_value_type<BOOST_PP_CAT(D, N)>::type                 \
     /**/
-#define HPX_UTIL_ARGUMENT_PACK_ARGS(Z, N, D) &BOOST_PP_CAT(arg, N)            \
+#else
+#define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
+    BOOST_FWD_REF(BOOST_PP_CAT(D, N))                                         \
     /**/
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>
-    make_argument_pack(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FWD_REF_PARAMS, _))
+    forward_as_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return HPX_UTIL_TUPLE_NAME<
                 BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>(
-            BOOST_PP_ENUM(N, HPX_UTIL_ARGUMENT_PACK_ARGS, _));
+            HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
     }
 
 #undef HPX_UTIL_ARGUMENT_PACK_ARGS
@@ -347,8 +370,6 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
 
 #undef N
 #undef HPX_UTIL_TUPLE_NAME
-#undef HPX_UTIL_TUPLE_FWD_REF_PARAMS
-#undef HPX_UTIL_TUPLE_FORWARD_PARAMS
 #undef HPX_UTIL_TUPLE_INIT_MEMBER
 #undef HPX_UTIL_TUPLE_INIT_COPY_MEMBER
 #undef HPX_UTIL_TUPLE_INIT_MOVE_MEMBER

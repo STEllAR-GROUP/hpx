@@ -12,18 +12,12 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(arg, n))                \
-    /**/
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/define_function_operators.hpp"))                     \
     /**/
 
 #include BOOST_PP_ITERATE()
-
-#undef HPX_MOVE_ARGS
 
 #endif
 
@@ -43,11 +37,11 @@
             boost::is_same<IdType, naming::id_type> >,
         typename traits::promise_local_result<Result>::type
     >::type
-    operator()(IdType const& id, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg),
+    operator()(IdType const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         error_code& ec = throws) const
     {
         return hpx::async(*this, id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _)).get(ec);
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get(ec);
     }
 
 #undef N

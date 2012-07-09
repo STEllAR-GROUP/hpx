@@ -8,21 +8,18 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM)
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM
 
+#include <hpx/util/move.hpp>
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::move(BOOST_PP_CAT(arg, n))                                 \
-    /**/
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
-        BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
+    BOOST_PP_COMMA_IF(n)                                                      \
+    util::detail::move_if_no_ref<                                             \
+        typename util::detail::remove_reference<Arguments_>::type::           \
+            BOOST_PP_CAT(member_type, n)>::call(data. BOOST_PP_CAT(a, n))     \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -32,8 +29,6 @@
 
 #include BOOST_PP_ITERATE()
 
-#undef HPX_FWD_ARGS
-#undef HPX_MOVE_ARGS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 
 #endif
@@ -57,7 +52,7 @@
         result_type operator()(continuation_type cont,
             void (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Object* obj
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -68,7 +63,7 @@
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
-                (obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+                (obj->*func)(HPX_ENUM_MOVE_ARGS(N, arg));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -85,7 +80,7 @@
             void (Object::* const func)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)) const,
             Component* obj
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -96,7 +91,7 @@
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
-                (obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+                (obj->*func)(HPX_ENUM_MOVE_ARGS(N, arg));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -148,7 +143,7 @@
         result_type operator()(continuation_type cont,
             Result (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Component* obj
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -160,7 +155,7 @@
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
                 cont->trigger(boost::move(
-                    (obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))
+                    (obj->*func)(HPX_ENUM_MOVE_ARGS(N, arg))
                 ));
             }
             catch (hpx::exception const&) {
@@ -177,7 +172,7 @@
             Result (Object::* const func)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)) const,
             Component* obj
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -189,7 +184,7 @@
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
                 cont->trigger(boost::move(
-                    (obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))
+                    (obj->*func)(HPX_ENUM_MOVE_ARGS(N, arg))
                 ));
             }
             catch (hpx::exception const&) {

@@ -8,12 +8,12 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads

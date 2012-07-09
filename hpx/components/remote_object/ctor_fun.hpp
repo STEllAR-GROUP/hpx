@@ -8,7 +8,7 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_CTOR_FUN_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_CTOR_FUN_HPP
 
-#include <boost/move/move.hpp>
+#include <hpx/util/move.hpp>
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 
@@ -43,15 +43,11 @@ namespace hpx { namespace components { namespace remote_object
     };
 
 #define HPX_REMOTE_OBJECT_M0(Z, N, D)                                           \
-    BOOST_PP_CAT(a, N)(BOOST_PP_CAT(a, N))                                      \
+    BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(Arg, N)>(BOOST_PP_CAT(arg, N)))\
 /**/
 
 #define HPX_REMOTE_OBJECT_COPY_CTOR(Z, N, D)                                    \
     BOOST_PP_CAT(a, N)(rhs. BOOST_PP_CAT(a, N))                                 \
-/**/
-
-#define HPX_REMOTE_OBJECT_MOVE_ARG(Z, N, D)                                     \
-    BOOST_PP_CAT(a, N)(boost::move(BOOST_PP_CAT(a, N)))                         \
 /**/
 
 #define HPX_REMOTE_OBJECT_MOVE_CTOR(Z, N, D)                                    \
@@ -75,7 +71,8 @@ namespace hpx { namespace components { namespace remote_object
 /**/
 
 #define HPX_REMOTE_OBJECT_M2(Z, N, D)                                           \
-    BOOST_PP_CAT(A, N) BOOST_PP_CAT(a, N);                                      \
+    typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, N)>::type      \
+    BOOST_PP_CAT(a, N);                                                         \
 /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -93,7 +90,6 @@ namespace hpx { namespace components { namespace remote_object
 #undef HPX_REMOTE_OBJECT_M0
 #undef HPX_REMOTE_OBJECT_M1
 #undef HPX_REMOTE_OBJECT_M2
-#undef HPX_REMOTE_OBJECT_MOVE_ARG
 #undef HPX_REMOTE_OBJECT_RV
 #undef HPX_REMOTE_OBJECT_MOVE
 #undef HPX_REMOTE_OBJECT_COPY
@@ -112,12 +108,10 @@ namespace hpx { namespace components { namespace remote_object
         typedef void result_type;
 
         ctor_fun() {}
-        ctor_fun(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-            : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_M0, _)
-        {}
 
-        ctor_fun(BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_RV, _))
-            : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_MOVE_ARG, _)
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        ctor_fun(HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_M0, _)
         {}
 
         ctor_fun(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)

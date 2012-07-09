@@ -10,23 +10,8 @@
 
 #include <boost/utility/enable_if.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/move.hpp>
 #include <boost/type_traits/remove_const.hpp>
-
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-    boost::move(BOOST_PP_CAT(a, n))                                           \
-    /**/
-
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-    boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))                    \
-    /**/
-
-#define HPX_FWD_REF_ARGS(z, n, _)                                             \
-    BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)                       \
-    /**/
-
-#define HPX_FWD_REF_ARGS2(z, n, _)                                             \
-    BOOST_FWD_REF(BOOST_PP_CAT(T, n)) BOOST_PP_CAT(t, n)                       \
-    /**/
 
 namespace hpx { namespace components { namespace server
 {
@@ -70,10 +55,6 @@ namespace hpx { namespace components { namespace server
 #undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M1
 #undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M2
 #undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M3
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_REF_ARGS
-#undef HPX_FWD_REF_ARGS2
-#undef HPX_MOVE_ARGS
 
 #endif
 
@@ -115,7 +96,7 @@ namespace hpx { namespace components { namespace server
             explicit
 #endif
             BOOST_PP_CAT(create_one_component_functor, N)(
-                BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS2, _)
+                HPX_ENUM_FWD_ARGS(N, T, t)
 #if N == 1
               , typename ::boost::disable_if<
                     typename boost::is_same<
@@ -134,7 +115,7 @@ namespace hpx { namespace components { namespace server
 
             result_type operator()(void* p)
             {
-                new (p) Component(BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));
+                new (p) Component(HPX_ENUM_MOVE_ARGS(N, a));
             }
             BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M1, _)
 
@@ -146,12 +127,12 @@ namespace hpx { namespace components { namespace server
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>
         naming::gid_type create_one_functor(
             component_factory_base* factory,
-            BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))
+            HPX_ENUM_FWD_ARGS(N, A, a))
         {
             return factory->create_one_functor(
                 BOOST_PP_CAT(create_one_component_functor, N)<
                     Component, BOOST_PP_ENUM_PARAMS(N, A)>(
-                        BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _))
+                        HPX_ENUM_FORWARD_ARGS(N, A, a))
             );
         }
 

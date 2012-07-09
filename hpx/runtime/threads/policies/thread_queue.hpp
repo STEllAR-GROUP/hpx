@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <hpx/config.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
@@ -20,7 +21,6 @@
 #include <boost/atomic.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
-#include <boost/move/move.hpp>
 
 #ifdef HPX_ACCEL_QUEUING
 #   include <hpx/runtime/threads/policies/accel_fifo.hpp>

@@ -6,13 +6,13 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 
+#include <hpx/util/move.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/config.hpp>
-#include <boost/move/move.hpp>
 #include <boost/detail/workaround.hpp>
 
 namespace hpx { namespace components

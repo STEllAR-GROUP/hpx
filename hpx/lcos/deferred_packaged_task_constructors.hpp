@@ -33,11 +33,11 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply(naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
         hpx::apply_c<Action>(
-            this->get_gid(), gid, BOOST_PP_ENUM_PARAMS(N, arg));
+            this->get_gid(), gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 private:
@@ -45,21 +45,21 @@ private:
     static void BOOST_PP_CAT(invoke,N)(
         hpx::lcos::deferred_packaged_task<Action,Result> *th,
         naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!((*th->impl_)->is_ready()))
-            th->apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
+            th->apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 public:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     deferred_packaged_task(naming::gid_type const& gid,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("deferred_packaged_task::apply"),
         closure_(boost::bind(
           &deferred_packaged_task::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>,
             this_(), naming::id_type(gid, naming::id_type::unmanaged),
-            BOOST_PP_ENUM_PARAMS(N, arg)))
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)))
     {
         LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
@@ -70,12 +70,12 @@ public:
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     deferred_packaged_task(naming::id_type const& gid,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("deferred_packaged_task::apply"),
         closure_(boost::bind(
           &deferred_packaged_task::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>,
             this_(), gid,
-            BOOST_PP_ENUM_PARAMS(N, arg)))
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)))
     {
         LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()

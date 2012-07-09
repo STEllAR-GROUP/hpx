@@ -62,32 +62,32 @@ namespace hpx { namespace components
         template <typename Arg0>
         static lcos::future<naming::id_type, naming::gid_type>
         create_one_async(naming::id_type const& gid, component_type type,
-            Arg0 const& arg0)
+            BOOST_FWD_REF(Arg0) arg0)
         {
             return stubs::runtime_support::create_one_component_async(
-                gid, type, arg0);
+                gid, type, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         static lcos::future<naming::id_type, naming::gid_type>
-        create_one_async(naming::id_type const& gid, Arg0 const& arg0)
+        create_one_async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
-            return create_one_async(gid, get_component_type(), arg0);
+            return create_one_async(gid, get_component_type(), boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         static naming::id_type
-        create_one_sync(naming::id_type const& gid, component_type type, Arg0 const& arg0)
+        create_one_sync(naming::id_type const& gid, component_type type, BOOST_FWD_REF(Arg0) arg0)
         {
             return stubs::runtime_support::create_one_component(
-                gid, type, arg0);
+                gid, type, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         static naming::id_type
-        create_one_sync(naming::id_type const& gid, Arg0 const& arg0)
+        create_one_sync(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
-            return create_one_sync(gid, get_component_type(), arg0);
+            return create_one_sync(gid, get_component_type(), boost::forward<Arg0>(arg0));
         }
 
         /// Delete an existing component

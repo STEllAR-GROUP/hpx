@@ -179,19 +179,19 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_route<Action>(this->get_gid(), gid, arg0);
+            hpx::applier::apply_c_route<Action>(this->get_gid(), gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         void apply_p(naming::id_type const& gid,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
             hpx::applier::apply_c_p_route<Action>(
-                this->get_gid(), gid, priority, arg0);
+                this->get_gid(), gid, priority, boost::forward<Arg0>(arg0));
         }
 
         /// Construct a new \a packaged_action instance. The \a thread
@@ -214,7 +214,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -223,12 +223,12 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -237,14 +237,14 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -253,13 +253,13 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -268,13 +268,13 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -284,12 +284,12 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-                priority, arg0);
+                priority, boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -298,14 +298,14 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply_p(gid, priority, arg0);
+            apply_p(gid, priority, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -315,13 +315,13 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-                priority, arg0);
+                priority, boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("packaged_action::apply")
         {
@@ -330,7 +330,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply_p(gid, priority, arg0);
+            apply_p(gid, priority, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors
@@ -381,7 +381,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(Action::execute_function(addr.address_,
-                        util::make_argument_pack()));
+                        util::forward_as_tuple()));
             }
             else {
                 // remote execution
@@ -439,7 +439,7 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
@@ -450,11 +450,11 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(Action::execute_function(addr.address_, 
-                        util::make_argument_pack(boost::forward<Arg0>(arg0))));
+                        util::forward_as_tuple(boost::forward<Arg0>(arg0))));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c_route<Action>(addr, this->get_gid(), gid, arg0);
+                hpx::applier::apply_c_route<Action>(addr, this->get_gid(), gid, boost::forward<Arg0>(arg0));
             }
         }
 
@@ -478,7 +478,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_action_direct::apply")
         {
@@ -487,12 +487,12 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_action_direct::apply")
         {
@@ -501,14 +501,14 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("packaged_action_direct::apply")
         {
@@ -517,13 +517,13 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("packaged_action_direct::apply")
         {
@@ -532,7 +532,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors

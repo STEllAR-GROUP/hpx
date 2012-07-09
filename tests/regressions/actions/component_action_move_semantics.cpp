@@ -98,14 +98,14 @@ int hpx_main(boost::program_options::variables_map&)
             pass_object<
                 action_move_semantics::test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 3u);
+        ), is_local ? 2u : 4u);
 
         // test for a non-movable object (direct actions)
         HPX_TEST_EQ((
             pass_object<
                 action_move_semantics::test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 0u : 3u);
+        ), is_local ? 0u : 4u);
 
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
@@ -128,14 +128,14 @@ int hpx_main(boost::program_options::variables_map&)
             move_object<
                 action_move_semantics::test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 3u);
+        ), is_local ? 4u : 4u);
 
         // test for a non-movable object (direct actions)
         HPX_TEST_EQ((
             move_object<
                 action_move_semantics::test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 0u : 3u);
+        ), is_local ? 2u : 4u);
         
         HPX_TEST_EQ((
             return_object<
@@ -153,13 +153,13 @@ int hpx_main(boost::program_options::variables_map&)
             return_object<
                 action_move_semantics::return_test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 6u);
+        ), is_local ? 5u : 7u);
 
         HPX_TEST_EQ((
             return_object<
                 action_move_semantics::return_test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 6u);
+        ), is_local ? 2u : 7u);
     }
 
     hpx::finalize();

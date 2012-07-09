@@ -9,6 +9,7 @@
 #define HPX_LCOS_WAIT_N_APR_19_2012_0203PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -21,7 +22,6 @@
 #include <vector>
 
 #include <boost/assert.hpp>
-#include <boost/move/move.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/enum.hpp>

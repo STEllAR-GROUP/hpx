@@ -61,16 +61,6 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     >
     struct dataflow_impl;
 
-#define HPX_RV_REF_ARGS(z, n, _)                                              \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_RV_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
-    /**/
-
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))            \
-    /**/
-
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
         3                                                                       \
@@ -82,9 +72,6 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
-
-#undef HPX_FWD_ARGS
-#undef HPX_FORWARD_ARGS
 
 }}}}
 
@@ -224,7 +211,7 @@ namespace hpx { namespace traits
         }
 
 
-        void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))//BOOST_PP_REPEAT(N, HPX_RV_REF_ARGS, _))
+        void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
         {
             LLCO_(info)
                 << "hpx::lcos::server::detail::dataflow_impl<"

@@ -11,12 +11,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/protect.hpp>
 #include <hpx/util/detail//pp_strip_parens.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 
-#include <boost/move/move.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -24,10 +24,6 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_MOVE_ARGS(z, n, _) boost::move(BOOST_PP_CAT(a, n))                \
-    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -86,14 +82,14 @@ namespace hpx
         >                                                                     \
     >::type                                                                   \
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,              \
-        BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                                 \
+        HPX_ENUM_FWD_ARGS(N, A, a))                                           \
     {                                                                         \
         typedef typename boost::result_of<                                    \
             F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
         >::type result_type;                                                  \
         lcos::local::futures_factory<result_type()> p(                        \
             util::bind(boost::forward<F>(f),                                  \
-                BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _)));                         \
+                HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
         if (policy & launch::async) p.apply();                                \
         return p.get_future();                                                \
     }                                                                         \
@@ -106,10 +102,10 @@ namespace hpx
             )                                                                 \
         >                                                                     \
     >::type                                                                   \
-    async (BOOST_FWD_REF(F) f, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))          \
+    async (BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                    \
     {                                                                         \
         return async(launch::all, boost::forward<F>(f),                       \
-            BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));                              \
+            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
     }                                                                         \
     /**/
 
@@ -130,8 +126,6 @@ namespace hpx
     /**/
 
 #include BOOST_PP_ITERATE()
-
-#undef HPX_MOVE_ARGS
 
 #endif
 
@@ -201,13 +195,13 @@ namespace hpx
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         lcos::local::futures_factory<R()> p(                                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
-              , BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _)));                         \
+              , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
         if (policy & launch::async) p.apply();                                \
         return p.get_future();                                                \
     }                                                                         \
@@ -225,11 +219,11 @@ namespace hpx
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         return async(launch::all, boost::move(bound),                         \
-            BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));                              \
+            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
     }                                                                         \
     /**/
 
@@ -311,13 +305,13 @@ namespace hpx
                     BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         lcos::local::futures_factory<R()> p(                                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
-              , BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _)));                         \
+              , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
         if (policy & launch::async) p.apply();                                \
         return p.get_future();                                                \
     }                                                                         \
@@ -339,11 +333,11 @@ namespace hpx
                     BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         return async(launch::all, boost::move(bound),                         \
-            BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));                              \
+            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
     }                                                                         \
     /**/
 
@@ -411,7 +405,7 @@ namespace hpx
                 F                                                             \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         typedef typename detail::create_future<                               \
@@ -420,7 +414,7 @@ namespace hpx
         lcos::local::futures_factory<result_type()> p(                        \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
-              , BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _)));                         \
+              , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
         if (policy & launch::async) p.apply();                                \
         return p.get_future();                                                \
     }                                                                         \
@@ -438,11 +432,11 @@ namespace hpx
                 F                                                             \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         return async(launch::all, boost::move(bound),                         \
-            BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));                              \
+            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
     }                                                                         \
     /**/
 
@@ -516,10 +510,10 @@ namespace hpx
                 Action                                                        \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        return bound.async(BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));               \
+        return bound.async(HPX_ENUM_FORWARD_ARGS(N, A, a));                   \
     }                                                                         \
     template <                                                                \
         typename Action                                                       \
@@ -538,11 +532,11 @@ namespace hpx
                 Action                                                        \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >))) bound                                                        \
-      , BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)                                  \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
         return async(launch::all, boost::move(bound),                         \
-            BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _));                              \
+            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
     }                                                                         \
     /**/
 

@@ -26,8 +26,8 @@
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <hpx/util/move.hpp>
 
-#include <boost/move/move.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 #include <boost/mpl/bool.hpp>

@@ -75,6 +75,10 @@ namespace hpx { namespace lcos { namespace detail
           : future_data_type(data_sink), back_ptr_(0)
         {}
 
+        promise(BOOST_RV_REF(completed_callback_type) data_sink)
+          : future_data_type(boost::move(data_sink)), back_ptr_(0)
+        {}
+
         // The implementation of the component is responsible for deleting the
         // actual managed component object
         ~promise()
@@ -168,6 +172,10 @@ namespace hpx { namespace lcos { namespace detail
 
         promise(completed_callback_type const& data_sink)
           : future_data_type(data_sink), back_ptr_(0)
+        {}
+
+        promise(BOOST_RV_REF(completed_callback_type) data_sink)
+          : future_data_type(boost::move(data_sink)), back_ptr_(0)
         {}
 
         // The implementation of the component is responsible for deleting the
@@ -314,6 +322,13 @@ namespace hpx { namespace lcos
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
+        promise(BOOST_RV_REF(completed_callback_type) data_sink)
+          : impl_(new wrapping_type(new wrapped_type(boost::move(data_sink)))),
+            future_obtained_(false)
+        {
+            LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
+        }
+
     protected:
         template <typename Impl>
         promise(Impl* impl)
@@ -425,6 +440,13 @@ namespace hpx { namespace lcos
 
         promise(completed_callback_type const& data_sink)
           : impl_(new wrapping_type(new wrapped_type(data_sink))),
+            future_obtained_(false)
+        {
+            LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
+        }
+
+        promise(BOOST_RV_REF(completed_callback_type) data_sink)
+          : impl_(new wrapping_type(new wrapped_type(boost::move(data_sink)))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";

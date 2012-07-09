@@ -8,6 +8,8 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM)
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM
 
+#include <hpx/util/move.hpp>
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/inc.hpp>
 #include <boost/preprocessor/dec.hpp>
@@ -33,22 +35,15 @@ namespace detail
     "hpx/runtime/actions/construct_continuation_function_objects.hpp"))       \
     /**/
 
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::move(BOOST_PP_CAT(arg, n))                                 \
-    /**/
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
-        BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
+    BOOST_PP_COMMA_IF(n)                                                      \
+    util::detail::move_if_no_ref<                                             \
+        typename util::detail::remove_reference<Arguments>::type::            \
+            BOOST_PP_CAT(member_type, n)>::call(data. BOOST_PP_CAT(a, n))     \
     /**/
 
 #include BOOST_PP_ITERATE()
 
-#undef HPX_FWD_ARGS
-#undef HPX_MOVE_ARGS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 
 }
@@ -76,7 +71,7 @@ namespace detail
         template <typename Func
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         result_type operator()(continuation_type cont, Func const& func
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -87,7 +82,7 @@ namespace detail
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
-                func(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, args));
+                func(HPX_ENUM_MOVE_ARGS(N, arg));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -126,7 +121,7 @@ namespace detail
         template <typename Func
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         result_type operator()(continuation_type cont, Func const& func
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -138,7 +133,7 @@ namespace detail
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
                 cont->trigger(boost::move(
-                    func(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))
+                    func(HPX_ENUM_MOVE_ARGS(N, arg))
                 ));
             }
             catch (hpx::exception const&) {

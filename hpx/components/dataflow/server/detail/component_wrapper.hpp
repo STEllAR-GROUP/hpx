@@ -9,14 +9,6 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
-#define HPX_FORWARD_ARGS(z, n, _)                                               \
-    boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))                      \
-    /**/
-
-#define HPX_FWD_REF_ARGS(z, n, _)                                               \
-    BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)                        \
-    /**/
-
 namespace hpx { namespace lcos { namespace server { namespace detail 
 {
     struct component_wrapper_base
@@ -45,9 +37,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        component_wrapper(BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))                \
+        component_wrapper(HPX_ENUM_FWD_ARGS(N, A, a))                           \
         {                                                                       \
-            T * t = new T(BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));               \
+            T * t = new T(HPX_ENUM_FORWARD_ARGS(N, A, a));                      \
             component_ptr = new component_type(t);                              \
         }                                                                       \
     /**/
@@ -85,8 +77,5 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         }
     };
 }}}}
-
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_REF_ARGS
 
 #endif

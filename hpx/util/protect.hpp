@@ -10,7 +10,7 @@
 #define HPX_UTIL_PROTECT_SEP_23_2011_1230PM
 
 #include <boost/config.hpp>
-#include <boost/move/move.hpp>
+#include <hpx/util/move.hpp>
 
 namespace hpx { namespace util { namespace detail
 {

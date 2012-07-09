@@ -9,12 +9,12 @@
 #define HPX_THREADS_THREAD_APR_10_2012_0145PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 
-#include <boost/move/move.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/enum.hpp>
@@ -252,19 +252,14 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
-    /**/
-
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thread(BOOST_FWD_REF(F) f, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+    thread(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : id_(threads::invalid_thread_id)
     {
         start_thread(HPX_STD_BIND(boost::forward<F>(f),
-            BOOST_PP_ENUM(N, HPX_MOVE_ARGS, _)));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
     }
 
-#undef HPX_MOVE_ARGS
 #undef N
 
 #endif

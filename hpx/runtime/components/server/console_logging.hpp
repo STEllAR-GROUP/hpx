@@ -85,7 +85,7 @@ namespace hpx { namespace components { namespace server
             try {
                 // call the function, ignoring the return value
                 console_logging(
-                    boost::move(util::get_argument_from_pack<0>(args)));
+                    boost::move(boost::fusion::at_c<0>(args)));
             }
             catch (hpx::exception const& /*e*/) {
                 /**/;      // no logging!

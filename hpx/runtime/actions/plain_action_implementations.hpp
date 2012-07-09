@@ -32,26 +32,14 @@
 #define N BOOST_PP_ITERATION()
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
-        BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
+    BOOST_PP_COMMA_IF(n)                                                      \
+    util::detail::move_if_no_ref<                                             \
+        typename util::detail::remove_reference<Arguments>::type::            \
+            BOOST_PP_CAT(member_type, n)>::call(data. BOOST_PP_CAT(a, n))     \
     /**/
 #define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
-    /**/
-
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
-    /**/
-
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::move(BOOST_PP_CAT(arg, n))                                 \
     /**/
 
 namespace hpx { namespace actions
@@ -91,7 +79,7 @@ namespace hpx { namespace actions
 
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
             result_type operator()(
-                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+                HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -104,7 +92,7 @@ namespace hpx { namespace actions
                     // out of the bound object.
 
                     // call the function, ignoring the return value
-                    F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+                    F(HPX_ENUM_MOVE_ARGS(N, arg));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -266,7 +254,7 @@ namespace hpx { namespace actions
 
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
             result_type operator()(
-                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+                HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -279,7 +267,7 @@ namespace hpx { namespace actions
                     // out of the bound object.
 
                     // call the function, ignoring the return value
-                    F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+                    F(HPX_ENUM_MOVE_ARGS(N, arg));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -322,9 +310,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
+            return
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)));
+                    cont, F, boost::forward<Arguments>(args));
         }
     };
 
@@ -463,9 +451,6 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#undef HPX_MOVE_ARGS
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_ARGS
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 // #undef HPX_ACTION_ARGUMENT

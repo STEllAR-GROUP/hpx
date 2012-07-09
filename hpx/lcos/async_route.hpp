@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/packaged_action_route.hpp>
+#include <hpx/util/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -84,11 +85,11 @@ namespace hpx { namespace lcos
         typename hpx::actions::extract_action<Action>::result_type
     >
     async (naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef hpx::actions::extract_action<Action>::type action_type;
         return packaged_action_route<action_type>(gid,
-            BOOST_PP_ENUM_PARAMS(N, arg)).get_future();
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get_future();
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -102,7 +103,7 @@ namespace hpx { namespace lcos
         HPX_STD_FUNCTION<void(future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
         >::type>)> const& data_sink, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -111,7 +112,7 @@ namespace hpx { namespace lcos
         typedef packaged_action_route<action_type, result_type> future_type;
 
         return future_type(gid, data_sink,
-            BOOST_PP_ENUM_PARAMS(N, arg)).get_future();
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get_future();
     }
 }}
 

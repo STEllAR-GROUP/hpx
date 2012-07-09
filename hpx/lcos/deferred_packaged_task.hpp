@@ -186,10 +186,10 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
-            hpx::apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::apply_c<Action>(this->get_gid(), gid, boost::forward<Arg0>(arg0));
         }
 
     private:
@@ -203,10 +203,10 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void invoke1(naming::id_type const& gid, Arg0 const& arg0)
+        void invoke1(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             if (!((*this->impl_)->is_ready()))
-                this->apply(gid, arg0);
+                this->apply(gid, boost::forward<Arg0>(arg0));
         }
 
     public:
@@ -228,10 +228,10 @@ namespace hpx { namespace lcos
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        deferred_packaged_task(naming::gid_type const& gid, Arg0 const& arg0)
+        deferred_packaged_task(naming::gid_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("deferred_packaged_task::apply"),
             closure_(boost::bind(&deferred_packaged_task::template invoke1<Arg0>, this_(),
-                naming::id_type(gid, naming::id_type::unmanaged), arg0))
+                naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0)))
         {
             LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                         << hpx::actions::detail::get_action_name<Action>()
@@ -241,9 +241,9 @@ namespace hpx { namespace lcos
         }
 
         template <typename Arg0>
-        deferred_packaged_task(naming::id_type const& gid, Arg0 const& arg0)
+        deferred_packaged_task(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("deferred_packaged_task::apply"),
-            closure_(boost::bind(&deferred_packaged_task::template invoke1<Arg0>, this_(), gid, arg0))
+            closure_(boost::bind(&deferred_packaged_task::template invoke1<Arg0>, this_(), gid, boost::forward<Arg0>(arg0)))
         {
             LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                         << hpx::actions::detail::get_action_name<Action>()
@@ -323,7 +323,7 @@ namespace hpx { namespace lcos
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
                     Action::execute_function(addr.address_,
-                        util::make_argument_pack()));
+                        util::forward_as_tuple()));
             }
             else {
                 // remote execution
@@ -392,7 +392,7 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
 
@@ -404,11 +404,11 @@ namespace hpx { namespace lcos
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
                     Action::execute_function(addr.address_, 
-                        util::make_argument_pack(boost::forward<Arg0>(arg0))));
+                        util::forward_as_tuple(boost::forward<Arg0>(arg0))));
             }
             else {
                 // remote execution
-                hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+                hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid, boost::forward<Arg0>(arg0));
             }
         }
 
@@ -424,10 +424,10 @@ namespace hpx { namespace lcos
         ///               apply operation for the embedded action.
         template <typename Arg0>
         static void invoke1(hpx::lcos::deferred_packaged_task<Action,Result,boost::mpl::true_> *th,
-                            naming::id_type const& gid, Arg0 const& arg0)
+                            naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             if (!((*th->impl_)->is_ready()))
-                th->apply(gid, arg0);
+                th->apply(gid, boost::forward<Arg0>(arg0));
         }
 
     public:
@@ -449,10 +449,10 @@ namespace hpx { namespace lcos
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        deferred_packaged_task(naming::gid_type const& gid, Arg0 const& arg0)
+        deferred_packaged_task(naming::gid_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("deferred_packaged_task_direct::apply"),
             closure_(boost::bind(&deferred_packaged_task::template invoke1<Arg0>, this,
-                naming::id_type(gid, naming::id_type::unmanaged), arg0))
+                naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0)))
         {
             LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                         << hpx::actions::detail::get_action_name<Action>()
@@ -462,9 +462,9 @@ namespace hpx { namespace lcos
         }
 
         template <typename Arg0>
-        deferred_packaged_task(naming::id_type const& gid, Arg0 const& arg0)
+        deferred_packaged_task(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("deferred_packaged_task_direct::apply"),
-            closure_(boost::bind(&deferred_packaged_task::template invoke1<Arg0>, this, gid, arg0))
+            closure_(boost::bind(&deferred_packaged_task::template invoke1<Arg0>, this, gid, boost::forward<Arg0>(arg0)))
         {
             LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                         << hpx::actions::detail::get_action_name<Action>()

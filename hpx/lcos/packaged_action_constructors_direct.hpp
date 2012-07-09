@@ -8,20 +8,13 @@
 #if !defined(HPX_LCOS_PACKAGED_ACTION_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
 #define HPX_LCOS_PACKAGED_ACTION_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
 
+#include <hpx/util/move.hpp>
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
-
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
-    /**/
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
-    /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
@@ -29,9 +22,6 @@
     /**/
 
 #include BOOST_PP_ITERATE()
-
-#undef HPX_FWD_ARGS
-#undef HPX_FORWARD_ARGS
 
 #endif
 
@@ -44,7 +34,7 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply(naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
@@ -57,19 +47,19 @@
 
             (*this->impl_)->set_data(
                 boost::move(action_type::execute_function(addr.address_,
-                    util::make_argument_pack(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))))
+                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))))
             );
         }
         else {
             // remote execution
             hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                this->get_gid(), gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action(naming::id_type const& gid,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -77,13 +67,13 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action(naming::id_type const& gid,
             completed_callback_type const& data_sink,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : base_type(data_sink),
         apply_logger_("packaged_action_direct::apply")
     {
@@ -92,7 +82,7 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 #undef N

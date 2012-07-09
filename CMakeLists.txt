@@ -989,6 +989,13 @@ else()
   endif()
 endif()
 
+
+add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
+
+if(HPX_HAVE_CXX11_RVALUE_REFERENCES)
+    message("yay!")
+endif()
+
 ################################################################################
 # target specification
 ################################################################################

@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/util/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -57,8 +58,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
-        > /*act*/, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg));
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg));
 }
 
 #undef N

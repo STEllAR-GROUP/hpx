@@ -11,22 +11,14 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 
-#include <boost/move/move.hpp>
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-            BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
-    /**/
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-            boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))            \
-    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -57,10 +49,10 @@ namespace hpx
         traits::supports_result_of<F>                                         \
       , bool                                                                  \
     >::type                                                                   \
-    apply(BOOST_FWD_REF(F) f, BOOST_PP_ENUM(N, HPX_FWD_ARGS, _))              \
+    apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \
     {                                                                         \
         thread t(boost::forward<F>(f),                                        \
-            BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));                           \
+            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
         t.detach();                                                           \
         return false;                                                         \
     }                                                                         \
@@ -83,9 +75,6 @@ namespace hpx
     /**/
 
 #include BOOST_PP_ITERATE()
-
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_ARGS
 
 ///////////////////////////////////////////////////////////////////////////////
 #else
@@ -131,11 +120,11 @@ namespace hpx
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >) bound                                                          \
-      , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )))                                                                       \
     {                                                                         \
         thread t(boost::move(bound)                                           \
-          , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));                           \
+          , HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
         t.detach();                                                           \
         return false;                                                         \
     }                                                                         \
@@ -193,11 +182,11 @@ namespace hpx
                     BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >) bound                                                          \
-      , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )))                                                                       \
     {                                                                         \
         thread t(boost::move(bound)                                           \
-          , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));                           \
+          , HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
         t.detach();                                                           \
         return false;                                                         \
     }                                                                         \
@@ -243,10 +232,10 @@ namespace hpx
                 F                                                             \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
             >) bound                                                          \
-      , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )))                                                                       \
     {                                                                         \
-        thread t(boost::move(bound), BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));  \
+        thread t(boost::move(bound), HPX_ENUM_FORWARD_ARGS(N, A, a));         \
         t.detach();                                                           \
         return false;                                                         \
     }                                                                         \
@@ -285,15 +274,15 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     bool apply(                                                               \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                        \
+        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_action, NN)<                \
                 Action                                                        \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
             >))) bound                                                        \
-      , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
+      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        return bound.apply(BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));            \
+        return bound.apply(HPX_ENUM_FORWARD_ARGS(N, A, a));                   \
     }                                                                         \
     /**/
 

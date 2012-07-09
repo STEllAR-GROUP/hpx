@@ -12,7 +12,7 @@
 #include <iostream>
 #include <list>
 
-#include <boost/move/move.hpp>
+#include <hpx/util/move.hpp>
 #include <boost/assert.hpp>
 #include <boost/integer.hpp>
 #include <boost/icl/interval_set.hpp>

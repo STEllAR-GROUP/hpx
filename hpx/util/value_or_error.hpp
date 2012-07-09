@@ -7,9 +7,9 @@
 #define HPX_UTIL_VALUE_OR_ERROR_FEB_28_2012_1220PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/move/move.hpp>
 
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/fold.hpp>
@@ -205,6 +205,17 @@ namespace hpx { namespace util
 
         // access stored data
 #if !defined(BOOST_NO_RVALUE_REFERENCES)
+#if __GNUC__ == 4 && __GNUC_MINOR__ == 4
+        value_type move_value()
+        {
+            if (!stores_value()) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "value_or_error::get_value",
+                    "unexpected retrieval of value")
+            }
+            return boost::move(*get_value_address());
+        }
+#else
         value_type&& move_value()
         {
             if (!stores_value()) {
@@ -214,6 +225,7 @@ namespace hpx { namespace util
             }
             return boost::move(*get_value_address());
         }
+#endif
 #else
         ::boost::rv<value_type>& move_value()
         {

@@ -9,12 +9,11 @@
 #define HPX_LCOS_DATAFLOW_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 #include <hpx/include/async.hpp>
-
-#include <boost/move/move.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -80,21 +79,11 @@ namespace hpx { namespace lcos
         {
         }
 
-#define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
-    /**/
-
 #define HPX_A(z, n, _)                                                        \
         BOOST_PP_COMMA_IF(n)                                                  \
             typename boost::remove_const<                                     \
                 typename hpx::util::detail::remove_reference<                 \
                     BOOST_PP_CAT(A, n)>::type>::type const &                  \
-    /**/
-
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))            \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -110,9 +99,7 @@ namespace hpx { namespace lcos
 
 #include BOOST_PP_ITERATE()
 
-#undef HPX_FWD_ARGS
 #undef HPX_A
-#undef HPX_FORWARD_ARGS
     private:
 
         friend class boost::serialization::access;
@@ -134,7 +121,7 @@ namespace hpx { namespace lcos
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
         static inline lcos::future<naming::id_type, naming::gid_type>
         create_component(naming::id_type const & target
-          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , HPX_ENUM_FWD_ARGS(N, A, a)
           , boost::mpl::false_
         )
         {
@@ -155,14 +142,14 @@ namespace hpx { namespace lcos
                   , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
-                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                  , HPX_ENUM_FORWARD_ARGS(N, A, a)
                 );
         }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
         static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , HPX_ENUM_FWD_ARGS(N, A, a)
           , boost::mpl::true_
         )
         {
@@ -183,18 +170,18 @@ namespace hpx { namespace lcos
                   , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
-                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                  , HPX_ENUM_FORWARD_ARGS(N, A, a)
                 );
         }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
         dataflow(
             naming::id_type const & target
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)//BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , HPX_ENUM_FWD_ARGS(N, A, a)
         )
             : base_type(
                 create_component(target
-                  , BOOST_PP_ENUM_PARAMS(N, a)//BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                  , HPX_ENUM_FORWARD_ARGS(N, A, a)
                   , typename Action::direct_execution()
                 )
             )

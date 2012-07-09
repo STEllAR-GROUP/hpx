@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/util/logging.hpp>
@@ -17,7 +18,6 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/move/move.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

@@ -75,7 +75,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action>
+    template <typename Action, typename F>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
@@ -83,9 +83,9 @@ namespace hpx
         typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (BOOST_SCOPED_ENUM(launch) policy,
-        HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
+        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const& data_sink, naming::id_type const& gid)
+        >::type>)> const&*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -94,13 +94,13 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
 
-        packaged_action_type p(data_sink);
+        packaged_action_type p(boost::forward<F>(data_sink));
         if (policy & launch::async)
             p.apply(gid);
         return p.get_future();
     }
 
-    template <typename Action>
+    template <typename Action, typename F>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
@@ -108,42 +108,46 @@ namespace hpx
         typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (
-        HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
+        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const& data_sink, naming::id_type const& gid)
+        >::type>)> const& data_sink*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid)
     {
-        return async_callback<Action>(launch::all, data_sink, gid);
+        return async_callback<Action>(launch::all, boost::forward<F>(data_sink), gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority>
+        typename Arguments, typename Derived, threads::thread_priority Priority, typename F>
     lcos::future<typename traits::promise_local_result<Result>::type, Result>
     async_callback (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/,
+        /*
         HPX_STD_FUNCTION<void(
             lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const& data_sink,
+        )> const& data_sink,*/
+        BOOST_FWD_REF(F) data_sink,
         naming::id_type const& gid)
     {
-        return async_callback<Derived>(policy, data_sink, gid);
+        return async_callback<Derived>(policy, boost::forward<F>(data_sink), gid);
     }
 
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority>
+        typename Arguments, typename Derived, threads::thread_priority Priority, typename F>
     lcos::future<typename traits::promise_local_result<Result>::type, Result>
     async_callback (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/,
+        /*
         HPX_STD_FUNCTION<void(
             lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const& data_sink,
+        )> const& data_sink,*/
+        BOOST_FWD_REF(F) data_sink,
         naming::id_type const& gid)
     {
-        return async_callback<Derived>(launch::all, data_sink, gid);
+        return async_callback<Derived>(launch::all, boost::forward<F>(data_sink), gid);
     }
 }
 
@@ -153,18 +157,12 @@ namespace hpx
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(arg, n))                \
-    /**/
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/lcos/async.hpp"))                                                    \
     /**/
 
 #include BOOST_PP_ITERATE()
-
-#undef HPX_MOVE_ARGS
 
 #include <hpx/runtime/actions/define_function_operators.hpp>
 
@@ -188,7 +186,7 @@ namespace hpx
         typename hpx::actions::extract_action<Action>::result_type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -199,7 +197,7 @@ namespace hpx
 
         packaged_action_type p;
         if (policy & launch::async)
-            p.apply(gid, BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+            p.apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         return p.get_future();
     }
 
@@ -210,10 +208,10 @@ namespace hpx
         >::type,
         typename hpx::actions::extract_action<Action>::result_type
     >
-    async (naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+    async (naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Action>(launch::all, gid,
-            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -224,11 +222,10 @@ namespace hpx
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
-        > /*act*/, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Derived>(policy, gid,
-            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Component, int Action, typename Result,
@@ -238,15 +235,14 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
-        > /*act*/, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Derived>(launch::all, gid,
-            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Action, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
@@ -254,10 +250,10 @@ namespace hpx
         typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (BOOST_SCOPED_ENUM(launch) policy,
-        HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
+        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const& data_sink, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        >::type>)> const&*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -266,13 +262,13 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
 
-        packaged_action_type p(data_sink);
+        packaged_action_type p(boost::forward<F>(data_sink));
         if (policy & launch::async)
-            p.apply(gid, BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+            p.apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         return p.get_future();
     }
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Action, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
@@ -280,50 +276,50 @@ namespace hpx
         typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (
-        HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
+        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const& data_sink, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        >::type>)> const&*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        return async_callback<Action>(launch::all, data_sink, gid,
-            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+        return async_callback<Action>(launch::all, boost::forward<F>(data_sink), gid,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, threads::thread_priority Priority,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<typename traits::promise_local_result<Result>::type, Result>
     async_callback (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/,
-        HPX_STD_FUNCTION<void(
+        /*HPX_STD_FUNCTION<void(
             lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const& data_sink,
+        )> const&*/BOOST_FWD_REF(F) data_sink,
         naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        return async_callback<Derived>(policy, data_sink, gid,
-            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+        return async_callback<Derived>(policy, boost::forward<F>(data_sink), gid,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, threads::thread_priority Priority,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<typename traits::promise_local_result<Result>::type, Result>
     async_callback (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/,
-        HPX_STD_FUNCTION<void(
+        /*HPX_STD_FUNCTION<void(
             lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const& data_sink,
+        )> const&*/BOOST_FWD_REF(F) data_sink,
         naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        return async_callback<Derived>(launch::all, data_sink, gid,
-            BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+        return async_callback<Derived>(launch::all, boost::forward<F>(data_sink), gid,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 }
 

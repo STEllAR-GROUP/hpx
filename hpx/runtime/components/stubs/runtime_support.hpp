@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace stubs
         static lcos::future<naming::id_type, naming::gid_type>
         create_one_component_async(
             naming::id_type const& gid, components::component_type type,
-            Arg0 const& arg0)
+            BOOST_FWD_REF(Arg0) arg0)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
@@ -122,7 +122,7 @@ namespace hpx { namespace components { namespace stubs
             typedef server::runtime_support::create_one_component_action
                 action_type;
             return hpx::async<action_type>(gid, type,
-                components::constructor_argument(arg0));
+                components::constructor_argument(boost::forward<Arg0>(arg0)));
         }
 
         /// Create a new component \a type using the runtime_support with the
@@ -131,11 +131,11 @@ namespace hpx { namespace components { namespace stubs
         template <typename Arg0>
         static naming::id_type create_one_component(
             naming::id_type const& targetgid, components::component_type type,
-            Arg0 const& arg0)
+            BOOST_FWD_REF(Arg0) arg0)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
-            return create_one_component_async(targetgid, type, arg0).get();
+            return create_one_component_async(targetgid, type, boost::forward<Arg0>(arg0)).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ namespace hpx { namespace components { namespace stubs
                 applier::detail::apply_helper<action_type>::call(
                     applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
                     threads::thread_priority_default,
-                    util::make_argument_pack(type, gid, count));
+                    util::forward_as_tuple(type, gid, count));
             }
             else {
                 // apply remotely

@@ -25,14 +25,6 @@
 
 #include <stdexcept>
 
-#define HPX_FORWARD_ARGS(z, n, _)                                             \
-    boost::forward<BOOST_PP_CAT(T, n)>(BOOST_PP_CAT(t, n))                    \
-    /**/
-
-#define HPX_FWD_REF_ARGS(z, n, _)                                             \
-    BOOST_FWD_REF(BOOST_PP_CAT(T, n)) BOOST_PP_CAT(t, n)                      \
-    /**/
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
@@ -78,11 +70,11 @@ namespace hpx { namespace components
             template <typename Component, typename Managed,                   \
                 BOOST_PP_ENUM_PARAMS(N, typename T)>                          \
             static void call(Component*& component, Managed* this_,           \
-                BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))                        \
+                HPX_ENUM_FWD_ARGS(N, T, t))                                   \
             {                                                                 \
                 typedef typename Managed::wrapped_type wrapped_type;          \
                 component = new wrapped_type(this_,                           \
-                    BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));                   \
+                    HPX_ENUM_FORWARD_ARGS(N , T, t));                         \
             }                                                                 \
     /**/
             BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
@@ -106,11 +98,11 @@ namespace hpx { namespace components
             template <typename Component, typename Managed,                   \
                 BOOST_PP_ENUM_PARAMS(N, typename T)>                          \
             static void call(Component*& component, Managed* this_,           \
-                BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))                        \
+                HPX_ENUM_FWD_ARGS(N, T, t))                                   \
             {                                                                 \
                 typedef typename Managed::wrapped_type wrapped_type;          \
                 component = new wrapped_type(                                 \
-                    BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));                   \
+                    HPX_ENUM_FORWARD_ARGS(N , T, t));                         \
                 component->set_back_ptr(this_);                               \
             }                                                                 \
     /**/
@@ -399,12 +391,12 @@ namespace hpx { namespace components
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        managed_component(BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))              \
+        managed_component(HPX_ENUM_FWD_ARGS(N, T, t))                         \
           : component_(0)                                                     \
         {                                                                     \
             detail_adl_barrier::init<                                         \
                 typename traits::managed_component_ctor_policy<Component>::type \
-            >::call(component_, this, BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)); \
+            >::call(component_, this, HPX_ENUM_FORWARD_ARGS(N, T, t));        \
         }                                                                     \
     /**/
 
@@ -566,14 +558,14 @@ namespace hpx { namespace components
 #define HPX_MANAGED_COMPONENT_CREATE_ONE(Z, N, _)                             \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
         static derived_type*                                                  \
-        create_one(BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))                     \
+        create_one(HPX_ENUM_FWD_ARGS(N, T, t))                                \
         {                                                                     \
             derived_type* p = heap_type::alloc();                             \
             if (NULL == p) {                                                  \
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),                     \
                     "managed_component::create_one");                         \
             }                                                                 \
-            return new (p) derived_type(BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));\
+            return new (p) derived_type(HPX_ENUM_FORWARD_ARGS(N, T, t));      \
         }                                                                     \
     /**/
 
@@ -677,9 +669,6 @@ namespace hpx { namespace components
         return back_ptr_->get_base_gid();
     }
 }}
-
-#undef HPX_FORWARD_ARGS
-#undef HPX_FWD_REF_ARGS
 
 #endif
 

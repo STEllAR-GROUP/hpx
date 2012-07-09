@@ -7,11 +7,11 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
-#include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/result_of.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>

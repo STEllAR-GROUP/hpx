@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
-#include <boost/move/move.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/intrusive/slist.hpp>

@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
@@ -19,7 +20,6 @@
 #include <boost/lockfree/deque.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
-#include <boost/move/move.hpp>
 
 // TODO: add branch prediction and function heat
 

@@ -337,7 +337,7 @@ namespace hpx { namespace lcos
 
                 (*this->impl_)->set_data(
                     boost::move(action_type::execute_function(addr.address_,
-                        util::make_argument_pack())));
+                        util::forward_as_tuple())));
             }
             else {
                 // remote execution
@@ -406,7 +406,7 @@ namespace hpx { namespace lcos
 
                 (*this->impl_)->set_data(
                     boost::move(action_type::execute_function(addr.address_,
-                        util::make_argument_pack(boost::forward<Arg0>(arg0)))));
+                        util::forward_as_tuple(boost::forward<Arg0>(arg0)))));
             }
             else {
                 // remote execution

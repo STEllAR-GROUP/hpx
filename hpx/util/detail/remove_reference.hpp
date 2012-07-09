@@ -6,7 +6,7 @@
 #ifndef HPX_UTIL_DETAIL_REMOVE_REFERENCE_HPP
 #define HPX_UTIL_DETAIL_REMOVE_REFERENCE_HPP
 
-#include <boost/move/move.hpp>
+#include <hpx/util/move.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/detail/workaround.hpp>
 

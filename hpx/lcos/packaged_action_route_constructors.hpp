@@ -8,6 +8,8 @@
 #if !defined(HPX_LCOS_PACKAGED_ACTION_ROUTE_CONSTRUCTORS_JUN_27_2008_0440PM)
 #define HPX_LCOS_PACKAGED_ACTION_ROUTE_CONSTRUCTORS_JUN_27_2008_0440PM
 
+#include <hpx/util/move.hpp>
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -32,26 +34,26 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply(naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::applier::apply_c_route<Action>(
-            this->get_gid(), gid, BOOST_PP_ENUM_PARAMS(N, arg));
+            this->get_gid(), gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply_p(naming::id_type const& gid,
         threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::applier::apply_c_p_route<Action>(
-            this->get_gid(), gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+            this->get_gid(), gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action_route(naming::gid_type const& gid,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("packaged_action::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -60,11 +62,11 @@
                     << gid
                     << ") args(" << (N + 1) << ")";
         apply(naming::id_type(gid, naming::id_type::unmanaged),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action_route(naming::id_type const& gid,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("packaged_action::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -72,13 +74,13 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
+        apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action_route(naming::gid_type const& gid,
             threads::thread_priority priority,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("packaged_action::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -87,12 +89,12 @@
                     << gid
                     << ") args(" << (N + 1) << ")";
         apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-            priority, BOOST_PP_ENUM_PARAMS(N, arg));
+            priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action_route(naming::id_type const& gid,
             threads::thread_priority priority,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("packaged_action::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -100,7 +102,7 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply_p(gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        apply_p(gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 #undef N

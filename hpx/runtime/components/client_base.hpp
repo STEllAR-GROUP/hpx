@@ -58,18 +58,18 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         template <typename Arg0>
         Derived& create_one(naming::id_type const& gid, component_type type,
-            Arg0 const& arg0)
+            BOOST_FWD_REF(Arg0) arg0)
         {
             free();
-            gid_ = stub_type::create_one_sync(gid, type, arg0);
+            gid_ = stub_type::create_one_sync(gid, type, boost::forward<Arg0>(arg0));
             return static_cast<Derived&>(*this);
         }
 
         template <typename Arg0>
-        Derived& create_one(naming::id_type const& gid, Arg0 const& arg0)
+        Derived& create_one(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             free();
-            gid_ = stub_type::create_one_sync(gid, arg0);
+            gid_ = stub_type::create_one_sync(gid, boost::forward<Arg0>(arg0));
             return static_cast<Derived&>(*this);
         }
 

@@ -9,6 +9,8 @@
 #if !defined(HPX_LCOS_DEFERRED_PACKAGED_TASK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
 #define HPX_LCOS_DEFERRED_PACKAGED_TASK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
 
+#include <hpx/util/move.hpp>
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -33,7 +35,7 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply(naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
 
@@ -43,12 +45,12 @@
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_, 
-                util::make_argument_pack(BOOST_PP_ENUM_PARAMS(N, arg))));
+                util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))));
         }
         else {
             // remote execution
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
-                BOOST_PP_ENUM_PARAMS(N, arg));
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }
 
@@ -57,21 +59,21 @@ private:
     static void BOOST_PP_CAT(invoke,N)(
         hpx::lcos::deferred_packaged_task<Action,Result,boost::mpl::true_> *th,
         naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!((*th->impl_)->is_ready()))
-            th->apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
+            th->apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 public:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     deferred_packaged_task(naming::gid_type const& gid,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("deferred_packaged_task_direct::apply"),
         closure_(boost::bind(
             &deferred_packaged_task::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>,
             this, naming::id_type(gid, naming::id_type::unmanaged),
-            BOOST_PP_ENUM_PARAMS(N, arg)))
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)))
     {
         LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
@@ -82,12 +84,12 @@ public:
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     deferred_packaged_task(naming::id_type const& gid,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : apply_logger_("deferred_packaged_task_direct::apply"),
         closure_(boost::bind(
             &deferred_packaged_task::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>,
             this, gid,
-            BOOST_PP_ENUM_PARAMS(N, arg)))
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)))
     {
         LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()

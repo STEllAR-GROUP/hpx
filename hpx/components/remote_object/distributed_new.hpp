@@ -36,7 +36,7 @@ namespace hpx { namespace components {
 #else
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
     std::vector<lcos::future<object<T> > >
-    distributed_new(std::size_t count, BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
+    distributed_new(std::size_t count, HPX_ENUM_FWD_ARGS(N, A, a))
 #endif
     {
         hpx::components::component_type type
@@ -75,7 +75,7 @@ namespace hpx { namespace components {
                 );
 #else
                 res.push_back(
-                    new_<T>(prefix, BOOST_PP_ENUM_PARAMS(N, a))
+                    new_<T>(prefix, HPX_ENUM_FORWARD_ARGS(N, A, a))
                 );
 #endif
             }

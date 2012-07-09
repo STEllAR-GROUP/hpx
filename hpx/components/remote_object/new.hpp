@@ -79,7 +79,7 @@ namespace hpx { namespace components
 
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
     lcos::future<object<T> >
-    new_(naming::id_type const & target_id, BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
+    new_(naming::id_type const & target_id, HPX_ENUM_FWD_ARGS(N, A, a))
     {
         lcos::packaged_action<
             remote_object::new_impl_action
@@ -93,7 +93,7 @@ namespace hpx { namespace components
                 T
               , BOOST_PP_ENUM_PARAMS(N, A)
             >(
-                BOOST_PP_ENUM_PARAMS(N, a)
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
             )
           , remote_object::dtor_fun<T>()
         );

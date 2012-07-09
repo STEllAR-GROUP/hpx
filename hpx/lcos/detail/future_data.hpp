@@ -7,13 +7,13 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
-#include <boost/move/move.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>

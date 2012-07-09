@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <boost/move/move.hpp>
+#include <hpx/util/move.hpp>
 
 namespace hpx { namespace threads
 {
