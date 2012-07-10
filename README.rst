@@ -17,24 +17,24 @@ Linux
     $ git clone https://github.com/STEllAR-GROUP/hpx.git 
 
 2) Create a build directory. HPX requires an out-of-tree build. This means you
-   will be unable to run CMake in the HPX source directory.:
+   will be unable to run CMake in the HPX source directory::
   
     $ cd hpx
     $ mkdir my_hpx_build
     $ cd my_hpx_build
 
 3) Invoke CMake from your build directory, pointing the CMake driver to the root
-   of your HPX source tree.:
+   of your HPX source tree::
 
     $ cmake [CMake variable definitions] /path/to/source/tree 
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of nodes
-   on your machine plus one.:
+   on your machine plus one::
 
     $ gmake -j5
  
-5) To complete the build and install HPX:
+5) To complete the build and install HPX::
 
     $ gmake install
 
