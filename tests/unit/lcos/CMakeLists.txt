@@ -8,6 +8,7 @@ set(tests
     barrier
     dataflow
     deferred_packaged_task
+    for_each
     future
     future_wait
     local_barrier
