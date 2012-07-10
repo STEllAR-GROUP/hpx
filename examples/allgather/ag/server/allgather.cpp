@@ -39,6 +39,7 @@ namespace ag { namespace server
         lazy_results.push_back( stubs::point::get_item_async(point_components[i]) );
       }
 
+      n_.clear();
       hpx::lcos::wait(lazy_results,n_);  
     }
 
