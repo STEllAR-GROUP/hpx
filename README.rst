@@ -2,6 +2,15 @@
  HPX Build Instructions 
 ************************
 
+All of HPX is distributed under the Boost Software License, 
+Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at 
+http://www.boost.org/LICENSE_1_0.txt)
+
+
+Before starting to build HPX, please read about the required prerequisites here:
+http://stellar.cct.lsu.edu/files/hpx_0.9.0/docs/hpx/tutorial/getting_started.html.
+
+
 Linux
 -----
 
