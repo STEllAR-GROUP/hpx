@@ -4,9 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/async.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/range.hpp>
@@ -14,18 +13,47 @@
 
 namespace hpx {
 
+    namespace detail
+    {
+        template <typename Output>
+        struct for_each_copy_future
+        {
+            typedef void result_type;
+
+            Output & out_;
+
+            for_each_copy_future(Output & out)
+                : out_(out)
+            {}
+
+            template <typename Future>
+            result_type operator()(Future const & f)
+            {
+                boost::copy(f.get(), out_);
+            }
+        };
+    }
+
     template <typename Range, typename F>
     std::vector<
         lcos::future<
+#if HPX_HAVE_CXX11_DECLTYPE
+            decltype(boost::declval<F>()(boost::declval<typename boost::range_value<Range>::type>()))
+#else
             typename boost::result_of<
                 F(typename boost::range_value<Range>::type)
             >::type
+#endif
         >
     >
     for_each(Range const & range, F f)
     {
         typedef typename boost::range_value<Range>::type value_type;
+#if HPX_HAVE_CXX11_DECLTYPE
+        typedef decltype(boost::declval<F>()(boost::declval<value_type>())) result_type;
+#else
         typedef typename boost::result_of<F(value_type)>::type result_type;
+#endif
         typedef lcos::future<result_type> future_type;
         typedef std::vector<future_type> futures_type;
         typedef typename boost::range_iterator<Range const>::type iterator_type;
@@ -71,16 +99,16 @@ namespace hpx {
                 )
             );
 
-        hpx::wait_all(left_future, right_future);
+        typedef typename futures_type::iterator futures_iterator_type;
 
-        typedef typename boost::range_iterator<futures_type>::type futures_iterator_type;
-
-        futures_iterator_type futures_begin = boost::begin(futures);
-        futures_iterator_type futures_mid = futures_begin + boost::size(futures)/2;
-        futures_iterator_type futures_end = boost::end(futures);
-
-        boost::copy(left_future.get(), futures_begin);
-        boost::copy(right_future.get(), futures_mid);
+        futures_iterator_type futures_begin = futures.begin();
+        futures_iterator_type futures_mid = futures.begin() + futures.size()/2;
+        
+        std::vector<hpx::lcos::future<void> > v;
+        v.reserve(2);
+        v.push_back(left_future.when(detail::for_each_copy_future<futures_iterator_type>(futures_begin)));
+        v.push_back(right_future.when(detail::for_each_copy_future<futures_iterator_type>(futures_mid)));
+        hpx::lcos::wait(v);
 
         return futures;
     }

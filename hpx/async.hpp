@@ -14,7 +14,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/protect.hpp>
-#include <hpx/util/detail//pp_strip_parens.hpp>
+#include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -366,7 +366,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename detail::create_future<F()>::type result_type;
-        lcos::local::futures_factory<result_type()>
+        lcos::local::futures_factory<typename result_type::result_type()>
             p(boost::move(bound));
         if (policy & launch::async)
             p.apply();
@@ -411,7 +411,7 @@ namespace hpx
         typedef typename detail::create_future<                               \
                 F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
             >::type result_type;                                              \
-        lcos::local::futures_factory<result_type()> p(                        \
+        lcos::local::futures_factory<typename result_type::result_type()> p(  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
