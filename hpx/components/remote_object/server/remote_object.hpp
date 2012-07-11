@@ -65,7 +65,7 @@ namespace hpx { namespace components { namespace server
     {
         return f(&object);
     }
-    
+
     template <typename F, typename A>
     typename F::result_type remote_object::apply2(F const & f, A const & a)
     {
@@ -84,50 +84,7 @@ namespace hpx { namespace components { namespace server
           , hpx::threads::thread_priority_default
           , remote_object_apply_action1<F>
         >
-    {
-    private:
-        typedef hpx::actions::result_action1<
-                remote_object
-              , typename F::result_type
-              , remote_object::remote_object_apply
-              , F const &
-              , &remote_object::apply1<F>
-              , hpx::threads::thread_priority_default
-              , remote_object_apply_action1<F>
-            >
-            base_type;
-
-    public:
-        remote_object_apply_action1() {}
-
-        // construct an action from its arguments
-        template <typename FF>
-        remote_object_apply_action1(BOOST_FWD_REF(FF) f)
-          : base_type(boost::forward<FF>(f))
-        {}
-
-        template <typename FF>
-        remote_object_apply_action1(threads::thread_priority p, BOOST_FWD_REF(FF) f)
-          : base_type(p, boost::forward<FF>(f))
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<remote_object_apply_action1, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename A>
@@ -142,51 +99,7 @@ namespace hpx { namespace components { namespace server
           , hpx::threads::thread_priority_default
           , remote_object_apply_action2<F, A>
         >
-    {
-    private:
-        typedef hpx::actions::result_action2<
-                remote_object
-              , typename F::result_type
-              , remote_object::remote_object_apply
-              , F const &
-              , A const &
-              , &remote_object::apply2<F, A>
-              , hpx::threads::thread_priority_default
-              , remote_object_apply_action2<F, A>
-            >
-            base_type;
-
-    public:
-        remote_object_apply_action2() {}
-
-        // construct an action from its arguments
-        template <typename FF, typename AA>
-        remote_object_apply_action2(BOOST_FWD_REF(FF) f, BOOST_FWD_REF(AA) a)
-          : base_type(boost::forward<FF>(f), boost::forward<AA>(a))
-        {}
-
-        template <typename FF, typename AA>
-        remote_object_apply_action2(threads::thread_priority p, BOOST_FWD_REF(FF) f, BOOST_FWD_REF(AA) a)
-          : base_type(p, boost::forward<FF>(f), boost::forward<AA>(a))
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<remote_object_apply_action2, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
+    {};
 }}}
 
 #if defined(BOOST_MSVC)
