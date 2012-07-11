@@ -192,31 +192,35 @@ namespace hpx { namespace actions
 #endif
 
     template <typename Component, typename Result,
-        Result (Component::*F)()>
-    struct make_action<Result (Component::*)(), F, boost::mpl::false_>
-      : result_action0<Component, Result, component_result_action_arg0, F>
+        Result (Component::*F)(), typename Derived>
+    struct make_action<Result (Component::*)(), F, boost::mpl::false_, Derived>
+      : result_action0<Component, Result, component_result_action_arg0, F,
+            threads::thread_priority_default, Derived>
     {};
 
     template <typename Component, typename Result,
-        Result (Component::*F)() const>
-    struct make_action<Result (Component::*)() const, F, boost::mpl::false_>
-      : result_action0<Component const, Result, component_result_action_arg0, F>
+        Result (Component::*F)() const, typename Derived>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::false_, Derived>
+      : result_action0<Component const, Result, component_result_action_arg0, F,
+            threads::thread_priority_default, Derived>
     {};
 
 #else
 
     template <typename Component, typename Result,
-        Result (Component::*F)()>
-    struct make_action<Result (Component::*)(), F, boost::mpl::false_>
+        Result (Component::*F)(), typename Derived>
+    struct make_action<Result (Component::*)(), F, boost::mpl::false_, Derived>
       : boost::mpl::identity<result_action0<
-            Component, Result, component_result_action_arg0, F> >
+            Component, Result, component_result_action_arg0, F,
+            threads::thread_priority_default, Derived> >
     {};
 
     template <typename Component, typename Result,
-        Result (Component::*F)() const>
-    struct make_action<Result (Component::*)() const, F, boost::mpl::false_>
+        Result (Component::*F)() const, typename Derived>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::false_, Derived>
       : boost::mpl::identity<result_action0<
-            Component const, Result, component_result_action_arg0, F> >
+            Component const, Result, component_result_action_arg0, F,
+            threads::thread_priority_default, Derived> >
     {};
 #endif
 
@@ -260,31 +264,31 @@ namespace hpx { namespace actions
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
     template <typename Component, typename Result,
-        Result (Component::*F)()>
-    struct make_action<Result (Component::*)(), F, boost::mpl::true_>
-      : direct_result_action0<Component, Result,
-            component_result_action_arg0, F>
+        Result (Component::*F)(), typename Derived>
+    struct make_action<Result (Component::*)(), F, boost::mpl::true_, Derived>
+      : direct_result_action0<Component, Result, component_result_action_arg0,
+            F, Derived>
     {};
 
     template <typename Component, typename Result,
-        Result (Component::*F)() const>
-    struct make_action<Result (Component::*)() const, F, boost::mpl::true_>
+        Result (Component::*F)() const, typename Derived>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::true_, Derived>
       : direct_result_action0<Component const, Result,
-            component_result_action_arg0, F>
+            component_result_action_arg0, F, Derived>
     {};
 #else
     template <typename Component, typename Result,
-        Result (Component::*F)()>
-    struct make_action<Result (Component::*)(), F, boost::mpl::true_>
+        Result (Component::*F)(), typename Derived>
+    struct make_action<Result (Component::*)(), F, boost::mpl::true_, Derived>
       : boost::mpl::identity<direct_result_action0<Component, Result,
-            component_result_action_arg0, F> >
+            component_result_action_arg0, F, Derived> >
     {};
 
     template <typename Component, typename Result,
-        Result (Component::*F)() const>
-    struct make_action<Result (Component::*)() const, F, boost::mpl::true_>
+        Result (Component::*F)() const, typename Derived>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::true_, Derived>
       : direct_result_action0<Component const, Result,
-            component_result_action_arg0, F>
+            component_result_action_arg0, F, Derived>
     {};
 #endif
 
@@ -387,26 +391,30 @@ namespace hpx { namespace actions
     };
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
-    template <typename Component, void (Component::*F)()>
-    struct make_action<void (Component::*)(), F, boost::mpl::false_>
-      : action0<Component, component_result_action_arg0, F>
+    template <typename Component, void (Component::*F)(), typename Derived>
+    struct make_action<void (Component::*)(), F, boost::mpl::false_, Derived>
+      : action0<Component, component_result_action_arg0, F,
+          threads::thread_priority_default, Derived>
     {};
 
-    template <typename Component, void (Component::*F)() const>
-    struct make_action<void (Component::*)() const, F, boost::mpl::false_>
-      : action0<Component const, component_result_action_arg0, F>
+    template <typename Component, void (Component::*F)() const, typename Derived>
+    struct make_action<void (Component::*)() const, F, boost::mpl::false_, Derived>
+      : action0<Component const, component_result_action_arg0, F,
+          threads::thread_priority_default, Derived>
     {};
 #else
-    template <typename Component, void (Component::*F)()>
-    struct make_action<void (Component::*)(), F, boost::mpl::false_>
+    template <typename Component, void (Component::*F)(), typename Derived>
+    struct make_action<void (Component::*)(), F, boost::mpl::false_, Derived>
       : boost::mpl::identity<action0<
-            Component, component_result_action_arg0, F> >
+            Component, component_result_action_arg0, F,
+            threads::thread_priority_default, Derived> >
     {};
 
-    template <typename Component, void (Component::*F)() const>
-    struct make_action<void (Component::*)() const, F, boost::mpl::false_>
+    template <typename Component, void (Component::*F)() const, typename Derived>
+    struct make_action<void (Component::*)() const, F, boost::mpl::false_, Derived>
       : boost::mpl::identity<action0<
-            Component const, component_result_action_arg0, F> >
+            Component const, component_result_action_arg0, F,
+            threads::thread_priority_default, Derived> >
     {};
 #endif
 
@@ -448,26 +456,26 @@ namespace hpx { namespace actions
     };
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
-    template <typename Component, void (Component::*F)()>
-    struct make_action<void (Component::*)(), F, boost::mpl::true_>
-      : direct_action0<Component, component_result_action_arg0, F>
+    template <typename Component, void (Component::*F)(), typename Derived>
+    struct make_action<void (Component::*)(), F, boost::mpl::true_, Derived>
+      : direct_action0<Component, component_result_action_arg0, F, Derived>
     {};
 
-    template <typename Component, void (Component::*F)() const>
-    struct make_action<void (Component::*)() const, F, boost::mpl::true_>
-      : direct_action0<Component const, component_result_action_arg0, F>
+    template <typename Component, void (Component::*F)() const, typename Derived>
+    struct make_action<void (Component::*)() const, F, boost::mpl::true_, Derived>
+      : direct_action0<Component const, component_result_action_arg0, F, Derived>
     {};
 #else
-    template <typename Component, void (Component::*F)()>
-    struct make_action<void (Component::*)(), F, boost::mpl::true_>
+    template <typename Component, void (Component::*F)(), typename Derived>
+    struct make_action<void (Component::*)(), F, boost::mpl::true_, Derived>
       : boost::mpl::identity<direct_action0<
-            Component, component_result_action_arg0, F> >
+            Component, component_result_action_arg0, F, Derived> >
     {};
 
-    template <typename Component, void (Component::*F)() const>
-    struct make_action<void (Component::*)() const, F, boost::mpl::true_>
+    template <typename Component, void (Component::*F)() const, typename Derived>
+    struct make_action<void (Component::*)() const, F, boost::mpl::true_, Derived>
       : boost::mpl::identity<direct_action0<
-            Component const, component_result_action_arg0, F> >
+            Component const, component_result_action_arg0, F, Derived> >
     {};
 #endif
 

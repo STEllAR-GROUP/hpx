@@ -564,12 +564,13 @@ namespace hpx { namespace actions
     // Base template allowing to generate a concrete action type from a function
     // pointer. It is instantiated only if the supplied pointer is not a
     // supported function pointer.
-    template <typename F, F funcptr, typename Direct = boost::mpl::false_>
+    template <typename F, F funcptr, typename Direct = boost::mpl::false_,
+        typename Derived = detail::this_type>
     struct make_action;
 
-    template <typename F, F funcptr>
+    template <typename F, F funcptr, typename Derived>
     struct make_direct_action
-      : make_action<F, funcptr, boost::mpl::true_>
+      : make_action<F, funcptr, boost::mpl::true_, Derived>
     {};
 
 // older compilers require BOOST_TYPEOF, newer compilers have decltype()

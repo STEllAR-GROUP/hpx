@@ -167,9 +167,10 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
 
-    template <typename Result, Result (*F)()>
-    struct make_action<Result (*)(), F, boost::mpl::false_>
-      : boost::mpl::identity<plain_result_action0<Result, F> >
+    template <typename Result, Result (*F)(), typename Derived>
+    struct make_action<Result (*)(), F, boost::mpl::false_, Derived>
+      : boost::mpl::identity<plain_result_action0<Result, F,
+            threads::thread_priority_default, Derived> >
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -200,9 +201,9 @@ namespace hpx { namespace actions
         }
     };
 
-    template <typename Result, Result (*F)()>
-    struct make_action<Result (*)(), F, boost::mpl::true_>
-      : boost::mpl::identity<plain_direct_result_action0<Result, F> >
+    template <typename Result, Result (*F)(), typename Derived>
+    struct make_action<Result (*)(), F, boost::mpl::true_, Derived>
+      : boost::mpl::identity<plain_direct_result_action0<Result, F, Derived> >
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -304,9 +305,10 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
 
-    template <void (*F)()>
-    struct make_action<void (*)(), F, boost::mpl::false_>
-      : boost::mpl::identity<plain_action0<F> >
+    template <void (*F)(), typename Derived>
+    struct make_action<void (*)(), F, boost::mpl::false_, Derived>
+      : boost::mpl::identity<plain_action0<F, threads::thread_priority_default, 
+            Derived> >
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -344,9 +346,9 @@ namespace hpx { namespace actions
         }
     };
 
-    template <void (*F)()>
-    struct make_action<void(*)(), F, boost::mpl::true_>
-      : boost::mpl::identity<plain_direct_action0<F> >
+    template <void (*F)(), typename Derived>
+    struct make_action<void(*)(), F, boost::mpl::true_, Derived>
+      : boost::mpl::identity<plain_direct_action0<F, Derived> >
     {};
 
     ///////////////////////////////////////////////////////////////////////////
