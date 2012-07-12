@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include "server/template_accumulator.hpp"
+#include "server/template_function_accumulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
@@ -16,10 +16,10 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<
-    examples::server::template_accumulator
+    examples::server::template_function_accumulator
 > accumulator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, template_accumulator);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, template_function_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for managed_accumulator actions.

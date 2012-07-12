@@ -7,7 +7,7 @@
 set(components
     managed_accumulator
     simple_accumulator
-    template_accumulator
+    template_function_accumulator
    )
 
 foreach(component ${components})

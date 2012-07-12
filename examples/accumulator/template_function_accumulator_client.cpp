@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 
-#include "accumulators/template_accumulator.hpp"
+#include "accumulators/template_function_accumulator.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -28,7 +28,7 @@ int hpx_main()
 {
     {
         // Create an accumulator component on this locality.
-        examples::template_accumulator accu;
+        examples::template_function_accumulator accu;
         accu.create(hpx::find_here());
 
         // Print out the available commands.

@@ -9,7 +9,7 @@ add_subdirectory(accumulators)
 set(examples
     managed_accumulator
     simple_accumulator
-    template_accumulator
+    template_function_accumulator
    )
 
 # for all targets specified above

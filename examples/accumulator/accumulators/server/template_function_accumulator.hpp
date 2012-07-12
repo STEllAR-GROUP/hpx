@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_EXAMPLES_SERVER_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM)
-#define HPX_EXAMPLES_SERVER_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM
+#if !defined(HPX_EXAMPLES_SERVER_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM)
+#define HPX_EXAMPLES_SERVER_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/components.hpp>
@@ -36,14 +36,14 @@ namespace examples { namespace server
     /// component usually does not require AGAS requests.
     ///
     /// This component exposes 3 different actions: reset, add and query.
-    class template_accumulator
-      : public hpx::components::managed_component_base<template_accumulator>
+    class template_function_accumulator
+      : public hpx::components::managed_component_base<template_function_accumulator>
     {
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
 
     public:
-        template_accumulator() : value_(0) {}
+        template_function_accumulator() : value_(0) {}
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
@@ -78,8 +78,8 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, reset, reset_action);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(template_accumulator, query, query_action);
+        HPX_DEFINE_COMPONENT_ACTION(template_function_accumulator, reset, reset_action);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(template_function_accumulator, query, query_action);
 
         // Actions with template arguments (see add<>() above) require special
         // type definitions. The simplest way to define such an action type is
@@ -87,8 +87,8 @@ namespace examples { namespace server
         template <typename T>
         struct add_action
           : hpx::actions::make_action<
-                void (template_accumulator::*)(T),
-                &template_accumulator::template add<T>,
+                void (template_function_accumulator::*)(T),
+                &template_function_accumulator::template add<T>,
                 boost::mpl::false_, add_action<T> >
         {};
 
@@ -99,11 +99,11 @@ namespace examples { namespace server
 }}
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    examples::server::template_accumulator::reset_action,
+    examples::server::template_function_accumulator::reset_action,
     managed_accumulator_reset_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    examples::server::template_accumulator::query_action,
+    examples::server::template_function_accumulator::query_action,
     managed_accumulator_query_action);
 
 // Actions with template arguments do not need to be declared in the same way
@@ -114,7 +114,7 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 // increases compilation time considerably.
 HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
     (template <typename T>),
-    (examples::server::template_accumulator::add_action<T>)
+    (examples::server::template_function_accumulator::add_action<T>)
 )
 
 #endif
