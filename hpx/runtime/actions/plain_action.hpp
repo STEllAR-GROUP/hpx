@@ -168,7 +168,7 @@ namespace hpx { namespace actions
     };
 
     template <typename Result, Result (*F)(), typename Derived>
-    struct make_action<Result (*)(), F, boost::mpl::false_, Derived>
+    struct make_action<Result (*)(), F, Derived, boost::mpl::false_>
       : boost::mpl::identity<plain_result_action0<Result, F,
             threads::thread_priority_default, Derived> >
     {};
@@ -202,7 +202,7 @@ namespace hpx { namespace actions
     };
 
     template <typename Result, Result (*F)(), typename Derived>
-    struct make_action<Result (*)(), F, boost::mpl::true_, Derived>
+    struct make_action<Result (*)(), F, Derived, boost::mpl::true_>
       : boost::mpl::identity<plain_direct_result_action0<Result, F, Derived> >
     {};
 
@@ -306,7 +306,7 @@ namespace hpx { namespace actions
     };
 
     template <void (*F)(), typename Derived>
-    struct make_action<void (*)(), F, boost::mpl::false_, Derived>
+    struct make_action<void (*)(), F, Derived, boost::mpl::false_>
       : boost::mpl::identity<plain_action0<F, threads::thread_priority_default, 
             Derived> >
     {};
@@ -347,7 +347,7 @@ namespace hpx { namespace actions
     };
 
     template <void (*F)(), typename Derived>
-    struct make_action<void(*)(), F, boost::mpl::true_, Derived>
+    struct make_action<void(*)(), F, Derived, boost::mpl::true_>
       : boost::mpl::identity<plain_direct_action0<F, Derived> >
     {};
 

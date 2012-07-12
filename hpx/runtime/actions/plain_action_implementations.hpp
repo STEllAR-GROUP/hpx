@@ -166,7 +166,7 @@ namespace hpx { namespace actions
 
     template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::false_, Derived>
+    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived, boost::mpl::false_>
       : boost::mpl::identity<BOOST_PP_CAT(plain_result_action, N)<Result,
             BOOST_PP_ENUM_PARAMS(N, T), F, threads::thread_priority_default,
             Derived> >
@@ -216,7 +216,7 @@ namespace hpx { namespace actions
 
     template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::true_, Derived>
+    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived, boost::mpl::true_>
       : boost::mpl::identity<BOOST_PP_CAT(plain_direct_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F, Derived> >
     {};
@@ -341,7 +341,7 @@ namespace hpx { namespace actions
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    struct make_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::false_, Derived>
+    struct make_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived, boost::mpl::false_>
       : boost::mpl::identity<BOOST_PP_CAT(plain_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F, threads::thread_priority_default,
             Derived> >
@@ -391,7 +391,7 @@ namespace hpx { namespace actions
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
-    struct make_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::true_, Derived>
+    struct make_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived, boost::mpl::true_>
       : boost::mpl::identity<BOOST_PP_CAT(plain_direct_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F, Derived> >
     {};

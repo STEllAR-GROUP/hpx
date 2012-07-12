@@ -86,10 +86,8 @@ namespace examples { namespace server
         // by deriving from the HPX facility make_action:
         template <typename T>
         struct add_action
-          : hpx::actions::make_action<
-                void (template_function_accumulator::*)(T),
-                &template_function_accumulator::template add<T>,
-                boost::mpl::false_, add_action<T> >
+          : hpx::actions::make_action<void (template_function_accumulator::*)(T),
+                &template_function_accumulator::template add<T>, add_action<T> >
         {};
 
     private:
@@ -112,7 +110,7 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 // the compiler generate the necessary serialization code. The same technique
 // could be employed for non-template action-types as well, however this
 // increases compilation time considerably.
-HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
+HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(
     (template <typename T>),
     (examples::server::template_function_accumulator::add_action<T>)
 )
