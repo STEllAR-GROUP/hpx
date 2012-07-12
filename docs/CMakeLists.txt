@@ -36,7 +36,7 @@ if(DOXYGEN_FOUND)
       ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
       ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
       ${hpx_SOURCE_DIR}/hpx/exception.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp 
+      ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp)
 
@@ -60,9 +60,9 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.section.depth 4
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
-                --stringparam boost.image.src images/hpx_0_9.png
+                --stringparam boost.image.src images/hpx_1_0.png
                 --stringparam boost.image.w 322
-                --stringparam boost.image.h 85
+                --stringparam boost.image.h 101
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
   QUICKBOOK_ARGS ${quickbook_fixme_mode} -D__hpx_svn_revision__=${SVN_REVISION})
 
