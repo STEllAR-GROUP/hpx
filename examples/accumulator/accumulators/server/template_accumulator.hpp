@@ -8,10 +8,10 @@
 #define HPX_EXAMPLES_SERVER_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/local_lcos.hpp>
 
-#include <boost/atomic.hpp>
+#include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server

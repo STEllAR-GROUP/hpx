@@ -7,7 +7,8 @@
 #if !defined(HPX_EXAMPLES_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM)
 #define HPX_EXAMPLES_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/include/components.hpp>
 
 #include "stubs/template_accumulator.hpp"
 
@@ -15,24 +16,24 @@ namespace examples
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Client for the \a server::managed_accumulator component.
-    class managed_accumulator
+    class template_accumulator
       : public hpx::components::client_base<
-            managed_accumulator, stubs::managed_accumulator
+            template_accumulator, stubs::managed_accumulator
         >
     {
         typedef hpx::components::client_base<
-            managed_accumulator, stubs::managed_accumulator
+            template_accumulator, stubs::managed_accumulator
         > base_type;
 
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
-        managed_accumulator()
+        template_accumulator()
         {}
 
         /// Create a client side representation for the existing
         /// \a server::managed_accumulator instance with the given GID.
-        managed_accumulator(hpx::naming::id_type const& gid)
+        template_accumulator(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
 

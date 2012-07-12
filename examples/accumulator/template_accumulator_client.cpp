@@ -28,7 +28,7 @@ int hpx_main()
 {
     {
         // Create an accumulator component on this locality.
-        examples::managed_accumulator accu;
+        examples::template_accumulator accu;
         accu.create(hpx::find_here());
 
         // Print out the available commands.

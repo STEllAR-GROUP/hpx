@@ -7,8 +7,9 @@
 #if !defined(HPX_EXAMPLES_STUBS_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM)
 #define HPX_EXAMPLES_STUBS_TEMPLATE_ACCUMULATOR_JUL_11_2012_1239PM
 
-#include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/applier.hpp>
 #include <hpx/include/async.hpp>
 
 #include "../server/template_accumulator.hpp"
@@ -63,7 +64,6 @@ namespace examples { namespace stubs
         add_sync(hpx::naming::id_type const& gid, T arg)
         {
             typedef typename server::template_accumulator::add_action<T> action_type;
-//             boost::mpl::print<typename server::template_accumulator::create_add_action<T>::type::derived_type::result_type> x = 0;
             hpx::async<action_type>(gid, arg).get();
         }
 
