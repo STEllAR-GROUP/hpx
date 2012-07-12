@@ -581,7 +581,7 @@ namespace hpx { namespace actions
         typename Direct = boost::mpl::false_>
     struct make_action;
 
-    template <typename F, F funcptr, typename Derived>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct make_direct_action
       : make_action<F, funcptr, Derived, boost::mpl::true_>
     {};
