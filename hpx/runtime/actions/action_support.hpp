@@ -561,6 +561,19 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // simple type allowing to distinguish whether an action is the most
+        // derived one
+        struct this_type {};
+
+        template <typename Action, typename Derived>
+        struct action_type
+          : boost::mpl::if_<boost::is_same<Derived, this_type>, Action, Derived>
+        {};
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Base template allowing to generate a concrete action type from a function
     // pointer. It is instantiated only if the supplied pointer is not a
     // supported function pointer.
@@ -705,19 +718,6 @@ namespace hpx { namespace actions
         typedef typename type::result_type result_type;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        // simple type allowing to distinguish whether an action is the most
-        // derived one
-        struct this_type {};
-
-        template <typename Action, typename Derived>
-        struct action_type
-          : boost::mpl::if_<boost::is_same<Derived, this_type>, Action, Derived>
-        {};
-    }
-
     /// \endcond
 }}
 
@@ -787,6 +787,44 @@ namespace hpx { namespace actions
         BOOST_PP_STRINGIZE(actionname))                                       \
     HPX_REGISTER_ACTION_DECLARATION_GUID(hpx::actions::transfer_action<action>) \
 /**/
+
+#if 0 //WIP
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1_TEMPLATE(            \
+        TEMPLATE, TYPE)                                                       \
+    namespace hpx { namespace actions { namespace detail {                    \
+        HPX_UTIL_STRIP(TEMPLATE) HPX_ALWAYS_EXPORT                            \
+        char const* get_action_name<HPX_UTIL_STRIP(TYPE)>();                  \
+    }}}                                                                       \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2_TEMPLATE(            \
+        TEMPLATE, TYPE)                                                       \
+    namespace hpx { namespace traits {                                        \
+        HPX_UTIL_STRIP(TEMPLATE)                                              \
+        struct needs_guid_initialization<HPX_UTIL_STRIP(TYPE)>                \
+          : boost::mpl::false_                                                \
+        {};                                                                   \
+    }}                                                                        \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_GUID_TEMPLATE(TEMPLATE, TYPE)         \
+    namespace boost { namespace archive { namespace detail {                  \
+        namespace extra_detail {                                              \
+            HPX_UTIL_STRIP(TEMPLATE)                                          \
+            struct init_guid<HPX_UTIL_STRIP(TYPE)>;                           \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(TEMPLATE, TYPE)              \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1_TEMPLATE(                \
+        TEMPLATE, HPX_UTIL_STRIP(TYPE))                                       \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2_TEMPLATE(                \
+        TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
+    HPX_SERIALIZATION_REGISTER_TEMPLATE(                                      \
+        TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
+    HPX_REGISTER_ACTION_DECLARATION_GUID_TEMPLATE(                            \
+        TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
+/**/
+#endif
 
 /// \endcond
 
@@ -908,7 +946,9 @@ namespace hpx { namespace actions
 /// \note This macro has to be used once for each of the component actions
 /// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
 /// occur exactly once for each of the actions, thus it is recommended to
-/// place it into the source file defining the component.
+/// place it into the source file defining the component. There is no need
+/// to use this macro for actions which have template type arguments (see
+/// \a HPX_REGISTER_ACTION_DECLARATION_TEMPLATE)
 #define HPX_REGISTER_ACTION(action)                                           \
     HPX_REGISTER_ACTION_EX(action, action)                                    \
 /**/
