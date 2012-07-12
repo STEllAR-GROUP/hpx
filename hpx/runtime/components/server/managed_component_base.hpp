@@ -324,14 +324,14 @@ namespace hpx { namespace components
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
     {
         detail_adl_barrier::destroy<
-	    typename traits::managed_component_dtor_policy<Component>::type
+            typename traits::managed_component_dtor_policy<Component>::type
         >::addref(p->component_);
     }
     template <typename Component, typename Derived>
     void intrusive_ptr_release(managed_component<Component, Derived>* p)
     {
         detail_adl_barrier::destroy<
-	    typename traits::managed_component_dtor_policy<Component>::type
+            typename traits::managed_component_dtor_policy<Component>::type
         >::release(p->component_);
     }
 
