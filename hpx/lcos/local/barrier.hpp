@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_barrier_JUN_23_2008_0530PM)
-#define HPX_LCOS_barrier_JUN_23_2008_0530PM
+#if !defined(HPX_LCOS_BARRIER_JUN_23_2008_0530PM)
+#define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
@@ -124,7 +124,7 @@ namespace hpx { namespace lcos { namespace local
                 reset_queue_entry r(e, queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    this_thread::suspend(threads::suspended, 
+                    this_thread::suspend(threads::suspended,
                         "barrier::wait");
                 }
             }
