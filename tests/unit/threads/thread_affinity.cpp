@@ -45,11 +45,9 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
         if (0 == hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD)) {
             // sadly get_cpubind is not implemented for Windows based systems
-            char buf[128];
-            hwloc_bitmap_snprintf(buf, sizeof(buf), cpuset);
-            std::size_t current_mask = strtoul(buf, 0, 16);     // parse the value back
-
-            HPX_TEST_EQ(desired_mask, current_mask);
+            hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
+            hwloc_bitmap_from_ulong(cpuset_cmp, desired_mask);
+            HPX_TEST(hwloc_bitmap_compare(cpuset, cpuset_cmp) == 0);
         }
 
         hwloc_bitmap_free(cpuset);
@@ -146,6 +144,8 @@ HPX_PLAIN_ACTION(thread_affinity_foreman, thread_affinity_foreman_action)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& /*vm*/)
 {
+    HPX_TEST_LTE(hpx::hardware_concurrency(), sizeof(std::size_t) * CHAR_BIT);
+    HPX_TEST_LTE(hpx::hardware_concurrency(), sizeof(unsigned long) * CHAR_BIT);
     {
         // Get a list of all available localities.
         std::vector<hpx::naming::id_type> localities =
