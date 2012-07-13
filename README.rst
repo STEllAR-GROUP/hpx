@@ -1,6 +1,23 @@
-************************
- HPX Build Instructions 
-************************
+*****
+ HPX 
+*****
+
+The goal of HPX is to create a high quality, freely available, open source 
+implementation of the ParalleX model for conventional systems, such as 
+classic Linux based Beowulf clusters or multi-socket highly parallel SMP 
+nodes. At the same time, we want to have a very modular and well designed 
+runtime system architecture which would allow us to port our implementation 
+onto new computer system architectures. We want to use real world applications 
+to drive the development of the runtime system, coining out required 
+functionalities and converging onto an stable API which will provide a 
+smooth migration path for developers. The API exposed by HPX is modelled 
+after the interfaces defined by the C++11 ISO standard and adheres to the 
+programming guidelines used by the Boost collection of C++ libraries. 
+
+
+********************
+ Build Instructions 
+********************
 
 All of HPX is distributed under the Boost Software License, 
 Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
