@@ -166,12 +166,24 @@ struct topology
     { // {{{
         // Figure out how many cores are available.
         // Now set the affinity to the required PU.
+
         std::size_t mask
             = get_thread_affinity_mask(num_thread, numa_sensitive);
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
+#if HPX_DEBUG
+        hwloc_bitmap_singlify(cpuset);
+        hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
+        if (0 == hwloc_get_cpubind(topo, cpuset_cmp, HWLOC_CPUBIND_THREAD)) {
+            hwloc_bitmap_singlify(cpuset_cmp);
+            BOOST_ASSERT(hwloc_bitmap_compare(cpuset, cpuset_cmp) != 0);
+        }
+        hwloc_bitmap_free(cpuset_cmp);
+#endif
+
         hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
         hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
+        hwloc_bitmap_singlify(cpuset);
         {
             scoped_lock lk(topo_mtx);
             if (hwloc_set_cpubind(topo, cpuset,
@@ -195,9 +207,10 @@ struct topology
         }
         sleep(0);
 #if HPX_DEBUG
-        hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
+        cpuset_cmp = hwloc_bitmap_alloc();
         if (0 == hwloc_get_cpubind(topo, cpuset_cmp, HWLOC_CPUBIND_THREAD)) {
-            BOOST_ASSERT(hwloc_cpuset_isequal(cpuset, cpuset_cmp) == 1);
+            hwloc_bitmap_singlify(cpuset_cmp);
+            BOOST_ASSERT(hwloc_bitmap_compare(cpuset, cpuset_cmp) == 0);
         }
         hwloc_bitmap_free(cpuset_cmp);
 #endif

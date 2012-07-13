@@ -43,11 +43,19 @@ std::size_t thread_affinity_worker(std::size_t desired)
 
         // retrieve the current affinity mask
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+        hwloc_bitmap_zero(cpuset);
         if (0 == hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD)) {
             // sadly get_cpubind is not implemented for Windows based systems
             hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
-            hwloc_bitmap_from_ulong(cpuset_cmp, desired_mask);
+            hwloc_bitmap_zero(cpuset_cmp);
+            hwloc_bitmap_from_ith_ulong(cpuset_cmp, 1, (desired_mask >> 32) & 0xFFFFFFFF);
+            hwloc_bitmap_from_ith_ulong(cpuset_cmp, 0, desired_mask & 0xFFFFFFFF);
             HPX_TEST(hwloc_bitmap_compare(cpuset, cpuset_cmp) == 0);
+            hwloc_bitmap_free(cpuset_cmp);
+        }
+        else
+        {
+            HPX_TEST(false && "hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD) failed!");
         }
 
         hwloc_bitmap_free(cpuset);
