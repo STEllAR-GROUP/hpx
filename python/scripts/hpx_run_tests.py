@@ -78,10 +78,18 @@ if __name__ == '__main__':
                         +"output (--log=never) or log output for tests "
                         +"that fail (--log=fail) [default: %default]")
 
+  parser.add_option("--log-stdout",
+                    action="store_true", dest="log_stdout", default=False,
+                    help="Send logs to stdout (overrides --log-prefix)")
+
   parser.add_option("--log-prefix",
                     action="store", type="string",
                     dest="log_prefix", default="./",
                     help="Prefix for log files [default: %default]") 
+
+  parser.add_option("--no-exit-code",
+                    action="store_false", dest="exit_code", default=True,
+                    help="Don't return a non-zero exit code when tests fail")
 
   (options, files) = parser.parse_args()
 
@@ -115,9 +123,14 @@ if __name__ == '__main__':
       print "-", "Failed (test not found)"
 
       if "always" == options.log or "fail" == options.log:
-        log = create_path(name, options.log_prefix, options.suffix) + ".log"
-        f = open(log, "w")
-        print (" " * 2) + "Log:", log 
+        f = None
+
+        if not options.log_stdout:
+          log = create_path(name, options.log_prefix, options.suffix) + ".log"
+          f = open(log, "w+")
+          print (" " * 2) + "Log:", log 
+        else:
+          f = sys.stdout 
 
         print >> f, ("#" * 80)
         print >> f, "Test:", full_name 
@@ -184,9 +197,14 @@ if __name__ == '__main__':
     print "-", ("Passed" if test_passed else "Failed")
 
     if "always" == options.log or ("fail" == options.log and not test_passed):
-      log = create_path(name, options.log_prefix, options.suffix) + ".log"
-      f = open(log, "w")
-      print (" " * 2) + "Log:", log 
+      f = None
+
+      if not options.log_stdout:
+        log = create_path(name, options.log_prefix, options.suffix) + ".log"
+        f = open(log, "w+")
+        print (" " * 2) + "Log:", log 
+      else:
+        f = sys.stdout
 
       print >> f, ("#" * 80)
       print >> f, "Test:", full_name 
@@ -208,7 +226,7 @@ if __name__ == '__main__':
 
         print >> f, "" 
 
-  if not all_passed:
+  if not all_passed and options.exit_code:
     sys.exit(1)
   # }}}
 

@@ -1024,6 +1024,16 @@ if(HPX_BUILD_TESTS)
   hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
 
   add_hpx_pseudo_target(tests)
+
+  add_custom_command(TARGET tests POST_BUILD
+    COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_tests.py
+    ARGS --prefix=${CMAKE_BINARY_DIR}/bin/
+         --log-stdout
+         --no-exit-code
+         ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
+         ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
+    COMMENT "Running HPX tests")
+
   hpx_include_directories(tests)
   add_subdirectory(tests)
 else()
@@ -1307,13 +1317,13 @@ file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
 file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
            "[\n${HPX_UNIT_TEST_LIST}\n]\n")
 
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regression.tests
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
            "[\n${HPX_REGRESSION_TEST_LIST}\n]\n")
 
 if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
           DESTINATION share/hpx-${HPX_VERSION}/tests)
-  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regression.tests
+  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
           DESTINATION share/hpx-${HPX_VERSION}/tests)
 endif()
 
