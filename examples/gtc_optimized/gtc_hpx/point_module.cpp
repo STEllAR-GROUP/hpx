@@ -34,3 +34,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::chargei_action,
     gtc_point_chargei_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::partd_allreduce_receive_action,
+    gtc_point_partd_allreduce_receive_action);

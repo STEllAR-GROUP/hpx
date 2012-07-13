@@ -82,8 +82,23 @@ namespace gtc { namespace server
 
     void point::partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1)
     {
-      // sum_allreduce(input,output,size,gids)
-      std::cout << " HELLO WORLD FROM ALL REDUCE " << std::endl;
+      std::cout << " HELLO WORLD FROM allreduce" << std::endl;
+      std::vector<double> send;
+      std::size_t length = *mgrid * (*mzetap1);
+      send.resize(length);
+      for (std::size_t ij=0;ij<length;ij++) {
+        send[ij] = dnitmp[ij];
+      }
+      for (std::size_t i=0;i<partd_comm_.size();i++) {
+        hpx::apply(partd_allreduce_receive_action(),partd_comm_[i],send,i);
+      }
+      //hpx::this_thread::suspend();
+    }
+
+    void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i) 
+    {
+      std::cout << " RECEIVED FROM " << i << std::endl;
+      return;
     }
 }}
 

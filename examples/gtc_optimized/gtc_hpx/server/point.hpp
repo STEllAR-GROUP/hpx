@@ -32,6 +32,7 @@ namespace gtc { namespace server
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei();
         void partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1);
+        void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -41,7 +42,8 @@ namespace gtc { namespace server
         enum actions
         {
             point_setup = 0,
-            point_chargei = 1
+            point_chargei = 1,
+            point_partd_allreduce_receive = 2
         };
 
         typedef hpx::actions::action3<
@@ -56,6 +58,18 @@ namespace gtc { namespace server
             // Method bound to this action.
             &point::setup
         > setup_action;
+
+        typedef hpx::actions::action2<
+            // Component server type.
+            point,
+            // Action code.
+            point_partd_allreduce_receive,
+            // Arguments of this action.
+            std::vector<double> const&,
+            std::size_t,
+            // Method bound to this action.
+            &point::partd_allreduce_receive
+        > partd_allreduce_receive_action;
 
         typedef hpx::actions::action0<
             // Component server type.
@@ -83,5 +97,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::chargei_action,
     gtc_point_chargei_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::partd_allreduce_receive_action,
+    gtc_point_partd_allreduce_receive_action);
+
 #endif
 

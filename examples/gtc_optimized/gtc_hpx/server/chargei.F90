@@ -71,7 +71,8 @@ subroutine chargei(ptr)
      enddo
   enddo
 
-  if(istep==0)return
+  ! TEST
+  !if(istep==0)return
 
 #ifdef _OPENMP
 ! The following lines are OpenMP directives for loop-level parallelism
@@ -162,6 +163,7 @@ subroutine chargei(ptr)
 
 ! If we have a particle decomposition on the toroidal domains, do a reduce
 ! operation to add up all the contributions to charge density on the grid
+  print*,' TEST npartdom ',npartdom 
   if(npartdom>1)then
    !$omp parallel do private(ij,kk)
     do ij=1,mgrid
