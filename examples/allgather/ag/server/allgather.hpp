@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Matthew Anderson
+//  Copyright (c) 2012 Matthew Anderson
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server
 {
-
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT allgather
       : public hpx::components::managed_component_base<allgather>
@@ -30,66 +29,17 @@ namespace ag { namespace server
 
         void init(std::size_t item,std::size_t np);
         void compute(std::vector<hpx::naming::id_type> const& point_components);
-        double get_item();
+        double get_item() const;
         void print();
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes.
-        enum actions
-        {
-            allgather_init = 0,
-            allgather_compute = 1,
-            allgather_get_item = 2,
-            allgather_print = 3
-        };
-
-        typedef hpx::actions::action2<
-            // Component server type.
-            allgather,
-            // Action code.
-            allgather_init,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            // Method bound to this action.
-            &allgather::init
-        > init_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            allgather,
-            // Action code.
-            allgather_compute,
-            // Arguments of this action.
-            std::vector<hpx::naming::id_type> const&,
-            // Method bound to this action.
-            &allgather::compute
-        > compute_action;
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            allgather,
-            // Action code.
-            allgather_print,
-            // Arguments of this action.
-            // Method bound to this action.
-            &allgather::print
-        > print_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            allgather,
-            // Return type
-            double,
-            // Action code.
-            allgather_get_item,
-            // Arguments of this action.
-            // Method bound to this action.
-            &allgather::get_item
-        > get_item_action;
+        HPX_DEFINE_COMPONENT_ACTION(allgather, init, init_action);
+        HPX_DEFINE_COMPONENT_ACTION(allgather, compute, compute_action);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(allgather, get_item, get_item_action);
+        HPX_DEFINE_COMPONENT_ACTION(allgather, print, print_action);
 
     private:
         //hpx::lcos::local::mutex mtx_;
@@ -116,5 +66,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     ag::server::allgather::print_action,
     allgather_print_action);
+
 #endif
 

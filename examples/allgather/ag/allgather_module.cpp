@@ -14,6 +14,7 @@
 #include <boost/serialization/export.hpp>
 
 #include "server/allgather.hpp"
+#include "server/allgather_and_gate.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -42,3 +43,24 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     allgather_type::wrapped_type::get_item_action,
     allgather_get_item_action);
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::components::managed_component<
+    ag::server::allgather_and_gate
+> allgather_and_gate_type;
+
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(allgather_and_gate_type, ag_allgather_and_gate);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_ACTION_EX(
+    allgather_and_gate_type::wrapped_type::compute_action,
+    allgather_and_gate_compute_action);
+
+HPX_REGISTER_ACTION_EX(
+    allgather_and_gate_type::wrapped_type::print_action,
+    allgather_and_gate_print_action);
+
+HPX_REGISTER_ACTION_EX(
+    allgather_and_gate_type::wrapped_type::set_data_action,
+    allgather_and_gate_set_data_action);
+
