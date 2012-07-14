@@ -587,12 +587,12 @@ namespace hpx { namespace actions
     {};
 
 // older compilers require BOOST_TYPEOF, newer compilers have decltype()
-#if defined(BOOST_NO_DECLTYPE)
-#  define HPX_TYPEOF(x)       BOOST_TYPEOF(x)
-#  define HPX_TYPEOF_TPL(x)   BOOST_TYPEOF_TPL(x)
-#else
+#if defined(HPX_HAVE_CXX11_DECLTYPE)
 #  define HPX_TYPEOF(x)       decltype(x)
 #  define HPX_TYPEOF_TPL(x)   decltype(x)
+#else
+#  define HPX_TYPEOF(x)       BOOST_TYPEOF(x)
+#  define HPX_TYPEOF_TPL(x)   BOOST_TYPEOF_TPL(x)
 #endif
 
     // Macros usable to refer to an action given the function to expose
