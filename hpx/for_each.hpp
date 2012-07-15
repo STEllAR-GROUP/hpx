@@ -35,7 +35,7 @@ namespace hpx {
     }
 
     template <typename Range, typename F>
-    std::vector<
+    inline std::vector<
         lcos::future<
 #if HPX_HAVE_CXX11_DECLTYPE
             decltype(boost::declval<F>()(boost::declval<typename boost::range_value<Range>::type>()))
