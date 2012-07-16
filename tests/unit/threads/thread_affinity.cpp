@@ -36,6 +36,15 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hpx::threads::topology const& t = hpx::get_runtime().get_topology();
         std::size_t desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
 
+        std::size_t idx = 0;
+        for(std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+        {
+            if(desired_mask & (static_cast<std::size_t>(1) << i))
+            {
+                idx = i;
+            }
+        }
+
 #if defined(HPX_HAVE_HWLOC)
         hwloc_topology_t topo;
         hwloc_topology_init(&topo);
@@ -48,8 +57,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
             // sadly get_cpubind is not implemented for Windows based systems
             hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
             hwloc_bitmap_zero(cpuset_cmp);
-            hwloc_bitmap_from_ith_ulong(cpuset_cmp, 1, (desired_mask >> 32) & 0xFFFFFFFF);
-            hwloc_bitmap_from_ith_ulong(cpuset_cmp, 0, desired_mask & 0xFFFFFFFF);
+            hwloc_bitmap_only(cpuset_cmp, idx);
             HPX_TEST(hwloc_bitmap_compare(cpuset, cpuset_cmp) == 0);
             hwloc_bitmap_free(cpuset_cmp);
         }

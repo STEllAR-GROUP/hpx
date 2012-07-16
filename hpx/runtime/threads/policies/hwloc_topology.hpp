@@ -171,6 +171,7 @@ struct topology
             = get_thread_affinity_mask(num_thread, numa_sensitive);
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
+        /*
 #if HPX_DEBUG
         hwloc_bitmap_singlify(cpuset);
         hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
@@ -183,6 +184,17 @@ struct topology
 
         hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
         hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
+        */
+
+        std::size_t idx = 0;
+        for(std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+        {
+            if(mask & (static_cast<std::size_t>(1) << i))
+            {
+                idx = i;
+            }
+        }
+        hwloc_bitmap_only(cpuset, idx);
         hwloc_bitmap_singlify(cpuset);
         {
             scoped_lock lk(topo_mtx);
@@ -206,6 +218,7 @@ struct topology
             }
         }
         sleep(0);
+        /*
 #if HPX_DEBUG
         cpuset_cmp = hwloc_bitmap_alloc();
         if (0 == hwloc_get_cpubind(topo, cpuset_cmp, HWLOC_CPUBIND_THREAD)) {
@@ -214,6 +227,7 @@ struct topology
         }
         hwloc_bitmap_free(cpuset_cmp);
 #endif
+*/
 
         hwloc_bitmap_free(cpuset);
 
@@ -357,7 +371,7 @@ struct topology
             // We need to detect the node_index-th bit which is set in
             // node_affinity_mask, this bit must be set in the result mask.
             std::size_t count = 0;
-            for (std::size_t i = 0; i < 64; ++i)
+            for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
             {
                 // Is the i-th bit set?
                 if (node_affinity_mask & (static_cast<std::size_t>(1) << i))
