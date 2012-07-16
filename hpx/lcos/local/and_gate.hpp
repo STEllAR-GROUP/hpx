@@ -35,7 +35,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         and_gate(BOOST_RV_REF(and_gate) rhs)
-          : received_segments_(boost::move(rhs.received_segments_))
+          : received_segments_(boost::move(rhs.received_segments_)),
+            promise_(boost::move(rhs.promise_))
         {
         }
 
@@ -44,6 +45,7 @@ namespace hpx { namespace lcos { namespace local
             if (this != &rhs)
             {
                 received_segments_ = boost::move(rhs.received_segments_);
+                promise_ = boost::move(rhs.promise_);
             }
             return *this;
         }
