@@ -8,7 +8,6 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
-#include "../stubs/point.hpp"
 #include "../../fname.h"
 #include "point.hpp"
 

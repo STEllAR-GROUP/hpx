@@ -37,49 +37,9 @@ namespace gtc { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-
-        /// Action codes.
-        enum actions
-        {
-            point_setup = 0,
-            point_chargei = 1,
-            point_partd_allreduce_receive = 2
-        };
-
-        typedef hpx::actions::action3<
-            // Component server type.
-            point,
-            // Action code.
-            point_setup,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            std::vector<hpx::naming::id_type> const&,
-            // Method bound to this action.
-            &point::setup
-        > setup_action;
-
-        typedef hpx::actions::action2<
-            // Component server type.
-            point,
-            // Action code.
-            point_partd_allreduce_receive,
-            // Arguments of this action.
-            std::vector<double> const&,
-            std::size_t,
-            // Method bound to this action.
-            &point::partd_allreduce_receive
-        > partd_allreduce_receive_action;
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            point,
-            // Action code.
-            point_chargei,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::chargei
-        > chargei_action;
+        HPX_DEFINE_COMPONENT_ACTION(point, setup, setup_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, chargei, chargei_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, partd_allreduce_receive, partd_allreduce_receive_action);
 
     private:
         hpx::lcos::local::mutex mtx_;

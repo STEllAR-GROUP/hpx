@@ -11,8 +11,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include "gtc_hpx/point.hpp"
-
+#include "gtc_hpx/server/point.hpp"
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 extern "C" {void FNAME(gtc)(); }
@@ -28,11 +27,11 @@ bool fexists(std::string const filename)
 /// \a hpx::components::distributing_factory.
 inline void
 init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<gtc::point>& p)
+    std::vector<hpx::naming::id_type>& p)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
-        p.push_back(gtc::point(id));
+        p.push_back(id);
     }
 }
 
@@ -62,27 +61,24 @@ int hpx_main(boost::program_options::variables_map &vm)
         
         // This vector will hold client classes referring to all of the
         // components we just created.
-        std::vector<gtc::point> points;
+        std::vector<hpx::naming::id_type> components;
         // Populate the client vectors.
-        init(hpx::util::locality_results(blocks), points);
-
-        std::vector<hpx::naming::id_type> point_components;
-        for (std::size_t i=0;i<num_partitions;i++) {
-          point_components.push_back(points[i].get_gid());
-        }
+        init(hpx::util::locality_results(blocks), components);
 
         {
           std::vector<hpx::lcos::future<void> > setup_phase;
+          gtc::server::point::setup_action setup;
           for (std::size_t i=0;i<num_partitions;i++) {
-            setup_phase.push_back(points[i].setup_async(num_partitions,i,point_components));
+            setup_phase.push_back(hpx::async(setup,components[i],num_partitions,i,components));
           }
           hpx::lcos::wait(setup_phase);
         }
 
         {
           std::vector<hpx::lcos::future<void> > chargei_phase;
+          gtc::server::point::chargei_action chargei;
           for (std::size_t i=0;i<num_partitions;i++) {
-            chargei_phase.push_back(points[i].chargei_async());
+            chargei_phase.push_back(hpx::async(chargei,components[i]));
           }
           hpx::lcos::wait(chargei_phase);
         }
