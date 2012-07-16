@@ -92,6 +92,7 @@ namespace gtc { namespace server
       for (std::size_t ij=0;ij<length;ij++) {
         send[ij] = dnitmp[ij];
       }
+
       for (std::size_t i=0;i<partd_comm_.size();i++) {
         hpx::apply(partd_allreduce_receive_action(),partd_comm_[i],send,i);
       }
@@ -106,6 +107,7 @@ namespace gtc { namespace server
     void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i) 
     {
       std::cout << " RECEIVED FROM " << i << std::endl;
+      gate_.set(i);
       return;
     }
 }}

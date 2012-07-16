@@ -84,7 +84,6 @@ namespace ag { namespace server
             // index out of bounds...
             return;
         }
-
         n_[which] = data;         // set the received data
         gate_.set(which);         // trigger corresponding and-gate input
     }
