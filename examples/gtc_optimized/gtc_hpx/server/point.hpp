@@ -9,6 +9,11 @@
 #include <vector>
 #include <queue>
 
+#include <hpx/include/components.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/local_lcos.hpp>
+#include <hpx/include/util.hpp>
+
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/unlock_lock.hpp>
@@ -46,6 +51,8 @@ namespace gtc { namespace server
         std::size_t item_;
         std::vector<hpx::naming::id_type> toroidal_comm_,partd_comm_;
         std::size_t left_pe_,right_pe_;
+
+        hpx::lcos::local::and_gate gate_; // synchronization gate
     };
 }}
 

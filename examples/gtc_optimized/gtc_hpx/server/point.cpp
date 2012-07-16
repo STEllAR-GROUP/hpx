@@ -82,6 +82,10 @@ namespace gtc { namespace server
     void point::partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1)
     {
       std::cout << " HELLO WORLD FROM allreduce" << std::endl;
+
+      // create a new and-gate object
+      gate_ = hpx::lcos::local::and_gate(partd_comm_.size());
+
       std::vector<double> send;
       std::size_t length = *mgrid * (*mzetap1);
       send.resize(length);
@@ -91,7 +95,12 @@ namespace gtc { namespace server
       for (std::size_t i=0;i<partd_comm_.size();i++) {
         hpx::apply(partd_allreduce_receive_action(),partd_comm_[i],send,i);
       }
-      //hpx::this_thread::suspend();
+      // synchronize with all operations to finish
+      hpx::future<void> f = gate_.get_future();
+
+      // put other work here
+      f.get();
+      gate_.reset();  // reset and-gate
     }
 
     void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i) 
