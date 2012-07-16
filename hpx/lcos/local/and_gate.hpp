@@ -54,14 +54,18 @@ namespace hpx { namespace lcos { namespace local
         void set(std::size_t which, error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
-            if (which < 0 || which >= received_segments_.size())
+            if (which >= received_segments_.size())
             {
                 // out of bounds index
+                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set", 
+                    "index is out of range for this and_gate");
                 return;
             }
             if (received_segments_.test(which))
             {
                 // segment already filled, logic error
+                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set", 
+                    "input with the given index has already been triggered");
                 return;
             }
 
