@@ -29,7 +29,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 {
   private:
     parcelset::parcelport& pp;
-    util::connection_cache<parcelset::parcelport_connection>& connection_cache_;
+    util::connection_cache<parcelset::parcelport_connection, naming::locality>& connection_cache_;
     util::io_service_pool& io_service_pool_;
 
     const service_mode service_type;

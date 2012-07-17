@@ -539,9 +539,6 @@ namespace hpx
 
         /// \brief Expand INI variables in a string
         HPX_API_EXPORT void expand(std::string& expand);
-
-        template <typename Connection, typename Key = boost::uint32_t>
-        class connection_cache;
     }
 
     ///////////////////////////////////////////////////////////////////////////

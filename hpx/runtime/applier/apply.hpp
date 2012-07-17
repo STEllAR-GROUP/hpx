@@ -17,6 +17,13 @@
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/base_lco_continuation.hpp>
+#include <hpx/util/remove_local_destinations.hpp>
+
+#include <boost/dynamic_bitset.hpp>
+
+#include <vector>
+#include <map>
+#include <algorithm>
 
 // FIXME: Error codes?
 
@@ -35,9 +42,24 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // zero parameter version of apply()
     // Invoked by a running HPX-thread to apply an action to any resource
-
     namespace applier { namespace detail
     {
+        template <typename Action>
+        inline naming::address& complement_addr(naming::address& addr)
+        {
+            if (components::component_invalid == addr.type_)
+            {
+                addr.type_ = components::get_component_type<
+                    typename Action::component_type>();
+            }
+            return addr;
+        }
+
+        inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
+        {
+            return id.get_gid();
+        }
+
         // We know it is remote.
         template <typename Action>
         inline bool
@@ -48,15 +70,69 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority));
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<
-                    typename action_type::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
+            return false;     // destination is remote
+        }
+
+        struct destinations
+        {
+            std::vector<naming::gid_type> gids_;
+            std::vector<naming::address> addrs_;
+        };
+
+        struct send_parcel
+        {
+            send_parcel(parcelset::parcelhandler& ph, actions::action_type act)
+              : ph_(ph), act_(act)
+            {}
+
+            void operator()(
+                std::pair<naming::locality const, destinations>& e) const
+            {
+                // Create a new parcel to be sent to the destination with the
+                // gid, action, and arguments
+                parcelset::parcel p(e.second.gids_, e.second.addrs_, act_);
+
+                // Send the parcel through the parcel handler
+                ph_.put_parcel(p);
+            }
+
+            parcelset::parcelhandler& ph_;
+            actions::action_type act_;
+        };
+
+        template <typename Action>
+        inline bool
+        apply_r_p(std::vector<naming::address>& addrs,
+            std::vector<naming::gid_type> const& gids,
+            threads::thread_priority priority)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+
+            // sort destinations
+            std::map<naming::locality, destinations> dests;
+
+            std::size_t count = gids.size();
+            for (std::size_t i = 0; i < count; ++i) {
+                complement_addr<action_type>(addrs[i]);
+
+                destinations& dest = dests[addrs[i].locality_];
+                dest.gids_.push_back(gids[i]);
+                dest.addrs_.push_back(addrs[i]);
+            }
+
+            // send one parcel to each of the destination localities
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+            actions::action_type act(
+                new hpx::actions::transfer_action<action_type>(priority));
+
+            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
+
             return false;     // destination is remote
         }
 
@@ -69,12 +145,8 @@ namespace hpx
 
             // Create a parcel and send it to the AGAS server
             // New parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority));
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<
-                    typename action_type::component_type>();
-            p.set_destination_addr(addr);   // redundant
 
             // Send the parcel to applier to be sent to the AGAS server
             return hpx::applier::get_applier().route(p);
@@ -84,8 +156,7 @@ namespace hpx
         inline bool
         apply_r (naming::address& addr, naming::id_type const& gid)
         {
-            return apply_r_p<Action>(addr, gid,
-                actions::action_priority<Action>());
+            return apply_r_p<Action>(addr, gid, actions::action_priority<Action>());
         }
 
         template <typename Action>
@@ -153,6 +224,60 @@ namespace hpx
         return apply_p<Derived>(gid, actions::action_priority<Derived>());
     }
 
+    // same for multiple destinations
+    template <typename Action>
+    inline bool
+    apply_p (std::vector<naming::id_type> const& ids, threads::thread_priority priority)
+    {
+        // Determine whether the gids are local or remote
+        std::vector<naming::gid_type> gids;
+        std::vector<naming::address> addrs;
+        boost::dynamic_bitset<> locals;
+
+        std::size_t count = ids.size();
+        gids.reserve(count);
+        if (agas::is_local_address(ids, addrs, locals)) {
+            // at least one destination is local
+            for (std::size_t i = 0; i < count; ++i) {
+                if (locals.test(i))
+                    applier::detail::apply_l_p<Action>(addrs[i], priority);
+                gids.push_back(applier::detail::convert_to_gid(ids[i]));
+            }
+
+            // remove local destinations
+            std::vector<naming::gid_type>::iterator it =
+                util::remove_local_destinations(gids, addrs, locals);
+            if (it == gids.begin())
+                return true;        // all destinations are local
+
+            gids.erase(it, gids.end());
+            addrs.resize(gids.size());
+        }
+        else {
+            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
+                applier::detail::convert_to_gid);
+        }
+
+        // apply remotely
+        return applier::detail::apply_r_p<Action>(addrs, gids, priority);
+    }
+
+    template <typename Action>
+    inline bool apply (std::vector<naming::id_type> const& gids)
+    {
+        return apply_p<Action>(gids, actions::action_priority<Action>());
+    }
+
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived, threads::thread_priority Priority>
+    inline bool apply (
+        hpx::actions::action<
+            Component, Action, Result, Arguments, Derived, Priority
+        > /*act*/, std::vector<naming::id_type> const& gids)
+    {
+        return apply_p<Derived>(gids, actions::action_priority<Derived>());
+    }
+
     namespace applier
     {
         /// routed version
@@ -195,12 +320,8 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority), cont);
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<
-                    typename action_type::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
@@ -216,12 +337,8 @@ namespace hpx
 
             actions::continuation_type cont(c);
 
-            parcelset::parcel p (gid.get_gid(),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority), cont);
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<
-                    typename action_type::component_type>();
-            p.set_destination_addr(addr); // redundant
 
             // send parcel to agas
             return hpx::applier::get_applier().route(p);
@@ -254,12 +371,8 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority));
-            if (components::component_invalid == addr.type_)
-                addr.type_ = components::get_component_type<
-                    typename action_type::component_type>();
-            p.set_destination_addr(addr);   // avoid to resolve address again
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(p);

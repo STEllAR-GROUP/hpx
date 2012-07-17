@@ -115,31 +115,24 @@ struct gva
     void lva(void* a)
     { lva_ = reinterpret_cast<lva_type>(a); }
 
-    lva_type lva(naming::gid_type const& gid = naming::invalid_gid,
-                 naming::gid_type const& gidbase = naming::invalid_gid) const
+    lva_type lva() const
     {
-        // Make sure that the credit has been stripped.
-        naming::gid_type raw_gid = gid
-                       , raw_gidbase = gidbase;
-        naming::strip_credit_from_gid(raw_gid);
-        naming::strip_credit_from_gid(raw_gidbase);
+        return lva_;
+    }
 
+    lva_type lva(naming::gid_type const& gid,
+                 naming::gid_type const& gidbase) const
+    {
         lva_type l = lva_;
-        l += (raw_gid.get_lsb() - raw_gidbase.get_lsb()) * offset;
+        l += (gid.get_lsb() - gidbase.get_lsb()) * offset;
         return l;
     }
 
     gva resolve(naming::gid_type const& gid,
                 naming::gid_type const& gidbase) const
     {
-        // Make sure that the credit has been stripped.
-        naming::gid_type raw_gid = gid
-                       , raw_gidbase = gidbase;
-        naming::strip_credit_from_gid(raw_gid);
-        naming::strip_credit_from_gid(raw_gidbase);
-
         gva g(*this);
-        g.lva_ = g.lva(raw_gid, raw_gidbase);
+        g.lva_ = g.lva(gid, gidbase);
 
         // This is a hack to make sure that if resolve() or lva() is called on
         // the returned GVA, an exact copy will be returned (see the last two

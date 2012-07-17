@@ -44,14 +44,13 @@ namespace hpx { namespace parcelset
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                boost::uint32_t prefix,
-                util::connection_cache<parcelport_connection>& cache,
+                naming::locality const& locality_id,
+                util::connection_cache<parcelport_connection, naming::locality>& cache,
                 util::high_resolution_timer& timer,
                 performance_counters::parcels::gatherer& parcels_sent)
-          : socket_(io_service), out_priority_(0), out_size_(0), there_(prefix),
+          : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
             connection_cache_(cache), timer_(timer), parcels_sent_(parcels_sent)
-        {
-        }
+        {}
 
         void set_parcel (parcel const& p)
         {
@@ -90,25 +89,10 @@ namespace hpx { namespace parcelset
                     boost::make_tuple(handler, parcel_postprocess)));
         }
 
-        boost::uint32_t destination() const
+        naming::locality const& destination() const
         {
             return there_;
         }
-
-#if defined(HPX_DEBUG)
-        void set_locality(naming::locality const& l)
-        {
-            locality_ = l;
-        }
-
-        naming::locality const& get_locality() const
-        {
-            return locality_;
-        }
-
-    private:
-        naming::locality locality_;
-#endif
 
     protected:
         /// handle completed write operation
@@ -164,10 +148,10 @@ namespace hpx { namespace parcelset
         std::vector<char> out_buffer_;
 
         /// the other (receiving) end of this connection
-        boost::uint32_t there_;
+        naming::locality there_;
 
         /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection>& connection_cache_;
+        util::connection_cache<parcelport_connection, naming::locality>& connection_cache_;
 
         /// Counters and their data containers.
         util::high_resolution_timer& timer_;

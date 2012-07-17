@@ -27,8 +27,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_DEBUG)
         BOOST_FOREACH(parcel const& p, pv)
         {
-            const boost::uint32_t locality_id =
-                naming::get_locality_id_from_gid(p.get_destination());
+            naming::locality const locality_id = p.get_destination_locality();
             BOOST_ASSERT(locality_id == destination());
         }
 #endif

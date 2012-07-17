@@ -10,6 +10,8 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
+#include <algorithm>
+
 namespace hpx { namespace agas
 {
 ///////////////////////////////////////////////////////////////////////////////
@@ -213,6 +215,25 @@ bool is_local_address(
     )
 {
     return naming::get_agas_client().is_local_address(gid, addr, ec);
+}
+
+inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
+{
+    return id.get_gid();
+}
+
+bool is_local_address(
+    std::vector<naming::id_type> const& ids
+  , std::vector<naming::address>& addrs
+  , boost::dynamic_bitset<>& locals
+  , error_code& ec
+    )
+{
+    std::vector<naming::gid_type> gids;
+    gids.reserve(ids.size());
+
+    std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
+    return naming::get_agas_client().is_local_address(gids, addrs, locals, ec);
 }
 
 bool is_local_address_cached(

@@ -824,6 +824,30 @@ bool addressing_service::is_local_address(
     return addr.locality_ == here_;
 }
 
+// Return true if at least one address is local.
+bool addressing_service::is_local_address(
+    std::vector<naming::gid_type>& gids
+  , std::vector<naming::address>& addrs
+  , boost::dynamic_bitset<>& locals
+  , error_code& ec
+    )
+{
+    // Try the cache
+    if (caching_)
+    {
+        bool all_resolved = resolve_cached(gids, addrs, locals, ec);
+        if (ec)
+            return false;
+        if (all_resolved)
+            return locals.any();      // all destinations resolved
+    }
+
+    if (!resolve_full(gids, addrs, locals, ec) || ec)
+        return false;
+
+    return locals.any();
+}
+
 bool addressing_service::is_local_address_cached(
     naming::gid_type const& id
   , error_code& ec
@@ -861,6 +885,67 @@ bool addressing_service::is_local_lva_encoded_address(
         == local_locality().get_msb();
 }
 
+bool addressing_service::resolve_locally_known_addresses(
+    naming::gid_type const& id
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    // LVA-encoded GIDs (located on this machine)
+    if (is_local_lva_encoded_address(id))
+    {
+        addr.locality_ = here_;
+
+        // An LSB of 0 references the runtime support component
+        if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
+        {
+            addr.type_ = components::component_runtime_support;
+            addr.address_ = rts_lva_;
+        }
+
+        else
+        {
+            addr.type_ = components::component_memory;
+            addr.address_ = id.get_lsb();
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+
+    // authoritative AGAS component address resolution
+    else if (id == bootstrap_primary_namespace_gid())
+    {
+        addr = primary_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+
+    else if (id == bootstrap_component_namespace_gid())
+    {
+        addr = component_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+
+    else if (id == bootstrap_symbol_namespace_gid())
+    {
+        addr = symbol_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return false;
+} // }}}
+
 bool addressing_service::resolve_full(
     naming::gid_type const& id
   , naming::address& addr
@@ -868,57 +953,10 @@ bool addressing_service::resolve_full(
     )
 { // {{{ resolve implementation
     try {
-        // {{{ special cases
-
-        // LVA-encoded GIDs (located on this machine)
-        if (is_local_lva_encoded_address(id))
-        {
-            addr.locality_ = here_;
-
-            // An LSB of 0 references the runtime support component
-            if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
-            {
-                addr.type_ = components::component_runtime_support;
-                addr.address_ = rts_lva_;
-            }
-
-            else
-            {
-                addr.type_ = components::component_memory;
-                addr.address_ = id.get_lsb();
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
+        // special cases
+        if (resolve_locally_known_addresses(id, addr, ec))
             return true;
-        }
-
-        // authoritative AGAS component address resolution
-        else if (id == bootstrap_primary_namespace_gid())
-        {
-            addr = primary_ns_addr_;
-            if (&ec != &throws)
-                ec = make_success_code();
-            return true;
-        }
-
-        else if (id == bootstrap_component_namespace_gid())
-        {
-            addr = component_ns_addr_;
-            if (&ec != &throws)
-                ec = make_success_code();
-            return true;
-        }
-
-        else if (id == bootstrap_symbol_namespace_gid())
-        {
-            addr = symbol_ns_addr_;
-            if (&ec != &throws)
-                ec = make_success_code();
-            return true;
-        }
-        // }}}
+        if (ec) return false;
 
         request req(primary_ns_resolve_gid, id);
         response rep;
@@ -979,57 +1017,11 @@ bool addressing_service::resolve_cached(
   , error_code& ec
     )
 { // {{{ resolve_cached implementation
-    // {{{ special cases
 
-    // LVA-encoded GIDs (located on this machine)
-    if (is_local_lva_encoded_address(id))
-    {
-        addr.locality_ = here_;
-
-        // An LSB of 0 references the runtime support component
-        if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
-        {
-            addr.type_ = components::component_runtime_support;
-            addr.address_ = rts_lva_;
-        }
-
-        else
-        {
-            addr.type_ = components::component_memory;
-            addr.address_ = id.get_lsb();
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
+    // special cases
+    if (resolve_locally_known_addresses(id, addr, ec))
         return true;
-    }
-
-    // authoritative AGAS component address resolution
-    else if (id == bootstrap_primary_namespace_gid())
-    {
-        addr = primary_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
-        return true;
-    }
-
-    else if (id == bootstrap_component_namespace_gid())
-    {
-        addr = component_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
-        return true;
-    }
-
-    else if (id == bootstrap_symbol_namespace_gid())
-    {
-        addr = symbol_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
-        return true;
-    }
-    // }}}
+    if (ec) return false;
 
     // If caching is disabled, bail
     if (!caching_)
@@ -1086,6 +1078,144 @@ bool addressing_service::resolve_cached(
 
     return false;
 } // }}}
+
+bool addressing_service::resolve_full(
+    std::vector<naming::gid_type> const& gids
+  , std::vector<naming::address>& addrs
+  , boost::dynamic_bitset<>& locals
+  , error_code& ec
+    )
+{
+    std::size_t count = gids.size();
+
+    addrs.resize(count);
+    locals.resize(count);
+
+    try {
+        std::vector<request> reqs;
+        reqs.reserve(count);
+
+        // special cases
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            if (!addrs[i] && !locals.test(i))
+            {
+                bool is_local = resolve_locally_known_addresses(gids[i], addrs[i], ec);
+                if (ec)
+                    return false;
+
+                locals.set(i, is_local);
+            }
+
+            if (!addrs[i] && !locals.test(i))
+            {
+                reqs.push_back(request(primary_ns_resolve_gid, gids[i]));
+            }
+        }
+
+        if (reqs.empty()) {
+            // all gids have been resolved
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
+        }
+
+        std::vector<response> reps;
+        if (is_bootstrap())
+            reps = bootstrap->primary_ns_server.bulk_service(reqs, ec);
+        else
+            reps = hosted->primary_ns_.bulk_service(reqs, action_priority_, ec);
+
+        if (ec)
+            return false;
+
+        std::size_t j = 0;
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            if (addrs[i] || locals.test(i))
+                continue;
+
+            BOOST_ASSERT(j < reps.size());
+            if (success != reps[j].get_status())
+                return false;
+
+            // Resolve the gva to the real resolved address (which is just a gva
+            // with as fully resolved LVA and an offset of zero).
+            gva const g = reps[j].get_gva().resolve(gids[i], reps[j].get_base_gid());
+
+            naming::address& addr = addrs[i];
+            addr.locality_ = g.endpoint;
+            addr.type_ = g.type;
+            addr.address_ = g.lva();
+
+            if (caching_)
+            {
+                if (range_caching_)
+                    // Put the gva range into the cache.
+                    update_cache(reps[j].get_base_gid(), reps[j].get_gva(), ec);
+                else
+                    // Put the fully resolve gva into the cache.
+                    update_cache(gids[i], g, ec);
+            }
+
+            if (ec)
+                return false;
+
+            ++j;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+                , "addressing_service::resolve_full"
+                , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+
+        return false;
+    }
+}
+
+bool addressing_service::resolve_cached(
+    std::vector<naming::gid_type> const& gids
+  , std::vector<naming::address>& addrs
+  , boost::dynamic_bitset<>& locals
+  , error_code& ec
+    )
+{
+    std::size_t count = gids.size();
+
+    addrs.resize(count);
+    locals.resize(count);
+
+    std::size_t resolved = 0;
+    for (std::size_t i = 0; i < count; ++i)
+    {
+        if (!addrs[i] && !locals.test(i))
+        {
+            bool was_resolved = resolve_cached(gids[i], addrs[i], ec);
+            if (ec)
+                return false;
+            if (was_resolved)
+                ++resolved;
+
+            if (addrs[i].locality_ == here_)
+                locals.set(i, true);
+        }
+
+        else if (addrs[i].locality_ == here_)
+            locals.set(i, true);
+    }
+
+    return resolved == count;   // returns whether all have been resolved
+}
 
 void addressing_service::incref(
     naming::gid_type const& lower

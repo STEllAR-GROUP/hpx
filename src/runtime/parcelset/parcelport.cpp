@@ -178,14 +178,10 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelport::send_parcel(parcel const& p, naming::address const& addr,
-        write_handler_type f)
+    void parcelport::put_parcel(parcel const& p, write_handler_type f)
     {
-        BOOST_ASSERT(p.get_destination_addr() == addr);
-
         typedef pending_parcels_map::iterator iterator;
-        const boost::uint32_t locality_id =
-            naming::get_locality_id_from_gid(p.get_destination());
+        naming::locality locality_id = p.get_destination_locality();
 
         parcelport_connection_ptr client_connection;
 
@@ -194,19 +190,6 @@ namespace hpx { namespace parcelset
             util::spinlock::scoped_lock l(mtx_);
             pending_parcels_[locality_id].first.push_back(p);
             pending_parcels_[locality_id].second.push_back(f);
-#if defined(HPX_DEBUG)
-            // verify the connection points to the right destination
-            BOOST_FOREACH(parcel const& pp, pending_parcels_[locality_id].first)
-            {
-                const boost::uint32_t parcel_locality_id =
-                    naming::get_locality_id_from_gid(pp.get_destination());
-                BOOST_ASSERT(parcel_locality_id == locality_id);
-                //FIXME: addr refers to a specific component ... once more than
-                //       one parcel is cached, this fails ...
-                //BOOST_ASSERT(pp.get_destination_addr() == addr);
-                BOOST_ASSERT(pp.get_destination_addr().locality_ == addr.locality_);
-            }
-#endif
         }
 
         // Get a connection or reserve space for a new connection. 
@@ -225,9 +208,9 @@ namespace hpx { namespace parcelset
             for (int i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
             {
                 try {
-                    naming::locality::iterator_type end = addr.locality_.connect_end();
+                    naming::locality::iterator_type end = locality_id.connect_end();
                     for (naming::locality::iterator_type it =
-                            addr.locality_.connect_begin(io_service_pool_.get_io_service());
+                            locality_id.connect_begin(io_service_pool_.get_io_service());
                          it != end; ++it)
                     {
                         client_connection->socket().close();
@@ -254,19 +237,19 @@ namespace hpx { namespace parcelset
 
                 hpx::util::osstream strm;
                 strm << error.message() << " (while trying to connect to: "
-                     << addr.locality_ << ")";
+                     << locality_id << ")";
                 HPX_THROW_EXCEPTION(network_error,
                     "parcelport::send_parcel",
                     hpx::util::osstream_get_string(strm));
             }
 #if defined(HPX_DEBUG)
             else {
-                client_connection->set_locality(addr.locality_);
-
-                std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
-                boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
-                BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
-                BOOST_ASSERT(addr.locality_.get_port() == connection_port);
+                std::string connection_addr = 
+                    client_connection->socket().remote_endpoint().address().to_string();
+                boost::uint16_t connection_port = 
+                    client_connection->socket().remote_endpoint().port();
+                BOOST_ASSERT(locality_id.get_address() == connection_addr);
+                BOOST_ASSERT(locality_id.get_port() == connection_port);
             }
 #endif
         }
@@ -274,13 +257,12 @@ namespace hpx { namespace parcelset
         else {
             //LPT_(info) << "parcelport: reusing existing connection to: "
             //           << addr.locality_;
-            BOOST_ASSERT(addr.locality_ == client_connection->get_locality());
             BOOST_ASSERT(locality_id == client_connection->destination());
 
             std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
             boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
-            BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
-            BOOST_ASSERT(addr.locality_.get_port() == connection_port);
+            BOOST_ASSERT(locality_id.get_address() == connection_addr);
+            BOOST_ASSERT(locality_id.get_port() == connection_port);
         }
 #endif
 
@@ -310,7 +292,8 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelport::send_pending_parcels_trampoline(boost::uint32_t locality_id)
+    void parcelport::send_pending_parcels_trampoline(
+        naming::locality const& locality_id)
     {
         parcelport_connection_ptr client_connection(
             connection_cache_.get(locality_id));
@@ -357,12 +340,11 @@ namespace hpx { namespace parcelset
         // verify the connection points to the right destination
         BOOST_FOREACH(parcel const& p, parcels)
         {
-            const boost::uint32_t parcel_locality_id =
-                naming::get_locality_id_from_gid(p.get_destination());
+            naming::locality const parcel_locality_id = p.get_destination_locality();
             BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-            BOOST_ASSERT(p.get_destination_addr().locality_.get_address() ==
+            BOOST_ASSERT(parcel_locality_id.get_address() ==
                 client_connection->socket().remote_endpoint().address().to_string());
-            BOOST_ASSERT(p.get_destination_addr().locality_.get_port() ==
+            BOOST_ASSERT(parcel_locality_id.get_port() ==
                 client_connection->socket().remote_endpoint().port());
         }
 #endif

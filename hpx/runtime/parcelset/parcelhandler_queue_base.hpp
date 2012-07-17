@@ -24,7 +24,7 @@ namespace hpx { namespace parcelset
         typedef boost::signals2::scoped_connection connection_type;
 
         typedef HPX_STD_FUNCTION<void(
-            parcelhandler&, naming::gid_type const&, naming::address const&
+            parcelhandler&, naming::gid_type const&
         )> callback_type;
 
         virtual ~parcelhandler_queue_base() {}

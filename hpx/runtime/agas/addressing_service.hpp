@@ -21,6 +21,7 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/dynamic_bitset.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -290,6 +291,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     {
         return runtime_type == runtime_mode_connect;
     }
+
+    bool resolve_locally_known_addresses(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec
+      );
 
     /// \brief Register performance counter types exposing properties from the
     ///        local cache.
@@ -849,6 +856,14 @@ public:
         naming::gid_type const& id
         );
 
+    // same, but bulk operation
+    bool is_local_address(
+        std::vector<naming::gid_type>& gids
+      , std::vector<naming::address>& addrs
+      , boost::dynamic_bitset<>& locals
+      , error_code& ec = throws
+        );
+
     /// \brief Resolve a given global address (\a id) to its associated local
     ///        address.
     ///
@@ -924,6 +939,41 @@ public:
     bool resolve_cached(
         naming::gid_type const& id
       , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    // same, but bulk operation
+    bool resolve(
+        std::vector<naming::gid_type> const& gids
+      , std::vector<naming::address>& addrs
+      , boost::dynamic_bitset<>& locals
+      , error_code& ec = throws
+        )
+    {
+        // Try the cache
+        if (caching_)
+        {
+            bool all_resolved = resolve_cached(gids, addrs, locals, ec);
+            if (ec)
+                return false;
+            if (all_resolved)
+                return true;    //nothing more to do
+        }
+
+        return resolve_full(gids, addrs, locals, ec);
+    }
+
+    bool resolve_full(
+        std::vector<naming::gid_type> const& gids
+      , std::vector<naming::address>& addrs
+      , boost::dynamic_bitset<>& locals
+      , error_code& ec = throws
+        );
+
+    bool resolve_cached(
+        std::vector<naming::gid_type> const& gids
+      , std::vector<naming::address>& addrs
+      , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
         );
 

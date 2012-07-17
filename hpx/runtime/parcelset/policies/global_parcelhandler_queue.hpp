@@ -36,7 +36,6 @@ namespace hpx { namespace parcelset { namespace policies
         bool add_parcel(parcel const& p)
         {
             naming::gid_type id(p.get_parcel_id());
-            naming::address addr(p.get_destination_addr());
 
             // Add parcel to queue.
             {
@@ -55,7 +54,7 @@ namespace hpx { namespace parcelset { namespace policies
 
             // do some work (notify event handlers)
             BOOST_ASSERT(ph_ != 0);
-            notify_(*ph_, id, addr);
+            notify_(*ph_, id);
             return true;
         }
 
@@ -119,7 +118,7 @@ namespace hpx { namespace parcelset { namespace policies
         parcelhandler* ph_;
 
         boost::signals2::signal_type<
-            void(parcelhandler&, naming::gid_type, naming::address const&)
+            void(parcelhandler&, naming::gid_type)
           , boost::signals2::keywords::mutex_type<lcos::local::mutex>
         >::type notify_;
     };

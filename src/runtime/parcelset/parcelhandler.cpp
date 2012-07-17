@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > parcel_data,
         performance_counters::parcels::data_point receive_data)
     {
-        // protect from unhandled exceptions bubbling up into thread manager
+        // protect from un-handled exceptions bubbling up into thread manager
         try {
             try {
                 // create a special io stream on top of in_buffer_
@@ -128,7 +128,7 @@ namespace hpx { namespace parcelset
                         archive >> p;
 
                         // make sure this parcel ended up on the right locality
-                        BOOST_ASSERT(p.get_destination_addr().locality_ == here());
+                        BOOST_ASSERT(p.get_destination_locality() == here());
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer_.elapsed_microseconds();
@@ -240,19 +240,16 @@ namespace hpx { namespace parcelset
         // properly initialize parcel
         init_parcel(p);
 
-        if (!p.get_destination_addr())
-        {
-            naming::address addr;
+        std::vector<naming::gid_type> const& gids = p.get_destinations();
+        std::vector<naming::address>& addrs = p.get_destination_addrs();
 
-            if (!resolver_.resolve_cached(p.get_destination(), addr))
-            {
-                // resolve the remote address
-                resolver_.resolve(p.get_destination(), addr);
-                p.set_destination_addr(addr);
-            }
-
-            else
-                p.set_destination_addr(addr);
+        if (1 == gids.size()) {
+            if (!addrs[0])
+                resolver_.resolve(gids[0], addrs[0]);
+        }
+        else {
+            boost::dynamic_bitset<> locals;
+            resolver_.resolve(gids, addrs, locals);
         }
 
         if (!p.get_parcel_id())

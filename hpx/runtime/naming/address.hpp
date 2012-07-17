@@ -61,8 +61,8 @@ namespace hpx { namespace naming
         // safe operator bool()
         operator util::safe_bool<address>::result_type() const
         {
-            return util::safe_bool<address>()(
-                components::component_invalid != type_ || 0 != address_);
+            return util::safe_bool<address>()(!!locality_ &&
+                (components::component_invalid != type_ || 0 != address_));
         }
 
         friend bool operator==(address const& lhs, address const& rhs)

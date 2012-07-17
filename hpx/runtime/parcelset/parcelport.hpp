@@ -114,11 +114,7 @@ namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        void put_parcel(parcel const & p, write_handler_type f)
-        {
-            // send the parcel to its destination
-            send_parcel(p, p.get_destination_addr(), f);
-        }
+        void put_parcel(parcel const & p, write_handler_type f);
 
         /// Register an event handler to be called whenever a parcel has been
         /// received.
@@ -157,7 +153,8 @@ namespace parcelset
             return io_service_pool_;
         }
 
-        util::connection_cache<parcelport_connection>& get_connection_cache()
+        util::connection_cache<parcelport_connection,naming::locality>& 
+            get_connection_cache()
         {
             return connection_cache_;
         }
@@ -249,12 +246,8 @@ namespace parcelset
         void handle_read_completion(boost::system::error_code const& e,
             server::parcelport_connection_ptr);
 
-        /// send the parcel to the specified address
-        void send_parcel(parcel const& p, naming::address const& addr,
-            write_handler_type f);
-
         /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(boost::uint32_t prefix);
+        void send_pending_parcels_trampoline(naming::locality const& prefix);
         void send_pending_parcels(parcelport_connection_ptr client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
@@ -272,14 +265,14 @@ namespace parcelset
         server::parcelport_queue parcels_;
 
         /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection> connection_cache_;
+        util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
         /// Mutex for pending parcels
         util::spinlock mtx_;
         /// The cache for pending parcels
         typedef
             std::map<
-                boost::uint32_t
+                naming::locality
               , std::pair<
                     std::vector<parcel>
                   , std::vector<write_handler_type>

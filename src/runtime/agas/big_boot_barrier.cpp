@@ -96,7 +96,7 @@ void early_write_handler(
     // no-op
 }
 
-void early_pending_parcel_handler(boost::uint32_t)
+void early_pending_parcel_handler(naming::locality const&)
 {
     // no-op
 }
@@ -601,7 +601,7 @@ void big_boot_barrier::apply(
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(locality_id, addr, act);
+    parcelset::parcel p(naming::get_gid_from_locality_id(locality_id), addr, act);
 
     parcelset::parcelport_connection_ptr client_connection;
 
@@ -610,7 +610,7 @@ void big_boot_barrier::apply(
     for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
         // Get a connection or reserve space for a new connection.
-        if (connection_cache_.get_or_reserve(locality_id, client_connection))
+        if (connection_cache_.get_or_reserve(addr.locality_, client_connection))
         {
             got_cache_space = true;
             break;
@@ -636,7 +636,7 @@ void big_boot_barrier::apply(
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
         client_connection.reset(new parcelset::parcelport_connection(
-            io_service_pool_.get_io_service(), locality_id,
+            io_service_pool_.get_io_service(), addr.locality_,
             connection_cache_, pp.timer_, pp.parcels_sent_));
         client_connection->set_parcel(p);
 
@@ -691,8 +691,6 @@ void big_boot_barrier::apply(
 #if defined(HPX_DEBUG)
         else
         {
-            client_connection->set_locality(addr.locality_);
-
             std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
             boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
             BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
@@ -706,7 +704,6 @@ void big_boot_barrier::apply(
         client_connection->set_parcel(p);
 
 #if defined(HPX_DEBUG)
-        BOOST_ASSERT(addr.locality_ == client_connection->get_locality());
         BOOST_ASSERT(locality_id == client_connection->destination());
 
         std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();

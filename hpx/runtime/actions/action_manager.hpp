@@ -28,12 +28,12 @@ namespace hpx { namespace actions
             // when a new parcel is received, it calls action_manager's
             // fetchNewParcel()
             appl.get_parcel_handler().register_event_handler(boost::bind(
-                    &action_manager::fetch_parcel, this, _1, _2, _3), conn_);
+                    &action_manager::fetch_parcel, this, _1, _2), conn_);
         }
 
         // Call-back function for parcelHandler to call when new parcels are received
         void fetch_parcel (parcelset::parcelhandler& parcel_handler,
-            naming::gid_type const& parcel_id, naming::address const& addr);
+            naming::gid_type const& parcel_id);
 
         // Invoked by the Thread Manager when it is running out of work-items
         // and needs something to execute on a specific starving resources
