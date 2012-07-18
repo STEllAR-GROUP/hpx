@@ -23,21 +23,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server
 {
-    void allgather_and_gate::compute(
-        std::vector<hpx::naming::id_type> const& components, std::size_t rank,
-        int num_loops)
+    void allgather_and_gate::init(
+        std::vector<hpx::naming::id_type> const& components, std::size_t rank)
     {
+        mutex_type::scoped_lock l(mtx_);
+
         rank_ = rank;
         components_ = components;
 
+        // prepare data array
+        n_.clear();
+        n_.resize(components.size());
+
+        // create a new and-gate object
+        gate_.init(components_.size());
+    }
+
+    void allgather_and_gate::compute(int num_loops)
+    {
         for (int i = 0; i < num_loops; ++i)
         {
             // do some stuff
             double value = rank_ * 3.14159 * (i+1);
-
-            // prepare data array
-            n_.clear();
-            n_.resize(components.size());
 
             // now hit the barrier
             allgather(value);
@@ -46,32 +53,37 @@ namespace ag { namespace server
 
     void allgather_and_gate::allgather(double value)
     {
-        // create a new and-gate object
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        std::size_t generation = 0;
         {
             mutex_type::scoped_lock l(mtx_);
-            gate_ = hpx::lcos::local::and_gate(components_.size());
+            generation = ++generation_;
         }
 
         // Send our value to all participants of this allgather operation. We
         // assume components_, rank_ and value to be constant, thus no locking
         // is required.
         set_data_action set_data_;
-        hpx::apply(set_data_, components_, rank_, value);
-
-        // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
+        hpx::apply(set_data_, components_, rank_, generation, value);
 
         // possibly do other stuff while the allgather is going on...
 
         f.get();
-
-        // FIXME: reset operation might not be required
-//         gate_.reset();              // reset and-gate
     }
 
-    void allgather_and_gate::set_data(std::size_t which, double data)
+    void allgather_and_gate::set_data(std::size_t which,
+        std::size_t generation, double data)
     {
         mutex_type::scoped_lock l(mtx_);
+
+        // make sure this set operation has not arrived ahead of time
+        while (generation > generation_)
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            hpx::this_thread::suspend();
+        }
 
         if (which >= n_.size())
         {

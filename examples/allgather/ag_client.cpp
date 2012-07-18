@@ -116,15 +116,25 @@ void test_allgather_and_gate(std::size_t np)
     // Populate the client vectors.
     init(hpx::util::locality_results(blocks), components);
 
+    hpx::util::high_resolution_timer inittimer;
+    {
+      std::vector<hpx::lcos::future<void> > init_phase;
+      ag::server::allgather_and_gate::init_action init;
+      for (std::size_t i = 0; i < np; ++i)
+      {
+        init_phase.push_back(hpx::async(init, components[i], components, i));
+      }
+      hpx::lcos::wait(init_phase);
+    }
+    double inittime = inittimer.elapsed();
+
     hpx::util::high_resolution_timer computetimer;
     {
       std::vector<hpx::lcos::future<void> > compute_phase;
       ag::server::allgather_and_gate::compute_action compute;
       for (std::size_t i = 0; i < np; ++i)
       {
-        compute_phase.push_back(
-          hpx::async(compute, components[i], components, i, 100)
-        );
+        compute_phase.push_back(hpx::async(compute, components[i], 100));
       }
       hpx::lcos::wait(compute_phase);
     }
@@ -137,6 +147,7 @@ void test_allgather_and_gate(std::size_t np)
       print(components[i]);
     }
 
+    std::cout << " init time: " << inittime << std::endl;
     std::cout << " compute time: " << computetime << std::endl;
 }
 

@@ -26,19 +26,22 @@ namespace ag { namespace server
 
     public:
         allgather_and_gate()
+          : generation_(0)
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        void compute(std::vector<hpx::naming::id_type> const& components,
-            std::size_t rank, int num_loops);
+        void init(std::vector<hpx::naming::id_type> const& components,
+            std::size_t rank);
+        void compute(int num_loops);
         void print();
 
+        HPX_DEFINE_COMPONENT_ACTION(allgather_and_gate, init, init_action);
         HPX_DEFINE_COMPONENT_ACTION(allgather_and_gate, compute, compute_action);
         HPX_DEFINE_COMPONENT_ACTION(allgather_and_gate, print, print_action);
 
         ///////////////////////////////////////////////////////////////////////
         // helper action for all-gather operation
-        void set_data(std::size_t which, double data);
+        void set_data(std::size_t which, std::size_t generation, double data);
         HPX_DEFINE_COMPONENT_ACTION(allgather_and_gate, set_data,set_data_action);
 
     protected:
@@ -48,6 +51,7 @@ namespace ag { namespace server
         mutable mutex_type mtx_;
 
         std::size_t rank_;                // our rank
+        std::size_t generation_;          // generational counter of all-gather ops
 
         std::vector<double> n_;                         // all-gathered values
         std::vector<hpx::naming::id_type> components_;  // components for allgather

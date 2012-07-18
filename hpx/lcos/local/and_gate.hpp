@@ -50,6 +50,15 @@ namespace hpx { namespace lcos { namespace local
             return *this;
         }
 
+        /// \brief re-initialize the gate with a different number of inputs
+        void init(std::size_t count)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            received_segments_.reset();         // reset all existing bits
+            received_segments_.resize(count);   // resize the bitmap
+            promise_ = promise<void>();         // renew promise
+        }
+
         /// \brief Set the data which has to go into the segment \a which.
         void set(std::size_t which, error_code& ec = throws)
         {
@@ -57,14 +66,14 @@ namespace hpx { namespace lcos { namespace local
             if (which >= received_segments_.size())
             {
                 // out of bounds index
-                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set", 
+                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set",
                     "index is out of range for this and_gate");
                 return;
             }
             if (received_segments_.test(which))
             {
                 // segment already filled, logic error
-                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set", 
+                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set",
                     "input with the given index has already been triggered");
                 return;
             }
@@ -75,23 +84,18 @@ namespace hpx { namespace lcos { namespace local
             if (received_segments_.count() == received_segments_.size())
             {
                 // we have received the last missing segment
-                promise_.set_value();    // fire event
+                promise_.set_value();           // fire event
+                received_segments_.reset();     // reset data store
+                promise_ = promise<void>();     // renew promise
             }
         }
 
         /// \brief get a future allowing to wait for the gate to fire
         future<void> get_future(error_code& ec = throws)
         {
+            // create new promise and return the future
             mutex_type::scoped_lock l(mtx_);
             return promise_.get_future(ec);
-        }
-
-        /// \brief Reset the internal state machine to restart the gate
-        void reset()
-        {
-            mutex_type::scoped_lock l(mtx_);
-            received_segments_.reset();
-            promise_ = promise<void>();
         }
 
     private:
