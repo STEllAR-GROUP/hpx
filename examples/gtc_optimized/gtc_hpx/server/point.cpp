@@ -20,12 +20,11 @@
 extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *); 
             void FNAME(load)(); 
             void FNAME(chargei)(void* opaque_ptr_to_class); 
-            void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,
-                               double *densityi,int *mgrid,int *mzetap1) {
+            void FNAME(partd_allreduce_cmm) (void* pfoo) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
                     gtc::server::point *ptr_to_class = static_cast<gtc::server::point*>(pfoo); 
-                    ptr_to_class->partd_allreduce(dnitmp,densityi,mgrid,mzetap1);
+                    ptr_to_class->partd_allreduce();
                     return; };
 }
 
@@ -97,7 +96,7 @@ namespace gtc { namespace server
       FNAME(chargei)(static_cast<void*>(this));
     }
 
-    void point::partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1)
+    void point::partd_allreduce()
     {
 
       std::cout << " HELLO WORLD FROM allreduce" << std::endl;

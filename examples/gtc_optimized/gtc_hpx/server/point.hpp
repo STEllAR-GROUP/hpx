@@ -36,7 +36,7 @@ namespace gtc { namespace server
         void setup(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei();
-        void partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1);
+        void partd_allreduce();
         //void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
         void partd_allreduce_receive();
         void allreduce();
