@@ -8,7 +8,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/high_resolution_clock.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/components/papi/server/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
 #include <hpx/exception.hpp>
@@ -123,7 +123,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     bool thread_counters::read_value(papi_counter *cnt)
     {
         if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
-        timestamp_ = hpx::performance_counters::high_resolution_clock::now();
+        timestamp_ = hpx::util::high_resolution_clock::now();
         cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
         return true;
     }
@@ -151,7 +151,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             if (PAPI_stop(evset_, &tmp[0]) != PAPI_OK) return false;
             // accumulate existing counts before modifying event set
             if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
-            timestamp_ = hpx::performance_counters::high_resolution_clock::now();
+            timestamp_ = hpx::util::high_resolution_clock::now();
         }
         return true;
     }

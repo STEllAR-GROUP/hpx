@@ -48,31 +48,179 @@ enum namespace_action_code
 
 namespace detail
 {
+    enum counter_target
+    {
+        counter_target_invalid = -1
+      , counter_target_count = 0
+      , counter_target_time = 1
+    };
+
     struct counter_service_data
     {
         char const* const name_;              // name of performance counter
+        char const* const uom_;               // unit of measure of performance counter
+        counter_target target_;               // target type of the counter
         namespace_action_code code_;          // corresponding AGAS service
         namespace_action_code service_code_;  // corresponding AGAS component
     };
 
-    static counter_service_data const counter_services[] =
+    // counter description data for component namespace components
+    static counter_service_data const component_namespace_services[] =
     {
+        // counters exposing API invocation counts
         {   "count/bind_prefix"
+          , ""
+          , counter_target_count
           , component_ns_bind_prefix
           , component_ns_statistics_counter }
       , {   "count/bind_name"
+          , ""
+          , counter_target_count
           , component_ns_bind_name
           , component_ns_statistics_counter }
       , {   "count/resolve_id"
+          , ""
+          , counter_target_count
           , component_ns_resolve_id
           , component_ns_statistics_counter }
       , {   "count/unbind"
+          , ""
+          , counter_target_count
           , component_ns_unbind
           , component_ns_statistics_counter }
       , {   "count/iterate_types"
+          , ""
+          , counter_target_count
+          , component_ns_iterate_types
+          , component_ns_statistics_counter }
+      // counters exposing API timings
+      , {   "time/bind_prefix"
+          , "ns"
+          , counter_target_time
+          , component_ns_bind_prefix
+          , component_ns_statistics_counter }
+      , {   "time/bind_name"
+          , "ns"
+          , counter_target_time
+          , component_ns_bind_name
+          , component_ns_statistics_counter }
+      , {   "time/resolve_id"
+          , "ns"
+          , counter_target_time
+          , component_ns_resolve_id
+          , component_ns_statistics_counter }
+      , {   "time/unbind"
+          , "ns"
+          , counter_target_time
+          , component_ns_unbind
+          , component_ns_statistics_counter }
+      , {   "time/iterate_types"
+          , "ns"
+          , counter_target_time
           , component_ns_iterate_types
           , component_ns_statistics_counter }
     };
+    static std::size_t const num_component_namespace_services =
+        sizeof(component_namespace_services)/sizeof(component_namespace_services[0]);
+
+    // counter description data for primary namespace components
+    static counter_service_data const primary_namespace_services[] =
+    {
+        // counters exposing API invocation counts
+        {   "count/allocate"
+          , ""
+          , counter_target_count
+          , primary_ns_allocate
+          , primary_ns_statistics_counter }
+      , {   "count/bind_gid"
+          , ""
+          , counter_target_count
+          , primary_ns_bind_gid
+          , primary_ns_statistics_counter }
+      , {   "count/resolve_gid"
+          , ""
+          , counter_target_count
+          , primary_ns_resolve_gid
+          , primary_ns_statistics_counter }
+      , {   "count/resolve_locality"
+          , ""
+          , counter_target_count
+          , primary_ns_resolve_locality
+          , primary_ns_statistics_counter }
+      , {   "count/free"
+          , ""
+          , counter_target_count
+          , primary_ns_free
+          , primary_ns_statistics_counter }
+      , {   "count/unbind_gid"
+          , ""
+          , counter_target_count
+          , primary_ns_unbind_gid
+          , primary_ns_statistics_counter }
+      , {   "count/change_credit_non_blocking"
+          , ""
+          , counter_target_count
+          , primary_ns_change_credit_non_blocking
+          , primary_ns_statistics_counter }
+      , {   "count/change_credit_sync"
+          , ""
+          , counter_target_count
+          , primary_ns_change_credit_sync
+          , primary_ns_statistics_counter }
+      , {   "count/localities"
+          , ""
+          , counter_target_count
+          , primary_ns_localities
+          , primary_ns_statistics_counter }
+      // counters exposing API timings
+      , {   "time/allocate"
+          , "ns"
+          , counter_target_time
+          , primary_ns_allocate
+          , primary_ns_statistics_counter }
+      , {   "time/bind_gid"
+          , "ns"
+          , counter_target_time
+          , primary_ns_bind_gid
+          , primary_ns_statistics_counter }
+      , {   "time/resolve_gid"
+          , "ns"
+          , counter_target_time
+          , primary_ns_resolve_gid
+          , primary_ns_statistics_counter }
+      , {   "time/resolve_locality"
+          , "ns"
+          , counter_target_time
+          , primary_ns_resolve_locality
+          , primary_ns_statistics_counter }
+      , {   "time/free"
+          , "ns"
+          , counter_target_time
+          , primary_ns_free
+          , primary_ns_statistics_counter }
+      , {   "time/unbind_gid"
+          , "ns"
+          , counter_target_time
+          , primary_ns_unbind_gid
+          , primary_ns_statistics_counter }
+      , {   "time/change_credit_non_blocking"
+          , "ns"
+          , counter_target_time
+          , primary_ns_change_credit_non_blocking
+          , primary_ns_statistics_counter }
+      , {   "time/change_credit_sync"
+          , "ns"
+          , counter_target_time
+          , primary_ns_change_credit_sync
+          , primary_ns_statistics_counter }
+      , {   "time/localities"
+          , "ns"
+          , counter_target_time
+          , primary_ns_localities
+          , primary_ns_statistics_counter }
+    };
+    static std::size_t const num_primary_namespace_services =
+        sizeof(primary_namespace_services)/sizeof(primary_namespace_services[0]);
 
     ///////////////////////////////////////////////////////////////////////////
     // get action code from counter type

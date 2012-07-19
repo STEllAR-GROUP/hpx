@@ -29,10 +29,10 @@ namespace performance_counters { namespace sine
     boost::int64_t immediate_sine()
     {
         static boost::uint64_t started_at =
-            hpx::performance_counters::high_resolution_clock::now();
+            hpx::util::high_resolution_clock::now();
 
         boost::uint64_t up_time =
-            hpx::performance_counters::high_resolution_clock::now() - started_at;
+            hpx::util::high_resolution_clock::now() - started_at;
         return boost::int64_t(std::sin(up_time / 1e10) * 100000.);
     }
 

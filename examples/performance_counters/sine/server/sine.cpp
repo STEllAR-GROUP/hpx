@@ -7,7 +7,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/high_resolution_clock.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 
 #include "sine.hpp"
 
@@ -27,7 +27,7 @@ namespace performance_counters { namespace sine { namespace server
       : base_type_holder(info), current_value_(0),
         timer_(boost::bind(&sine_counter::evaluate, this), 1000000,
             "sine example performance counter"),
-        started_at_(hpx::performance_counters::high_resolution_clock::now())
+        started_at_(hpx::util::high_resolution_clock::now())
     {
     }
 
@@ -68,7 +68,7 @@ namespace performance_counters { namespace sine { namespace server
     void sine_counter::evaluate()
     {
         mutex_type::scoped_lock mtx(mtx_);
-        evaluated_at_ = hpx::performance_counters::high_resolution_clock::now();
+        evaluated_at_ = hpx::util::high_resolution_clock::now();
         current_value_ = std::sin((evaluated_at_ - started_at_) / 1e10);
     }
 }}}

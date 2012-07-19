@@ -10,6 +10,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/locality_result.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 
 #endif
 

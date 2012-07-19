@@ -31,7 +31,6 @@ naming::id_type bootstrap_component_namespace_id()
 
 namespace server
 {
-
 // TODO: This isn't scalable, we have to update it every time we add a new
 // AGAS request/response type.
 response component_namespace::service(
@@ -42,20 +41,50 @@ response component_namespace::service(
     switch (req.get_action_code())
     {
         case component_ns_bind_prefix:
-            counter_data_.increment_bind_prefix_count();
-            return bind_prefix(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.bind_prefix_.time_
+                );
+                counter_data_.increment_bind_prefix_count();
+                return bind_prefix(req, ec);
+            }
         case component_ns_bind_name:
-            counter_data_.increment_bind_name_count();
-            return bind_name(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.bind_name_.time_
+                );
+                counter_data_.increment_bind_name_count();
+                return bind_name(req, ec);
+            }
         case component_ns_resolve_id:
-            counter_data_.increment_resolve_id_count();
-            return resolve_id(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.resolve_id_.time_
+                );
+                counter_data_.increment_resolve_id_count();
+                return resolve_id(req, ec);
+            }
         case component_ns_unbind:
-            counter_data_.increment_unbind_count();
-            return unbind(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.unbind_.time_
+                );
+                counter_data_.increment_unbind_count();
+                return unbind(req, ec);
+            }
         case component_ns_iterate_types:
-            counter_data_.increment_iterate_types_count();
-            return iterate_types(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.iterate_types_.time_
+                );
+                counter_data_.increment_iterate_types_count();
+                return iterate_types(req, ec);
+            }
         case component_ns_statistics_counter:
             return statistics_counter(req, ec);
 
@@ -108,68 +137,53 @@ void component_namespace::register_counter_types(
   , error_code& ec
     )
 {
-    performance_counters::generic_counter_type_data const counter_types[] =
+    boost::format help_count(
+        "returns the number of invocations of the AGAS service '%s'");
+    boost::format help_time(
+        "returns the overall execution time of the AGAS service '%s'");
+    HPX_STD_FUNCTION<performance_counters::create_counter_func> creator(
+        boost::bind(&performance_counters::agas_raw_counter_creator
+          , _1, _2, agas::server::component_namespace_service_name));
+
+    for (std::size_t i = 0;
+          i < detail::num_component_namespace_services;
+          ++i)
     {
-        { "/agas/count/bind_prefix", performance_counters::counter_raw,
-          "returns the number of invocations of the AGAS service 'bind_prefix'",
-          HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::agas_raw_counter_creator,
-              _1, _2, agas::server::component_namespace_service_name),
-          &performance_counters::agas_counter_discoverer,
-          ""
-        },
-        { "/agas/count/bind_name", performance_counters::counter_raw,
-          "returns the number of invocations of the AGAS service 'bind_name'",
-          HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::agas_raw_counter_creator,
-              _1, _2, agas::server::component_namespace_service_name),
-          &performance_counters::agas_counter_discoverer,
-          ""
-        },
-        { "/agas/count/resolve_id", performance_counters::counter_raw,
-          "returns the number of invocations of the AGAS service 'resolve_id'",
-          HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::agas_raw_counter_creator,
-              _1, _2, agas::server::component_namespace_service_name),
-          &performance_counters::agas_counter_discoverer,
-          ""
-        },
-        { "/agas/count/unbind", performance_counters::counter_raw,
-          "returns the number of invocations of the AGAS service 'unbind'",
-          HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::agas_raw_counter_creator,
-              _1, _2, agas::server::component_namespace_service_name),
-          &performance_counters::agas_counter_discoverer,
-          ""
-        },
-        { "/agas/count/iterate_types", performance_counters::counter_raw,
-          "returns the number of invocations of the AGAS service 'iterate_types'",
-          HPX_PERFORMANCE_COUNTER_V1,
-          boost::bind(&performance_counters::agas_raw_counter_creator,
-              _1, _2, agas::server::component_namespace_service_name),
-          &performance_counters::agas_counter_discoverer,
-          ""
-        }
-    };
-    performance_counters::install_counter_types(
-        counter_types, sizeof(counter_types)/sizeof(counter_types[0]), ec);
-    if (ec) return;
+        std::string name(detail::component_namespace_services[i].name_);
+        std::string help;
+        if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
+            help = boost::str(help_count % name.substr(name.find_last_of('/')+1));
+        else
+            help = boost::str(help_time % name.substr(name.find_last_of('/')+1));
+
+        performance_counters::install_counter_type(
+            "/agas/" + name
+          , performance_counters::counter_raw
+          , help
+          , creator
+          , &performance_counters::default_counter_discoverer
+          , HPX_PERFORMANCE_COUNTER_V1
+          , detail::component_namespace_services[i].uom_
+          , ec
+          );
+        if (ec) return;
+    }
 
     // now register this AGAS instance with AGAS :-P
-    instance_name = agas::server::component_namespace_service_name;
-    instance_name += servicename;
+    instance_name_ = agas::server::component_namespace_service_name;
+    instance_name_ += servicename;
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name(instance_name, get_gid().get_gid(), ec);
+    agas::register_name(instance_name_, get_gid().get_gid(), ec);
 }
 
 void component_namespace::finalize()
 {
-    if (!instance_name.empty())
+    if (!instance_name_.empty())
     {
         error_code ec;
-        agas::unregister_name(instance_name, ec);
+        agas::unregister_name(instance_name_, ec);
     }
 }
 
@@ -453,7 +467,7 @@ response component_namespace::statistics_counter(
     request const& req
   , error_code& ec
     )
-{ // {{{ iterate implementation
+{ // {{{ statistics_counter implementation
     LAGAS_(info) << "component_namespace::statistics_counter";
 
     std::string name(req.get_statistics_counter_name());
@@ -464,26 +478,30 @@ response component_namespace::statistics_counter(
 
     if (p.objectname_ != "agas")
     {
-        HPX_THROWS_IF(ec, bad_parameter, "component_namespace::statistics_counter",
+        HPX_THROWS_IF(ec, bad_parameter,
+            "component_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
         return response();
     }
 
     namespace_action_code code = invalid_request;
+    detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
-          i < sizeof(detail::counter_services)/sizeof(detail::counter_services[0]);
+          i < detail::num_component_namespace_services;
           ++i)
     {
-        if (p.countername_ == detail::counter_services[i].name_)
+        if (p.countername_ == detail::component_namespace_services[i].name_)
         {
-            code = detail::counter_services[i].code_;
+            code = detail::component_namespace_services[i].code_;
+            target = detail::component_namespace_services[i].target_;
             break;
         }
     }
 
-    if (code == invalid_request)
+    if (code == invalid_request || target == detail::counter_target_invalid)
     {
-        HPX_THROWS_IF(ec, bad_parameter, "component_namespace::statistics_counter",
+        HPX_THROWS_IF(ec, bad_parameter,
+            "component_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
         return response();
     }
@@ -491,27 +509,54 @@ response component_namespace::statistics_counter(
     typedef component_namespace::counter_data cd;
 
     HPX_STD_FUNCTION<boost::int64_t()> get_data_func;
-    switch (code) {
-    case component_ns_bind_prefix:
-        get_data_func = boost::bind(&cd::get_bind_prefix_count, &counter_data_);
-        break;
-    case component_ns_bind_name:
-        get_data_func = boost::bind(&cd::get_bind_name_count, &counter_data_);
-        break;
-    case component_ns_resolve_id:
-        get_data_func = boost::bind(&cd::get_resolve_id_count, &counter_data_);
-        break;
-    case component_ns_unbind:
-        get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_);
-        break;
-    case component_ns_iterate_types:
-        get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_);
-        break;
-    default:
-        HPX_THROWS_IF(ec, bad_parameter
-          , "component_namespace::statistics"
-          , "bad action code while querying statistics");
-        return response();
+    if (target == detail::counter_target_count)
+    {
+        switch (code) {
+        case component_ns_bind_prefix:
+            get_data_func = boost::bind(&cd::get_bind_prefix_count, &counter_data_);
+            break;
+        case component_ns_bind_name:
+            get_data_func = boost::bind(&cd::get_bind_name_count, &counter_data_);
+            break;
+        case component_ns_resolve_id:
+            get_data_func = boost::bind(&cd::get_resolve_id_count, &counter_data_);
+            break;
+        case component_ns_unbind:
+            get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_);
+            break;
+        case component_ns_iterate_types:
+            get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_);
+            break;
+        default:
+            HPX_THROWS_IF(ec, bad_parameter
+              , "component_namespace::statistics"
+              , "bad action code while querying statistics");
+            return response();
+        }
+    }
+    else {
+        switch (code) {
+        case component_ns_bind_prefix:
+            get_data_func = boost::bind(&cd::get_bind_prefix_time, &counter_data_);
+            break;
+        case component_ns_bind_name:
+            get_data_func = boost::bind(&cd::get_bind_name_time, &counter_data_);
+            break;
+        case component_ns_resolve_id:
+            get_data_func = boost::bind(&cd::get_resolve_id_time, &counter_data_);
+            break;
+        case component_ns_unbind:
+            get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_);
+            break;
+        case component_ns_iterate_types:
+            get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_);
+            break;
+        default:
+            HPX_THROWS_IF(ec, bad_parameter
+              , "component_namespace::statistics"
+              , "bad action code while querying statistics");
+            return response();
+        }
     }
 
     performance_counters::counter_info info;
@@ -535,63 +580,95 @@ response component_namespace::statistics_counter(
 boost::int64_t component_namespace::counter_data::get_bind_prefix_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_prefix_;
+    return bind_prefix_.count_;
 }
 
 boost::int64_t component_namespace::counter_data::get_bind_name_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_name_;
+    return bind_name_.count_;
 }
 
 boost::int64_t component_namespace::counter_data::get_resolve_id_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_id_;
+    return resolve_id_.count_;
 }
 
 boost::int64_t component_namespace::counter_data::get_unbind_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_;
+    return unbind_.count_;
 }
 
 boost::int64_t component_namespace::counter_data::get_iterate_types_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return iterate_types_;
+    return iterate_types_.count_;
+}
+
+// access execution time counters
+boost::int64_t component_namespace::counter_data::get_bind_prefix_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return bind_prefix_.time_;
+}
+
+boost::int64_t component_namespace::counter_data::get_bind_name_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return bind_name_.time_;
+}
+
+boost::int64_t component_namespace::counter_data::get_resolve_id_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolve_id_.time_;
+}
+
+boost::int64_t component_namespace::counter_data::get_unbind_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return unbind_.time_;
+}
+
+boost::int64_t component_namespace::counter_data::get_iterate_types_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return iterate_types_.time_;
 }
 
 // increment counter values
 void component_namespace::counter_data::increment_bind_prefix_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++bind_prefix_;
+    ++bind_prefix_.count_;
 }
 
 void component_namespace::counter_data::increment_bind_name_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++bind_name_;
+    ++bind_name_.count_;
 }
 
 void component_namespace::counter_data::increment_resolve_id_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++resolve_id_;
+    ++resolve_id_.count_;
 }
 
 void component_namespace::counter_data::increment_unbind_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++unbind_;
+    ++unbind_.count_;
 }
 
 void component_namespace::counter_data::increment_iterate_types_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++iterate_types_;
+    ++iterate_types_.count_;
 }
+
 
 }}}
 

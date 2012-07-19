@@ -99,6 +99,15 @@ void symbol_namespace::register_counter_types(
 {
 }
 
+void symbol_namespace::finalize()
+{
+    if (!instance_name_.empty())
+    {
+        error_code ec;
+        agas::unregister_name(instance_name_, ec);
+    }
+}
+
 // TODO: do/undo semantics (e.g. transactions)
 std::vector<response> symbol_namespace::bulk_service(
     std::vector<request> const& reqs

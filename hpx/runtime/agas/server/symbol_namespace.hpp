@@ -22,6 +22,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
 namespace hpx { namespace agas
@@ -53,6 +54,7 @@ struct HPX_EXPORT symbol_namespace :
   private:
     mutex_type mutex_;
     gid_table_type gids_;
+    std::string instance_name_;
 
   public:
     symbol_namespace()
@@ -60,7 +62,9 @@ struct HPX_EXPORT symbol_namespace :
       , gids_()
     {}
 
-    response service(
+    void finalize();
+
+    response remote_service(
         request const& req
         )
     {
@@ -78,7 +82,7 @@ struct HPX_EXPORT symbol_namespace :
       , error_code& ec = throws);
 
     /// Maps \a service over \p reqs in parallel.
-    std::vector<response> bulk_service(
+    std::vector<response> remote_bulk_service(
         std::vector<request> const& reqs
         )
     {
@@ -130,23 +134,8 @@ struct HPX_EXPORT symbol_namespace :
       , namespace_statistics_counter = symbol_ns_statistics_counter
     }; // }}}
 
-    typedef hpx::actions::result_action1<
-        symbol_namespace
-      , /* return type */ response
-      , /* enum value */  namespace_service
-      , /* arguments */   request const&
-      , &symbol_namespace::service
-      , threads::thread_priority_critical
-    > service_action;
-
-    typedef hpx::actions::result_action1<
-        symbol_namespace
-      , /* return type */ std::vector<response>
-      , /* enum value */  namespace_bulk_service
-      , /* arguments */   std::vector<request> const&
-      , &symbol_namespace::bulk_service
-      , threads::thread_priority_critical
-    > bulk_service_action;
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_service, service_action);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_bulk_service, bulk_service_action);
 };
 
 }}}

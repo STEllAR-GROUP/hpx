@@ -273,16 +273,28 @@ namespace hpx { namespace performance_counters
         p.parentinstanceindex_ = -1;
         p.instanceindex_ = -1;
 
-        // list all counter related to agas
+        // list all counter related to component_ns
         for (std::size_t i = 0;
-             i < sizeof(agas::detail::counter_services)/sizeof(agas::detail::counter_services[0]);
+             i < agas::detail::num_component_namespace_services;
              ++i)
         {
-            p.instancename_ = agas::detail::counter_services[i].name_;
+            p.instancename_ = agas::detail::component_namespace_services[i].name_;
             status = get_counter_name(p, i_.fullname_, ec);
             if (!status_is_valid(status) || !f(i_, ec) || ec)
                 return false;
         }
+
+        // list all counter related to primary_ns
+        for (std::size_t i = 0;
+             i < agas::detail::num_primary_namespace_services;
+             ++i)
+        {
+            p.instancename_ = agas::detail::primary_namespace_services[i].name_;
+            status = get_counter_name(p, i_.fullname_, ec);
+            if (!status_is_valid(status) || !f(i_, ec) || ec)
+                return false;
+        }
+
         return true;
     }
 }}

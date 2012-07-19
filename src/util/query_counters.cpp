@@ -7,9 +7,9 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 
 #include <boost/assert.hpp>
@@ -80,7 +80,7 @@ namespace hpx { namespace util
         }
 
         // this will invoke the evaluate function for the first time
-        started_at_ = hpx::performance_counters::high_resolution_clock::now();
+        started_at_ = hpx::util::high_resolution_clock::now();
         timer_.start();
     }
 

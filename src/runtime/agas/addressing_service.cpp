@@ -102,13 +102,13 @@ void addressing_service::launch_bootstrap(
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
-        bootstrap->primary_ns_server.service(reqs[i]);
+        bootstrap->primary_ns_server.remote_service(reqs[i]);
 
-    bootstrap->symbol_ns_server.service(
+    bootstrap->symbol_ns_server.remote_service(
         request(symbol_ns_bind, "/locality(agas#0)", here));
 
     if (runtime_type == runtime_mode_console)
-        bootstrap->symbol_ns_server.service(
+        bootstrap->symbol_ns_server.remote_service(
             request(symbol_ns_bind, "/locality(console)", here));
 
     naming::gid_type lower, upper;
@@ -1497,12 +1497,22 @@ namespace detail
             return invalid_request;
         }
 
+        // component_ns
         for (std::size_t i = 0;
-             i < sizeof(counter_services)/sizeof(counter_services[0]);
+             i < num_component_namespace_services;
              ++i)
         {
-            if (p.countername_ == counter_services[i].name_)
-                return counter_services[i].code_;
+            if (p.countername_ == component_namespace_services[i].name_)
+                return component_namespace_services[i].code_;
+        }
+
+        // primary_ns
+        for (std::size_t i = 0;
+             i < num_primary_namespace_services;
+             ++i)
+        {
+            if (p.countername_ == primary_namespace_services[i].name_)
+                return primary_namespace_services[i].code_;
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
@@ -1528,11 +1538,19 @@ namespace detail
         }
 
         for (std::size_t i = 0;
-             i < sizeof(counter_services)/sizeof(counter_services[0]);
+             i < num_component_namespace_services;
              ++i)
         {
-            if (p.countername_ == counter_services[i].name_)
-                return counter_services[i].service_code_;
+            if (p.countername_ == component_namespace_services[i].name_)
+                return component_namespace_services[i].service_code_;
+        }
+
+        for (std::size_t i = 0;
+             i < num_primary_namespace_services;
+             ++i)
+        {
+            if (p.countername_ == primary_namespace_services[i].name_)
+                return primary_namespace_services[i].service_code_;
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",

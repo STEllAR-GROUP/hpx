@@ -25,6 +25,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
@@ -69,19 +70,27 @@ struct HPX_EXPORT component_namespace :
     component_id_table_type component_ids_;
     factory_table_type factories_;
     component_id_type type_counter;
-    std::string instance_name;
+    std::string instance_name_;
+
+    struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
     struct counter_data :  boost::noncopyable
     {
       typedef lcos::local::spinlock mutex_type;
 
+      struct api_counter_data
+      {
+        api_counter_data()
+          : count_(0)
+          , time_(0)
+        {}
+
+        boost::int64_t count_;
+        boost::int64_t time_;
+      };
+
       counter_data()
-        : bind_prefix_(0)
-        , bind_name_(0)
-        , resolve_id_(0)
-        , unbind_(0)
-        , iterate_types_(0)
       {}
 
     public:
@@ -92,6 +101,12 @@ struct HPX_EXPORT component_namespace :
       boost::int64_t get_unbind_count() const;
       boost::int64_t get_iterate_types_count() const;
 
+      boost::int64_t get_bind_prefix_time() const;
+      boost::int64_t get_bind_name_time() const;
+      boost::int64_t get_resolve_id_time() const;
+      boost::int64_t get_unbind_time() const;
+      boost::int64_t get_iterate_types_time() const;
+
       // increment counter values
       void increment_bind_prefix_count();
       void increment_bind_name_count();
@@ -99,14 +114,37 @@ struct HPX_EXPORT component_namespace :
       void increment_unbind_count();
       void increment_iterate_types_count();
 
+    private:
+      friend struct update_time_on_exit;
+      friend struct component_namespace;
+
       mutable mutex_type mtx_;
-      boost::int64_t bind_prefix_;          // component_ns_bind_prefix
-      boost::int64_t bind_name_;            // component_ns_bind_name
-      boost::int64_t resolve_id_;           // component_ns_resolve_id
-      boost::int64_t unbind_;               // component_ns_unbind
-      boost::int64_t iterate_types_;        // component_ns_iterate_types
+      api_counter_data bind_prefix_;          // component_ns_bind_prefix
+      api_counter_data bind_name_;            // component_ns_bind_name
+      api_counter_data resolve_id_;           // component_ns_resolve_id
+      api_counter_data unbind_;               // component_ns_unbind
+      api_counter_data iterate_types_;        // component_ns_iterate_types
     };
     counter_data counter_data_;
+
+    struct update_time_on_exit
+    {
+        update_time_on_exit(counter_data& data, boost::int64_t& t)
+          : started_at_(hpx::util::high_resolution_clock::now())
+          , data_(data)
+          , t_(t)
+        {}
+
+        ~update_time_on_exit()
+        {
+            counter_data::mutex_type::scoped_lock l(data_.mtx_);
+            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
+        }
+
+        boost::uint64_t started_at_;
+        component_namespace::counter_data& data_;
+        boost::int64_t& t_;
+    };
 
   public:
     component_namespace()
@@ -118,7 +156,7 @@ struct HPX_EXPORT component_namespace :
 
     void finalize();
 
-    response service(
+    response remote_service(
         request const& req
         )
     {
@@ -131,7 +169,7 @@ struct HPX_EXPORT component_namespace :
         );
 
     /// Maps \a service over \p reqs in parallel.
-    std::vector<response> bulk_service(
+    std::vector<response> remote_bulk_service(
         std::vector<request> const& reqs
         )
     {
@@ -194,23 +232,8 @@ struct HPX_EXPORT component_namespace :
       , namespace_statistics    = component_ns_statistics_counter
     }; // }}}
 
-    typedef hpx::actions::result_action1<
-        component_namespace
-      , /* return type */ response
-      , /* enum value */  namespace_service
-      , /* arguments */   request const&
-      , &component_namespace::service
-      , threads::thread_priority_critical
-    > service_action;
-
-    typedef hpx::actions::result_action1<
-        component_namespace
-      , /* return type */ std::vector<response>
-      , /* enum value */  namespace_bulk_service
-      , /* arguments */   std::vector<request> const&
-      , &component_namespace::bulk_service
-      , threads::thread_priority_critical
-    > bulk_service_action;
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_bulk_service, bulk_service_action);
 };
 
 }}}

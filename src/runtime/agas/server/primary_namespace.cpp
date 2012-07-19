@@ -9,6 +9,7 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/include/performance_counters.hpp>
 
 #include <list>
 
@@ -42,21 +43,77 @@ response primary_namespace::service(
     switch (req.get_action_code())
     {
         case primary_ns_allocate:
-            return allocate(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.allocate_.time_
+                );
+                counter_data_.increment_allocate_count();
+                return allocate(req, ec);
+            }
         case primary_ns_bind_gid:
-            return bind_gid(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.bind_gid_.time_
+                );
+                counter_data_.increment_bind_gid_count();
+                return bind_gid(req, ec);
+            }
         case primary_ns_resolve_gid:
-            return resolve_gid(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.resolve_gid_.time_
+                );
+                counter_data_.increment_resolve_gid_count();
+                return resolve_gid(req, ec);
+            }
         case primary_ns_free:
-            return free(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.free_.time_
+                );
+                counter_data_.increment_free_count();
+                return free(req, ec);
+            }
         case primary_ns_unbind_gid:
-            return unbind_gid(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.unbind_gid_.time_
+                );
+                counter_data_.increment_unbind_gid_count();
+                return unbind_gid(req, ec);
+            }
         case primary_ns_change_credit_non_blocking:
-            return change_credit_non_blocking(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.change_credit_non_blocking_.time_
+                );
+                counter_data_.increment_change_credit_non_blocking_count();
+                return change_credit_non_blocking(req, ec);
+            }
         case primary_ns_change_credit_sync:
-            return change_credit_sync(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.change_credit_sync_.time_
+                );
+                counter_data_.increment_change_credit_sync_count();
+                return change_credit_sync(req, ec);
+            }
         case primary_ns_localities:
-            return localities(req, ec);
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.localities_.time_
+                );
+                counter_data_.increment_localities_count();
+                return localities(req, ec);
+            }
         case primary_ns_statistics_counter:
             return statistics_counter(req, ec);
 
@@ -106,6 +163,54 @@ void primary_namespace::register_counter_types(
   , error_code& ec
     )
 {
+    boost::format help_count(
+        "returns the number of invocations of the AGAS service '%s'");
+    boost::format help_time(
+        "returns the overall execution time of the AGAS service '%s'");
+    HPX_STD_FUNCTION<performance_counters::create_counter_func> creator(
+        boost::bind(&performance_counters::agas_raw_counter_creator
+          , _1, _2, agas::server::primary_namespace_service_name));
+
+    for (std::size_t i = 0;
+          i < detail::num_primary_namespace_services;
+          ++i)
+    {
+        std::string name(detail::primary_namespace_services[i].name_);
+        std::string help;
+        if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
+            help = boost::str(help_count % name.substr(name.find_last_of('/')+1));
+        else
+            help = boost::str(help_time % name.substr(name.find_last_of('/')+1));
+
+        performance_counters::install_counter_type(
+            "/agas/" + name
+          , performance_counters::counter_raw
+          , help
+          , creator
+          , &performance_counters::default_counter_discoverer
+          , HPX_PERFORMANCE_COUNTER_V1
+          , detail::primary_namespace_services[i].uom_
+          , ec
+          );
+        if (ec) return;
+    }
+
+    // now register this AGAS instance with AGAS :-P
+    instance_name_ = agas::server::primary_namespace_service_name;
+    instance_name_ += servicename;
+
+    // register a gid (not the id) to avoid AGAS holding a reference to this
+    // component
+    agas::register_name(instance_name_, get_gid().get_gid(), ec);
+}
+
+void primary_namespace::finalize()
+{
+    if (!instance_name_.empty())
+    {
+        error_code ec;
+        agas::unregister_name(instance_name_, ec);
+    }
 }
 
 // TODO: do/undo semantics (e.g. transactions)
@@ -1226,9 +1331,302 @@ response primary_namespace::statistics_counter(
     request const& req
   , error_code& ec
     )
-{ // {{{ iterate implementation
+{ // {{{ statistics_counter implementation
     LAGAS_(info) << "primary_namespace::statistics_counter";
-    return response();
+
+    std::string name(req.get_statistics_counter_name());
+
+    performance_counters::counter_path_elements p;
+    performance_counters::get_counter_path_elements(name, p, ec);
+    if (ec) return response();
+
+    if (p.objectname_ != "agas")
+    {
+        HPX_THROWS_IF(ec, bad_parameter,
+            "primary_namespace::statistics_counter",
+            "unknown performance counter (unrelated to AGAS)");
+        return response();
+    }
+
+    namespace_action_code code = invalid_request;
+    detail::counter_target target = detail::counter_target_invalid;
+    for (std::size_t i = 0;
+          i < detail::num_primary_namespace_services;
+          ++i)
+    {
+        if (p.countername_ == detail::primary_namespace_services[i].name_)
+        {
+            code = detail::primary_namespace_services[i].code_;
+            target = detail::primary_namespace_services[i].target_;
+            break;
+        }
+    }
+
+    if (code == invalid_request || target == detail::counter_target_invalid)
+    {
+        HPX_THROWS_IF(ec, bad_parameter,
+            "primary_namespace::statistics_counter",
+            "unknown performance counter (unrelated to AGAS)");
+        return response();
+    }
+
+    typedef primary_namespace::counter_data cd;
+
+    HPX_STD_FUNCTION<boost::int64_t()> get_data_func;
+    if (target == detail::counter_target_count)
+    {
+        switch (code) {
+        case primary_ns_allocate:
+            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_);
+            break;
+        case primary_ns_bind_gid:
+            get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_);
+            break;
+        case primary_ns_resolve_gid:
+            get_data_func = boost::bind(&cd::get_resolve_gid_count, &counter_data_);
+            break;
+        case primary_ns_resolve_locality:
+            get_data_func = boost::bind(&cd::get_resolve_locality_count, &counter_data_);
+            break;
+        case primary_ns_free:
+            get_data_func = boost::bind(&cd::get_free_count, &counter_data_);
+            break;
+        case primary_ns_unbind_gid:
+            get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_);
+            break;
+        case primary_ns_change_credit_non_blocking:
+            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_count, &counter_data_);
+            break;
+        case primary_ns_change_credit_sync:
+            get_data_func = boost::bind(&cd::get_change_credit_sync_count, &counter_data_);
+            break;
+        case primary_ns_localities:
+            get_data_func = boost::bind(&cd::get_localities_count, &counter_data_);
+            break;
+        default:
+            HPX_THROWS_IF(ec, bad_parameter
+              , "primary_namespace::statistics"
+              , "bad action code while querying statistics");
+            return response();
+        }
+    }
+    else {
+        switch (code) {
+        case primary_ns_allocate:
+            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_);
+            break;
+        case primary_ns_bind_gid:
+            get_data_func = boost::bind(&cd::get_bind_gid_time, &counter_data_);
+            break;
+        case primary_ns_resolve_gid:
+            get_data_func = boost::bind(&cd::get_resolve_gid_time, &counter_data_);
+            break;
+        case primary_ns_resolve_locality:
+            get_data_func = boost::bind(&cd::get_resolve_locality_time, &counter_data_);
+            break;
+        case primary_ns_free:
+            get_data_func = boost::bind(&cd::get_free_time, &counter_data_);
+            break;
+        case primary_ns_unbind_gid:
+            get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_);
+            break;
+        case primary_ns_change_credit_non_blocking:
+            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_time, &counter_data_);
+            break;
+        case primary_ns_change_credit_sync:
+            get_data_func = boost::bind(&cd::get_change_credit_sync_time, &counter_data_);
+            break;
+        case primary_ns_localities:
+            get_data_func = boost::bind(&cd::get_localities_time, &counter_data_);
+            break;
+        default:
+            HPX_THROWS_IF(ec, bad_parameter
+              , "component_namespace::statistics"
+              , "bad action code while querying statistics");
+            return response();
+        }
+    }
+
+    performance_counters::counter_info info;
+    performance_counters::get_counter_type(name, info, ec);
+    if (ec) return response();
+
+    performance_counters::complement_counter_info(info, ec);
+    if (ec) return response();
+
+    using performance_counters::detail::create_raw_counter;
+    naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
+    if (ec) return response();
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(component_ns_statistics_counter, gid);
+}
+
+// access current counter values
+boost::int64_t primary_namespace::counter_data::get_allocate_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return allocate_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_bind_gid_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return bind_gid_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_resolve_gid_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolve_gid_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_resolve_locality_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolve_locality_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_free_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return free_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_unbind_gid_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return unbind_gid_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return change_credit_non_blocking_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_change_credit_sync_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return change_credit_sync_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_localities_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return localities_.time_;
+}
+
+// access execution time counters
+boost::int64_t primary_namespace::counter_data::get_allocate_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return allocate_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_bind_gid_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return bind_gid_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_resolve_gid_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolve_gid_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_resolve_locality_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolve_locality_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_free_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return free_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_unbind_gid_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return unbind_gid_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return change_credit_non_blocking_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_change_credit_sync_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return change_credit_sync_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_localities_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return localities_.time_;
+}
+
+// increment counter values
+void primary_namespace::counter_data::increment_allocate_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++allocate_.count_;
+}
+
+void primary_namespace::counter_data::increment_bind_gid_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++bind_gid_.count_;
+}
+
+void primary_namespace::counter_data::increment_resolve_gid_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++resolve_gid_.count_;
+}
+
+void primary_namespace::counter_data::increment_resolve_locality_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++resolve_locality_.count_;
+}
+
+void primary_namespace::counter_data::increment_free_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++free_.count_;
+}
+
+void primary_namespace::counter_data::increment_unbind_gid_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++unbind_gid_.count_;
+}
+
+void primary_namespace::counter_data::increment_change_credit_non_blocking_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++change_credit_non_blocking_.count_;
+}
+
+void primary_namespace::counter_data::increment_change_credit_sync_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++change_credit_sync_.count_;
+}
+
+void primary_namespace::counter_data::increment_localities_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++localities_.count_;
 }
 
 }}}

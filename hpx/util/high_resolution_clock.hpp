@@ -9,7 +9,7 @@
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
 
-namespace hpx { namespace performance_counters
+namespace hpx { namespace util
 {
     struct high_resolution_clock
     {

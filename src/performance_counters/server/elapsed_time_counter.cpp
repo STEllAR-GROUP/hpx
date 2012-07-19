@@ -6,9 +6,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 
 #include <boost/version.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace performance_counters { namespace server
 {
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
       : base_type_holder(info),
-        started_at_(static_cast<boost::int64_t>(high_resolution_clock::now()))
+        started_at_(static_cast<boost::int64_t>(util::high_resolution_clock::now()))
     {
         if (info.type_ != counter_elapsed_time) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -41,7 +41,7 @@ namespace hpx { namespace performance_counters { namespace server
     void elapsed_time_counter::get_counter_value(counter_value& value)
     {
         // gather the current value
-        boost::int64_t now = static_cast<boost::int64_t>(high_resolution_clock::now());
+        boost::int64_t now = static_cast<boost::int64_t>(util::high_resolution_clock::now());
         value.value_ = now - started_at_;
         value.scaling_ = 1000000000LL;      // coefficient to get seconds
         value.scale_inverse_ = true;

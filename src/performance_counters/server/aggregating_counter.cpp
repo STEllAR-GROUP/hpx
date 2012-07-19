@@ -7,9 +7,9 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/performance_counters/server/aggregating_counter.hpp>
 
@@ -114,7 +114,7 @@ namespace hpx { namespace performance_counters { namespace server
         value = prev_value_;                              // return value
         value.value_ = detail::counter_type_from_statistic<Statistic>::call(value_);
         value.status_ = status_new_data;
-        value.time_ = high_resolution_clock::now();
+        value.time_ = util::high_resolution_clock::now();
 
         prev_value_ = value;
 

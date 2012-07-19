@@ -26,6 +26,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/merging_map.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
 namespace hpx { namespace agas
@@ -36,6 +37,9 @@ HPX_EXPORT naming::id_type bootstrap_primary_namespace_id();
 
 namespace server
 {
+
+// Base name used to register the component
+char const* const primary_namespace_service_name = "/primary_namespace/";
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
 /// resolved addresses.
@@ -119,6 +123,97 @@ struct HPX_EXPORT primary_namespace :
     partition_table_type partitions_;
     refcnt_table_type refcnts_;
     boost::uint32_t prefix_counter_;
+    std::string instance_name_;
+
+    struct update_time_on_exit;
+
+    // data structure holding all counters for the omponent_namespace component
+    struct counter_data :  boost::noncopyable
+    {
+      typedef lcos::local::spinlock mutex_type;
+
+      struct api_counter_data
+      {
+        api_counter_data()
+          : count_(0)
+          , time_(0)
+        {}
+
+        boost::int64_t count_;
+        boost::int64_t time_;
+      };
+
+      counter_data()
+      {}
+
+    public:
+      // access current counter values
+      boost::int64_t get_allocate_count() const;
+      boost::int64_t get_bind_gid_count() const;
+      boost::int64_t get_resolve_gid_count() const;
+      boost::int64_t get_resolve_locality_count() const;
+      boost::int64_t get_free_count() const;
+      boost::int64_t get_unbind_gid_count() const;
+      boost::int64_t get_change_credit_non_blocking_count() const;
+      boost::int64_t get_change_credit_sync_count() const;
+      boost::int64_t get_localities_count() const;
+
+      boost::int64_t get_allocate_time() const;
+      boost::int64_t get_bind_gid_time() const;
+      boost::int64_t get_resolve_gid_time() const;
+      boost::int64_t get_resolve_locality_time() const;
+      boost::int64_t get_free_time() const;
+      boost::int64_t get_unbind_gid_time() const;
+      boost::int64_t get_change_credit_non_blocking_time() const;
+      boost::int64_t get_change_credit_sync_time() const;
+      boost::int64_t get_localities_time() const;
+
+      // increment counter values
+      void increment_allocate_count();
+      void increment_bind_gid_count();
+      void increment_resolve_gid_count();
+      void increment_resolve_locality_count();
+      void increment_free_count();
+      void increment_unbind_gid_count();
+      void increment_change_credit_non_blocking_count();
+      void increment_change_credit_sync_count();
+      void increment_localities_count();
+
+    private:
+      friend struct update_time_on_exit;
+      friend struct primary_namespace;
+
+      mutable mutex_type mtx_;
+      api_counter_data allocate_;           // primary_ns_allocate
+      api_counter_data bind_gid_;           // primary_ns_bind_gid
+      api_counter_data resolve_gid_;        // primary_ns_resolve_gid
+      api_counter_data resolve_locality_;   // primary_ns_resolve_locality
+      api_counter_data free_;               // primary_ns_free
+      api_counter_data unbind_gid_;         // primary_ns_unbind_gid
+      api_counter_data change_credit_non_blocking_;  // primary_ns_change_credit_non_blocking
+      api_counter_data change_credit_sync_; // primary_ns_change_credit_sync
+      api_counter_data localities_;         // primary_ns_localities
+    };
+    counter_data counter_data_;
+
+    struct update_time_on_exit
+    {
+        update_time_on_exit(counter_data& data, boost::int64_t& t)
+          : started_at_(hpx::util::high_resolution_clock::now())
+          , data_(data)
+          , t_(t)
+        {}
+
+        ~update_time_on_exit()
+        {
+            counter_data::mutex_type::scoped_lock l(data_.mtx_);
+            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
+        }
+
+        boost::uint64_t started_at_;
+        primary_namespace::counter_data& data_;
+        boost::int64_t& t_;
+    };
 
   public:
     primary_namespace()
@@ -129,7 +224,9 @@ struct HPX_EXPORT primary_namespace :
       , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
     {}
 
-    bool route(
+    void finalize();
+
+    bool remote_route(
         parcelset::parcel const& p
         )
     {
@@ -141,7 +238,7 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec
         );
 
-    response service(
+    response remote_service(
         request const& req
         )
     {
@@ -154,7 +251,7 @@ struct HPX_EXPORT primary_namespace :
         );
 
     /// Maps \a service over \p reqs in parallel.
-    std::vector<response> bulk_service(
+    std::vector<response> remote_bulk_service(
         std::vector<request> const& reqs
         )
     {
@@ -298,32 +395,9 @@ struct HPX_EXPORT primary_namespace :
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 
-    typedef hpx::actions::result_action1<
-        primary_namespace
-      , /* return type */ response
-      , /* enum value */  namespace_service
-      , /* arguments */   request const&
-      , &primary_namespace::service
-      , threads::thread_priority_critical
-    > service_action;
-
-    typedef hpx::actions::result_action1<
-        primary_namespace
-      , /* return type */ std::vector<response>
-      , /* enum value */  namespace_bulk_service
-      , /* arguments */   std::vector<request> const&
-      , &primary_namespace::bulk_service
-      , threads::thread_priority_critical
-    > bulk_service_action;
-
-    typedef hpx::actions::result_action1<
-        primary_namespace
-      , /* return type */ bool
-      , /* enum value */  namespace_route
-      , /* arguments */   parcelset::parcel const&
-      , &primary_namespace::route
-      , threads::thread_priority_critical
-    > route_action;
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_route, route_action);
 };
 
 }}}

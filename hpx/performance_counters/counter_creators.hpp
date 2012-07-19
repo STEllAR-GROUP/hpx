@@ -61,7 +61,7 @@ namespace hpx { namespace performance_counters
     ///   /agas(<objectinstance>/total)/<instancename>
     ///
     HPX_API_EXPORT naming::gid_type agas_raw_counter_creator(
-        counter_info const&, error_code&, char const* const service_name);
+        counter_info const&, error_code&, char const* const);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
