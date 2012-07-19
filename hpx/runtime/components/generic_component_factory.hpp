@@ -196,7 +196,6 @@ namespace hpx { namespace components
                 get_component_name() + ")");
             return naming::invalid_gid;
         }
-    /**/
 
         /// \brief Destroy one or more component instances
         ///
