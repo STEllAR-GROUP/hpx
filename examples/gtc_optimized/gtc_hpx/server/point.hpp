@@ -37,7 +37,10 @@ namespace gtc { namespace server
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei();
         void partd_allreduce(double *dnitmp,double *densityi,int *mgrid,int *mzetap1);
-        void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
+        //void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
+        void partd_allreduce_receive();
+        void allreduce();
+        void setdata(std::size_t item, std::size_t generation, double data);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -45,14 +48,18 @@ namespace gtc { namespace server
         HPX_DEFINE_COMPONENT_ACTION(point, setup, setup_action);
         HPX_DEFINE_COMPONENT_ACTION(point, chargei, chargei_action);
         HPX_DEFINE_COMPONENT_ACTION(point, partd_allreduce_receive, partd_allreduce_receive_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, allreduce, allreduce_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, setdata, setdata_action);
 
     private:
-        hpx::lcos::local::mutex mtx_;
+        typedef hpx::lcos::local::spinlock mutex_type;
         std::size_t item_;
         std::vector<hpx::naming::id_type> toroidal_comm_,partd_comm_;
         std::size_t left_pe_,right_pe_;
-
         hpx::lcos::local::and_gate gate_; // synchronization gate
+        std::vector<hpx::naming::id_type> components_;
+        std::size_t generation_;
+        mutable mutex_type mtx_;
     };
 }}
 
@@ -68,6 +75,14 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::partd_allreduce_receive_action,
     gtc_point_partd_allreduce_receive_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::allreduce_action,
+    gtc_point_allreduce_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::setdata_action,
+    gtc_point_setdata_action);
 
 #endif
 

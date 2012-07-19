@@ -38,3 +38,11 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::partd_allreduce_receive_action,
     gtc_point_partd_allreduce_receive_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::allreduce_action,
+    gtc_point_allreduce_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::setdata_action,
+    gtc_point_setdata_action);

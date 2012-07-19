@@ -74,6 +74,15 @@ int hpx_main(boost::program_options::variables_map &vm)
           hpx::lcos::wait(setup_phase);
         }
 
+      //  {
+      //    std::vector<hpx::lcos::future<void> > allreduce_phase;
+      //    gtc::server::point::allreduce_action allreduce;
+      //    for (std::size_t i=0;i<num_partitions;i++) {
+      //      allreduce_phase.push_back(hpx::async(allreduce,components[i]));
+      //    }
+      //    hpx::lcos::wait(allreduce_phase);
+      //  }
+
         {
           std::vector<hpx::lcos::future<void> > chargei_phase;
           gtc::server::point::chargei_action chargei;
@@ -82,7 +91,6 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
           hpx::lcos::wait(chargei_phase);
         }
-
 
     } // Ensure things go out of scope before hpx::finalize is called.
 
