@@ -17,7 +17,7 @@
 #include <boost/foreach.hpp>
 
 #include <vector>
-#include <algorithm>
+#include <numeric>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

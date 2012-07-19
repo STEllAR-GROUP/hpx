@@ -4,9 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "stencil_iterator.hpp"
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
+
+#include "stencil_iterator.hpp"
 
 #include <boost/make_shared.hpp>
 
@@ -26,7 +28,7 @@ namespace jacobi
             std::vector<hpx::lcos::future<void> > fs;
             for(std::size_t x = 1; x < nx-1; x += line_block)
             {
-                std::size_t x_end = std::min(nx-1, x + line_block);
+                std::size_t x_end = (std::min)(nx-1, x + line_block);
                 fs.push_back(
                     hpx::async(
                         HPX_STD_BIND(
@@ -55,7 +57,7 @@ namespace jacobi
             row_range s = src.get();
             row_range t = top.get();
             row_range b = bottom.get();
-            
+
             std::vector<double>::iterator dst_ptr = d.begin();
             std::vector<double>::iterator src_ptr = s.begin();
             std::vector<double>::iterator top_ptr = t.begin();
@@ -89,7 +91,7 @@ namespace jacobi
                 ++bottom_ptr;
             }
         }
-            
+
         row_range stencil_iterator::get_range(std::size_t begin, std::size_t end)
         {
             return rows[src].get(begin, end).get();

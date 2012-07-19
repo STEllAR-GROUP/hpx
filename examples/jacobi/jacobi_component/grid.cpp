@@ -4,14 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "grid.hpp"
-#include "row.hpp"
-
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/components/remote_object/object.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/components/remote_object/distributed_new.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
+
+#include "grid.hpp"
+#include "row.hpp"
 
 namespace jacobi
 {

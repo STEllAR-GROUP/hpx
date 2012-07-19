@@ -9,8 +9,8 @@
 
 #include <hpx/include/iostreams.hpp>
 
-#include "grid.hpp"
-#include "solver.hpp"
+#include "jacobi_component/grid.hpp"
+#include "jacobi_component/solver.hpp"
 
 #include <vector>
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 {
     options_description
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-    
+
     desc_commandline.add_options()
         (
             "output"

@@ -28,7 +28,7 @@ namespace jacobi
               , hpx::traits::construct_with_back_ptr
             >
         {
-            typedef 
+            typedef
                 hpx::components::managed_component_base<
                     solver
                   , hpx::components::detail::this_type
@@ -66,7 +66,7 @@ namespace jacobi
                     type = hpx::components::get_component_type<
                         server::stencil_iterator
                     >();
-         
+
                 hpx::components::distributing_factory::result_type si_allocated =
                     factory.create_components(type, ny);
 
@@ -142,7 +142,7 @@ namespace jacobi
                      << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS\n" << hpx::flush;
             }
 
-            HPX_DEFINE_COMPONENT_ACTION(solver, solver::run, run_action);
+            HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action);
 
             std::size_t ny;
             std::size_t nx;

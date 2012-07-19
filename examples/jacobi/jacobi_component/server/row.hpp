@@ -13,7 +13,7 @@
 
 #include <boost/smart_ptr/shared_array.hpp>
 
-namespace jacobi { 
+namespace jacobi {
     namespace server
     {
 
@@ -38,7 +38,7 @@ namespace jacobi {
                 : base_type(back_ptr)
             {}
 
-            void init(std::size_t nx, double value = 0.0);
+            void init(std::size_t nx, double value);
 
             typedef boost::intrusive_ptr<value_holder> values_type;
 
@@ -51,8 +51,8 @@ namespace jacobi {
                 return row_range(values, begin, end);
             }
 
-            HPX_DEFINE_COMPONENT_ACTION(row, row::get, get_action);
-            HPX_DEFINE_COMPONENT_ACTION(row, row::init, init_action);
+            HPX_DEFINE_COMPONENT_ACTION(row, get, get_action);
+            HPX_DEFINE_COMPONENT_ACTION(row, init, init_action);
         };
     }
 }
