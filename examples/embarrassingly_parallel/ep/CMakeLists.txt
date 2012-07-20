@@ -6,6 +6,6 @@
 
 add_hpx_component(ep
   DEPENDENCIES iostreams_component
-  FOLDER "Examples/Embarrassingly_parallel/ep"
+  FOLDER "Examples/Embarrassingly Parallel"
   AUTOGLOB)
 
