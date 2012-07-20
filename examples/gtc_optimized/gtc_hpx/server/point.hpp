@@ -40,7 +40,7 @@ namespace gtc { namespace server
         //void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
         void partd_allreduce_receive();
         void allreduce();
-        void setdata(std::size_t item, std::size_t generation, double data);
+        void set_data(std::size_t item, std::size_t generation, double data);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -49,7 +49,7 @@ namespace gtc { namespace server
         HPX_DEFINE_COMPONENT_ACTION(point, chargei, chargei_action);
         HPX_DEFINE_COMPONENT_ACTION(point, partd_allreduce_receive, partd_allreduce_receive_action);
         HPX_DEFINE_COMPONENT_ACTION(point, allreduce, allreduce_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, setdata, setdata_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -60,6 +60,7 @@ namespace gtc { namespace server
         std::vector<hpx::naming::id_type> components_;
         std::size_t generation_;
         mutable mutex_type mtx_;
+        std::vector<double> n_;
     };
 }}
 
@@ -81,8 +82,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc_point_allreduce_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::setdata_action,
-    gtc_point_setdata_action);
+    gtc::server::point::set_data_action,
+    gtc_point_set_data_action);
 
 #endif
 

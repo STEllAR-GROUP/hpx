@@ -44,5 +44,5 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_allreduce_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtc_point_type::wrapped_type::setdata_action,
-    gtc_point_setdata_action);
+    gtc_point_type::wrapped_type::set_data_action,
+    gtc_point_set_data_action);

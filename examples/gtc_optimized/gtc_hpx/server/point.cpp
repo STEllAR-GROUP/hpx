@@ -23,7 +23,7 @@ extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *);
             void FNAME(partd_allreduce_cmm) (void* pfoo) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = static_cast<gtc::server::point*>(pfoo); 
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo); 
                     ptr_to_class->partd_allreduce();
                     return; };
 }
@@ -37,6 +37,10 @@ namespace gtc { namespace server
       item_ = mype;
       components_ = components;
       generation_ = 0;
+
+      // prepare data array
+      n_.clear();
+      n_.resize(components.size());
 
       // TEST
       int npartdom,ntoroidal;
@@ -100,48 +104,25 @@ namespace gtc { namespace server
     {
 
       std::cout << " HELLO WORLD FROM allreduce" << std::endl;
-//#if 0      
+      
       // synchronize with all operations to finish
       hpx::future<void> f = gate_.get_future();
 
       std::size_t generation = 0;
-      generation = ++generation_;
+      {
+        mutex_type::scoped_lock l(mtx_);
+        generation = ++generation_;
+      }
 
       double value = item_*3.4159;
 
-      setdata_action setdata;
-      hpx::apply(setdata, components_, item_, generation, value);
+      set_data_action set_data_;
+      hpx::apply(set_data_, components_, item_, generation, value);
 
       // possibly do other stuff while the allgather is going on...
       f.get();
-      //gate_.reset();              // reset and-gate
+
       std::cout << " Finish TEST allreduce " << item_ << std::endl;
-//#endif
-      //std::size_t length = *mgrid * (*mzetap1);
-      //send.resize(length);
-      //for (std::size_t ij=0;ij<length;ij++) {
-      //  send[ij] = dnitmp[ij];
-      //}
-
-      //std::vector<hpx::lcos::future<void> > test_phase;
-      //partd_allreduce_receive_action partd_allreduce_receive; 
-      //test_phase.push_back(hpx::async(partd_allreduce_receive,components_[0]));
-      //hpx::lcos::wait(test_phase);
-      //std::cout << " end HELLO WORLD FROM allreduce" << std::endl;
-
-      //partd_allreduce_receive_action partd_allreduce_receive; 
-      //for (std::size_t i=0;i<partd_comm_.size();i++) {
-       // hpx::apply(partd_allreduce_receive_action(),partd_comm_[i],send,i);
-      //  test_phase.push_back(hpx::async(partd_allreduce_receive,partd_comm_[i],send,i));
-     // }
-     // std::cout << " HELLO WORLD " << std::endl;
-     // hpx::lcos::wait(test_phase);
-      // synchronize with all operations to finish
-      //hpx::future<void> f = gate_.get_future();
-
-      // put other work here
-      //f.get();
-      //gate_.reset();  // reset and-gate
     }
 
     void point::allreduce()
@@ -158,8 +139,8 @@ namespace gtc { namespace server
 
       double value = item_*3.4159;
 
-      setdata_action setdata;
-      hpx::apply(setdata, components_, item_, generation, value);
+      set_data_action set_data;
+      hpx::apply(set_data, components_, item_, generation, value);
 
       // possibly do other stuff while the allgather is going on...
       f.get();
@@ -168,14 +149,29 @@ namespace gtc { namespace server
      
     }
 
-    void point::setdata(std::size_t item, std::size_t generation, double data)
+    void point::set_data(std::size_t which, 
+                std::size_t generation, double data)
     {
-      while ( generation > generation_ ) {
-        hpx::this_thread::suspend();
-      }
+       mutex_type::scoped_lock l(mtx_);
 
-      std::cout << " TEST setdata " << item_ << " receiving from " << item << std::endl;
-      gate_.set(item);
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       if (which >= n_.size())
+       {
+         // index out of bounds...
+         HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                      "allgather_and_gate::set_data",
+                      "index is out of range for this allgather operation");
+         return;
+       }
+       n_[which] = data;         // set the received data
+
+       gate_.set(which);         // trigger corresponding and-gate input
     }
 
 //    void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i) 
