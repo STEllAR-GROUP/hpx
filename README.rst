@@ -15,6 +15,8 @@ after the interfaces defined by the C++11 ISO standard and adheres to the
 programming guidelines used by the Boost collection of C++ libraries. 
 
 
+The documentation for HPX can be found `here <http://stellar.cct.lsu.edu/docs/index.html>`_.
+
 ********************
  Build Instructions 
 ********************
