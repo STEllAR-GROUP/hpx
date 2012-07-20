@@ -61,6 +61,7 @@ namespace gtc { namespace server
         std::size_t generation_;
         mutable mutex_type mtx_;
         std::vector<double> n_;
+        std::size_t in_toroidal_,in_particle_;
     };
 }}
 

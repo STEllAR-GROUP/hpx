@@ -37,10 +37,12 @@ namespace gtc { namespace server
       item_ = mype;
       components_ = components;
       generation_ = 0;
+      in_toroidal_ = 0;
+      in_particle_ = 0;
 
       // prepare data array
-      n_.clear();
-      n_.resize(components.size());
+      //n_.clear();
+      //n_.resize(components.size());
 
       // TEST
       int npartdom,ntoroidal;
@@ -68,6 +70,10 @@ namespace gtc { namespace server
       // Figure out the communicators: toroidal_comm and partd_comm
       int my_pdl = mype%npartdom;
       int my_tdl = mype/npartdom;
+
+      if ( my_pdl == (int) mype ) in_particle_ = 1;
+      if ( my_tdl == (int) mype ) in_toroidal_ = 1;
+
       for (std::size_t i=0;i<numberpe;i++) {
         int particle_domain_location= i%npartdom;
         int toroidal_domain_location= i/npartdom;
@@ -102,36 +108,36 @@ namespace gtc { namespace server
 
     void point::partd_allreduce()
     {
+      if ( in_particle_ ) {
+        std::cout << " HELLO WORLD FROM allreduce" << std::endl;
+        // create a new and-gate object
+        gate_.init(partd_comm_.size());
 
-      std::cout << " HELLO WORLD FROM allreduce" << std::endl;
-      // create a new and-gate object
-      gate_.init(components_.size());
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
 
-      // synchronize with all operations to finish
-      hpx::future<void> f = gate_.get_future();
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
 
-      std::size_t generation = 0;
-      {
-        mutex_type::scoped_lock l(mtx_);
-        generation = ++generation_;
+        double value = item_*3.4159;
+
+        set_data_action set_data_;
+        hpx::apply(set_data_, partd_comm_, item_, generation, value);
+
+        // possibly do other stuff while the allgather is going on...
+        f.get();
+        std::cout << " Finish TEST allreduce " << item_ << std::endl;
       }
-
-      double value = item_*3.4159;
-
-      set_data_action set_data_;
-      hpx::apply(set_data_, components_, item_, generation, value);
-
-      // possibly do other stuff while the allgather is going on...
-      f.get();
-
-      std::cout << " Finish TEST allreduce " << item_ << std::endl;
     }
 
     void point::allreduce()
     {
       std::cout << " TEST allreduce " << item_ << std::endl;
       // create a new and-gate object
-      gate_.init(components_.size());
+      gate_.init(partd_comm_.size());
 
       // synchronize with all operations to finish
       hpx::future<void> f = gate_.get_future();
@@ -142,7 +148,7 @@ namespace gtc { namespace server
       double value = item_*3.4159;
 
       set_data_action set_data;
-      hpx::apply(set_data, components_, item_, generation, value);
+      hpx::apply(set_data, partd_comm_, item_, generation, value);
 
       // possibly do other stuff while the allgather is going on...
       f.get();
@@ -163,15 +169,15 @@ namespace gtc { namespace server
          hpx::this_thread::suspend();
        }
 
-       if (which >= n_.size())
-       {
-         // index out of bounds...
-         HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                      "allgather_and_gate::set_data",
-                      "index is out of range for this allgather operation");
-         return;
-       }
-       n_[which] = data;         // set the received data
+       //if (which >= n_.size())
+       //{
+       //  // index out of bounds...
+       //  HPX_THROW_EXCEPTION(hpx::bad_parameter,
+       //               "allgather_and_gate::set_data",
+       //               "index is out of range for this allgather operation");
+       //  return;
+       //}
+       //n_[which] = data;         // set the received data
 
        gate_.set(which);         // trigger corresponding and-gate input
     }
