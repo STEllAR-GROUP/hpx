@@ -15,10 +15,12 @@ namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template<typename Heap>
-    class wrapper_heap_list : public util::one_size_heap_list<Heap>
+    template <typename Heap, typename SharedMutex =
+        lcos::local::detail::shared_mutex<lcos::local::spinlock> >
+    class wrapper_heap_list 
+      : public util::one_size_heap_list<Heap, SharedMutex>
     {
-        typedef util::one_size_heap_list<Heap> base_type;
+        typedef util::one_size_heap_list<Heap, SharedMutex> base_type;
 
     public:
         wrapper_heap_list(component_type type)

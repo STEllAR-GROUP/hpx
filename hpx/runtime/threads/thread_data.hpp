@@ -17,6 +17,7 @@
 #include <boost/coroutine/coroutine.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -801,7 +802,8 @@ namespace hpx { namespace threads
     struct thread_pool
     {
         typedef components::detail::wrapper_heap_list<
-            components::detail::fixed_wrapper_heap<threads::thread_data> >
+            components::detail::fixed_wrapper_heap<threads::thread_data>,
+            boost::shared_mutex>
         heap_type;
         typedef boost::lockfree::caching_freelist<threads::detail::thread_data>
             detail_heap_type;
