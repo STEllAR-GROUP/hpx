@@ -17,13 +17,13 @@
 #include <iostream>
 #include <fstream>
 
-extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *); 
-            void FNAME(load)(); 
-            void FNAME(chargei)(void* opaque_ptr_to_class); 
+extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *);
+            void FNAME(load)();
+            void FNAME(chargei)(void* opaque_ptr_to_class);
             void FNAME(partd_allreduce_cmm) (void* pfoo) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo); 
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->partd_allreduce();
                     return; };
 }
@@ -72,30 +72,30 @@ namespace gtc { namespace server
         int particle_domain_location= i%npartdom;
         int toroidal_domain_location= i/npartdom;
         if ( toroidal_domain_location == my_tdl ) {
-          partd_comm_.push_back( components[i] );  
-        } 
+          partd_comm_.push_back( components[i] );
+        }
         if ( particle_domain_location == my_pdl ) {
           // record the left gid
-          if ( particle_domain_location == hpx_left_pe ) left_pe_ = toroidal_comm_.size(); 
-          
-          // record the right gid
-          if ( particle_domain_location == hpx_right_pe ) right_pe_ = toroidal_comm_.size(); 
+          if ( particle_domain_location == hpx_left_pe ) left_pe_ = toroidal_comm_.size();
 
-          toroidal_comm_.push_back( components[i] );  
+          // record the right gid
+          if ( particle_domain_location == hpx_right_pe ) right_pe_ = toroidal_comm_.size();
+
+          toroidal_comm_.push_back( components[i] );
         }
       }
 
       if ( partd_comm_.size() != (std::size_t) npartdom ) {
-        std::cerr << " PROBLEM: partd_comm " << partd_comm_.size() 
+        std::cerr << " PROBLEM: partd_comm " << partd_comm_.size()
                      << " != npartdom " << npartdom << std::endl;
       }
       if ( toroidal_comm_.size() != (std::size_t) ntoroidal ) {
-        std::cerr << " PROBLEM: toroidal_comm " << toroidal_comm_.size() 
+        std::cerr << " PROBLEM: toroidal_comm " << toroidal_comm_.size()
                      << " != ntoroidal " << ntoroidal << std::endl;
       }
     }
 
-    void point::chargei()
+    void point::chargei_wrapper()
     {
       FNAME(chargei)(static_cast<void*>(this));
     }
@@ -104,7 +104,9 @@ namespace gtc { namespace server
     {
 
       std::cout << " HELLO WORLD FROM allreduce" << std::endl;
-      
+      // create a new and-gate object
+      gate_.init(components_.size());
+
       // synchronize with all operations to finish
       hpx::future<void> f = gate_.get_future();
 
@@ -130,7 +132,7 @@ namespace gtc { namespace server
       std::cout << " TEST allreduce " << item_ << std::endl;
       // create a new and-gate object
       gate_.init(components_.size());
-      
+
       // synchronize with all operations to finish
       hpx::future<void> f = gate_.get_future();
 
@@ -146,10 +148,10 @@ namespace gtc { namespace server
       f.get();
       //gate_.reset();              // reset and-gate
       std::cout << " Finish TEST allreduce " << item_ << std::endl;
-     
+
     }
 
-    void point::set_data(std::size_t which, 
+    void point::set_data(std::size_t which,
                 std::size_t generation, double data)
     {
        mutex_type::scoped_lock l(mtx_);
@@ -174,8 +176,8 @@ namespace gtc { namespace server
        gate_.set(which);         // trigger corresponding and-gate input
     }
 
-//    void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i) 
-    void point::partd_allreduce_receive() 
+//    void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i)
+    void point::partd_allreduce_receive()
     {
       std::cout << " HELLO WORLD IN receive " << std::endl;
    //   std::cout << " RECEIVED FROM " << i << std::endl;

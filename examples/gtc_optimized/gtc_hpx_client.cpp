@@ -14,7 +14,7 @@
 #include "gtc_hpx/server/point.hpp"
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-extern "C" {void FNAME(gtc)(); }
+extern "C" {void FNAME(gtc_wrapper)(); }
 
 bool fexists(std::string const filename)
 {
@@ -51,14 +51,14 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Get the component type for our point component.
         hpx::components::component_type block_type =
         hpx::components::get_component_type<gtc::server::point>();
-        
+
         hpx::components::distributing_factory factory;
         factory.create(hpx::find_here());
-        
+
         std::size_t num_partitions = 10;
         hpx::components::distributing_factory::result_type blocks =
                                   factory.create_components(block_type, num_partitions);
-        
+
         // This vector will hold client classes referring to all of the
         // components we just created.
         std::vector<hpx::naming::id_type> components;

@@ -35,7 +35,7 @@ namespace gtc { namespace server
 
         void setup(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
-        void chargei();
+        void chargei_wrapper();
         void partd_allreduce();
         //void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
         void partd_allreduce_receive();
@@ -46,7 +46,7 @@ namespace gtc { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(point, setup, setup_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, chargei, chargei_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, chargei_wrapper, chargei_action);
         HPX_DEFINE_COMPONENT_ACTION(point, partd_allreduce_receive, partd_allreduce_receive_action);
         HPX_DEFINE_COMPONENT_ACTION(point, allreduce, allreduce_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
