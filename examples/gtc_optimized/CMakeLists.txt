@@ -5,27 +5,27 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 
-set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
+if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_LIBRARY)
+  set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
 
-add_subdirectory(gtc_hpx)
+  add_subdirectory(gtc_hpx)
 
-# for all targets specified above
-set(sources
+  # for all targets specified above
+  set(sources
     gtc_hpx_client.cpp
     )
 
-source_group("Source Files" FILES ${sources})
+  source_group("Source Files" FILES ${sources})
 
-set(dependencies
+  set(dependencies
     ${HDF5_FORTRAN_LIBRARY}
     distributing_factory_component)
 
   # add example executable
-if (CMAKE_Fortran_COMPILER)
   add_hpx_executable(gtc_hpx_client
     SOURCES ${sources}
     DEPENDENCIES gtc_hpx_component ${dependencies}
-    FOLDER "Examples/GTC Optimized")
+    FOLDER "Examples/Applications/GTC Optimized")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.gtc_optimized.gtc_hpx)
