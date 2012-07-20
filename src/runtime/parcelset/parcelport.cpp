@@ -192,7 +192,7 @@ namespace hpx { namespace parcelset
             pending_parcels_[locality_id].second.push_back(f);
         }
 
-        // Get a connection or reserve space for a new connection. 
+        // Get a connection or reserve space for a new connection.
         if (!connection_cache_.get_or_reserve(locality_id, client_connection))
             return;
 
@@ -244,9 +244,9 @@ namespace hpx { namespace parcelset
             }
 #if defined(HPX_DEBUG)
             else {
-                std::string connection_addr = 
+                std::string connection_addr =
                     client_connection->socket().remote_endpoint().address().to_string();
-                boost::uint16_t connection_port = 
+                boost::uint16_t connection_port =
                     client_connection->socket().remote_endpoint().port();
                 BOOST_ASSERT(locality_id.get_address() == connection_addr);
                 BOOST_ASSERT(locality_id.get_port() == connection_port);
@@ -269,14 +269,16 @@ namespace hpx { namespace parcelset
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
 
-        util::spinlock::scoped_lock l(mtx_);
-        iterator it = pending_parcels_.find(locality_id);
-
-        if (it != pending_parcels_.end())
         {
-            BOOST_ASSERT(it->first == locality_id);
-            std::swap(parcels, it->second.first);
-            std::swap(handlers, it->second.second);
+            util::spinlock::scoped_lock l(mtx_);
+            iterator it = pending_parcels_.find(locality_id);
+
+            if (it != pending_parcels_.end())
+            {
+                BOOST_ASSERT(it->first == locality_id);
+                std::swap(parcels, it->second.first);
+                std::swap(handlers, it->second.second);
+            }
         }
 
         // If the parcels didn't get sent by another connection ...
@@ -306,7 +308,7 @@ namespace hpx { namespace parcelset
         std::vector<write_handler_type> handlers;
 
         typedef pending_parcels_map::iterator iterator;
-        
+
         util::spinlock::scoped_lock l(mtx_);
         iterator it = pending_parcels_.find(locality_id);
 
