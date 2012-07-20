@@ -42,8 +42,8 @@ namespace hpx { namespace components { namespace detail
 
         void set_range(
             naming::gid_type const& lower
-          , naming::gid_type const& upper
-        ) {
+          , naming::gid_type const& upper)
+        {
             typename base_type::shared_lock_type guard(this->mtx_);
             id_range_.set_range(lower, upper);
         }
