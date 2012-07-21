@@ -312,9 +312,9 @@ the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
 
 [*hello_world.ini]
 ``
-	[hpx.components.hello_world]
-	name = hello_world
-	path = ${HOME}/my_hpx_libs
+    [hpx.components.hello_world]
+    name = hello_world
+    path = ${HOME}/my_hpx_libs
 ``
 
 [note For additional details about ini file configuration and __hpx__, see [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
@@ -323,8 +323,8 @@ In addition, you'll need this in your home directory:
 
 [*.hpx.ini]
 ``
-	[hpx]
-	ini_path = $[hpx.ini_default_path]:${HOME}/my_hpx_libs
+    [hpx]
+    ini_path = $[hpx.ini_default_path]:${HOME}/my_hpx_libs
 ``
 
 Now, to build the application that uses this component (hello_world_client.cpp),
@@ -343,7 +343,7 @@ Finally, you'll need to set your LD_LIBRARY_PATH before you can run the program.
 To run the program, type:
 
 ``
-	$ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
+    $ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
     $ ./hello_world_client
 ``
 
@@ -490,6 +490,23 @@ node; the __hpx__ library will derive this parameter automatically from PBS.
 Finally, __pbsdsh__ is a PBS command that starts tasks to the resources allocated
 to the current job. It is recommended to leave this line as shown and modify
 only the PBS options and shell variables as needed for a specific application.
+
+[important A script invoked by __pbsdsh__ starts in a very basic environment:
+           the user's `$HOME` directory is defined and is the current directory,
+           the LANG variable is set to C, and the `PATH` is set to the basic
+           `/usr/local/bin:/usr/bin:/bin` as defined in a system-wide file
+           pbs_environment. Nothing that would normally be set up by a system
+           shell profile or user shell profile is defined, unlike the
+           environment for the main job script.]
+
+Another choice is for the __pbsdsh__ command in your main job script to invoke
+your program via a shell, like `sh` or `bash`, with or without the `"-l"`
+login-shell option, so that it gives an initialized environment for each
+instance. For example:
+
+``
+    pbsdsh -u bash -l -c '$APP_PATH --hpx:nodes=`cat $PBS_NODEFILE` $APP_OPTIONS'
+``
 
 All that remains now is submitting the job to the queuing system. Assuming that
 the contents of the PBS script were saved in file [^pbs_hello_world.sh] in the
