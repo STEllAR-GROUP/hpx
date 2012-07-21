@@ -111,31 +111,30 @@ namespace hpx { namespace util
                 shared_lock_type guard(mtx_);
 
                 size = heap_list_.size();
-
-                for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
+                if (size)
                 {
-                    if ((*it)->alloc(&p, count))
+                    for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
                     {
-                        // Allocation succeeded, update statistics.
-                        alloc_count_ += count;
+                        if ((*it)->alloc(&p, count))
+                        {
+                            // Allocation succeeded, update statistics.
+                            alloc_count_ += count;
 
-                        if (alloc_count_ - free_count_ > max_alloc_count_)
-                            max_alloc_count_ = alloc_count_- free_count_;
+                            if (alloc_count_ - free_count_ > max_alloc_count_)
+                                max_alloc_count_ = alloc_count_- free_count_;
 
-                        return p;
-                    }
+                            return p;
+                        }
 
-                    else
-                    {
                         LOSH_(info)
                             << (boost::format(
-                               "%1%::alloc: failed to allocate from heap[%2%] "
-                               "(heap[%2%] has allocated %3% objects and has "
-                               "space for %4% more objects)")
-                               % name()
-                               % (*it)->heap_count_
-                               % (*it)->size()
-                               % (*it)->free_size());
+                                "%1%::alloc: failed to allocate from heap[%2%] "
+                                "(heap[%2%] has allocated %3% objects and has "
+                                "space for %4% more objects)")
+                                % name()
+                                % (*it)->heap_count_
+                                % (*it)->size()
+                                % (*it)->free_size());
                     }
                 }
             }
@@ -146,47 +145,42 @@ namespace hpx { namespace util
                 // Acquire exclusive access.
                 unique_lock_type ul(mtx_);
 
-                if (size == heap_list_.size())
+                iterator itnew = heap_list_.insert(heap_list_.begin(),
+                    typename list_type::value_type(new heap_type
+                        (class_name_.c_str(), heap_count_ + 1, heap_step)));
+
+                if (HPX_UNLIKELY(itnew == heap_list_.end()))
+                    HPX_THROW_EXCEPTION(out_of_memory,
+                        name() + "::alloc",
+                        "new heap could not be added");
+
+                bool result = (*itnew)->alloc(&p, count);
+
+                if (HPX_UNLIKELY(!result || NULL == p))
                 {
-                    iterator itnew = heap_list_.insert(heap_list_.begin(),
-                        typename list_type::value_type(new heap_type
-                            (class_name_.c_str(), heap_count_ + 1, heap_step)));
-
-                    if (HPX_UNLIKELY(itnew == heap_list_.end()))
-                        HPX_THROW_EXCEPTION(out_of_memory,
-                            name() + "::alloc",
-                            "new heap could not be added");
-
-                    bool result = (*itnew)->alloc(&p, count);
-
-                    // REVIEW: What does "snh" mean? That was the only comment
-                    // explaining this branch.
-                    if (HPX_UNLIKELY(!result || NULL == p))
-                    {
-                        HPX_THROW_EXCEPTION(out_of_memory,
-                            name() + "::alloc",
-                            boost::str(boost::format(
-                                "new heap failed to allocate %1% objects")
-                                % count));
-                    }
-
-                    ++heap_count_;
-                    LOSH_(info)
-                        << (boost::format(
-                           "%1%::alloc: creating new heap[%2%], size is now %3%")
-                           % name()
-                           % heap_count_
-                           % heap_list_.size());
-                    did_create = true;
+                    // out of memory
+                    HPX_THROW_EXCEPTION(out_of_memory,
+                        name() + "::alloc",
+                        boost::str(boost::format(
+                            "new heap failed to allocate %1% objects")
+                            % count));
                 }
+
+                ++heap_count_;
+                LOSH_(info)
+                    << (boost::format(
+                        "%1%::alloc: creating new heap[%2%], size is now %3%")
+                        % name()
+                        % heap_count_
+                        % heap_list_.size());
+                did_create = true;
             }
 
             if (did_create)
                 return p;
 
             // Try again, we just got a new heap, so we should be good.
-            else
-                return alloc(count);
+            return alloc(count);
         }
 
         heap_type* alloc_heap()

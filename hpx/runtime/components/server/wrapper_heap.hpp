@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////////
-    template<typename T, typename Allocator>
+    template<typename T, typename Allocator, typename Mutex = hpx::lcos::local::spinlock>
     class wrapper_heap : private boost::noncopyable
     {
     public:
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
-        typedef hpx::lcos::local::mutex mutex_type;
+        typedef Mutex mutex_type;
 
         typedef typename mutex_type::scoped_lock scoped_lock;
 
@@ -362,13 +362,13 @@ namespace hpx { namespace components { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // heap using malloc and friends
-    template<typename T>
+    template <typename T, typename Mutex = hpx::lcos::local::spinlock>
     class fixed_wrapper_heap :
-        public wrapper_heap<T, one_size_heap_allocators::fixed_mallocator>
+        public wrapper_heap<T, one_size_heap_allocators::fixed_mallocator, Mutex>
     {
     private:
         typedef
-            wrapper_heap<T, one_size_heap_allocators::fixed_mallocator>
+            wrapper_heap<T, one_size_heap_allocators::fixed_mallocator, Mutex>
         base_type;
 
     public:
