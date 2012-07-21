@@ -12,11 +12,15 @@ namespace hpx { namespace util
 {
     struct register_lock_data {};
 
-#if defined(HPX_DEBUG)
+    // Always provide function exports, which guarantees ABI compatibility of
+    // Debug and Release builds.
+
+#if defined(HPX_VERIFY_LOCKS) || defined(HPX_EXPORTS)
     HPX_API_EXPORT bool register_lock(void const* lock,
         register_lock_data* data = 0);
     HPX_API_EXPORT bool unregister_lock(void const* lock);
     HPX_API_EXPORT void verify_no_locks();
+    HPX_API_EXPORT void force_error_on_lock();
 #else
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
@@ -27,6 +31,9 @@ namespace hpx { namespace util
         return true;
     }
     inline void verify_no_locks()
+    {
+    }
+    inline void force_error_on_lock()
     {
     }
 #endif

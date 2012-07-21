@@ -300,6 +300,15 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Enable lock verification code which allows to check whether there are locks
+// held while HPX-threads are suspended and/or interrupted.
+#if !defined(HPX_VERIFY_LOCKS)
+#  if defined(HPX_DEBUG)
+#    define HPX_VERIFY_LOCKS 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DEFAULT_STACK_SIZE)
 #  if defined(BOOST_WINDOWS)
 #    define HPX_DEFAULT_STACK_SIZE 0x4000

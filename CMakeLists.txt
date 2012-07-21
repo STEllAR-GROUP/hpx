@@ -311,6 +311,19 @@ if(HPX_CXX11)
 endif()
 
 ################################################################################
+# Additional debug support
+################################################################################
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: ON)" ON)
+else()
+  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: OFF)" OFF)
+endif()
+
+if(HPX_VERIFY_LOCKS)
+  add_definitions(-DHPX_VERIFY_LOCKS)
+endif()
+
+################################################################################
 # SDF output
 ################################################################################
 find_package(HPX_RNPL)
@@ -620,7 +633,7 @@ if(MSVC)
     if(HPX_CXX11_AUTO)
       add_definitions(-DHPX_HAVE_CXX11_AUTO)
     endif()
-    
+
     hpx_option(HPX_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
     if(HPX_CXX11_DECLTYPE)
       add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)

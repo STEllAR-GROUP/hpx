@@ -76,8 +76,10 @@ namespace hpx
         }
         catch (hpx::exception const& e) {
             if (e.get_error() != hpx::thread_interrupted) {
-                // verify that there are no more registered locks for this OS-thread
-                util::verify_no_locks();
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
 
                 // run all callbacks attached to the exit event for this thread
                 run_thread_exit_callbacks();
@@ -86,8 +88,10 @@ namespace hpx
             }
         }
 
-        // verify that there are no more registered locks for this OS-thread
-        util::verify_no_locks();
+        // Verify that there are no more registered locks for this
+        // OS-thread. This will throw if there are still any locks
+        // held.
+        util::force_error_on_lock();
 
         // run all callbacks attached to the exit event for this thread
         run_thread_exit_callbacks();
@@ -287,6 +291,12 @@ namespace hpx
         {
             if (interruption_enabled() && interruption_requested())
             {
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+
+                // now interrupt this thread
                 HPX_THROW_EXCEPTION(thread_interrupted,
                     "hpx::thread::interruption_point",
                     "hpx::this_thread::interruption_point: "

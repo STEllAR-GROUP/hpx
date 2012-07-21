@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -19,7 +20,7 @@ namespace hpx { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-#if defined(HPX_DEBUG)
+#if defined(HPX_VERIFY_LOCKS)
     struct register_locks
     {
         typedef boost::ptr_map<void const*, util::register_lock_data>
@@ -109,6 +110,41 @@ namespace hpx { namespace util
                 }
             }
         }
+    }
+
+    void force_error_on_lock()
+    {
+        if (0 != threads::get_self_ptr())
+        {
+            register_locks::held_locks_map const& held_locks =
+                register_locks::get_lock_map();
+
+            // we throw an error if there are still registered locks for
+            // this OS-thread
+            if (!held_locks.empty()) {
+                HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
+                    "At least one lock is held while thread is being suspended "
+                    "or interrupted.");
+            }
+        }
+    }
+#else
+    bool register_lock(void const*, util::register_lock_data*)
+    {
+        return true;
+    }
+
+    bool unregister_lock(void const*)
+    {
+        return true;
+    }
+
+    void verify_no_locks()
+    {
+    }
+
+    void force_error_on_lock()
+    {
     }
 #endif
 }}
