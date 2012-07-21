@@ -112,8 +112,10 @@ namespace hpx { namespace actions
                 }
             }
 
-            // verify that there are no more registered locks for this OS-thread
-            util::verify_no_locks();
+            // Verify that there are no more registered locks for this
+            // OS-thread. This will throw if there are still any locks
+            // held.
+            util::force_error_on_lock();
             return threads::terminated;
         }
 
@@ -251,8 +253,10 @@ namespace hpx { namespace actions
                 }
             }
 
-            // verify that there are no more registered locks for this OS-thread
-            util::verify_no_locks();
+            // Verify that there are no more registered locks for this
+            // OS-thread. This will throw if there are still any locks
+            // held.
+            util::force_error_on_lock();
             return threads::terminated;
         }
 
