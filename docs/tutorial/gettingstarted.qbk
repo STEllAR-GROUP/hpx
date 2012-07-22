@@ -493,20 +493,39 @@ only the PBS options and shell variables as needed for a specific application.
 
 [important A script invoked by __pbsdsh__ starts in a very basic environment:
            the user's `$HOME` directory is defined and is the current directory,
-           the LANG variable is set to C, and the `PATH` is set to the basic
+           the `LANG` variable is set to `C`, and the `PATH` is set to the basic
            `/usr/local/bin:/usr/bin:/bin` as defined in a system-wide file
            pbs_environment. Nothing that would normally be set up by a system
            shell profile or user shell profile is defined, unlike the
            environment for the main job script.]
 
 Another choice is for the __pbsdsh__ command in your main job script to invoke
-your program via a shell, like `sh` or `bash`, with or without the `"-l"`
-login-shell option, so that it gives an initialized environment for each
-instance. For example:
+your program via a shell, like `sh` or `bash`, so that it gives an initialized
+environment for each instance. We create a small script `runme.sh` which is
+used to invoke the program:
 
 ``
-    pbsdsh -u bash -l -c '$APP_PATH --hpx:nodes=`cat $PBS_NODEFILE` $APP_OPTIONS'
+    #!/bin/bash
+    # Small script which invokes the program based on what was passed on its
+    # command line.
+    #
+    # This script is executed by the bash shell which will initialize all
+    # environment variables as usual.
+    $@
 ``
+
+Now, we invoke this script using the __pbsdsh__ tool:
+
+```
+    #!/bin/bash
+    #
+    #PBS -l nodes=2:ppn=4
+
+    APP_PATH=~/packages/hpx/bin/hello_world
+    APP_OPTIONS=
+
+    __pbsdsh__ -u runme.sh $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+```
 
 All that remains now is submitting the job to the queuing system. Assuming that
 the contents of the PBS script were saved in file [^pbs_hello_world.sh] in the
