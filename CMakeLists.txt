@@ -304,7 +304,7 @@ endif()
 ################################################################################
 # C++11 configuration
 ################################################################################
-hpx_option(HPX_CXX11 BOOL "Use C++11 support, if available (default: ON)" ON)
+hpx_option(HPX_CXX11 BOOL "Use C++11 support, if available (default: ON)" ON ADVANCED)
 
 if(HPX_CXX11)
   add_definitions(-DHPX_HAVE_CXX11)
@@ -314,9 +314,9 @@ endif()
 # Additional debug support
 ################################################################################
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: ON)" ON)
+  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: ON)" ON ADVANCED)
 else()
-  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: OFF)" OFF)
+  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: OFF)" OFF ADVANCED)
 endif()
 
 if(HPX_VERIFY_LOCKS)
