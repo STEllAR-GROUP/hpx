@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,13 +68,13 @@ response component_namespace::service(
                 counter_data_.increment_resolve_id_count();
                 return resolve_id(req, ec);
             }
-        case component_ns_unbind:
+        case component_ns_unbind_name:
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.unbind_.time_
+                  , counter_data_.unbind_name_.time_
                 );
-                counter_data_.increment_unbind_count();
+                counter_data_.increment_unbind_name_ount();
                 return unbind(req, ec);
             }
         case component_ns_iterate_types:
@@ -420,7 +421,7 @@ response component_namespace::unbind(
         if (&ec != &throws)
             ec = make_success_code();
 
-       return response(component_ns_unbind, no_success);
+       return response(component_ns_unbind_name, no_success);
     }
 
     // REVIEW: If there are no localities with this type, should we throw
@@ -435,7 +436,7 @@ response component_namespace::unbind(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(component_ns_unbind);
+    return response(component_ns_unbind_name);
 } // }}}
 
 // TODO: catch exceptions
@@ -521,8 +522,8 @@ response component_namespace::statistics_counter(
         case component_ns_resolve_id:
             get_data_func = boost::bind(&cd::get_resolve_id_count, &counter_data_);
             break;
-        case component_ns_unbind:
-            get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_);
+        case component_ns_unbind_name:
+            get_data_func = boost::bind(&cd::get_unbind_name_count, &counter_data_);
             break;
         case component_ns_iterate_types:
             get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_);
@@ -545,8 +546,8 @@ response component_namespace::statistics_counter(
         case component_ns_resolve_id:
             get_data_func = boost::bind(&cd::get_resolve_id_time, &counter_data_);
             break;
-        case component_ns_unbind:
-            get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_);
+        case component_ns_unbind_name:
+            get_data_func = boost::bind(&cd::get_unbind_name_time, &counter_data_);
             break;
         case component_ns_iterate_types:
             get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_);
@@ -595,10 +596,10 @@ boost::int64_t component_namespace::counter_data::get_resolve_id_count() const
     return resolve_id_.count_;
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_count() const
+boost::int64_t component_namespace::counter_data::get_unbind_name_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_.count_;
+    return unbind_name_.count_;
 }
 
 boost::int64_t component_namespace::counter_data::get_iterate_types_count() const
@@ -626,10 +627,10 @@ boost::int64_t component_namespace::counter_data::get_resolve_id_time() const
     return resolve_id_.time_;
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_time() const
+boost::int64_t component_namespace::counter_data::get_unbind_name_time() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_.time_;
+    return unbind_name_.time_;
 }
 
 boost::int64_t component_namespace::counter_data::get_iterate_types_time() const
@@ -657,10 +658,10 @@ void component_namespace::counter_data::increment_resolve_id_count()
     ++resolve_id_.count_;
 }
 
-void component_namespace::counter_data::increment_unbind_count()
+void component_namespace::counter_data::increment_unbind_name_ount()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++unbind_.count_;
+    ++unbind_name_.count_;
 }
 
 void component_namespace::counter_data::increment_iterate_types_count()
@@ -668,7 +669,6 @@ void component_namespace::counter_data::increment_iterate_types_count()
     mutex_type::scoped_lock l(mtx_);
     ++iterate_types_.count_;
 }
-
 
 }}}
 

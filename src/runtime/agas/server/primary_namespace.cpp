@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -120,7 +121,7 @@ response primary_namespace::service(
         case component_ns_bind_prefix:
         case component_ns_bind_name:
         case component_ns_resolve_id:
-        case component_ns_unbind:
+        case component_ns_unbind_name:
         case component_ns_iterate_types:
         {
             LAGAS_(warning) <<

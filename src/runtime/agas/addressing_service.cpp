@@ -1515,6 +1515,15 @@ namespace detail
                 return primary_namespace_services[i].code_;
         }
 
+        // symbol_ns
+        for (std::size_t i = 0;
+             i < num_symbol_namespace_services;
+             ++i)
+        {
+            if (p.countername_ == symbol_namespace_services[i].name_)
+                return symbol_namespace_services[i].code_;
+        }
+
         HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
             "unknown performance counter (unrelated to AGAS)");
         return invalid_request;
@@ -1537,6 +1546,7 @@ namespace detail
             return invalid_request;
         }
 
+        // component_ns
         for (std::size_t i = 0;
              i < num_component_namespace_services;
              ++i)
@@ -1545,12 +1555,22 @@ namespace detail
                 return component_namespace_services[i].service_code_;
         }
 
+        // primary_ns
         for (std::size_t i = 0;
              i < num_primary_namespace_services;
              ++i)
         {
             if (p.countername_ == primary_namespace_services[i].name_)
                 return primary_namespace_services[i].service_code_;
+        }
+
+        // symbol_ns
+        for (std::size_t i = 0;
+             i < num_symbol_namespace_services;
+             ++i)
+        {
+            if (p.countername_ == symbol_namespace_services[i].name_)
+                return symbol_namespace_services[i].service_code_;
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",

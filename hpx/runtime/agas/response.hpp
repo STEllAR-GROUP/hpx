@@ -344,7 +344,7 @@ struct response
         // 0x7
         // primary_ns_free
         // primary_ns_bind_gid
-        // component_ns_unbind
+        // component_ns_unbind_name
         // component_ns_iterate_types
         // symbol_ns_bind
         // symbol_ns_iterate_names

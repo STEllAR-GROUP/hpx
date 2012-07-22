@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,11 +8,6 @@
 
 #if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
-
-#include <map>
-
-#include <boost/format.hpp>
-#include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/request.hpp>
@@ -25,6 +21,10 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
+#include <map>
+
+#include <boost/format.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -33,6 +33,9 @@ HPX_EXPORT naming::id_type bootstrap_symbol_namespace_id();
 
 namespace server
 {
+
+// Base name used to register the component
+char const* const symbol_namespace_service_name = "/symbol_namespace/";
 
 struct HPX_EXPORT symbol_namespace :
     components::fixed_component_base<
@@ -55,6 +58,76 @@ struct HPX_EXPORT symbol_namespace :
     mutex_type mutex_;
     gid_table_type gids_;
     std::string instance_name_;
+
+    struct update_time_on_exit;
+
+    // data structure holding all counters for the omponent_namespace component
+    struct counter_data :  boost::noncopyable
+    {
+      typedef lcos::local::spinlock mutex_type;
+
+      struct api_counter_data
+      {
+        api_counter_data()
+          : count_(0)
+          , time_(0)
+        {}
+
+        boost::int64_t count_;
+        boost::int64_t time_;
+      };
+
+      counter_data()
+      {}
+
+    public:
+      // access current counter values
+      boost::int64_t get_bind_count() const;
+      boost::int64_t get_resolve_count() const;
+      boost::int64_t get_unbind_count() const;
+      boost::int64_t get_iterate_names_count() const;
+
+      boost::int64_t get_bind_time() const;
+      boost::int64_t get_resolve_time() const;
+      boost::int64_t get_unbind_time() const;
+      boost::int64_t get_iterate_names_time() const;
+
+      // increment counter values
+      void increment_bind_count();
+      void increment_resolve_count();
+      void increment_unbind_count();
+      void increment_iterate_names_count();
+
+    private:
+      friend struct update_time_on_exit;
+      friend struct symbol_namespace;
+
+      mutable mutex_type mtx_;
+      api_counter_data bind_;               // symbol_ns_bind
+      api_counter_data resolve_;            // symbol_ns_resolve
+      api_counter_data unbind_;             // symbol_ns_unbind
+      api_counter_data iterate_names_;      // symbol_ns_iterate_names
+    };
+    counter_data counter_data_;
+
+    struct update_time_on_exit
+    {
+        update_time_on_exit(counter_data& data, boost::int64_t& t)
+          : started_at_(hpx::util::high_resolution_clock::now())
+          , data_(data)
+          , t_(t)
+        {}
+
+        ~update_time_on_exit()
+        {
+            counter_data::mutex_type::scoped_lock l(data_.mtx_);
+            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
+        }
+
+        boost::uint64_t started_at_;
+        symbol_namespace::counter_data& data_;
+        boost::int64_t& t_;
+    };
 
   public:
     symbol_namespace()

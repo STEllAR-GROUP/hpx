@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,12 +8,6 @@
 
 #if !defined(HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21)
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
-
-#include <boost/format.hpp>
-#include <boost/preprocessor/stringize.hpp>
-
-#include <boost/fusion/include/vector.hpp>
-#include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
@@ -28,6 +23,11 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+
+#include <map>
+
+#include <boost/format.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace hpx { namespace agas
 {

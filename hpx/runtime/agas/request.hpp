@@ -459,7 +459,7 @@ struct request
         >
         // 0x9
         // component_ns_bind_name
-        // component_ns_unbind
+        // component_ns_unbind_name
         // symbol_ns_resolve
         // symbol_ns_unbind
         // component_ns_statistics

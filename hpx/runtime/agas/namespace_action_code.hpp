@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,7 +35,7 @@ enum namespace_action_code
     component_ns_bind_prefix                = BOOST_BINARY_U(0100010),
     component_ns_bind_name                  = BOOST_BINARY_U(0100011),
     component_ns_resolve_id                 = BOOST_BINARY_U(0100100),
-    component_ns_unbind                     = BOOST_BINARY_U(0100101),
+    component_ns_unbind_name                = BOOST_BINARY_U(0100101),
     component_ns_iterate_types              = BOOST_BINARY_U(0100110),
     component_ns_statistics_counter         = BOOST_BINARY_U(0100111),
     symbol_ns_service                       = BOOST_BINARY_U(0010000),
@@ -83,10 +84,10 @@ namespace detail
           , counter_target_count
           , component_ns_resolve_id
           , component_ns_statistics_counter }
-      , {   "count/unbind"
+      , {   "count/unbind_name"
           , ""
           , counter_target_count
-          , component_ns_unbind
+          , component_ns_unbind_name
           , component_ns_statistics_counter }
       , {   "count/iterate_types"
           , ""
@@ -109,10 +110,10 @@ namespace detail
           , counter_target_time
           , component_ns_resolve_id
           , component_ns_statistics_counter }
-      , {   "time/unbind"
+      , {   "time/unbind_name"
           , "ns"
           , counter_target_time
-          , component_ns_unbind
+          , component_ns_unbind_name
           , component_ns_statistics_counter }
       , {   "time/iterate_types"
           , "ns"
@@ -221,6 +222,56 @@ namespace detail
     };
     static std::size_t const num_primary_namespace_services =
         sizeof(primary_namespace_services)/sizeof(primary_namespace_services[0]);
+
+
+    // counter description data for symbol namespace components
+    static counter_service_data const symbol_namespace_services[] =
+    {
+        // counters exposing API invocation counts
+        {   "count/bind"
+          , ""
+          , counter_target_count
+          , symbol_ns_bind
+          , symbol_ns_statistics_counter }
+      , {   "count/resolve"
+          , ""
+          , counter_target_count
+          , symbol_ns_resolve
+          , symbol_ns_statistics_counter }
+      , {   "count/unbind"
+          , ""
+          , counter_target_count
+          , symbol_ns_unbind
+          , symbol_ns_statistics_counter }
+      , {   "count/iterate_names"
+          , ""
+          , counter_target_count
+          , symbol_ns_iterate_names
+          , symbol_ns_statistics_counter }
+      // counters exposing API timings
+      , {   "time/bind"
+          , "ns"
+          , counter_target_time
+          , symbol_ns_bind
+          , symbol_ns_statistics_counter }
+      , {   "time/resolve"
+          , "ns"
+          , counter_target_time
+          , symbol_ns_resolve
+          , symbol_ns_statistics_counter }
+      , {   "time/unbind"
+          , "ns"
+          , counter_target_time
+          , symbol_ns_unbind
+          , symbol_ns_statistics_counter }
+      , {   "time/iterate_names"
+          , "ns"
+          , counter_target_time
+          , symbol_ns_iterate_names
+          , symbol_ns_statistics_counter }
+    };
+    static std::size_t const num_symbol_namespace_services =
+        sizeof(symbol_namespace_services)/sizeof(symbol_namespace_services[0]);
 
     ///////////////////////////////////////////////////////////////////////////
     // get action code from counter type
