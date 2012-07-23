@@ -307,7 +307,22 @@ system and application performance.
         [Return the overall number of parcels transferred over the network by
          the given locality (see `<operation>`, e.g. `sent` or `received`).]
     ]
-    [   [`/parcelqueue/length`
+    [   [`/parcelqueue/length/<operation>`
+
+          where `<operation>` is one of the following:
+          `send`, `receive`
+        ]
+        [`locality#<*>/total`
+
+          where `<*>` is the locality id of the locality the parcel queue should
+          be queried. The locality id is a (zero based) number identifying the
+          locality.
+        ]
+        [None]
+        [Return the current number of parcels stored in the parcel queue  (see
+         `<operation>` for which queue to query, e.g. `send` or `receive`).]
+    ]
+    [   [`/serialize/time/<operation>`
 
           where `<operation>` is one of the following:
           `sent`, `received`
@@ -319,13 +334,9 @@ system and application performance.
           locality.
         ]
         [None]
-        [Return the overall number of parcels transferred (see `<operation>`,
-         e.g. `sent` or `received`) over the network by the given locality.]
+        [Return the overall time spent performing outgoing data serialization
+         on the given locality (see `<operation>`, e.g. `sent` or `received`).]
     ]
-]
-[/
-    /serialize{locality#<*>/total}/time/received
-    /serialize{locality#<*>/total}/time/sent
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -336,20 +347,25 @@ system and application performance.
 [/
     /threadqueue{locality#<*>/total}/length
     /threadqueue{locality#<*>/worker-thread#<*>}/length
+
     /threads{locality#<*>/total}/count/cumulative
-    /threads{locality#<*>/worker-thread#<*>}/count/cumulative
     /threads{locality#<*>/total}/count/instantaneous/active
-    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/active
-    /threads{locality#<*>/total}/count/instantaneous/all
-    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/all
     /threads{locality#<*>/total}/count/instantaneous/pending
-    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/pending
     /threads{locality#<*>/total}/count/instantaneous/suspended
-    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/suspended
     /threads{locality#<*>/total}/count/instantaneous/terminated
+    /threads{locality#<*>/total}/count/instantaneous/all
+
+    /threads{locality#<*>/worker-thread#<*>}/count/cumulative
+    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/active
+    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/pending
+    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/suspended
     /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/terminated
+    /threads{locality#<*>/worker-thread#<*>}/count/instantaneous/all
+
     /threads{locality#<*>/allocator#<*>}/count/objects
+
     /threads{locality#<*>/total}/count/stack-recycles
+
     /threads{locality#<*>/total}/idle-rate
     /threads{locality#<*>/worker-thread#<*>}/idle-rate
 ]
