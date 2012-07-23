@@ -80,20 +80,6 @@ endif()
 include(HPX_FortranCompiler)
 
 ################################################################################
-# search path configuration
-################################################################################
-hpx_include_directories(${hpx_SOURCE_DIR})
-hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
-
-################################################################################
 # Boost configuration
 ################################################################################
 
@@ -154,6 +140,23 @@ if(${HPX_INTERNAL_MOVE})
   hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
+################################################################################
+# search path configuration
+################################################################################
+hpx_include_directories(${hpx_SOURCE_DIR})
+if(${BOOST_MINOR_VERSION} LESS 52)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
+endif()
+hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
+hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+
+###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
@@ -1129,11 +1132,9 @@ if(NOT HPX_NO_INSTALL)
     PATTERN ".git" EXCLUDE)
 
   install( # install external dependencies
-    DIRECTORY external/atomic/boost
-              external/cache/boost
+    DIRECTORY external/cache/boost
               external/coroutine/boost
               external/endian/boost
-              external/lockfree/boost
               external/logging/boost
               external/plugin/boost
     DESTINATION include
@@ -1143,7 +1144,7 @@ if(NOT HPX_NO_INSTALL)
     PATTERN ".git" EXCLUDE)
 
   if(${BOOST_MINOR_VERSION} LESS 49)
-    # install Boost Serialization patch for older Boost versions only
+    # install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
       DESTINATION include
@@ -1153,8 +1154,21 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
+  if(${BOOST_MINOR_VERSION} LESS 52)
+    # install Boost.Atomic library for older Boost versions only
+    install(
+      DIRECTORY external/atomic/boost
+                external/lockfree/boost
+      DESTINATION include
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+  endif()
+
   if(HPX_INTERNAL_MOVE)
-    install( # install external dependencies
+    # Install Boost.Move if requested
+    install(
       DIRECTORY external/move/boost
       DESTINATION include
       COMPONENT core
