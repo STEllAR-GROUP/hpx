@@ -401,6 +401,11 @@ system and application performance.
     /full_empty{locality#<*>/total}/count/read_enqueued
     /full_empty{locality#<*>/total}/count/set_full
 
+    /dataflow{locality#<*>/total}/count/constructed
+    /dataflow{locality#<*>/total}/count/initialized
+    /dataflow{locality#<*>/total}/count/fired
+    /dataflow{locality#<*>/total}/count/destructed
+
     /runtime{locality#<*>/total}/component/count
     /runtime{locality#<*>/total}/uptime
 ]
