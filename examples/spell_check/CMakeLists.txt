@@ -19,7 +19,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
                      ${${example_program}_FLAGS}
-                     FOLDER "Examples/Quickstart/${example_program}")
+                     FOLDER "Examples/Spell Check/${example_program}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.spell_check.${example_program})
