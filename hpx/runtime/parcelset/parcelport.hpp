@@ -153,7 +153,7 @@ namespace parcelset
             return io_service_pool_;
         }
 
-        util::connection_cache<parcelport_connection,naming::locality>& 
+        util::connection_cache<parcelport_connection,naming::locality>&
             get_connection_cache()
         {
             return connection_cache_;
@@ -233,6 +233,12 @@ namespace parcelset
             return parcels_received_.total_bytes();
         }
 
+        std::size_t get_pending_parcels_count() const
+        {
+            util::spinlock::scoped_lock l(mtx_);
+            return pending_parcels_.size();
+        }
+
         void add_received_data(
             performance_counters::parcels::data_point const& data)
         {
@@ -267,8 +273,9 @@ namespace parcelset
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
-        /// Mutex for pending parcels
-        util::spinlock mtx_;
+        /// mutex for pending parcels
+        mutable util::spinlock mtx_;
+
         /// The cache for pending parcels
         typedef
             std::map<

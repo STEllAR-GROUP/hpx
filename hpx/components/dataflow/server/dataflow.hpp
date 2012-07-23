@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace server
         {
             components::set_component_type<dataflow>(type);
         }
-        
+
         void finalize()
         {
         }
@@ -64,6 +64,9 @@ namespace hpx { namespace lcos { namespace server
                 << "~server::dataflow::dataflow()";
             BOOST_ASSERT(component_ptr);
             delete component_ptr;
+
+            lcos::local::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
+            ++detail::dataflow_counter_data_.destructed_;
         }
 
         /// init initializes the dataflow, it creates a dataflow_impl object
@@ -93,7 +96,7 @@ namespace hpx { namespace lcos { namespace server
             lcos::local::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.initialized_;
         }
-        
+
         dataflow()
         {
             BOOST_ASSERT(false);
@@ -159,7 +162,7 @@ namespace hpx { namespace lcos { namespace server
             }
             (*component_ptr)->connect_nonvirt(target);
         }
-        
+
         void set_event() {}
 
     private:

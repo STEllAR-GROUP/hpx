@@ -38,12 +38,13 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     struct dataflow_counter_data
     {
         dataflow_counter_data()
-          : constructed_(0), initialized_(0), fired_(0)
+          : constructed_(0), initialized_(0), fired_(0), destructed_(0)
         {}
 
         boost::int64_t constructed_;
         boost::int64_t initialized_;
         boost::int64_t fired_;
+        boost::int64_t destructed_;
         lcos::local::spinlock mtx_;
     };
     HPX_COMPONENT_EXPORT extern dataflow_counter_data dataflow_counter_data_;
@@ -324,7 +325,7 @@ namespace hpx { namespace traits
             {
                 data_type d;
                 result.read(d);
-                
+
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;

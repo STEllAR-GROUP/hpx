@@ -67,6 +67,12 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         return dataflow_counter_data_.fired_;
     }
 
+    boost::int64_t get_destructed_count()
+    {
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        return dataflow_counter_data_.destructed_;
+    }
+
     // call this to register all counter types for dataflow entries
     void register_counter_types()
     {
@@ -95,6 +101,14 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                   _1, get_fired_count, _2),
               &performance_counters::locality_counter_discoverer,
               ""
+            },
+            { "/dataflow/count/destructed", performance_counters::counter_raw,
+              "returns the number of destructed dataflow objects",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_destructed_count, _2),
+              &performance_counters::locality_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(
@@ -102,3 +116,21 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     }
 }}}}
 
+namespace dataflow_module
+{
+    ///////////////////////////////////////////////////////////////////////////
+    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    {
+        // return our startup-function if performance counters are required
+        startup_func = hpx::lcos::server::detail::register_counter_types;
+        return true;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Register a startup function which will be called as a HPX-thread during
+// runtime startup. We use this function to register our performance counter
+// type and performance counter instances.
+//
+// Note that this macro can be used not more than once in one module.
+HPX_REGISTER_STARTUP_MODULE(::dataflow_module::get_startup);

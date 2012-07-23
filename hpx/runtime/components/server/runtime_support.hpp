@@ -10,6 +10,7 @@
 
 #include <map>
 #include <list>
+#include <set>
 
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -456,7 +457,8 @@ namespace hpx { namespace components { namespace server
             std::string const& component, boost::filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
-            boost::program_options::options_description& options);
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
 
         bool load_startup_shutdown_functions(boost::plugin::dll& d);
         bool load_commandline_options(boost::plugin::dll& d,

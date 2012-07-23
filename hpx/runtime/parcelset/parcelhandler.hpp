@@ -313,9 +313,14 @@ namespace hpx { namespace parcelset
         void register_counter_types();
 
     protected:
-        std::size_t get_queue_length() const
+        std::size_t get_incoming_queue_length() const
         {
             return parcels_->get_queue_length();
+        }
+
+        std::size_t get_outgoing_queue_length() const
+        {
+            return pp_.get_pending_parcels_count();
         }
 
     private:
