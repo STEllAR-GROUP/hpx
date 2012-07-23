@@ -9,31 +9,30 @@ set(HPX_PATCH_LEVEL   @HPX_PATCH_LEVEL@)
 set(HPX_VERSION       @HPX_VERSION@)
 set(HPX_SOVERSION     @HPX_SOVERSION@)
 
-set(HPX_FOUND ON)
+set(HPX_FOUND ON CACHE BOOL "True if HPX was found")
 
-set(HPX_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@")
+set(HPX_COMPILE_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@"
+    CACHE STRING "Compile flags for HPX")
 
-set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@ CACHE PATH "HPX installation root")
+set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@
+    CACHE PATH "HPX installation prefix")
 
 if(NOT MSVC)
-  set(HPX_RPATH @external_rpath@ CACHE STRING "Base RPATH for linking")
+  set(HPX_RPATH @external_rpath@ CACHE PATH "Base RPATH for linking against HPX")
 endif()
 
-link_directories(@external_link_directories@)
+set(HPX_LINK_DIRS @external_link_directories@ CACHE STRING "HPX link directories")
 
-include_directories(@external_include_directories@)
+set(HPX_INCLUDE_DIRS @external_include_directories@ CACHE STRING "HPX include directories")
 
-if(NOT HPX_CMAKE_LOGLEVEL)
-  set(HPX_CMAKE_LOGLEVEL "WARN")
-endif()
+@boost_library_info@
 
-set(CMAKE_BUILD_TYPE @CMAKE_BUILD_TYPE@ CACHE STRING
-    "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)"
-    FORCE)
+set(HPX_BUILD_TYPE @CMAKE_BUILD_TYPE@ CACHE STRING
+    "Configuration type used to build HPX (one of Debug, RelWithDebInfo, Release, MinSizeRel)")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} @external_cmake_path@)
 
-set(CMAKE_DEBUG_POSTFIX "d")
+set(HPX_DEBUG_POSTFIX "d" CACHE STRING "Debug postfix for HPX")
 
 include(HPX_Utils)
 

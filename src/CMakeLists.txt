@@ -230,12 +230,12 @@ set_target_properties(hpx_serialization PROPERTIES
 
 set(hpx_serialization_lib_dependencies
   ${hpx_MALLOC_LIBRARY}
-  ${BOOST_serialization_LIBRARY})
+  ${BOOST_SERIALIZATION_LIBRARY})
 
 if(NOT MSVC)
   set(hpx_serialization_lib_dependencies
       ${hpx_serialization_lib_dependencies}
-      ${BOOST_system_LIBRARY})
+      ${BOOST_SYSTEM_LIBRARY})
 endif()
 
 target_link_libraries(hpx_serialization

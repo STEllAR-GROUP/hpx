@@ -54,10 +54,10 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
-  if(HPX_FLAGS)
-    set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
+  if(HPX_COMPILE_FLAGS)
+    set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+      set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 
@@ -77,11 +77,11 @@ macro(add_hpx_executable name)
 
   # linker instructions
   if(NOT ${${name}_NOLIBS})
-    if(HPX_FOUND AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    if(HPX_FOUND AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
       set(hpx_libs
-        hpx${CMAKE_DEBUG_POSTFIX}
-        hpx_init${CMAKE_DEBUG_POSTFIX}
-        hpx_serialization${CMAKE_DEBUG_POSTFIX})
+        hpx${HPX_DEBUG_POSTFIX}
+        hpx_init${HPX_DEBUG_POSTFIX}
+        hpx_serialization${HPX_DEBUG_POSTFIX})
     else()
       set(hpx_libs
         hpx

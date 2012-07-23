@@ -30,6 +30,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
 endif()
 
+set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+
 # Always force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
 # (at least for now, until we figure out how to use multiple build types in
 # the same project).
@@ -523,6 +525,7 @@ endif()
 
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
+set(HPX_DEBUG_POSTFIX "d")
 
 ################################################################################
 # Utility configuration
@@ -1123,6 +1126,14 @@ if(NOT HPX_NO_INSTALL)
     endforeach()
   endif()
 
+  # create a symlink in share pointing to the latest HPX installation
+  install(CODE
+    "set(sharedir \"${CMAKE_INSTALL_PREFIX}/share/\")
+     execute_process(
+     COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
+             \"hpx\" \"hpx-${HPX_VERSION}\"
+     WORKING_DIRECTORY \"\${sharedir}\")")
+
   install( # install hpx python module (TODO: this is a temporary hack)
     DIRECTORY python/hpx
     DESTINATION share/hpx-${HPX_VERSION}/python
@@ -1258,6 +1269,16 @@ endforeach()
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
+endforeach()
+
+set(boost_library_info "")
+
+foreach(library ${BOOST_LIBRARIES})
+  string(TOUPPER ${library} library_uc)
+  set(boost_library_info
+    "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
+  set(boost_library_info
+    "${boost_library_info}    CACHE FILEPATH \"Boost ${target_lib} shared library.\")\n")
 endforeach()
 
 get_directory_property(external_definitions DEFINITIONS)

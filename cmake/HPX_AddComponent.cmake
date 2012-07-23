@@ -100,8 +100,8 @@ macro(add_hpx_component name)
 
   hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
 
-  if(HPX_FOUND AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(hpx_libs hpx${CMAKE_DEBUG_POSTFIX} hpx_serialization${CMAKE_DEBUG_POSTFIX})
+  if(HPX_FOUND AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
+    set(hpx_libs hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX})
   else()
     set(hpx_libs hpx hpx_serialization)
   endif()
@@ -128,10 +128,10 @@ macro(add_hpx_component name)
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
-  if(HPX_FLAGS)
-    set_property(TARGET ${name}_component APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
+  if(HPX_COMPILE_FLAGS)
+    set_property(TARGET ${name}_component APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_component APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+      set_property(TARGET ${name}_component APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 

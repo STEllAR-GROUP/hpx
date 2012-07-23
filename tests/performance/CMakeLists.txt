@@ -25,7 +25,7 @@ set(benchmarks
 if(MSVC)
   set(boost_library_dependencies)
 else()
-  set(boost_library_dependencies ${BOOST_program_options_LIBRARY})
+  set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY})
 endif()
 
 if(OPENMP_FOUND)
@@ -92,7 +92,7 @@ set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
 if(NOT MSVC)
-  set(boost_library_dependencies ${boost_library_dependencies} ${BOOST_thread_LIBRARY})
+  set(boost_library_dependencies ${boost_library_dependencies} ${BOOST_THREAD_LIBRARY})
 endif()
 
 set(boost_tls_overhead_FLAGS NOLIBS

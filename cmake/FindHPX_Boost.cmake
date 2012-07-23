@@ -141,91 +141,93 @@ macro(build_boost_libname BOOST_RAW_NAME)
   endif()
 endmacro()
 
-macro(find_boost_library TARGET_LIB)
+macro(find_boost_library target_lib)
   if(NOT BOOST_VERSION_FOUND)
     get_boost_version()
   endif()
 
+  string(TOUPPER ${target_lib} target_lib_uc)
+
   # Non-system Boost tree (tarball, SCM checkout, etc)
   if(NOT BOOST_USE_SYSTEM AND BOOST_LIBRARY_DIR)
     # Locate libraries
-    build_boost_libname(${TARGET_LIB})
-    hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIBRARY_DIR} for" BOOST_LIBNAMES)
+    build_boost_libname(${target_lib})
+    hpx_print_list("DEBUG" "boost.${target_lib}" "Searching in ${BOOST_LIBRARY_DIR} for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      unset(BOOST_${TARGET_LIB}_LIBRARY CACHE)      # force the library to be found again
-      find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIBRARY_DIR} NO_DEFAULT_PATH)
+      unset(BOOST_${target_lib_uc}_LIBRARY CACHE)      # force the library to be found again
+      find_library(BOOST_${target_lib_uc}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIBRARY_DIR} NO_DEFAULT_PATH)
 
-      if(BOOST_${TARGET_LIB}_LIBRARY)
-        get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
-        get_filename_component(name ${BOOST_${TARGET_LIB}_LIBRARY} NAME)
-        hpx_info("boost.${TARGET_LIB}" "Found ${name} in ${path}.")
+      if(BOOST_${target_lib_uc}_LIBRARY)
+        get_filename_component(path ${BOOST_${target_lib_uc}_LIBRARY} PATH)
+        get_filename_component(name ${BOOST_${target_lib_uc}_LIBRARY} NAME)
+        hpx_info("boost.${target_lib}" "Found ${name} in ${path}.")
         break()
       endif()
     endforeach()
 
-    if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      hpx_warn("boost.${TARGET_LIB}" "Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIBRARY_DIR}. Now searching the system path.")
-      unset(BOOST_${TARGET_LIB}_LIBRARY)
+    if(NOT BOOST_${target_lib_uc}_LIBRARY)
+      hpx_warn("boost.${target_lib}" "Could not locate Boost ${target_lib} shared library in ${BOOST_LIBRARY_DIR}. Now searching the system path.")
+      unset(BOOST_${target_lib_uc}_LIBRARY)
 
-      build_boost_libname(${TARGET_LIB})
-      hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
+      build_boost_libname(${target_lib})
+      hpx_print_list("DEBUG" "boost.${target_lib}" "Searching in system path for" BOOST_LIBNAMES)
 
       foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-        find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
+        find_library(BOOST_${target_lib_uc}_LIBRARY NAMES ${BOOST_TARGET})
 
-        if(BOOST_${TARGET_LIB}_LIBRARY)
-          get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
-          get_filename_component(name ${BOOST_${TARGET_LIB}_LIBRARY} NAME)
-          hpx_info("boost.${TARGET_LIB}" "Found ${name} in ${path}.")
+        if(BOOST_${target_lib_uc}_LIBRARY)
+          get_filename_component(path ${BOOST_${target_lib_uc}_LIBRARY} PATH)
+          get_filename_component(name ${BOOST_${target_lib_uc}_LIBRARY} NAME)
+          hpx_info("boost.${target_lib}" "Found ${name} in ${path}.")
           break()
         endif()
       endforeach()
 
-      if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-        hpx_error("boost.${TARGET_LIB}" "Failed to locate library in ${BOOST_LIBRARY_DIR} or in the system path.")
-        unset(BOOST_${TARGET_LIB}_LIBRARY)
+      if(NOT BOOST_${target_lib_uc}_LIBRARY)
+        hpx_error("boost.${target_lib}" "Failed to locate library in ${BOOST_LIBRARY_DIR} or in the system path.")
+        unset(BOOST_${target_lib_uc}_LIBRARY)
       else()
-        set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
-          CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
+        set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
+          CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
       endif()
     else()
-      set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
-        CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
+      set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
+        CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
       set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
-    list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
+    list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${target_lib_uc}_LIBRARY})
 
   # System Boost installation (deb, rpm, etc)
   else()
     # Locate libraries
-    build_boost_libname(${TARGET_LIB})
-    hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
+    build_boost_libname(${target_lib})
+    hpx_print_list("DEBUG" "boost.${target_lib}" "Searching in system path for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
-      unset(BOOST_${TARGET_LIB}_LIBRARY CACHE)      # force thelibrary to be found again
-      find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
+      unset(BOOST_${target_lib_uc}_LIBRARY CACHE)      # force thelibrary to be found again
+      find_library(BOOST_${target_lib_uc}_LIBRARY NAMES ${BOOST_TARGET})
 
-      if(BOOST_${TARGET_LIB}_LIBRARY)
-        get_filename_component(path ${BOOST_${TARGET_LIB}_LIBRARY} PATH)
-        get_filename_component(name ${BOOST_${TARGET_LIB}_LIBRARY} NAME)
-        hpx_info("boost.${TARGET_LIB}" "Found ${name} in ${path}.")
+      if(BOOST_${target_lib_uc}_LIBRARY)
+        get_filename_component(path ${BOOST_${target_lib_uc}_LIBRARY} PATH)
+        get_filename_component(name ${BOOST_${target_lib_uc}_LIBRARY} NAME)
+        hpx_info("boost.${target_lib}" "Found ${name} in ${path}.")
         break()
       endif()
     endforeach()
 
-    if(NOT BOOST_${TARGET_LIB}_LIBRARY)
-      hpx_error("boost.${TARGET_LIB}" "Failed to locate library in the system path.")
+    if(NOT BOOST_${target_lib_uc}_LIBRARY)
+      hpx_error("boost.${target_lib}" "Failed to locate library in the system path.")
       set(BOOST_FOUND OFF)
-      unset(BOOST_${TARGET_LIB}_LIBRARY)
+      unset(BOOST_${target_lib_uc}_LIBRARY)
     else()
-      set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
-        CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
+      set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
+        CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
       set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
-    list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
+    list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${target_lib_uc}_LIBRARY})
   endif()
 endmacro()
 
