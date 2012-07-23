@@ -131,7 +131,7 @@ namespace hpx { namespace util
 //                     "At least one lock is held while thread is being terminated "
 //                     "or interrupted.");
 //             }
-        }
+//         }
     }
 #else
     bool register_lock(void const*, util::register_lock_data*)
