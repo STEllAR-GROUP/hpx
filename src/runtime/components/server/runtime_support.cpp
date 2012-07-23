@@ -823,6 +823,10 @@ namespace hpx { namespace components { namespace server
             return false;     // something bad happened
         }
 
+        // make sure every component module gets asked for startup/shutdown 
+        // functions only once
+        std::set<std::string> startup_handled;
+
         // collect additional command-line options
         boost::program_options::options_description options;
 
@@ -869,13 +873,15 @@ namespace hpx { namespace components { namespace server
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
                 if (!load_component(ini, instance, component, lib, prefix,
-                        agas_client, isdefault, isenabled, options))
+                        agas_client, isdefault, isenabled, options, 
+                        startup_handled))
                 {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= hpx::util::create_path(libname);
                     if (!load_component(ini, instance, component, lib, prefix,
-                            agas_client, isdefault, isenabled, options))
+                            agas_client, isdefault, isenabled, options,
+                            startup_handled))
                     {
                         continue;   // next please :-P
                     }
@@ -1011,7 +1017,8 @@ namespace hpx { namespace components { namespace server
         std::string const& instance, std::string const& component,
         boost::filesystem::path lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
-        boost::program_options::options_description& options)
+        boost::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -1020,7 +1027,6 @@ namespace hpx { namespace components { namespace server
             return false;
         }
 
-        std::set<std::string> startup_handled;
         try {
             // get the handle of the library
             boost::plugin::dll d (lib.string(), component);
