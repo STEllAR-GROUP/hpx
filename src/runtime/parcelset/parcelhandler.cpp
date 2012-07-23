@@ -324,7 +324,7 @@ namespace hpx { namespace parcelset
               ""
             },
 
-            { "/time/data/sent", performance_counters::counter_raw,
+            { "/data/time/sent", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
               "write and the invocation of the write callback for the referenced "
               "locality",
@@ -334,7 +334,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { "/time/data/received", performance_counters::counter_raw,
+            { "/data/time/received", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
               "read and the invocation of the read callback for the referenced "
               "locality",
@@ -344,7 +344,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { "/time/serialize/sent", performance_counters::counter_raw,
+            { "/serialize/time/sent", performance_counters::counter_raw,
               "returns the total time required to serialize all sent parcels "
               "for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -353,7 +353,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { "/time/serialize/received", performance_counters::counter_raw,
+            { "/serialize/time/received", performance_counters::counter_raw,
               "returns the total time required to de-serialize all received "
               "parcels for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -363,7 +363,7 @@ namespace hpx { namespace parcelset
               "ns"
             },
 
-            { "/data/size/sent", performance_counters::counter_raw,
+            { "/data/count/sent", performance_counters::counter_raw,
               "returns the amount of parcel data (including headers) sent "
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -372,7 +372,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { "/data/size/received", performance_counters::counter_raw,
+            { "/data/count/received", performance_counters::counter_raw,
               "returns the amount of parcel data (including headers) received "
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,

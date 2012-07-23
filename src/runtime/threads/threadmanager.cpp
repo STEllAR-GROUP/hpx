@@ -1144,8 +1144,8 @@ namespace hpx { namespace threads
         performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
         if (ec) return naming::invalid_gid;
 
-        // /time{locality#%d/total}/idle-rate
-        // /time{locality#%d/worker-thread%d}/idle-rate
+        // /threads{locality#%d/total}/idle-rate
+        // /threads{locality#%d/worker-thread%d}/idle-rate
         if (paths.parentinstance_is_basename_) {
             HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
                 "invalid counter instance parent name: " +
@@ -1341,7 +1341,7 @@ namespace hpx { namespace threads
               ""
             },
             // idle rate
-            { "/time/idle-rate", performance_counters::counter_raw,
+            { "/threads/idle-rate", performance_counters::counter_raw,
               "returns the idle rate for the referenced object [0.1%]",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
