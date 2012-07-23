@@ -286,8 +286,10 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t()> data_received(
             boost::bind(&parcelport::get_data_received, &pp_));
 
-        HPX_STD_FUNCTION<boost::int64_t()> queue_length(
-            boost::bind(&parcelhandler::get_queue_length, this));
+        HPX_STD_FUNCTION<boost::int64_t()> incoming_queue_length(
+            boost::bind(&parcelhandler::get_incoming_queue_length, this));
+        HPX_STD_FUNCTION<boost::int64_t()> outgoing_queue_length(
+            boost::bind(&parcelhandler::get_outgoing_queue_length, this));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
@@ -382,11 +384,19 @@ namespace hpx { namespace parcelset
               "bytes"
             },
 
-            { "/parcelqueue/length", performance_counters::counter_raw,
-              "returns the number current length of the queue of incoming threads",
+            { "/parcelqueue/length/receive", performance_counters::counter_raw,
+              "returns the number current length of the queue of incoming parcels",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, queue_length, _2),
+                  _1, incoming_queue_length, _2),
+              &performance_counters::locality_counter_discoverer,
+              ""
+            },
+            { "/parcelqueue/length/send", performance_counters::counter_raw,
+              "returns the number current length of the queue of outgoing parcels",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, outgoing_queue_length, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             }
