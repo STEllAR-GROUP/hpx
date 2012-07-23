@@ -14,6 +14,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -215,6 +217,24 @@ namespace hpx { namespace util
             ++heap_count_;
         }
 
+        // need to reschedule if not using boost::shared_mutex
+        bool reschedule(void* p, std::size_t count, boost::mpl::false_)
+        {
+            if (0 == threads::get_self_ptr())
+            {
+                hpx::applier::register_work(
+                    util::bind(&one_size_heap_list::free, this, p, count),
+                    "one_size_heap_list::free");
+                return true;
+            }
+            return false;
+        }
+
+        bool reschedule(void* p, std::size_t count, boost::mpl::true_)
+        {
+            return false;
+        }
+
         void free(void* p, std::size_t count = 1)
         {
             if (NULL == p || !threads::threadmanager_is(running))
@@ -222,13 +242,10 @@ namespace hpx { namespace util
 
             // if this is called from outside a HPX thread we need to
             // re-schedule the request
-            if (0 == threads::get_self_ptr())
-            {
-                hpx::applier::register_work(
-                    util::bind(&one_size_heap_list::free, this, p, count),
-                    "one_size_heap_list::free");
+            typedef boost::is_same<boost::shared_mutex, SharedMutex>
+                reschedule_pred;
+            if (reschedule(p, count, reschedule_pred()))
                 return;
-            }
 
             shared_lock_type guard(mtx_);
 
