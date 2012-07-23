@@ -114,18 +114,23 @@ namespace hpx { namespace util
 
     void force_error_on_lock()
     {
-        if (0 != threads::get_self_ptr())
-        {
-            register_locks::held_locks_map const& held_locks =
-                register_locks::get_lock_map();
+        // For now just do the same as during suspension. We can't reliably
+        // tell whether there are still locks held as those could have been
+        // acquired in a different OS thread.
+        verify_no_locks();
 
-            // we throw an error if there are still registered locks for
-            // this OS-thread
-            if (!held_locks.empty()) {
-                HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
-                    "At least one lock is held while thread is being suspended "
-                    "or interrupted.");
-            }
+//         if (0 != threads::get_self_ptr())
+//         {
+//             register_locks::held_locks_map const& held_locks =
+//                 register_locks::get_lock_map();
+//
+//             // we throw an error if there are still registered locks for
+//             // this OS-thread
+//             if (!held_locks.empty()) {
+//                 HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
+//                     "At least one lock is held while thread is being terminated "
+//                     "or interrupted.");
+//             }
         }
     }
 #else
