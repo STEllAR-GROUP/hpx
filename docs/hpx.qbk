@@ -128,6 +128,9 @@
 [def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
 [def __commandline__            [link hpx.manual.init.commandline __hpx__ Command Line Options]]
 
+[def __counter_names__          [link hpx.manual.performance_counters.names Performance Counter Names]]
+[def __consuming_counters__     [link hpx.manual.performance_counters.consuming Consuming Performance Counters]]
+
 [template hpx_cmdline[str] [link hpx.manual.init.commandline [str]]]
 
 [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
@@ -186,6 +189,7 @@ QuickBook can be found in the collection of __boost_tools__.
 [include manual/components.qbk]
 [include manual/lcos.qbk]
 [include manual/exceptions.qbk]
+[include manual/performance_counters.qbk]
 
 [endsect] [/ Manual]
 

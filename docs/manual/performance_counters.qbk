@@ -1,0 +1,134 @@
+[/=============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:performance_counters Performance Counters]
+
+Performance Counters in __hpx__ are used to provide information as to how well
+the runtime system or an application is performing. The counter data can help
+determine system bottlenecks and fine-tune system and application performance.
+The __hpx__ runtime system, its networking and other layers provide counter
+data that an application can consume to provide users with information of how
+well the application is performing.
+
+Applications can also use counter data to determine how much system resources
+to consume. For example, an application that transfers data over the network
+could consume counter data from an  network switch to determine how much data
+to transfer without competing for network bandwidth with other network traffic.
+The application could use the counter data to adjust its transfer rate as the
+bandwidth usage from other network traffic increases or decreases.
+
+Performance Counters are __hpx__ parallel processes which expose a predefined
+interface. __hpx__ exposes special API functions allowing to create, manage,
+access the data from, and release instances of Performance Counters. The main
+means to identify a Performance Counter instance is the counter instance name.
+Performance Counter instance names have a predefined structure which is
+described in the section __counter_names__. The main advantages of this is that
+any Performance Counter can be accessed remotely (from a different locality)
+or locally (from the same locality). Moreover, since all counters expose their
+data using the same API, any code consuming counter data can be utilized to
+access arbitrary system information with minimal effort.
+
+Consumers of counter data can consume counter data in real time. Real time data
+describes the current activity of the computer. More information about how
+to consume counter data can be found in the section __consuming_counters__.
+
+All __hpx__ applications provide command line options related to performance
+counters, such as the possibility to list available counter types, or
+periodically query the counter data of specific counters to be printed to the
+screen or to be written to a file. For more information about these, please
+refer to the section __commandline__.
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:names Performance Counter Names]
+
+All Performance Counter instances have a name uniquely identifying this
+instance. This name can be used to access the counter, retrieve all related meta
+data, and to query the counter data (as described in the section
+__consuming_counters__). Counter names are strings with a predefined structure.
+The general form of a countername is:
+
+    /objectname{full_instancename}/countername@parameters
+
+where `full_instancename` could be either another (full) counter name or a
+string formatted as:
+
+    parentinstancename#parentindex/instancename#instanceindex
+
+[teletype]Each separate part of a countername (e.g. `objectname`, `countername`,
+`parentinstancename`, `instancename`, and `parameters`) should start
+with a letter (`'a'`...`'z'`, `'A'`...`'Z'`) or an underscore character (`'_'`),
+optionally followed by letters, digits (`'0'`...`'9'`), or underscore characters.
+Whitespace is not allowed inside a counter name. The characters `'/'`, `'{'`,
+`'}'`, `'#'`, and `'@'` have a special meaning and are used to delimit the
+different parts of the counter name.[c++]
+
+[heading:example A Simple Example]
+
+An instance for a well formed (and meaningful) counter name would be:
+
+    /threads{locality#0/total}/count/cumulative
+
+This counter returns the current cumulative number of executed (retired)
+__hpx__-threads for the locality `0`. The counter type of this counter is
+`/threads/count/cumulative` and the full instance name is `locality#0/total`.
+This counter type does not require an `instanceindex` or `parameters` to be
+specified.
+
+In this case, the `parentindex` (the `'0'`) designates the locality for which
+the counter instance is created. The counter will return the number of
+__hpx__-threads retired on that particular locality.
+
+[heading:types Performance Counter Types]
+
+Every performance counter belongs to a specific Performance Counter type which
+classifies the performance counters into groups of common semantics. The type of
+a counter is identified by the `objectname` and the `countername` parts of the
+name.
+
+    /objectname/countername
+
+At application start __hpx__ will register all available counter types on each
+of the localities. These counter types are held in a special Performance
+Counter registration database which can be later used to retrieve the meta data
+related to a counter type and to create counter instances based on a given
+counter instance name.
+
+[heading:types Performance Counter Instances]
+
+The `full_instancename` allows to distinguish different counter instances of
+the same counter type. The formatting of the `full_instancename` depends on
+the counter type. Not all counter types require to specify all 4 elements of a
+full counter instance name, some of the parts (`parentinstancename`,
+`parentindex`, `instancename`, and `instanceindex`) are optional for specific
+counters. Please refer to the documentation of a particular counter for more
+information about the formatting requirements for the name of this counter.
+
+The `parameters` are used to pass additional information to a counter at
+creation time. They are optional and fully depend on the concrete counter.
+Please refer to the documentation of a particular counter for more
+information about what parameters are supported and how to specify them.
+
+Every locality an application runs on exposes its own set of Performance
+Counter types and Performance Counter instances. The set of exposed counters
+is determinded dynamically at application start based on the execution
+environment of the application. For instance, this set is influenced by the
+current hardware environment for the locality (such as whether the locality has
+access to accelerators), and the software environment (such as the number of
+OS-threads used to execute __hpx__-threads.
+
+[endsect] [/ Performance Counter Names]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:consuming Consuming Performance Counter Data]
+[endsect] [/ Consuming Performance Counter Data]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:providing Providing Performance Counter Data]
+[endsect] [/ Providing Performance Counter Data]
+
+[endsect] [/ Performance Counters]
+

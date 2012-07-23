@@ -835,7 +835,7 @@ The predefined command line options for any application using `hpx::init` are
 described in the table below:
 
 [/ TODO: proofread the options]
-[table:commandline Default __hpx__ Command Line Options
+[table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*__hpx__ options (allowed on command line only)]]]
     [[`--hpx:help`, `--help` or `-h`]       [print out program usage]]
