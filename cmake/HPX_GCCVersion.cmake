@@ -30,9 +30,11 @@ if(NOT MSVC)
     FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir})
 
   if("${gcc_version_RESULT}" STREQUAL "0")
-    execute_process(
-      COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gcc_version"
-      OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
+    if(NOT GCC_VERSION)
+      execute_process(
+        COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gcc_version"
+        OUTPUT_VARIABLE GCC_VERSION)
+    endif()
 
     if("${GCC_VERSION}" STREQUAL "")
       set(GCC_VERSION "000000" CACHE INTERNAL "" FORCE)
