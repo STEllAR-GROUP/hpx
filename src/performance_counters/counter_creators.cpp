@@ -158,7 +158,7 @@ namespace hpx { namespace performance_counters
 
     namespace detail
     {
-        naming::gid_type retrieve_statistics_counter(std::string const& name,
+        naming::gid_type retrieve_agas_counter(std::string const& name,
             naming::id_type const& agas_id, error_code& ec)
         {
             naming::gid_type id;
@@ -181,7 +181,7 @@ namespace hpx { namespace performance_counters
                 rep = agas::stubs::primary_namespace::service(
                     agas_id, req, threads::thread_priority_default, ec);
                 break;
-            case agas::symbol_ns_service:
+            case agas::symbol_ns_statistics_counter:
                 rep = agas::stubs::symbol_namespace::service(
                     agas_id, req, threads::thread_priority_default, ec);
                 break;
@@ -222,29 +222,27 @@ namespace hpx { namespace performance_counters
             return naming::invalid_gid;
         }
 
-        if (service_name == paths.parentinstancename_ && paths.parentinstanceindex_ == -1)
+        // counter instance name: <agas_instance_name>/total
+        // for instance: root/total
+        if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
-            // counter instance name: /<agas_service_name>/<agas_instance_name>/total
-            // for instance: /component_namespace/root/total
-            std::string::size_type p = paths.instancename_.find("total");
-            if (p == paths.instancename_.size() - 5 && paths.instanceindex_ == -1)
-            {
-                // find the referenced AGAS instance and dispatch the request there
-                std::string agas_instance;
-                performance_counters::get_counter_instance_name(paths, agas_instance, ec);
-                if (ec) return naming::invalid_gid;
+            // find the referenced AGAS instance and dispatch the request there
+//             std::string agas_instance;
+//             performance_counters::get_counter_instance_name(paths, agas_instance, ec);
+//             if (ec) return naming::invalid_gid;
 
-                naming::id_type id;
-                bool result = agas::resolve_name(
-                    agas_instance.substr(0, agas_instance.size() - 6), id, ec);
-                if (!result) {
-                    HPX_THROWS_IF(ec, not_implemented,
-                        "agas_raw_counter_creator",
-                        "invalid counter instance name: " + agas_instance);
-                    return naming::invalid_gid;
-                }
-                return detail::retrieve_statistics_counter(info.fullname_, id, ec);
+            std::string service(agas::service_name);
+            service += service_name + paths.parentinstancename_;
+
+            naming::id_type id;
+            bool result = agas::resolve_name(service, id, ec);
+            if (!result) {
+                HPX_THROWS_IF(ec, not_implemented,
+                    "agas_raw_counter_creator",
+                    "invalid counter name: " + info.fullname_);
+                return naming::invalid_gid;
             }
+            return detail::retrieve_agas_counter(info.fullname_, id, ec);
         }
 
         HPX_THROWS_IF(ec, not_implemented, "agas_raw_counter_creator",

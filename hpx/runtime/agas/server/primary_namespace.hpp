@@ -39,7 +39,7 @@ namespace server
 {
 
 // Base name used to register the component
-char const* const primary_namespace_service_name = "/primary_namespace/";
+char const* const primary_namespace_service_name = "primary_namespace/";
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
 /// resolved addresses.

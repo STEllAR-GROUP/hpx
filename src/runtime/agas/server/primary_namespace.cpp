@@ -169,8 +169,8 @@ void primary_namespace::register_counter_types(
     boost::format help_time(
         "returns the overall execution time of the AGAS service '%s'");
     HPX_STD_FUNCTION<performance_counters::create_counter_func> creator(
-        boost::bind(&performance_counters::agas_raw_counter_creator
-          , _1, _2, agas::server::primary_namespace_service_name));
+        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+      , agas::server::primary_namespace_service_name));
 
     for (std::size_t i = 0;
           i < detail::num_primary_namespace_services;
@@ -197,7 +197,8 @@ void primary_namespace::register_counter_types(
     }
 
     // now register this AGAS instance with AGAS :-P
-    instance_name_ = agas::server::primary_namespace_service_name;
+    instance_name_ = agas::service_name;
+    instance_name_ += agas::server::primary_namespace_service_name;
     instance_name_ += servicename;
 
     // register a gid (not the id) to avoid AGAS holding a reference to this

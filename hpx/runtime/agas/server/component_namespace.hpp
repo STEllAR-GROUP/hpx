@@ -38,7 +38,7 @@ namespace server
 {
 
 // Base name used to register the component
-char const* const component_namespace_service_name = "/component_namespace/";
+char const* const component_namespace_service_name = "component_namespace/";
 
 struct HPX_EXPORT component_namespace :
     components::fixed_component_base<

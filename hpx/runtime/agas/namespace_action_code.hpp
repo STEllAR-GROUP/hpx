@@ -14,6 +14,9 @@
 namespace hpx { namespace agas
 {
 
+// Base name used to register AGAS service instances
+char const* const service_name = "/agas/";
+
 enum namespace_action_code
 {
     invalid_request                         = 0,
