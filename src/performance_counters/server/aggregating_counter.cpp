@@ -97,8 +97,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         // acquire the current value of the base counter
         counter_value base_value;
-        evaluate_base_counter(base_value);
-
+        if (evaluate_base_counter(base_value))
         {
             mutex_type::scoped_lock l(mtx_);
             value_(static_cast<double>(base_value.value_));
@@ -123,11 +122,12 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     template <typename Statistic>
-    void aggregating_counter<Statistic>::evaluate()
+    bool aggregating_counter<Statistic>::evaluate()
     {
         // gather current base value
         counter_value base_value;
-        evaluate_base_counter(base_value);
+        if (!evaluate_base_counter(base_value))
+            return false;
 
         // simply average the measured base counter values since it got queried
         // for the last time
@@ -139,15 +139,17 @@ namespace hpx { namespace performance_counters { namespace server
             HPX_THROW_EXCEPTION(not_implemented,
                 "aggregating_counter<Statistic>::get_counter_value",
                 "base counter should keep scaling constant over time");
+            return false;
         }
         else {
             mutex_type::scoped_lock l(mtx_);
             value_(static_cast<double>(base_value.value_));          // accumulate new value
         }
+        return true;
     }
 
     template <typename Statistic>
-    void aggregating_counter<Statistic>::evaluate_base_counter(
+    bool aggregating_counter<Statistic>::evaluate_base_counter(
         counter_value& value)
     {
         {
@@ -168,12 +170,14 @@ namespace hpx { namespace performance_counters { namespace server
                             "could not get or create performance counter: '%s'") %
                                 base_counter_name_)
                         )
+                    return false;
                 }
             }
         }
 
         // query the actual value
         value = stubs::performance_counter::get_value(base_counter_id_);
+        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////

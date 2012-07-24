@@ -48,7 +48,7 @@ namespace performance_counters { namespace sine { namespace server
         using base_type::set_component_type;
 
     protected:
-        void evaluate();
+        bool evaluate();
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;

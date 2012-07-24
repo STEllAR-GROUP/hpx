@@ -67,8 +67,8 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     protected:
-        void evaluate_base_counter(counter_value& value);
-        void evaluate();
+        bool evaluate_base_counter(counter_value& value);
+        bool evaluate();
 
     private:
         typedef lcos::local::spinlock mutex_type;

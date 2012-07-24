@@ -19,7 +19,7 @@ namespace hpx { namespace util
       : microsecs_(0), id_(0)
     {}
 
-    interval_timer::interval_timer(HPX_STD_FUNCTION<void()> const& f,
+    interval_timer::interval_timer(HPX_STD_FUNCTION<bool()> const& f,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), microsecs_(microsecs), id_(0), description_(description),
@@ -99,12 +99,15 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
         id_ = 0;
 
+        bool result = false;
+
         {
             util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f_();                     // invoke the supplied function
+            result = f_();                     // invoke the supplied function
         }
 
-        schedule_thread();            // wait and repeat
+        if (result)
+            schedule_thread();        // wait and repeat
         return threads::terminated;   // do not re-schedule this thread
     }
 

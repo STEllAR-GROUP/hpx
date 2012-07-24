@@ -29,7 +29,7 @@ namespace hpx { namespace util
           boost::int64_t interval, std::string const& dest);
 
         void start();
-        void evaluate();
+        bool evaluate();
 
     protected:
         void find_counters();

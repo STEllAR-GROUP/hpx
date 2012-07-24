@@ -105,15 +105,12 @@ namespace hpx { namespace util
         }
     }
 
-    void query_counters::evaluate()
+    bool query_counters::evaluate()
     {
         if (timer_.is_terminated())
         {
-            // too late, the counter has already been terminated
-            HPX_THROW_EXCEPTION(invalid_status,
-                "query_counters::evaluate",
-                "The counters to be evaluated have been already terminated");
-            return;
+            // just do nothing as we're about to terminate the application
+            return false;
         }
 
         bool has_been_started = false;
@@ -130,7 +127,7 @@ namespace hpx { namespace util
             HPX_THROW_EXCEPTION(invalid_status,
                 "query_counters::evaluate",
                 "The counters to be evaluated have not been initialized yet");
-            return;
+            return false;
         }
 
         for (std::size_t i = 0; i < names_.size(); ++i)
@@ -149,6 +146,8 @@ namespace hpx { namespace util
                 print_value(out, names_[i], value, uoms_[i]);
             }
         }
+
+        return true;
     }
 }}
 

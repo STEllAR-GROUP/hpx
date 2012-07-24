@@ -65,11 +65,12 @@ namespace performance_counters { namespace sine { namespace server
         base_type::finalize();
     }
 
-    void sine_counter::evaluate()
+    bool sine_counter::evaluate()
     {
         mutex_type::scoped_lock mtx(mtx_);
         evaluated_at_ = hpx::util::high_resolution_clock::now();
         current_value_ = std::sin((evaluated_at_ - started_at_) / 1e10);
+        return true;
     }
 }}}
 
