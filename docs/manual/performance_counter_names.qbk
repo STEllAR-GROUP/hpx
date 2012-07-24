@@ -1,0 +1,132 @@
+[/=============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:names Performance Counter Names]
+
+All Performance Counter instances have a name uniquely identifying this
+instance. This name can be used to access the counter, retrieve all related meta
+data, and to query the counter data (as described in the section
+__consuming_counters__). Counter names are strings with a predefined structure.
+The general form of a countername is:
+
+[teletype]
+```
+    /objectname{full_instancename}/countername@parameters
+```
+[c++]
+
+where `full_instancename` could be either another (full) counter name or a
+string formatted as:
+
+[teletype]
+```
+    parentinstancename#parentindex/instancename#instanceindex
+```
+[c++]
+
+Each separate part of a countername (e.g. `objectname`, `countername`,
+`parentinstancename`, `instancename`, and `parameters`) should start
+with a letter (`'a'`...`'z'`, `'A'`...`'Z'`) or an underscore character (`'_'`),
+optionally followed by letters, digits (`'0'`...`'9'`), hyphen (`'-'`),
+or underscore characters. Whitespace is not allowed inside a counter name.
+The characters `'/'`, `'{'`, `'}'`, `'#'`, and `'@'` have a special meaning and
+are used to delimit the different parts of the counter name.
+
+The parts `parentinstanceindex` and `instanceindex` are integers. If a index
+is not specified __hpx__ will assume a default of `-1`.
+
+[heading:example Two Simple Examples]
+
+An instance for a well formed (and meaningful) simple counter name would be:
+
+```
+    /threads{``*locality#0/total*``}/count/cumulative
+```
+
+This counter returns the current cumulative number of executed (retired)
+__hpx__-threads for the locality `0`. The counter type of this counter is
+`/threads/count/cumulative` and the full instance name is [teletype]`locality#0/total`[c++]
+(*highlighted* for readability). This counter type does not require an
+`instanceindex` or `parameters` to be specified.
+
+In this case, the `parentindex` (the `'0'`) designates the locality for which
+the counter instance is created. The counter will return the number of
+__hpx__-threads retired on that particular locality.
+
+Another example for a well formed (aggregate) counter name is:
+
+[teletype]
+```
+    /statistics{``*/threads{locality#0/total}/count/cumulative*``}/average@500
+```
+[c++]
+
+This counter takes the simple counter from the first example, samples its
+values every `500` milliseconds, and returns the average of the value samples
+whenever it is queried. The counter type of this counter is `/statistics/average`
+and the instance name is the full name of the counter for which the values have
+to be averaged. In this case, the `parameters` (the `'500'`) specify the sampling
+interval for the averaging to take place (in milliseconds).
+
+
+[heading:types Performance Counter Types]
+
+Every Performance Counter belongs to a specific Performance Counter type which
+classifies the counters into groups of common semantics. The type of a counter
+is identified by the `objectname` and the `countername` parts of the name.
+
+    /objectname/countername
+
+At application start, __hpx__ will register all available counter types on each
+of the localities. These counter types are held in a special Performance
+Counter registration database which can be later used to retrieve the meta data
+related to a counter type and to create counter instances based on a given
+counter instance name.
+
+[heading:types Performance Counter Instances]
+
+The `full_instancename` allows to distinguish different counter instances of
+the same counter type. The formatting of the `full_instancename` depends on
+the counter type. There are two types of counters: simple counters which
+usually generate the counter values based on direct measurements, and
+aggregate counters which take another counter and transform its values before
+generating their own counter values. An example for a simple counter is given
+[link hpx.manual.performance_counters.names.example above]: counting retired
+__hpx__-threads. An aggreagate counter is shown as an example
+[link hpx.manual.performance_counters.names.example above] as well:
+calculating the average of the underlying counter values sampled at constant
+time intervals.
+
+While simple counters use instance names formatted as
+`parentinstancename#parentindex/instancename#instanceindex`, most aggregate
+counters have the full counter name of the embedded counter as its instance
+name.
+
+Not all simple counter types require specifying all 4 elements of a
+full counter instance name, some of the parts (`parentinstancename`,
+`parentindex`, `instancename`, and `instanceindex`) are optional for specific
+counters. Please refer to the documentation of a particular counter for more
+information about the formatting requirements for the name of this counter.
+
+The `parameters` are used to pass additional information to a counter at
+creation time. They are optional and they fully depend on the concrete counter.
+Even if a specific counter type allows additional parameters to be given, those
+usually are not required as sensible defaults will be chosen. Please refer
+to the documentation of a particular counter for more information about what
+parameters are supported, how to specify them, and what default values are
+assumed.
+
+Every locality of an application exposes its own set of Performance
+Counter types and Performance Counter instances. The set of exposed counters
+is determinded dynamically at application start based on the execution
+environment of the application. For instance, this set is influenced by the
+current hardware environment for the locality (such as whether the locality has
+access to accelerators), and the software environment of the application (such
+as the number of OS-threads used to execute __hpx__-threads).
+
+[endsect] [/ Performance Counter Names]
+

@@ -1386,7 +1386,7 @@ namespace hpx { namespace threads
               ""
             },
             { "/threads/count/stack-recycles", performance_counters::counter_raw,
-              "returns the total number of HPX-threads recycling operations performed "
+              "returns the total number of HPX-thread recycling operations performed "
               "for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator, &performance_counters::locality_counter_discoverer,
               ""
