@@ -392,7 +392,7 @@ endif()
 find_package(OpenCL)
 if(OPENCL_FOUND)
   hpx_include_sys_directories(${OPENCL_INCLUDE_DIRS})
-  hpx_include_sys_directories(external/oclm/include)
+  hpx_include_directories(external/oclm/include)
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${OPENCL_LIBRARIES})
 endif()
 
@@ -1126,14 +1126,6 @@ if(NOT HPX_NO_INSTALL)
     endforeach()
   endif()
 
-  # create a symlink in share pointing to the latest HPX installation
-  install(CODE
-    "set(sharedir \"${CMAKE_INSTALL_PREFIX}/share/\")
-     execute_process(
-     COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
-             \"hpx\" \"hpx-${HPX_VERSION}\"
-     WORKING_DIRECTORY \"\${sharedir}\")")
-
   install( # install hpx python module (TODO: this is a temporary hack)
     DIRECTORY python/hpx
     DESTINATION share/hpx-${HPX_VERSION}/python
@@ -1141,6 +1133,14 @@ if(NOT HPX_NO_INSTALL)
     FILES_MATCHING PATTERN "*.py"
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
+
+  # create a symlink in share pointing to the latest HPX installation
+  install(CODE
+    "set(sharedir \"${CMAKE_INSTALL_PREFIX}/share/\")
+     execute_process(
+     COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
+             \"hpx-${HPX_VERSION}\" \"hpx\"
+     WORKING_DIRECTORY \"\${sharedir}\")")
 
   install( # install external dependencies
     DIRECTORY external/cache/boost
