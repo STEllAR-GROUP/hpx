@@ -704,7 +704,7 @@ void big_boot_barrier::apply(
         client_connection->set_parcel(p);
 
 #if defined(HPX_DEBUG)
-        BOOST_ASSERT(locality_id == client_connection->destination());
+        BOOST_ASSERT(addr.locality_ == client_connection->destination());
 
         std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
         boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
