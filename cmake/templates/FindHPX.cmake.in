@@ -21,9 +21,9 @@ if(NOT MSVC)
   set(HPX_RPATH @external_rpath@ CACHE PATH "Base RPATH for linking against HPX")
 endif()
 
-set(HPX_LINK_DIRS @external_link_directories@ CACHE STRING "HPX link directories")
+set(HPX_LINK_DIR @external_link_directories@ CACHE STRING "HPX link directories")
 
-set(HPX_INCLUDE_DIRS @external_include_directories@ CACHE STRING "HPX include directories")
+set(HPX_INCLUDE_DIR @external_include_directories@ CACHE STRING "HPX include directories")
 
 @boost_library_info@
 
