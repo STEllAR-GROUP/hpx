@@ -300,21 +300,40 @@ system and application performance.
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[/
 [table Performance Counters related to LCOs
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
-]
+    [   [`/full_empty/count/<operation>`
 
-    /full_empty{locality#<*>/total}/count/constructed
-    /full_empty{locality#<*>/total}/count/destructed
-    /full_empty{locality#<*>/total}/count/read_dequeued
-    /full_empty{locality#<*>/total}/count/read_enqueued
-    /full_empty{locality#<*>/total}/count/set_full
+          where:[br] `<operation>` is one of the following:
+          `constructed`, `destructed`, `read_enqueued`, `read_dequeued`, `fired`
+        ]
+        [`locality#<*>/total`
 
-    /dataflow{locality#<*>/total}/count/constructed
-    /dataflow{locality#<*>/total}/count/initialized
-    /dataflow{locality#<*>/total}/count/fired
-    /dataflow{locality#<*>/total}/count/destructed
+          where:[br] `<*>` is the locality id of the locality the number of
+          invocations of the specified operation should be queried for (see
+          `<operation>`, e.g. `constructed`, `destructed`, `read_enqueued`,
+          `read_dequeued`, `fired`). The locality id is a (zero based) number
+          identifying the locality.]
+        [None]
+        [Return the overall number of operations performed on full-empty bit
+         data structures on the specified locality.]
+    ]
+    [   [`/dataflow/count/<operation>`
+
+          where:[br] `<operation>` is one of the following:
+          `constructed`, `destructed`, `initialized`, `fired`
+        ]
+        [`locality#<*>/total`
+
+          where:[br] `<*>` is the locality id of the locality the number of
+          invocations of the specified operation should be queried for (see
+          `<operation>`, e.g. `constructed`, `destructed`, `initialized`,
+          `fired`). The locality id is a (zero based) number identifying the
+          locality.]
+        [None]
+        [Return the overall number of operations performed on dataflow
+         components on the specified locality.]
+    ]
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]

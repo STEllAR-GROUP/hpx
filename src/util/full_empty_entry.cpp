@@ -84,7 +84,7 @@ namespace hpx { namespace util { namespace detail
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/full_empty/count/set_full", performance_counters::counter_raw,
+            { "/full_empty/count/fired", performance_counters::counter_raw,
               "returns the number of full_empty 'set' operations",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
