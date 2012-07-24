@@ -91,7 +91,7 @@ namespace hpx { namespace util
         error_code ec;        // do not throw
         double val = value.get_value<double>(ec);
 
-        out << name << ",";
+        out << performance_counters::remove_counter_prefix(name) << ",";
         if (!ec) {
             double elapsed = static_cast<double>(value.time_ - started_at_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)

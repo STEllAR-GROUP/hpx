@@ -130,6 +130,7 @@
 
 [def __counter_names__          [link hpx.manual.performance_counters.names Performance Counter Names]]
 [def __consuming_counters__     [link hpx.manual.performance_counters.consuming Consuming Performance Counters]]
+[def __existing_counters__      [link hpx.manual.performance_counters.counters Existing Performance Counters]]
 
 [template hpx_cmdline[str] [link hpx.manual.init.commandline [str]]]
 

@@ -33,6 +33,19 @@ namespace hpx { namespace performance_counters
         return ensure_counter_prefix(name);
     }
 
+    inline std::string& remove_counter_prefix(std::string& name)
+    {
+        if (name.find(counter_prefix) == 0)
+            name = name.substr(sizeof(counter_prefix));
+        return name;
+    }
+
+    inline std::string remove_counter_prefix(std::string const& counter)
+    {
+        std::string name(counter);
+        return remove_counter_prefix(name);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     enum counter_type
     {
