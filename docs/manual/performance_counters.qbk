@@ -371,8 +371,58 @@ system and application performance.
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[table Performance Counters related to LCOs
+    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+]
+
+[/
+    /full_empty{locality#<*>/total}/count/constructed
+    /full_empty{locality#<*>/total}/count/destructed
+    /full_empty{locality#<*>/total}/count/read_dequeued
+    /full_empty{locality#<*>/total}/count/read_enqueued
+    /full_empty{locality#<*>/total}/count/set_full
+
+    /dataflow{locality#<*>/total}/count/constructed
+    /dataflow{locality#<*>/total}/count/initialized
+    /dataflow{locality#<*>/total}/count/fired
+    /dataflow{locality#<*>/total}/count/destructed
+]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [table General Performance Counters
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [   [`/runtime/count/component`]
+        [`locality#<*>/total`
+
+          where `<*>` is the locality id of the locality the AGAS cache should
+          be queried. The locality id is a (zero based) number identifying the
+          locality.
+        ]
+        [The type of the component. This is the string which has been used
+         while registering the component with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`].
+        ]
+        [Return the overall number of currently active components of the
+         specified type on the given locality.]
+    ]
+    [   [`/runtime/uptime`]
+        [`locality#<*>/total`
+
+          where `<*>` is the locality id of the locality the AGAS cache should
+          be queried. The locality id is a (zero based) number identifying the
+          locality.
+        ]
+        [None]
+        [Return the overall time since application start on the given locality
+         in nanoseconds.
+        ]
+    ]
+]
+
+[/
+
+    /runtime{locality#<*>/total}/uptime
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -408,22 +458,6 @@ system and application performance.
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume 1000ms as the default.]
     ]
-]
-
-[/
-    /full_empty{locality#<*>/total}/count/constructed
-    /full_empty{locality#<*>/total}/count/destructed
-    /full_empty{locality#<*>/total}/count/read_dequeued
-    /full_empty{locality#<*>/total}/count/read_enqueued
-    /full_empty{locality#<*>/total}/count/set_full
-
-    /dataflow{locality#<*>/total}/count/constructed
-    /dataflow{locality#<*>/total}/count/initialized
-    /dataflow{locality#<*>/total}/count/fired
-    /dataflow{locality#<*>/total}/count/destructed
-
-    /runtime{locality#<*>/total}/component/count
-    /runtime{locality#<*>/total}/uptime
 ]
 
 [c++]

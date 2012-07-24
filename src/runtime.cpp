@@ -665,7 +665,7 @@ namespace hpx
             },
 
             // component instance counters
-            { "/runtime/component/count", performance_counters::counter_raw,
+            { "/runtime/count/component", performance_counters::counter_raw,
               "returns the number of component instances currently alive on "
               "this locality (the component type has to be specified as the "
               "counter parameter)",
