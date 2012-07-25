@@ -45,8 +45,8 @@ macro(add_hpx_library_headers_noglob name)
   if(MSVC)
     hpx_parse_arguments(HEADERS "EXCLUDE;HEADERS" "APPEND" ${ARGN})
 
-    hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
-      "Sources for ${name}" ${HEADERS_HEADERS})
+#    hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
+#      "Sources for ${name}" ${HEADERS_HEADERS})
 
     set(headers ${HEADERS_HEADERS})
 

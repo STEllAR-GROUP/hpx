@@ -42,8 +42,8 @@ endmacro()
 macro(add_hpx_library_sources_noglob name)
   hpx_parse_arguments(SOURCES "EXCLUDE;SOURCES" "APPEND" ${ARGN})
 
-  hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
-    "Sources for ${name}" ${SOURCES_SOURCES})
+#  hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
+#    "Sources for ${name}" ${SOURCES_SOURCES})
 
   set(sources ${SOURCES_SOURCES})
 
