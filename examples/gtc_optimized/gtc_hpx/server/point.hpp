@@ -63,7 +63,8 @@ namespace gtc { namespace server
         std::vector<hpx::naming::id_type> components_;
         std::size_t generation_;
         mutable mutex_type mtx_;
-        std::vector<double> n_;
+        std::vector<int> intparams_;
+        std::vector<double> realparams_;
         std::size_t in_toroidal_,in_particle_;
     };
 }}

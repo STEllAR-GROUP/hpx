@@ -131,8 +131,23 @@ namespace gtc { namespace server
         // synchronize with all operations to finish
         hpx::future<void> f = gate_.get_future();
 
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
+
         f.get();
+  
+        // Copy the parameters to the fortran arrays
+        for (int i=0;i<intparams_.size();i++) {
+          integer_params[i] = intparams_[i];
+        }
+        for (int i=0;i<realparams_.size();i++) {
+          real_params[i] = realparams_[i];
+        }
       } else {
+        // The sender:  broadcast the parameters to the other components
+        // in a fire and forget fashion
         std::size_t generation = 0;
         {
           mutex_type::scoped_lock l(mtx_);
@@ -160,7 +175,6 @@ namespace gtc { namespace server
         hpx::apply(set_params_, all_but_root, item_, generation, 
                         intparams,realparams);
       } 
-      std::cout << " HELLO WORLD FROM broadcast parameters " << nint << " " << nreal << std::endl;
     }
 
     void point::set_params(std::size_t which,
@@ -170,8 +184,6 @@ namespace gtc { namespace server
     {
        mutex_type::scoped_lock l(mtx_);
 
-       std::cout << " TEST set_params " << item_ << std::endl;
-
        // make sure this set operation has not arrived ahead of time
        while (generation > generation_)
        {
@@ -179,15 +191,8 @@ namespace gtc { namespace server
          hpx::this_thread::suspend();
        }
 
-       //if (which >= n_.size())
-       //{
-       //  // index out of bounds...
-       //  HPX_THROW_EXCEPTION(hpx::bad_parameter,
-       //               "allgather_and_gate::set_data",
-       //               "index is out of range for this allgather operation");
-       //  return;
-       //}
-       //n_[which] = data;         // set the received data
+       intparams_ = intparams;
+       realparams_ = realparams;
 
        gate_.set(which);         // trigger corresponding and-gate input
     }
