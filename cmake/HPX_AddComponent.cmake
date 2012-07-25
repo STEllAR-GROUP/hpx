@@ -106,13 +106,10 @@ macro(add_hpx_component name)
     set(hpx_libs hpx hpx_serialization)
   endif()
 
+  target_link_libraries(${name}_component
+    ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
   if(NOT MSVC)
-    target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
     set(prefix "hpx_component_")
-  else()
-    target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
   endif()
 
   # set properties of generated shared library
