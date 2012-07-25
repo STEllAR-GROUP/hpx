@@ -37,19 +37,22 @@ namespace gtc { namespace server
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei_wrapper();
         void partd_allreduce();
-        //void partd_allreduce_receive(std::vector<double> const&receive,std::size_t i);
-        void partd_allreduce_receive();
-        void allreduce();
+        void broadcast_parameters(int *integer_params,double *real_params,
+                                  int *n_integers,int *n_reals);
         void set_data(std::size_t item, std::size_t generation, double data);
+
+        void set_params(std::size_t which,
+                        std::size_t generation,
+                        std::vector<int> const& intparams,
+                        std::vector<double> const& realparams);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(point, setup, setup_action);
         HPX_DEFINE_COMPONENT_ACTION(point, chargei_wrapper, chargei_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, partd_allreduce_receive, partd_allreduce_receive_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, allreduce, allreduce_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_params, set_params_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -75,16 +78,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc_point_chargei_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::partd_allreduce_receive_action,
-    gtc_point_partd_allreduce_receive_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::allreduce_action,
-    gtc_point_allreduce_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::set_data_action,
     gtc_point_set_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_params_action,
+    gtc_point_set_params_action);
 
 #endif
 

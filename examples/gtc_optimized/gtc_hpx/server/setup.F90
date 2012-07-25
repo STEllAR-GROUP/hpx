@@ -13,11 +13,13 @@ end module particle_decomp
 
 !========================================================================
 
-    Subroutine setup(hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
+    Subroutine setup(ptr, &
+                     hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
 !========================================================================
 
+  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
   use global_parameters
   use particle_decomp
   use particle_array
@@ -25,6 +27,7 @@ end module particle_decomp
   use diagnosis_array
   use particle_tracking
   implicit none
+  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
   integer mi_local,me_local,hpx_left_pe, hpx_right_pe
@@ -37,6 +40,20 @@ end module particle_decomp
 ! hjw
   integer nmem
 ! hjw
+
+  interface
+    subroutine read_input_params(ptr,micell,mecell,r0,b0,&
+                                 temperature,edensity0)
+    USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+    use global_parameters
+    use particle_decomp
+    use particle_tracking
+    use diagnosis_array
+    TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+    integer ierror,micell,mecell
+    real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+    end subroutine read_input_params
+  end interface
 
 #ifdef __AIX
 #define FLUSH flush_
@@ -51,7 +68,7 @@ end module particle_decomp
 !  call mpi_comm_rank(mpi_comm_world,mype,ierror)
 
 ! Read the input file that contains the run parameters
-  call read_input_params(micell,mecell,r0,b0,temperature,edensity0)
+  call read_input_params(ptr,micell,mecell,r0,b0,temperature,edensity0)
 
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
@@ -360,16 +377,18 @@ end subroutine setup
 
 !=============================================================================
 
-  Subroutine read_input_params(micell,mecell,r0,b0,temperature,edensity0)
+  Subroutine read_input_params(ptr,micell,mecell,r0,b0,temperature,edensity0)
 
 !=============================================================================
 
+  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
   use global_parameters
   use particle_decomp
   use particle_tracking
   use diagnosis_array
   implicit none
 
+  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
   logical file_exist
   integer ierror,micell,mecell
   real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
@@ -385,6 +404,20 @@ end subroutine setup
        kappate,kappan,tite,fixed_Tprofile,flow0,&
        flow1,flow2,r0,b0,temperature,edensity0,stdout,nbound,umax,iload,&
        tauii,track_particles,nptrack,rng_control,nmode,mmode
+
+  interface
+    subroutine broadcast_input_params(ptr,micell,mecell,r0,b0,&
+                                      temperature,edensity0)
+    USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+    use global_parameters
+    use particle_decomp
+    use particle_tracking
+    use diagnosis_array
+    TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+    integer ierror,micell,mecell
+    real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+    end subroutine broadcast_input_params
+  end interface
 !
 ! Since it is preferable to have only one MPI process reading the input file,
 ! we choose the master process to set the default run parameters and to read
@@ -499,22 +532,25 @@ end subroutine setup
   endif
 
 ! Now send the parameter values to all the other MPI processes
-!  call broadcast_input_params(micell,mecell,r0,b0,temperature,edensity0)
+  call broadcast_input_params(ptr,micell,mecell,r0,b0,temperature,edensity0)
 
 end Subroutine read_input_params
 
 
 !=============================================================================
 
-  Subroutine broadcast_input_params(micell,mecell,r0,b0,temperature,edensity0)
+  Subroutine broadcast_input_params(ptr,&
+                  micell,mecell,r0,b0,temperature,edensity0)
 
 !=============================================================================
 
+  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
   use global_parameters
   use particle_tracking
   use particle_decomp
   use diagnosis_array
 
+  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
   real(wp) :: real_params(n_reals)
@@ -581,66 +617,68 @@ end Subroutine read_input_params
     real_params(27)=umax
     real_params(28)=tauii
   endif
+  call broadcast_parameters_cmm(ptr,integer_params,real_params,&
+                                n_integers,n_reals); 
 
 ! Send input parameters to all processes
 !  call MPI_BCAST(integer_params,n_integers,MPI_INTEGER,0,MPI_COMM_WORLD,ierror)
 !  call MPI_BCAST(real_params,n_reals,mpi_Rsize,0,MPI_COMM_WORLD,ierror)
 
-  if(mype/=0)then
-!   Unpack integer parameters
-    irun=integer_params(1)
-    mstep=integer_params(2)
-    msnap=integer_params(3)
-    ndiag=integer_params(4)
-    nhybrid=integer_params(5)
-    mode00=integer_params(6)
-    micell=integer_params(7)
-    mecell=integer_params(8)
-    mpsi=integer_params(9)
-    mthetamax=integer_params(10)
-    mzetamax=integer_params(11)
-    npartdom=integer_params(12)
-    ncycle=integer_params(13)
-    stdout=integer_params(14)
-    nbound=integer_params(15)
-    iload=integer_params(16)
-    track_particles=integer_params(17)
-    nptrack=integer_params(18)
-    rng_control=integer_params(19)
-    fixed_Tprofile=integer_params(20)
-    nmode(1:num_mode)=integer_params(21:21+num_mode-1)
-    mmode(1:num_mode)=integer_params(21+num_mode:21+2*num_mode-1)
-
-!   Unpack real parameters
-    nonlinear=real_params(1)
-    paranl=real_params(2)
-    tstep=real_params(3)
-    a=real_params(4)
-    a0=real_params(5)
-    a1=real_params(6)
-    q0=real_params(7)
-    q1=real_params(8)
-    q2=real_params(9)
-    rc=real_params(10)
-    rw=real_params(11)
-    aion=real_params(12)
-    qion=real_params(13)
-    aelectron=real_params(14)
-    qelectron=real_params(15)
-    kappati=real_params(16)
-    kappate=real_params(17)
-    kappan=real_params(18)
-    tite=real_params(19)
-    flow0=real_params(20)
-    flow1=real_params(21)
-    flow2=real_params(22)
-    r0=real_params(23)
-    b0=real_params(24)
-    temperature=real_params(25)
-    edensity0=real_params(26)
-    umax=real_params(27)
-    tauii=real_params(28)
-  endif
+!  if(mype/=0)then
+!!   Unpack integer parameters
+!    irun=integer_params(1)
+!    mstep=integer_params(2)
+!    msnap=integer_params(3)
+!    ndiag=integer_params(4)
+!    nhybrid=integer_params(5)
+!    mode00=integer_params(6)
+!    micell=integer_params(7)
+!    mecell=integer_params(8)
+!    mpsi=integer_params(9)
+!    mthetamax=integer_params(10)
+!    mzetamax=integer_params(11)
+!    npartdom=integer_params(12)
+!    ncycle=integer_params(13)
+!    stdout=integer_params(14)
+!    nbound=integer_params(15)
+!    iload=integer_params(16)
+!    track_particles=integer_params(17)
+!    nptrack=integer_params(18)
+!    rng_control=integer_params(19)
+!    fixed_Tprofile=integer_params(20)
+!    nmode(1:num_mode)=integer_params(21:21+num_mode-1)
+!    mmode(1:num_mode)=integer_params(21+num_mode:21+2*num_mode-1)
+!
+!!   Unpack real parameters
+!    nonlinear=real_params(1)
+!    paranl=real_params(2)
+!    tstep=real_params(3)
+!    a=real_params(4)
+!    a0=real_params(5)
+!    a1=real_params(6)
+!    q0=real_params(7)
+!    q1=real_params(8)
+!    q2=real_params(9)
+!    rc=real_params(10)
+!    rw=real_params(11)
+!    aion=real_params(12)
+!    qion=real_params(13)
+!    aelectron=real_params(14)
+!    qelectron=real_params(15)
+!    kappati=real_params(16)
+!    kappate=real_params(17)
+!    kappan=real_params(18)
+!    tite=real_params(19)
+!    flow0=real_params(20)
+!    flow1=real_params(21)
+!    flow2=real_params(22)
+!    r0=real_params(23)
+!    b0=real_params(24)
+!    temperature=real_params(25)
+!    edensity0=real_params(26)
+!    umax=real_params(27)
+!    tauii=real_params(28)
+!  endif
 
 #ifdef DEBUG_BCAST
 !    write(mype+10,*)irun,mstep,msnap,ndiag,nhybrid,mode00,micell,mecell,&

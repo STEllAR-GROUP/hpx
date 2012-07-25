@@ -36,13 +36,9 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_chargei_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtc_point_type::wrapped_type::partd_allreduce_receive_action,
-    gtc_point_partd_allreduce_receive_action);
-
-HPX_REGISTER_ACTION_EX(
-    gtc_point_type::wrapped_type::allreduce_action,
-    gtc_point_allreduce_action);
-
-HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::set_data_action,
     gtc_point_set_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_params_action,
+    gtc_point_set_params_action);

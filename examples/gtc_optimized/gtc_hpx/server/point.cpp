@@ -17,7 +17,8 @@
 #include <iostream>
 #include <fstream>
 
-extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *);
+extern "C" {void FNAME(setup)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
             void FNAME(load)();
             void FNAME(chargei)(void* opaque_ptr_to_class);
             void FNAME(partd_allreduce_cmm) (void* pfoo) {
@@ -26,6 +27,15 @@ extern "C" {void FNAME(setup)(int *,int *,int *,int *,int *, int *);
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->partd_allreduce();
                     return; };
+            void FNAME(broadcast_parameters_cmm) (void* pfoo,
+                     int *integer_params,double *real_params,
+                     int *n_integers,int *n_reals) {
+                    // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
+                    // derived from point, then the world will end.
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->broadcast_parameters(integer_params,
+                              real_params, n_integers,n_reals);
+ return; };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +53,7 @@ namespace gtc { namespace server
       // prepare data array
       //n_.clear();
       //n_.resize(components.size());
-
+//#if 0
       // TEST
       int npartdom,ntoroidal;
       int hpx_left_pe, hpx_right_pe;
@@ -57,15 +67,17 @@ namespace gtc { namespace server
       }
       hpx_left_pe = (myrank_toroidal-1+ntoroidal)%ntoroidal;
       hpx_right_pe = (myrank_toroidal+1)%ntoroidal;
-#if 0
+//#endif
+//#if 0
       int t1 = numberpe;
       int t2 = mype;
-      int npartdom,ntoroidal;
-      int hpx_left_pe, hpx_right_pe;
-      FNAME(setup)(&t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+      int t_npartdom,t_ntoroidal;
+      int t_hpx_left_pe, t_hpx_right_pe;
+      FNAME(setup)(static_cast<void*>(this),
+         &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
 
-      FNAME(load)();
-#endif
+//      FNAME(load)();
+//#endif
 
       // Figure out the communicators: toroidal_comm and partd_comm
       int my_pdl = mype%npartdom;
@@ -106,6 +118,80 @@ namespace gtc { namespace server
       FNAME(chargei)(static_cast<void*>(this));
     }
 
+    void point::broadcast_parameters(int *integer_params,double *real_params,
+                             int *n_integers,int *n_reals)
+    {
+      int nint = *n_integers;
+      int nreal = *n_reals;
+
+      if ( item_ != 0 ) {
+        // create a new and-gate object
+        gate_.init(1);
+        
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        f.get();
+      } else {
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+        std::vector<int> intparams;
+        std::vector<double> realparams;
+        intparams.resize(nint);
+        for (int i=0;i<nint;i++) {
+          intparams[i] = integer_params[i];
+        }
+        realparams.resize(nreal);
+        for (int i=0;i<nreal;i++) {
+          realparams[i] = real_params[i];
+        }
+
+        // eliminate item 0's (the sender's) gid
+        std::vector<hpx::naming::id_type> all_but_root;
+        all_but_root.resize(components_.size()-1);
+        for (std::size_t i=0;i<all_but_root.size();i++) {
+          all_but_root[i] = components_[i+1];
+        }
+
+        set_params_action set_params_;
+        hpx::apply(set_params_, all_but_root, item_, generation, 
+                        intparams,realparams);
+      } 
+      std::cout << " HELLO WORLD FROM broadcast parameters " << nint << " " << nreal << std::endl;
+    }
+
+    void point::set_params(std::size_t which,
+                           std::size_t generation, 
+                           std::vector<int> const& intparams,
+                           std::vector<double> const& realparams)
+    {
+       mutex_type::scoped_lock l(mtx_);
+
+       std::cout << " TEST set_params " << item_ << std::endl;
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       //if (which >= n_.size())
+       //{
+       //  // index out of bounds...
+       //  HPX_THROW_EXCEPTION(hpx::bad_parameter,
+       //               "allgather_and_gate::set_data",
+       //               "index is out of range for this allgather operation");
+       //  return;
+       //}
+       //n_[which] = data;         // set the received data
+
+       gate_.set(which);         // trigger corresponding and-gate input
+    }
+
     void point::partd_allreduce()
     {
       if ( in_particle_ ) {
@@ -133,30 +219,6 @@ namespace gtc { namespace server
       }
     }
 
-    void point::allreduce()
-    {
-      std::cout << " TEST allreduce " << item_ << std::endl;
-      // create a new and-gate object
-      gate_.init(partd_comm_.size());
-
-      // synchronize with all operations to finish
-      hpx::future<void> f = gate_.get_future();
-
-      std::size_t generation = 0;
-      generation = ++generation_;
-
-      double value = item_*3.4159;
-
-      set_data_action set_data;
-      hpx::apply(set_data, partd_comm_, item_, generation, value);
-
-      // possibly do other stuff while the allgather is going on...
-      f.get();
-      //gate_.reset();              // reset and-gate
-      std::cout << " Finish TEST allreduce " << item_ << std::endl;
-
-    }
-
     void point::set_data(std::size_t which,
                 std::size_t generation, double data)
     {
@@ -182,13 +244,5 @@ namespace gtc { namespace server
        gate_.set(which);         // trigger corresponding and-gate input
     }
 
-//    void point::partd_allreduce_receive(std::vector<double> const&receive,std::size_t i)
-    void point::partd_allreduce_receive()
-    {
-      std::cout << " HELLO WORLD IN receive " << std::endl;
-   //   std::cout << " RECEIVED FROM " << i << std::endl;
-   //   gate_.set(i);
-      return;
-    }
 }}
 
