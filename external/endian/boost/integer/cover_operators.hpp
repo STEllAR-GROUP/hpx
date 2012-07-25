@@ -7,8 +7,8 @@
 
 //----------------------------------------------------------------------------//
 
-#ifndef BOOST_SPIRIT_INTEGER_COVER_OPERATORS_HPP
-#define BOOST_SPIRIT_INTEGER_COVER_OPERATORS_HPP
+#ifndef BOOST_INTEGER_ENDIAN_COVER_OPERATORS_HPP
+#define BOOST_INTEGER_ENDIAN_COVER_OPERATORS_HPP
 
 #include <boost/operators.hpp>
 #include <iosfwd>
@@ -74,4 +74,4 @@ namespace boost
   } // namespace integer
 } // namespace boost
 
-#endif // BOOST_SPIRIT_INTEGER_COVER_OPERATORS_HPP
+#endif // BOOST_INTEGER_ENDIAN_COVER_OPERATORS_HPP

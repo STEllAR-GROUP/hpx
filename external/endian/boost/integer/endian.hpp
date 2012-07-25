@@ -16,8 +16,8 @@
 //  partial specialization to correctly extend the sign when cover integer size
 //  differs from endian representation size.
 
-#ifndef BOOST_SPIRIT_ENDIAN_HPP
-#define BOOST_SPIRIT_ENDIAN_HPP
+#ifndef BOOST_INTEGER_ENDIAN_HPP
+#define BOOST_INTEGER_ENDIAN_HPP
 
 #include <boost/detail/endian.hpp>
 #include <boost/integer/cover_operators.hpp>
@@ -335,4 +335,4 @@ namespace boost
   } // namespace integer
 } // namespace boost
 
-#endif // BOOST_SPIRIT_ENDIAN_HPP
+#endif // BOOST_INTEGER_ENDIAN_HPP
