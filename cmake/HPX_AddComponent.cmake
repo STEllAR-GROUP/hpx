@@ -20,14 +20,19 @@ macro(add_hpx_component name)
     "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT;HEADER_GLOB;SOURCE_GLOB"
     "ESSENTIAL;NOLIBS;AUTOGLOB" ${ARGN})
 
+  if(NOT ${name}_SOURCE_ROOT)
+    set(${name}_SOURCE_ROOT ".")
+  endif()
+  hpx_debug("add_component.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
+
+  if(NOT ${name}_HEADER_ROOT)
+    set(${name}_HEADER_ROOT ".")
+  endif()
+  hpx_debug("add_component.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
+
   # Collect sources and headers from the given (current) directory
   # (recursively), but only if AUTOGLOB flag is specified.
   if(${${name}_AUTOGLOB})
-    if(NOT ${name}_SOURCE_ROOT)
-      set(${name}_SOURCE_ROOT ".")
-    endif()
-    hpx_debug("add_component.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
-
     if(NOT ${name}_SOURCE_GLOB)
       set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp"
                               "${${name}_SOURCE_ROOT}/*.f"
@@ -50,13 +55,6 @@ macro(add_hpx_component name)
       ROOT ${${name}_SOURCE_ROOT}
       TARGETS ${${name}_component_SOURCES})
 
-    set(${name}_SOURCES ${${name}_component_SOURCES})
-
-    if(NOT ${name}_HEADER_ROOT)
-      set(${name}_HEADER_ROOT ".")
-    endif()
-    hpx_debug("add_component.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
-
     if(NOT ${name}_HEADER_GLOB)
       set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp")
     endif()
@@ -70,9 +68,28 @@ macro(add_hpx_component name)
       CLASS "Header Files"
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_component_HEADERS})
+  else()
+    add_hpx_library_sources_noglob(${name}_component
+        SOURCES "${${name}_SOURCES}")
 
-    set(${name}_HEADERS ${${name}_component_HEADERS})
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Source Files"
+      ROOT ${${name}_SOURCE_ROOT}
+      TARGETS ${${name}_component_SOURCES})
+
+    add_hpx_library_headers_noglob(${name}_component
+        HEADERS "${${name}_HEADERS}")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_component_HEADERS})
   endif()
+
+  set(${name}_SOURCES ${${name}_component_SOURCES})
+  set(${name}_HEADERS ${${name}_component_HEADERS})
 
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -106,13 +123,10 @@ macro(add_hpx_component name)
     set(hpx_libs hpx hpx_serialization)
   endif()
 
+  target_link_libraries(${name}_component
+    ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
   if(NOT MSVC)
-    target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
     set(prefix "hpx_component_")
-  else()
-    target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
   endif()
 
   # set properties of generated shared library

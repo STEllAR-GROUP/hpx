@@ -11,6 +11,7 @@
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
+#include <boost/preprocessor/arithmetic/add.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms
@@ -75,10 +76,10 @@
 /// Note that this needs to be larger than HPX_ACTION_ARGUMENT_LIMIT by at
 /// least 3.
 #if !defined(HPX_FUNCTION_LIMIT)
-#  define HPX_FUNCTION_LIMIT 7
+#  define HPX_FUNCTION_LIMIT BOOST_PP_ADD(HPX_ACTION_ARGUMENT_LIMIT, 3)
 #endif
 
-#if HPX_FUNCTION_LIMIT < (HPX_ACTION_ARGUMENT_LIMIT + 3)
+#if HPX_FUNCTION_LIMIT < BOOST_PP_ADD(HPX_ACTION_ARGUMENT_LIMIT, 3)
 #  error "The specified HPX_FUNCTION_LIMIT (default is 7) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
 #endif
 
@@ -87,7 +88,7 @@
 #endif
 
 #if HPX_TUPLE_LIMIT < HPX_FUNCTION_LIMIT
-#   error "The specified HPX_TUPLE_LIMIT (default is 10) has to be bigger or equal than HPX_FUNCTION_LIMIT."
+#   error "The specified HPX_TUPLE_LIMIT (default is HPX_FUNCTION_LIMIT) has to be bigger or equal than HPX_FUNCTION_LIMIT."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
