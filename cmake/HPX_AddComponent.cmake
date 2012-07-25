@@ -129,6 +129,11 @@ macro(add_hpx_component name)
     set(prefix "hpx_component_")
   endif()
 
+  if(HPX_FOUND AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
+      set(lib_name ${prefix}${name}${HPX_DEBUG_POSTFIX})
+  else()
+      set(lib_name ${prefix}${name})
+  endif()
   # set properties of generated shared library
   set_target_properties(${name}_component PROPERTIES
     # create *nix style library versions + symbolic links
@@ -136,7 +141,7 @@ macro(add_hpx_component name)
     SOVERSION ${HPX_SOVERSION}
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${prefix}${name}
+    OUTPUT_NAME ${lib_name}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
