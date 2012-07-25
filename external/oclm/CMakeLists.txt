@@ -24,6 +24,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 
 find_package(OpenCL REQUIRED)
+if(OPENCL_FOUND)
+  hpx_include_sys_directories(${OPENCL_INCLUDE_DIRS})
+  hpx_include_directories(external/oclm/include)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${OPENCL_LIBRARIES})
+endif()
+
 oclm_add_library(${OPENCL_LIBRARIES})
 
 link_directories(${OPENCL_LIBPATH})
@@ -63,7 +69,7 @@ oclm_add_library(${BOOST_regex_LIBRARY})
 oclm_add_library(${BOOST_system_LIBRARY})
 oclm_add_library(${BOOST_filesystem_LIBRARY})
 include_directories(${BOOST_INCLUDE_DIR})
-  
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

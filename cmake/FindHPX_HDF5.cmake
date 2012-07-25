@@ -7,6 +7,7 @@
 
 if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
+  include(HPX_AddConfigTest)
 endif()
 
 if(HDF5_USE_SYSTEM)
@@ -73,3 +74,5 @@ hpx_find_package(HDF5_FORTRAN
   HEADERS hdf5.mod
   HEADER_PATHS include include/fortran ${hdf5_fortran_mod})
 
+# verify thread safety
+hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)

@@ -5,6 +5,8 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 
+find_package(HPX_HDF5)
+
 if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_LIBRARY)
   set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
 

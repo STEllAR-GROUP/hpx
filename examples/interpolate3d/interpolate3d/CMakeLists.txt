@@ -3,6 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+find_package(HPX_HDF5)
+
 set(dependencies
     distributing_factory_component
     ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY})

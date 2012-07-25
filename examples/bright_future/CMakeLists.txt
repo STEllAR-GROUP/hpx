@@ -3,6 +3,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+find_package(HPX_OpenMP)
+find_package(HPX_MPI)
+
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_FUNCTION_LIMIT=15)
@@ -143,7 +146,7 @@ if(HPX_CXX11_LAMBDAS)
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
-    
+
     set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
     set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")

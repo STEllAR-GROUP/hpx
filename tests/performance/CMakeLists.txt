@@ -38,6 +38,14 @@ if(OPENMP_FOUND)
       DEPENDENCIES ${boost_library_dependencies})
 endif()
 
+################################################################################
+# find dependencies
+################################################################################
+find_package(HPX_Qthreads)
+find_package(HPX_TBB)
+find_package(HPX_SWARM)
+find_package(HPX_OpenMP)
+
 if(UNIX)
   # GCC 4.7 chokes on Qthreads headers.
   if(QTHREADS_FOUND AND (040700 GREATER ${GCC_VERSION}))

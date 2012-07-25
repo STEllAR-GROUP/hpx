@@ -12,6 +12,8 @@ add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_FUNCTION_LIMIT=13)
 
+find_package(HPX_HDF5)
+
 include_directories (${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
 
 # define build target for this directory
