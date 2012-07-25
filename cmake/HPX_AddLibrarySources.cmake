@@ -38,3 +38,36 @@ macro(add_hpx_library_sources name globtype)
   endforeach()
 endmacro()
 
+###############################################################################
+macro(add_hpx_library_sources_noglob name)
+  hpx_parse_arguments(SOURCES "EXCLUDE;SOURCES" "APPEND" ${ARGN})
+
+  hpx_print_list("DEBUG" "add_hpx_library_sources_noglob.${name}"
+    "Sources for ${name}" ${SOURCES_SOURCES})
+
+  set(sources ${SOURCES_SOURCES})
+
+  if(NOT ${SOURCES_APPEND})
+    set(${name}_SOURCES "" CACHE INTERNAL "Sources for lib${name}." FORCE)
+  endif()
+
+  foreach(source ${sources})
+    get_filename_component(absolute_path ${source} ABSOLUTE)
+
+    set(add_flag ON)
+
+    if(SOURCES_EXCLUDE)
+      if(${absolute_path} MATCHES ${SOURCES_EXCLUDE})
+        set(add_flag OFF)
+      endif()
+    endif()
+
+    if(add_flag)
+      hpx_debug("add_library_sources.${name}"
+                "Adding ${absolute_path} to source list for lib${name}")
+      set(${name}_SOURCES ${${name}_SOURCES} ${absolute_path}
+        CACHE INTERNAL "Sources for lib${name}." FORCE)
+    endif()
+  endforeach()
+endmacro()
+
