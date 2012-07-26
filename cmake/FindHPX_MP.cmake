@@ -9,7 +9,7 @@ endif()
 
 #FIXME: as mp is just a prove of concept for now, we search the build directory.
 hpx_find_package(MP
-  LIBRARIES libmp
+  LIBRARIES libmp mp
   LIBRARY_PATHS lib64 lib build
   HEADERS mp/mp.hpp
   HEADER_PATHS include)
