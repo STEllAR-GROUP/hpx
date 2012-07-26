@@ -473,6 +473,19 @@ response component_namespace::iterate_types(
     return response(component_ns_iterate_types);
 } // }}}
 
+template <typename Map>
+std::string get_component_name(Map const& m, components::component_type t)
+{
+    if (t < components::component_last)
+        return components::get_component_type_name(t);
+
+    typename Map::const_iterator it = m.find(t);
+    if (it == m.end())
+        return "";
+
+    return (*it).second;
+}
+
 response component_namespace::get_component_type_name(
     request const& req
   , error_code& ec
@@ -482,8 +495,21 @@ response component_namespace::get_component_type_name(
 
     mutex_type::scoped_lock l(mutex_);
 
-    component_id_table_type::right_map::iterator it = component_ids_.right.begin();
-    if (it == component_ids_.right.end())
+    std::string result;
+
+    if (t == components::component_invalid) {
+        result = "component_invalid";
+    }
+    else if (components::get_derived_type(t) == 0) {
+        result = get_component_name(component_ids_.right, t);
+    }
+    else if (components::get_derived_type(t) != 0) {
+        result = get_component_name(component_ids_.right, components::get_derived_type(t));
+        result += "/";
+        result += get_component_name(component_ids_.right, components::get_base_type(t));
+    }
+
+    if (result.empty())
     {
         LAGAS_(info) << (boost::format(
             "component_namespace::get_component_typename, key(%1%), response(no_success)")
@@ -500,7 +526,7 @@ response component_namespace::get_component_type_name(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(component_ns_get_component_type_name, (*it).second);
+    return response(component_ns_get_component_type_name, result);
 } // }}}
 
 response component_namespace::statistics_counter(

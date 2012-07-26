@@ -462,9 +462,9 @@ void addressing_service::iterate_types(
         request req(component_ns_iterate_types, f);
 
         if (is_bootstrap())
-            bootstrap->symbol_ns_server.service(req, ec);
+            bootstrap->component_ns_server.service(req, ec);
         else
-            hosted->symbol_ns_.service(req, action_priority_, ec);
+            hosted->component_ns_.service(req, action_priority_, ec);
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -488,9 +488,9 @@ std::string addressing_service::get_component_type_name(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->component_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+            rep = hosted->component_ns_.service(req, action_priority_, ec);
 
         return rep.get_component_typename();
     }
@@ -504,7 +504,7 @@ std::string addressing_service::get_component_type_name(
             ec = e.get_error_code(hpx::rethrow);
         }
     }
-    return "";
+    return "<unknown>";
 } // }}}
 
 components::component_type addressing_service::register_factory(

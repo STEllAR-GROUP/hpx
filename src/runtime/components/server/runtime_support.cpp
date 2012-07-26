@@ -363,10 +363,11 @@ namespace hpx { namespace components { namespace server
             // we don't know anything about this component
             hpx::util::osstream strm;
 
+            error_code ec;
             strm << "attempt to destroy component " << gid
                  << " of invalid/unknown type: "
                  << components::get_component_type_name(type) << " ("
-                 << naming::get_agas_client().get_component_type_name(type)
+                 << naming::get_agas_client().get_component_type_name(type, ec)
                  << ")" << std::endl;
 
             strm << "list of registered components: \n";
@@ -374,7 +375,8 @@ namespace hpx { namespace components { namespace server
             for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
             {
                 strm << "  " << components::get_component_type_name((*cit).first)
-                     << std::endl;
+                     << " (" << naming::get_agas_client().get_component_type_name((*cit).first, ec)
+                      << ")" << std::endl;
             }
 
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
