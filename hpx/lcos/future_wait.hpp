@@ -189,7 +189,11 @@ namespace hpx { namespace lcos
         BOOST_FOREACH(value_type const& f, v)
             f.get();
     }
-}}
+}
+
+using lcos::wait;
+
+}
 
 #endif
 
