@@ -21,11 +21,12 @@ extern "C" {void FNAME(setup)(void* opaque_ptr_to_class,
                           int *,int *,int *,int *,int *, int *);
             void FNAME(load)();
             void FNAME(chargei)(void* opaque_ptr_to_class);
-            void FNAME(partd_allreduce_cmm) (void* pfoo) {
+            void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
+                                             int* mgrid, int *mzetap1) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
-                    ptr_to_class->partd_allreduce();
+                    ptr_to_class->partd_allreduce(dnitmp,densityi,mgrid,mzetap1);
                     return; };
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
                      int *integer_params,double *real_params,
@@ -76,7 +77,7 @@ namespace gtc { namespace server
       FNAME(setup)(static_cast<void*>(this),
          &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
 
-//      FNAME(load)();
+      //FNAME(load)();
 //#endif
 
       // Figure out the communicators: toroidal_comm and partd_comm
@@ -184,6 +185,7 @@ namespace gtc { namespace server
     {
        mutex_type::scoped_lock l(mtx_);
 
+       std::cout << " TEST set_params " << which << " " << generation << " _ " << generation_ << std::endl;
        // make sure this set operation has not arrived ahead of time
        while (generation > generation_)
        {
@@ -197,10 +199,11 @@ namespace gtc { namespace server
        gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::partd_allreduce()
+    void point::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
     {
       if ( in_particle_ ) {
         std::cout << " HELLO WORLD FROM allreduce" << std::endl;
+  
         // create a new and-gate object
         gate_.init(partd_comm_.size());
 
@@ -213,19 +216,31 @@ namespace gtc { namespace server
           generation = ++generation_;
         }
 
-        double value = item_*3.4159;
+        int vsize = (*mgrid)*(*mzetap1);
+        std::vector<double> dnisend;
+        dnisend.resize(vsize); 
+        dnireceive_.resize(vsize); 
+        std::fill( dnireceive_.begin(),dnireceive_.end(),0.0);
+
+        for (std::size_t i=0;i<dnisend.size();i++) {
+          dnisend[i] = dnitmp[i];
+        }
 
         set_data_action set_data_;
-        hpx::apply(set_data_, partd_comm_, item_, generation, value);
+        hpx::apply(set_data_, partd_comm_, item_, generation, dnisend);
 
         // possibly do other stuff while the allgather is going on...
         f.get();
+
+        for (std::size_t i=0;i<dnireceive_.size();i++) {
+          densityi[i] = dnireceive_[i]; 
+        }
         std::cout << " Finish TEST allreduce " << item_ << std::endl;
       }
     }
 
     void point::set_data(std::size_t which,
-                std::size_t generation, double data)
+                std::size_t generation, std::vector<double> const& data)
     {
        mutex_type::scoped_lock l(mtx_);
 
@@ -236,15 +251,9 @@ namespace gtc { namespace server
          hpx::this_thread::suspend();
        }
 
-       //if (which >= n_.size())
-       //{
-       //  // index out of bounds...
-       //  HPX_THROW_EXCEPTION(hpx::bad_parameter,
-       //               "allgather_and_gate::set_data",
-       //               "index is out of range for this allgather operation");
-       //  return;
-       //}
-       //n_[which] = data;         // set the received data
+       for (std::size_t i=0;i<dnireceive_.size();i++) {
+         dnireceive_[i] += data[i];
+       }
 
        gate_.set(which);         // trigger corresponding and-gate input
     }

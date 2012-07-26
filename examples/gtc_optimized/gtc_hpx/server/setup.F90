@@ -64,11 +64,14 @@ end module particle_decomp
 ! total # of PE and rank of PE
   numberpe = hpx_numberpe
   mype = hpx_mype
+  print*,' TEST mype ', mype
 !  call mpi_comm_size(mpi_comm_world,numberpe,ierror)
 !  call mpi_comm_rank(mpi_comm_world,mype,ierror)
 
 ! Read the input file that contains the run parameters
   call read_input_params(ptr,micell,mecell,r0,b0,temperature,edensity0)
+
+  print*,' TEST2 mype ', mype
 
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
@@ -562,6 +565,7 @@ end Subroutine read_input_params
 ! an expensive MPI_BCAST() for each parameter, it is better to pack
 ! everything in a single vector, broadcast it, and unpack it.
 
+  print*,' TEST3 mype ',mype
   if(mype==0)then
 !   Pack all the integer parameters in integer_params() array
     integer_params(1)=irun
@@ -624,6 +628,7 @@ end Subroutine read_input_params
 !  call MPI_BCAST(integer_params,n_integers,MPI_INTEGER,0,MPI_COMM_WORLD,ierror)
 !  call MPI_BCAST(real_params,n_reals,mpi_Rsize,0,MPI_COMM_WORLD,ierror)
 
+  print*,' TEST3.5 mype ',mype
   if(mype/=0)then
 !   Unpack integer parameters
     irun=integer_params(1)
@@ -679,6 +684,7 @@ end Subroutine read_input_params
     umax=real_params(27)
     tauii=real_params(28)
   endif
+  print*,' TEST4 mype ',mype
 
 #ifdef DEBUG_BCAST
 !    write(mype+10,*)irun,mstep,msnap,ndiag,nhybrid,mode00,micell,mecell,&

@@ -36,10 +36,11 @@ namespace gtc { namespace server
         void setup_wrapper(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei_wrapper();
-        void partd_allreduce();
+        void partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1);
         void broadcast_parameters(int *integer_params,double *real_params,
                                   int *n_integers,int *n_reals);
-        void set_data(std::size_t item, std::size_t generation, double data);
+        void set_data(std::size_t item, std::size_t generation,
+                              std::vector<double> const& data);
 
         void set_params(std::size_t which,
                         std::size_t generation,
@@ -65,6 +66,7 @@ namespace gtc { namespace server
         mutable mutex_type mtx_;
         std::vector<int> intparams_;
         std::vector<double> realparams_;
+        std::vector<double> dnireceive_;
         std::size_t in_toroidal_,in_particle_;
     };
 }}
