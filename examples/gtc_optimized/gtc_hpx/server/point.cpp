@@ -41,7 +41,7 @@ extern "C" {void FNAME(setup)(void* opaque_ptr_to_class,
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-    void point::setup(std::size_t numberpe,std::size_t mype,
+    void point::setup_wrapper(std::size_t numberpe,std::size_t mype,
                       std::vector<hpx::naming::id_type> const& components)
     {
       item_ = mype;
@@ -127,7 +127,7 @@ namespace gtc { namespace server
       if ( item_ != 0 ) {
         // create a new and-gate object
         gate_.init(1);
-        
+
         // synchronize with all operations to finish
         hpx::future<void> f = gate_.get_future();
 
@@ -137,7 +137,7 @@ namespace gtc { namespace server
         }
 
         f.get();
-  
+
         // Copy the parameters to the fortran arrays
         for (int i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
@@ -172,13 +172,13 @@ namespace gtc { namespace server
         }
 
         set_params_action set_params_;
-        hpx::apply(set_params_, all_but_root, item_, generation, 
+        hpx::apply(set_params_, all_but_root, item_, generation,
                         intparams,realparams);
-      } 
+      }
     }
 
     void point::set_params(std::size_t which,
-                           std::size_t generation, 
+                           std::size_t generation,
                            std::vector<int> const& intparams,
                            std::vector<double> const& realparams)
     {

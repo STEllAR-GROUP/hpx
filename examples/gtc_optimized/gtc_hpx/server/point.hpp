@@ -33,7 +33,7 @@ namespace gtc { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void setup(std::size_t numberpe,std::size_t mype,
+        void setup_wrapper(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
         void chargei_wrapper();
         void partd_allreduce();
@@ -49,7 +49,7 @@ namespace gtc { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(point, setup, setup_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, setup_wrapper, setup_action);
         HPX_DEFINE_COMPONENT_ACTION(point, chargei_wrapper, chargei_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_params, set_params_action);
