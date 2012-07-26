@@ -123,6 +123,7 @@ response primary_namespace::service(
         case component_ns_resolve_id:
         case component_ns_unbind_name:
         case component_ns_iterate_types:
+        case component_ns_get_component_type_name:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

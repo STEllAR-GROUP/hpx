@@ -100,12 +100,14 @@ struct HPX_EXPORT component_namespace :
       boost::int64_t get_resolve_id_count() const;
       boost::int64_t get_unbind_name_count() const;
       boost::int64_t get_iterate_types_count() const;
+      boost::int64_t get_get_component_type_name_count() const;
 
       boost::int64_t get_bind_prefix_time() const;
       boost::int64_t get_bind_name_time() const;
       boost::int64_t get_resolve_id_time() const;
       boost::int64_t get_unbind_name_time() const;
       boost::int64_t get_iterate_types_time() const;
+      boost::int64_t get_get_component_type_name_time() const;
 
       // increment counter values
       void increment_bind_prefix_count();
@@ -113,6 +115,7 @@ struct HPX_EXPORT component_namespace :
       void increment_resolve_id_count();
       void increment_unbind_name_ount();
       void increment_iterate_types_count();
+      void increment_get_component_type_name_count();
 
     private:
       friend struct update_time_on_exit;
@@ -124,6 +127,7 @@ struct HPX_EXPORT component_namespace :
       api_counter_data resolve_id_;           // component_ns_resolve_id
       api_counter_data unbind_name_;          // component_ns_unbind_name
       api_counter_data iterate_types_;        // component_ns_iterate_types
+      api_counter_data get_component_type_name_; // component_ns_get_component_type_name
     };
     counter_data counter_data_;
 
@@ -212,7 +216,7 @@ struct HPX_EXPORT component_namespace :
       , error_code& ec = throws
         );
 
-    response get_component_typename(
+    response get_component_type_name(
         request const& req
       , error_code& ec = throws
         );
@@ -225,17 +229,17 @@ struct HPX_EXPORT component_namespace :
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service                = component_ns_service
-      , namespace_bulk_service           = component_ns_bulk_service
+        namespace_service                 = component_ns_service
+      , namespace_bulk_service            = component_ns_bulk_service
 
         // Pseudo-actions
-      , namespace_bind_prefix            = component_ns_bind_prefix
-      , namespace_bind_name              = component_ns_bind_name
-      , namespace_resolve_id             = component_ns_resolve_id
-      , namespace_unbind_name            = component_ns_unbind_name
-      , namespace_iterate_types          = component_ns_iterate_types
-      , namespace_get_component_typename = component_ns_get_component_typename
-      , namespace_statistics             = component_ns_statistics_counter
+      , namespace_bind_prefix             = component_ns_bind_prefix
+      , namespace_bind_name               = component_ns_bind_name
+      , namespace_resolve_id              = component_ns_resolve_id
+      , namespace_unbind_name             = component_ns_unbind_name
+      , namespace_iterate_types           = component_ns_iterate_types
+      , namespace_get_component_type_name = component_ns_get_component_type_name
+      , namespace_statistics              = component_ns_statistics_counter
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);

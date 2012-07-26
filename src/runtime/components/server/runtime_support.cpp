@@ -366,7 +366,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to destroy component " << gid
                  << " of invalid/unknown type: "
                  << components::get_component_type_name(type) << " ("
-                 << naming::get_agas_client().get_component_typename(type)
+                 << naming::get_agas_client().get_component_type_name(type)
                  << ")" << std::endl;
 
             strm << "list of registered components: \n";

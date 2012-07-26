@@ -465,7 +465,7 @@ public:
       , error_code& ec = throws
         );
 
-    std::string get_component_typename(
+    std::string get_component_type_name(
         components::component_type id
       , error_code& ec = throws
         );

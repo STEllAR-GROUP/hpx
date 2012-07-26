@@ -478,13 +478,13 @@ void addressing_service::iterate_types(
     }
 } // }}}
 
-std::string addressing_service::get_component_typename(
+std::string addressing_service::get_component_type_name(
     components::component_type id
   , error_code& ec
     )
 { // {{{
     try {
-        request req(component_ns_get_component_typename, id);
+        request req(component_ns_get_component_type_name, id);
         response rep;
 
         if (is_bootstrap())

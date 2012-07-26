@@ -86,6 +86,15 @@ response component_namespace::service(
                 counter_data_.increment_iterate_types_count();
                 return iterate_types(req, ec);
             }
+        case component_ns_get_component_type_name:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.iterate_types_.time_
+                );
+                counter_data_.increment_get_component_type_name_count();
+                return get_component_type_name(req, ec);
+            }
         case component_ns_statistics_counter:
             return statistics_counter(req, ec);
 
@@ -464,7 +473,7 @@ response component_namespace::iterate_types(
     return response(component_ns_iterate_types);
 } // }}}
 
-response component_namespace::get_component_typename(
+response component_namespace::get_component_type_name(
     request const& req
   , error_code& ec
     )
@@ -483,7 +492,7 @@ response component_namespace::get_component_typename(
         if (&ec != &throws)
             ec = make_success_code();
 
-       return response(component_ns_get_component_typename, no_success);
+       return response(component_ns_get_component_type_name, no_success);
     }
 
     LAGAS_(info) << "component_namespace::get_component_typename";
@@ -491,7 +500,7 @@ response component_namespace::get_component_typename(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(component_ns_get_component_typename, (*it).second);
+    return response(component_ns_get_component_type_name, (*it).second);
 } // }}}
 
 response component_namespace::statistics_counter(
@@ -558,6 +567,9 @@ response component_namespace::statistics_counter(
         case component_ns_iterate_types:
             get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_);
             break;
+        case component_ns_get_component_type_name:
+            get_data_func = boost::bind(&cd::get_get_component_type_name_count, &counter_data_);
+            break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
               , "component_namespace::statistics"
@@ -581,6 +593,9 @@ response component_namespace::statistics_counter(
             break;
         case component_ns_iterate_types:
             get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_);
+            break;
+        case component_ns_get_component_type_name:
+            get_data_func = boost::bind(&cd::get_get_component_type_name_time, &counter_data_);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -638,6 +653,12 @@ boost::int64_t component_namespace::counter_data::get_iterate_types_count() cons
     return iterate_types_.count_;
 }
 
+boost::int64_t component_namespace::counter_data::get_get_component_type_name_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return get_component_type_name_.count_;
+}
+
 // access execution time counters
 boost::int64_t component_namespace::counter_data::get_bind_prefix_time() const
 {
@@ -669,6 +690,12 @@ boost::int64_t component_namespace::counter_data::get_iterate_types_time() const
     return iterate_types_.time_;
 }
 
+boost::int64_t component_namespace::counter_data::get_get_component_type_name_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return get_component_type_name_.time_;
+}
+
 // increment counter values
 void component_namespace::counter_data::increment_bind_prefix_count()
 {
@@ -698,6 +725,12 @@ void component_namespace::counter_data::increment_iterate_types_count()
 {
     mutex_type::scoped_lock l(mtx_);
     ++iterate_types_.count_;
+}
+
+void component_namespace::counter_data::increment_get_component_type_name_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++get_component_type_name_.count_;
 }
 
 }}}
