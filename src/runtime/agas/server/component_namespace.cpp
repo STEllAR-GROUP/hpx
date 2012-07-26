@@ -521,7 +521,9 @@ response component_namespace::get_component_type_name(
        return response(component_ns_get_component_type_name, no_success);
     }
 
-    LAGAS_(info) << "component_namespace::get_component_typename";
+    LAGAS_(info) << (boost::format(
+        "component_namespace::get_component_typename, key(%1%), response(%2%)")
+        % int(t) % result);
 
     if (&ec != &throws)
         ec = make_success_code();
