@@ -365,8 +365,9 @@ namespace hpx { namespace components { namespace server
 
             strm << "attempt to destroy component " << gid
                  << " of invalid/unknown type: "
-                 << components::get_component_type_name(type)
-                 << std::endl;
+                 << components::get_component_type_name(type) << " ("
+                 << naming::get_agas_client().get_component_typename(type)
+                 << ")" << std::endl;
 
             strm << "list of registered components: \n";
             component_map_type::iterator end = components_.end();
@@ -823,7 +824,7 @@ namespace hpx { namespace components { namespace server
             return false;     // something bad happened
         }
 
-        // make sure every component module gets asked for startup/shutdown 
+        // make sure every component module gets asked for startup/shutdown
         // functions only once
         std::set<std::string> startup_handled;
 
@@ -873,7 +874,7 @@ namespace hpx { namespace components { namespace server
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
                 if (!load_component(ini, instance, component, lib, prefix,
-                        agas_client, isdefault, isenabled, options, 
+                        agas_client, isdefault, isenabled, options,
                         startup_handled))
                 {
                     // build path to component to load

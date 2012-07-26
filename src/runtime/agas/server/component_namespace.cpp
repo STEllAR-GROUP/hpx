@@ -218,14 +218,14 @@ response component_namespace::bind_prefix(
 
     mutex_type::scoped_lock l(mutex_);
 
-    component_id_table_type::iterator cit = component_ids_.find(key)
-                                    , cend = component_ids_.end();
+    component_id_table_type::left_map::iterator cit = component_ids_.left.find(key)
+                                    , cend = component_ids_.left.end();
 
     // This is the first request, so we use the type counter, and then
     // increment it.
-    if (cit == cend)
+    if (component_ids_.left.find(key) == cend)
     {
-        if (HPX_UNLIKELY(!util::insert_checked(component_ids_.insert(
+        if (HPX_UNLIKELY(!util::insert_checked(component_ids_.left.insert(
                 std::make_pair(key, type_counter)), cit)))
         {
             HPX_THROWS_IF(ec, lock_error
@@ -313,14 +313,14 @@ response component_namespace::bind_name(
 
     mutex_type::scoped_lock l(mutex_);
 
-    component_id_table_type::iterator it = component_ids_.find(key)
-                                    , end = component_ids_.end();
+    component_id_table_type::left_map::iterator it = component_ids_.left.find(key)
+                                    , end = component_ids_.left.end();
 
     // If the name is not in the table, register it (this is only done so
     // we can implement a backwards compatible get_component_id).
     if (it == end)
     {
-        if (HPX_UNLIKELY(!util::insert_checked(component_ids_.insert(
+        if (HPX_UNLIKELY(!util::insert_checked(component_ids_.left.insert(
                 std::make_pair(key, type_counter)), it)))
         {
             HPX_THROWS_IF(ec, lock_error
@@ -409,11 +409,10 @@ response component_namespace::unbind(
 
     mutex_type::scoped_lock l(mutex_);
 
-    component_id_table_type::iterator it = component_ids_.find(key)
-                                    , end = component_ids_.end();
+    component_id_table_type::left_map::iterator it = component_ids_.left.find(key);
 
     // REVIEW: Should this be an error?
-    if (it == end)
+    if (it == component_ids_.left.end())
     {
         LAGAS_(info) << (boost::format(
             "component_namespace::unbind, key(%1%), response(no_success)")
@@ -428,7 +427,7 @@ response component_namespace::unbind(
     // REVIEW: If there are no localities with this type, should we throw
     // an exception here?
     factories_.erase(it->second);
-    component_ids_.erase(it);
+    component_ids_.left.erase(it);
 
     LAGAS_(info) << (boost::format(
         "component_namespace::unbind, key(%1%)")
@@ -450,8 +449,8 @@ response component_namespace::iterate_types(
 
     mutex_type::scoped_lock l(mutex_);
 
-    for (component_id_table_type::iterator it = component_ids_.begin()
-                                         , end = component_ids_.end();
+    for (component_id_table_type::left_map::iterator it = component_ids_.left.begin()
+                                         , end = component_ids_.left.end();
          it != end; ++it)
     {
         f(it->first, it->second);
@@ -463,6 +462,36 @@ response component_namespace::iterate_types(
         ec = make_success_code();
 
     return response(component_ns_iterate_types);
+} // }}}
+
+response component_namespace::get_component_typename(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ iterate implementation
+    components::component_type t = req.get_component_type();
+
+    mutex_type::scoped_lock l(mutex_);
+
+    component_id_table_type::right_map::iterator it = component_ids_.right.begin();
+    if (it == component_ids_.right.end())
+    {
+        LAGAS_(info) << (boost::format(
+            "component_namespace::get_component_typename, key(%1%), response(no_success)")
+            % int(t));
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+       return response(component_ns_get_component_typename, no_success);
+    }
+
+    LAGAS_(info) << "component_namespace::get_component_typename";
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(component_ns_get_component_typename, (*it).second);
 } // }}}
 
 response component_namespace::statistics_counter(

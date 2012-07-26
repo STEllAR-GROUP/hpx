@@ -478,6 +478,35 @@ void addressing_service::iterate_types(
     }
 } // }}}
 
+std::string addressing_service::get_component_typename(
+    components::component_type id
+  , error_code& ec
+    )
+{ // {{{
+    try {
+        request req(component_ns_get_component_typename, id);
+        response rep;
+
+        if (is_bootstrap())
+            rep = bootstrap->symbol_ns_server.service(req, ec);
+        else
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+
+        return rep.get_component_typename();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::iterate_types"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+    return "";
+} // }}}
+
 components::component_type addressing_service::register_factory(
     boost::uint32_t prefix
   , std::string const& name

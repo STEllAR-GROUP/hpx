@@ -40,7 +40,8 @@ enum namespace_action_code
     component_ns_resolve_id                 = BOOST_BINARY_U(0100100),
     component_ns_unbind_name                = BOOST_BINARY_U(0100101),
     component_ns_iterate_types              = BOOST_BINARY_U(0100110),
-    component_ns_statistics_counter         = BOOST_BINARY_U(0100111),
+    component_ns_get_component_typename     = BOOST_BINARY_U(0100111),
+    component_ns_statistics_counter         = BOOST_BINARY_U(0101000),
     symbol_ns_service                       = BOOST_BINARY_U(0010000),
     symbol_ns_bulk_service                  = BOOST_BINARY_U(0010001),
     symbol_ns_bind                          = BOOST_BINARY_U(0010010),
@@ -97,6 +98,11 @@ namespace detail
           , counter_target_count
           , component_ns_iterate_types
           , component_ns_statistics_counter }
+      , {   "count/get_component_typename"
+          , "ns"
+          , counter_target_count
+          , component_ns_get_component_typename
+          , component_ns_statistics_counter }
       // counters exposing API timings
       , {   "time/bind_prefix"
           , "ns"
@@ -122,6 +128,11 @@ namespace detail
           , "ns"
           , counter_target_time
           , component_ns_iterate_types
+          , component_ns_statistics_counter }
+      , {   "time/get_component_typename"
+          , "ns"
+          , counter_target_time
+          , component_ns_get_component_typename
           , component_ns_statistics_counter }
     };
     static std::size_t const num_component_namespace_services =

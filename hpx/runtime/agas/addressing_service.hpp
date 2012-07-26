@@ -465,6 +465,11 @@ public:
       , error_code& ec = throws
         );
 
+    std::string get_component_typename(
+        components::component_type id
+      , error_code& ec = throws
+        );
+
     /// \brief Register a factory for a specific component type
     ///
     /// This function allows to register a component factory for a given

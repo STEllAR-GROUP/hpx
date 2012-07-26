@@ -442,6 +442,7 @@ struct request
         >
         // 0x6
         // component_ns_resolve_id
+        // component_ns_get_component_type
       , boost::fusion::vector1<
             components::component_type // ctype
         >

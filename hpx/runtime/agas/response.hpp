@@ -30,7 +30,7 @@
 #include <boost/serialization/tracking.hpp>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 8
+#define HPX_AGAS_RESPONSE_SUBTYPES 9
 
 namespace hpx { namespace agas
 {
@@ -143,6 +143,18 @@ struct response
       : mc(type_)
       , status(status_)
       , data(boost::fusion::make_vector(prefix_))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
+    response(
+        namespace_action_code type_
+      , std::string const& name_
+      , error status_ = success
+        )
+      : mc(type_)
+      , status(status_)
+      , data(boost::fusion::make_vector(name_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -262,6 +274,13 @@ struct response
         return get_data<subtype_gid_gid_prefix, 1>(ec);
     }
 
+    std::string get_component_typename(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_string, 0>(ec);
+    }
+
     naming::gid_type get_statistics_counter(
         error_code& ec = throws
         ) const
@@ -292,6 +311,7 @@ struct response
       , subtype_gid             = 0x5
       , subtype_prefix          = 0x6
       , subtype_void            = 0x7
+      , subtype_string          = 0x8
       // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
     };
 
@@ -350,6 +370,11 @@ struct response
         // symbol_ns_iterate_names
         // primary_ns_change_credit
       , boost::fusion::vector0<
+        >
+        // 0x8
+        // component_ns_get_component_typename
+      , boost::fusion::vector1<
+            std::string   // component typename
         >
     > data_type;
 

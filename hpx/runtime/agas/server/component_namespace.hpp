@@ -27,6 +27,7 @@
 #include <set>
 
 #include <boost/format.hpp>
+#include <boost/bimap.hpp>
 
 namespace hpx { namespace agas
 {
@@ -57,7 +58,7 @@ struct HPX_EXPORT component_namespace :
 
     typedef std::set<boost::uint32_t> prefixes_type;
 
-    typedef std::map<std::string, component_id_type> component_id_table_type;
+    typedef boost::bimap<std::string, component_id_type> component_id_table_type;
 
     typedef std::map<component_id_type, prefixes_type> factory_table_type;
     // }}}
@@ -211,6 +212,11 @@ struct HPX_EXPORT component_namespace :
       , error_code& ec = throws
         );
 
+    response get_component_typename(
+        request const& req
+      , error_code& ec = throws
+        );
+
     response statistics_counter(
         request const& req
       , error_code& ec = throws
@@ -219,16 +225,17 @@ struct HPX_EXPORT component_namespace :
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service       = component_ns_service
-      , namespace_bulk_service  = component_ns_bulk_service
+        namespace_service                = component_ns_service
+      , namespace_bulk_service           = component_ns_bulk_service
 
         // Pseudo-actions
-      , namespace_bind_prefix   = component_ns_bind_prefix
-      , namespace_bind_name     = component_ns_bind_name
-      , namespace_resolve_id    = component_ns_resolve_id
-      , namespace_unbind_name   = component_ns_unbind_name
-      , namespace_iterate_types = component_ns_iterate_types
-      , namespace_statistics    = component_ns_statistics_counter
+      , namespace_bind_prefix            = component_ns_bind_prefix
+      , namespace_bind_name              = component_ns_bind_name
+      , namespace_resolve_id             = component_ns_resolve_id
+      , namespace_unbind_name            = component_ns_unbind_name
+      , namespace_iterate_types          = component_ns_iterate_types
+      , namespace_get_component_typename = component_ns_get_component_typename
+      , namespace_statistics             = component_ns_statistics_counter
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);
