@@ -229,13 +229,13 @@ set_target_properties(hpx_serialization PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
 set(hpx_serialization_lib_dependencies
-  ${hpx_MALLOC_LIBRARY}
-  ${BOOST_SERIALIZATION_LIBRARY})
+  ${hpx_MALLOC_LIBRARY})
 
 if(NOT MSVC)
   set(hpx_serialization_lib_dependencies
       ${hpx_serialization_lib_dependencies}
-      ${BOOST_SYSTEM_LIBRARY})
+      ${BOOST_SYSTEM_LIBRARY}
+      ${BOOST_SERIALIZATION_LIBRARY})
 endif()
 
 target_link_libraries(hpx_serialization
