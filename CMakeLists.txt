@@ -1179,7 +1179,7 @@ foreach(library ${BOOST_LIBRARIES})
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info
-    "${boost_library_info}    CACHE FILEPATH \"Boost ${target_lib} shared library.\")\n")
+    "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
 endforeach()
 
 get_directory_property(external_definitions DEFINITIONS)

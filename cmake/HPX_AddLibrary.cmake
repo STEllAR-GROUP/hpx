@@ -41,9 +41,9 @@ macro(add_hpx_library name)
   hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
 
   if(HPX_FOUND AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-    set(hpx_lib hpx${HPX_DEBUG_POSTFIX})
+    set(hpx_lib hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX})
   else()
-    set(hpx_lib hpx)
+    set(hpx_lib hpx hpx_serialization)
   endif()
 
   set(prefix "")
