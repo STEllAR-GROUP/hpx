@@ -28,5 +28,6 @@ hpx_include(Message
             AddSourceGroup
             LinkDirectories
             IncludeDirectories
-            ForceOutOfTreeBuild)
+            ForceOutOfTreeBuild
+            SetOutputPaths)
 
