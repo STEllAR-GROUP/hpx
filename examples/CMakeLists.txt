@@ -20,8 +20,12 @@ set(subdirs
     distributed_test
     embarrassingly_parallel
     gtc
+    gtc_optimized
+    gravity
     heartbeat
     hplpx
+    interpolate1d
+    interpolate3d
     jacobi
     nbody
     nqueen
@@ -30,6 +34,7 @@ set(subdirs
     queue
     quickstart
     random_mem_access
+    sheneos
     spell_check
     startup_shutdown
     throttle
@@ -47,28 +52,6 @@ if(${BOOST_MINOR_VERSION} GREATER 46)
   set(subdirs ${subdirs}
       geometry
      )
-endif()
-
-if(HDF5_CPP_FOUND)
-  if(HDF5_FOUND)
-    set(subdirs ${subdirs}
-        interpolate1d
-        interpolate3d
-        gravity
-       )
-  endif()
-
-  if(HDF5_THREAD_SAFE)
-    set(subdirs ${subdirs}
-        sheneos
-       )
-
-    if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
-      set(subdirs ${subdirs}
-          gtc_optimized
-         )
-    endif()
-  endif()
 endif()
 
 foreach(subdir ${subdirs})

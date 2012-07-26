@@ -6,54 +6,59 @@
 
 find_package(HPX_HDF5)
 
-include_directories(${HDF5_INCLUDE_DIR})
-include_directories(${HDF5_CPP_INCLUDE_DIR})
+if(HDF5_CPP_FOUND)
+  if(HDF5_FOUND)
 
-# just recurse into all components subdirectories and execute the scripts there
-set(subdirs
-    interpolate3d)
+    include_directories(${HDF5_INCLUDE_DIR})
+    include_directories(${HDF5_CPP_INCLUDE_DIR})
 
-# for all targets specified above
-foreach(subdir ${subdirs})
-  add_subdirectory(${subdir})
+    # just recurse into all components subdirectories and execute the scripts there
+    set(subdirs
+        interpolate3d)
 
-  set(sources
-      ${subdir}_client.cpp)
+    # for all targets specified above
+    foreach(subdir ${subdirs})
+      add_subdirectory(${subdir})
 
-  source_group("Source Files" FILES ${sources})
+      set(sources
+          ${subdir}_client.cpp)
 
-  # add example executable
-  add_hpx_executable(${subdir}_client
-    SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component
-    FOLDER "Examples/Interpolate3D")
+      source_group("Source Files" FILES ${sources})
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(examples.interpolate3d.${subdir})
+      # add example executable
+      add_hpx_executable(${subdir}_client
+        SOURCES ${sources}
+        DEPENDENCIES ${subdir}_component
+        FOLDER "Examples/Interpolate3D")
 
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.interpolate3d
-                              examples.interpolate3d.${subdir})
+      # add a custom target for this example
+      add_hpx_pseudo_target(examples.interpolate3d.${subdir})
 
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.interpolate3d.${subdir}
-                              ${subdir}_client_exe)
-endforeach()
+      # make pseudo-targets depend on master pseudo-target
+      add_hpx_pseudo_dependencies(examples.interpolate3d
+                                  examples.interpolate3d.${subdir})
 
-add_hpx_executable(create_3d_testdata
-  SOURCES create_testdata.cpp
-  DEPENDENCIES ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY}
-  NOLIBS
-  FOLDER "Examples/Interpolate3D")
+      # add dependencies to pseudo-target
+      add_hpx_pseudo_dependencies(examples.interpolate3d.${subdir}
+                                  ${subdir}_client_exe)
+    endforeach()
 
-# add a custom target for this example
-add_hpx_pseudo_target(examples.interpolate3d.create_3d_testdata)
+    add_hpx_executable(create_3d_testdata
+      SOURCES create_testdata.cpp
+      DEPENDENCIES ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY}
+      NOLIBS
+      FOLDER "Examples/Interpolate3D")
 
-# make pseudo-targets depend on master pseudo-target
-add_hpx_pseudo_dependencies(examples.interpolate3d
-                            examples.interpolate3d.create_3d_testdata)
+    # add a custom target for this example
+    add_hpx_pseudo_target(examples.interpolate3d.create_3d_testdata)
 
-# add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.interpolate3d.create_3d_testdata
-                            create_3d_testdata_exe)
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(examples.interpolate3d
+                                examples.interpolate3d.create_3d_testdata)
 
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(examples.interpolate3d.create_3d_testdata
+                                create_3d_testdata_exe)
+
+  endif()
+endif()

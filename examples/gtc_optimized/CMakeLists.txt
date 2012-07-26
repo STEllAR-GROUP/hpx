@@ -7,36 +7,42 @@
 
 find_package(HPX_HDF5)
 
-if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_LIBRARY)
-  set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
+if(HDF5_CPP_FOUND)
+  if(HDF5_THREAD_SAFE)
+    if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
 
-  add_subdirectory(gtc_hpx)
+        set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
 
-  # for all targets specified above
-  set(sources
-    gtc_hpx_client.cpp
-    )
+        add_subdirectory(gtc_hpx)
 
-  source_group("Source Files" FILES ${sources})
+        # for all targets specified above
+        set(sources
+          gtc_hpx_client.cpp
+        )
 
-  set(dependencies
-    ${HDF5_FORTRAN_LIBRARY}
-    distributing_factory_component)
+        source_group("Source Files" FILES ${sources})
 
-  # add example executable
-  add_hpx_executable(gtc_hpx_client
-    SOURCES ${sources}
-    DEPENDENCIES gtc_hpx_component ${dependencies}
-    FOLDER "Examples/Applications/GTC Optimized")
+        set(dependencies
+          ${HDF5_FORTRAN_LIBRARY}
+          distributing_factory_component)
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(examples.gtc_optimized.gtc_hpx)
+        # add example executable
+        add_hpx_executable(gtc_hpx_client
+          SOURCES ${sources}
+          DEPENDENCIES gtc_hpx_component ${dependencies}
+          FOLDER "Examples/Applications/GTC Optimized")
 
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.gtc_optimized
-                              examples.gtc_optimized.gtc_hpx)
+        # add a custom target for this example
+        add_hpx_pseudo_target(examples.gtc_optimized.gtc_hpx)
 
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.gtc_optimized.gtc_hpx
-                              gtc_hpx_client_exe)
+        # make pseudo-targets depend on master pseudo-target
+        add_hpx_pseudo_dependencies(examples.gtc_optimized
+                                    examples.gtc_optimized.gtc_hpx)
+
+        # add dependencies to pseudo-target
+        add_hpx_pseudo_dependencies(examples.gtc_optimized.gtc_hpx
+                                    gtc_hpx_client_exe)
+
+    endif()
+  endif()
 endif()

@@ -8,56 +8,62 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 
-add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_FUNCTION_LIMIT=13)
-
 find_package(HPX_HDF5)
 
-include_directories (${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
+if(HDF5_CPP_FOUND)
+  if(HDF5_FOUND)
 
-# define build target for this directory
-set(sources
-    gravity_future/gravity_hpx.cpp
-    gravity_future/HDF5_reader.cpp
-    gravity_future/HDF5_writer.cpp)
+    add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
+    add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
+    add_definitions(-DHPX_FUNCTION_LIMIT=13)
 
-set(headers
-    gravity_future/gravity.hpp)
+    include_directories (${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
 
-set(headers2                                   #
-    gravity_dataflow/gravity_dataflow.hpp)     #
-                                               #
-set(sources2                                   #
-    gravity_dataflow/gravity_dataflow.cpp      #
-    gravity_dataflow/HDF5_dataflow_reader.cpp  #
-    gravity_dataflow/HDF5_dataflow_writer.cpp) #
+    # define build target for this directory
+    set(sources
+        gravity_future/gravity_hpx.cpp
+        gravity_future/HDF5_reader.cpp
+        gravity_future/HDF5_writer.cpp)
 
-# define basic dependencies
-set(dependencies 
-    ${HDF5_CPP_LIBRARY} ${HDF5_LIBRARY})
+    set(headers
+        gravity_future/gravity.hpp)
 
-source_group("Source Files" FILES ${sources} ${sources2})
-#source_group("Source Files 2" FILES ${sources2})
+    set(headers2                                   #
+        gravity_dataflow/gravity_dataflow.hpp)     #
+                                                   #
+    set(sources2                                   #
+        gravity_dataflow/gravity_dataflow.cpp      #
+        gravity_dataflow/HDF5_dataflow_reader.cpp  #
+        gravity_dataflow/HDF5_dataflow_writer.cpp) #
 
-add_hpx_executable(gravity_hpx
-  MODULE gravity_module
-  SOURCES ${sources}
-  HEADERS ${headers}
-  DEPENDENCIES ${dependencies}
-  FOLDER "Examples/Gravity")
+    # define basic dependencies
+    set(dependencies
+        ${HDF5_CPP_LIBRARY} ${HDF5_LIBRARY})
 
-add_hpx_executable(gravity_dataflow               #
-  MODULE gravity_module                           #
-  SOURCES ${sources2}                             #
-  HEADERS ${headers2}                             #
-  DEPENDENCIES ${dependencies} dataflow_component #
-  FOLDER "Examples/Gravity")                      #
+    source_group("Source Files" FILES ${sources} ${sources2})
+    #source_group("Source Files 2" FILES ${sources2})
 
-# add a dependency to the pseudo-target          #
-add_hpx_pseudo_target(examples.gravity_hpx)      #
-add_hpx_pseudo_target(examples.gravity_dataflow) #
+    add_hpx_executable(gravity_hpx
+      MODULE gravity_module
+      SOURCES ${sources}
+      HEADERS ${headers}
+      DEPENDENCIES ${dependencies}
+      FOLDER "Examples/Gravity")
 
-# add a dependency to the pseudo-target
-add_hpx_pseudo_dependencies(examples.gravity gravity_hpx_exe)
-add_hpx_pseudo_dependencies(examples.gravity_dataflow gravity_dataflow_exe)#
+    add_hpx_executable(gravity_dataflow               #
+      MODULE gravity_module                           #
+      SOURCES ${sources2}                             #
+      HEADERS ${headers2}                             #
+      DEPENDENCIES ${dependencies} dataflow_component #
+      FOLDER "Examples/Gravity")                      #
+
+    # add a dependency to the pseudo-target          #
+    add_hpx_pseudo_target(examples.gravity_hpx)      #
+    add_hpx_pseudo_target(examples.gravity_dataflow) #
+
+    # add a dependency to the pseudo-target
+    add_hpx_pseudo_dependencies(examples.gravity gravity_hpx_exe)
+    add_hpx_pseudo_dependencies(examples.gravity_dataflow gravity_dataflow_exe)#
+
+  endif()
+endif()

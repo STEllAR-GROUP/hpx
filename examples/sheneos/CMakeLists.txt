@@ -5,62 +5,66 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 find_package(HPX_HDF5)
-find_package(HPX_OpenMP)
 
-include_directories(${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
+if(HDF5_CPP_FOUND)
+  if(HDF5_THREAD_SAFE)
 
-# add a custom target for this example
-add_hpx_pseudo_target(examples.sheneos.sheneos)
+    include_directories(${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
 
-add_subdirectory(sheneos)
+    # add a custom target for this example
+    add_hpx_pseudo_target(examples.sheneos.sheneos)
 
-# make pseudo-targets depend on master pseudo-target
-add_hpx_pseudo_dependencies(examples.sheneos examples.sheneos.sheneos)
+    add_subdirectory(sheneos)
 
-###############################################################################
-source_group("Source Files"
-  FILES sheneos_client.cpp sheneos_test.cpp sheneos_compare.cpp
-        read_nuc_table.F90 eosmodule.F90 readtable.F90 nuc_eos.F90 findrho.F90
-        findtemp.F90 linterp.f linterp_many.F90 bisection.F90)
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(examples.sheneos examples.sheneos.sheneos)
 
-# add example executable
-add_hpx_executable(sheneos_client
-  SOURCES sheneos_client.cpp
-  DEPENDENCIES sheneos_component
-  FOLDER "Examples/ShenEOS")
+    ###############################################################################
+    source_group("Source Files"
+      FILES sheneos_client.cpp sheneos_test.cpp sheneos_compare.cpp
+            read_nuc_table.F90 eosmodule.F90 readtable.F90 nuc_eos.F90 findrho.F90
+            findtemp.F90 linterp.f linterp_many.F90 bisection.F90)
 
-# add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.sheneos sheneos_client_exe)
+    # add example executable
+    add_hpx_executable(sheneos_client
+      SOURCES sheneos_client.cpp
+      DEPENDENCIES sheneos_component
+      FOLDER "Examples/ShenEOS")
 
-add_hpx_executable(sheneos_test
-  SOURCES sheneos_test.cpp
-  DEPENDENCIES sheneos_component
-  FOLDER "Examples/ShenEOS")
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(examples.sheneos sheneos_client_exe)
 
-# add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe)
+    add_hpx_executable(sheneos_test
+      SOURCES sheneos_test.cpp
+      DEPENDENCIES sheneos_component
+      FOLDER "Examples/ShenEOS")
 
-if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
-  add_hpx_executable(sheneos_compare
-    SOURCES
-        sheneos_compare.cpp
-        eos_driver/read_nuc_table.F90
-        eos_driver/eosmodule.F90
-        eos_driver/readtable.F90
-        eos_driver/nuc_eos.F90
-        eos_driver/findrho.F90
-        eos_driver/findtemp.F90
-        eos_driver/linterp.f
-        eos_driver/linterp_many.F90
-        eos_driver/bisection.F90
-    DEPENDENCIES sheneos_component ${HDF5_FORTRAN_LIBRARY} ${HDF5_LIBRARY}
-    FOLDER "Examples/ShenEOS")
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe)
 
-set_target_properties(sheneos_compare_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
+    if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
+      add_hpx_executable(sheneos_compare
+        SOURCES
+            sheneos_compare.cpp
+            eos_driver/read_nuc_table.F90
+            eos_driver/eosmodule.F90
+            eos_driver/readtable.F90
+            eos_driver/nuc_eos.F90
+            eos_driver/findrho.F90
+            eos_driver/findtemp.F90
+            eos_driver/linterp.f
+            eos_driver/linterp_many.F90
+            eos_driver/bisection.F90
+        DEPENDENCIES sheneos_component ${HDF5_FORTRAN_LIBRARY} ${HDF5_LIBRARY}
+        FOLDER "Examples/ShenEOS")
 
-set_target_properties(sheneos_compare_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+    set_target_properties(sheneos_compare_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
 
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.sheneos sheneos_compare_exe)
+    set_target_properties(sheneos_compare_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+
+      # add dependencies to pseudo-target
+      add_hpx_pseudo_dependencies(examples.sheneos sheneos_compare_exe)
+    endif()
+
+  endif()
 endif()
-
