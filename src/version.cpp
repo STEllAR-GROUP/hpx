@@ -61,11 +61,10 @@ namespace hpx
 
     std::string build_string()
     {
-        return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d), SVN: %s") %
+        return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d)") %
             HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
             HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
-            (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
-            HPX_SVN_REVISION);
+            (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10));
     }
 
     std::string boost_version()
