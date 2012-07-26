@@ -1,0 +1,41 @@
+////////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+////////////////////////////////////////////////////////////////////////////////
+
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/lcos.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+struct cout_continuation
+{
+    typedef void result_type;
+
+    result_type operator()(hpx::future<std::vector<hpx::future<int> > > f) const
+    {
+        for (std::size_t i = 0; i < f.get().size(); ++i)
+            std::cout << f.get()[i].get() << "\n";
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main(boost::program_options::variables_map& vm)
+{
+    {
+        hpx::future<int> a = hpx::lcos::create_value<int>(17);
+        hpx::future<int> b = hpx::lcos::create_value<int>(42);
+        hpx::future<int> c = hpx::lcos::create_value<int>(-1);
+
+        hpx::wait_all(a, b, c).when(cout_continuation());
+    }
+
+    return hpx::finalize();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int main(int argc, char* argv[])
+{
+    return hpx::init(argc, argv); // Initialize and run HPX.
+}

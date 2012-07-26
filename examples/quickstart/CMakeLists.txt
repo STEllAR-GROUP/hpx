@@ -17,6 +17,7 @@ set(example_programs
     quicksort
     simplest_hello_world
     timed_wake
+    wait_composition
    )
 
 if(HPX_CXX11_LAMBDAS)
