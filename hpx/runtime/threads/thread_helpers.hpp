@@ -276,6 +276,30 @@ namespace hpx { namespace this_thread
         boost::posix_time::time_duration const&,
         char const* description = "this_thread::suspend",
         error_code& ec = throws);
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to \a suspended and schedules a wakeup for this threads after the given
+    /// time (specified in milliseconds).
+    ///
+    /// \note Must be called from within a HPX-thread.
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    ///
+    inline threads::thread_state_ex_enum suspend(
+        int ms, char const* description = "this_thread::suspend",
+        error_code& ec = throws)
+    {
+        return suspend(boost::posix_time::milliseconds(ms), description, ec);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
