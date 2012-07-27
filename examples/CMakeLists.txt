@@ -19,6 +19,7 @@ set(subdirs
     dataflow
     distributed_test
     embarrassingly_parallel
+    fortran_threadsafe
     gtc
     gtc_optimized
     gravity
