@@ -1,10 +1,15 @@
 !========================================================================
 
-    module global_parameters
-
-!========================================================================
-  integer  :: mype
+module global_parameters
+  type mytype
+    integer  :: imype
+  end type mytype
+  type(mytype) bonk
+  save bonk
+!$OMP THREADPRIVATE(bonk)
 end module global_parameters
+
+#define mype bonk%imype
 
 
 !========================================================================
@@ -39,13 +44,16 @@ end module global_parameters
     end do
   endif
 
+  print*, ' TEST A mype ', mype
+
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  if (mype/=0) then
+  print*, ' TEST B mype ', mype
+  !if (mype/=0) then
   ! unpack
-    print*, ' TEST mype ', mype, &
-  ' <= should be a number between 0 and 9; numbers should not be duplicated'
-  endif
+  !  print*, ' TEST mype ', mype, &
+  !' <= should be a number between 0 and 9; numbers should not be duplicated'
+  !endif
 
 end subroutine setup
