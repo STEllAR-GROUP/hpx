@@ -6,5 +6,88 @@
 =============================================================================/]
 
 [section:providing Providing Performance Counter Data]
+
+__hpx__ provides several ways to provide your own data as a performance counter.
+This has the benefit of exposing additional, possibly application specific
+information using the existing Performance Counter framework, unifying the
+process of gathering data about your application.
+
+An application that wants to provide counter data can write a Performance
+Counter to provide the data. When a consumer queries performance data, the
+__hpx__ runtime system calls the provider to collect the data. The runtime
+system uses an internal registry to determine which provider to call.
+
+[heading Exposing Performance Counter Data using a Function]
+
+The simplest way to expose arbitrary numeric data is to write a function which
+then will be called whenever a consumer queries this counter. Currently, this
+type of Performance Counter can only be used to expose integer values. The
+expected signature of this function is:
+
+    // The atomic variable 'counter' ensures the thread safety of the counter.
+    boost::atomic<boost::int64_t> counter(0);
+
+    boost::int64_t some_performance_data()
+    {
+        return ++counter;
+    }
+
+This function exposes a linearly increasing value as our performance data. The
+value is incrememnted on each invocation, e.g. each time a consumer requests
+the counter data of this Performance Counter.
+
+The next step in exposing this counter to the runtime system is to register
+the function as a new raw counter type using the __hpx__ API function
+[funcref hpx::performance_counters::install_counter_type `hpx::performance_counters::install_counter_type`].
+A counter type represents certain common characteristics of counters, such like
+their counter type name, and any associated description information. The
+following snippet shows an example of how to register the function
+`some_performance_data` which is shown above for a counter type named
+`"/test/data"`. This registration has to be executed before
+any consumer instantiates and queries an instance of this counter type.
+
+    #include <hpx/include/performance_counters.hpp>
+
+    void register_counter_type()
+    {
+        // Call the HPX API function to register the counter type
+        ``[funcref hpx::performance_counters::install_counter_type hpx::performance_counters::install_counter_type]``(
+            "/test/data",                                   // counter type name
+            &some_performance_data,                         // function providing counter data
+            "returns a linearly increasing counter value"   // description text
+        );
+    }
+
+Now it is possible to instantiate a new counter instance based on
+the naming scheme `"/test{locality#<*>/total}/data"`, where `<*>` is a zero
+based integer index indentifying the locality for which the counter instance
+should be accessed. The function [funcref hpx::performance_counters::install_counter_type `install_counter_type`]
+allows to instantiate exactly one counter for each locality.
+
+If this counter should be accessible using the standard __hpx__ command line
+options, the registration has to be performed during application startup,
+before `hpx_main` is executed. The easiest way to achieve this is to register
+a __hpx__ startup function using the API function
+[funcref hpx::register_startup_function `hpx::register_startup_function`] before
+calling to initialize the runtime system:
+
+    int main(int argc, char* argv[])
+    {
+        // By registering the counter type we make it available to any consumer
+        // creating and querying an instance of the type "/test/data".
+        //
+        // This registration should be performed during startup. We register the
+        // function 'register_counter_type' to be executed as an HPX thread right
+        // before hpx_main will be executed.
+        ``[funcref hpx::register_startup_function `hpx::register_startup_function`]``(&register_counter_type);
+
+        // Initialize and run HPX.
+        return ``[funcref hpx::init `hpx::init`]``(argc, argv);
+    }
+
+Please see the code in
+[hpx_link examples/performance_counters/simplest_performance_counter.cpp..simplest_performance_counter.cpp]
+for a full example demonstrating this functionality.
+
 [endsect] [/ Providing Performance Counter Data]
 

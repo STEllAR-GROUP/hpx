@@ -126,9 +126,11 @@ bool pre_main(runtime_mode mode)
 
         register_counter_types();
 
+        get_runtime().set_state(runtime::state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
+        get_runtime().set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }
@@ -196,9 +198,11 @@ bool pre_main(runtime_mode mode)
 
         register_counter_types();
 
+        get_runtime().set_state(runtime::state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
+        get_runtime().set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 

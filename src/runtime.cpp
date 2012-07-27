@@ -143,11 +143,17 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // There is no need to protect these global from thread concurrent access
+    // as they are access during early startup only.
+    std::list<HPX_STD_FUNCTION<void()> > global_pre_startup_functions;
+    std::list<HPX_STD_FUNCTION<void()> > global_startup_functions;
+
+    ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::resolver_client& agas_client,
             util::runtime_configuration& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
-        stopped_(true)
+        state_(state_invalid)
     {
         // initialize thread mapping for external libraries (i.e. PAPI)
         thread_support_.register_thread("main");
@@ -198,6 +204,22 @@ namespace hpx
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
+
+        // copy over all startup functions registered so far
+        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_startup_functions)
+        {
+            add_pre_startup_function(f);
+        }
+        global_pre_startup_functions.clear();
+
+        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_startup_functions)
+        {
+            add_startup_function(f);
+        }
+        global_startup_functions.clear();
+
+        // set state to initialized
+        set_state(state_initialized);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -238,6 +260,7 @@ namespace hpx
         }
 
         LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete";
+        state_ = state_running;
 
         // Now, execute the user supplied thread function (hpx_main)
         if (!!func)
@@ -872,14 +895,34 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void register_startup_function(startup_function_type const& f)
     {
-        if (NULL != get_runtime_ptr())
+        if (NULL != get_runtime_ptr()) {
+            if (get_runtime().get_state() >= runtime::state_startup) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "register_startup_function",
+                    "Too late to register a new startup function.");
+                return;
+            }
             get_runtime().add_startup_function(f);
+        }
+        else {
+            global_pre_startup_functions.push_back(f);
+        }
     }
 
     void register_pre_startup_function(startup_function_type const& f)
     {
-        if (NULL != get_runtime_ptr())
+        if (NULL != get_runtime_ptr()) {
+            if (get_runtime().get_state() >= runtime::state_pre_startup) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "register_startup_function",
+                    "Too late to register a new pre-startup function.");
+                return;
+            }
             get_runtime().add_pre_startup_function(f);
+        }
+        else {
+            global_startup_functions.push_back(f);
+        }
     }
 
     void register_pre_shutdown_function(shutdown_function_type const& f)

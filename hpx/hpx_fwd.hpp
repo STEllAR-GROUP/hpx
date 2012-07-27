@@ -327,23 +327,6 @@ namespace hpx
         std::size_t dflt);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Add a function to be executed inside a HPX thread before hpx_main
-    /// but guaranteed before any startup function is executed (system-wide)
-    typedef HPX_STD_FUNCTION<void()> startup_function_type;
-    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const&);
-
-    /// Add a function to be executed inside a HPX thread before hpx_main
-    HPX_API_EXPORT void register_startup_function(startup_function_type const&);
-
-    /// Add a function to be executed inside a HPX thread during hpx::finalize
-    /// but guaranteed before any shutdown function is executed (system-wide)
-    typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
-    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
-
-    /// Add a function to be executed inside a HPX thread during hpx::finalize
-    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
-
-    ///////////////////////////////////////////////////////////////////////////
     template <
         typename SchedulingPolicy,
         typename NotificationPolicy = threads::policies::callback_notifier>
@@ -597,6 +580,11 @@ namespace hpx
     ///        from.
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Pulling important types into the main namespace
+    using naming::id_type;
+    using lcos::future;
+
     /// \endcond
 }
 
@@ -699,8 +687,92 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
     HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
 
-    using naming::id_type;
-    using lcos::future;
+    /// The type of a function which is registered to be executed as a
+    /// startup or pre-startup function.
+    typedef HPX_STD_FUNCTION<void()> startup_function_type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Add a function to be executed by a HPX thread before hpx_main
+    /// but guaranteed before any startup function is executed (system-wide).
+    ///
+    /// Any of the functions registered with \a register_pre_startup_function
+    /// are guaranteed to be executed by an HPX thread before any of the
+    /// registered startup functions are executed (see
+    /// \a hpx::register_startup_function()).
+    ///
+    /// \param f  [in] The function to be registered to run by an HPX thread as
+    ///           a pre-startup function.
+    ///
+    /// \note If this function is called while the pre-startup functions are
+    ///       being executed or after that point, it will raise a invalid_status
+    ///       exception.
+    ///
+    /// \see    \a hpx::register_startup_function()
+    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const&);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Add a function to be executed by a HPX thread before hpx_main
+    /// but guaranteed after any pre-startup function is executed (system-wide).
+    ///
+    /// Any of the functions registered with \a register_startup_function
+    /// are guaranteed to be executed by an HPX thread after any of the
+    /// registered pre-startup functions are executed (see:
+    /// \a hpx::register_pre_startup_function()), but before \a hpx_main is
+    /// being called.
+    ///
+    /// \param f  [in] The function to be registered to run by an HPX thread as
+    ///           a startup function.
+    ///
+    /// \note If this function is called while the startup functions are
+    ///       being executed or after that point, it will raise a invalid_status
+    ///       exception.
+    ///
+    /// \see    \a hpx::register_pre_startup_function()
+    HPX_API_EXPORT void register_startup_function(startup_function_type const&);
+
+    /// The type of a function which is registered to be executed as a
+    /// shutdown or pre-shutdown function.
+    typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
+
+    /// \brief Add a function to be executed by a HPX thread during
+    /// \a hpx::finalize() but guaranteed before any shutdown function is
+    /// executed (system-wide)
+    ///
+    /// Any of the functions registered with \a register_pre_shutdown_function
+    /// are guaranteed to be executed by an HPX thread during the execution of
+    /// \a hpx::finalize() before any of the registered shutdown functions are
+    /// executed (see: \a hpx::register_shutdown_function()).
+    ///
+    /// \param f  [in] The function to be registered to run by an HPX thread as
+    ///           a pre-shutdown function.
+    ///
+    /// \note If this function is called before the runtime system is
+    ///       initialized, or while the pre-shutdown functions are
+    ///       being executed, or after that point, it will raise a invalid_status
+    ///       exception.
+    ///
+    /// \see    \a hpx::register_shutdown_function()
+    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
+
+    /// \brief Add a function to be executed by a HPX thread during
+    /// \a hpx::finalize() but guaranteed after any pre-shutdown function is
+    /// executed (system-wide)
+    ///
+    /// Any of the functions registered with \a register_shutdown_function
+    /// are guaranteed to be executed by an HPX thread during the execution of
+    /// \a hpx::finalize() after any of the registered pre-shutdown functions
+    /// are executed (see: \a hpx::register_pre_shutdown_function()).
+    ///
+    /// \param f  [in] The function to be registered to run by an HPX thread as
+    ///           a shutdown function.
+    ///
+    /// \note If this function is called before the runtime system is
+    ///       initialized, or while the shutdown functions are
+    ///       being executed, or after that point, it will raise a invalid_status
+    ///       exception.
+    ///
+    /// \see    \a hpx::register_pre_shutdown_function()
+    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

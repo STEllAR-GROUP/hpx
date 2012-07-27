@@ -35,12 +35,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    bool pre_main(runtime_mode);
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
 
     class HPX_EXPORT runtime
     {
     public:
+        enum state
+        {
+            state_invalid = -1,
+            state_initialized = 0,
+            state_pre_startup = 1,
+            state_startup = 2,
+            state_pre_main = 3,
+            state_running = 4,
+            state_stopped = 5
+        };
+
+        state get_state() const { return state_; }
+
         /// The \a hpx_main_function_type is the default function type usable
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
@@ -70,13 +86,13 @@ namespace hpx
         /// \brief Manage runtime 'stopped' state
         void start()
         {
-            stopped_ = false;
+            state_ = state_pre_main;
         }
 
         /// \brief Call all registered on_exit functions
         void stop()
         {
-            stopped_ = true;
+            state_ = state_stopped;
 
             typedef HPX_STD_FUNCTION<void()> value_type;
 
@@ -88,7 +104,7 @@ namespace hpx
         /// This accessor returns whether the runtime instance has been stopped
         bool stopped() const
         {
-            return stopped_;
+            return state_ == state_stopped;
         }
 
         // the TSS holds a pointer to the runtime associated with a given
@@ -191,6 +207,9 @@ namespace hpx
         void init_tss();
         void deinit_tss();
 
+        friend bool hpx::pre_main(runtime_mode);
+        void set_state(state s) { state_ = s; }
+
     protected:
         // list of functions to call on exit
         typedef std::vector<HPX_STD_FUNCTION<void()> > on_exit_type;
@@ -209,7 +228,7 @@ namespace hpx
 
         threads::topology topology_;
 
-        bool stopped_;
+        state state_;
     };
 
     /// The \a runtime class encapsulates the HPX runtime system in a simple to

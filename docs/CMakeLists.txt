@@ -25,7 +25,8 @@ set(documentation_dependencies
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.cpp
     ${hpx_SOURCE_DIR}/examples/accumulator/managed_accumulator_client.cpp
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp
-    ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp)
+    ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp
+    ${hpx_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp)
 
 if(DOXYGEN_FOUND)
   set(documentation_dependencies ${documentation_dependencies}
@@ -38,7 +39,8 @@ if(DOXYGEN_FOUND)
       ${hpx_SOURCE_DIR}/hpx/exception.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp)
+      ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp
+      ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
 
   # Generate Doxygen from the source code.
   hpx_source_to_boostbook(hpx_autodoc

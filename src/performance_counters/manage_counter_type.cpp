@@ -9,7 +9,10 @@
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+
+#include <boost/bind.hpp>
 
 namespace hpx { namespace performance_counters
 {
@@ -20,7 +23,7 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void install_counter_type(std::string const& name,
+    counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext, boost::uint32_t version,
         error_code& ec)
     {
@@ -35,12 +38,13 @@ namespace hpx { namespace performance_counters
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
             boost::bind(&counter_type_shutdown, p));
+        return status_valid_data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Install a new generic performance counter type in a way, which will
     // uninstall it automatically during shutdown.
-    void install_counter_type(std::string const& name,
+    counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext,
         HPX_STD_FUNCTION<create_counter_func> const& create_counter,
         HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
@@ -57,6 +61,21 @@ namespace hpx { namespace performance_counters
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
             boost::bind(&counter_type_shutdown, p));
+        return status_valid_data;
+    }
+
+    // Install a new generic performance counter type which uses a function to
+    // provide the data in a way, which will uninstall it automatically during
+    // shutdown.
+    counter_status install_counter_type(std::string const& name,
+        HPX_STD_FUNCTION<boost::int64_t()> const& counter_value,
+        std::string const& helptext, error_code& ec)
+    {
+        return install_counter_type(name, counter_raw, helptext,
+            boost::bind(&hpx::performance_counters::locality_raw_counter_creator,
+                _1, counter_value, _2),
+            &hpx::performance_counters::locality_counter_discoverer,
+            HPX_PERFORMANCE_COUNTER_V1, "", ec);
     }
 
     /// Install several new performance counter types in a way, which will
