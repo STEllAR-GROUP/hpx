@@ -17,7 +17,7 @@ Counter to provide the data. When a consumer queries performance data, the
 __hpx__ runtime system calls the provider to collect the data. The runtime
 system uses an internal registry to determine which provider to call.
 
-[heading Exposing Performance Counter Data using a Function]
+[heading Exposing Performance Counter Data using a Simple Function]
 
 The simplest way to expose arbitrary numeric data is to write a function which
 then will be called whenever a consumer queries this counter. Currently, this
@@ -39,7 +39,7 @@ the counter data of this Performance Counter.
 The next step in exposing this counter to the runtime system is to register
 the function as a new raw counter type using the __hpx__ API function
 [funcref hpx::performance_counters::install_counter_type `hpx::performance_counters::install_counter_type`].
-A counter type represents certain common characteristics of counters, such like
+A counter type represents certain common characteristics of counters, like
 their counter type name, and any associated description information. The
 following snippet shows an example of how to register the function
 `some_performance_data` which is shown above for a counter type named
@@ -62,11 +62,11 @@ Now it is possible to instantiate a new counter instance based on
 the naming scheme `"/test{locality#<*>/total}/data"`, where `<*>` is a zero
 based integer index indentifying the locality for which the counter instance
 should be accessed. The function [funcref hpx::performance_counters::install_counter_type `install_counter_type`]
-allows to instantiate exactly one counter for each locality.
+enables to instantiate exactly one counter for each locality.
 
 If this counter should be accessible using the standard __hpx__ command line
 options, the registration has to be performed during application startup,
-before `hpx_main` is executed. The easiest way to achieve this is to register
+before `hpx_main` is executed. The best way to achieve this is to register
 a __hpx__ startup function using the API function
 [funcref hpx::register_startup_function `hpx::register_startup_function`] before
 calling to initialize the runtime system:

@@ -707,6 +707,11 @@ namespace hpx
     ///       being executed or after that point, it will raise a invalid_status
     ///       exception.
     ///
+    ///       This function is one of the few API functions which can be called
+    ///       before the runtime system has been fully initialized. It will
+    ///       automatically stage the provided startup function to the runtime
+    ///       system during its initialization (if necessary).
+    ///
     /// \see    \a hpx::register_startup_function()
     HPX_API_EXPORT void register_pre_startup_function(startup_function_type const&);
 
@@ -726,6 +731,11 @@ namespace hpx
     /// \note If this function is called while the startup functions are
     ///       being executed or after that point, it will raise a invalid_status
     ///       exception.
+    ///
+    ///       This function is one of the few API functions which can be called
+    ///       before the runtime system has been fully initialized. It will
+    ///       automatically stage the provided startup function to the runtime
+    ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_pre_startup_function()
     HPX_API_EXPORT void register_startup_function(startup_function_type const&);

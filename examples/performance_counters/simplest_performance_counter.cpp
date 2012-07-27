@@ -45,7 +45,9 @@ int hpx_main()
         //    test{locality#0/total}/data,1.005240[s],1
         //
         // where the time is the timestamp marking the point in time since
-        // application startup at which this counter has been queried.
+        // application startup at which this counter has been queried. The last
+        // value printed is the counter value retrieved at the listed point in
+        // time.
 
         // By invoking this example with the command line options:
         //
