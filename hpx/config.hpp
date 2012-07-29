@@ -23,7 +23,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_DEBUG) && defined(DEBUG)
+#if defined(DEBUG) && !defined(HPX_DEBUG)
 #  define HPX_DEBUG 1
 #endif
 
@@ -39,8 +39,6 @@
 /// This is the default ip/port number used by the parcel subsystem
 #define HPX_INITIAL_IP_PORT         7910
 #define HPX_INITIAL_IP_ADDRESS      "127.0.0.1"
-#define HPX_RANDOM_PORT_MIN         26001
-#define HPX_RANDOM_PORT_MAX         26132
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines if the Intel Thread Building Blocks library will be used
