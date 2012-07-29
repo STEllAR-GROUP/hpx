@@ -18,30 +18,6 @@
 
 namespace hpx { namespace components { namespace remote_object
 {
-    // helper functor to construct objects remotely
-    template <
-        typename T
-      , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_FUNCTION_ARGUMENT_LIMIT, typename A, void)
-      , typename Enable = void
-    >
-    struct ctor_fun;
-
-    template <typename T>
-    struct ctor_fun<T>
-    {
-        typedef void result_type;
-
-        void operator()(void ** p) const
-        {
-            T * t = new T();
-            *p = t;
-        }
-
-        template <typename Archive>
-        void serialize(Archive &, unsigned)
-        {}
-    };
-
 #define HPX_REMOTE_OBJECT_M0(Z, N, D)                                           \
     BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(Arg, N)>(BOOST_PP_CAT(arg, N)))\
 /**/
@@ -82,6 +58,30 @@ namespace hpx { namespace components { namespace remote_object
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(preserve: 1, line: 0, output: "preprocessed/ctor_fun_" HPX_LIMIT_STR ".hpp")
 #endif
+
+    // helper functor to construct objects remotely
+    template <
+        typename T
+      , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_FUNCTION_ARGUMENT_LIMIT, typename A, void)
+      , typename Enable = void
+    >
+    struct ctor_fun;
+
+    template <typename T>
+    struct ctor_fun<T>
+    {
+        typedef void result_type;
+
+        void operator()(void ** p) const
+        {
+            T * t = new T();
+            *p = t;
+        }
+
+        template <typename Archive>
+        void serialize(Archive &, unsigned)
+        {}
+    };
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
