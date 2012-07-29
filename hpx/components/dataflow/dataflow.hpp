@@ -86,18 +86,32 @@ namespace hpx { namespace lcos
                     BOOST_PP_CAT(A, n)>::type>::type const &                  \
     /**/
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/components/dataflow/preprocessed/dataflow.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/dataflow_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (                                                                         \
         3                                                                     \
       , (                                                                     \
             1                                                                 \
-          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 4)                        \
+          , HPX_ACTION_ARGUMENT_LIMIT                                         \
           , "hpx/components/dataflow/dataflow.hpp"                            \
         )                                                                     \
     )                                                                         \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #undef HPX_A
     private:

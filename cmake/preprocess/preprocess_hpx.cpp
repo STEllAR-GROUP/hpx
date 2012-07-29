@@ -24,3 +24,5 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/deferred_packaged_task.hpp>
+
+#include <hpx/components/dataflow/dataflow.hpp>

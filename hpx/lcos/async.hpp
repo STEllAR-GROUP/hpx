@@ -172,13 +172,13 @@ namespace hpx
 
 #include BOOST_PP_ITERATE()
 
-#include <hpx/runtime/actions/define_function_operators.hpp>
-
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(output: null)
 #endif
 
 #endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+
+#include <hpx/runtime/actions/define_function_operators.hpp>
 
 #endif
 

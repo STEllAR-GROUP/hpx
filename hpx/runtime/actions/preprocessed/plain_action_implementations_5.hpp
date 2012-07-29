@@ -42,7 +42,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -53,7 +53,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg));
+                    F(boost::move(arg0));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -202,7 +202,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -213,7 +213,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg));
+                    F(boost::move(arg0));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -414,7 +414,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -425,7 +425,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg));
+                    F(boost::move(arg0) , boost::move(arg1));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -574,7 +574,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -585,7 +585,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg));
+                    F(boost::move(arg0) , boost::move(arg1));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -786,7 +786,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg)) , HPX_FWD_ARGS(2, 2, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -797,7 +797,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg) , HPX_MOVE_ARGS(2, 2, arg));
+                    F(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -946,7 +946,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg)) , HPX_FWD_ARGS(2, 2, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -957,7 +957,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg) , HPX_MOVE_ARGS(2, 2, arg));
+                    F(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -1158,7 +1158,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg)) , HPX_FWD_ARGS(2, 2, ( Arg, arg)) , HPX_FWD_ARGS(2, 3, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -1169,7 +1169,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg) , HPX_MOVE_ARGS(2, 2, arg) , HPX_MOVE_ARGS(2, 3, arg));
+                    F(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -1318,7 +1318,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg)) , HPX_FWD_ARGS(2, 2, ( Arg, arg)) , HPX_FWD_ARGS(2, 3, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -1329,7 +1329,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg) , HPX_MOVE_ARGS(2, 2, arg) , HPX_MOVE_ARGS(2, 3, arg));
+                    F(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -1530,7 +1530,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg)) , HPX_FWD_ARGS(2, 2, ( Arg, arg)) , HPX_FWD_ARGS(2, 3, ( Arg, arg)) , HPX_FWD_ARGS(2, 4, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -1541,7 +1541,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg) , HPX_MOVE_ARGS(2, 2, arg) , HPX_MOVE_ARGS(2, 3, arg) , HPX_MOVE_ARGS(2, 4, arg));
+                    F(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {
@@ -1690,7 +1690,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
             result_type operator()(
-                HPX_FWD_ARGS(2, 0, ( Arg, arg)) , HPX_FWD_ARGS(2, 1, ( Arg, arg)) , HPX_FWD_ARGS(2, 2, ( Arg, arg)) , HPX_FWD_ARGS(2, 3, ( Arg, arg)) , HPX_FWD_ARGS(2, 4, ( Arg, arg))) const
+                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
@@ -1701,7 +1701,7 @@ namespace hpx { namespace actions
                     
                     
                     
-                    F(HPX_MOVE_ARGS(2, 0, arg) , HPX_MOVE_ARGS(2, 1, arg) , HPX_MOVE_ARGS(2, 2, arg) , HPX_MOVE_ARGS(2, 3, arg) , HPX_MOVE_ARGS(2, 4, arg));
+                    F(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
                 }
                 catch (hpx::exception const& e) {
                     if (e.get_error() != hpx::thread_interrupted) {

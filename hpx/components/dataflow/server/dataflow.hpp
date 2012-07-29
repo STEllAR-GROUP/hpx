@@ -129,6 +129,14 @@ namespace hpx { namespace lcos { namespace server
             init<typename Action::type>(target);
         }
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/components/dataflow/server/preprocessed/dataflow.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/dataflow_" HPX_LIMIT_STR ".hpp")
+#endif
+
         // Vertical preprocessor repetition to define the remaining
         // init functions and actions
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -136,12 +144,18 @@ namespace hpx { namespace lcos { namespace server
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)                          \
+          , HPX_ACTION_ARGUMENT_LIMIT                                           \
           , <hpx/components/dataflow/server/dataflow.hpp>                       \
         )                                                                       \
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
         /// the connect function is used to connect the current dataflow
         /// to the specified target lco
