@@ -134,9 +134,9 @@ namespace hpx
                 R                                                             \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >) bound                                                          \
+            >))) bound                                                        \
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )))                                                                       \
+    )                                                                         \
     {                                                                         \
         thread t(boost::move(bound)                                           \
           , HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
@@ -196,9 +196,9 @@ namespace hpx
               BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                             \
                     BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >) bound                                                          \
+            >))) bound                                                        \
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )))                                                                       \
+    )                                                                         \
     {                                                                         \
         thread t(boost::move(bound)                                           \
           , HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
@@ -246,9 +246,9 @@ namespace hpx
             BOOST_PP_CAT(hpx::util::detail::bound_functor, NN)<               \
                 F                                                             \
               BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >) bound                                                          \
+            >))) bound                                                        \
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )))                                                                       \
+    )                                                                         \
     {                                                                         \
         thread t(boost::move(bound), HPX_ENUM_FORWARD_ARGS(N, A, a));         \
         t.detach();                                                           \
