@@ -55,7 +55,7 @@ namespace hpx
 // #else
         // Vertical preprocessor repetition to define the remaining constructors
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_FUNCTION_LIMIT, <hpx/runtime/threads/thread.hpp>))            \
+    (3, (1, HPX_FUNCTION_ARGUMENT_LIMIT, <hpx/runtime/threads/thread.hpp>))   \
     /**/
 
 #include BOOST_PP_ITERATE()

@@ -110,7 +110,7 @@ namespace hpx { namespace util {
         BOOST_PP_CAT(BOOST_PP_CAT(arg_, BOOST_PP_INC(N)), _type) const          \
             BOOST_PP_CAT(_, BOOST_PP_INC(N)) = {};                              \
 /**/
-        BOOST_PP_REPEAT(HPX_FUNCTION_LIMIT, HPX_UTIL_BIND_PLACEHOLDERS, _)
+        BOOST_PP_REPEAT(HPX_FUNCTION_ARGUMENT_LIMIT, HPX_UTIL_BIND_PLACEHOLDERS, _)
 #undef HPX_UTIL_BIND_PLACEHOLDERS
     }
 
@@ -181,7 +181,7 @@ namespace hpx { namespace util {
                 return f();
             }
 
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_LIMIT,
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
                 HPX_UTIL_BIND_FUNCTOR_OPERATOR, ())
         };
 
@@ -252,7 +252,7 @@ namespace hpx { namespace util {
                 return f();
             }
 
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_LIMIT,
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
                 HPX_UTIL_BIND_FUNCTOR_OPERATOR, ())
 
         private:
@@ -277,17 +277,31 @@ namespace hpx { namespace util {
         return detail::bound_functor0<F>(boost::forward<F>(f));
     }
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/util/preprocessed/bind.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/bind_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
           , <hpx/util/bind.hpp>                                                 \
         )                                                                       \
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #undef HPX_UTIL_BIND_MOVE_PARAMS
 #undef HPX_UTIL_BIND_FWD_PARAMS
@@ -394,7 +408,7 @@ namespace hpx { namespace util {
                 return f(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_LIMIT,
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
                 HPX_UTIL_BIND_FUNCTOR_OPERATOR,
                 (BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)))
 
@@ -535,7 +549,7 @@ namespace hpx { namespace util {
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
           , <hpx/util/detail/bind_functor_operator.hpp>                         \
         )                                                                       \
     )                                                                           \
@@ -653,7 +667,7 @@ namespace hpx { namespace util {
 
             BOOST_PP_REPEAT_FROM_TO(
                 1
-              , HPX_FUNCTION_LIMIT
+              , HPX_FUNCTION_ARGUMENT_LIMIT
               , HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR, _
             )
 #undef HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR
@@ -810,7 +824,7 @@ namespace hpx { namespace util {
                 return eval(env, f)(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_LIMIT,
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
                 HPX_UTIL_BIND_FUNCTOR_OPERATOR,
                 (BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)))
 

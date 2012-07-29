@@ -15,7 +15,7 @@
         3                                                                       \
       , (                                                                       \
             0                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
           , <hpx/components/remote_object/distributed_new.hpp>                  \
         )                                                                       \
     )                                                                           \

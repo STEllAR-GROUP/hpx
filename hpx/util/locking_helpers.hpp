@@ -25,13 +25,24 @@
 #include <boost/thread/locks.hpp>
 
 // boost doesn't have an overload for more than 5 mutexes
-namespace boost
-{
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/util/preprocessed/locking_helpers.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/locking_helpers_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
         (3, (6, HPX_LOCK_LIMIT,                                               \
         "hpx/util/locking_helpers.hpp"))
 #include BOOST_PP_ITERATE()
-}
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif // HPX_LOCK_LIMIT >= 6
 
@@ -48,36 +59,36 @@ namespace boost
     BOOST_PP_REPEAT_FROM_TO(1, N, HPX_ENUM_MUTEX_ARG, _)                      \
     /**/
 
-    namespace detail
+namespace boost { namespace detail
+{
+    template <BOOST_PP_ENUM_PARAMS(N, typename MutexType)>
+    inline unsigned lock_helper(BOOST_PP_ENUM_BINARY_PARAMS(N, MutexType, & m))
     {
-        template <BOOST_PP_ENUM_PARAMS(N, typename MutexType)>
-        inline unsigned lock_helper(BOOST_PP_ENUM_BINARY_PARAMS(N, MutexType, & m))
+        boost::unique_lock<MutexType0> l0(m0);
+        if (unsigned const failed_lock = try_lock_internal(HPX_ENUM_FROM_1_TO_N()))
         {
-            boost::unique_lock<MutexType0> l0(m0);
-            if (unsigned const failed_lock = try_lock_internal(HPX_ENUM_FROM_1_TO_N()))
-            {
-                return failed_lock;
-            }
-            l0.release();
-            return 0;
+            return failed_lock;
         }
-
-        template <BOOST_PP_ENUM_PARAMS(N, typename MutexType)>
-        inline unsigned try_lock_internal(BOOST_PP_ENUM_BINARY_PARAMS(N, MutexType, & m))
-        {
-            boost::unique_lock<MutexType0> l0(m0, boost::try_to_lock);
-            if (!l0)
-            {
-                return 1;
-            }
-            if (unsigned const failed_lock = try_lock_internal(HPX_ENUM_FROM_1_TO_N()))
-            {
-                return failed_lock + 1;
-            }
-            l0.release();
-            return 0;
-        }
+        l0.release();
+        return 0;
     }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename MutexType)>
+    inline unsigned try_lock_internal(BOOST_PP_ENUM_BINARY_PARAMS(N, MutexType, & m))
+    {
+        boost::unique_lock<MutexType0> l0(m0, boost::try_to_lock);
+        if (!l0)
+        {
+            return 1;
+        }
+        if (unsigned const failed_lock = try_lock_internal(HPX_ENUM_FROM_1_TO_N()))
+        {
+            return failed_lock + 1;
+        }
+        l0.release();
+        return 0;
+    }
+}}
 
 #undef HPX_ENUM_MUTEX_ARG
 #undef HPX_ENUM_FROM_1_TO_N
@@ -107,6 +118,8 @@ namespace boost
             HPX_SET_LOCK_FIRST, HPX_LOCK_EMPTY)(n, data)                      \
         break;                                                                \
 
+namespace boost
+{
     template <BOOST_PP_ENUM_PARAMS(N, typename MutexType)>
     inline void lock(BOOST_PP_ENUM_BINARY_PARAMS(N, MutexType, & m))
     {
@@ -119,6 +132,7 @@ namespace boost
             }
         }
     }
+}
 
 #undef HPX_ROTATE_ARGS
 #undef HPX_ENUM_MUTEX_ARG2

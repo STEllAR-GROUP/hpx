@@ -15,6 +15,14 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/runtime/actions/preprocessed/construct_continuation_functions.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/construct_continuation_functions_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
     util::detail::move_if_no_ref<                                             \
@@ -30,6 +38,12 @@
 #include BOOST_PP_ITERATE()
 
 #undef HPX_ACTION_DIRECT_ARGUMENT
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 

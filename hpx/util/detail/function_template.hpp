@@ -124,7 +124,7 @@ namespace hpx { namespace util
         function(BOOST_RV_REF(function) other)
             : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
-        
+
         function& operator=(BOOST_COPY_ASSIGN_REF(function) t)
         {
             this->base_type::operator=(t);
@@ -276,17 +276,31 @@ namespace hpx { namespace util
     };
 }}
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/util/detail/preprocessed/function_template.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/function_template_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
         3                                                                       \
       , (                                                                       \
             0                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
           , <hpx/util/detail/function_template.hpp>                             \
         )                                                                       \
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 

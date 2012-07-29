@@ -328,10 +328,24 @@ namespace hpx
     }
 }
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/lcos/preprocessed/wait_any.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/wait_any_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/wait_any.hpp>))                \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 

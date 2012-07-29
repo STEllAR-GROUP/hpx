@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/detail/pp_strip_parens.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -42,7 +43,7 @@ namespace hpx { namespace util
         {
             typedef T type;
         }
-        
+
         template <typename T>
         struct env_value_type<T const>
         {
@@ -84,7 +85,7 @@ namespace hpx { namespace util
         {
             typedef T const & type;
         };
-        
+
         template <typename T>
         struct env_value_type<T &, false>
         {
@@ -109,7 +110,7 @@ namespace hpx { namespace util
                 return a;
             }
         };
-        
+
         template <typename A>
         struct move_if_no_ref<A const &>
         {
@@ -212,6 +213,14 @@ namespace boost {
     }
 }
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/util/preprocessed/tuple.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/tuple_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
         3                                                                       \
@@ -223,6 +232,12 @@ namespace boost {
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #undef M0
 #undef M1
@@ -295,8 +310,9 @@ namespace hpx { namespace util
 */
 
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        HPX_UTIL_TUPLE_NAME & operator=(BOOST_RV_REF(
-                HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>) other)
+        HPX_UTIL_TUPLE_NAME & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
+                HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>
+            ))) other)
         {
             BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, T)
             return *this;
@@ -320,8 +336,9 @@ namespace hpx { namespace util
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-        HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(
-                HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>) other)
+        HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(HPX_UTIL_STRIP((
+                    HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>
+                ))) other)
           : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, T)
         {}
 #endif

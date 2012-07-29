@@ -12,8 +12,8 @@
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 
-#ifndef HPX_FUNCTION_LIMIT
-#define HPX_FUNCTION_LIMIT 10
+#ifndef HPX_FUNCTION_ARGUMENT_LIMIT
+#define HPX_FUNCTION_ARGUMENT_LIMIT 10
 #endif
 
 namespace hpx { namespace components { namespace remote_object
@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace remote_object
     // helper functor to construct objects remotely
     template <
         typename T
-      , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_FUNCTION_LIMIT, typename A, void)
+      , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_FUNCTION_ARGUMENT_LIMIT, typename A, void)
       , typename Enable = void
     >
     struct ctor_fun;
@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace remote_object
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
           , <hpx/components/remote_object/ctor_fun.hpp>                         \
         )                                                                       \
     )                                                                           \

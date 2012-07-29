@@ -13,6 +13,19 @@
 #include <hpx/traits.hpp>
 #include <hpx/util/move.hpp>
 
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/lcos/preprocessed/async_fwd.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/async_fwd_" HPX_LIMIT_STR ".hpp")
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -26,18 +39,18 @@ namespace hpx
         > /*act*/, naming::id_type const& gid);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/lcos/async_fwd.hpp"))                                                \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 

@@ -10,12 +10,13 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
-#include <hpx/util/bind_action.hpp>
 #include <hpx/include/async.hpp>
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -34,17 +35,31 @@
     typename detail::env_value_type<BOOST_FWD_REF(BOOST_PP_CAT(D, N))>::type  \
 /**/
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/util/preprocessed/bind_action.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/bind_action_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (                                                                         \
         3                                                                     \
       , (                                                                     \
             1                                                                 \
-          , HPX_FUNCTION_LIMIT                                                \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                       \
           , <hpx/util/bind_action.hpp>                                        \
         )                                                                     \
     )                                                                         \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #undef HPX_UTIL_BIND_EVAL
 #undef HPX_UTIL_BIND_REMOVE_REFERENCE
@@ -197,7 +212,7 @@ namespace hpx { namespace util
 /**/
             BOOST_PP_REPEAT_FROM_TO(
                 1
-              , HPX_FUNCTION_LIMIT
+              , HPX_FUNCTION_ARGUMENT_LIMIT
               , HPX_UTIL_BIND_ACTION_APPLY, _
             )
 #undef HPX_UTIL_BIND_ACTION_APPLY
@@ -258,7 +273,7 @@ namespace hpx { namespace util
 /**/
             BOOST_PP_REPEAT_FROM_TO(
                 1
-              , HPX_FUNCTION_LIMIT
+              , HPX_FUNCTION_ARGUMENT_LIMIT
               , HPX_UTIL_BIND_ACTION_ASYNC, _
             )
 #undef HPX_UTIL_BIND_ACTION_ASYNC
@@ -289,7 +304,7 @@ namespace hpx { namespace util
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
           , <hpx/util/detail/bind_action_functor_operator.hpp>                  \
         )                                                                       \
     )                                                                           \

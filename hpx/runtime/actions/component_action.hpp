@@ -36,6 +36,14 @@ namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/runtime/actions/preprocessed/component_action_enum.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/component_action_enum_" HPX_LIMIT_STR ".hpp")
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
 #define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
         BOOST_PP_CAT(component_action_arg, BOOST_PP_INC(n)) =                 \
@@ -61,6 +69,12 @@ namespace hpx { namespace actions
 
 #undef HPX_FUNCTION_RETARG_ENUM
 #undef HPX_FUNCTION_ARG_ENUM
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic component action types allowing to hold a different

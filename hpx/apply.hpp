@@ -20,6 +20,14 @@
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/hpx/preprocessed/apply.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/apply_" HPX_LIMIT_STR ".hpp")
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -60,12 +68,11 @@ namespace hpx
 
     BOOST_PP_REPEAT_FROM_TO(
         1
-      , HPX_FUNCTION_LIMIT
+      , HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_UTIL_BOUND_FUNCTION_APPLY, _
     )
 
 #undef HPX_UTIL_BOUND_FUNCTION_APPLY
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +82,14 @@ namespace hpx
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #else
@@ -132,7 +147,7 @@ namespace hpx
 
     BOOST_PP_REPEAT_FROM_TO(
         1
-      , HPX_FUNCTION_LIMIT
+      , HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_UTIL_BOUND_FUNCTION_APPLY, _
     )
 
@@ -194,7 +209,7 @@ namespace hpx
 
     BOOST_PP_REPEAT_FROM_TO(
         1
-      , HPX_FUNCTION_LIMIT
+      , HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_UTIL_BOUND_MEMBER_FUNCTION_APPLY, _
     )
 
@@ -243,7 +258,7 @@ namespace hpx
 
     BOOST_PP_REPEAT_FROM_TO(
         1
-      , HPX_FUNCTION_LIMIT
+      , HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_UTIL_BOUND_FUNCTOR_APPLY, _
     )
 
@@ -288,7 +303,7 @@ namespace hpx
 
     BOOST_PP_REPEAT_FROM_TO(
         1
-      , HPX_FUNCTION_LIMIT
+      , HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_UTIL_BOUND_ACTION_APPLY, _
     )
 

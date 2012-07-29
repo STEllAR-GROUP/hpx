@@ -9,7 +9,7 @@ set(subdirs
     point_geometry)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
-add_definitions(-DHPX_FUNCTION_LIMIT=11)
+add_definitions(-DHPX_FUNCTION_ARGUMENT_LIMIT=11)
 
 # GCC 4.4.6 detects uninitialized variables in Boost.Geometry headers. These
 # appear to be false positives as newer versions of GCC don't detect these.

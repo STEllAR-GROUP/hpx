@@ -30,11 +30,18 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
+
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/runtime/actions/preprocessed/plain_action_enum.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/plain_action_enum_" HPX_LIMIT_STR ".hpp")
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
 #define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
@@ -61,6 +68,12 @@ namespace hpx { namespace actions
 
 #undef HPX_FUNCTION_RETARG_ENUM
 #undef HPX_FUNCTION_ARG_ENUM
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic plain (free) action types allowing to hold a
@@ -311,7 +324,7 @@ namespace hpx { namespace actions
 
     template <void (*F)(), typename Derived>
     struct make_action<void (*)(), F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<plain_action0<F, threads::thread_priority_default, 
+      : boost::mpl::identity<plain_action0<F, threads::thread_priority_default,
             Derived> >
     {};
 

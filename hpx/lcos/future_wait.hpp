@@ -153,6 +153,15 @@ namespace hpx { namespace lcos
         f1.get();
         f2.get();
     }
+}}
+
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/lcos/preprocessed/future_wait.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/future_wait_" HPX_LIMIT_STR ".hpp")
+#endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (3, HPX_WAIT_ARGUMENT_LIMIT,                                          \
@@ -161,6 +170,14 @@ namespace hpx { namespace lcos
 
 #include BOOST_PP_ITERATE()
 
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+
+namespace hpx { namespace lcos
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename TR>
     inline void
@@ -189,10 +206,11 @@ namespace hpx { namespace lcos
         BOOST_FOREACH(value_type const& f, v)
             f.get();
     }
-}
+}}
 
-using lcos::wait;
-
+namespace hpx
+{
+    using lcos::wait;
 }
 
 #endif
@@ -216,6 +234,8 @@ using lcos::wait;
     /**/
 #define HPX_FUTURE_VOID_STATEMENT(z, n, data) BOOST_PP_CAT(f, n).get();
 
+namespace hpx { namespace lcos
+{
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
         BOOST_PP_ENUM_PARAMS(N, typename TR)>
@@ -225,11 +245,12 @@ using lcos::wait;
         return boost::make_tuple(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
     }
 
-    inline void 
+    inline void
     wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_VOID_ARGUMENT, _))
     {
         BOOST_PP_REPEAT(N, HPX_FUTURE_VOID_STATEMENT, _)
     }
+}}
 
 #undef HPX_FUTURE_WAIT_ARGUMENT
 #undef HPX_FUTURE_WAIT_VOID_ARGUMENT

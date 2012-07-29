@@ -12,12 +12,26 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/runtime/actions/preprocessed/define_function_operators.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/define_function_operators_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/define_function_operators.hpp"))                     \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 

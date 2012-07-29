@@ -62,7 +62,7 @@ namespace hpx { namespace components
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
           , <hpx/components/remote_object/new.hpp>                              \
         )                                                                       \
     )                                                                           \

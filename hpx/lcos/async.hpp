@@ -14,6 +14,12 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/async_fwd.hpp>
+
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -151,11 +157,13 @@ namespace hpx
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/lcos/preprocessed/async.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/async_" HPX_LIMIT_STR ".hpp")
+#endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
@@ -165,6 +173,12 @@ namespace hpx
 #include BOOST_PP_ITERATE()
 
 #include <hpx/runtime/actions/define_function_operators.hpp>
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 

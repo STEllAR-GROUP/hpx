@@ -8,7 +8,8 @@ find_package(HPX_MPI)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_FUNCTION_LIMIT=15)
+add_definitions(-DHPX_FUNCTION_ARGUMENT_LIMIT=15)
+
 
 set(bright_future_programs
         root_finder

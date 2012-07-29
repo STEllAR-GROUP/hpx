@@ -337,6 +337,15 @@ namespace hpx { namespace components
         // now return the resolved result
         return lazy_result.get();
     }
+}}
+
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/runtime/components/preprocessed/memory_block.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/memory_block_" HPX_LIMIT_STR ".hpp")
+#endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_WAIT_ARGUMENT_LIMIT,                                          \
@@ -345,7 +354,11 @@ namespace hpx { namespace components
 
 #include BOOST_PP_ITERATE()
 
-}}
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 
@@ -365,12 +378,15 @@ namespace hpx { namespace components
         stubs::memory_block::get_async(BOOST_PP_CAT(g, n))                    \
     /**/
 
+namespace hpx { namespace components
+{
     template <typename T>
     inline boost::tuple<BOOST_PP_REPEAT(N, HPX_ACCESS_ARGUMENT, _)>
     get_memory_block_async(BOOST_PP_REPEAT(N, HPX_GET_ASYNC_ARGUMENT, _))
     {
         return lcos::wait(BOOST_PP_REPEAT(N, HPX_WAIT_ARGUMENT, _));
     }
+}}
 
 #undef HPX_WAIT_ARGUMENT
 #undef HPX_GET_ASYNC_ARGUMENT

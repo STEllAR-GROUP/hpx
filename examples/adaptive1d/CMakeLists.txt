@@ -12,7 +12,7 @@ set(subdirs
     application)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
-add_definitions(-DHPX_FUNCTION_LIMIT=10)
+add_definitions(-DHPX_FUNCTION_ARGUMENT_LIMIT=10)
 
 # GCC 4.4.6 detects uninitialized variables in this application. These
 # appear to be false positives as newer versions of GCC don't detect these.

@@ -9,6 +9,8 @@
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM
 
 #include <hpx/util/move.hpp>
+#include <boost/fusion/include/size.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/inc.hpp>
@@ -18,10 +20,6 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#include <boost/fusion/include/size.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
 namespace detail
 {
     template <typename Action, int N>
@@ -29,7 +27,17 @@ namespace detail
 
     template <typename Action, int N>
     struct construct_continuation_thread_functionN;
+}
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/runtime/actions/preprocessed/construct_continuation_function_objects.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/construct_continuation_function_objects_" HPX_LIMIT_STR ".hpp")
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/construct_continuation_function_objects.hpp"))       \
@@ -46,7 +54,11 @@ namespace detail
 
 #undef HPX_ACTION_DIRECT_ARGUMENT
 
-}
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #endif
 
@@ -57,6 +69,8 @@ namespace detail
 
 #define N BOOST_PP_ITERATION()
 
+namespace detail
+{
     ///////////////////////////////////////////////////////////////////////////
     /// The \a continuation_thread_function will be registered as the thread
     /// function of a thread. It encapsulates the execution of the
@@ -159,6 +173,7 @@ namespace detail
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
         }
     };
+}
 
 #undef N
 
