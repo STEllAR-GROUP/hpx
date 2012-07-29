@@ -22,8 +22,8 @@ boost::int64_t some_performance_data()
 
 void register_counter_type()
 {
-    namespace pc = hpx::performance_counters;
-    pc::install_counter_type(
+    // Call the HPX API function to register the counter type.
+    hpx::performance_counters::install_counter_type(
         "/test/data",                                   // counter type name
         &some_performance_data,                         // function providing counter data
         "returns a linearly increasing counter value"   // description text
@@ -54,7 +54,7 @@ int hpx_main()
         //    --hpx:print-counter=/test{locality#0/total}/data
         //    --hpx:print-counter-interval=100
         //
-        // The counter will be queried periodically and the output will look
+        // the counter will be queried periodically and the output will look
         // like:
         //
         //    test{locality#0/total}/data,0.001937[s],1
@@ -70,7 +70,9 @@ int hpx_main()
         //    test{locality#0/total}/data,1.015063[s],11
         //
         // which shows that the counter has been queried roughly every 100
-        // milliseconds, as specified.
+        // milliseconds, as specified. Additionally it will be queried during
+        // application shutdown, as before.
+
         hpx::this_thread::suspend(1000);   // wait for one second
     }
     return hpx::finalize();

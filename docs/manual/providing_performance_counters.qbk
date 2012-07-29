@@ -50,7 +50,7 @@ any consumer instantiates and queries an instance of this counter type.
 
     void register_counter_type()
     {
-        // Call the HPX API function to register the counter type
+        // Call the HPX API function to register the counter type.
         ``[funcref hpx::performance_counters::install_counter_type hpx::performance_counters::install_counter_type]``(
             "/test/data",                                   // counter type name
             &some_performance_data,                         // function providing counter data
