@@ -393,6 +393,16 @@ mark_as_advanced(HPX_STACK_SIZE)
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 
 ################################################################################
+# Disable the use of partially preprocessed header files
+################################################################################
+hpx_option(HPX_NO_PREPROCESSED_FILES BOOL "Use preprocessed headers (default: OFF)" OFF ADVANCED)
+
+if(HPX_NO_PREPROCESSED_FILES)
+  hpx_info("tls" "Use preprocessed headers are disabled.")
+  add_definitions(-DHPX_DONT_USE_PREPROCESSED_FILES)
+endif()
+
+################################################################################
 # Compiler configuration
 ################################################################################
 # Clear CMake defaults
