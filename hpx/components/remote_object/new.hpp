@@ -55,6 +55,14 @@ namespace hpx { namespace components
         return p.get_future();
     }
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/components/remote_object/preprocessed/new.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/new_" HPX_LIMIT_STR ".hpp")
+#endif
+
     // vertical repetition code to enable constructor parameters up to
     // HPX_FUNCTION limit
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -62,12 +70,18 @@ namespace hpx { namespace components
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
           , <hpx/components/remote_object/new.hpp>                              \
         )                                                                       \
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 }}
 
@@ -85,7 +99,7 @@ namespace hpx { namespace components
             remote_object::new_impl_action
           , object<T>
         > p;
-        
+
         p.apply(
             target_id
           , target_id

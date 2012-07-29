@@ -75,17 +75,31 @@ namespace hpx { namespace components { namespace remote_object
     BOOST_PP_CAT(a, N);                                                         \
 /**/
 
+#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#  include <hpx/components/remote_object/preprocessed/ctor_fun.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/ctor_fun_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
           , <hpx/components/remote_object/ctor_fun.hpp>                         \
         )                                                                       \
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
 #undef HPX_REMOTE_OBJECT_M0
 #undef HPX_REMOTE_OBJECT_M1

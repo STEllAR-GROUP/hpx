@@ -26,3 +26,6 @@
 #include <hpx/lcos/deferred_packaged_task.hpp>
 
 #include <hpx/components/dataflow/dataflow.hpp>
+
+#include <hpx/components/remote_object/distributed_new.hpp>
+#include <hpx/components/remote_object/ctor_fun.hpp>
