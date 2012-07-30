@@ -142,7 +142,7 @@ namespace hpx { namespace util
                 print_value(std::cout, names_[i], value, uoms_[i]);
             }
             else {
-                std::ofstream out(destination_, std::ios_base::ate);
+                std::ofstream out(destination_, std::ios_base::app);
                 print_value(out, names_[i], value, uoms_[i]);
             }
         }
