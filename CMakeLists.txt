@@ -395,7 +395,7 @@ add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 ################################################################################
 # Disable the use of partially preprocessed header files
 ################################################################################
-hpx_option(HPX_NO_PREPROCESSED_FILES BOOL "Use preprocessed headers (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_NO_PREPROCESSED_FILES BOOL "Use preprocessed headers (default: ON)" ON ADVANCED)
 
 if(HPX_NO_PREPROCESSED_FILES)
   hpx_info("tls" "Use preprocessed headers are disabled.")
