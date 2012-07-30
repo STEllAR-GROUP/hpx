@@ -6,20 +6,12 @@
 
 # We have to compile the Fortran sources into a separate static library as
 # cmake does not support generating mixed C++/Fortran modules for MSVC.
-if(WIN32)
-  add_hpx_library(gtc_hpx_fortran
-    AUTOGLOB
-    STATIC
-    SOURCE_GLOB "*.F90"
-    HEADER_GLOB ""
-    FOLDER "Examples/Applications/GTC Optimized")
-else()
-  add_hpx_library(gtc_hpx_fortran
-    AUTOGLOB
-    SOURCE_GLOB "*.F90"
-    HEADER_GLOB ""
-    FOLDER "Examples/Applications/GTC Optimized")
-endif()
+add_hpx_library(gtc_hpx_fortran
+  AUTOGLOB
+  STATIC                # will be ignored on Linux
+  SOURCE_GLOB "*.F90"
+  HEADER_GLOB ""
+  FOLDER "Examples/Applications/GTC Optimized")
 
 # Special hackery to make everything work for Windows Intel compiler
 if(WIN32 AND ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")

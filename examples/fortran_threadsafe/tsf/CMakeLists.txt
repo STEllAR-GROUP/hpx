@@ -7,7 +7,7 @@
 # We have to compile the Fortran sources into a separate static library as
 # cmake does not support generating mixed C++/Fortran modules for MSVC.
 add_hpx_library(tsf_fortran
-  STATIC
+  STATIC                # will be ignored on Linux
   SOURCES server/setup.F90
   FOLDER "Examples/Applications/Fortran Threadsafe")
 
