@@ -7,6 +7,7 @@ add_subdirectory(sine)
 
 set(example_programs
     simplest_performance_counter
+    mem_counter
    )
 
 foreach(example_program ${example_programs})
