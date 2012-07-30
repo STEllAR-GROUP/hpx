@@ -54,6 +54,10 @@ __boost_getting_started__ document. It is often possible to download the Boost
 libraries using the package manager of your distribution. Please refer to the
 corresponding documentation for your system for more information.
 
+The installation of Boost is described in detail in Boost's own
+__boost_getting_started__ document. However, if you've never used the Boost
+libraries (or even if you have), here's a quick primer: __boost_installation__.
+
 Currently, __hpx__ only supports two compilers: GCC and MSVC. __hpx__ uses CMake as
 a build system.
 
@@ -149,6 +153,30 @@ listed below.
            ]
 
 [endsect] [/ Prerequisites]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:boost_installation Installing Boost Libraries]
+
+The easiest way to create a working Boost installation is to compile Boost from
+sources yourself. This is particularly important as many high performance
+resources, even if they have Boost installed, usually only provide you with an
+older version of Boost. We suggest you download the most recent release of the
+Boost libraries from here: __boost_downloads__. Unpack the downloaded archive
+into a directory of your choosing. We will refer to this directory a `$BOOST_ROOT`.
+
+Building and installing the Boost binaries is simple, regardless what platform
+you are on:
+
+    cd $BOOST_ROOT
+    bootstrap --prefix=<where to install boost>
+    ./b2 -j<N>
+    ./b2 install
+
+where: `<where to install boost>` is the directory the built binaries will be
+installed to, and `<N>` is the number of cores to use to build the Boost
+binaries.
+
+[ensect]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:unix_installation How to Install __hpx__ on Unix Variants]

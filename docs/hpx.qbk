@@ -50,6 +50,7 @@
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
+[def __boost_downloads__        [@http://www.boost.org/users/download/ Boost Downloads]]
 
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
@@ -107,6 +108,7 @@
 [template cxx_crtp              [@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern [str]]]
 
 [/ Section link shortcuts]
+[def __boost_installation__     [link hpx.tutorial.getting_started.boost_installation Installing Boost Libraries]]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
 [def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 

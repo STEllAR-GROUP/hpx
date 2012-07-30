@@ -713,7 +713,7 @@ namespace hpx
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_startup_function()
-    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const&);
+    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const& f);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -738,7 +738,7 @@ namespace hpx
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_pre_startup_function()
-    HPX_API_EXPORT void register_startup_function(startup_function_type const&);
+    HPX_API_EXPORT void register_startup_function(startup_function_type const& f);
 
     /// The type of a function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
@@ -762,7 +762,7 @@ namespace hpx
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
-    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
+    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const& f);
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed after any pre-shutdown function is
@@ -782,7 +782,7 @@ namespace hpx
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
-    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
+    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const& f);
 }
 
 #include <hpx/lcos/async_fwd.hpp>
