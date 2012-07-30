@@ -11,6 +11,18 @@ add_hpx_library(tsf_fortran
   SOURCES server/setup.F90
   FOLDER "Examples/Applications/Fortran Threadsafe")
 
+# Special hackery to make everything work for Windows Intel compiler
+if(WIN32 AND ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+  # Make sure all Fortran symbols are lower case for Windows Intel ifort compiler.
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /names:lowercase")
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    # Make sure we use the proper druntime libraries in Debug build.
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /dbglibs")
+  endif()
+  # Make sure the C++ linker will find the Fortran runtime libraries.
+  link_directories("$ENV{IFORT_COMPILER12}/compiler/lib/intel64")
+endif()
+
 add_hpx_component(tsf
   SOURCES ${sources}
   DEPENDENCIES iostreams_component tsf_fortran_lib
