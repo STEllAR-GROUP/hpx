@@ -27,7 +27,7 @@ if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_LIBRARY)
   add_hpx_executable(tsf_client
     SOURCES ${sources}
     DEPENDENCIES tsf_component ${dependencies}
-    FOLDER "Examples/Applications/GTC Optimized")
+    FOLDER "Examples/Applications/Fortran Threadsafe")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.fortran_threadsafe.tsf)
