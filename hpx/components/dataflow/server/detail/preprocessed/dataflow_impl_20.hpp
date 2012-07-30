@@ -102,8 +102,8 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -171,7 +171,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -184,7 +184,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -192,8 +192,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -302,9 +302,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -462,7 +462,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -475,7 +475,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -483,8 +483,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -596,9 +596,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -756,7 +756,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -769,7 +769,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -777,8 +777,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -890,9 +890,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1050,7 +1050,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1063,7 +1063,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1071,8 +1071,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -1184,9 +1184,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1344,7 +1344,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1357,7 +1357,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1365,8 +1365,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -1478,9 +1478,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1638,7 +1638,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1651,7 +1651,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1659,8 +1659,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -1772,9 +1772,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1932,7 +1932,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1945,7 +1945,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1953,8 +1953,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2066,9 +2066,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -2226,7 +2226,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -2239,7 +2239,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2247,8 +2247,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2360,9 +2360,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -2520,7 +2520,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -2533,7 +2533,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2541,8 +2541,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2654,9 +2654,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -2814,7 +2814,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -2827,7 +2827,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2835,8 +2835,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2948,9 +2948,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3108,7 +3108,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -3121,7 +3121,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -3129,8 +3129,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -3242,9 +3242,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3402,7 +3402,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -3415,7 +3415,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -3423,8 +3423,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -3536,9 +3536,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3696,7 +3696,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -3709,7 +3709,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -3717,8 +3717,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -3830,9 +3830,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3990,7 +3990,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4003,7 +4003,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4011,8 +4011,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -4124,9 +4124,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -4284,7 +4284,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4297,7 +4297,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4305,8 +4305,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -4418,9 +4418,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -4578,7 +4578,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4591,7 +4591,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4599,8 +4599,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -4712,9 +4712,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -4872,7 +4872,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4885,7 +4885,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4893,8 +4893,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -5006,9 +5006,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -5166,7 +5166,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -5179,7 +5179,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -5187,8 +5187,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -5300,9 +5300,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -5460,7 +5460,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -5473,7 +5473,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -5481,8 +5481,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -5594,9 +5594,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -5754,7 +5754,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -5767,7 +5767,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -5775,8 +5775,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -5888,9 +5888,9 @@
         }
         ~dataflow_impl()
         {
-            (void)( (!!(!result.is_empty())) || (_wassert(L"!result.is_empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 280), 0) );
-            (void)( (!!(targets.empty())) || (_wassert(L"targets.empty()", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 281), 0) );
-            (void)( (!!(slots_set == slots_completed)) || (_wassert(L"slots_set == slots_completed", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 283), 0) );
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
+            BOOST_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -6048,7 +6048,7 @@
         }
         result_type get_value()
         {
-            (void)( (!!(false)) || (_wassert(L"false", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 467), 0) );
+            BOOST_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -6061,7 +6061,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            (void)( (!!(back_ptr_)) || (_wassert(L"back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 482), 0) );
+            BOOST_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -6069,8 +6069,8 @@
         friend class components::managed_component;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            (void)( (!!(0 == back_ptr_)) || (_wassert(L"0 == back_ptr_", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 492), 0) );
-            (void)( (!!(bp)) || (_wassert(L"bp", L"D:/Devel\\hpx\\hpx\\components\\dataflow\\server\\detail\\dataflow_impl.hpp", 493), 0) );
+            BOOST_ASSERT(0 == back_ptr_);
+            BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;

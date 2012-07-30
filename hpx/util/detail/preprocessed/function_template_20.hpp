@@ -216,12 +216,12 @@ namespace hpx { namespace util {
         }
         R operator()() const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object );
         }
         R operator()()
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object );
         }
     private:
@@ -440,12 +440,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0);
         }
         R operator()(A0 a0)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0);
         }
     private:
@@ -664,12 +664,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1);
         }
         R operator()(A0 a0 , A1 a1)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1);
         }
     private:
@@ -888,12 +888,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2);
         }
     private:
@@ -1112,12 +1112,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
         }
     private:
@@ -1336,12 +1336,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
         }
     private:
@@ -1560,12 +1560,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
         }
     private:
@@ -1784,12 +1784,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
         }
     private:
@@ -2008,12 +2008,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
         }
     private:
@@ -2232,12 +2232,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
         }
     private:
@@ -2456,12 +2456,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
         }
     private:
@@ -2680,12 +2680,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
         }
     private:
@@ -2904,12 +2904,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
         }
     private:
@@ -3128,12 +3128,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
         }
     private:
@@ -3352,12 +3352,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
         }
     private:
@@ -3576,12 +3576,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
         }
     private:
@@ -3800,12 +3800,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
         }
     private:
@@ -4024,12 +4024,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
         }
     private:
@@ -4248,12 +4248,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
         }
     private:
@@ -4472,12 +4472,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
         }
     private:
@@ -4696,12 +4696,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
         }
     private:
@@ -4920,12 +4920,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20);
         }
     private:
@@ -5144,12 +5144,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21);
         }
     private:
@@ -5368,12 +5368,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22);
         }
     private:
@@ -5592,12 +5592,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23);
         }
     private:
@@ -5816,12 +5816,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24);
         }
     private:
@@ -6040,12 +6040,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25);
         }
     private:
@@ -6264,12 +6264,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26);
         }
     private:
@@ -6488,12 +6488,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26 , A27 a27) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26 , a27);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26 , A27 a27)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26 , a27);
         }
     private:
@@ -6712,12 +6712,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26 , A27 a27 , A28 a28) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26 , a27 , a28);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26 , A27 a27 , A28 a28)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26 , a27 , a28);
         }
     private:
@@ -6936,12 +6936,12 @@ namespace hpx { namespace util {
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26 , A27 a27 , A28 a28 , A29 a29) const
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 544), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26 , a27 , a28 , a29);
         }
         R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22 , A23 a23 , A24 a24 , A25 a25 , A26 a26 , A27 a27 , A28 a28 , A29 a29)
         {
-            (void)( (!!(!empty())) || (_wassert(L"!empty()", L"D:/Devel\\hpx\\hpx\\util\\detail\\function_template.hpp", 550), 0) );
+            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22 , a23 , a24 , a25 , a26 , a27 , a28 , a29);
         }
     private:

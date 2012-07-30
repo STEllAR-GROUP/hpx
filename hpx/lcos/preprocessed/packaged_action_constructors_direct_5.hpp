@@ -15,7 +15,9 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\lcos\\packaged_action_constructors_direct.hpp", 58), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             (*this->impl_)->set_data(
                 boost::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))))
@@ -61,7 +63,9 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\lcos\\packaged_action_constructors_direct.hpp", 58), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             (*this->impl_)->set_data(
                 boost::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))))
@@ -107,7 +111,9 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\lcos\\packaged_action_constructors_direct.hpp", 58), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             (*this->impl_)->set_data(
                 boost::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))))
@@ -153,7 +159,9 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\lcos\\packaged_action_constructors_direct.hpp", 58), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             (*this->impl_)->set_data(
                 boost::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))))

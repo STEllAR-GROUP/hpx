@@ -89,7 +89,9 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 147), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             apply_helper<action_type>::call(addr.address_, priority,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 )));
             return true; 
@@ -285,7 +287,9 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 373), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, addr.address_, priority,
@@ -559,7 +563,9 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 147), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             apply_helper<action_type>::call(addr.address_, priority,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
             return true; 
@@ -755,7 +761,9 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 373), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, addr.address_, priority,
@@ -1029,7 +1037,9 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 147), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             apply_helper<action_type>::call(addr.address_, priority,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
             return true; 
@@ -1225,7 +1235,9 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 373), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, addr.address_, priority,
@@ -1499,7 +1511,9 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 147), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             apply_helper<action_type>::call(addr.address_, priority,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
             return true; 
@@ -1695,7 +1709,9 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 373), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, addr.address_, priority,
@@ -1969,7 +1985,9 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 147), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             apply_helper<action_type>::call(addr.address_, priority,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
             return true; 
@@ -2165,7 +2183,9 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            (void)( (!!(components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>()))) || (_wassert(L"components::types_are_compatible(addr.type_, components::get_component_type< typename action_type::component_type>())", L"D:/Devel\\hpx\\hpx\\runtime\\applier\\apply_implementations.hpp", 373), 0) );
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, addr.address_, priority,
