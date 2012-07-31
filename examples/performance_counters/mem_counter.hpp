@@ -106,12 +106,12 @@ namespace hpx { namespace performance_counters { namespace server
             iterator_type itr = in_string.begin(); 
             iterator_type end = in_string.end(); 
             bool r = phrase_parse(itr, end, psg, space, psm);                    
-            if(r)                                                                
-                std::cout << "parsing success" << std::endl;
-            else                                                                 
-            {                                                                    
-                std::cout << "parsing failure" << std::endl;                     
-            }                                                                    
+            //if(r)                                                                
+                //std::cout << "parsing success" << std::endl;
+            //else                                                                 
+            //{                                                                    
+                //std::cout << "parsing failure" << std::endl;                     
+            //}                                                                    
             return psm.size;
         }
         
@@ -135,12 +135,12 @@ namespace hpx { namespace performance_counters { namespace server
             iterator_type itr = in_string.begin(); 
             iterator_type end = in_string.end(); 
             bool r = phrase_parse(itr, end, psg, space, psm);                    
-            if(r)                                                                
-                std::cout << "parsing success" << std::endl;
-            else                                                                 
-            {                                                                    
-                std::cout << "parsing failure" << std::endl;                     
-            }                                                                    
+            //if(r)                                                                
+            //    std::cout << "parsing success" << std::endl;
+            //else                                                                 
+            //{                                                                    
+            //    std::cout << "parsing failure" << std::endl;                     
+            //}                                                                    
             return psm.resident;
         }
 }}}
