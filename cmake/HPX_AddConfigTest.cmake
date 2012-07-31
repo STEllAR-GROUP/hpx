@@ -13,14 +13,8 @@ hpx_include(Message
             ParseArguments)
 
 macro(add_hpx_config_test name variable)
-  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;DEFAULT;ARGS;ROOT"
+  hpx_parse_arguments(${name} "SOURCE;FLAGS;DEFINITIONS;LANGUAGE;ARGS;ROOT"
                               "FILE" ${ARGN})
-
-  # FIXME: Sadly, CMake doesn't support non-boolean options with the option
-  # command yet.
-  #option(${variable}
-  #  "Enable (ON), auto-detect (DETECT) or disable (OFF) ${name} (Default: ${${name}_DEFAULT}"
-  #  ${${name}_DEFAULT})
 
   if("${variable}" STREQUAL "ON")
     hpx_debug("config_test.${name}" "${variable} is currently set to ON, test will not be performed.")
