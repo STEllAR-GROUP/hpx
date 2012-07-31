@@ -33,6 +33,7 @@
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/mpl/identity.hpp>
 #if defined(BOOST_NO_DECLTYPE)
 #  include <boost/typeof/typeof.hpp>
 #endif
@@ -571,6 +572,18 @@ namespace hpx { namespace actions
         struct action_type
           : boost::mpl::if_<boost::is_same<Derived, this_type>, Action, Derived>
         {};
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+        template <typename Action>
+        struct make_base_action : Action {};
+#else
+        template <typename Action>
+        struct make_base_action : boost::mpl::identity<Action> {};
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

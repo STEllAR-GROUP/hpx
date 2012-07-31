@@ -133,21 +133,21 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0), typename Derived>
     struct make_action<Result (Component::*)(T0),
             F, Derived, boost::mpl::false_>
-      : result_action1<
+      : detail::make_base_action<result_action1<
             Component, Result, component_result_action_arg1,
             T0, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename Result,
         typename T0,
         Result (Component::*F)(T0) const, typename Derived>
     struct make_action<Result (Component::*)(T0) const,
             F, Derived, boost::mpl::false_>
-      : result_action1<
+      : detail::make_base_action<result_action1<
             Component const, Result,
             component_result_action_arg1,
             T0, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     
@@ -198,19 +198,19 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0), typename Derived>
     struct make_action<Result (Component::*)(T0),
             F, Derived, boost::mpl::true_>
-      : direct_result_action1<
+      : detail::make_base_action<direct_result_action1<
             Component, Result, component_result_action_arg1,
-            T0, F, Derived>
+            T0, F, Derived> >
     {};
     template <typename Component, typename Result,
         typename T0,
         Result (Component::*F)(T0) const, typename Derived>
     struct make_action<Result (Component::*)(T0) const,
             F, Derived, boost::mpl::true_>
-      : direct_result_action1<
+      : detail::make_base_action<direct_result_action1<
             Component const, Result,
             component_result_action_arg1,
-            T0, F, Derived>
+            T0, F, Derived> >
     {};
     
     
@@ -329,19 +329,19 @@ namespace hpx { namespace actions
         void (Component::*F)(T0), typename Derived>
     struct make_action<void (Component::*)(T0),
             F, Derived, boost::mpl::false_>
-      : action1<
+      : detail::make_base_action<action1<
             Component, component_action_arg1,
             T0, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename T0,
         void (Component::*F)(T0) const, typename Derived>
     struct make_action<void (Component::*)(T0) const,
             F, Derived, boost::mpl::false_>
-      : action1<
+      : detail::make_base_action<action1<
             Component const, component_action_arg1,
             T0, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     template <
@@ -389,17 +389,17 @@ namespace hpx { namespace actions
         void (Component::*F)(T0), typename Derived>
     struct make_action<void (Component::*)(T0),
             F, Derived, boost::mpl::true_>
-      : direct_action1<
+      : detail::make_base_action<direct_action1<
             Component, component_action_arg1,
-            T0, F, Derived>
+            T0, F, Derived> >
     {};
     template <typename Component, typename T0,
         void (Component::*F)(T0) const, typename Derived>
     struct make_action<void (Component::*)(T0) const,
             F, Derived, boost::mpl::true_>
-      : direct_action1<
+      : detail::make_base_action<direct_action1<
             Component const, component_action_arg1,
-            T0, F, Derived>
+            T0, F, Derived> >
     {};
     
     
@@ -541,21 +541,21 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1),
             F, Derived, boost::mpl::false_>
-      : result_action2<
+      : detail::make_base_action<result_action2<
             Component, Result, component_result_action_arg2,
             T0 , T1, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1,
         Result (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::false_>
-      : result_action2<
+      : detail::make_base_action<result_action2<
             Component const, Result,
             component_result_action_arg2,
             T0 , T1, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     
@@ -606,19 +606,19 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1),
             F, Derived, boost::mpl::true_>
-      : direct_result_action2<
+      : detail::make_base_action<direct_result_action2<
             Component, Result, component_result_action_arg2,
-            T0 , T1, F, Derived>
+            T0 , T1, F, Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1,
         Result (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::true_>
-      : direct_result_action2<
+      : detail::make_base_action<direct_result_action2<
             Component const, Result,
             component_result_action_arg2,
-            T0 , T1, F, Derived>
+            T0 , T1, F, Derived> >
     {};
     
     
@@ -737,19 +737,19 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1), typename Derived>
     struct make_action<void (Component::*)(T0 , T1),
             F, Derived, boost::mpl::false_>
-      : action2<
+      : detail::make_base_action<action2<
             Component, component_action_arg2,
             T0 , T1, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::false_>
-      : action2<
+      : detail::make_base_action<action2<
             Component const, component_action_arg2,
             T0 , T1, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     template <
@@ -797,17 +797,17 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1), typename Derived>
     struct make_action<void (Component::*)(T0 , T1),
             F, Derived, boost::mpl::true_>
-      : direct_action2<
+      : detail::make_base_action<direct_action2<
             Component, component_action_arg2,
-            T0 , T1, F, Derived>
+            T0 , T1, F, Derived> >
     {};
     template <typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::true_>
-      : direct_action2<
+      : detail::make_base_action<direct_action2<
             Component const, component_action_arg2,
-            T0 , T1, F, Derived>
+            T0 , T1, F, Derived> >
     {};
     
     
@@ -949,21 +949,21 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::false_>
-      : result_action3<
+      : detail::make_base_action<result_action3<
             Component, Result, component_result_action_arg3,
             T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::false_>
-      : result_action3<
+      : detail::make_base_action<result_action3<
             Component const, Result,
             component_result_action_arg3,
             T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     
@@ -1014,19 +1014,19 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::true_>
-      : direct_result_action3<
+      : detail::make_base_action<direct_result_action3<
             Component, Result, component_result_action_arg3,
-            T0 , T1 , T2, F, Derived>
+            T0 , T1 , T2, F, Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::true_>
-      : direct_result_action3<
+      : detail::make_base_action<direct_result_action3<
             Component const, Result,
             component_result_action_arg3,
-            T0 , T1 , T2, F, Derived>
+            T0 , T1 , T2, F, Derived> >
     {};
     
     
@@ -1145,19 +1145,19 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::false_>
-      : action3<
+      : detail::make_base_action<action3<
             Component, component_action_arg3,
             T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::false_>
-      : action3<
+      : detail::make_base_action<action3<
             Component const, component_action_arg3,
             T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     template <
@@ -1205,17 +1205,17 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::true_>
-      : direct_action3<
+      : detail::make_base_action<direct_action3<
             Component, component_action_arg3,
-            T0 , T1 , T2, F, Derived>
+            T0 , T1 , T2, F, Derived> >
     {};
     template <typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::true_>
-      : direct_action3<
+      : detail::make_base_action<direct_action3<
             Component const, component_action_arg3,
-            T0 , T1 , T2, F, Derived>
+            T0 , T1 , T2, F, Derived> >
     {};
     
     
@@ -1357,21 +1357,21 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::false_>
-      : result_action4<
+      : detail::make_base_action<result_action4<
             Component, Result, component_result_action_arg4,
             T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::false_>
-      : result_action4<
+      : detail::make_base_action<result_action4<
             Component const, Result,
             component_result_action_arg4,
             T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     
@@ -1422,19 +1422,19 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::true_>
-      : direct_result_action4<
+      : detail::make_base_action<direct_result_action4<
             Component, Result, component_result_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived>
+            T0 , T1 , T2 , T3, F, Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::true_>
-      : direct_result_action4<
+      : detail::make_base_action<direct_result_action4<
             Component const, Result,
             component_result_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived>
+            T0 , T1 , T2 , T3, F, Derived> >
     {};
     
     
@@ -1553,19 +1553,19 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::false_>
-      : action4<
+      : detail::make_base_action<action4<
             Component, component_action_arg4,
             T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::false_>
-      : action4<
+      : detail::make_base_action<action4<
             Component const, component_action_arg4,
             T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     template <
@@ -1613,17 +1613,17 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::true_>
-      : direct_action4<
+      : detail::make_base_action<direct_action4<
             Component, component_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived>
+            T0 , T1 , T2 , T3, F, Derived> >
     {};
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::true_>
-      : direct_action4<
+      : detail::make_base_action<direct_action4<
             Component const, component_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived>
+            T0 , T1 , T2 , T3, F, Derived> >
     {};
     
     
@@ -1765,21 +1765,21 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::false_>
-      : result_action5<
+      : detail::make_base_action<result_action5<
             Component, Result, component_result_action_arg5,
             T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::false_>
-      : result_action5<
+      : detail::make_base_action<result_action5<
             Component const, Result,
             component_result_action_arg5,
             T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     
@@ -1830,19 +1830,19 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::true_>
-      : direct_result_action5<
+      : detail::make_base_action<direct_result_action5<
             Component, Result, component_result_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            T0 , T1 , T2 , T3 , T4, F, Derived> >
     {};
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::true_>
-      : direct_result_action5<
+      : detail::make_base_action<direct_result_action5<
             Component const, Result,
             component_result_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            T0 , T1 , T2 , T3 , T4, F, Derived> >
     {};
     
     
@@ -1961,19 +1961,19 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::false_>
-      : action5<
+      : detail::make_base_action<action5<
             Component, component_action_arg5,
             T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::false_>
-      : action5<
+      : detail::make_base_action<action5<
             Component const, component_action_arg5,
             T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived>
+            Derived> >
     {};
     
     template <
@@ -2021,17 +2021,17 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::true_>
-      : direct_action5<
+      : detail::make_base_action<direct_action5<
             Component, component_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            T0 , T1 , T2 , T3 , T4, F, Derived> >
     {};
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::true_>
-      : direct_action5<
+      : detail::make_base_action<direct_action5<
             Component const, component_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            T0 , T1 , T2 , T3 , T4, F, Derived> >
     {};
     
     

@@ -8,7 +8,7 @@
 find_package(HPX_HDF5)
 
 if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_LIBRARY)
-  set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS} -fopenmp")
+  set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
 
   add_subdirectory(tsf)
 
