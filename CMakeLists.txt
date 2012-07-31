@@ -176,6 +176,7 @@ add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
+add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
 add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
@@ -944,13 +945,6 @@ else()
     hpx_warn("malloc"
       "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
   endif()
-endif()
-
-
-add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
-
-if(HPX_HAVE_CXX11_RVALUE_REFERENCES)
-    message("yay!")
 endif()
 
 ################################################################################
