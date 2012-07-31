@@ -582,7 +582,7 @@ namespace hpx { namespace actions
         struct make_base_action : Action {};
 #else
         template <typename Action>
-        struct make_base_action : boost::identity<Action> {};
+        struct make_base_action : boost::mpl::identity<Action> {};
 #endif
     }
 
