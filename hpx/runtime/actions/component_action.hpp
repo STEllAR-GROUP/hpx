@@ -25,9 +25,6 @@
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
-#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
-#include <boost/mpl/identity.hpp>
-#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -185,7 +182,6 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
 #if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
     namespace detail
     {
@@ -210,35 +206,18 @@ namespace hpx { namespace actions
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::false_>
-      : result_action0<Component, Result, component_result_action_arg0, F,
-            threads::thread_priority_default, Derived>
+      : detail::make_base_action<
+            result_action0<Component, Result, component_result_action_arg0, F,
+                threads::thread_priority_default, Derived> >
     {};
 
     template <typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>
     struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::false_>
-      : result_action0<Component const, Result, component_result_action_arg0, F,
-            threads::thread_priority_default, Derived>
+      : detail::make_base_action<
+            result_action0<Component const, Result, component_result_action_arg0, F,
+                threads::thread_priority_default, Derived> >
     {};
-
-#else
-
-    template <typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    struct make_action<Result (Component::*)(), F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<result_action0<
-            Component, Result, component_result_action_arg0, F,
-            threads::thread_priority_default, Derived> >
-    {};
-
-    template <typename Component, typename Result,
-        Result (Component::*F)() const, typename Derived>
-    struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<result_action0<
-            Component const, Result, component_result_action_arg0, F,
-            threads::thread_priority_default, Derived> >
-    {};
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <
@@ -278,35 +257,21 @@ namespace hpx { namespace actions
         }
     };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_result_action0<Component, Result, component_result_action_arg0,
-            F, Derived>
+      : detail::make_base_action<
+            direct_result_action0<Component, Result,
+                component_result_action_arg0, F, Derived> >
     {};
 
     template <typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>
     struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::true_>
-      : direct_result_action0<Component const, Result,
-            component_result_action_arg0, F, Derived>
+      : detail::make_base_action<
+            direct_result_action0<Component const, Result,
+                component_result_action_arg0, F, Derived> >
     {};
-#else
-    template <typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
-    struct make_action<Result (Component::*)(), F, Derived, boost::mpl::true_>
-      : boost::mpl::identity<direct_result_action0<Component, Result,
-            component_result_action_arg0, F, Derived> >
-    {};
-
-    template <typename Component, typename Result,
-        Result (Component::*F)() const, typename Derived>
-    struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::true_>
-      : direct_result_action0<Component const, Result,
-            component_result_action_arg0, F, Derived>
-    {};
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
@@ -408,33 +373,19 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::false_>
-      : action0<Component, component_result_action_arg0, F,
-          threads::thread_priority_default, Derived>
+      : detail::make_base_action<
+            action0<Component, component_result_action_arg0, F,
+                threads::thread_priority_default, Derived> >
     {};
 
     template <typename Component, void (Component::*F)() const, typename Derived>
     struct make_action<void (Component::*)() const, F, Derived, boost::mpl::false_>
-      : action0<Component const, component_result_action_arg0, F,
-          threads::thread_priority_default, Derived>
+      : detail::make_base_action<
+            action0<Component const, component_result_action_arg0, F,
+                threads::thread_priority_default, Derived> >
     {};
-#else
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct make_action<void (Component::*)(), F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<action0<
-            Component, component_result_action_arg0, F,
-            threads::thread_priority_default, Derived> >
-    {};
-
-    template <typename Component, void (Component::*F)() const, typename Derived>
-    struct make_action<void (Component::*)() const, F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<action0<
-            Component const, component_result_action_arg0, F,
-            threads::thread_priority_default, Derived> >
-    {};
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, void (Component::*F)(),
@@ -473,29 +424,19 @@ namespace hpx { namespace actions
         }
     };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_action0<Component, component_result_action_arg0, F, Derived>
+      : detail::make_base_action<
+            direct_action0<Component, component_result_action_arg0, F,
+                Derived> >
     {};
 
     template <typename Component, void (Component::*F)() const, typename Derived>
     struct make_action<void (Component::*)() const, F, Derived, boost::mpl::true_>
-      : direct_action0<Component const, component_result_action_arg0, F, Derived>
+      : detail::make_base_action<
+            direct_action0<Component const, component_result_action_arg0, F,
+                Derived> >
     {};
-#else
-    template <typename Component, void (Component::*F)(), typename Derived>
-    struct make_action<void (Component::*)(), F, Derived, boost::mpl::true_>
-      : boost::mpl::identity<direct_action0<
-            Component, component_result_action_arg0, F, Derived> >
-    {};
-
-    template <typename Component, void (Component::*F)() const, typename Derived>
-    struct make_action<void (Component::*)() const, F, Derived, boost::mpl::true_>
-      : boost::mpl::identity<direct_action0<
-            Component const, component_result_action_arg0, F, Derived> >
-    {};
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // the specialization for void return type is just a template alias
