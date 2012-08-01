@@ -4,16 +4,20 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We have to compile the Fortran sources into a separate static library as
-# cmake does not support generating mixed C++/Fortran modules for MSVC.
 if(MSVC)
+  # We have to compile the Fortran sources into a separate static library as
+  # cmake does not support generating mixed C++/Fortran modules for MSVC.
   add_hpx_library(tsf_fortran
+    AUTOGLOB
     STATIC
-    SOURCES server/setup_pl.F90 server/point_pl.cpp
+    SOURCE_GLOB "*.F90"
+    HEADER_GLOB ""
     FOLDER "Examples/Applications/Fortran Threadsafe")
 else()
   add_hpx_library(tsf_fortran
-    SOURCES server/setup_pl.F90 server/point_pl.cpp
+    AUTOGLOB
+    SOURCE_GLOB "*.F90"
+    HEADER_GLOB ""
     FOLDER "Examples/Applications/Fortran Threadsafe")
 endif()
 
@@ -34,8 +38,9 @@ if(MSVC AND ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
 endif()
 
 add_hpx_component(tsf
-  SOURCES ${sources}
   DEPENDENCIES iostreams_component tsf_fortran_lib
   FOLDER "Examples/Applications/Fortran Threadsafe"
-  AUTOGLOB)
+  AUTOGLOB
+  SOURCE_GLOB "*.cpp"
+  HEADER_GLOB "*.hpp")
 
