@@ -17,7 +17,7 @@
 
 // When using the dataflow component we have to define the following constants
 #define HPX_ACTION_ARGUMENT_LIMIT 6             // 4 more than max number of arguments
-#define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 6   // 4 more than max number of arguments
+#define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 6   // 7 more than max number of arguments
 #define HPX_FUNCTION_ARGUMENT_LIMIT 9           // 7 more than max number of arguments
 
 #include <iostream>
