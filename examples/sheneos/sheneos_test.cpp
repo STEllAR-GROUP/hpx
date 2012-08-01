@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <hpx/include/performance_counter.hpp>
+#include <hpx/include/performance_counters.hpp>
 #include <examples/performance_counters/mem_counter.hpp>
 
 #include <boost/dynamic_bitset.hpp>
