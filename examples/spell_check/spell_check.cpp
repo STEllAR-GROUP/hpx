@@ -21,11 +21,11 @@
 
 std::vector<std::string> words;
 
-std::string search(int start, int end, std::string &word);
+std::string search(int start, int end, std::string const &word);
 
 HPX_PLAIN_ACTION(search, search_action);
 
-std::string search(int start, int end, std::string &word)
+std::string search(int start, int end, std::string const &word)
 {
     //highest value is 'z' at 122
     //lowest value is 'a' at 97
@@ -183,8 +183,9 @@ int hpx_main()
             vector<search_action> sAct;//[sizeX * sizeY];
             vector<future<string>> wordRun;
             wordRun.reserve(strs.size());
-            for each(string single in strs)
+            for (int i = 0; i < strs.size(); ++i)
             {
+                string& single = strs[i]; 
                 int start = 0;
                 hpx::naming::id_type const locality_id = hpx::find_here();
                 search_action temp;
