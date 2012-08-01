@@ -60,6 +60,10 @@
 #  define HPX_LIMIT 5
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+// We currently do not support more than 20 arguments (ask if you need more)
+#define HPX_MAX_LIMIT 20
+
 // We need the same value as a string for partial preprocessing the files.
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
 #  define HPX_LIMIT_STR BOOST_PP_STRINGIZE(HPX_LIMIT)
@@ -75,7 +79,7 @@
 #  endif
 #elif (HPX_ACTION_ARGUMENT_LIMIT < 4)
 #  error "HPX_ACTION_ARGUMENT_LIMIT is too low, it must be higher than 4"
-#elif HPX_ACTION_ARGUMENT_LIMIT != HPX_PP_ROUND_UP(HPX_LIMIT) && \
+#elif (HPX_ACTION_ARGUMENT_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 #  define HPX_DONT_USE_PREPROCESSED_FILES
 #endif
@@ -90,7 +94,7 @@
 #  endif
 #elif (HPX_WAIT_ARGUMENT_LIMIT < 4)
 #  error "HPX_WAIT_ARGUMENT_LIMIT is too low, it must be higher than 4"
-#elif HPX_WAIT_ARGUMENT_LIMIT != HPX_PP_ROUND_UP(HPX_LIMIT) && \
+#elif (HPX_WAIT_ARGUMENT_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 #  define HPX_DONT_USE_PREPROCESSED_FILES
 #endif
@@ -106,7 +110,7 @@
 #  endif
 #elif (HPX_COMPONENT_CREATE_ARGUMENT_LIMIT < 4)
 #  error "HPX_COMPONENT_CREATE_ARGUMENT_LIMIT is too low, it must be higher than 4"
-#elif HPX_COMPONENT_CREATE_ARGUMENT_LIMIT != HPX_PP_ROUND_UP(HPX_LIMIT) && \
+#elif (HPX_COMPONENT_CREATE_ARGUMENT_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 #  define HPX_DONT_USE_PREPROCESSED_FILES
 #endif
@@ -123,7 +127,7 @@
 #  endif
 #elif (HPX_FUNCTION_ARGUMENT_LIMIT < 7)
 #  error "HPX_FUNCTION_ARGUMENT_LIMIT is too low, it must be higher than 7"
-#elif HPX_FUNCTION_ARGUMENT_LIMIT != HPX_PP_ROUND_UP_ADD3(HPX_LIMIT) && \
+#elif (HPX_FUNCTION_ARGUMENT_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 #  define HPX_DONT_USE_PREPROCESSED_FILES
 #endif
@@ -144,7 +148,7 @@
 #  endif
 #elif (HPX_TUPLE_LIMIT < 7)
 #  error "HPX_TUPLE_LIMIT is too low, it must be higher than 7"
-#elif HPX_TUPLE_LIMIT != HPX_PP_ROUND_UP(HPX_FUNCTION_ARGUMENT_LIMIT) && \
+#elif (HPX_TUPLE_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 #  define HPX_DONT_USE_PREPROCESSED_FILES
 #endif
@@ -160,7 +164,7 @@
 #  else
 #    define HPX_LOCK_LIMIT HPX_PP_ROUND_UP(HPX_LIMIT)
 #  endif
-#elif HPX_LOCK_LIMIT != HPX_PP_ROUND_UP(HPX_LIMIT) && \
+#elif (HPX_LOCK_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 #  define HPX_DONT_USE_PREPROCESSED_FILES
 #endif
