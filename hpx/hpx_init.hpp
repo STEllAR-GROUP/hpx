@@ -518,6 +518,8 @@ namespace hpx
     ///           as well, it will disable any addition local wait time before
     ///           proceeding.
     ///
+    /// \returns  This function will always return zero.
+    ///
     /// This function will block and wait for all connected localities to exit
     /// before returning to the caller. It should be the last HPX-function
     /// called by any application.
@@ -569,10 +571,13 @@ namespace hpx
     ///           as well, it will disable any addition local wait time before
     ///           proceeding.
     ///
+    /// \returns  This function will always return zero.
+    ///
     /// This function will block and wait for this locality to finish executing
     /// before returning to the caller. It should be the last HPX-function
     /// called by any locality being disconnected.
-    void disconnect(double shutdown_timeout = -1.0,
+    ///
+    int disconnect(double shutdown_timeout = -1.0,
         double localwait = -1.0);
 }
 
