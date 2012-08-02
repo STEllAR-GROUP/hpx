@@ -31,10 +31,7 @@ using boost::posix_time::milliseconds;
 using boost::format;
 using boost::str;
 
-using hpx::register_shutdown_function;
 using hpx::running;
-using hpx::runtime_mode_connect;
-using hpx::network_error;
 
 using hpx::threads::threadmanager_is;
 
@@ -42,31 +39,19 @@ using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 
-using hpx::naming::get_locality_id_from_gid;
-
-using hpx::lcos::future;
-using hpx::lcos::promise;
-using hpx::async;
-using hpx::lcos::base_lco;
-
 ///////////////////////////////////////////////////////////////////////////////
-void stop_monitor(std::string const& name)
+void stop_monitor(hpx::promise<void> p)
 {
-    // Kill the monitor.
-    hpx::naming::id_type id;
-    if (!hpx::agas::resolve_name(name, id))
-    {
-        HPX_THROW_EXCEPTION(network_error, "stop_monitor",
-            "couldn't find stop flag");
-    }
-    BOOST_ASSERT(id);
-
-    async<base_lco::set_event_action>(id).get();
+    p.set_value();      // Kill the monitor.
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int monitor(std::string const& name, boost::uint64_t pause)
 {
+#if defined(BOOST_WINDOWS)
+    hpx::register_shutdown_function(&uninstall_windows_counters);
+#endif
+
     // Resolve the GID of the performance counter using it's symbolic name.
     hpx::naming::id_type id = hpx::performance_counters::get_counter(name);
     if (!id)
@@ -78,7 +63,7 @@ int monitor(std::string const& name, boost::uint64_t pause)
     }
 
     boost::uint32_t const locality_id = hpx::get_locality_id();
-    if (locality_id == get_locality_id_from_gid(id.get_gid()))
+    if (locality_id == hpx::naming::get_locality_id_from_gid(id.get_gid()))
     {
         std::cout << (format(
             "error: cannot query performance counters on its own locality (%s)")
@@ -86,23 +71,16 @@ int monitor(std::string const& name, boost::uint64_t pause)
         return 1;
     }
 
-    promise<void> stop_flag;
-    const std::string stop_flag_name =
-        str(format("/stop_flag(locality#%d)/heartbeat)") % locality_id);
-
-    // Associate the stop flag with a symbolic name.
-    hpx::naming::id_type stop_id = stop_flag.get_gid();
-    hpx::agas::register_name(stop_flag_name, stop_id);
-
-    register_shutdown_function(boost::bind(&stop_monitor, stop_flag_name));
+    hpx::promise<void> stop_flag;
+    hpx::register_shutdown_function(boost::bind(&stop_monitor, stop_flag));
 
     boost::int64_t zero_time = 0;
-
-    future<void> f = stop_flag.get_future();
+    hpx::future<void> f = stop_flag.get_future();
 
     while (true)
     {
-        if (!threadmanager_is(running) || f.is_ready())
+        // stop collecting data when the runtime is exiting
+        if (!hpx::is_running() || f.is_ready())
             return 0;
 
         // Query the performance counter.
@@ -127,27 +105,18 @@ int monitor(std::string const& name, boost::uint64_t pause)
         hpx::this_thread::suspend(milliseconds(pause));
     }
 
-    hpx::agas::unregister_name(stop_flag_name, stop_id);
-
-    return 0;
+    return hpx::disconnect();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    int r = 0;
+    std::cout << "starting monitor" << std::endl;
 
-    {
-        std::cout << "starting monitor" << std::endl;
+    const std::string name = vm["name"].as<std::string>();
+    const boost::uint64_t pause = vm["pause"].as<boost::uint64_t>();
 
-        const std::string name = vm["name"].as<std::string>();
-        const boost::uint64_t pause = vm["pause"].as<boost::uint64_t>();
-
-        r = monitor(name, pause);
-    }
-
-    hpx::disconnect();
-    return r;
+    return monitor(name, pause);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,13 +135,12 @@ int main(int argc, char* argv[])
         , "milliseconds between each performance counter query")
         ;
 
+#if defined(BOOST_WINDOWS)
+    hpx::register_startup_function(&install_windows_counters);
+#endif
+
     // Initialize and run HPX, enforce connect mode as we connect to an existing
     // application.
-#if defined(BOOST_WINDOWS)
-    return hpx::init(desc_commandline, argc, argv, install_windows_counters,
-        uninstall_windows_counters, runtime_mode_connect);
-#else
-    return hpx::init(desc_commandline, argc, argv, runtime_mode_connect);
-#endif
+    return hpx::init(desc_commandline, argc, argv, hpx::runtime_mode_connect);
 }
 

@@ -880,29 +880,44 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_os_thread_count()
     {
-        if (NULL == get_runtime_ptr())
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
             return 0;
-        return get_runtime().get_config().get_os_thread_count();
+        return rt->get_config().get_os_thread_count();
     }
 
-    std::size_t get_worker_thread_num(bool* numa_sensitive)
+    std::size_t get_worker_thread_num()
     {
-        if (NULL == get_runtime_ptr())
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
             return std::size_t(-1);
-        return get_runtime().get_thread_manager().get_worker_thread_num(numa_sensitive);
+        return rt->get_thread_manager().get_worker_thread_num();
+    }
+
+    bool is_scheduler_numa_sensitive()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
+            return false;
+
+        bool numa_sensitive = false;
+        if (std::size_t(-1) != rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
+            return numa_sensitive;
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void register_startup_function(startup_function_type const& f)
     {
-        if (NULL != get_runtime_ptr()) {
-            if (get_runtime().get_state() >= runtime::state_startup) {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            if (rt->get_state() >= runtime::state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new startup function.");
                 return;
             }
-            get_runtime().add_startup_function(f);
+            rt->add_startup_function(f);
         }
         else {
             global_pre_startup_functions.push_back(f);
@@ -911,14 +926,15 @@ namespace hpx
 
     void register_pre_startup_function(startup_function_type const& f)
     {
-        if (NULL != get_runtime_ptr()) {
-            if (get_runtime().get_state() >= runtime::state_pre_startup) {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            if (rt->get_state() >= runtime::state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new pre-startup function.");
                 return;
             }
-            get_runtime().add_pre_startup_function(f);
+            rt->add_pre_startup_function(f);
         }
         else {
             global_startup_functions.push_back(f);
@@ -927,21 +943,24 @@ namespace hpx
 
     void register_pre_shutdown_function(shutdown_function_type const& f)
     {
-        if (NULL != get_runtime_ptr())
-            get_runtime().add_pre_shutdown_function(f);
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            rt->add_pre_shutdown_function(f);
     }
 
     void register_shutdown_function(shutdown_function_type const& f)
     {
-        if (NULL != get_runtime_ptr())
-            get_runtime().add_shutdown_function(f);
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            rt->add_shutdown_function(f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool keep_factory_alive(components::component_type type)
     {
-        if (NULL != get_runtime_ptr())
-            return get_runtime().keep_factory_alive(type);
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            return rt->keep_factory_alive(type);
         return false;
     }
 
@@ -950,6 +969,15 @@ namespace hpx
     {
         return reinterpret_cast<components::server::runtime_support*>(
             get_runtime().get_runtime_support_lva());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool is_running()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            return rt->get_state() == runtime::state_running;
+        return false;
     }
 }
 

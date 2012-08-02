@@ -27,8 +27,8 @@ std::size_t thread_affinity_worker(std::size_t desired)
 {
     // Returns the OS-thread number of the worker that is running this
     // PX-thread.
-    bool numa_sensitive = false;
-    std::size_t current = hpx::get_worker_thread_num(&numa_sensitive);
+    std::size_t current = hpx::get_worker_thread_num();
+    bool numa_sensitive = hpx::is_scheduler_numa_sensitive();
 
     if (current == desired)
     {

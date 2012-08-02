@@ -565,25 +565,13 @@ namespace hpx
     HPX_API_EXPORT std::size_t get_os_thread_count();
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of the current OS-thread running in the
-    ///        runtime instance the current HPX-thread is associated with.
-    ///
-    /// \note   The returned value is zero based and it's maximum value is
-    ///         smaller than the overall number of OS-threads executed (as
-    ///         returned by \a get_os_thread_count().
-    /// \note   This function needs to be executed on a HPX-thread. It will
-    ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of the locality this function is being called
-    ///        from.
-    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+    HPX_API_EXPORT bool is_scheduler_numa_sensitive();
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
+    using lcos::promise;
 
     /// \endcond
 }
@@ -783,6 +771,30 @@ namespace hpx
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const& f);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the current OS-thread running in the
+    ///        runtime instance the current HPX-thread is executed with.
+    ///
+    /// This function returns the zero based index of the OS-thread which
+    /// executes the current HPX-thread.
+    ///
+    /// \note   The returned value is zero based and it's maximum value is
+    ///         smaller than the overall number of OS-threads executed (as
+    ///         returned by \a get_os_thread_count().
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         fail otherwise (it will return -1).
+    HPX_API_EXPORT std::size_t get_worker_thread_num();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the locality this function is being called
+    ///        from.
+    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \brief Test whether the runtime system is currently running.
+    HPX_API_EXPORT bool is_running();
 }
 
 #include <hpx/lcos/async_fwd.hpp>

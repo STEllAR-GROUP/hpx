@@ -1273,7 +1273,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void disconnect(double shutdown_timeout, double localwait)
+    int disconnect(double shutdown_timeout, double localwait)
     {
         if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
@@ -1297,6 +1297,8 @@ namespace hpx
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
         p->shutdown(shutdown_timeout);
+
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
