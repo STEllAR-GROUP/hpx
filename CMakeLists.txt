@@ -791,7 +791,7 @@ else()
              "Allow microarchitecture-specific optimizations (Default: OFF)"
              OFF ADVANCED)
 
-  if(HPX_MICROARCH_OPTIMIZATIONS)
+  if(NOT HPX_MICROARCH_OPTIMIZATIONS)
     if(NOT HPX_CXX_FLAG_MARCH_NATIVE)
       set(HPX_CXX_FLAG_MARCH_NATIVE OFF)
     endif()
