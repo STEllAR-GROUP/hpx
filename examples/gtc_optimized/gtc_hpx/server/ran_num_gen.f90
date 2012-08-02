@@ -32,7 +32,7 @@ module rngdef
   end type rng_state
 end module rngdef
 
-module rng
+module rng1
   ! the main module 
   use rngdef, only: rng_state, rng_s, rng_c
 
@@ -190,7 +190,7 @@ module rng
        integer, optional, intent(in) :: n0,n1,n2
      end subroutine rng_step_seed
   end interface
-end module rng
+end module rng1
  
 
 
@@ -214,21 +214,21 @@ module rngf77
   use rngdef
   implicit none
   interface
-     function random(ri,ra)
+     function random1(ri,ra)
        use rngdef
        implicit none
-       real(kind=double) :: random
+       real(kind=double) :: random1
        integer, intent(inout) :: ri
        real(kind=double), intent(inout), dimension(0:rng_k-1) :: ra
-     end function random
+     end function random1
 
-     function srandom(ri,ra)
+     function srandom1(ri,ra)
        use rngdef
        implicit none
-       real(kind=single) :: srandom
+       real(kind=single) :: srandom1
        integer, intent(inout) :: ri
        real(kind=double), intent(inout), dimension(0:rng_k-1) :: ra
-     end function srandom
+     end function srandom1
 
      subroutine random_array(y,n,ri,ra)
        use rngdef
@@ -539,7 +539,7 @@ subroutine rng_gauss_d1(state,x)
   if (mod(size(x,1),2) .eq. 0) return
 
   theta=pi*(2.0d0 *x(ubound(x,1))- 1.0d0 )
-  z=sqrt(- 2.0d0 *log(random(state%index,state%array)))
+  z=sqrt(- 2.0d0 *log(random1(state%index,state%array)))
   x(ubound(x,1))=z*cos(theta)
   return
 end subroutine rng_gauss_d1
@@ -590,7 +590,7 @@ subroutine rng_gauss_s1(state,x)
   if (mod(size(x,1),2) .eq. 0) return
 
   theta=pi*(2.0*x(ubound(x,1))-1.0)
-  z=sqrt(-2.0*log(srandom(state%index,state%array)))
+  z=sqrt(-2.0*log(srandom1(state%index,state%array)))
   x(ubound(x,1))=z*cos(theta)
   return
 end subroutine rng_gauss_s1
@@ -774,7 +774,7 @@ end subroutine rng_set_seed_string
 ! Author: Charles Karney <karney@princeton.edu>
 ! Date: 1999-10-05 14:33 -0400
 !
-      function random(ri,ra)
+      function random1(ri,ra)
       implicit none
       double precision  ulp2
       parameter(ulp2= 2.0d0 **(-47-1))
@@ -783,8 +783,8 @@ end subroutine rng_set_seed_string
       double precision  mult
       parameter(ulps=2.0**(-23),mult= 2.0d0 **23)
 
-      double precision  random
-      Real srandom
+      double precision  random1
+      Real srandom1
       integer ri
       double precision  ra(0:100-1)
       external rand_batch
@@ -792,16 +792,16 @@ end subroutine rng_set_seed_string
       if(ri.GE.100)then
       call rand_batch(ri,ra(0))
       end if
-      random=ra(ri)+ulp2
+      random1=ra(ri)+ulp2
       ri=ri+1
       return
 
-      entry srandom(ri,ra)
+      entry srandom1(ri,ra)
       if(ri.GE.100)then
       call rand_batch(ri,ra(0))
       end if
 
-      srandom=(int(mult*ra(ri))+0.5)*ulps
+      srandom1=(int(mult*ra(ri))+0.5)*ulps
 
       ri=ri+1
       return
