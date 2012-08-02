@@ -143,8 +143,7 @@ response component_namespace::service(
 
 // register all performance counter types exposed by this component
 void component_namespace::register_counter_types(
-    char const* servicename
-  , error_code& ec
+    error_code& ec
     )
 {
     boost::format help_count(
@@ -178,7 +177,13 @@ void component_namespace::register_counter_types(
           );
         if (ec) return;
     }
+}
 
+void component_namespace::register_server_instance(
+    char const* servicename
+  , error_code& ec
+    )
+{
     // now register this AGAS instance with AGAS :-P
     instance_name_ = agas::service_name;
     instance_name_ += agas::server::component_namespace_service_name;

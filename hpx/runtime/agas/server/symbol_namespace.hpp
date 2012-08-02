@@ -149,11 +149,6 @@ struct HPX_EXPORT symbol_namespace :
       , error_code& ec
         );
 
-    // register all performance counter types exposed by this component
-    void register_counter_types(
-        char const* servicename
-      , error_code& ec = throws);
-
     /// Maps \a service over \p reqs in parallel.
     std::vector<response> remote_bulk_service(
         std::vector<request> const& reqs
@@ -166,6 +161,16 @@ struct HPX_EXPORT symbol_namespace :
     std::vector<response> bulk_service(
         std::vector<request> const& reqs
       , error_code& ec
+        );
+
+    // register all performance counter types exposed by this component
+    static void register_counter_types(
+        error_code& ec = throws
+        );
+
+    void register_server_instance(
+        char const* servicename
+      , error_code& ec = throws
         );
 
     response bind(

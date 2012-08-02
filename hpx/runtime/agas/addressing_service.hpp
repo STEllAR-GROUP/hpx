@@ -167,11 +167,18 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     struct bootstrap_data_type
     { // {{{
 
-        void register_counter_types(char const* servicename)
+        void register_counter_types()
         {
-            primary_ns_server.register_counter_types(servicename);
-            component_ns_server.register_counter_types(servicename);
-            symbol_ns_server.register_counter_types(servicename);
+            server::primary_namespace::register_counter_types();
+            server::component_namespace::register_counter_types();
+            server::symbol_namespace::register_counter_types();
+        }
+
+        void register_server_instance(char const* servicename)
+        {
+            primary_ns_server.register_server_instance(servicename);
+            component_ns_server.register_server_instance(servicename);
+            symbol_ns_server.register_server_instance(servicename);
         }
 
         server::primary_namespace primary_ns_server;
@@ -181,6 +188,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
+        void register_counter_types()
+        {
+            server::primary_namespace::register_counter_types();
+            server::component_namespace::register_counter_types();
+            server::symbol_namespace::register_counter_types();
+        }
+
         primary_namespace primary_ns_;
         component_namespace component_ns_;
         symbol_namespace symbol_ns_;
