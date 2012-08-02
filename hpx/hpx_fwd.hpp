@@ -547,11 +547,6 @@ namespace hpx
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type);
 
-    /// \brief Return the number of localities which are currently registered
-    ///        for the running application.
-    HPX_API_EXPORT boost::uint32_t get_num_localities();
-    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
-
     /// \cond NODETAIL
     namespace detail
     {
@@ -675,6 +670,13 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
     HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    HPX_API_EXPORT boost::uint32_t get_num_localities();
+    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
     /// startup or pre-startup function.
     typedef HPX_STD_FUNCTION<void()> startup_function_type;
@@ -790,6 +792,25 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.
+    ///
+    /// This function returns the id of the current locality.
+    ///
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \note   The returned value is zero based and it's maximum value is
+    ///         smaller than the overall number of localities the current
+    ///         application is running on (as returned by
+    ///         \a get_num_localities()).
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         fail otherwise (it will return -1).
+    ///
+    /// \note   As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///         function doesn't throw but returns the result code using the
+    ///         parameter \a ec. Otherwise it throws an instance of
+    ///         hpx::exception.
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
