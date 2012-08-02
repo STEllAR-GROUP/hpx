@@ -111,6 +111,9 @@ macro(get_boost_version)
     CACHE STRING "Boost minor version (mm)." FORCE)
   set(BOOST_PATCH_VERSION "${BOOST_PATCH_VERSION}"
     CACHE STRING "Boost patch version (p)." FORCE)
+  mark_as_advanced(FORCE BOOST_VERSION_HPP BOOST_VERSION BOOST_VERSION_NUM
+    BOOST_MAJOR_VERSION, BOOST_MINOR_VERSION BOOST_PATCH_VERSION)
+
   set(BOOST_VERSION_STR
     "${BOOST_MAJOR_VERSION}.${BOOST_MINOR_VERSION}.${BOOST_PATCH_VERSION}"
     CACHE STRING "Boost version (M.mm.p string version)." FORCE)
@@ -128,6 +131,7 @@ macro(get_boost_version)
     "Path to Boost shared libraries (default: \${BOOST_ROOT}/stage/lib)." FORCE)
   set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" CACHE PATH
     "Include path for Boost (default: \${BOOST_ROOT})." FORCE)
+  mark_as_advanced(FORCE BOOST_USE_SYSTEM BOOST_USE_SYSTEM BOOST_LIBRARY_DIR BOOST_INCLUDE_DIR)
 
   endif()
 endmacro()

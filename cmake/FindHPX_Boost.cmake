@@ -190,10 +190,12 @@ macro(find_boost_library target_lib)
       else()
         set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
           CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
+        mark_as_advanced(FORCE BOOST_${target_lib_uc}_LIBRARY)
       endif()
     else()
       set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
         CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
+      mark_as_advanced(FORCE BOOST_${target_lib_uc}_LIBRARY)
       set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
@@ -224,6 +226,7 @@ macro(find_boost_library target_lib)
     else()
       set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
         CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
+      mark_as_advanced(FORCE BOOST_${target_lib_uc}_LIBRARY)
       set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
