@@ -5,8 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with futures.
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
@@ -18,14 +16,13 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
-
 std::vector<std::string> words;
 
-std::string search(int start, int end, std::string &word);
+std::string search(int start, int end, std::string const &word);
 
 HPX_PLAIN_ACTION(search, search_action);
 
-std::string search(int start, int end, std::string &word)
+std::string search(int start, int end, std::string const &word)
 {
     //highest value is 'z' at 122
     //lowest value is 'a' at 97
@@ -129,8 +126,8 @@ int hpx_main()
             while (fin.good())
             {
                 fin >> temp;
-                for each(char c in temp)
-                word.push_back(c);
+                for (int i = 0; i < temp.size(); ++i)
+                    word.push_back(temp[i]);
                 word.push_back(' ');
                 fileLines++;
             }
@@ -207,8 +204,9 @@ int hpx_main()
             vector<search_action> sAct;//[sizeX * sizeY];
             vector<future<string>> wordRun;
             wordRun.reserve(strs.size());
-            for each(string single in strs)
+            for (int i = 0; i < strs.size(); ++i)
             {
+                string& single = strs[i]; 
                 int start = 0;
                 hpx::naming::id_type const locality_id = hpx::find_here();
                 search_action temp;

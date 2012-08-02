@@ -12,8 +12,6 @@ set(sources
 ###############################################################################
 source_group("Source Files" FILES ${sources})
 
-find_package(HPX_RNPL)
-
 if(RNPL_FOUND)
   # add RNPL as a dependency
   set(dependencies

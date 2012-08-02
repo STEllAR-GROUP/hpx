@@ -17,26 +17,9 @@
 #include <iostream>
 #include <fstream>
 
-extern "C" {void FNAME(setup_0)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_1)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_2)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_3)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_4)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_5)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_6)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_7)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_8)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
-            void FNAME(setup_9)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+extern "C" {
+            void FNAME(setup)(void* opaque_ptr_to_class, int *,int *,int *,
+                      int *,int *, int *);
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
                      int *integer_params,double *real_params,
                      int *n_integers,int *n_reals) {
@@ -79,39 +62,9 @@ namespace tsf { namespace server
       int t2 = mype;
       int t_npartdom,t_ntoroidal;
       int t_hpx_left_pe, t_hpx_right_pe;
-      if ( mype == 0 ) {
-        FNAME(setup_0)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 1 ) {
-        FNAME(setup_1)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 2 ) {
-        FNAME(setup_2)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 3 ) {
-        FNAME(setup_3)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 4 ) {
-        FNAME(setup_4)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 5 ) {
-        FNAME(setup_5)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 6 ) {
-        FNAME(setup_6)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 7 ) {
-        FNAME(setup_7)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 8 ) {
-        FNAME(setup_8)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else if ( mype == 9 ) {
-        FNAME(setup_9)(static_cast<void*>(this),
-           &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
-      } else {
-        std::cerr << " Sorry -- more module names needed " << std::endl;
-      }
+      
+      FNAME(setup)(static_cast<void*>(this),
+         &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
 
 //#endif
 

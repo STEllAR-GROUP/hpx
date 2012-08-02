@@ -62,7 +62,7 @@ macro(add_hpx_library name)
         GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
 
       set(${name}_HEADERS ${${name}_lib_HEADERS})
-      add_hpx_library_headers(${name}_component
+      add_hpx_library_headers(${name}_library
         GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
 
       add_hpx_source_group(
@@ -78,13 +78,10 @@ macro(add_hpx_library name)
   hpx_print_list("DEBUG" "add_library.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_library.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
-  set(${name}_lib_linktype SHARED)
   if(${${name}_STATIC})
-    if(WIN32)
-      set(${name}_lib_linktype STATIC)
-    else()
-      hpx_info("add_library.${name}" "Ignoring directive 'STATIC' for library ${name}.")
-    endif()
+    set(${name}_lib_linktype STATIC)
+  else()
+    set(${name}_lib_linktype SHARED)
   endif()
 
   if(NOT MSVC)

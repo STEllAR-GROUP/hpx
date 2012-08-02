@@ -1,57 +1,56 @@
+! WARNING:  THIS FILE IS GENERATED FROM A PERL SCRIPT:  DO NOT MODIFY
+! SINCE YOUR CHANGES WILL NOT PERSIST BETWEEN BUILDS.
+!                                                    
 !========================================================================
 
 module global_parameters_0
   integer  :: mype
 end module global_parameters_0
-
 module global_parameters_1
   integer  :: mype
 end module global_parameters_1
-
 module global_parameters_2
   integer  :: mype
 end module global_parameters_2
-
 module global_parameters_3
   integer  :: mype
 end module global_parameters_3
-
 module global_parameters_4
   integer  :: mype
 end module global_parameters_4
-
 module global_parameters_5
   integer  :: mype
 end module global_parameters_5
-
 module global_parameters_6
   integer  :: mype
 end module global_parameters_6
-
 module global_parameters_7
   integer  :: mype
 end module global_parameters_7
-
 module global_parameters_8
   integer  :: mype
 end module global_parameters_8
-
 module global_parameters_9
   integer  :: mype
 end module global_parameters_9
+module global_parameters_10
+  integer  :: mype
+end module global_parameters_10
+module global_parameters_11
+  integer  :: mype
+end module global_parameters_11
 
 !========================================================================
 
-    Subroutine setup_0(ptr, &
+    subroutine setup_0(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_0
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -59,9 +58,8 @@ end module global_parameters_9
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -72,32 +70,23 @@ end module global_parameters_9
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_0
-
-!========================================================================
-
-    Subroutine setup_1(ptr, &
+    subroutine setup_1(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_1
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -105,9 +94,8 @@ end subroutine setup_0
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -118,31 +106,23 @@ end subroutine setup_0
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_1
-!========================================================================
-
-    Subroutine setup_2(ptr, &
+    subroutine setup_2(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_2
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -150,9 +130,8 @@ end subroutine setup_1
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -163,31 +142,23 @@ end subroutine setup_1
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_2
-!========================================================================
-
-    Subroutine setup_3(ptr, &
+    subroutine setup_3(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_3
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -195,9 +166,8 @@ end subroutine setup_2
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -208,31 +178,23 @@ end subroutine setup_2
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_3
-!========================================================================
-
-    Subroutine setup_4(ptr, &
+    subroutine setup_4(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_4
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -240,9 +202,8 @@ end subroutine setup_3
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -253,31 +214,23 @@ end subroutine setup_3
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_4
-!========================================================================
-
-    Subroutine setup_5(ptr, &
+    subroutine setup_5(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_5
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -285,9 +238,8 @@ end subroutine setup_4
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -298,31 +250,23 @@ end subroutine setup_4
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_5
-!========================================================================
-
-    Subroutine setup_6(ptr, &
+    subroutine setup_6(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_6
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -330,9 +274,8 @@ end subroutine setup_5
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -343,31 +286,23 @@ end subroutine setup_5
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_6
-!========================================================================
-
-    Subroutine setup_7(ptr, &
+    subroutine setup_7(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_7
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -375,9 +310,8 @@ end subroutine setup_6
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -388,31 +322,23 @@ end subroutine setup_6
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_7
-!========================================================================
-
-    Subroutine setup_8(ptr, &
+    subroutine setup_8(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_8
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -420,9 +346,8 @@ end subroutine setup_7
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -433,31 +358,23 @@ end subroutine setup_7
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_8
-!========================================================================
-
-    Subroutine setup_9(ptr, &
+    subroutine setup_9(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
                      hpx_left_pe, hpx_right_pe)
 
-!========================================================================
 
-  USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR
+  use, intrinsic :: iso_c_binding, only: c_ptr
   use global_parameters_9
   implicit none
-  TYPE(C_PTR), INTENT(IN), VALUE :: ptr
+  type(c_ptr), intent(in), value :: ptr
   integer,parameter:: n_integers = 20,n_reals=28
   integer  :: integer_params(n_integers)
   real*8   :: real_params(n_reals)
@@ -465,9 +382,8 @@ end subroutine setup_8
   integer hpx_left_pe, hpx_right_pe
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
 
-! total # of PE and rank of PE
   mype = hpx_mype
-  print*,' TEST mype ', mype
+  print*,' test mype ', mype
 
   if (mype == 0) then
     do i=0,n_integers
@@ -478,16 +394,83 @@ end subroutine setup_8
     end do
   endif
 
-  print*, ' TEST A mype ', mype
+  print*, ' test a mype ', mype
 
   call broadcast_parameters_cmm(ptr,integer_params,real_params,&
                                 n_integers,n_reals); 
 
-  print*, ' TEST B mype ', mype
-  !if (mype/=0) then
-  ! unpack
-  !  print*, ' TEST mype ', mype, &
-  !' <= should be a number between 0 and 9; numbers should not be duplicated'
-  !endif
+  print*, ' test b mype ', mype
 
 end subroutine setup_9
+    subroutine setup_10(ptr, &
+                     hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
+                     hpx_left_pe, hpx_right_pe)
+
+
+  use, intrinsic :: iso_c_binding, only: c_ptr
+  use global_parameters_10
+  implicit none
+  type(c_ptr), intent(in), value :: ptr
+  integer,parameter:: n_integers = 20,n_reals=28
+  integer  :: integer_params(n_integers)
+  real*8   :: real_params(n_reals)
+  integer  :: i
+  integer hpx_left_pe, hpx_right_pe
+  integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
+
+  mype = hpx_mype
+  print*,' test mype ', mype
+
+  if (mype == 0) then
+    do i=0,n_integers
+      integer_params(i)= i
+    end do
+    do i=0,n_reals
+      real_params(i)= i*10.0d0
+    end do
+  endif
+
+  print*, ' test a mype ', mype
+
+  call broadcast_parameters_cmm(ptr,integer_params,real_params,&
+                                n_integers,n_reals); 
+
+  print*, ' test b mype ', mype
+
+end subroutine setup_10
+    subroutine setup_11(ptr, &
+                     hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
+                     hpx_left_pe, hpx_right_pe)
+
+
+  use, intrinsic :: iso_c_binding, only: c_ptr
+  use global_parameters_11
+  implicit none
+  type(c_ptr), intent(in), value :: ptr
+  integer,parameter:: n_integers = 20,n_reals=28
+  integer  :: integer_params(n_integers)
+  real*8   :: real_params(n_reals)
+  integer  :: i
+  integer hpx_left_pe, hpx_right_pe
+  integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
+
+  mype = hpx_mype
+  print*,' test mype ', mype
+
+  if (mype == 0) then
+    do i=0,n_integers
+      integer_params(i)= i
+    end do
+    do i=0,n_reals
+      real_params(i)= i*10.0d0
+    end do
+  endif
+
+  print*, ' test a mype ', mype
+
+  call broadcast_parameters_cmm(ptr,integer_params,real_params,&
+                                n_integers,n_reals); 
+
+  print*, ' test b mype ', mype
+
+end subroutine setup_11

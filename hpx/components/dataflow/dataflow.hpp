@@ -99,7 +99,7 @@ namespace hpx { namespace lcos
         3                                                                     \
       , (                                                                     \
             1                                                                 \
-          , HPX_ACTION_ARGUMENT_LIMIT                                         \
+          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 4)                        \
           , "hpx/components/dataflow/dataflow.hpp"                            \
         )                                                                     \
     )                                                                         \

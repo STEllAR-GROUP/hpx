@@ -162,12 +162,12 @@ sources yourself. This is particularly important as many high performance
 resources, even if they have Boost installed, usually only provide you with an
 older version of Boost. We suggest you download the most recent release of the
 Boost libraries from here: __boost_downloads__. Unpack the downloaded archive
-into a directory of your choosing. We will refer to this directory a `$BOOST_ROOT`.
+into a directory of your choosing. We will refer to this directory a `$BOOST`.
 
 Building and installing the Boost binaries is simple, regardless what platform
 you are on:
 
-    cd $BOOST_ROOT
+    cd $BOOST
     bootstrap --prefix=<where to install boost>
     ./b2 -j<N>
     ./b2 install
@@ -176,7 +176,12 @@ where: `<where to install boost>` is the directory the built binaries will be
 installed to, and `<N>` is the number of cores to use to build the Boost
 binaries.
 
-[ensect]
+After the above sequence of command has been executed (this may take a while!)
+you will need to specify the directory where Boost was installed as `BOOST_ROOT`
+(`<where to install boost>`) while executing cmake for __hpx__ as explained in
+detail in the sections __unix_installation__ and __windows_installation__.
+
+[endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:unix_installation How to Install __hpx__ on Unix Variants]
@@ -225,7 +230,16 @@ binaries.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:windows_installation How to Install __hpx__ on Windows]
 
-[heading Installation]
+[heading Installation of Required Prerequisites]
+
+* Download the Boost c++ libraries from __boost_downloads__
+* Install the boost library as explained in the section __boost_installation__
+* Download the latest version of __cmake__ binaries, which are located under
+  the platform section of the downloads page at __cmake_download__.
+* Download the latest version of __hpx__ from the __stellar__ website:
+  __stellar_hpx_download__
+
+[heading Installation of the __hpx__ Library]
 
 * Create a build folder. __hpx__ requires an out-of-tree-build. This means that you
   will be unable to run CMake in the __hpx__ source folder.
@@ -234,13 +248,17 @@ binaries.
   "Where to build the binaries:", enter the full path to the build folder you
   created before.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
-  The only required variable you need to define is [^BOOST_ROOT]. This variable
-  needs to be set to point to the root folder of your Boost
-  installation. It is recommended to set the variable [^CMAKE_INSTALL_PREFIX] as
-  well. This allows to control where the built __hpx__ libraries will be installed.
+  The only required variable you need to define is `BOOST_ROOT`. This (PATH)
+  variable needs to be set to point to the root folder of your Boost
+  installation. It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
+  well. This allows to control where the built HPX libraries will be installed.
+  If this (PATH) variable is set, it has to refer to the directory where the
+  built __hpx__ files should be installed to.
 * Press the "Configure" button. A window will pop up asking you which compilers
   to use. Select the Visual Studio 10 (64Bit) compilers (they are usually
   the default if available).
+* Make sure that the under the `CMAKE` tree that the `CMAKE_BUILD_TYPE` build
+  type is set to Debug or Release, according to what you plain to do.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked red anymore).
 * Press "Generate".
