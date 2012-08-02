@@ -176,6 +176,7 @@ add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
+add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
 add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
@@ -786,6 +787,32 @@ else()
 
   ##############################################################################
   # x86-64 specific configuration
+  hpx_option(HPX_MICROACRH_OPTIMIZATIONS BOOL
+             "Allow microarchitecture-specific optimizations (Default: OFF)"
+             OFF ADVANCED)
+
+  if(HPX_MICROARCH_OPTIMIZATIONS)
+    if(NOT HPX_CXX_FLAG_MARCH_NATIVE)
+      set(HPX_CXX_FLAG_MARCH_NATIVE OFF)
+    endif()
+
+    if(NOT HPX_CXX_FLAG_MCX16)
+      set(HPX_CXX_FLAG_MCX16 OFF)
+    endif()
+
+    if(NOT HPX_CXX_FLAG_MCX16)
+      set(HPX_CXX_FLAG_MCX16 OFF)
+    endif()
+
+    if(NOT HPX_SSE2)
+      set(HPX_SSE2 OFF)
+    endif()
+
+    if(NOT HPX_RDTSCP)
+      set(HPX_RDTSCP OFF)
+    endif()
+  endif()
+
   ##############################################################################
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
@@ -851,7 +878,8 @@ else()
 
   hpx_use_flag_if_available(-pthread)
 
-  set(HPX_GOOGLE_PERFTOOLS ON CACHE BOOL "Compile HPX with google perftools" FORCE)
+  hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
+             "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
 
   if(HPX_GOOGLE_PERFTOOLS)
     find_package(HPX_GooglePerftools)
@@ -917,13 +945,6 @@ else()
     hpx_warn("malloc"
       "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
   endif()
-endif()
-
-
-add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
-
-if(HPX_HAVE_CXX11_RVALUE_REFERENCES)
-    message("yay!")
 endif()
 
 ################################################################################

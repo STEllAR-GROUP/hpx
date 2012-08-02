@@ -37,6 +37,8 @@
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenet]]
+[def __stellar_hpx_download__   [@http://stellar.cct.lsu.edu/downloads/ __hpx__ Downloads]]
+
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
 [def __iu__                     [@http://www.iu.edu Indiana University (IU)]]
@@ -58,6 +60,7 @@
 
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
+[def __cmake_download__         [@http://www.cmake.org/cmake/resources/software.html CMake Downloads]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
 [def __gmake__                  [@http://www.gnu.org/software/make GNU Make (gmake)]]
 [def __eglibc__                 [@http://eglibc.org/home Embedded GLIBC (EGLIBC)]]
@@ -109,6 +112,8 @@
 
 [/ Section link shortcuts]
 [def __boost_installation__     [link hpx.tutorial.getting_started.boost_installation Installing Boost Libraries]]
+[def __unix_installation__      [link hpx.tutorial.getting_started.unix_installation How to Install __hpx__ on Unix Variants]]
+[def __windows_installation__   [link hpx.tutorial.getting_started.windows_installation How to Install __hpx__ on Windows]]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
 [def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
