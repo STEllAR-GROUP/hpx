@@ -12,9 +12,14 @@ void register_counter_type()
 {
     namespace pc = hpx::performance_counters;
     pc::install_counter_type(
-        "/read_memory/vm",
+        "/memory/vm",
         &read_mem::read_psm_vm,
-        "returns the proc_statm file for the pid value sent"
+        "returns the virtual memory for the pid value of process which calls this counter"
+    );
+    pc::install_counter_type(
+        "/memory/resident",
+        &read_mem::read_psm_resident,
+        "returns the virtual memory for the pid value of process which calls this counter"
     );
 }
 
