@@ -316,9 +316,10 @@ namespace hpx
             if (!!shutdown)
                 rt.add_shutdown_function(shutdown);
 
-            // add startup function related to listing counter names or counter
-            // infos
-            handle_list_and_print_options(rt, vm);
+            // Add startup function related to listing counter names or counter
+            // infos (on console only).
+            if (mode == runtime_mode_console)
+                handle_list_and_print_options(rt, vm);
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("hpx:dump-config-initial")) {
