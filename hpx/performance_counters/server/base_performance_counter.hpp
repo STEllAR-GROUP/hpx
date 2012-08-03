@@ -66,7 +66,7 @@ namespace hpx { namespace performance_counters { namespace server
     public:
         base_performance_counter() : invocation_count_(0) {}
         base_performance_counter(counter_info const& info)
-          : invocation_count_(0) , info_(info)
+          : info_(info), invocation_count_(0)
         {}
 
         // components must contain a typedef for wrapping_type defining the
