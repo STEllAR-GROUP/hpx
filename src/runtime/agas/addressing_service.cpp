@@ -1728,9 +1728,13 @@ void addressing_service::register_counter_types()
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
     // now install counters for services
+    server::primary_namespace::register_counter_types();
+    server::component_namespace::register_counter_types();
+    server::symbol_namespace::register_counter_types();
+
     if (is_bootstrap()) {
-        // always register as root server, for now
-        bootstrap->register_counter_types("root");
+        // always register as 'root' server, for now
+        bootstrap->register_server_instance("root");
     }
 } // }}}
 

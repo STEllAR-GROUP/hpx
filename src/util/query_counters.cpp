@@ -92,6 +92,7 @@ namespace hpx { namespace util
         double val = value.get_value<double>(ec);
 
         out << performance_counters::remove_counter_prefix(name) << ",";
+        out << value.count_ << ",";
         if (!ec) {
             double elapsed = static_cast<double>(value.time_ - started_at_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)

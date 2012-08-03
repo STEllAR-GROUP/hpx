@@ -316,9 +316,10 @@ namespace hpx
             if (!!shutdown)
                 rt.add_shutdown_function(shutdown);
 
-            // add startup function related to listing counter names or counter
-            // infos
-            handle_list_and_print_options(rt, vm);
+            // Add startup function related to listing counter names or counter
+            // infos (on console only).
+            if (mode == runtime_mode_console)
+                handle_list_and_print_options(rt, vm);
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("hpx:dump-config-initial")) {
@@ -1273,7 +1274,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void disconnect(double shutdown_timeout, double localwait)
+    int disconnect(double shutdown_timeout, double localwait)
     {
         if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
@@ -1297,6 +1298,8 @@ namespace hpx
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
         p->shutdown(shutdown_timeout);
+
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

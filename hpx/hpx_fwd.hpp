@@ -547,11 +547,6 @@ namespace hpx
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type);
 
-    /// \brief Return the number of localities which are currently registered
-    ///        for the running application.
-    HPX_API_EXPORT boost::uint32_t get_num_localities();
-    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
-
     /// \cond NODETAIL
     namespace detail
     {
@@ -565,25 +560,13 @@ namespace hpx
     HPX_API_EXPORT std::size_t get_os_thread_count();
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of the current OS-thread running in the
-    ///        runtime instance the current HPX-thread is associated with.
-    ///
-    /// \note   The returned value is zero based and it's maximum value is
-    ///         smaller than the overall number of OS-threads executed (as
-    ///         returned by \a get_os_thread_count().
-    /// \note   This function needs to be executed on a HPX-thread. It will
-    ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of the locality this function is being called
-    ///        from.
-    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+    HPX_API_EXPORT bool is_scheduler_numa_sensitive();
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
+    using lcos::promise;
 
     /// \endcond
 }
@@ -687,6 +670,13 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
     HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    HPX_API_EXPORT boost::uint32_t get_num_localities();
+    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
     /// startup or pre-startup function.
     typedef HPX_STD_FUNCTION<void()> startup_function_type;
@@ -783,6 +773,49 @@ namespace hpx
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const& f);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the current OS-thread running in the
+    ///        runtime instance the current HPX-thread is executed with.
+    ///
+    /// This function returns the zero based index of the OS-thread which
+    /// executes the current HPX-thread.
+    ///
+    /// \note   The returned value is zero based and it's maximum value is
+    ///         smaller than the overall number of OS-threads executed (as
+    ///         returned by \a get_os_thread_count().
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         fail otherwise (it will return -1).
+    HPX_API_EXPORT std::size_t get_worker_thread_num();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the locality this function is being called
+    ///        from.
+    ///
+    /// This function returns the id of the current locality.
+    ///
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \note   The returned value is zero based and it's maximum value is
+    ///         smaller than the overall number of localities the current
+    ///         application is running on (as returned by
+    ///         \a get_num_localities()).
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         fail otherwise (it will return -1).
+    ///
+    /// \note   As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///         function doesn't throw but returns the result code using the
+    ///         parameter \a ec. Otherwise it throws an instance of
+    ///         hpx::exception.
+    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \brief Test whether the runtime system is currently running.
+    HPX_API_EXPORT bool is_running();
 }
 
 #include <hpx/lcos/async_fwd.hpp>

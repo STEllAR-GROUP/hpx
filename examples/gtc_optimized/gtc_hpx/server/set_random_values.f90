@@ -1,5 +1,5 @@
 module rng_gtc
-  use rng
+  use rng1
 ! Declarations and parameters for the portable random number generator
   integer,dimension(rng_s) :: seed
   type(rng_state) :: state

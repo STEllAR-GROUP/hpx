@@ -92,8 +92,15 @@ macro(hpx_find_package name)
     set(${name}_LIBRARY ${${name}_LIBRARY} CACHE FILEPATH "${name} shared library.")
     set(${name}_LIBRARY_DIR ${${name}_LIBRARY_DIR} CACHE PATH "${name} library directory.")
     set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
-    mark_as_advanced(FORCE ${name}_ROOT ${name}_LIBRARY ${name}_LIBRARY_DIR ${name}_INCLUDE_DIR)
+    mark_as_advanced(FORCE
+      ${name}_FOUND
+      ${name}_ROOT
+      ${name}_LIBRARY
+      ${name}_LIBRARY_DIR
+      ${name}_INCLUDE_DIR)
+
   else()
+
     if(NOT ${name}_SEARCHED)
       hpx_info("find_package.${name}" "Searching for package ${name}.")
 
@@ -175,7 +182,15 @@ macro(hpx_find_package name)
       set(${name}_LIBRARY ${${name}_LIBRARY} CACHE FILEPATH "${name} shared library.")
       set(${name}_LIBRARY_DIR ${${name}_LIBRARY_DIR} CACHE PATH "${name} library directory.")
       set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
-      mark_as_advanced(FORCE ${name}_ROOT ${name}_LIBRARY ${name}_LIBRARY_DIR ${name}_INCLUDE_DIR)
+
+      mark_as_advanced(FORCE
+        ${name}_ROOT
+        ${name}_LIBRARY
+        ${name}_LIBRARY_DIR
+        ${name}_INCLUDE_DIR)
+      if(NOT ${name}_FOUND)
+        mark_as_advanced(FORCE ${name}_FOUND)
+      endif()
 
     endif()
   endif()
