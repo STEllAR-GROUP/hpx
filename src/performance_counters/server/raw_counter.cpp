@@ -44,6 +44,7 @@ namespace hpx { namespace performance_counters { namespace server
         value.scale_inverse_ = false;
         value.status_ = status_new_data;
         value.time_ = util::high_resolution_clock::now();
+        value.count_ = ++invocation_count_;
     }
 }}}
 

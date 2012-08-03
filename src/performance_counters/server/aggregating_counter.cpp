@@ -114,6 +114,7 @@ namespace hpx { namespace performance_counters { namespace server
         value.value_ = detail::counter_type_from_statistic<Statistic>::call(value_);
         value.status_ = status_new_data;
         value.time_ = util::high_resolution_clock::now();
+        value.count_ = ++invocation_count_;
 
         prev_value_ = value;
 
@@ -137,7 +138,7 @@ namespace hpx { namespace performance_counters { namespace server
         {
             // not supported right now
             HPX_THROW_EXCEPTION(not_implemented,
-                "aggregating_counter<Statistic>::get_counter_value",
+                "aggregating_counter<Statistic>::evaluate",
                 "base counter should keep scaling constant over time");
             return false;
         }
