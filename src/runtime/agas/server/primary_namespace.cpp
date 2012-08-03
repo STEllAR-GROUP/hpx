@@ -1476,55 +1476,55 @@ response primary_namespace::statistics_counter(
 boost::int64_t primary_namespace::counter_data::get_allocate_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return allocate_.time_;
+    return allocate_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_bind_gid_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_gid_.time_;
+    return bind_gid_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_resolve_gid_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_gid_.time_;
+    return resolve_gid_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_resolve_locality_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_locality_.time_;
+    return resolve_locality_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_free_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return free_.time_;
+    return free_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_unbind_gid_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_gid_.time_;
+    return unbind_gid_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return change_credit_non_blocking_.time_;
+    return change_credit_non_blocking_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_change_credit_sync_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return change_credit_sync_.time_;
+    return change_credit_sync_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_localities_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return localities_.time_;
+    return localities_.count_;
 }
 
 // access execution time counters
