@@ -47,6 +47,7 @@ namespace hpx { namespace performance_counters { namespace server
         value.scale_inverse_ = true;
         value.status_ = status_new_data;
         value.time_ = static_cast<boost::uint64_t>(now);
+        value.count_ = ++invocation_count_;
     }
 }}}
 

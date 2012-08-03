@@ -577,13 +577,8 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
         template <typename Action>
         struct make_base_action : Action {};
-#else
-        template <typename Action>
-        struct make_base_action : boost::mpl::identity<Action> {};
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -603,6 +598,9 @@ namespace hpx { namespace actions
 #if defined(HPX_HAVE_CXX11_DECLTYPE)
 #  define HPX_TYPEOF(x)       decltype(x)
 #  define HPX_TYPEOF_TPL(x)   decltype(x)
+#elif HPX_GCC_VERSION <= 40400
+#  define HPX_TYPEOF(x)       __typeof__(x)
+#  define HPX_TYPEOF_TPL(x)   __typeof__(x)
 #else
 #  define HPX_TYPEOF(x)       BOOST_TYPEOF(x)
 #  define HPX_TYPEOF_TPL(x)   BOOST_TYPEOF_TPL(x)
@@ -687,29 +685,29 @@ namespace hpx { namespace actions
 #else
     // the implementation on conforming compilers is almost trivial
     #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
-        HPX_MAKE_ACTION(component::f)::type                                   \
+        HPX_MAKE_ACTION(component::f)                                         \
     /**/
     #define HPX_MAKE_DIRECT_COMPONENT_ACTION(component, f)                    \
-        HPX_MAKE_DIRECT_ACTION(component::f)::type                            \
+        HPX_MAKE_DIRECT_ACTION(component::f)                                  \
     /**/
     #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
-        HPX_MAKE_ACTION(component::f)::type                                   \
+        HPX_MAKE_ACTION(component::f)                                         \
     /**/
     #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, f)              \
-        HPX_MAKE_DIRECT_ACTION(component::f)::type                            \
+        HPX_MAKE_DIRECT_ACTION(component::f)                                  \
     /**/
 
     #define HPX_MAKE_COMPONENT_ACTION_TPL(component, f)                       \
-        typename HPX_MAKE_ACTION_TPL(component::f)::type                      \
+        HPX_MAKE_ACTION_TPL(component::f)                                     \
     /**/
     #define HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, f)                \
-        typename HPX_MAKE_DIRECT_ACTION_TPL(component::f)::type               \
+        HPX_MAKE_DIRECT_ACTION_TPL(component::f)                              \
     /**/
     #define HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, f)                 \
-        typename HPX_MAKE_ACTION_TPL(component::f)::type                      \
+        HPX_MAKE_ACTION_TPL(component::f)                                     \
     /**/
     #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, f)          \
-        typename HPX_MAKE_DIRECT_ACTION_TPL(component::f)::type               \
+        HPX_MAKE_DIRECT_ACTION_TPL(component::f)                              \
     /**/
 #endif
 

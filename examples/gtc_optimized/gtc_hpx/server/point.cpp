@@ -17,10 +17,38 @@
 #include <iostream>
 #include <fstream>
 
-extern "C" {void FNAME(setup)(void* opaque_ptr_to_class,
+extern "C" {
+            void FNAME(setup_0)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_1)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_2)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_3)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_4)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_5)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_6)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_7)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_8)(void* opaque_ptr_to_class,
+                          int *,int *,int *,int *,int *, int *);
+            void FNAME(setup_9)(void* opaque_ptr_to_class,
                           int *,int *,int *,int *,int *, int *);
             void FNAME(load)();
-            void FNAME(chargei)(void* opaque_ptr_to_class);
+            void FNAME(chargei_0)(void* opaque_ptr_to_class);
+            void FNAME(chargei_1)(void* opaque_ptr_to_class);
+            void FNAME(chargei_2)(void* opaque_ptr_to_class);
+            void FNAME(chargei_3)(void* opaque_ptr_to_class);
+            void FNAME(chargei_4)(void* opaque_ptr_to_class);
+            void FNAME(chargei_5)(void* opaque_ptr_to_class);
+            void FNAME(chargei_6)(void* opaque_ptr_to_class);
+            void FNAME(chargei_7)(void* opaque_ptr_to_class);
+            void FNAME(chargei_8)(void* opaque_ptr_to_class);
+            void FNAME(chargei_9)(void* opaque_ptr_to_class);
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
@@ -74,8 +102,48 @@ namespace gtc { namespace server
       int t2 = mype;
       int t_npartdom,t_ntoroidal;
       int t_hpx_left_pe, t_hpx_right_pe;
-      FNAME(setup)(static_cast<void*>(this),
-         &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+      switch(item_) {
+        case 0:
+          FNAME(setup_0)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 1:
+          FNAME(setup_1)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 2:
+          FNAME(setup_2)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 3:
+          FNAME(setup_3)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 4:
+          FNAME(setup_4)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 5:
+          FNAME(setup_5)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 6:
+          FNAME(setup_6)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 7:
+          FNAME(setup_7)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 8:
+          FNAME(setup_8)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+        case 9:
+          FNAME(setup_9)(static_cast<void*>(this),
+            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+          break;
+      }
 
       //FNAME(load)();
 //#endif
@@ -116,7 +184,38 @@ namespace gtc { namespace server
 
     void point::chargei_wrapper()
     {
-      FNAME(chargei)(static_cast<void*>(this));
+      switch(item_) {
+        case 0:
+          FNAME(chargei_0)(static_cast<void*>(this));
+          break;
+        case 1:
+          FNAME(chargei_1)(static_cast<void*>(this));
+          break;
+        case 2:
+          FNAME(chargei_2)(static_cast<void*>(this));
+          break;
+        case 3:
+          FNAME(chargei_3)(static_cast<void*>(this));
+          break;
+        case 4:
+          FNAME(chargei_4)(static_cast<void*>(this));
+          break;
+        case 5:
+          FNAME(chargei_5)(static_cast<void*>(this));
+          break;
+        case 6:
+          FNAME(chargei_6)(static_cast<void*>(this));
+          break;
+        case 7:
+          FNAME(chargei_7)(static_cast<void*>(this));
+          break;
+        case 8:
+          FNAME(chargei_8)(static_cast<void*>(this));
+          break;
+        case 9:
+          FNAME(chargei_9)(static_cast<void*>(this));
+          break;
+      }
     }
 
     void point::broadcast_parameters(int *integer_params,double *real_params,

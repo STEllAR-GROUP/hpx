@@ -12,6 +12,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
+#include <boost/detail/atomic_count.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
@@ -62,9 +64,9 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     public:
-        base_performance_counter() {}
+        base_performance_counter() : invocation_count_(0) {}
         base_performance_counter(counter_info const& info)
-          : info_(info)
+          : info_(info), invocation_count_(0)
         {}
 
         // components must contain a typedef for wrapping_type defining the
@@ -176,6 +178,7 @@ namespace hpx { namespace performance_counters { namespace server
 
     protected:
         hpx::performance_counters::counter_info info_;
+        boost::detail::atomic_count invocation_count_;
     };
 }}}
 

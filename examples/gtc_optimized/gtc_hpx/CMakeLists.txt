@@ -10,7 +10,7 @@ if(MSVC)
   add_hpx_library(gtc_hpx_fortran
     AUTOGLOB
     STATIC
-    SOURCE_GLOB "*.F90"
+    SOURCE_GLOB "*_pl.F90" "*_pl.f90" "*.cpp"
     HEADER_GLOB ""
     FOLDER "Examples/Applications/GTC Optimized")
 else()

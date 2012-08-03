@@ -39,7 +39,12 @@ if(UNIX AND HPX_WARNINGS)
   hpx_use_flag_if_available(-Werror=reorder)
   hpx_use_flag_if_available(-Werror=return-type)
   hpx_use_flag_if_available(-Werror=sequence-point)
-  hpx_use_flag_if_available(-Werror=uninitialized)
+
+  if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
+    # Uninitialized variables are bad, earlier compilers issue spurious warnings
+    hpx_use_flag_if_available(-Werror=uninitialized)
+  endif()
+
   hpx_use_flag_if_available(-Werror=missing-field-initializers)
   hpx_use_flag_if_available(-Werror=format)
   hpx_use_flag_if_available(-Werror=missing-braces)
