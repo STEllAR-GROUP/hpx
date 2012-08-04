@@ -295,7 +295,7 @@ namespace hpx { namespace this_thread
     ///         \a hpx#invalid_status.
     ///
     inline threads::thread_state_ex_enum suspend(
-        int ms, char const* description = "this_thread::suspend",
+        boost::uint64_t ms, char const* description = "this_thread::suspend",
         error_code& ec = throws)
     {
         return suspend(boost::posix_time::milliseconds(ms), description, ec);
