@@ -71,8 +71,10 @@ namespace hpx { namespace parcelset
     {
         // make sure all existing connections get destroyed first
         connection_cache_.clear();
-        if (NULL != acceptor_)
+        if (NULL != acceptor_) {
+            acceptor_->close();
             delete acceptor_;
+        }
     }
 
     bool parcelport::run(bool blocking)
@@ -132,6 +134,7 @@ namespace hpx { namespace parcelset
 
             if (NULL != acceptor_)
             {
+                acceptor_->close();
                 delete acceptor_;
                 acceptor_ = NULL;
             }
