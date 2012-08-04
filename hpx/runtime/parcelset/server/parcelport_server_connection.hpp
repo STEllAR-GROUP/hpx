@@ -51,6 +51,11 @@ namespace hpx { namespace parcelset { namespace server
         {
         }
 
+        ~parcelport_connection()
+        {
+            socket_.close();    // close the socket to give it back to the OS
+        }
+
         /// Get the socket associated with the parcelport_connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }
 
