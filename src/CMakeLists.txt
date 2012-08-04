@@ -69,7 +69,10 @@ add_hpx_library_sources(hpx_serialization
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE ".*(hpx_main|hpx_init)[.]cpp")
+  EXCLUDE "(.*(hpx_main|hpx_init).*[.]cpp)|main.cpp")
+add_hpx_library_sources(hpx
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/pre_main.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
   APPEND)
@@ -87,6 +90,8 @@ add_hpx_library_sources(hpx
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp")
+add_hpx_library_sources(hpx_init
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/main.cpp" APPEND)
 
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 
