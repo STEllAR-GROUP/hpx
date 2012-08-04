@@ -72,7 +72,8 @@ namespace hpx { namespace parcelset
         // make sure all existing connections get destroyed first
         connection_cache_.clear();
         if (NULL != acceptor_) {
-            acceptor_->close();
+            boost::system::error_code ec;
+            acceptor_->close(ec);
             delete acceptor_;
         }
     }
@@ -134,7 +135,8 @@ namespace hpx { namespace parcelset
 
             if (NULL != acceptor_)
             {
-                acceptor_->close();
+                boost::system::error_code ec;
+                acceptor_->close(ec);
                 delete acceptor_;
                 acceptor_ = NULL;
             }

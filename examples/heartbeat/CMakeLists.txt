@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# define build targets for this directory
+###############################################################################
 set(heartbeat_HEADERS)
 
 set(heartbeat_SOURCES
@@ -30,4 +30,13 @@ add_hpx_executable(heartbeat
 
 # add pseudo-target dependencies
 add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_exe)
+
+###############################################################################
+add_hpx_executable(heartbeat_console
+                   SOURCES heartbeat_console.cpp
+                   FOLDER "Examples/HeartBeat"
+                   DEPENDENCIES iostreams_component)
+
+# add pseudo-target dependencies
+add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_console_exe)
 

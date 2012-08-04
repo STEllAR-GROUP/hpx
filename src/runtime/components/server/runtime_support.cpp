@@ -100,6 +100,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::get_instance_count_action,
     get_instance_count_action)
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::remove_from_connection_cache_action,
+    remove_from_connection_cache_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -402,10 +405,11 @@ namespace hpx { namespace components { namespace server
 
     // function to be called during shutdown
     // Action: shut down this runtime system instance
-    void runtime_support::shutdown(double timeout, naming::id_type const& respond_to)
+    void runtime_support::shutdown(double timeout,
+        naming::id_type const& respond_to)
     {
         // initiate system shutdown
-        stop(timeout, respond_to);
+        stop(timeout, respond_to, false);
     }
 
     // function to be called to terminate this locality immediately
@@ -485,7 +489,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // now make sure this local locality gets shut down as well.
-        stop(timeout, naming::invalid_id);    // no need to respond
+        stop(timeout, naming::invalid_id, false);    // no need to respond
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -601,6 +605,18 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Remove the given locality from our connection cache
+    void runtime_support::remove_from_connection_cache(naming::locality const& l)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == 0)
+            return;
+
+        // instruct our connection cache to drop all connections it is holding
+        rt->get_parcel_handler().get_parcelport().get_connection_cache().clear(l);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
         mutex_type::scoped_lock l(mtx_);
@@ -637,7 +653,8 @@ namespace hpx { namespace components { namespace server
         tm.cleanup_terminated();
     }
 
-    void runtime_support::stop(double timeout, naming::id_type const& respond_to)
+    void runtime_support::stop(double timeout,
+        naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
@@ -680,6 +697,7 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
+            //remove all entries for this locality from AGAS
             naming::resolver_client& agas_client =
                 get_runtime().get_agas_client();
 
@@ -689,6 +707,9 @@ namespace hpx { namespace components { namespace server
 
             // Drop the locality from the partition table.
             agas_client.unregister_locality(appl.here(), ec);
+
+            if (remove_from_remote_caches)
+                remove_here_from_connection_cache();
 
             if (respond_to) {
                 // respond synchronously
@@ -777,6 +798,18 @@ namespace hpx { namespace components { namespace server
 
         (*it).second.second.keep_alive();
         return true;
+    }
+
+    void runtime_support::remove_here_from_connection_cache()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == 0)
+            return;
+
+        std::vector<naming::id_type> locality_ids = find_remote_localities();
+
+        typedef server::runtime_support::remove_from_connection_cache_action action_type;
+        apply(action_type(), locality_ids, rt->here());
     }
 
     ///////////////////////////////////////////////////////////////////////////
