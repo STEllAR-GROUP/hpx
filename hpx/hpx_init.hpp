@@ -28,7 +28,7 @@ int hpx_main(boost::program_options::variables_map& vm);
 // We support redefining the plain C-main provided by the user to be executed
 // as the first HPX-thread (equivalent to hpx_main()). This is implemented by
 // a macro redefining main, so we disable it by default.
-#if defined(HPX_MAIN_IS_HPX_MAIN)
+#if defined(HPX_MAIN_IS_MAIN)
 #  define main hpx::user_main
 #endif
 
