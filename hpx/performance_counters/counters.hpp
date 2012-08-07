@@ -425,7 +425,7 @@ namespace hpx { namespace performance_counters
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & status_ & time_ & value_ & scaling_ & scale_inverse_;
+            ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
         }
     };
 

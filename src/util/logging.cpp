@@ -125,8 +125,7 @@ namespace hpx { namespace util
     struct shepherd_thread_id
       : boost::logging::formatter::class_<
             shepherd_thread_id,
-            boost::logging::formatter::implement_op_equal::no_context
-        >
+            boost::logging::formatter::implement_op_equal::no_context>
     {
         shepherd_thread_id()
         {}
@@ -146,28 +145,33 @@ namespace hpx { namespace util
     struct locality_prefix
       : boost::logging::formatter::class_<
             locality_prefix,
-            boost::logging::formatter::implement_op_equal::no_context
-        >
+            boost::logging::formatter::implement_op_equal::no_context>
     {
         locality_prefix()
         {}
 
         void operator()(param str) const
         {
-            boost::uint32_t locality_id = 0;
+            boost::uint32_t locality_id = naming::invalid_locality_id;
             applier::applier* appl = applier::get_applier_ptr();
             if (appl)
                 locality_id = appl->get_locality_id();
 
-            std::stringstream out;
-            out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
-                << std::setfill('0') << locality_id;
-            str.prepend_string(out.str());
+            if (naming::invalid_locality_id != locality_id) {
+                std::stringstream out;
+                out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                    << std::setfill('0') << locality_id;
+                str.prepend_string(out.str());
+            }
+            else {
+                // called from outside a HPX thread
+                str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
+            }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: PX thread id
+    // custom formatter: HPX thread id
     struct thread_id
       : boost::logging::formatter::class_<
             thread_id,
@@ -177,21 +181,21 @@ namespace hpx { namespace util
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (0 != self) {
-                // called from inside a PX thread
+                // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0')
                     << reinterpret_cast<std::ptrdiff_t>(self->get_thread_id());
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread
+                // called from outside a HPX thread
                 str.prepend_string(std::string(sizeof(void*)*2, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: PX thread phase
+    // custom formatter: HPX thread phase
     struct thread_phase
       : boost::logging::formatter::class_<
             thread_phase,
@@ -201,14 +205,14 @@ namespace hpx { namespace util
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (0 != self) {
-                // called from inside a PX thread
+                // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(2) << std::setfill('0')
                     << self->get_thread_phase();
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread
+                // called from outside a HPX thread
                 str.prepend_string("--");
             }
         }
@@ -219,96 +223,92 @@ namespace hpx { namespace util
     struct parent_thread_locality
       : boost::logging::formatter::class_<
             parent_thread_locality,
-            boost::logging::formatter::implement_op_equal::no_context
-        >
+            boost::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
             boost::uint32_t parent_locality_id = threads::get_parent_locality_id();
-            if (0 != parent_locality_id) {
-                // called from inside a PX thread
+            if (naming::invalid_locality_id != parent_locality_id) {
+                // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0')
                     << parent_locality_id;
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread
+                // called from outside a HPX thread
                 str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: PX parent thread id
+    // custom formatter: HPX parent thread id
     struct parent_thread_id
       : boost::logging::formatter::class_<
             parent_thread_id,
-            boost::logging::formatter::implement_op_equal::no_context
-        >
+            boost::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
             if (0 != parent_id) {
-                // called from inside a PX thread
+                // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0')
                     << reinterpret_cast<std::ptrdiff_t>(parent_id);
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread
+                // called from outside a HPX thread
                 str.prepend_string(std::string(sizeof(void*)*2, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: PX parent thread phase
+    // custom formatter: HPX parent thread phase
     struct parent_thread_phase
       : boost::logging::formatter::class_<
             parent_thread_phase,
-            boost::logging::formatter::implement_op_equal::no_context
-        >
+            boost::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
             std::size_t parent_phase = threads::get_parent_phase();
             if (0 != parent_phase) {
-                // called from inside a PX thread
+                // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(2) << std::setfill('0')
                     << parent_phase;
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread
+                // called from outside a HPX thread
                 str.prepend_string("--");
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: PX component id of current thread
+    // custom formatter: HPX component id of current thread
     struct thread_component_id
       : boost::logging::formatter::class_<
             thread_component_id,
-            boost::logging::formatter::implement_op_equal::no_context
-        >
+            boost::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
             boost::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id) {
-                // called from inside a PX thread
+                // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0')
                     << component_id;
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread
+                // called from outside a HPX thread
                 str.prepend_string(std::string(sizeof(boost::uint64_t)*2, '-'));
             }
         }
