@@ -272,7 +272,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Insert the given name mapping into the AGAS cache of this
         ///        locality.
-        void update_agas_cache(naming::gid_type const&, agas::gva const&);
+        void update_agas_cache(naming::gid_type const&, naming::address const&);
 
         /// \brief Load all components on this locality.
         bool load_components();
@@ -382,7 +382,7 @@ namespace hpx { namespace components { namespace server
 
         typedef hpx::actions::action2<
             runtime_support, runtime_support_update_agas_cache,
-            naming::gid_type const&, agas::gva const&,
+            naming::gid_type const&, naming::address const&,
             &runtime_support::update_agas_cache
         > update_agas_cache_action;
 

@@ -326,6 +326,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         error_code& ec = throws
         );
 
+    naming::locality get_here() const
+    {
+        return here_;
+    }
+
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void increment_refcnt_requests(
@@ -1314,6 +1319,15 @@ public:
     void update_cache(
         naming::gid_type const& gid
       , gva const& gva
+      , error_code& ec = throws
+        );
+
+    void update_cache(
+        naming::gid_type const& gid
+      , naming::locality const& l
+      , components::component_type t
+      , boost::uint64_t addr
+      , boost::uint64_t count = 1
       , error_code& ec = throws
         );
 
