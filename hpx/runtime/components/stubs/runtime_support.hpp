@@ -411,6 +411,14 @@ namespace hpx { namespace components { namespace stubs
             // is executed and the result is returned to the future
             return get_instance_count_async(targetgid, type).get();
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        static void
+        call_shutdown_functions_async(naming::id_type const& gid, naming::locality const& l)
+        {
+            typedef server::runtime_support::remove_from_connection_cache_action action_type;
+            hpx::apply<action_type>(gid, l);
+        }
     };
 }}}
 

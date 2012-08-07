@@ -71,7 +71,7 @@ namespace hpx { namespace util
         /// Try to get a connection to \a l from the cache.
         ///
         /// \returns A usable connection to \a l if a connection could be
-        ///          found, otherwise a default constructed connection. 
+        ///          found, otherwise a default constructed connection.
         ///
         /// \note    The connection must be returned to the cache by calling
         ///          \a reclaim().
@@ -121,7 +121,7 @@ namespace hpx { namespace util
         ///          set such that conn.get() == 0, and this function returns
         ///          true. If a connection could not be found and space could
         ///          not be returned, \a conn is unmodified and this function
-        ///          returns false. 
+        ///          returns false.
         ///
         /// \note    The connection must be returned to the cache by calling
         ///          \a reclaim().
@@ -160,11 +160,11 @@ namespace hpx { namespace util
                 if (boost::get<1>(it->second) < max_connections_per_locality_)
                 {
                     // See if we have enough space or can make space available.
-                    // If we can't find or make space, give up. 
+                    // If we can't find or make space, give up.
                     if (!free_space())
                     {
                         check_invariants();
-                        return false; 
+                        return false;
                     }
 
                     // Make sure the input connection shared_ptr doesn't hold
@@ -186,14 +186,14 @@ namespace hpx { namespace util
                 return false;
             }
 
-            // Key isn't in cache. 
+            // Key isn't in cache.
 
             // See if we have enough space or can make space available.
-            // If we can't find or make space, give up. 
+            // If we can't find or make space, give up.
             if (!free_space())
             {
                 check_invariants();
-                return false; 
+                return false;
             }
 
             // Update LRU meta data.
@@ -208,13 +208,13 @@ namespace hpx { namespace util
 
             // Increase the overall connection counts.
             ++connections_;
-   
+
             check_invariants();
-            return true; 
+            return true;
         }
 
         /// Returns a connection for \a l to the cache.
-        /// 
+        ///
         /// \note The cache must already be aware of the connection, through
         ///       a prior call to \a get() or \a get_or_reserve().
         void reclaim(key_type const& l, connection_type const& conn)
@@ -225,7 +225,7 @@ namespace hpx { namespace util
             typename cache_type::iterator const ct = cache_.find(l);
 
             // Key should already exist in the cache. FIXME: This should
-            // probably throw as could easily be triggered by caller error. 
+            // probably throw as could easily be triggered by caller error.
             BOOST_ASSERT(ct != cache_.end());
 
             // Update LRU meta data.
@@ -279,7 +279,36 @@ namespace hpx { namespace util
             connections_ = 0;
 
             // FIXME: This should probably throw instead of asserting, as it
-            // can be triggered by caller error. 
+            // can be triggered by caller error.
+            check_invariants();
+        }
+
+        /// Destroys all connections for the give locality in the cache, reset
+        /// all associated counts.
+        ///
+        /// \note Calling this function while connections are still checked out
+        ///       of the cache is a bad idea, and will violate this classes
+        ///       invariants.
+        void clear(key_type const& l)
+        {
+            mutex_type::scoped_lock lock(mtx_);
+
+            // Check if this key already exists in the cache.
+            typename cache_type::iterator const it = cache_.find(l);
+            if (it != cache_.end())
+            {
+                // Remove from LRU meta data.
+                key_tracker_.erase(boost::get<2>(it->second));
+
+                // correct counter to avoid assertions later on
+                connections_ -= boost::get<1>(it->second);
+
+                // Erase entry if key exists in the cache.
+                cache_.erase(it);
+            }
+
+            // FIXME: This should probably throw instead of asserting, as it
+            // can be triggered by caller error.
             check_invariants();
         }
 
@@ -304,7 +333,7 @@ namespace hpx { namespace util
                 // locality) should not be larger than the allowed number.
                 BOOST_ASSERT(boost::get<1>(val) <= max_connections_per_locality_);
 
-                // Count all connections (both those in the cache and those 
+                // Count all connections (both those in the cache and those
                 // checked out of the cache).
                 in_cache_count += boost::get<0>(val).size();
                 total_count += boost::get<1>(val);
@@ -315,7 +344,7 @@ namespace hpx { namespace util
             BOOST_ASSERT(in_cache_count <= connections_);
 
             // Overall connection count should be equal to the sum of connection
-            // counts for all localities. 
+            // counts for all localities.
             BOOST_ASSERT(total_count == connections_);
 
             // Check that we do not hold too many elements.
@@ -336,7 +365,7 @@ namespace hpx { namespace util
             // If the cache isn't full, just return true.
             if (connections_ < max_connections_)
                 return true;
- 
+
             // Find the least recently used key.
             typename key_tracker_type::iterator kt = key_tracker_.begin();
 
@@ -347,11 +376,11 @@ namespace hpx { namespace util
                 BOOST_ASSERT(ct != cache_.end());
 
                 // If the entry is empty, ignore it and try the next least
-                // recently used entry. 
+                // recently used entry.
                 if (boost::get<0>(ct->second).empty())
                 {
-                    // Remove the key if its connection count is zero. 
-                    if (0 == boost::get<1>(ct->second)) 
+                    // Remove the key if its connection count is zero.
+                    if (0 == boost::get<1>(ct->second))
                     {
                         cache_.erase(ct);
                         key_tracker_.erase(kt);
@@ -361,11 +390,11 @@ namespace hpx { namespace util
                     else
                         // REVIEW: Should we reorder key_tracker_ to speed up
                         // the eviction?
-                        ++kt; 
+                        ++kt;
 
                     // If we've gone through key_tracker_ and haven't found
                     // anything evictable, then all the entries must be checked
-                    // out. 
+                    // out.
                     if (key_tracker_.end() == kt)
                         return false;
                     else

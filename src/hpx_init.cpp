@@ -942,6 +942,10 @@ namespace hpx
                     run_agas_server = true;
                     mode = hpx::runtime_mode_console;
                 }
+                else if (mode == hpx::runtime_mode_connect) {
+                    // when connecting we need to select a unique port
+                    hpx_port = HPX_CONNECTING_IP_PORT;
+                }
                 else {
                     // each node gets an unique port
                     hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
@@ -955,6 +959,10 @@ namespace hpx
                 // store node number in configuration
                 ini_config += "hpx.locality=" +
                     boost::lexical_cast<std::string>(node + 1);
+            }
+            else if (mode == hpx::runtime_mode_connect) {
+                // when connecting we need to select a unique port
+                hpx_port = HPX_CONNECTING_IP_PORT;
             }
 
             if (vm.count("hpx:ini")) {
@@ -1297,7 +1305,7 @@ namespace hpx
 
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
-        p->shutdown(shutdown_timeout);
+        p->stop(shutdown_timeout, naming::invalid_id, true);
 
         return 0;
     }

@@ -138,7 +138,8 @@ namespace hpx { namespace components { namespace server
             runtime_support_update_agas_cache = 14,
             runtime_support_garbage_collect = 15,
             runtime_support_create_performance_counter = 16,
-            runtime_support_get_instance_count = 17
+            runtime_support_get_instance_count = 17,
+            runtime_support_remove_from_connection_cache = 18
         };
 
         static component_type get_component_type()
@@ -290,6 +291,9 @@ namespace hpx { namespace components { namespace server
         ///        type
         long get_instance_count(components::component_type);
 
+        /// \brief Remove the given locality from our connection cache
+        void remove_from_connection_cache(naming::locality const& l);
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
@@ -399,6 +403,11 @@ namespace hpx { namespace components { namespace server
             components::component_type, &runtime_support::get_instance_count
         > get_instance_count_action;
 
+        typedef hpx::actions::action1<
+            runtime_support, runtime_support_remove_from_connection_cache,
+            naming::locality const&, &runtime_support::remove_from_connection_cache
+        > remove_from_connection_cache_action;
+
         ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
         void run();
@@ -416,7 +425,8 @@ namespace hpx { namespace components { namespace server
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout, naming::id_type const& respond_to);
+        void stop(double timeout, naming::id_type const& respond_to,
+            bool remove_from_remote_caches);
 
         /// called locally only
         void stopped();
@@ -448,6 +458,8 @@ namespace hpx { namespace components { namespace server
         }
 
         bool keep_factory_alive(component_type t);
+
+        void remove_here_from_connection_cache();
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -585,6 +597,9 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::get_instance_count_action,
     get_instance_count_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::remove_from_connection_cache_action,
+    remove_from_connection_cache_action)
 
 #include <hpx/config/warnings_suffix.hpp>
 

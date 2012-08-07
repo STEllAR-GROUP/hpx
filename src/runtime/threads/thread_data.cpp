@@ -197,7 +197,8 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_locality_id() : 0;
+            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_locality_id() :
+            naming::invalid_locality_id;
     }
 
     naming::address::address_type get_self_component_id()

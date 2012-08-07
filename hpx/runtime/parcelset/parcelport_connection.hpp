@@ -52,6 +52,14 @@ namespace hpx { namespace parcelset
             connection_cache_(cache), timer_(timer), parcels_sent_(parcels_sent)
         {}
 
+        ~parcelport_connection()
+        {
+            // gracefully and portably shutdown the socket
+            boost::system::error_code ec;
+            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+            socket_.close(ec);    // close the socket to give it back to the OS
+        }
+
         void set_parcel (parcel const& p)
         {
             set_parcel(std::vector<parcel>(1, p));

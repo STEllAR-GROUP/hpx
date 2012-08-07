@@ -42,9 +42,10 @@ int hpx_main()
         //
         // This will print something like:
         //
-        //    test{locality#0/total}/data,1.005240[s],1
+        //    test{locality#0/total}/data,1,1.005240[s],1
         //
-        // where the time is the timestamp marking the point in time since
+        // where the first value is a sequence counter of the invocation of the
+        // counter. The next is the timestamp marking the point in time since
         // application startup at which this counter has been queried. The last
         // value printed is the counter value retrieved at the listed point in
         // time.
@@ -57,17 +58,17 @@ int hpx_main()
         // the counter will be queried periodically and the output will look
         // like:
         //
-        //    test{locality#0/total}/data,0.001937[s],1
-        //    test{locality#0/total}/data,0.109625[s],2
-        //    test{locality#0/total}/data,0.217192[s],3
-        //    test{locality#0/total}/data,0.323497[s],4
-        //    test{locality#0/total}/data,0.430867[s],5
-        //    test{locality#0/total}/data,0.536965[s],6
-        //    test{locality#0/total}/data,0.643422[s],7
-        //    test{locality#0/total}/data,0.750788[s],8
-        //    test{locality#0/total}/data,0.857031[s],9
-        //    test{locality#0/total}/data,0.963330[s],10
-        //    test{locality#0/total}/data,1.015063[s],11
+        //    test{locality#0/total}/data,1,0.001937[s],1
+        //    test{locality#0/total}/data,2,0.109625[s],2
+        //    test{locality#0/total}/data,3,0.217192[s],3
+        //    test{locality#0/total}/data,4,0.323497[s],4
+        //    test{locality#0/total}/data,5,0.430867[s],5
+        //    test{locality#0/total}/data,6,0.536965[s],6
+        //    test{locality#0/total}/data,7,0.643422[s],7
+        //    test{locality#0/total}/data,8,0.750788[s],8
+        //    test{locality#0/total}/data,9,0.857031[s],9
+        //    test{locality#0/total}/data,10,0.963330[s],10
+        //    test{locality#0/total}/data,11,1.015063[s],11
         //
         // which shows that the counter has been queried roughly every 100
         // milliseconds, as specified. Additionally it will be queried during

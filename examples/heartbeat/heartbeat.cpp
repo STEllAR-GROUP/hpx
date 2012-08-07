@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// #define HPX_USE_WINDOWS_PERFORMANCE_COUNTERS 1
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -17,27 +19,11 @@
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 // include Windows specific performance counter binding
+#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
 #include "win_perf_counters.hpp"
-
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
-
-using boost::posix_time::milliseconds;
-
-using boost::format;
-using boost::str;
-
-using hpx::running;
-
-using hpx::threads::threadmanager_is;
-
-using hpx::performance_counters::stubs::performance_counter;
-using hpx::performance_counters::counter_value;
-using hpx::performance_counters::status_is_valid;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 void stop_monitor(hpx::promise<void> p)
@@ -46,9 +32,9 @@ void stop_monitor(hpx::promise<void> p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int monitor(std::string const& name, boost::uint64_t pause)
+int monitor(double runfor, std::string const& name, boost::uint64_t pause)
 {
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
     hpx::register_shutdown_function(&uninstall_windows_counters);
 #endif
 
@@ -56,7 +42,7 @@ int monitor(std::string const& name, boost::uint64_t pause)
     hpx::naming::id_type id = hpx::performance_counters::get_counter(name);
     if (!id)
     {
-        std::cout << (format(
+        std::cout << (boost::format(
             "error: performance counter not found (%s)")
             % name) << std::endl;
         return 1;
@@ -65,7 +51,7 @@ int monitor(std::string const& name, boost::uint64_t pause)
     boost::uint32_t const locality_id = hpx::get_locality_id();
     if (locality_id == hpx::naming::get_locality_id_from_gid(id.get_gid()))
     {
-        std::cout << (format(
+        std::cout << (boost::format(
             "error: cannot query performance counters on its own locality (%s)")
             % name) << std::endl;
         return 1;
@@ -77,55 +63,60 @@ int monitor(std::string const& name, boost::uint64_t pause)
     boost::int64_t zero_time = 0;
     hpx::future<void> f = stop_flag.get_future();
 
-    while (true)
+    hpx::util::high_resolution_timer t;
+    while (runfor < 0 || t.elapsed() < runfor)
     {
         // stop collecting data when the runtime is exiting
         if (!hpx::is_running() || f.is_ready())
             return 0;
 
         // Query the performance counter.
-        counter_value value = performance_counter::get_value(id);
+        using namespace hpx::performance_counters;
+        counter_value value = stubs::performance_counter::get_value(id);
 
-        if (HPX_LIKELY(status_is_valid(value.status_)))
+        if (status_is_valid(value.status_))
         {
             if (!zero_time)
                 zero_time = value.time_;
 
-            std::cout << ( format("  %s,%d[s],%d\n")
+            std::cout << (boost::format("  %s,%d,%d[s],%d\n")
                          % name
+                         % value.count_
                          % double((value.time_ - zero_time) * 1e-9)
                          % value.value_);
 
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
             update_windows_counters(value.value_);
 #endif
         }
 
         // Schedule a wakeup.
-        hpx::this_thread::suspend(milliseconds(pause));
+        hpx::this_thread::suspend(pause);
     }
 
     return hpx::disconnect();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(boost::program_options::variables_map& vm)
 {
     std::cout << "starting monitor" << std::endl;
 
-    const std::string name = vm["name"].as<std::string>();
-    const boost::uint64_t pause = vm["pause"].as<boost::uint64_t>();
+    std::string const name = vm["name"].as<std::string>();
+    boost::uint64_t const pause = vm["pause"].as<boost::uint64_t>();
+    double const runfor = vm["runfor"].as<double>();
 
-    return monitor(name, pause);
+    return monitor(runfor, name, pause);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    options_description
+    boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    using boost::program_options::value;
     desc_commandline.add_options()
         ( "name", value<std::string>()->default_value(
               "/threadqueue{locality#0/total}/length")
@@ -133,9 +124,12 @@ int main(int argc, char* argv[])
 
         ( "pause", value<boost::uint64_t>()->default_value(500)
         , "milliseconds between each performance counter query")
+
+        ( "runfor", value<double>()->default_value(-1)
+        , "time to wait before this application exits ([s], default: run forever)")
         ;
 
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
     hpx::register_startup_function(&install_windows_counters);
 #endif
 

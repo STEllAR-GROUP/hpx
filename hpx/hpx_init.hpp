@@ -22,6 +22,7 @@
 // One of these functions must be implemented by the application for the
 // console locality.
 int hpx_main();
+int hpx_main(int argc, char* argv[]);
 int hpx_main(boost::program_options::variables_map& vm);
 
 /// \endcond
@@ -30,6 +31,11 @@ int hpx_main(boost::program_options::variables_map& vm);
 namespace hpx
 {
     /// \cond NOINTERNAL
+
+    ///////////////////////////////////////////////////////////////////////////
+    // As an alternative, the user can provide a function hpx::user_main, which
+    // is semantically equivalent to the plain old C-main.
+    int user_main(int argc, char* argv[]);
 
 #if !defined(HPX_NO_DEPRECATED)
     ///////////////////////////////////////////////////////////////////////////
