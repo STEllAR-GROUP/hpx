@@ -5,7 +5,7 @@
 
 add_subdirectory(sine)
 
-if(NOT MSVC)
+if(UNIX)
     set(example_programs
         simplest_performance_counter
         mem_counter
