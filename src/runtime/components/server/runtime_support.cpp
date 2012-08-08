@@ -534,9 +534,10 @@ namespace hpx { namespace components { namespace server
     /// \brief Insert the given name mapping into the AGAS cache of this
     ///        locality.
     void runtime_support::update_agas_cache(naming::gid_type const& gid,
-        agas::gva const& g)
+        naming::address const& addr)
     {
-        naming::get_agas_client().update_cache(gid, g);
+        naming::get_agas_client().update_cache(gid, addr.locality_,
+            addr.type_, addr.address_);
     }
 
     ///////////////////////////////////////////////////////////////////////////

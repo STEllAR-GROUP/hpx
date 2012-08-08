@@ -117,14 +117,35 @@ member function.
 
 [section:action_invocation Action Invocation]
 
-The process of invoking a global function with the help of the associated
-action is called 'applying the action'. Actions can have arguments, which will
-be supplied while the action is applied. At the minimum, one parameter
-is required to apply any action - the id of the locality the associated
-function should be invoked on. __hpx__ provides three ways to apply an
-action:
+The process of invoking a global function (or a member function of an object)
+with the help of the associated action is called 'applying the action'. Actions
+can have arguments, which will be supplied while the action is applied. At the
+minimum, one parameter is required to apply any action - the id of the locality
+the associated function should be invoked on (for global functions), or the id
+of the object instance (for member functions). Generally, __hpx__ provides
+three ways to apply an action:
 
-[heading Applying an action asynchronously without any synchronization]
+* [link hpx.manual.applying_actions.action_invocation.apply Applying an Action Asynchronously without any Synchronization]
+* [link hpx.manual.applying_actions.action_invocation.async Applying an Action Asynchronously with Synchronization]
+* [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]
+
+__hpx__ allows to apply any action with a syntax which is very clode to the
+standard C++ way of invoking functions. In fact, all action types have an
+overloaded function operator allowing to synchronously apply the action. Further,
+__hpx__ implements `hpx::async`, which semantically works similar to the
+way `std::async` works for plain C++ function.
+
+[note The similarity of applying an action to conventional function invocations
+      extend even further. __hpx__ implements `hpx::bind` and `hpx::function`:
+      two facilities which are semantically equivalent to the `std::bind` and
+      `std::function` types as defined by the C++11 Standard. While `hpx::async`
+      extends beyond the conventional semantics by supporting actions and
+      conventional C++ functions, `the __hpx__ facilities `hpx::bind` and
+      `hpx::function` extend beyond the conventional standard facilities. The
+      __hpx__ facilities not only support conventional functions, but can be
+      used for actions as well.]
+
+[heading:apply Applying an action asynchronously without any synchronization]
 
 This method ('fire and forget') will make sure the function associated with
 the action is scheduled to run on the target locality. Applying the action
@@ -148,7 +169,7 @@ created earlier, this invocation looks like:
 In this case any value returned from this action (e.g. in this case the
 integer `42`) is ignored.
 
-[heading Applying an action asynchronously with synchronization]
+[heading:async Applying an Action Asynchronously with Synchronization]
 
 This method will make sure the action is scheduled to run on the target locality.
 Applying the action itself does not wait for the function to start running or
@@ -189,7 +210,7 @@ created earlier, this invocation looks like:
       the execution of the calling thread until the asynchronous operation returns
       its result.]
 
-[heading Applying an action synchronously]
+[heading:sync Applying an Action Synchronously]
 
 This method will schedule the function wrapped in the specified action on the
 target locality. While the invocation appears to be synchronous (as we will

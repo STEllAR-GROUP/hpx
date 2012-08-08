@@ -1507,6 +1507,47 @@ void addressing_service::update_cache(
     }
 } // }}}
 
+void addressing_service::update_cache(
+    naming::gid_type const& gid
+  , naming::locality const& l
+  , components::component_type t
+  , boost::uint64_t addr
+  , boost::uint64_t count
+  , error_code& ec
+    )
+{ // {{{
+    if (!caching_)
+    {
+        HPX_THROWS_IF(ec, service_unavailable
+          , "addressing_service::update_cache"
+          , "AGAS caching is disabled");
+        return;
+    }
+
+    try {
+        LAS_(debug) <<
+            (boost::format("updating cache, gid(%1%), count(%2%)") % gid);
+
+        mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        gva_cache_key key(gid, count);
+        gva_cache_.insert(key, gva(l, t, count, addr));
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::update_cache"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+} // }}}
+
 namespace detail
 {
     // get action code from counter type

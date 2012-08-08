@@ -87,7 +87,7 @@ Counter registration database which can be later used to retrieve the meta data
 related to a counter type and to create counter instances based on a given
 counter instance name.
 
-[heading:types Performance Counter Instances]
+[heading:instances Performance Counter Instances]
 
 The `full_instancename` allows to distinguish different counter instances of
 the same counter type. The formatting of the `full_instancename` depends on
