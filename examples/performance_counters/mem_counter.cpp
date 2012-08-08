@@ -1,3 +1,7 @@
+//  Copyright (c) 2012 Vinay C Amatya                                       
+//                                                                               
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -19,7 +23,7 @@ void register_counter_type()
     pc::install_counter_type(
         "/memory/resident",
         &read_mem::read_psm_resident,
-        "returns the virtual memory for the pid value of process which calls this counter"
+        "returns the resident memory for the pid value of process which calls this counter"
     );
 }
 
@@ -27,6 +31,7 @@ int hpx_main()
 {
     {
     }
+    hpx::this_thread::suspend(10000);
     return hpx::finalize();
 }
 

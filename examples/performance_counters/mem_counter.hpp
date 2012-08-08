@@ -1,3 +1,8 @@
+// Copyright (c) 2012 Vinay C Amatya
+// Copyright (c) Bryce Aldestine-Lelbach
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_Sg7J0M91KTJ7FTMezA1gNjwaA2LCgq70PgnGNvX3)
 #define HPX_Sg7J0M91KTJ7FTMezA1gNjwaA2LCgq70PgnGNvX3
@@ -36,6 +41,9 @@ namespace hpx { namespace performance_counters { namespace server
 
     struct proc_statm
     {
+        proc_statm(){};
+        ~proc_statm(){};
+        
         boost::uint64_t size;
         boost::uint64_t resident;
         boost::uint64_t share;
@@ -66,7 +74,7 @@ namespace hpx { namespace performance_counters { namespace server
     {                                                                            
         proc_statm_parser() : proc_statm_parser::base_type(start)                
         {                                                                        
-            using qi::ulong_;           // does not work?                        
+            using qi::ulong_;                                   
                                                                                  
             start = ulong_                                                       
                 >> ulong_                                                        
@@ -83,6 +91,7 @@ namespace hpx { namespace performance_counters { namespace server
                                                                                  
 }}}
 
+#if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__)
 namespace hpx { namespace performance_counters { namespace server
 {       
         typedef hpx::performance_counters::server::proc_statm proc_statm_type; 
@@ -98,20 +107,28 @@ namespace hpx { namespace performance_counters { namespace server
             std::string in_string;   
             boost::uint32_t pid = getpid();
             std::string filename = boost::str(boost::format("/proc/%1%/statm") % pid);
-            std::stringstream buffer;                                            
-            std::ifstream infile(filename.c_str());                              
-            buffer << infile.rdbuf();                                            
-            in_string = buffer.str();                                            
+            std::stringstream buffer;
+            std::ifstream infile;
+            
+            infile.open(filename.c_str());
+            if(infile.is_open())
+            {
+                buffer << infile.rdbuf();
+                in_string = buffer.str();
+            }
+            else
+            {
+                std::cerr << "Unable to open statm file" << std::endl;
+            }
+            infile.close();
+    
             hpx::performance_counters::server::proc_statm psm;                   
             iterator_type itr = in_string.begin(); 
             iterator_type end = in_string.end(); 
             bool r = phrase_parse(itr, end, psg, space, psm);                    
-            //if(r)                                                                
-                //std::cout << "parsing success" << std::endl;
-            //else                                                                 
-            //{                                                                    
-                //std::cout << "parsing failure" << std::endl;                     
-            //}                                                                    
+            if(!r)
+                std::cerr << "parsing failure" << std::endl;                     
+            
             return psm.size;
         }
         
@@ -122,26 +139,35 @@ namespace hpx { namespace performance_counters { namespace server
             typedef std::string::const_iterator iterator_type;                   
             typedef hpx::performance_counters::server::proc_statm_parser<iterator_type>
                 proc_statm_parser;                                               
-                                                                                 
+
             proc_statm_parser psg;                                               
-            std::string in_string;   
+            std::string in_string;
             boost::uint32_t pid = getpid();
             std::string filename = boost::str(boost::format("/proc/%1%/statm") % pid);
-            std::stringstream buffer;                                            
-            std::ifstream infile(filename.c_str());                              
-            buffer << infile.rdbuf();                                            
-            in_string = buffer.str();                                            
-            hpx::performance_counters::server::proc_statm psm;                   
-            iterator_type itr = in_string.begin(); 
-            iterator_type end = in_string.end(); 
-            bool r = phrase_parse(itr, end, psg, space, psm);                    
-            //if(r)                                                                
-            //    std::cout << "parsing success" << std::endl;
-            //else                                                                 
-            //{                                                                    
-            //    std::cout << "parsing failure" << std::endl;                     
-            //}                                                                    
+            std::stringstream buffer;
+            std::ifstream infile;
+            
+            infile.open(filename.c_str());
+            if(infile.is_open())
+            {
+                buffer << infile.rdbuf();
+                in_string = buffer.str();
+            }
+            else
+            {
+                std::cerr << "Unable to open statm file" << std::endl;
+            }
+            infile.close();
+
+            hpx::performance_counters::server::proc_statm psm;
+            iterator_type itr = in_string.begin();
+            iterator_type end = in_string.end();
+            bool r = phrase_parse(itr, end, psg, space, psm);
+            if(!r) 
+                std::cerr << "parsing failure" << std::endl;                     
+            
             return psm.resident;
         }
 }}}
+#endif
 #endif //HPX_Sg7J0M91KTJ7FTMezA1gNjwaA2LCgq70PgnGNvX3

@@ -21,24 +21,6 @@
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 
-typedef hpx::performance_counters::server::proc_statm proc_statm_type;
-
-namespace read_mem = hpx::performance_counters::server;
-void register_counter_type()
-{
-    namespace pc = hpx::performance_counters;
-    pc::install_counter_type(
-        "/memory/vm",
-        &read_mem::read_psm_vm,
-        "returns the virtual memory for the pid value of process which calls this counter"
-    );
-    pc::install_counter_type(
-        "/memory/resident",
-        &read_mem::read_psm_resident,
-        "returns the virtual memory for the pid value of process which calls this counter"
-    );
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
 /// benchmark is being run on.
@@ -461,9 +443,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
 
-    // register memory counters
-    hpx::register_startup_function(&register_counter_type);
-    
     using boost::program_options::options_description;
     using boost::program_options::value;
 
