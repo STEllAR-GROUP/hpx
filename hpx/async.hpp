@@ -26,7 +26,7 @@
 #include <boost/preprocessor/iterate.hpp>
 
 #if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
-#  include <hpx/lcos/preprocessed/async.hpp>
+#  include <hpx/preprocessed/async.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
