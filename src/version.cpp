@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/version.hpp>
 #include <boost/format.hpp>
