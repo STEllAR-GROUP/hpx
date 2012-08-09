@@ -9,6 +9,7 @@ set(subdirs
     dataflow
     distributing_factory
     iostreams
+    memory
     remote_object
    )
 
