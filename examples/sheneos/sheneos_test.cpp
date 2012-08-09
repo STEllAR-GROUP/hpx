@@ -8,6 +8,9 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <hpx/include/performance_counters.hpp>
+#include <examples/performance_counters/mem_counter.hpp>
+
 #include <boost/dynamic_bitset.hpp>
 #include <boost/bind.hpp>
 
@@ -439,6 +442,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+
     using boost::program_options::options_description;
     using boost::program_options::value;
 
