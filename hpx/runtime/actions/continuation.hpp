@@ -157,6 +157,17 @@ namespace hpx { namespace actions
     }
 }}
 
+// Avoid compile time warnings about serializing continuations using pointers
+// without object tracking.
+namespace boost { namespace archive { namespace detail
+{
+    template <>
+    inline void check_object_tracking<hpx::actions::continuation>() {}
+
+    template <>
+    void inline check_pointer_tracking<hpx::actions::continuation>() {}
+}}}
+
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)

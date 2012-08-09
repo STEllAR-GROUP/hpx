@@ -40,7 +40,7 @@ namespace hpx { namespace parcelset
         {
             ar << parcel_id_;
 
-            // serialize only one destination, if needed
+            // Serialize only one destination, if needed.
             bool has_one_dest = (gids_.size() == 1) ? true : false;
             ar << has_one_dest;
             if (has_one_dest)
@@ -53,14 +53,14 @@ namespace hpx { namespace parcelset
             ar << has_source_id;
             if (has_source_id)
                 ar << source_id_;
+
             ar << action_;
 
-            // If we have a continuation, serialize it. Do not serialize as a
-            // shared pointer, this breaks for unknown reasons.
+            // If we have a continuation, serialize it.
             bool has_continuations = continuation_;
             ar << has_continuations;
             if (has_continuations) {
-                hpx::actions::continuation* c = continuation_.get();
+                actions::continuation const* c = continuation_.get();
                 ar << c;
             }
 
@@ -84,7 +84,7 @@ namespace hpx { namespace parcelset
 
             ar >> parcel_id_;
 
-            // properly deserialize destinations
+            // Properly de-serialize destinations.
             ar >> has_one_dest;
             if (has_one_dest) {
                 gids_.resize(1);
@@ -105,7 +105,7 @@ namespace hpx { namespace parcelset
             // Check for a continuation.
             ar >> has_continuation;
             if (has_continuation) {
-                hpx::actions::continuation* c = 0;
+                actions::continuation* c = 0;
                 ar >> c;
                 continuation_.reset(c);
             }
