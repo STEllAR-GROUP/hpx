@@ -312,6 +312,14 @@ if(HPX_VERIFY_LOCKS)
 endif()
 
 ################################################################################
+# Fixing the "shared" folder
+################################################################################
+file(COPY ${CMAKE_SOURCE_DIR}/cmake/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules)
+################################################################################
+# Adding headers to binary directory
+################################################################################
+file(COPY ${CMAKE_SOURCE_DIR}/hpx DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+################################################################################
 # OpenCL
 ################################################################################
 
@@ -327,11 +335,10 @@ if (MSVC)
       #OCLM
       find_package(HPX_OCLM)
       if(${OCLM_FOUND})
-         include_directories(${OCLM_INCLUDE_DIR})
          hpx_link_sys_directories(${OCLM_LIBRARY_DIR})
          set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} OCLM.lib)
          if (EXISTS ${OCLM_ROOT}/bin/${CMAKE_BUILD_TYPE}/oclm.dll)
-            file(COPY ${OCLM_ROOT}/bin/${CMAKE_BUILD_TYPE}/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin)
+            file(COPY ${OCLM_ROOT}/bin/${CMAKE_BUILD_TYPE}/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib)
          else()
             message(STATUS "WARNING: No OCLM dll found.")
         endif()
