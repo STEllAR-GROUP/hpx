@@ -342,9 +342,9 @@ system and application performance.
     [   [`/runtime/count/component`]
         [`locality#<*>/total`
 
-          where:[br] `<*>` is the locality id of the locality the AGAS cache should
-          be queried. The locality id is a (zero based) number identifying the
-          locality.
+          where:[br] `<*>` is the locality id of the locality the number of
+          components should be queried. The locality id is a (zero based)
+          number identifying the locality.
         ]
         [The type of the component. This is the string which has been used
          while registering the component with __hpx__, e.g. which has been
@@ -357,9 +357,9 @@ system and application performance.
     [   [`/runtime/uptime`]
         [`locality#<*>/total`
 
-          where:[br] `<*>` is the locality id of the locality the AGAS cache should
-          be queried. The locality id is a (zero based) number identifying the
-          locality.
+          where:[br] `<*>` is the locality id of the locality the system uptime
+          should be queried. The locality id is a (zero based) number
+          identifying the locality.
         ]
         [None]
         [Return the overall time since application start on the given locality
@@ -400,6 +400,33 @@ system and application performance.
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume 1000ms as the default.]
+    ]
+]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[table Performance Counters exposing Memory Requirements of Localities
+    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [   [`/memory/vm`]
+        [`locality#<*>/total`
+
+          where:[br] `<*>` is the locality id of the locality the allocated
+          virtual memory should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [Returns the amount of virtual memory currently allocated by the
+         referenced locality (in bytes).]
+        [None]
+    ]
+    [   [`/memory/resident`]
+        [`locality#<*>/total`
+
+          where:[br] `<*>` is the locality id of the locality the the allocated
+          resident memory should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [Returns the amount of resident memory currently allocated by the
+         referenced locality (in bytes).]
+        [None]
     ]
 ]
 
