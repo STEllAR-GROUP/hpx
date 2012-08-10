@@ -21,12 +21,12 @@ namespace hpx { namespace performance_counters { namespace memory
     {
         namespace pc = hpx::performance_counters;
         pc::install_counter_type(
-            "/memory/vm", &read_psm_vm,
+            "/runtime/memory/vm", &read_psm_vm,
             "returns the amount of virtual memory currently allocated by the "
             "referenced locality", "bytes"
         );
         pc::install_counter_type(
-            "/memory/resident", &read_psm_resident,
+            "/runtime/memory/resident", &read_psm_resident,
             "returns the amount of resident memory currently allocated by the "
             "referenced locality", "bytes"
         );
