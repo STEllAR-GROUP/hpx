@@ -314,18 +314,15 @@ endif()
 ################################################################################
 # Fixing the "shared" folder
 ################################################################################
+
 file(COPY ${CMAKE_SOURCE_DIR}/cmake/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules)
-################################################################################
-# Adding headers to binary directory
-################################################################################
-file(COPY ${CMAKE_SOURCE_DIR}/hpx DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 ################################################################################
 # OpenCL
 ################################################################################
 
 if (MSVC)
 
-   hpx_include(FindPackage)
    find_package(HPX_OpenCL)
 
    if(${OpenCL_FOUND})
@@ -333,16 +330,23 @@ if (MSVC)
       hpx_link_sys_directories(${OpenCL_LIBRARY_DIR})
       set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} OpenCL.lib)
       #OCLM
-      find_package(HPX_OCLM)
-      if(${OCLM_FOUND})
-         hpx_link_sys_directories(${OCLM_LIBRARY_DIR})
+      if(NOT OCLM_ROOT AND NOT $ENV{OCLM_ROOT} STREQUAL "")
+        set(OCLM_ROOT $ENV{OCLM_ROOT})
+      endif()
+      if(EXISTS ${OCLM_ROOT}/includeLoc.cmake)
+         include (${OCLM_ROOT}/includeLoc.cmake)
+         
+         include_directories(${OCLM_INCLUDE_DIR})
+         hpx_link_sys_directories(${OCLM_LIBRARY_DIR}/${CMAKE_BUILD_TYPE})
          set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} OCLM.lib)
-         if (EXISTS ${OCLM_ROOT}/bin/${CMAKE_BUILD_TYPE}/oclm.dll)
-            file(COPY ${OCLM_ROOT}/bin/${CMAKE_BUILD_TYPE}/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib)
+         if (EXISTS ${OCLM_BIN_ROOT}/${CMAKE_BUILD_TYPE}/oclm.dll)
+            file(COPY ${OCLM_BIN_ROOT}/${CMAKE_BUILD_TYPE}/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/)
          else()
             message(STATUS "WARNING: No OCLM dll found.")
         endif()
-     endif()
+      else()
+         message(STATUS "OCLM NOT FOUND")
+      endif()
 
    endif()
 
