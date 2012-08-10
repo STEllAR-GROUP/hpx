@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unlock_lock.hpp>

@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/foreach.hpp>
@@ -131,20 +132,26 @@ namespace hpx { namespace util
             return false;
         }
 
+        // Query the performance counters.
+        using performance_counters::stubs::performance_counter;
+        std::vector<future<performance_counters::counter_value> > values;
+        values.reserve(ids_.size());
         for (std::size_t i = 0; i < names_.size(); ++i)
-        {
-            // Query the performance counter.
-            using performance_counters::stubs::performance_counter;
-            performance_counters::counter_value value =
-                performance_counter::get_value(ids_[i]);
+            values.push_back(performance_counter::get_value_async(ids_[i]));
 
+        // wait for all values to be returned
+        wait_all(values);
+
+        // print the values
+        for (std::size_t i = 0; i < values.size(); ++i)
+        {
             // Output the performance counter value.
             if (destination_is_cout) {
-                print_value(std::cout, names_[i], value, uoms_[i]);
+                print_value(std::cout, names_[i], values[i].get(), uoms_[i]);
             }
             else {
                 std::ofstream out(destination_, std::ios_base::app);
-                print_value(out, names_[i], value, uoms_[i]);
+                print_value(out, names_[i], values[i].get(), uoms_[i]);
             }
         }
 
