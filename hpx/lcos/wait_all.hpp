@@ -33,10 +33,10 @@ namespace hpx
     namespace detail
     {
         template <typename T, typename RT>
-        struct wait_all
+        struct when_all
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_all)
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
 
             void on_future_ready(threads::thread_id_type id)
             {
@@ -56,17 +56,17 @@ namespace hpx
             typedef std::vector<lcos::future<T, RT> > argument_type;
             typedef std::vector<lcos::future<T, RT> > result_type;
 
-            wait_all(argument_type const& lazy_values)
+            when_all(argument_type const& lazy_values)
               : lazy_values_(lazy_values),
                 ready_count_(0)
             {}
 
-            wait_all(BOOST_RV_REF(argument_type) lazy_values)
+            when_all(BOOST_RV_REF(argument_type) lazy_values)
               : lazy_values_(boost::move(lazy_values)),
                 ready_count_(0)
             {}
 
-            wait_all(BOOST_RV_REF(wait_all) rhs)
+            when_all(BOOST_RV_REF(when_all) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 ready_count_(rhs.ready_count_),
                 mtx_(boost::move(rhs.mtx_))
@@ -74,7 +74,7 @@ namespace hpx
                 rhs.ready_count_ = 0;
             }
 
-            wait_all& operator= (BOOST_RV_REF(wait_all) rhs)
+            when_all& operator= (BOOST_RV_REF(when_all) rhs)
             {
                 if (this != &rhs) {
                     mutex_type::scoped_lock l1(mtx_);
@@ -100,7 +100,7 @@ namespace hpx
                     for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     {
                         lazy_values_[i].when(
-                            util::bind(&wait_all::on_future_ready, this, id)
+                            util::bind(&when_all::on_future_ready, this, id)
                         );
                     }
                 }
@@ -132,35 +132,56 @@ namespace hpx
         };
     }
 
-    /// The function \a wait_all is a operator allowing to join on the result
+    /// The function \a when_all is a operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects stored in the
     /// given vector and returns a new future object representing the same
     /// list of futures after they finished executing.
     ///
     /// \return   The returned future holds the same list of futures as has
-    ///           been passed to wait_all.
+    ///           been passed to when_all.
     template <typename T, typename RT>
     lcos::future<std::vector<lcos::future<T, RT> > >
-    wait_all (BOOST_RV_REF(HPX_UTIL_STRIP((
+    when_all(BOOST_RV_REF(HPX_UTIL_STRIP((
         std::vector<lcos::future<T, RT> >))) lazy_values)
     {
         typedef std::vector<lcos::future<T, RT> > return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_all<T, RT>(boost::move(lazy_values)));
+            detail::when_all<T, RT>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
     }
 
     template <typename T, typename RT>
     lcos::future<std::vector<lcos::future<T, RT> > >
-    wait_all (std::vector<lcos::future<T, RT> > const& lazy_values)
+    when_all(std::vector<lcos::future<T, RT> > const& lazy_values)
     {
         typedef std::vector<lcos::future<T, RT> > return_type;
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::wait_all<T, RT>(lazy_values));
+                detail::when_all<T, RT>(lazy_values));
         p.apply();
         return p.get_future();
+    }
+
+    /// The function \a wait_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects stored in the
+    /// given vector and returns a new future object representing the same
+    /// list of futures after they finished executing.
+    ///
+    /// \a wait_all returns after all futures have been triggered.
+    template <typename T, typename RT>
+    std::vector<lcos::future<T, RT> >
+    wait_all(BOOST_RV_REF(HPX_UTIL_STRIP((
+        std::vector<lcos::future<T, RT> >))) lazy_values)
+    {
+        return when_all(lazy_values).get();
+    }
+
+    template <typename T, typename RT>
+    std::vector<lcos::future<T, RT> >
+    wait_all (std::vector<lcos::future<T, RT> > const& lazy_values)
+    {
+        return when_all(lazy_values).get();
     }
 }
 
@@ -190,11 +211,13 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_WAIT_ALL_PUSH_BACK_ARGS(z, n, _)                                  \
+#define HPX_WHEN_ALL_PUSH_BACK_ARG(z, n, _)                                   \
         lazy_values.push_back(BOOST_PP_CAT(f, n));                            \
     /**/
-#define HPX_WAIT_ALL_FUTURE_ARGS(z, n, _)                                     \
+#define HPX_WHEN_ALL_FUTURE_ARG(z, n, _)                                      \
         lcos::future<T, RT> BOOST_PP_CAT(f, n)                                \
+    /**/
+#define HPX_WHEN_ALL_FUTURE_VAR(z, n, _) BOOST_PP_CAT(f, n)                   \
     /**/
 
 namespace hpx
@@ -202,22 +225,30 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename RT>
     lcos::future<std::vector<lcos::future<T, RT> > >
-    wait_all (BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_ARGS, _))
+    when_all (BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_ARG, _))
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(N);
-        BOOST_PP_REPEAT(N, HPX_WAIT_ALL_PUSH_BACK_ARGS, _)
+        BOOST_PP_REPEAT(N, HPX_WHEN_ALL_PUSH_BACK_ARG, _)
 
         typedef std::vector<lcos::future<T, RT> > return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_all<T, RT>(boost::move(lazy_values)));
+            detail::when_all<T, RT>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
     }
+
+    template <typename T, typename RT>
+    std::vector<lcos::future<T, RT> >
+    wait_all(BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_ARG, _))
+    {
+        return when_all(BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_VAR, _)).get();
+    }
 }
 
-#undef HPX_WAIT_ALL_FUTURE_ARGS
-#undef HPX_WAIT_ALL_PUSH_BACK_ARGS
+#undef HPX_WHEN_ALL_FUTURE_VAR
+#undef HPX_WHEN_ALL_FUTURE_ARG
+#undef HPX_WHEN_ALL_PUSH_BACK_ARG
 #undef N
 
 #endif

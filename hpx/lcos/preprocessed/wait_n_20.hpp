@@ -12,7 +12,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0)
+    when_n(std::size_t n, lcos::future<T, RT> f0)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(1);
@@ -20,9 +20,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0)
+    {
+        return when_n(f0).get();
     }
 }
 namespace hpx
@@ -30,7 +36,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(2);
@@ -38,9 +44,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1)
+    {
+        return when_n(f0 , f1).get();
     }
 }
 namespace hpx
@@ -48,7 +60,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(3);
@@ -56,9 +68,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2)
+    {
+        return when_n(f0 , f1 , f2).get();
     }
 }
 namespace hpx
@@ -66,7 +84,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(4);
@@ -74,9 +92,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3)
+    {
+        return when_n(f0 , f1 , f2 , f3).get();
     }
 }
 namespace hpx
@@ -84,7 +108,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(5);
@@ -92,9 +116,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4).get();
     }
 }
 namespace hpx
@@ -102,7 +132,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(6);
@@ -110,9 +140,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5).get();
     }
 }
 namespace hpx
@@ -120,7 +156,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(7);
@@ -128,9 +164,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6).get();
     }
 }
 namespace hpx
@@ -138,7 +180,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(8);
@@ -146,9 +188,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7).get();
     }
 }
 namespace hpx
@@ -156,7 +204,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(9);
@@ -164,9 +212,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8).get();
     }
 }
 namespace hpx
@@ -174,7 +228,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(10);
@@ -182,9 +236,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9).get();
     }
 }
 namespace hpx
@@ -192,7 +252,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(11);
@@ -200,9 +260,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10).get();
     }
 }
 namespace hpx
@@ -210,7 +276,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(12);
@@ -218,9 +284,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11).get();
     }
 }
 namespace hpx
@@ -228,7 +300,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(13);
@@ -236,9 +308,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12).get();
     }
 }
 namespace hpx
@@ -246,7 +324,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(14);
@@ -254,9 +332,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13).get();
     }
 }
 namespace hpx
@@ -264,7 +348,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(15);
@@ -272,9 +356,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14).get();
     }
 }
 namespace hpx
@@ -282,7 +372,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(16);
@@ -290,9 +380,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15).get();
     }
 }
 namespace hpx
@@ -300,7 +396,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(17);
@@ -308,9 +404,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16).get();
     }
 }
 namespace hpx
@@ -318,7 +420,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(18);
@@ -326,9 +428,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17).get();
     }
 }
 namespace hpx
@@ -336,7 +444,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17 , lcos::future<T, RT> f18)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17 , lcos::future<T, RT> f18)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(19);
@@ -344,9 +452,15 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17 , lcos::future<T, RT> f18)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17 , f18).get();
     }
 }
 namespace hpx
@@ -354,7 +468,7 @@ namespace hpx
     
     template <typename T, typename RT>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > > >
-    wait_n (std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17 , lcos::future<T, RT> f18 , lcos::future<T, RT> f19)
+    when_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17 , lcos::future<T, RT> f18 , lcos::future<T, RT> f19)
     {
         std::vector<lcos::future<T, RT> > lazy_values;
         lazy_values.reserve(20);
@@ -362,8 +476,14 @@ namespace hpx
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_n<T, RT>(boost::move(lazy_values), n));
+            detail::when_n<T, RT>(boost::move(lazy_values), n));
         p.apply();
         return p.get_future();
+    }
+    template <typename T, typename RT>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    wait_n(std::size_t n, lcos::future<T, RT> f0 , lcos::future<T, RT> f1 , lcos::future<T, RT> f2 , lcos::future<T, RT> f3 , lcos::future<T, RT> f4 , lcos::future<T, RT> f5 , lcos::future<T, RT> f6 , lcos::future<T, RT> f7 , lcos::future<T, RT> f8 , lcos::future<T, RT> f9 , lcos::future<T, RT> f10 , lcos::future<T, RT> f11 , lcos::future<T, RT> f12 , lcos::future<T, RT> f13 , lcos::future<T, RT> f14 , lcos::future<T, RT> f15 , lcos::future<T, RT> f16 , lcos::future<T, RT> f17 , lcos::future<T, RT> f18 , lcos::future<T, RT> f19)
+    {
+        return when_n(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17 , f18 , f19).get();
     }
 }

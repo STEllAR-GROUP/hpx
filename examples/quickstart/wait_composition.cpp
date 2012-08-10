@@ -28,7 +28,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::future<int> b = hpx::lcos::create_value<int>(42);
         hpx::future<int> c = hpx::lcos::create_value<int>(-1);
 
-        hpx::wait_all(a, b, c).when(cout_continuation());
+        hpx::when_all(a, b, c).when(cout_continuation());
     }
 
     return hpx::finalize();
