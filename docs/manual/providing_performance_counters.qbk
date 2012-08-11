@@ -12,7 +12,7 @@ This has the benefit of exposing additional, possibly application specific
 information using the existing Performance Counter framework, unifying the
 process of gathering data about your application.
 
-An application that wants to provide counter data can write a Performance
+An application that wants to provide counter data can implement a Performance
 Counter to provide the data. When a consumer queries performance data, the
 __hpx__ runtime system calls the provider to collect the data. The runtime
 system uses an internal registry to determine which provider to call.
@@ -24,6 +24,10 @@ then will be called whenever a consumer queries this counter. Currently, this
 type of Performance Counter can only be used to expose integer values. The
 expected signature of this function is:
 
+    boost::int64_t some_performance_data();
+
+For instance, here is such a function returning how often it was invoked:
+
     // The atomic variable 'counter' ensures the thread safety of the counter.
     boost::atomic<boost::int64_t> counter(0);
 
@@ -32,9 +36,9 @@ expected signature of this function is:
         return ++counter;
     }
 
-This function exposes a linearly increasing value as our performance data. The
-value is incrememnted on each invocation, e.g. each time a consumer requests
-the counter data of this Performance Counter.
+This example function exposes a linearly increasing value as our performance
+data. The value is incrememnted on each invocation, e.g. each time a consumer
+requests the counter data of this Performance Counter.
 
 The next step in exposing this counter to the runtime system is to register
 the function as a new raw counter type using the __hpx__ API function
@@ -54,7 +58,8 @@ any consumer instantiates and queries an instance of this counter type.
         ``[funcref hpx::performance_counters::install_counter_type hpx::performance_counters::install_counter_type]``(
             "/test/data",                                   // counter type name
             &some_performance_data,                         // function providing counter data
-            "returns a linearly increasing counter value"   // description text
+            "returns a linearly increasing counter value"   // description text (optional)
+            ""                                              // unit of measure (optional)
         );
     }
 
@@ -62,14 +67,16 @@ Now it is possible to instantiate a new counter instance based on
 the naming scheme `"/test{locality#<*>/total}/data"`, where `<*>` is a zero
 based integer index indentifying the locality for which the counter instance
 should be accessed. The function [funcref hpx::performance_counters::install_counter_type `install_counter_type`]
-enables to instantiate exactly one counter for each locality.
+enables to instantiate exactly one counter instance for each locality. Repeated
+requests to instantiate such a counter will return the same instance, e.g. the
+instance created for the first request.
 
 If this counter should be accessible using the standard __hpx__ command line
 options, the registration has to be performed during application startup,
 before `hpx_main` is executed. The best way to achieve this is to register
 a __hpx__ startup function using the API function
 [funcref hpx::register_startup_function `hpx::register_startup_function`] before
-calling to initialize the runtime system:
+calling `hpx::init` to initialize the runtime system:
 
     int main(int argc, char* argv[])
     {

@@ -39,7 +39,6 @@ namespace hpx { namespace util
             BOOST_ASSERT(NULL != held_locks_.get());
             return *held_locks_.get();
         }
-
     };
 
     hpx::util::thread_specific_ptr<register_locks::held_locks_map, register_locks::tls_tag>
@@ -48,7 +47,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     bool register_lock(void const* lock, util::register_lock_data* data)
     {
-        if (0 != threads::get_self_ptr())
+        if (LHPX_ENABLED(debug) && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -72,7 +71,7 @@ namespace hpx { namespace util
     // unregister the given lock from this HPX-thread
     bool unregister_lock(void const* lock)
     {
-        if (0 != threads::get_self_ptr())
+        if (LHPX_ENABLED(debug) && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -89,7 +88,7 @@ namespace hpx { namespace util
     // verify that no locks are held by this HPX-thread
     void verify_no_locks()
     {
-        if (0 != threads::get_self_ptr())
+        if (LHPX_ENABLED(debug) && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map const& held_locks =
                 register_locks::get_lock_map();

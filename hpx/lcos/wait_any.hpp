@@ -5,8 +5,8 @@
 
 #if !BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_WAIT_ANY_APR_17_2012_1143AM)
-#define HPX_LCOS_WAIT_ANY_APR_17_2012_1143AM
+#if !defined(HPX_LCOS_when_any_APR_17_2012_1143AM)
+#define HPX_LCOS_when_any_APR_17_2012_1143AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unlock_lock.hpp>
@@ -39,10 +40,10 @@ namespace hpx
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename RT>
-        struct wait_any
+        struct when_any
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_any)
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any)
 
             enum { index_error = std::size_t(-1) };
 
@@ -63,15 +64,15 @@ namespace hpx
             typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > result_type;
             typedef std::vector<lcos::future<T, RT> > argument_type;
 
-            wait_any(argument_type const& lazy_values)
+            when_any(argument_type const& lazy_values)
               : lazy_values_(lazy_values), index_(index_error)
             {}
 
-            wait_any(BOOST_RV_REF(argument_type) lazy_values)
+            when_any(BOOST_RV_REF(argument_type) lazy_values)
               : lazy_values_(boost::move(lazy_values)), index_(index_error)
             {}
 
-            wait_any(BOOST_RV_REF(wait_any) rhs)
+            when_any(BOOST_RV_REF(when_any) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 index_(rhs.index_),
                 mtx_(boost::move(rhs.mtx_))
@@ -79,7 +80,7 @@ namespace hpx
                 rhs.index_ = index_error;
             }
 
-            wait_any& operator= (BOOST_RV_REF(wait_any) rhs)
+            when_any& operator= (BOOST_RV_REF(when_any) rhs)
             {
                 if (this != &rhs) {
                     mutex_type::scoped_lock l1(mtx_);
@@ -105,7 +106,7 @@ namespace hpx
                     for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     {
                         lazy_values_[i].when(
-                            util::bind(&wait_any::on_future_ready, this, i, id)
+                            util::bind(&when_any::on_future_ready, this, i, id)
                         );
                     }
                 }
@@ -136,14 +137,14 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Tuple, typename T, typename RT>
-        struct wait_any_tuple
+        struct when_any_tuple
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_any_tuple)
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any_tuple)
 
             struct init_when
             {
-                init_when(wait_any_tuple& outer, threads::thread_id_type id)
+                init_when(when_any_tuple& outer, threads::thread_id_type id)
                   : outer_(&outer), id_(id)
                 {}
 
@@ -151,12 +152,12 @@ namespace hpx
 
                 result_type operator()(std::size_t i, lcos::future<T, RT> f) const
                 {
-                    f.when(util::bind(&wait_any_tuple::on_future_ready,
+                    f.when(util::bind(&when_any_tuple::on_future_ready,
                         outer_, ++i, id_));
                     return i;
                 };
 
-                wait_any_tuple* outer_;
+                when_any_tuple* outer_;
                 threads::thread_id_type id_;
             };
             friend struct init_when;
@@ -226,15 +227,15 @@ namespace hpx
             typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > result_type;
             typedef Tuple argument_type;
 
-            wait_any_tuple(argument_type const& lazy_values)
+            when_any_tuple(argument_type const& lazy_values)
               : lazy_values_(lazy_values), index_(index_error)
             {}
 
-            wait_any_tuple(BOOST_RV_REF(argument_type) lazy_values)
+            when_any_tuple(BOOST_RV_REF(argument_type) lazy_values)
               : lazy_values_(boost::move(lazy_values)), index_(index_error)
             {}
 
-            wait_any_tuple(BOOST_RV_REF(wait_any_tuple) rhs)
+            when_any_tuple(BOOST_RV_REF(when_any_tuple) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 index_(rhs.index_),
                 mtx_(boost::move(rhs.mtx_))
@@ -242,7 +243,7 @@ namespace hpx
                 rhs.index_ = index_error;
             }
 
-            wait_any_tuple& operator= (BOOST_RV_REF(wait_any_tuple) rhs)
+            when_any_tuple& operator= (BOOST_RV_REF(when_any_tuple) rhs)
             {
                 if (this != &rhs) {
                     mutex_type::scoped_lock l1(mtx_);
@@ -295,7 +296,7 @@ namespace hpx
         };
     }
 
-    /// The function \a wait_any is a non-deterministic choice operator. It
+    /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects stored in the given vector and returns
     /// a new future object representing the first future from that list which
     /// finishes execution.
@@ -305,26 +306,49 @@ namespace hpx
     ///           value represents the actual future which returned first.
     template <typename T, typename RT>
     lcos::future<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
-    wait_any (BOOST_RV_REF(HPX_UTIL_STRIP((
+    when_any(BOOST_RV_REF(HPX_UTIL_STRIP((
         std::vector<lcos::future<T, RT> >))) lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_any<T, RT>(boost::move(lazy_values)));
+            detail::when_any<T, RT>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
     }
 
     template <typename T, typename RT>
     lcos::future<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
-    wait_any (std::vector<lcos::future<T, RT> > const& lazy_values)
+    when_any(std::vector<lcos::future<T, RT> > const& lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::wait_any<T, RT>(lazy_values));
+                detail::when_any<T, RT>(lazy_values));
         p.apply();
         return p.get_future();
+    }
+
+    /// The function \a wait_any is a non-deterministic choice operator. It
+    /// OR-composes all future objects stored in the given vector and returns
+    /// a new future object representing the first future from that list which
+    /// finishes execution.
+    ///
+    /// \return   The returned tuple holds a pair of values, the first value
+    ///           is the index of the future which returned first and the second
+    ///           value represents the actual future which returned first.
+    template <typename T, typename RT>
+    HPX_STD_TUPLE<int, lcos::future<T, RT> >
+    wait_any(BOOST_RV_REF(HPX_UTIL_STRIP((
+        std::vector<lcos::future<T, RT> >))) lazy_values)
+    {
+        return when_any(lazy_values).get();
+    }
+
+    template <typename T, typename RT>
+    HPX_STD_TUPLE<int, lcos::future<T, RT> >
+    wait_any(std::vector<lcos::future<T, RT> > const& lazy_values)
+    {
+        return when_any(lazy_values).get();
     }
 }
 
@@ -354,14 +378,13 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_WAIT_ANY_FUTURE_ARGS(z, n, _)                                     \
+#define HPX_WHEN_ANY_FUTURE_ARG(z, n, _)                                      \
         lcos::future<T, RT> BOOST_PP_CAT(f, n)                                \
     /**/
-#define HPX_WAIT_ANY_FUTURE_TYPE(z, n, _)                                     \
+#define HPX_WHEN_ANY_FUTURE_TYPE(z, n, _)                                     \
         lcos::future<T, RT>                                                   \
     /**/
-#define HPX_WAIT_ANY_FUTURE_VAR(z, n, _)                                      \
-        BOOST_PP_CAT(f, n)                                                    \
+#define HPX_WHEN_ANY_FUTURE_VAR(z, n, _) BOOST_PP_CAT(f, n)                   \
     /**/
 
 namespace hpx
@@ -369,24 +392,31 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename RT>
     lcos::future<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
-    wait_any (BOOST_PP_ENUM(N, HPX_WAIT_ANY_FUTURE_ARGS, _))
+    when_any (BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_ARG, _))
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
         typedef boost::fusion::tuple<
-            BOOST_PP_ENUM(N, HPX_WAIT_ANY_FUTURE_TYPE, _)
+            BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_TYPE, _)
         > argument_type;
 
         lcos::local::futures_factory<return_type()> p(
-            detail::wait_any_tuple<argument_type, T, RT>(
-                argument_type(BOOST_PP_ENUM(N, HPX_WAIT_ANY_FUTURE_VAR, _))));
+            detail::when_any_tuple<argument_type, T, RT>(
+                argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _))));
         p.apply();
         return p.get_future();
     }
+
+    template <typename T, typename RT>
+    HPX_STD_TUPLE<int, lcos::future<T, RT> >
+    wait_any (BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_ARG, _))
+    {
+        return when_any(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _)).get();
+    }
 }
 
-#undef HPX_WAIT_ANY_FUTURE_ARGS
-#undef HPX_WAIT_ANY_FUTURE_TYPE
-#undef HPX_WAIT_ANY_FUTURE_VAR
+#undef HPX_WHEN_ANY_FUTURE_ARG
+#undef HPX_WHEN_ANY_FUTURE_TYPE
+#undef HPX_WHEN_ANY_FUTURE_VAR
 #undef N
 
 #endif

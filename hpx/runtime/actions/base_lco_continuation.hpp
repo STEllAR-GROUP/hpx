@@ -53,7 +53,7 @@ namespace hpx
             static void register_base()
             {
                 util::void_cast_register_nonvirt<
-                    base_lco_continuation, base_type>();
+                    base_lco_continuation, typed_continuation<Result> >();
                 base_type::register_base();
             }
 

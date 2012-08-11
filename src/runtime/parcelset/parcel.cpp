@@ -40,10 +40,10 @@ namespace hpx { namespace parcelset
         {
             ar << parcel_id_;
 
-            // serialize only one destination, if needed
+            // Serialize only one destination, if needed.
             bool has_one_dest = (gids_.size() == 1) ? true : false;
             ar << has_one_dest;
-            if (has_one_dest) 
+            if (has_one_dest)
                 ar << gids_[0] << addrs_[0];
             else
                 ar << gids_ << addrs_;
@@ -53,13 +53,16 @@ namespace hpx { namespace parcelset
             ar << has_source_id;
             if (has_source_id)
                 ar << source_id_;
+
             ar << action_;
 
             // If we have a continuation, serialize it.
             bool has_continuations = continuation_;
             ar << has_continuations;
-            if (has_continuations)
-                ar << continuation_;
+            if (has_continuations) {
+                actions::continuation const* c = continuation_.get();
+                ar << c;
+            }
 
             ar << start_time_;
             ar << creation_time_;
@@ -80,8 +83,8 @@ namespace hpx { namespace parcelset
             bool has_one_dest = false;
 
             ar >> parcel_id_;
-            
-            // properly deserialize destinations
+
+            // Properly de-serialize destinations.
             ar >> has_one_dest;
             if (has_one_dest) {
                 gids_.resize(1);
@@ -101,8 +104,11 @@ namespace hpx { namespace parcelset
 
             // Check for a continuation.
             ar >> has_continuation;
-            if (has_continuation)
-                ar >> continuation_;
+            if (has_continuation) {
+                actions::continuation* c = 0;
+                ar >> c;
+                continuation_.reset(c);
+            }
 
             ar >> start_time_;
             ar >> creation_time_;
@@ -120,7 +126,7 @@ namespace hpx { namespace parcelset
         std::ostream& operator<< (std::ostream& os, parcel_data const& p)
         {
             os << "(";
-            if (!p.gids_.empty()) 
+            if (!p.gids_.empty())
                 os << p.gids_[0] << ":" << p.addrs_[0] << ":";
 
             os << p.action_->get_action_name() << ")";

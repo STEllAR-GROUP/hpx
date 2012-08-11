@@ -389,7 +389,7 @@ namespace hpx { namespace performance_counters
         /// \brief Retrieve the 'real' value of the counter_value, converted to
         ///        the requested type \a T
         template <typename T>
-        T get_value(error_code& ec = throws)
+        T get_value(error_code& ec = throws) const
         {
             if (!status_is_valid(status_)) {
                 HPX_THROWS_IF(ec, invalid_status,

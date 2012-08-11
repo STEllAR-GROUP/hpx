@@ -109,6 +109,8 @@ namespace hpx { namespace performance_counters
     /// \param helptext [in] A longer descriptive  text shown to the user to
     ///               explain the nature of the counters created from this
     ///               type.
+    /// \param uom    [in] The unit of measure for the new performance counter
+    ///               type.
     /// \param version [in] The version of the counter type. This is currently
     ///               expected to be set to HPX_PERFORMANCE_COUNTER_V1.
     /// \param ec     [in,out] this represents the error status on exit,
@@ -129,6 +131,7 @@ namespace hpx { namespace performance_counters
     ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext,
+        std::string const& uom = "",
         boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
         error_code& ec = throws);
 
@@ -199,6 +202,8 @@ namespace hpx { namespace performance_counters
     /// \param helptext [in, optional] A longer descriptive text shown to the
     ///               user to explain the nature of the counters created from
     ///               this type.
+    /// \param uom    [in] The unit of measure for the new performance counter
+    ///               type.
     /// \param ec     [in,out] this represents the error status on exit,
     ///               if this is pre-initialized to \a hpx#throws
     ///               the function will throw on error instead.
@@ -217,7 +222,8 @@ namespace hpx { namespace performance_counters
     ///       corresponding performance counter will be created.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         HPX_STD_FUNCTION<boost::int64_t()> const& counter_value,
-        std::string const& helptext = "", error_code& ec = throws);
+        std::string const& helptext = "", std::string const& uom = "",
+        error_code& ec = throws);
 
     /// \cond NOINTERNAL
 

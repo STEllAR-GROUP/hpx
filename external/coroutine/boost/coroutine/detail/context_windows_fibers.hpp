@@ -228,6 +228,10 @@ namespace boost {namespace coroutines {
 
       void reset_stack()
       {
+      }
+
+      void rebind_stack()
+      {
         increment_stack_recycle_count();
       }
 
