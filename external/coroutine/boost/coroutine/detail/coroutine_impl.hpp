@@ -356,6 +356,7 @@ private:
     template <typename Functor>
     void rebind(BOOST_FWD_REF(Functor) f, thread_id_type id)
     {
+        this->rebind_stack();     // count how often a coroutines object was reused
         m_fun = boost::forward<Functor>(f);
         this->super_type::rebind(id);
     }
