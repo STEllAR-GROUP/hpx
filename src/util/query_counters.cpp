@@ -87,7 +87,7 @@ namespace hpx { namespace util
 
     template <typename Stream>
     void query_counters::print_value(Stream& out, std::string const& name,
-        performance_counters::counter_value& value, std::string const& uom)
+        performance_counters::counter_value const& value, std::string const& uom)
     {
         error_code ec;        // do not throw
         double val = value.get_value<double>(ec);

@@ -36,7 +36,7 @@ namespace hpx { namespace util
 
         template <typename Stream>
         void print_value(Stream& out, std::string const& name,
-            performance_counters::counter_value& value,
+            performance_counters::counter_value const& value,
             std::string const& uom);
 
     private:
