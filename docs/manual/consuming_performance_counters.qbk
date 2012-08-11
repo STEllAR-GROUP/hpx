@@ -9,7 +9,7 @@
 
 You can consume performance data using either the command line interface of
 your __hpx__ application or the __hpx__ API. The command line interface is
-easier to use than the API, but itis less flexible and does not allow to adjust
+easier to use than the API, but it is less flexible and does not allow to adjust
 the behaviour of your application at runtime.
 The command line interface is essentially a convenience abstraction for
 querying and logging performance counter data for a set of performance counters.
@@ -26,15 +26,18 @@ once at application termination or repeatedly after a constant time interval.
 The following table summarizes the available command line options:
 
 [table __hpx__ Command Line Options Related to Performance Counters
+    [   [Command line option]
+        [Description]
+    ]
     [   [`--hpx:print-counter`]
         [print the specified performance counter either repeatedly or
-         before shutting down the system (see option --hpx:print-counter-interval)]]
+         before shutting down the system (see option `--hpx:print-counter-interval`)]]
     [   [`--hpx:print-counter-interval`]
-        [print the performance counter(s) specified with --hpx:print-counter
+        [print the performance counter(s) specified with `--hpx:print-counter`
          repeatedly after the time interval (specified in milliseconds)
-         (default: 0, which means print once at shutdown)]]
+         (default: `0`, which means print once at shutdown)]]
     [   [`--hpx:print-counter-destination`]
-        [print the performance counter(s) specified with --hpx:print-counter
+        [print the performance counter(s) specified with `--hpx:print-counter`
          to the given file (default: console)]]
     [   [`--hpx:list-counters`]
         [list the names of all registered performance counters]]
@@ -43,7 +46,7 @@ The following table summarizes the available command line options:
 ]
 
 While the options `--hpx:list-counters` and `--hpx:list-counter-infos` give a
-short listing of all available counters, the full documentation those can be
+short listing of all available counters, the full documentation for those can be
 found in the section __existing_counters__.
 
 [heading A Simple Example]

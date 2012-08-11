@@ -327,9 +327,12 @@ namespace sheneos
     // bulk operation has been completed
     struct on_completed_bulk_one
     {
-        on_completed_bulk_one(context_data const& data,
+        typedef std::map<hpx::naming::id_type, context_data> partitions_type;
+
+        on_completed_bulk_one(boost::shared_ptr<partitions_type> parts,
+                context_data const& data,
                 std::vector<double>& overall_result)
-          : data_(data), overall_result_(overall_result)
+          : data_(data), overall_result_(overall_result), partitions_(parts)
         {}
 
         void operator()(hpx::lcos::future<std::vector<double> > f)
@@ -350,6 +353,7 @@ namespace sheneos
 
         boost::reference_wrapper<context_data const> data_;
         boost::reference_wrapper<std::vector<double> > overall_result_;
+        boost::shared_ptr<partitions_type> partitions_;
     };
 
     struct bulk_one_context
@@ -384,7 +388,7 @@ namespace sheneos
                 context_data& d = p.second;
                 lazy_results.push_back(
                     hpx::async_callback<action_type>(
-                        on_completed_bulk_one(d, overall_result),
+                        on_completed_bulk_one(partitions, d, overall_result),
                         p.first, boost::move(d.coords_), eosvalue));
             }
 
@@ -434,9 +438,12 @@ namespace sheneos
     // bulk operation has been completed
     struct on_completed_bulk
     {
-        on_completed_bulk(context_data const& data,
+        typedef std::map<hpx::naming::id_type, context_data> partitions_type;
+
+        on_completed_bulk(boost::shared_ptr<partitions_type> parts,
+                context_data const& data,
                 std::vector<std::vector<double> >& overall_results)
-          : data_(data), overall_results_(overall_results)
+          : data_(data), overall_results_(overall_results), partitions_(parts)
         {}
 
         void operator()(hpx::lcos::future<std::vector<std::vector<double> > > f)
@@ -458,6 +465,7 @@ namespace sheneos
 
         boost::reference_wrapper<context_data const> data_;
         boost::reference_wrapper<std::vector<std::vector<double> > > overall_results_;
+        boost::shared_ptr<partitions_type> partitions_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -493,7 +501,7 @@ namespace sheneos
                 context_data& d = p.second;
                 lazy_results.push_back(
                     hpx::async_callback<action_type>(
-                        on_completed_bulk(d, overall_results),
+                        on_completed_bulk(partitions, d, overall_results),
                         p.first, boost::move(d.coords_), eosvalues));
             }
 

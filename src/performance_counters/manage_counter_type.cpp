@@ -24,11 +24,11 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status install_counter_type(std::string const& name,
-        counter_type type, std::string const& helptext, boost::uint32_t version,
-        error_code& ec)
+        counter_type type, std::string const& helptext,
+        std::string const& uom, boost::uint32_t version, error_code& ec)
     {
         counter_info info(type, name, helptext,
-            version ? version : HPX_PERFORMANCE_COUNTER_V1);
+            version ? version : HPX_PERFORMANCE_COUNTER_V1, uom);
         boost::shared_ptr<manage_counter_type> p =
             boost::make_shared<manage_counter_type>(info);
 
@@ -69,13 +69,13 @@ namespace hpx { namespace performance_counters
     // shutdown.
     counter_status install_counter_type(std::string const& name,
         HPX_STD_FUNCTION<boost::int64_t()> const& counter_value,
-        std::string const& helptext, error_code& ec)
+        std::string const& helptext, std::string const& uom, error_code& ec)
     {
         return install_counter_type(name, counter_raw, helptext,
             boost::bind(&hpx::performance_counters::locality_raw_counter_creator,
                 _1, counter_value, _2),
             &hpx::performance_counters::locality_counter_discoverer,
-            HPX_PERFORMANCE_COUNTER_V1, "", ec);
+            HPX_PERFORMANCE_COUNTER_V1, uom, ec);
     }
 
     /// Install several new performance counter types in a way, which will

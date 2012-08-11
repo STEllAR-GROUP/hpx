@@ -434,8 +434,7 @@ required).
 The next stumbling block to integrating __hpx__ is having it actually link
 against your program. If your application uses a CMake build system, you can
 set the CMake Module Path to the path where __hpx__ has the `FindHPX.cmake`
-module. Here is a code snippet demonstrating this. It adds the preprocessor
-definition `HPX_ENABLED` to the compiler command line if __hpx__ is found.
+module. Here is a code snippet demonstrating this.
 
 [teletype]
 ``
@@ -449,7 +448,6 @@ definition `HPX_ENABLED` to the compiler command line if __hpx__ is found.
     IF(HPX_FOUND)
         # Add a special option to you compiler command line.
         MESSAGE("HPX was found.")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D HPX_ENABLED")
     ENDIF()
 ``
 

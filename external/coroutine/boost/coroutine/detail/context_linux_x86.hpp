@@ -199,10 +199,15 @@ namespace boost { namespace coroutines {
       void reset_stack()
       {
         if(m_stack) {
-          increment_stack_recycle_count();
           if(posix::reset_stack(m_stack, static_cast<std::size_t>(m_stack_size)))
             increment_stack_unbind_count();
         }
+      }
+
+      void rebind_stack()
+      {
+        if(m_stack) 
+          increment_stack_recycle_count();
       }
 
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT

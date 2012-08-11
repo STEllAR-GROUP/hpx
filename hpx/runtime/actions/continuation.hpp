@@ -71,7 +71,10 @@ namespace hpx { namespace actions
 
         explicit continuation(naming::id_type const& gid)
           : gid_(gid)
-        {}
+        {
+            // continuations with invalid id do not make sense
+            BOOST_ASSERT(gid_);
+        }
 
         virtual ~continuation() {}
 
@@ -98,6 +101,9 @@ namespace hpx { namespace actions
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
             ar & gid_;
+
+            // continuations with invalid id do not make sense
+            BOOST_ASSERT(gid_);
         }
 
     protected:
@@ -151,6 +157,17 @@ namespace hpx { namespace actions
     }
 }}
 
+// Avoid compile time warnings about serializing continuations using pointers
+// without object tracking.
+namespace boost { namespace archive { namespace detail
+{
+    template <>
+    inline void check_object_tracking<hpx::actions::continuation>() {}
+
+    template <>
+    void inline check_pointer_tracking<hpx::actions::continuation>() {}
+}}}
+
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -159,7 +176,10 @@ namespace hpx { namespace actions
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
+
 BOOST_CLASS_VERSION(hpx::actions::continuation, HPX_CONTINUATION_VERSION)
+BOOST_CLASS_TRACKING(hpx::actions::continuation, boost::serialization::track_never)
+
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop

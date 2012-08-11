@@ -139,7 +139,9 @@
 [def __consuming_counters__     [link hpx.manual.performance_counters.consuming Consuming Performance Counters]]
 [def __existing_counters__      [link hpx.manual.performance_counters.counters Existing Performance Counters]]
 
-[template hpx_cmdline[str] [link hpx.manual.init.commandline [str]]]
+[/ Do not add any whitespace between [str]and the template body, it ends upin the
+   generated docs, which may cause unwanted effects.]
+[template hpx_cmdline[str][link hpx.manual.init.commandline [str]]]
 
 [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 

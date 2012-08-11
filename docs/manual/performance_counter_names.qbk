@@ -36,7 +36,7 @@ or underscore characters. Whitespace is not allowed inside a counter name.
 The characters `'/'`, `'{'`, `'}'`, `'#'`, and `'@'` have a special meaning and
 are used to delimit the different parts of the counter name.
 
-The parts `parentinstanceindex` and `instanceindex` are integers. If a index
+The parts `parentinstanceindex` and `instanceindex` are integers. If an index
 is not specified __hpx__ will assume a default of `-1`.
 
 [heading:example Two Simple Examples]
@@ -110,7 +110,8 @@ Not all simple counter types require specifying all 4 elements of a
 full counter instance name, some of the parts (`parentinstancename`,
 `parentindex`, `instancename`, and `instanceindex`) are optional for specific
 counters. Please refer to the documentation of a particular counter for more
-information about the formatting requirements for the name of this counter.
+information about the formatting requirements for the name of this counter
+(see __existing_counters__).
 
 The `parameters` are used to pass additional information to a counter at
 creation time. They are optional and they fully depend on the concrete counter.
@@ -118,7 +119,7 @@ Even if a specific counter type allows additional parameters to be given, those
 usually are not required as sensible defaults will be chosen. Please refer
 to the documentation of a particular counter for more information about what
 parameters are supported, how to specify them, and what default values are
-assumed.
+assumed (see also __existing_counters__).
 
 Every locality of an application exposes its own set of Performance
 Counter types and Performance Counter instances. The set of exposed counters

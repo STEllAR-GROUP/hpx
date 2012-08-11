@@ -140,7 +140,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-#ifdef NDEBUG
+#if defined(NDEBUG) && defined(BOOST_DISABLE_ASSERTS)
         static component_type* create(std::size_t)
 #else
         static component_type* create(std::size_t count)
@@ -158,7 +158,8 @@ namespace hpx { namespace components
         static component_type*                                                \
         create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
         {                                                                     \
-            return static_cast<component_type* >(new Component(BOOST_PP_ENUM_PARAMS(N, t)));                 \
+            return static_cast<component_type* >(                             \
+                new Component(BOOST_PP_ENUM_PARAMS(N, t)));                   \
         }                                                                     \
     /**/
 
@@ -169,7 +170,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
-#ifdef NDEBUG
+#if defined(NDEBUG) && defined(BOOST_DISABLE_ASSERTS)
         static void destroy(Component* p, std::size_t /*count*/ = 1)
 #else
         static void destroy(Component* p, std::size_t count = 1)
@@ -181,7 +182,6 @@ namespace hpx { namespace components
             delete p;
         }
     };
-
 }}
 
 #endif
