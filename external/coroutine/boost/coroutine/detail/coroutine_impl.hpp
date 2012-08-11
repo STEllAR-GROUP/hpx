@@ -361,10 +361,10 @@ private:
         this->super_type::rebind(id);
     }
 
-  private:
     // the memory for the threads is managed by a lockfree caching_freelist
     typedef coroutine_heap<coroutine_impl_wrapper, Heap> heap_type;
 
+  private:
     struct heap_tag {};
 
     static heap_type& get_heap(std::size_t i)
@@ -387,6 +387,13 @@ private:
     {
         get_heap(i).deallocate(wrapper);
     }
+
+#if defined(_DEBUG)
+    static heap_type const* get_first_heap_address()
+    {
+        return &get_heap(0);
+    }
+#endif
 
     functor_type m_fun;
   };
@@ -413,6 +420,10 @@ private:
           wrapper = wrapper_type::try_allocate((heap_num + i) % BOOST_COROUTINE_NUM_HEAPS);
       }
 
+#if defined(_DEBUG)
+      wrapper_type::heap_type const* heaps = wrapper_type::get_first_heap_address();
+#endif
+
       // allocate a new coroutine object, if non is available (or all heaps are locked)
       if (NULL == wrapper) {
           context_base<ContextImpl>::increment_allocation_count(heap_num);
@@ -429,6 +440,11 @@ private:
   inline void
   coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
+#if defined(_DEBUG)
+      typedef coroutine_impl_wrapper<
+          functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
+      wrapper_type::heap_type const* heaps = wrapper_type::get_first_heap_address();
+#endif
       // always hand the stack back to the matching heap
       deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);
   }
