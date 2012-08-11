@@ -958,7 +958,7 @@ namespace hpx
                 }
                 // store node number in configuration
                 ini_config += "hpx.locality=" +
-                    boost::lexical_cast<std::string>(node + 1);
+                    boost::lexical_cast<std::string>(node);
             }
             else if (mode == hpx::runtime_mode_connect) {
                 // when connecting we need to select a unique port
