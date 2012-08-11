@@ -286,6 +286,9 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_data(BOOST_FWD_REF(T) result)
         {
+            // this future instance coincidentally keeps us alive
+            lcos::future<Result, RemoteResult> f(this);
+
             // set the received result, reset error status
             try {
                 // check weather the data already has been set
@@ -308,8 +311,6 @@ namespace hpx { namespace lcos { namespace detail
                     // lock only when needed
                     typename mutex_type::scoped_lock l(this->mtx_);
                     if (!on_completed_.empty()) {
-                        // this future instance coincidentally keeps us alive
-                        lcos::future<Result, RemoteResult> f(this);
                         data_.set(boost::move(get_remote_result_type::call(
                             boost::forward<T>(result))));
 
@@ -333,12 +334,13 @@ namespace hpx { namespace lcos { namespace detail
         // trigger the future with the given error condition
         void set_exception(boost::exception_ptr const& e)
         {
+            // this future instance coincidentally keeps us alive
+            lcos::future<Result, RemoteResult> f(this);
+
             // store the error code
             if (set_on_completed_) {
                 typename mutex_type::scoped_lock l(this->mtx_);
                 if (!on_completed_.empty()) {
-                    // this future coincidentally instance keeps us alive
-                    lcos::future<Result, RemoteResult> f(this);
                     data_.set(e);
 
                     // invoke the callback (continuation) function
@@ -412,13 +414,13 @@ namespace hpx { namespace lcos { namespace detail
         completed_callback_type
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
+            // this future coincidentally instance keeps us alive
+            lcos::future<Result, RemoteResult> f(this);
+
             completed_callback_type retval = boost::move(on_completed_);
             set_on_completed_ = !data_sink.empty();
             on_completed_ = boost::move(data_sink);
             if (!on_completed_.empty() && this->is_ready()) {
-                // this future coincidentally instance keeps us alive
-                lcos::future<Result, RemoteResult> f(this);
-
                 // invoke the callback (continuation) function
                 on_completed_(f);
                 set_on_completed_ = false;
