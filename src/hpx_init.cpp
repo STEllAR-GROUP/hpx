@@ -931,11 +931,6 @@ namespace hpx
                             "is not compatible with --hpx:agas");
                     }
                     node = vm["hpx:node"].as<std::size_t>();
-                    if (1 == num_localities && !vm.count("hpx:localities")) {
-                        throw std::logic_error("Command line option --hpx:node "
-                            "requires to specify the number of localities as "
-                            "well (for instance by using --hpx:localities)");
-                    }
                 }
                 if (env.agas_node() == node) {
                     // console node, by default runs AGAS
