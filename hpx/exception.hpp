@@ -250,6 +250,21 @@ namespace hpx
         ///
         /// \param e      The parameter \p e holds the hpx::error code the new
         ///               exception should encapsulate.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws nothing
+        explicit error_code(error e, throwmode mode = plain)
+          : boost::system::error_code(make_system_error_code(e, mode))
+        {}
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
         /// \param msg    The parameter \p msg holds the error message the new
         ///               exception should encapsulate.
         /// \param mode   The parameter \p mode specifies whether the constructed
@@ -288,6 +303,14 @@ namespace hpx
         ///
         /// \throws nothing
         std::string const& get_message() const { return message_; }
+
+        /// \brief Clear this error_code object.
+        /// The postconditions of invoking this method are
+        /// * value() == hpx::success and category() == hpx::get_hpx_category()
+        void clear()
+        {
+            this->boost::system::error_code::assign(success, get_hpx_category());
+        }
 
     private:
         std::string message_;
@@ -339,9 +362,10 @@ namespace hpx
     ///@}
 
     /// \brief Returns error_code(hpx::success, "success", mode).
-    inline error_code make_success_code(throwmode mode = plain)
+    inline error_code
+    make_success_code(throwmode mode = plain)
     {
-        return error_code(success, "success", mode);
+        return error_code(success, mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////
