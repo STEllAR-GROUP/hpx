@@ -20,7 +20,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename Functor, typename Sig, typename IArchive, typename OArchive>
         struct type;
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable.hpp>
 #else
 
@@ -45,7 +45,7 @@ namespace hpx { namespace util { namespace detail {
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
     };
 

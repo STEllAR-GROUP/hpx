@@ -15,7 +15,7 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/actions/preprocessed/construct_continuation_functions.hpp>
 #else
 
@@ -43,7 +43,7 @@
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #endif
 

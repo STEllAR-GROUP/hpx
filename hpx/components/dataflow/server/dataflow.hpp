@@ -129,7 +129,7 @@ namespace hpx { namespace lcos { namespace server
             init<typename Action::type>(target);
         }
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/components/dataflow/server/preprocessed/dataflow.hpp>
 #else
 
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace server
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
         /// the connect function is used to connect the current dataflow
         /// to the specified target lco

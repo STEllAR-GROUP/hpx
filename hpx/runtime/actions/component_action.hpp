@@ -33,7 +33,7 @@ namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/actions/preprocessed/component_action_enum.hpp>
 #else
 
@@ -71,7 +71,7 @@ namespace hpx { namespace actions
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic component action types allowing to hold a different

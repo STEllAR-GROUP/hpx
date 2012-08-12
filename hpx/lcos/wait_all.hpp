@@ -186,7 +186,7 @@ namespace hpx
     }
 }
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/preprocessed/wait_all.hpp>
 #else
 
@@ -203,7 +203,7 @@ namespace hpx
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #endif
 

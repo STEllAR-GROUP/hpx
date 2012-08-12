@@ -10,7 +10,7 @@
 
 #include <hpx/components/remote_object/new.hpp>
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/components/remote_object/preprocessed/distributed_new.hpp>
 #else
 
@@ -34,7 +34,7 @@
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #endif
 

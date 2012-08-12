@@ -277,7 +277,7 @@ namespace hpx { namespace util {
         return detail::bound_functor0<F>(boost::forward<F>(f));
     }
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/preprocessed/bind.hpp>
 #else
 
@@ -301,7 +301,7 @@ namespace hpx { namespace util {
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #undef HPX_UTIL_BIND_MOVE_PARAMS
 #undef HPX_UTIL_BIND_FWD_PARAMS

@@ -16,7 +16,7 @@
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/void_cast.hpp>
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable_ptr.hpp>
 #else
 
@@ -40,7 +40,7 @@
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (
