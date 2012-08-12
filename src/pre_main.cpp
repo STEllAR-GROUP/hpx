@@ -186,6 +186,10 @@ bool pre_main(runtime_mode mode)
         }
         // }}}
 
+        // Register all counter types before the startup functions are being
+        // executed.
+        register_counter_types();
+
         // Second stage bootstrap synchronizes component loading across all
         // localities, ensuring that the component namespace tables are fully
         // populated before user code is executed.
@@ -195,8 +199,6 @@ bool pre_main(runtime_mode mode)
         // Tear down the second stage barrier.
         if (agas_client.is_bootstrap())
             agas::unregister_name(second_barrier);
-
-        register_counter_types();
 
         get_runtime().set_state(runtime::state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
