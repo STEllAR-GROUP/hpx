@@ -48,7 +48,7 @@ namespace hpx { namespace performance_counters { namespace memory
             return boost::uint64_t(-1);
         }
 
-        return pmc.PrivateUsage;
+        return pmc.WorkingSetSize;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ namespace hpx { namespace performance_counters { namespace memory
             return boost::uint64_t(-1);
         }
 
-        return pmc.WorkingSetSize;
+        return pmc.PrivateUsage;
     }
 }}}
 
