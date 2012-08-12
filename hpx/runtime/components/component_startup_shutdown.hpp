@@ -15,8 +15,8 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_startup_shutdown class provides a minimal
     /// implementation of a component's startup/shutdown function provider.
-    template <bool(*Startup)(HPX_STD_FUNCTION<void()>&),
-        bool(*Shutdown)(HPX_STD_FUNCTION<void()>&)>
+    template <bool(*Startup)(HPX_STD_FUNCTION<void()>&, bool&),
+        bool(*Shutdown)(HPX_STD_FUNCTION<void()>&, bool&)>
     struct component_startup_shutdown : public component_startup_shutdown_base
     {
         ///
@@ -31,9 +31,10 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
-        bool get_startup_function(HPX_STD_FUNCTION<void()>& startup_)
+        bool get_startup_function(HPX_STD_FUNCTION<void()>& startup_,
+            bool& pre_startup_)
         {
-            return Startup(startup_);
+            return Startup(startup_, pre_startup_);
         }
 
         /// \brief Return any startup function for this component
@@ -45,9 +46,10 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a shutdown has been
         ///         successfully initialized with the shutdown function.
-        bool get_shutdown_function(HPX_STD_FUNCTION<void()>& shutdown_)
+        bool get_shutdown_function(HPX_STD_FUNCTION<void()>& shutdown_,
+            bool& pre_shutdown_)
         {
-            return Shutdown(shutdown_);
+            return Shutdown(shutdown_, pre_shutdown_);
         }
     };
 }}
@@ -56,20 +58,20 @@ namespace hpx { namespace components
 #define HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)            \
     namespace hpx { namespace components { namespace startup_shutdown_provider \
     {                                                                         \
-        bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup)                   \
-            (HPX_STD_FUNCTION<void()>& startup_func)                          \
+        bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup)(                  \
+             HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)       \
         {                                                                     \
-            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp =           \
-                static_cast<bool(*)(HPX_STD_FUNCTION<void()>&)>(startup_);    \
-            if (!!tmp) { return tmp(startup_func); }                          \
+            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&, bool&)> tmp =    \
+                static_cast<bool(*)(HPX_STD_FUNCTION<void()>&, bool&)>(startup_); \
+            if (!!tmp) { return tmp(startup_func, pre_startup); }             \
             return false;                                                     \
         }                                                                     \
-        bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _shutdown)                  \
-            (HPX_STD_FUNCTION<void()>& shutdown_func)                         \
+        bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _shutdown)(                 \
+             HPX_STD_FUNCTION<void()>& shutdown_func, bool& pre_shutdown)     \
         {                                                                     \
-            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp =           \
-                static_cast<bool(*)(HPX_STD_FUNCTION<void()>&)>(shutdown_);   \
-            if (!!tmp) { return tmp(shutdown_func); }                         \
+            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&, bool&)> tmp =    \
+                static_cast<bool(*)(HPX_STD_FUNCTION<void()>&, bool&)>(shutdown_); \
+            if (!!tmp) { return tmp(shutdown_func, pre_shutdown); }           \
             return false;                                                     \
         }                                                                     \
     }}}                                                                       \

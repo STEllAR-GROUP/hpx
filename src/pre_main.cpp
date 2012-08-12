@@ -67,6 +67,7 @@ find_barrier(char const* symname)
 // Symbolic names of global boot barrier objects
 const char* second_barrier = "/barrier(agas#0)/second_stage";
 const char* third_barrier = "/barrier(agas#0)/third_stage";
+const char* forth_barrier = "/barrier(agas#0)/forth_stage";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
@@ -155,7 +156,7 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_requested ? ", application exit has been requested" : "");
 
-        lcos::barrier second_stage, third_stage;
+        lcos::barrier second_stage, third_stage, forth_stage;
 
         // {{{ Second and third stage barrier creation.
         if (agas_client.is_bootstrap())
@@ -172,6 +173,7 @@ bool pre_main(runtime_mode mode)
             std::size_t const num_localities = cfg.get_num_localities();
             second_stage = create_barrier(num_localities, second_barrier);
             third_stage = create_barrier(num_localities, third_barrier);
+            forth_stage = create_barrier(num_localities, forth_barrier);
 
             LBT_(info) << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
         }
@@ -181,6 +183,7 @@ bool pre_main(runtime_mode mode)
             // Initialize the barrier clients (find them in AGAS)
             second_stage = find_barrier(second_barrier);
             third_stage = find_barrier(third_barrier);
+            forth_stage = find_barrier(forth_barrier);
 
             LBT_(info) << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
@@ -204,16 +207,19 @@ bool pre_main(runtime_mode mode)
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
+        // Third stage separates pre-startup and startup function phase.
+        third_stage.wait();
+
         get_runtime().set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
-        LBT_(info) << "(3rd stage) pre_main: ran startup functions";
+        LBT_(info) << "(4th stage) pre_main: ran startup functions";
 
-        // Third stage bootstrap synchronizes startup functions across all
+        // Forth stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
         // all user code, including startup functions, are only run after the
         // component tables are populated.
-        third_stage.wait();
-        LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+        forth_stage.wait();
+        LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
 
         // Tear down the second stage barrier.
         if (agas_client.is_bootstrap())
@@ -223,7 +229,7 @@ bool pre_main(runtime_mode mode)
     // Enable logging. Even if we terminate at this point we will see all
     // pending log messages so far.
     components::activate_logging();
-    LBT_(info) << "(3rd stage) pre_main: activated logging";
+    LBT_(info) << "(4th stage) pre_main: activated logging";
 
     // Register pre-shutdown and shutdown functions to flush pending
     // reference counting operations.

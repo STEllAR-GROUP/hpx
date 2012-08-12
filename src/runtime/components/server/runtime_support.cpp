@@ -995,12 +995,24 @@ namespace hpx { namespace components { namespace server
                 startup_shutdown(pf.create("startup_shutdown"));
 
             startup_function_type startup;
-            if (startup_shutdown->get_startup_function(startup))
-                pre_startup_functions_.push_back(startup);
+            bool pre_startup = true;
+            if (startup_shutdown->get_startup_function(startup, pre_startup))
+            {
+                if (pre_startup)
+                    pre_startup_functions_.push_back(startup);
+                else
+                    startup_functions_.push_back(startup);
+            }
 
             shutdown_function_type s;
-            if (startup_shutdown->get_shutdown_function(s))
-                shutdown_functions_.push_back(s);
+            bool pre_shutdown = false;
+            if (startup_shutdown->get_shutdown_function(s, pre_shutdown))
+            {
+                if (pre_shutdown)
+                    pre_shutdown_functions_.push_back(s);
+                else
+                    shutdown_functions_.push_back(s);
+            }
         }
         catch (hpx::exception const&) {
             throw;
