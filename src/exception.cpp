@@ -217,7 +217,7 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::exception_ptr detail::access_exception(error_code const& e)
+    boost::exception_ptr access_exception(error_code const& e)
     {
         return e.exception_;
     }
