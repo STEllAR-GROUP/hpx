@@ -7,9 +7,9 @@
 #
 # definitions essential for partial preprocesssing
 #
--DHPX_DONT_USE_PREPROCESSED_FILES
 -DHPX_CREATE_PREPROCESSED_FILES
 -DHPX_USE_PREPROCESSOR_LIMIT_EXPANSION
+
 #
 # Macro names configuring HPX, no need to change.
 #
@@ -26,6 +26,7 @@
 -DHPX_ABP_PRIORITY_SCHEDULER 
 -DHPX_HIERARCHY_SCHEDULER 
 -DHPX_PERIODIC_PRIORITY_SCHEDULER 
+
 #
 # Names of macros which should not be expanded
 #
@@ -68,11 +69,13 @@
 -NLBT_
 #
 -NHPX_UTIL_STRIP
+
 #
 # We inhibit expanding this because it otherwise generates some funky
 # preprocessing errors. This needs to be investigated at some point.
 #
 -NBOOST_ACCUMULATORS_DEFINE_EXTRACTOR
+
 #
 # Specify the HPX include directories (adapt for your install)
 #

@@ -159,7 +159,7 @@ else()
             add_custom_target(
                 hpx_partial_preprocess_headers_${limit}
                 WORKING_DIRECTORY ${output_dir}/preprocess
-                COMMAND ${BOOSTWAVE_PROGRAM} -o- -DHPX_LIMIT=${limit} preprocess_hpx.cpp --license=${hpx_SOURCE_DIR}/cmake/preprocess/preprocess_license.hpp --config-file wave.cfg
+                COMMAND ${BOOSTWAVE_PROGRAM} -o- -DHPX_LIMIT=${limit} preprocess_hpx.cpp --license=${hpx_SOURCE_DIR}/cmake/templates/preprocess_license.hpp --config-file wave.cfg
             )
             set_target_properties(hpx_partial_preprocess_headers_${limit}
                 PROPERTIES FOLDER "Preprocessing/Dependencies")
