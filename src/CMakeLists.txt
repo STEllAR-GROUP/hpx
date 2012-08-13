@@ -176,6 +176,131 @@ add_hpx_library_headers(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
 
 ################################################################################
+# add headers to preprocessing
+hpx_partial_preprocess_header(
+    "hpx/util/detail/function_template.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/detail/get_table.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/detail/vtable.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/detail/vtable_ptr.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/detail/vtable_ptr_base.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/bind.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/bind_action.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/tuple.hpp"
+    LIMIT HPX_TUPLE_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/util/locking_helpers.hpp"
+    LIMIT HPX_LOCK_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/apply.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/async.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/async_fwd.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/wait_all.hpp"
+    LIMIT HPX_WAIT_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/wait_n.hpp"
+    LIMIT HPX_WAIT_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/wait_any.hpp"
+    LIMIT HPX_WAIT_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/future_wait.hpp"
+    LIMIT HPX_WAIT_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/packaged_action_constructors.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/packaged_action_constructors_direct.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/deferred_packaged_task_constructors.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/component_action_enum.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/component_action_implementations.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/construct_continuation_function_objects.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/construct_continuation_functions.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/define_function_operators.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/plain_action_enum.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/plain_action_implementations.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/actions/transfer_action_constructors.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/applier/apply_implementations.hpp"
+    LIMIT HPX_ACTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/runtime/components/memory_block.hpp"
+    LIMIT HPX_WAIT_ARGUMENT_LIMIT
+)
+
+################################################################################
+
+################################################################################
 # make source groups
 add_hpx_source_group(
   NAME hpx_serialization

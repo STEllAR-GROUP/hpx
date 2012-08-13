@@ -332,6 +332,8 @@ endif()
 ################################################################################
 hpx_include(Documentation)
 
+hpx_include(Preprocessing)
+
 ################################################################################
 # Warning configuration
 ################################################################################
@@ -1311,3 +1313,7 @@ endif()
 unset(HPX_UNIT_TEST_LIST CACHE)
 unset(HPX_REGRESSION_TEST_LIST CACHE)
 
+################################################################################
+# Automatic Preprocessing. Used to preprocess C++ macro iterations
+################################################################################
+hpx_setup_partial_preprocess_headers()

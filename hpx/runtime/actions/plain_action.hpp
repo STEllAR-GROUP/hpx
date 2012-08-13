@@ -19,13 +19,12 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/plain_action_enum.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
 #include <boost/mpl/identity.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -33,47 +32,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    /// \cond NOINTERNAL
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/runtime/actions/preprocessed/plain_action_enum.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/plain_action_enum_" HPX_LIMIT_STR ".hpp")
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-#define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
-        BOOST_PP_CAT(function_action_arg, BOOST_PP_INC(n)) =                  \
-            function_action_base + BOOST_PP_INC(n),                           \
-    /**/
-#define HPX_FUNCTION_RETARG_ENUM(z, n, data)                                  \
-        BOOST_PP_CAT(function_result_action_arg, BOOST_PP_INC(n)) =           \
-            function_result_action_base + BOOST_PP_INC(n),                    \
-    /**/
-
-    enum function_action
-    {
-        /// plain (free) remotely callable function identifiers
-        function_action_base = 3000,
-        function_action_arg0 = function_action_base + 0,
-        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_ARG_ENUM, _)
-
-        /// plain (free) remotely callable function identifiers with result
-        function_result_action_base = 4000,
-        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
-        function_result_action_arg0 = function_result_action_base + 0
-    };
-
-#undef HPX_FUNCTION_RETARG_ENUM
-#undef HPX_FUNCTION_ARG_ENUM
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic plain (free) action types allowing to hold a
