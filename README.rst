@@ -22,7 +22,7 @@ Additionally, we regularily upload the current status of the documentation
 `here <http://stellar.cct.lsu.edu/files/hpx_master/docs/index.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version 
-(currently HPX V0.9.0) which can be `downloaded here http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V0.9.0) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
