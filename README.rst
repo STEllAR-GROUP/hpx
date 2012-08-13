@@ -15,7 +15,25 @@ after the interfaces defined by the C++11 ISO standard and adheres to the
 programming guidelines used by the Boost collection of C++ libraries. 
 
 
-The documentation for HPX can be found `here <http://stellar.cct.lsu.edu/docs/index.html>`_.
+The documentation for the latest release of HPX (currently V0.9.0) can be 
+`found here <http://stellar.cct.lsu.edu/files/hpx_0.9.0/docs/index.html>`_. 
+Additionally, we regularily upload the current status of the documentation 
+(which is being worked on as we speak) 
+`here <http://stellar.cct.lsu.edu/files/hpx_master/docs/index.html>`_.
+
+If you plan to use HPX we suggest to start with the latest released version 
+(currently HPX V0.9.0) which can be `downloaded here http://stellar.cct.lsu.edu/downloads/>`_.
+
+If you would like to work with the cutting edge version from this repository
+we suggest following the current health status of the master branch by looking at
+our `contiguous integration results website <http://ithaca.cct.lsu.edu/waterfall>`_.
+While we try to keep the master branch stable and usable, sometimes new bugs 
+trick their way into the code base - you have been warned! 
+
+In any case, if you happen to run into problems we very much encourage and appreciate
+any problem reports through the `issue tracker for this Github project 
+<http://github.com/STEllAR-GROUP/hpx/issues>`_.
+
 
 ********************
  Build Instructions 
