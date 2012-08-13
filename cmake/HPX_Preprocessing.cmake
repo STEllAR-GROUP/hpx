@@ -14,9 +14,9 @@ find_package(HPX_BoostWave)
 
 if(NOT BOOSTWAVE_FOUND)
     hpx_warn("preprocessing" "Boost.Wave is unavailable, automatic preprocessing of header files is disabled. This feature is only needed if you change headers that need to be preprocessed. Set BOOST_ROOT or BOOSTWAVE_ROOT pointing to your Boost.Wave Installation")
-    set(HPX_AUTOMATIC_PREPROCESSING OFF CACHE BOOL "True if the automatic header preprocessing target should be created." FORCE ADVANCED)
+    hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created." OFF ADVANCED)
 else()
-    set(HPX_AUTOMATIC_PREPROCESSING ON CACHE BOOL "True if the automatic header preprocessing target should be created." FORCE ADVANCED)
+    hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created." ON ADVANCED)
     set(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS ${HPX_WAVE_ADDITIONAL_INCLUDE_DIRS} CACHE PATH "Additional (compiler specific) include directories for the wave preprocessing tool.")
 endif()
 
@@ -26,7 +26,7 @@ set(HPX_PREPROCESS_INCLUDE_DIRS CACHE INTERNAL "" FORCE)
 if(NOT HPX_AUTOMATIC_PREPROCESSING)
     macro(hpx_partial_preprocess_header file)
     endmacro()
-    macro(hpx_partial_preprocess_headers)
+    macro(hpx_setup_partial_preprocess_headers)
     endmacro()
 else()
 
@@ -51,7 +51,7 @@ else()
             else()
                 set(HPX_PREPROCESS_HEADERS_${file}_LIMIT "HPX_LIMIT" CACHE INTERNAL "" FORCE)
             endif()
-            
+
             if(HPX_PREPROCESS_HEADERS_${file}_GUARD)
                 set(HPX_PREPROCESS_HEADERS_${file}_GUARD ${HPX_PREPROCESS_HEADERS_${file}_GUARD} CACHE INTERNAL "" FORCE)
             else()
@@ -70,8 +70,8 @@ else()
         set(HPX_PREPROCESS_INCLUDE_HEADERS)
         foreach(file ${HPX_PREPROCESS_HEADERS})
             set(HPX_PREPROCESS_INCLUDE_HEADERS "${HPX_PREPROCESS_INCLUDE_HEADERS}#include <${file}>\n")
-            #hpx_info("preprocessing" "${HPX_PREPROCESS_HEADERS_${file}_LIMIT}")
-            #hpx_info("preprocessing" "${HPX_PREPROCESS_HEADERS_${file}_GUARD}")
+            hpx_info("preprocessing" "${HPX_PREPROCESS_HEADERS_${file}_LIMIT}")
+            hpx_info("preprocessing" "${HPX_PREPROCESS_HEADERS_${file}_GUARD}")
 
             set(HPX_PREPROCESS_LIMIT ${HPX_PREPROCESS_HEADERS_${file}_LIMIT})
             set(HPX_PREPROCESS_GUARD ${HPX_PREPROCESS_HEADERS_${file}_GUARD})
@@ -87,7 +87,7 @@ else()
         endforeach()
 
         set(HPX_WAVE_ARGUMENTS)
-        
+
         if(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS)
             foreach(dir ${HPX_WAVE_ADDITIONAL_INCLUDE_DIRS})
                 set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-S${dir}\n")
@@ -97,7 +97,7 @@ else()
         foreach(dir ${HPX_PREPROCESS_INCLUDE_DIRS})
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-S${dir}\n")
         endforeach()
-        
+
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}#\n")
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}# Specify compiler specific macro names (adapt for your compiler)\n")
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}# \n")
@@ -125,8 +125,6 @@ else()
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-DSHSTDAPI_(x)=x\n")
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D_WIN32_WINNT=0x0501\n")
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D_CPPUNWIND\n")
-
-            set(output_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
         else()
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D__GNUC__=${GCC_VERSION}\n")
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D__USE_ISOC99\n")
@@ -136,20 +134,21 @@ else()
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D__EXCEPTIONS\n")
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-DCHAR_BIT=8\n")
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D__GXX_EXPERIMENTAL_CXX0X__\n")
-
-            set(output_dir ${CMAKE_BINARY_DIR})
         endif()
-        
+
+        set(output_dir ${CMAKE_BINARY_DIR})
+        hpx_info("preprocessing" "output_dir: ${output_dir}")
+
         configure_file(
             ${hpx_SOURCE_DIR}/cmake/templates/wave.cfg.in
-            ${output_dir}/cmake/preprocess/wave.cfg
+            ${output_dir}/preprocess/wave.cfg
             ESCAPE_QUOTES
             @ONLY
         )
 
         configure_file(
             ${hpx_SOURCE_DIR}/cmake/templates/preprocess_hpx.cpp.in
-            ${output_dir}/cmake/preprocess/preprocess_hpx.cpp
+            ${output_dir}/preprocess/preprocess_hpx.cpp
             ESCAPE_QUOTES
             @ONLY
         )
@@ -159,15 +158,20 @@ else()
 
             add_custom_target(
                 hpx_partial_preprocess_headers_${limit}
-                WORKING_DIRECTORY ${output_dir}/cmake/preprocess
+                WORKING_DIRECTORY ${output_dir}/preprocess
                 COMMAND ${BOOSTWAVE_PROGRAM} -o- -DHPX_LIMIT=${limit} preprocess_hpx.cpp --license=${hpx_SOURCE_DIR}/cmake/preprocess/preprocess_license.hpp --config-file wave.cfg
             )
+            set_target_properties(hpx_partial_preprocess_headers_${limit}
+                PROPERTIES FOLDER "Preprocessing/Dependencies")
         endforeach()
 
         add_custom_target(
             hpx_partial_preprocess_headers
             DEPENDS ${HPX_PREPROCESSING_LIMITS}
-                WORKING_DIRECTORY ${output_dir}/cmake/preprocess
+                WORKING_DIRECTORY ${output_dir}/preprocess
         )
+        set_target_properties(hpx_partial_preprocess_headers
+            PROPERTIES FOLDER "Preprocessing")
+
     endmacro()
 endif()
