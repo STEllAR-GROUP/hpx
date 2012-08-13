@@ -88,7 +88,7 @@ namespace hpx
         thread_not_interruptable = 46,
         duplicate_component_id = 47,
 
-        ///\cond NOINTERNAL
+        /// \cond NOINTERNAL
         last_error,
         error_upper_bound = 0x7fffL   // force this enum type to be at least 16 bits.
         /// \endcond
@@ -230,7 +230,7 @@ namespace hpx
     }
     /// \endcond
 
-    /// \cond NOINTERNAL
+    /// \cond NODETAIL
     namespace detail
     {
         // main function for throwing exceptions
@@ -281,7 +281,23 @@ namespace hpx
         ///
         /// \throws nothing
         inline explicit error_code(error e, throwmode mode = plain);
-        inline explicit error_code(error e, std::string const& func,
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param func   The name of the function where the error was raised.
+        /// \param file   The file name of the code where the error was raised.
+        /// \param line   The line number of the code line where the error was
+        ///               raised.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws nothing
+        inline error_code(error e, std::string const& func,
                 std::string const& file, long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -298,8 +314,27 @@ namespace hpx
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        inline explicit error_code(error e, char const* msg, throwmode mode = plain);
-        inline explicit error_code(error e, char const* msg, std::string const& func,
+        inline error_code(error e, char const* msg, throwmode mode = plain);
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param func   The name of the function where the error was raised.
+        /// \param file   The file name of the code where the error was raised.
+        /// \param line   The line number of the code line where the error was
+        ///               raised.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
+        inline error_code(error e, char const* msg, std::string const& func,
                 std::string const& file, long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -317,6 +352,25 @@ namespace hpx
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
         inline error_code(error e, std::string const& msg, throwmode mode = plain);
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param func   The name of the function where the error was raised.
+        /// \param file   The file name of the code where the error was raised.
+        /// \param line   The line number of the code line where the error was
+        ///               raised.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
         inline error_code(error e, std::string const& msg, std::string const& func,
                 std::string const& file, long line, throwmode mode = plain);
 
@@ -336,6 +390,9 @@ namespace hpx
 
     private:
         friend boost::exception_ptr detail::access_exception(error_code const&);
+        friend class exception;
+
+        inline error_code(int err, hpx::exception const& e);
         boost::exception_ptr exception_;
     };
 
@@ -400,7 +457,7 @@ namespace hpx
     {
         return error_code(e, msg, func, file, line, mode);
     }
-    /// @}
+    ///@}
 
     /// \brief Returns error_code(hpx::success, "success", mode).
     inline error_code
@@ -502,7 +559,11 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        inline error_code get_error_code(throwmode mode = plain) const throw();
+        error_code get_error_code(throwmode mode = plain) const throw()
+        {
+            return error_code(this->boost::system::system_error::code().value(),
+                *this);
+        }
     };
 
     /// \cond NODETAIL
@@ -739,10 +800,13 @@ namespace hpx
     ///             \a hpx::get_thread_description()
     ///
     HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
+
+    /// \copydoc diagnostic_information(hpx::exception const& e)
+    HPX_EXPORT std::string diagnostic_information(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
     HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
-    HPX_EXPORT std::string diagnostic_information(hpx::error_code const& e);
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -775,10 +839,13 @@ namespace hpx
     ///             \a hpx::get_thread_description()
     ///
     HPX_EXPORT boost::uint32_t get_locality_id(hpx::exception const& e);
+
+    /// \copydoc get_locality_id(hpx::exception const& e)
+    HPX_EXPORT boost::uint32_t get_locality_id(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception const& e);
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception_ptr const& e);
-    HPX_EXPORT boost::uint32_t get_locality_id(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the hostname of the locality where the exception was
@@ -801,10 +868,13 @@ namespace hpx
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_host_name(hpx::exception const& e);
+
+    /// \copydoc get_host_name(hpx::exception const& e)
+    HPX_EXPORT std::string get_host_name(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_host_name(boost::exception const& e);
     HPX_EXPORT std::string get_host_name(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_host_name(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the (operating system) process id of the locality where
@@ -827,10 +897,13 @@ namespace hpx
     /// \throws     nothing
     ///
     HPX_EXPORT boost::int64_t get_process_id(hpx::exception const& e);
+
+    /// \copydoc get_process_id(hpx::exception const& e)
+    HPX_EXPORT boost::int64_t get_process_id(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT boost::int64_t get_process_id(boost::exception const& e);
     HPX_EXPORT boost::int64_t get_process_id(boost::exception_ptr const& e);
-    HPX_EXPORT boost::int64_t get_process_id(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the function name from which the exception was thrown.
@@ -852,10 +925,13 @@ namespace hpx
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_function_name(hpx::exception const& e);
+
+    /// \copydoc get_function_name(hpx::exception const& e)
+    HPX_EXPORT std::string get_function_name(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_function_name(boost::exception const& e);
     HPX_EXPORT std::string get_function_name(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_function_name(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the (source code) file name of the function from which
@@ -879,10 +955,13 @@ namespace hpx
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_file_name(hpx::exception const& e);
+
+    /// \copydoc get_file_name(hpx::exception const& e)
+    HPX_EXPORT std::string get_file_name(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_file_name(boost::exception const& e);
     HPX_EXPORT std::string get_file_name(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_file_name(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the line number in the (source code) file of the function
@@ -905,10 +984,13 @@ namespace hpx
     /// \throws     nothing
     ///
     HPX_EXPORT int get_line_number(hpx::exception const& e);
+
+    /// \copydoc get_line_number(hpx::exception const& e)
+    HPX_EXPORT int get_line_number(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT int get_line_number(boost::exception const& e);
     HPX_EXPORT int get_line_number(boost::exception_ptr const& e);
-    HPX_EXPORT int get_line_number(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the sequence number of the OS-thread used to execute
@@ -932,10 +1014,13 @@ namespace hpx
     /// \throws     nothing
     ///
     HPX_EXPORT std::size_t get_os_thread(hpx::exception const& e);
+
+    /// \copydoc get_os_thread(hpx::exception const& e)
+    HPX_EXPORT std::size_t get_os_thread(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::size_t get_os_thread(boost::exception const& e);
     HPX_EXPORT std::size_t get_os_thread(boost::exception_ptr const& e);
-    HPX_EXPORT std::size_t get_os_thread(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return the unique thread id of the HPX-thread from which the
@@ -959,10 +1044,13 @@ namespace hpx
     /// \throws     nothing
     ///
     HPX_EXPORT std::size_t get_thread_id(hpx::exception const& e);
+
+    /// \copydoc get_thread_id(hpx::exception const& e)
+    HPX_EXPORT std::size_t get_thread_id(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::size_t get_thread_id(boost::exception const& e);
     HPX_EXPORT std::size_t get_thread_id(boost::exception_ptr const& e);
-    HPX_EXPORT std::size_t get_thread_id(hpx::error_code const& e);
     /// \endcond
 
     /// \brief Return any additionally available thread description of the
@@ -986,14 +1074,17 @@ namespace hpx
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_thread_description(hpx::exception const& e);
+
+    /// \copydoc get_thread_description(hpx::exception const& e)
+    HPX_EXPORT std::string get_thread_description(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_thread_description(boost::exception const& e);
     HPX_EXPORT std::string get_thread_description(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_thread_description(hpx::error_code const& e);
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \cond NOINTERNAL
+    // \cond NOINTERNAL
     inline error_code::error_code(error e, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
@@ -1048,6 +1139,17 @@ namespace hpx
         }
     }
 
+    inline error_code::error_code(int err, hpx::exception const& e)
+    {
+        this->boost::system::error_code::assign(err, get_hpx_category());
+        try {
+            throw e;
+        }
+        catch (...) {
+            exception_ = boost::current_exception();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     inline std::string error_code::get_message() const
     {
@@ -1061,17 +1163,7 @@ namespace hpx
         }
         return "";
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline error_code exception::get_error_code(throwmode mode) const throw()
-    {
-        return make_error_code(static_cast<error>(
-            this->boost::system::system_error::code().value()),
-            this->boost::system::system_error::what(),
-            get_function_name(*this), get_file_name(*this),
-            get_line_number(*this), mode);
-    }
-    /// \endcond
+    // \endcond
 }
 
 /// \cond NOEXTERNAL
