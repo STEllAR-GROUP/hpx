@@ -124,7 +124,7 @@
 #  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #    define HPX_FUNCTION_ARGUMENT_LIMIT HPX_PP_ADD3(HPX_LIMIT)
 #  else
-#    define HPX_FUNCTION_ARGUMENT_LIMIT HPX_PP_ROUND_UP_ADD3(HPX_LIMIT)
+#    define HPX_FUNCTION_ARGUMENT_LIMIT HPX_PP_ROUND_UP_ADD3(HPX_ACTION_ARGUMENT_LIMIT)
 #  endif
 #elif (HPX_FUNCTION_ARGUMENT_LIMIT < 7)
 #  error "HPX_FUNCTION_ARGUMENT_LIMIT is too low, it must be higher than 7"
@@ -134,7 +134,7 @@
 #endif
 
 #if HPX_FUNCTION_ARGUMENT_LIMIT < (HPX_ACTION_ARGUMENT_LIMIT + 3)
-#  error "HPX_FUNCTION_ARGUMENT LIMIT has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
+#  error "HPX_FUNCTION_ARGUMENT_LIMIT has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@
 #  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #    define HPX_TUPLE_LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
 #  else
-#    define HPX_TUPLE_LIMIT HPX_PP_ROUND_UP_ADD3(HPX_FUNCTION_ARGUMENT_LIMIT)
+#    define HPX_TUPLE_LIMIT HPX_PP_ROUND_UP(HPX_FUNCTION_ARGUMENT_LIMIT)
 #  endif
 #elif (HPX_TUPLE_LIMIT < 7)
 #  error "HPX_TUPLE_LIMIT is too low, it must be higher than 7"
