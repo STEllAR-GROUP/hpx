@@ -38,104 +38,47 @@ namespace hpx { namespace detail
 #endif
     }
 
+    template <typename Exception>
+    inline boost::shared_ptr<boost::exception>
+    make_exception_ptr(Exception const& e)
+    {
+        return boost::static_pointer_cast<boost::exception>(
+            boost::make_shared<Exception>(e));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    HPX_EXPORT void rethrow_exception(Exception const& e, std::string const& func,
+    HPX_EXPORT boost::exception_ptr construct_exception(
+        Exception const& e, std::string const& func,
         std::string const& file, long line, std::string const& back_trace,
         boost::uint32_t node, std::string const& hostname_, boost::int64_t pid_,
         std::size_t shepherd, std::size_t thread_id, std::string const& thread_name)
     {
-        // create a boost::exception object encapsulating the Exception to
+        // create a boost::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
-        throw boost::enable_current_exception(
-            boost::enable_error_info(e)
-                << hpx::detail::throw_stacktrace(back_trace)
-                << hpx::detail::throw_locality(node)
-                << hpx::detail::throw_hostname(hostname_)
-                << hpx::detail::throw_pid(pid_)
-                << hpx::detail::throw_shepherd(shepherd)
-                << hpx::detail::throw_thread_id(thread_id)
-                << hpx::detail::throw_thread_name(thread_name)
-                << hpx::detail::throw_function(func)
-                << hpx::detail::throw_file(file)
-                << hpx::detail::throw_line(static_cast<int>(line)));
+        try {
+            throw boost::enable_current_exception(
+                boost::enable_error_info(e)
+                    << hpx::detail::throw_stacktrace(back_trace)
+                    << hpx::detail::throw_locality(node)
+                    << hpx::detail::throw_hostname(hostname_)
+                    << hpx::detail::throw_pid(pid_)
+                    << hpx::detail::throw_shepherd(shepherd)
+                    << hpx::detail::throw_thread_id(thread_id)
+                    << hpx::detail::throw_thread_name(thread_name)
+                    << hpx::detail::throw_function(func)
+                    << hpx::detail::throw_file(file)
+                    << hpx::detail::throw_line(static_cast<int>(line)));
+        }
+        catch (...) {
+            return boost::current_exception();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // FIXME: This is just painful whenever we have to modify rethrow_exception's
-    // signature.
-    template HPX_EXPORT void rethrow_exception(hpx::exception const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-
-    template HPX_EXPORT void rethrow_exception(boost::system::system_error const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-
-    template HPX_EXPORT void rethrow_exception(std::exception const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(hpx::detail::std_exception const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::bad_exception const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(hpx::detail::bad_exception const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-#ifndef BOOST_NO_TYPEID
-    template HPX_EXPORT void rethrow_exception(std::bad_typeid const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(hpx::detail::bad_typeid const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::bad_cast const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(hpx::detail::bad_cast const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-#endif
-    template HPX_EXPORT void rethrow_exception(std::bad_alloc const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(hpx::detail::bad_alloc const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::logic_error const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::runtime_error const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::out_of_range const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::invalid_argument const&,
-        std::string const&, std::string const&, long, std::string const&,
-        boost::uint32_t, std::string const&, boost::int64_t,
-        std::size_t, std::size_t, std::string const&);
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
+    HPX_EXPORT boost::exception_ptr
+        get_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
         boost::int64_t pid_ = ::getpid();
@@ -169,8 +112,15 @@ namespace hpx { namespace detail
             thread_name = threads::get_thread_description(self->get_thread_id());
         }
 
-        rethrow_exception(e, func, file, line, back_trace, node, hostname_,
-            pid_, shepherd, thread_id, thread_name);
+        return construct_exception(e, func, file, line, back_trace, node,
+            hostname_, pid_, shepherd, thread_id, thread_name);
+    }
+
+    template <typename Exception>
+    HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
+        std::string const& file, long line)
+    {
+        boost::rethrow_exception(get_exception(e, func, file, line));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -264,6 +214,12 @@ namespace hpx { namespace detail
     {
         std::cerr << hpx::diagnostic_information(e) << std::endl;
         std::abort();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::exception_ptr detail::access_exception(error_code const& e)
+    {
+        return e.exception_;
     }
 }}
 
@@ -378,6 +334,11 @@ namespace hpx
         return hpx::diagnostic_information(dynamic_cast<boost::exception const&>(e));
     }
 
+    std::string diagnostic_information(hpx::error_code const& e)
+    {
+        return hpx::diagnostic_information(detail::access_exception(e));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// Return the locality where the exception was thrown.
     boost::uint32_t get_locality_id(boost::exception const& e)
@@ -404,6 +365,10 @@ namespace hpx
         return get_locality_id(dynamic_cast<boost::exception const&>(e));
     }
 
+    boost::uint32_t get_locality_id(hpx::error_code const& e)
+    {
+        return get_locality_id(detail::access_exception(e));
+    }
 
     /// Return the host-name of the locality where the exception was thrown.
     std::string get_host_name(boost::exception const& e)
@@ -430,6 +395,10 @@ namespace hpx
         return get_host_name(dynamic_cast<boost::exception const&>(e));
     }
 
+    std::string get_host_name(hpx::error_code const& e)
+    {
+        return get_host_name(detail::access_exception(e));
+    }
 
     /// Return the (operating system) process id of the locality where the
     /// exception was thrown.
@@ -457,6 +426,10 @@ namespace hpx
         return get_process_id(dynamic_cast<boost::exception const&>(e));
     }
 
+    boost::int64_t get_process_id(hpx::error_code const& e)
+    {
+        return get_process_id(detail::access_exception(e));
+    }
 
     /// Return the function name from which the exception was thrown.
     std::string get_function_name(boost::exception const& e)
@@ -489,6 +462,10 @@ namespace hpx
         return get_function_name(dynamic_cast<boost::exception const&>(e));
     }
 
+    std::string get_function_name(hpx::error_code const& e)
+    {
+        return get_function_name(detail::access_exception(e));
+    }
 
     /// Return the (source code) file name of the function from which the
     /// exception was thrown.
@@ -522,6 +499,10 @@ namespace hpx
         return get_file_name(dynamic_cast<boost::exception const&>(e));
     }
 
+    std::string get_file_name(hpx::error_code const& e)
+    {
+        return get_file_name(detail::access_exception(e));
+    }
 
     /// Return the line number in the (source code) file of the function from
     /// which the exception was thrown.
@@ -549,6 +530,10 @@ namespace hpx
         return get_line_number(dynamic_cast<boost::exception const&>(e));
     }
 
+    int get_line_number(hpx::error_code const& e)
+    {
+        return get_line_number(detail::access_exception(e));
+    }
 
     /// Return the sequence number of the OS-thread used to execute HPX-threads
     /// from which the exception was thrown.
@@ -576,6 +561,10 @@ namespace hpx
         return get_os_thread(dynamic_cast<boost::exception const&>(e));
     }
 
+    std::size_t get_os_thread(hpx::error_code const& e)
+    {
+        return get_os_thread(detail::access_exception(e));
+    }
 
     /// Return the unique thread id of the HPX-thread from which the exception
     /// was thrown.
@@ -603,6 +592,10 @@ namespace hpx
         return get_thread_id(dynamic_cast<boost::exception const&>(e));
     }
 
+    std::size_t get_thread_id(hpx::error_code const& e)
+    {
+        return get_thread_id(detail::access_exception(e));
+    }
 
     /// Return any addition thread description of the HPX-thread from which the
     /// exception was thrown.
@@ -628,6 +621,11 @@ namespace hpx
     std::string get_thread_description(hpx::exception const& e)
     {
         return get_thread_description(dynamic_cast<boost::exception const&>(e));
+    }
+
+    std::string get_thread_description(hpx::error_code const& e)
+    {
+        return get_thread_description(detail::access_exception(e));
     }
 }
 
