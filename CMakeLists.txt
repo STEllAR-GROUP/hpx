@@ -312,6 +312,47 @@ if(HPX_VERIFY_LOCKS)
 endif()
 
 ################################################################################
+# Fixing the "shared" folder
+################################################################################
+
+file(COPY ${CMAKE_SOURCE_DIR}/cmake/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules)
+
+################################################################################
+# OpenCL
+################################################################################
+
+if (MSVC)
+
+   find_package(HPX_OpenCL)
+
+   if(${OpenCL_FOUND})
+      include_directories(${OpenCL_INCLUDE_DIR})
+      hpx_link_sys_directories(${OpenCL_LIBRARY_DIR})
+      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} OpenCL.lib)
+      #OCLM
+      if(NOT OCLM_ROOT AND NOT $ENV{OCLM_ROOT} STREQUAL "")
+        set(OCLM_ROOT $ENV{OCLM_ROOT})
+      endif()
+      if(EXISTS ${OCLM_ROOT}/includeLoc.cmake)
+         include (${OCLM_ROOT}/includeLoc.cmake)
+         
+         include_directories(${OCLM_INCLUDE_DIR})
+         hpx_link_sys_directories(${OCLM_LIBRARY_DIR}/${CMAKE_BUILD_TYPE})
+         set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} OCLM.lib)
+         if (EXISTS ${OCLM_BIN_ROOT}/${CMAKE_BUILD_TYPE}/oclm.dll)
+            file(COPY ${OCLM_BIN_ROOT}/${CMAKE_BUILD_TYPE}/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/)
+         else()
+            message(STATUS "WARNING: No OCLM dll found.")
+        endif()
+      else()
+         message(STATUS "OCLM NOT FOUND")
+      endif()
+
+   endif()
+
+endif()
+
+################################################################################
 # PAPI event counters
 ################################################################################
 find_package(HPX_PAPI)
@@ -1310,4 +1351,3 @@ endif()
 
 unset(HPX_UNIT_TEST_LIST CACHE)
 unset(HPX_REGRESSION_TEST_LIST CACHE)
-
