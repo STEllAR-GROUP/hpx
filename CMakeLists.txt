@@ -32,6 +32,26 @@ endif()
 
 set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
 
+################################################################################
+# Install include directory
+################################################################################
+MACRO(SUBDIRCOPY curdir)
+  FILE(GLOB children ${curdir}/ ${curdir}/*)
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+       # Install include subdirectories
+       FILE(GLOB files "${curdir}/${child}/*.hpp")
+       STRING(REPLACE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/include bindir ${curdir}/${child})
+       INSTALL(FILES ${files} DESTINATION ${bindir})
+       SUBDIRCOPY("${curdir}/${child}")
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
+
+SUBDIRCOPY(${CMAKE_SOURCE_DIR}/hpx/)
+
+################################################################################
+
 # Always force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
 # (at least for now, until we figure out how to use multiple build types in
 # the same project).
@@ -80,6 +100,7 @@ endif()
 # Fortran compiler detection
 ################################################################################
 include(HPX_FortranCompiler)
+
 
 ################################################################################
 # Boost configuration
