@@ -122,14 +122,14 @@ with the help of the associated action is called 'applying the action'. Actions
 can have arguments, which will be supplied while the action is applied. At the
 minimum, one parameter is required to apply any action - the id of the locality
 the associated function should be invoked on (for global functions), or the id
-of the object instance (for member functions). Generally, __hpx__ provides
+of the component instance (for member functions). Generally, __hpx__ provides
 three ways to apply an action:
 
 * [link hpx.manual.applying_actions.action_invocation.apply Applying an Action Asynchronously without any Synchronization]
 * [link hpx.manual.applying_actions.action_invocation.async Applying an Action Asynchronously with Synchronization]
 * [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]
 
-__hpx__ allows to apply any action with a syntax which is very clode to the
+__hpx__ allows to apply any action with a syntax which is very close to the
 standard C++ way of invoking functions. In fact, all action types have an
 overloaded function operator allowing to synchronously apply the action. Further,
 __hpx__ implements `hpx::async`, which semantically works similar to the
@@ -140,8 +140,8 @@ way `std::async` works for plain C++ function.
       two facilities which are semantically equivalent to the `std::bind` and
       `std::function` types as defined by the C++11 Standard. While `hpx::async`
       extends beyond the conventional semantics by supporting actions and
-      conventional C++ functions, `the __hpx__ facilities `hpx::bind` and
-      `hpx::function` extend beyond the conventional standard facilities. The
+      conventional C++ functions, the __hpx__ facilities `hpx::bind` and
+      `hpx::function` extend beyond the conventional standard facilities too. The
       __hpx__ facilities not only support conventional functions, but can be
       used for actions as well.]
 
@@ -151,13 +151,14 @@ This method ('fire and forget') will make sure the function associated with
 the action is scheduled to run on the target locality. Applying the action
 does not wait for the function to start running, instead it is a fully
 asynchronous operation. The following example shows how to apply the action
-from above on the local locality:
+as defined [link hpx.manual.applying_actions.action_type_definition in the previous section]
+on the local locality (the locality this code runs on):
 
     some_global_action act;     // define an instance of some_global_action
     hpx::apply(act, hpx::find_here(), 2.0);
 
 (the function `hpx::find_here()` returns the id of the local locality (the
-locality this code is executed on).
+locality this code executes on).
 
 Any component member function can be invoked using the same syntactic
 construct. Given that `id` is the global address for a component instance
@@ -167,7 +168,8 @@ created earlier, this invocation looks like:
     hpx::apply(act, id, "42");
 
 In this case any value returned from this action (e.g. in this case the
-integer `42`) is ignored.
+integer `42`) is ignored. Please look at __action_type_definition__ for the
+code defining the component action (`some_component_action`) used.
 
 [heading:async Applying an Action Asynchronously with Synchronization]
 
@@ -262,6 +264,40 @@ communication latencies.
       there. Once this thread runs on the remote locality, it will execute the
       function encapsulated by the action.]
 
+[heading:compare Comparing Actions with C++ Functions]
+
+As mentioned above, __hpx__ actions are very similar to 'normal' C++ functions
+except that actions can be invoked remotely. The following table compares the
+way C++ functions can be invoked with the syntax used to apply an __hpx__
+action. This table assumes that `func` is an arbitrary C++ function or function
+object and `act` is an instance of an __hpx__ action. `R` stands for an
+arbitrary result type.
+
+[table Comparing C++ Functions and __hpx__ Actions
+    [[Invocation] [C++ Function] [__hpx__ Action]]
+    [[Apply (fire&forget)]
+     [`hpx::apply(func, ...);`]
+     [`hpx::apply(act, id, ...);`]
+    ]
+    [[Asynchronous]
+     [``
+        std::future<R> f = std::async(func, ...);
+        R r = f.get();
+
+        hpx::future<R> f = hpx::async(func, ...);
+        R r = f.get();
+     ``]
+     [``
+        hpx::future<R> f = hpx::async(act, id, ...);
+        R r = f.get();
+     ``]
+    ]
+    [[Synchronous]
+     [`R r = f(...)`]
+     [`R r = act(id, ...)`]
+    ]
+]
+
 [endsect] [/ Action Invocation]
 
 [section:action_error_handling Action Error Handling]
@@ -337,7 +373,7 @@ function `get()`:
         cout << e.what();
     }
 
-For more information about error handling plese refer to the section
+For more information about error handling please refer to the section
 __exceptions__. There we also explain how to handle error conditions without
 having to rely on exception.
 
