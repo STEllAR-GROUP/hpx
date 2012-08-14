@@ -321,6 +321,8 @@ namespace hpx
 
     std::string diagnostic_information(boost::exception_ptr const& e)
     {
+        if (!e) return "";
+
         try {
             boost::rethrow_exception(e);
         }
@@ -352,6 +354,9 @@ namespace hpx
 
     boost::uint32_t get_locality_id(boost::exception_ptr const& e)
     {
+        if (!e)
+            return naming::invalid_locality_id;
+
         try {
             boost::rethrow_exception(e);
         }
@@ -382,6 +387,8 @@ namespace hpx
 
     std::string get_host_name(boost::exception_ptr const& e)
     {
+        if (!e) return "";
+
         try {
             boost::rethrow_exception(e);
         }
@@ -413,6 +420,8 @@ namespace hpx
 
     boost::int64_t get_process_id(boost::exception_ptr const& e)
     {
+        if (!e) return -1;
+
         try {
             boost::rethrow_exception(e);
         }
@@ -449,6 +458,8 @@ namespace hpx
 
     std::string get_function_name(boost::exception_ptr const& e)
     {
+        if (!e) return "";
+
         try {
             boost::rethrow_exception(e);
         }
@@ -486,6 +497,8 @@ namespace hpx
 
     std::string get_file_name(boost::exception_ptr const& e)
     {
+        if (!e) return "";
+
         try {
             boost::rethrow_exception(e);
         }
@@ -517,6 +530,8 @@ namespace hpx
 
     int get_line_number(boost::exception_ptr const& e)
     {
+        if (!e) return -1;
+
         try {
             boost::rethrow_exception(e);
         }
@@ -548,6 +563,8 @@ namespace hpx
 
     std::size_t get_os_thread(boost::exception_ptr const& e)
     {
+        if (!e) return std::size_t(-1);
+
         try {
             boost::rethrow_exception(e);
         }
@@ -579,6 +596,8 @@ namespace hpx
 
     std::size_t get_thread_id(boost::exception_ptr const& e)
     {
+        if (!e) return std::size_t(-1);
+
         try {
             boost::rethrow_exception(e);
         }
@@ -610,6 +629,8 @@ namespace hpx
 
     std::string get_thread_description(boost::exception_ptr const& e)
     {
+        if (!e) return "";
+
         try {
             boost::rethrow_exception(e);
         }
