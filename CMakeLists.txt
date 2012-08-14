@@ -1013,6 +1013,10 @@ if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
+if(HPX_AUTOMATIC_PREPROCESSING)
+  add_subdirectory(preprocess)
+endif()
+
 ################################################################################
 # installation instructions
 ################################################################################
@@ -1255,46 +1259,6 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION lib/pkgconfig)
 endif()
 
-if(DOXYGEN_FOUND)
-  # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
-  set(doxygen_inputs_list
-      "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
-      "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp"
-      "${hpx_SOURCE_DIR}/hpx/exception.hpp"
-      "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
-      "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
-      "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
-      "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
-
-  foreach(doxygen_input ${doxygen_inputs_list})
-    set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
-  endforeach()
-  #hpx_info("doxygen" "${doxygen_inputs}")
-
-  set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
-  set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
-
-  set(doxygen_definition_list
-      "DOXYGEN:=1"
-      "BOOST_SCOPED_ENUM_START(x):=enum x"
-      "BOOST_SCOPED_ENUM_END="
-      "HPX_EXCEPTION_EXPORT="
-      "HPX_EXPORT="
-      "HPX_API_EXPORT="
-      "HPX_STD_FUNCTION=std::function"
-      "extern=")
-
-  foreach(doxygen_predef ${doxygen_definition_list})
-    set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
-  endforeach()
-  #hpx_info("doxygen" "${doxygen_definitions}")
-
-  hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
-  configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
-                 @ONLY)
-endif()
-
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
 
 file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
@@ -1313,7 +1277,4 @@ endif()
 unset(HPX_UNIT_TEST_LIST CACHE)
 unset(HPX_REGRESSION_TEST_LIST CACHE)
 
-################################################################################
-# Automatic Preprocessing. Used to preprocess C++ macro iterations
-################################################################################
-hpx_setup_partial_preprocess_headers()
+

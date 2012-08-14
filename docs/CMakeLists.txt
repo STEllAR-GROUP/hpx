@@ -28,25 +28,52 @@ set(documentation_dependencies
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp
     ${hpx_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp)
 
-if(DOXYGEN_FOUND)
-  set(documentation_dependencies ${documentation_dependencies}
-      ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
+# Add all files here which should be passed to doxygen
+set(doxygen_dependencies
+    ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
+    ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
+    ${hpx_SOURCE_DIR}/hpx/exception.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp
+    ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
 
-  # Add all files here which should be passed to doxygen
-  set(doxygen_dependencies
-      ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
-      ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
-      ${hpx_SOURCE_DIR}/hpx/exception.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp
-      ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
+foreach(doxygen_input ${doxygen_dependencies})
+set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
+endforeach()
+#hpx_info("doxygen" "${doxygen_inputs}")
 
-  # Generate Doxygen from the source code.
-  hpx_source_to_boostbook(hpx_autodoc
-    CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
-    DEPENDENCIES ${doxygen_dependencies})
-endif()
+set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
+set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
+
+set(doxygen_definition_list
+    "DOXYGEN:=1"
+    "BOOST_SCOPED_ENUM_START(x):=enum x"
+    "BOOST_SCOPED_ENUM_END="
+    "HPX_EXCEPTION_EXPORT="
+    "HPX_EXPORT="
+    "HPX_API_EXPORT="
+    "HPX_STD_FUNCTION=std::function"
+    "extern=")
+
+foreach(doxygen_predef ${doxygen_definition_list})
+set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
+endforeach()
+#hpx_info("doxygen" "${doxygen_definitions}")
+
+hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
+                ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
+                @ONLY)
+
+#############################################################################
+set(documentation_dependencies ${documentation_dependencies}
+    ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
+
+# Generate Doxygen from the source code.
+hpx_source_to_boostbook(hpx_autodoc
+CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
+DEPENDENCIES ${doxygen_dependencies})
 
 set(quickbook_fixme_mode "-D__hpx_disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)

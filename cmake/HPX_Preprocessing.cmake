@@ -154,10 +154,14 @@ else()
         foreach(limit RANGE 5 20 5)
             set(HPX_PREPROCESSING_LIMITS ${HPX_PREPROCESSING_LIMITS} "hpx_partial_preprocess_headers_${limit}")
 
+            add_custom_command(
+                OUTPUT ${output_dir}/preprocess/hpx_preprocessed_${limit}.touch
+                COMMAND ${BOOSTWAVE_PROGRAM}
+                ARGS -o- -DHPX_LIMIT=${limit} ${output_dir}/preprocess/preprocess_hpx.cpp --license=${hpx_SOURCE_DIR}/preprocess/preprocess_license.hpp --config-file ${output_dir}/preprocess/wave.cfg
+            )
             add_custom_target(
                 hpx_partial_preprocess_headers_${limit}
-                WORKING_DIRECTORY ${output_dir}/preprocess
-                COMMAND ${BOOSTWAVE_PROGRAM} -o- -DHPX_LIMIT=${limit} preprocess_hpx.cpp --license=${hpx_SOURCE_DIR}/cmake/templates/preprocess_license.hpp --config-file wave.cfg
+                DEPENDS ${output_dir}/preprocess/hpx_preprocessed_${limit}.touch
             )
             set_target_properties(hpx_partial_preprocess_headers_${limit}
                 PROPERTIES FOLDER "Preprocessing/Dependencies")
@@ -166,7 +170,7 @@ else()
         add_custom_target(
             hpx_partial_preprocess_headers
             DEPENDS ${HPX_PREPROCESSING_LIMITS}
-                WORKING_DIRECTORY ${output_dir}/preprocess
+            WORKING_DIRECTORY ${output_dir}/preprocess
         )
         set_target_properties(hpx_partial_preprocess_headers
             PROPERTIES FOLDER "Preprocessing")
