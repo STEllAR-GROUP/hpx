@@ -49,44 +49,6 @@ Head scalar_multiply(
     return head;
 }
 
-/// Let A by a multidimensional array with dimensions d{0}, d{1}, ..., d{n}. For
-/// any index s{0}, s{1}, ..., s{n}, the offset of the index is:
-///
-///       (s{n}     - 1)(d{n - 1})(d{n - 2}) ... (d{0})
-///     + (s{n - 1} - 1)(d{n - 2})(d{n - 3}) ... (d{0})
-///     + ...
-///     + (s{1}      -1)(d{0})
-///     +  s{0}
-template <
-    typename Head
-  , typename... Tail
->
-Head index(
-    std::vector<std::size_t> const& extent
-  , Head head
-  , Tail... tail
-    )
-{
-    BOOST_ASSERT(extent.size() != 0);
-    std::vector<std::size_t> const offsets(extent.size(), 0);
-    return compute_index(extent, offsets, 0, head, tail...);
-}
-
-template <
-    typename Head
-  , typename... Tail
->
-Head index(
-    std::vector<std::size_t> const& extent
-  , std::vector<std::size_t> const& offsets
-  , Head head
-  , Tail... tail
-    )
-{
-    BOOST_ASSERT(extent.size() != 0);
-    return compute_index(extent, offsets, 0, head, tail...);
-}
-
 /// Base case.
 template <
     typename Head
@@ -144,6 +106,44 @@ Head compute_index(
     }
 
     return head;
+}
+
+/// Let A by a multidimensional array with dimensions d{0}, d{1}, ..., d{n}. For
+/// any index s{0}, s{1}, ..., s{n}, the offset of the index is:
+///
+///       (s{n}     - 1)(d{n - 1})(d{n - 2}) ... (d{0})
+///     + (s{n - 1} - 1)(d{n - 2})(d{n - 3}) ... (d{0})
+///     + ...
+///     + (s{1}      -1)(d{0})
+///     +  s{0}
+template <
+    typename Head
+  , typename... Tail
+>
+Head index(
+    std::vector<std::size_t> const& extent
+  , Head head
+  , Tail... tail
+    )
+{
+    BOOST_ASSERT(extent.size() != 0);
+    std::vector<std::size_t> const offsets(extent.size(), 0);
+    return compute_index(extent, offsets, 0, head, tail...);
+}
+
+template <
+    typename Head
+  , typename... Tail
+>
+Head index(
+    std::vector<std::size_t> const& extent
+  , std::vector<std::size_t> const& offsets
+  , Head head
+  , Tail... tail
+    )
+{
+    BOOST_ASSERT(extent.size() != 0);
+    return compute_index(extent, offsets, 0, head, tail...);
 }
 
 struct matrix_mutex 

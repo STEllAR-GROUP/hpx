@@ -90,7 +90,7 @@ struct time_element{
   bool computed;
 };
 // declaring time_array
-std::vector<time_element> time_array;
+boost::scoped_ptr<std::vector<time_element> > time_array;
 
 
 // this is the fundimental element of the hydrodynamics code, the
@@ -187,11 +187,11 @@ typedef future<cell> compute_future;
 double timestep_size(boost::uint64_t timestep)
 {
   // locking
-  hpx::lcos::local::mutex::scoped_lock l(time_array[timestep].mtx);
+  hpx::lcos::local::mutex::scoped_lock l((*time_array)[timestep].mtx);
 
   // if it has already been calculated, then just return the value
-  if (time_array[timestep].computed)
-    return time_array[timestep].dt;
+  if ((*time_array)[timestep].computed)
+    return (*time_array)[timestep].dt;
 
   //  cout << (boost::format("calculating timestep, ts=%1% \n") % timestep) << flush;
 
@@ -200,10 +200,10 @@ double timestep_size(boost::uint64_t timestep)
   // decide the timestep
   if (timestep < n_predict)
     {
-      time_array[timestep].computed = true;
-      time_array[timestep].dt = dx*0.033;// this should be fine unless
+      (*time_array)[timestep].computed = true;
+      (*time_array)[timestep].dt = dx*0.033;// this should be fine unless
       // the initial conditions are changed
-      return time_array[timestep].dt;
+      return (*time_array)[timestep].dt;
     }
 
   // send back the compute futures for the whole grid
@@ -247,16 +247,16 @@ double timestep_size(boost::uint64_t timestep)
 
   // we don't want to let the timestep increase too quickly, so
   // we only let it increase by 25% each timestep
-  time_array[timestep].computed = true;
-  time_array[timestep].dt = (std::min)(
+  (*time_array)[timestep].computed = true;
+  (*time_array)[timestep].dt = (std::min)(
                                      cfl_predict_factor*dt_cfl
                                      ,
-                                     1.25*time_array[timestep-1].dt);
-  //    time_array[timestep].dt = cfl_predict_factor*dt_cfl;
+                                     1.25*(*time_array)[timestep-1].dt);
+  //    (*time_array)[timestep].dt = cfl_predict_factor*dt_cfl;
 
 
-  //  cout << (boost::format("timestep = %1%, dt = %2%\n") % timestep % time_array[timestep].dt) << flush;
-  return time_array[timestep].dt;
+  //  cout << (boost::format("timestep = %1%, dt = %2%\n") % timestep % (*time_array)[timestep].dt) << flush;
+  return (*time_array)[timestep].dt;
 }
 
 cell compute(boost::uint64_t timestep, boost::uint64_t location)
@@ -548,7 +548,7 @@ int hpx_main(
   cout << (boost::format("n_predict = %1%\n") % n_predict) << flush;
 
   // allocating the time array
-  time_array = std::vector<time_element>(nt);
+  time_array.reset(new std::vector<time_element>(nt));
 
   // allocating the grid 2d array of all of the cells for all timesteps
   grid = std::vector<std::vector<cell> >(nt, std::vector<cell>(nx));
@@ -588,13 +588,13 @@ int hpx_main(
 
     boost::uint64_t i;
     // writing the "time array" to a file
-    time_array[0].elapsed_time = time_array[0].dt;
+    (*time_array)[0].elapsed_time = (*time_array)[0].dt;
     for (i=1;i<nt;i++)
-      time_array[i].elapsed_time = time_array[i-1].elapsed_time + time_array[i].dt;
+      (*time_array)[i].elapsed_time = (*time_array)[i-1].elapsed_time + (*time_array)[i].dt;
 
     for (i =0;i<nt;i++)
       {
-        outfile2 << (boost::format("%1% %2% %3%\n") % i % time_array[i].dt % time_array[i].elapsed_time) << flush;
+        outfile2 << (boost::format("%1% %2% %3%\n") % i % (*time_array)[i].dt % (*time_array)[i].elapsed_time) << flush;
       }
     outfile2.close();
 
@@ -605,7 +605,7 @@ int hpx_main(
     for (i =0;i<nx;i++)
       {
         double x_here = (i-0.5)*dx+x_min;
-        cell analytic = get_analytic(x_here,time_array[nt-1].elapsed_time);
+        cell analytic = get_analytic(x_here,(*time_array)[nt-1].elapsed_time);
         double velocity_here = analytic.mom/analytic.rho;
         double tauoverrho = analytic.tau/analytic.rho;
         double pressure_here = get_pressure(analytic);
@@ -617,7 +617,7 @@ int hpx_main(
     cout << (boost::format("total mass = %1%\n") % total_mass ) << flush;
 
     char const* fmt0 = "code elapsed time: %1%\n";
-    std::cout << (boost::format(fmt0) % time_array[nt-1].elapsed_time);
+    std::cout << (boost::format(fmt0) % (*time_array)[nt-1].elapsed_time);
 
     char const* fmt = "wall elapsed time: %1% [s]\n";
     std::cout << (boost::format(fmt) % t.elapsed());
