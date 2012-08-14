@@ -132,7 +132,7 @@
 [def __loading_ini__            [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 [def __loading_components__     [link hpx.manual.init.configuration.loading_components Loading Components]]
 [def __component_example__      [link hpx.manual.init.configuration.component_example Application Specific Component Example]]
-[def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
+[def __exceptions__             [link hpx.manual.error_handling Error Handling]]
 [def __commandline__            [link hpx.manual.init.commandline __hpx__ Command Line Options]]
 
 [def __counter_names__          [link hpx.manual.performance_counters.names Performance Counter Names]]

@@ -922,6 +922,38 @@ described in the table below:
     [[`--hpx:list-counter-infos`][list the description of all registered performance counters]]
 ]
 
+Additionally, every __hpx__ application defines certain shortcuts allowing to
+significantly shorten the command line options. The follwoing table lists all
+predefined command line option shortcuts:
+
+[table Predefined command line option shortcuts
+    [[Shortcut option]  [ Equivalent long option]]
+    [[-a]               [--hpx:agas]]
+    [[-c]               [--hpx:console]]
+    [[-h]               [--hpx:help]]
+    [[--help]           [--hpx:help]]
+    [[-I]               [--hpx:ini]]
+    [[-l]               [--hpx:localities]]
+    [[-p]               [--hpx:app-config]]
+    [[-q]               [--hpx:queuing]]
+    [[-r]               [--hpx:run-agas-server]]
+    [[-t]               [--hpx:threads]]
+    [[-v]               [--hpx:version]]
+    [[--version]        [--hpx:version]]
+    [[-w]               [--hpx:worker]]
+    [[-x]               [--hpx:hpx]]
+    [[-0]               [--hpx:node=0]]
+    [[-1]               [--hpx:node=1]]
+    [[-2]               [--hpx:node=2]]
+    [[-3]               [--hpx:node=3]]
+    [[-4]               [--hpx:node=4]]
+    [[-5]               [--hpx:node=5]]
+    [[-6]               [--hpx:node=6]]
+    [[-7]               [--hpx:node=7]]
+    [[-8]               [--hpx:node=8]]
+    [[-9]               [--hpx:node=9]]
+]
+
 [endsect] [/ Command Line Handling]
 
 [endsect]

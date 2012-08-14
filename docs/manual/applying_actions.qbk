@@ -264,7 +264,7 @@ communication latencies.
 
 [endsect] [/ Action Invocation]
 
-[section:action_exception_handling Action Exception Handling]
+[section:action_error_handling Action Error Handling]
 
 Like in any other asynchronous invocation scheme it is important to be able to
 handle error conditions occurring while the asynchronous (and possibly remote)
@@ -280,6 +280,10 @@ it is rethrown during synchronization with the calling thread.
            the execution of an asynchronous action /without/ synchronization
            will result in calling `hpx::terminate`, causing the running
            application to exit immediately.]
+
+[note      Even if error handling internally relies on exceptions, most of the
+           API functions exposed by __hpx__ can be used without throwing an
+           exception. Please see __exceptions__ for more information.]
 
 As an example, we will assume that the following remote function will be
 executed:
@@ -334,7 +338,8 @@ function `get()`:
     }
 
 For more information about error handling plese refer to the section
-__exceptions__.
+__exceptions__. There we also explain how to handle error conditions without
+having to rely on exception.
 
 [endsect] [/ Action Exception Handling]
 

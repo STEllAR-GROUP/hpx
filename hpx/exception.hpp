@@ -880,7 +880,7 @@ namespace hpx
     /// \brief Return the (operating system) process id of the locality where
     ///        the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_process_id can be used to extract the
     /// diagnostic information element representing the process id as stored in
     /// the given exception instance.
     ///
@@ -908,7 +908,7 @@ namespace hpx
 
     /// \brief Return the function name from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_function_name can be used to extract the
     /// diagnostic information element representing the name of the function
     /// as stored in the given exception instance.
     ///
@@ -937,7 +937,7 @@ namespace hpx
     /// \brief Return the (source code) file name of the function from which
     ///        the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_file_name can be used to extract the
     /// diagnostic information element representing the name of the source file
     /// as stored in the given exception instance.
     ///
@@ -967,7 +967,7 @@ namespace hpx
     /// \brief Return the line number in the (source code) file of the function
     ///        from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_line_number can be used to extract the
     /// diagnostic information element representing the line number
     /// as stored in the given exception instance.
     ///
@@ -996,7 +996,7 @@ namespace hpx
     /// \brief Return the sequence number of the OS-thread used to execute
     ///        HPX-threads from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_os_thread can be used to extract the
     /// diagnostic information element representing the sequence number  of the
     /// OS-thread as stored in the given exception instance.
     ///
@@ -1026,7 +1026,7 @@ namespace hpx
     /// \brief Return the unique thread id of the HPX-thread from which the
     ///        exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_thread_id can be used to extract the
     /// diagnostic information element representing the HPX-thread id
     /// as stored in the given exception instance.
     ///
@@ -1056,7 +1056,7 @@ namespace hpx
     /// \brief Return any additionally available thread description of the
     ///        HPX-thread from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_thread_description can be used to extract the
     /// diagnostic information element representing the additional thread
     /// description as stored in the given exception instance.
     ///

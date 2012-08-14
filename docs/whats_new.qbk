@@ -112,7 +112,7 @@ approximately 80 tickets (bugs, feature requests, etc.).
   all relevant localities.
 * Added API functions allowing to access elements of the diagnostic information
   embedded in the given exception: [funcref hpx::get_locality_id]`()`, [funcref hpx::get_host_name]`()`,
-  [funcref hpx::get_pid]`()`, [funcref hpx::get_function_name]`()`, [funcref hpx::get_file_name]`()`,
+  [funcref hpx::get_process_id]`()`, [funcref hpx::get_function_name]`()`, [funcref hpx::get_file_name]`()`,
   [funcref hpx::get_line_number]`()`, [funcref hpx::get_os_thread]`()`, [funcref hpx::get_thread_id]`()`, and
   [funcref hpx::get_thread_description]`()`.
 
