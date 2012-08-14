@@ -19,7 +19,7 @@ set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@
 
 if(NOT MSVC)
   set(HPX_RPATH @external_rpath@ CACHE PATH "Base RPATH for linking against HPX")
-  mark_as_advanced(HPX_RPATH)
+  mark_as_advanced(FORCE HPX_RPATH)
 endif()
 
 set(HPX_LIBRARY_DIR @external_link_directories@ CACHE STRING "HPX library directories")
@@ -34,7 +34,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} @external_cmake_path@)
 
 set(HPX_DEBUG_POSTFIX "d" CACHE STRING "Debug postfix for HPX")
 
-mark_as_advanced(HPX_COMPILE_FLAGS HPX_LIBRARY_DIR HPX_INCLUDE_DIR HPX_PREFIX HPX_DEBUG_POSTFIX)
+mark_as_advanced(FORCE HPX_COMPILE_FLAGS HPX_LIBRARY_DIR HPX_INCLUDE_DIR HPX_PREFIX HPX_DEBUG_POSTFIX)
 
 include(HPX_Utils)
 

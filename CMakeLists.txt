@@ -391,7 +391,7 @@ if(NOT HPX_STACK_SIZE)
 else()
   set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
 endif()
-mark_as_advanced(HPX_STACK_SIZE)
+mark_as_advanced(FORCE HPX_STACK_SIZE)
 
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 

@@ -18,6 +18,7 @@ if(NOT BOOSTWAVE_FOUND)
 else()
     hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created." ON ADVANCED)
     set(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS ${HPX_WAVE_ADDITIONAL_INCLUDE_DIRS} CACHE PATH "Additional (compiler specific) include directories for the wave preprocessing tool.")
+    mark_as_advanced(FORCE HPX_WAVE_ADDITIONAL_INCLUDE_DIRS)
 endif()
 
 set(HPX_PREPROCESS_HEADERS CACHE INTERNAL "" FORCE)
