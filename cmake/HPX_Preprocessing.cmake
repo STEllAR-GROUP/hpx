@@ -70,8 +70,6 @@ else()
         set(HPX_PREPROCESS_INCLUDE_HEADERS)
         foreach(file ${HPX_PREPROCESS_HEADERS})
             set(HPX_PREPROCESS_INCLUDE_HEADERS "${HPX_PREPROCESS_INCLUDE_HEADERS}#include <${file}>\n")
-            hpx_info("preprocessing" "${HPX_PREPROCESS_HEADERS_${file}_LIMIT}")
-            hpx_info("preprocessing" "${HPX_PREPROCESS_HEADERS_${file}_GUARD}")
 
             set(HPX_PREPROCESS_LIMIT ${HPX_PREPROCESS_HEADERS_${file}_LIMIT})
             set(HPX_PREPROCESS_GUARD ${HPX_PREPROCESS_HEADERS_${file}_GUARD})
