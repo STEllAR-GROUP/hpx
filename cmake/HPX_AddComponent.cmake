@@ -125,14 +125,11 @@ macro(add_hpx_component name)
 
   target_link_libraries(${name}_component
     ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
-  if(NOT MSVC)
-    set(prefix "hpx_component_")
-  endif()
 
   if(HPX_FOUND AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-      set(lib_name ${prefix}${name}${HPX_DEBUG_POSTFIX})
+      set(lib_name ${name}${HPX_DEBUG_POSTFIX})
   else()
-      set(lib_name ${prefix}${name})
+      set(lib_name ${name})
   endif()
   # set properties of generated shared library
   set_target_properties(${name}_component PROPERTIES
