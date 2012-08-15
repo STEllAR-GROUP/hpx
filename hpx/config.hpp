@@ -274,7 +274,35 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_DEBUG)
+#if !defined(BOOST_WINDOWS)
+#  if defined(HPX_DEBUG)
+#    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
+      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
+      /**/
+#    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
+      "lib" + n + "d"                                                         \
+      /**/
+#    define HPX_MANGLE_NAME(n)                                                \
+      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
+      /**/
+#    define HPX_MANGLE_NAME_STR(n)                                            \
+      "lib" + n + "d"                                                         \
+      /**/
+#  else
+#    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
+      n                                                                       \
+      /**/
+#    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
+      n                                                                       \
+      /**/
+#    define HPX_MANGLE_NAME(n)                                                \
+      BOOST_PP_CAT(lib, n)                                                    \
+      /**/
+#    define HPX_MANGLE_NAME_STR(n)                                            \
+      "lib" + n                                                               \
+      /**/
+#  endif
+#elif defined(HPX_DEBUG)
 #  define HPX_MANGLE_COMPONENT_NAME(n)      BOOST_PP_CAT(n, d)
 #  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n + "d"
 #  define HPX_MANGLE_NAME(n)                BOOST_PP_CAT(n, d)

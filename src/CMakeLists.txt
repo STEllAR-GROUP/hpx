@@ -440,7 +440,7 @@ macro(add_hpx_runtime_lib target)
 
     set_property(TARGET ${target} APPEND
       PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY=\"${name}\""
+      "HPX_LIBRARY=\"hpx\""
       "HPX_COMPONENT_NAME=hpx"
       "HPX_COMPONENT_STRING=\"hpx\""
       "HPX_EXPORTS"
