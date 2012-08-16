@@ -32,7 +32,7 @@ namespace hpx { namespace lcos
 
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
-    class base_lco
+    class HPX_API_EXPORT base_lco
     {
     protected:
         virtual void set_event () = 0;

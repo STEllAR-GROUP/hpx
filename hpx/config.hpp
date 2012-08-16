@@ -290,10 +290,10 @@
       /**/
 #  else
 #    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      n                                                                       \
+      BOOST_PP_CAT(lib, n)                                                    \
       /**/
 #    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      n                                                                       \
+      "lib" + n                                                               \
       /**/
 #    define HPX_MANGLE_NAME(n)                                                \
       BOOST_PP_CAT(lib, n)                                                    \
