@@ -649,8 +649,8 @@ if(MSVC)
 ################################################################################
 else()
   # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
-  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
-                            NAME copy_dt_needed_entries)
+  #hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
+  #                          NAME copy_dt_needed_entries)
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
@@ -781,6 +781,9 @@ else()
   if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
     hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
   endif()
+  
+  # Check if our libraries have unresolved symbols
+  hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
 
   ##############################################################################
   # GCC-only configuration
@@ -932,7 +935,7 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+        #hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
         hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
