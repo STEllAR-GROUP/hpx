@@ -14,12 +14,11 @@ find_package(HPX_BoostWave)
 
 if(NOT BOOSTWAVE_FOUND)
     hpx_warn("preprocessing" "Boost.Wave is unavailable, automatic preprocessing of header files is disabled. This feature is only needed if you change headers that need to be preprocessed. Set BOOST_ROOT or BOOSTWAVE_ROOT pointing to your Boost.Wave Installation")
-    hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created." OFF ADVANCED)
 else()
-    hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created." ON ADVANCED)
     set(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS ${HPX_WAVE_ADDITIONAL_INCLUDE_DIRS} CACHE PATH "Additional (compiler specific) include directories for the wave preprocessing tool.")
     mark_as_advanced(FORCE HPX_WAVE_ADDITIONAL_INCLUDE_DIRS)
 endif()
+hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
 
 set(HPX_PREPROCESS_HEADERS CACHE INTERNAL "" FORCE)
 set(HPX_PREPROCESS_INCLUDE_DIRS CACHE INTERNAL "" FORCE)
