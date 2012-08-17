@@ -9,6 +9,7 @@
 #include <hpx/include/lcos.hpp>
 
 #include <hpx/include/performance_counters.hpp>
+//#include <hpx/components/memory/mem_counter.hpp>
 #include <examples/performance_counters/mem_counter.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -20,6 +21,24 @@
 #include "sheneos/interpolator.hpp"
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
+
+//namespace read_mem = hpx::performance_counters::memory;
+namespace read_mem = hpx::performance_counters::server;
+void register_counter_type()
+{
+    namespace pc = hpx::performance_counters;
+    pc::install_counter_type(
+        "/memory/count/vm",
+        &read_mem::read_psm_vm,
+        "returns the virtual memory for the pid value of process which calls this counter"
+    );
+    pc::install_counter_type(
+        "/memory/count/resident",
+        &read_mem::read_psm_resident,
+        "returns the virtual memory for the pid value of process which calls this counter"
+    );
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -442,6 +461,9 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+
+    // register memory counters
+    hpx::register_startup_function(&register_counter_type);    
 
     using boost::program_options::options_description;
     using boost::program_options::value;
