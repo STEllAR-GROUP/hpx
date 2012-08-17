@@ -144,7 +144,7 @@ add_hpx_library_headers(hpx_serialization
 # libhpx headers
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
-  EXCLUDE ".*hpx_init.hpp")
+  EXCLUDE ".*(hpx_main|hpx_init).hpp")
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/preprocessed/*.hpp"
   APPEND)
@@ -174,6 +174,9 @@ add_hpx_library_headers(hpx
 # libhpx_init headers
 add_hpx_library_headers(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
+add_hpx_library_headers(hpx_init
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_main.hpp"
+  APPEND)
 
 ################################################################################
 # add headers to preprocessing
