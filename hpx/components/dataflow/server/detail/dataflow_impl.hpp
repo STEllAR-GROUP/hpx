@@ -62,7 +62,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     >
     struct dataflow_impl;
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/components/dataflow/server/detail/preprocessed/dataflow_impl.hpp>
 #else
 
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 }}}}
 

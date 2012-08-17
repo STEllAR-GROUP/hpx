@@ -19,12 +19,10 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/component_action_enum.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -32,46 +30,6 @@
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
-
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
-#  include <hpx/runtime/actions/preprocessed/component_action_enum.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/component_action_enum_" HPX_LIMIT_STR ".hpp")
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-#define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
-        BOOST_PP_CAT(component_action_arg, BOOST_PP_INC(n)) =                 \
-            component_action_base + BOOST_PP_INC(n),                          \
-    /**/
-#define HPX_FUNCTION_RETARG_ENUM(z, n, data)                                  \
-        BOOST_PP_CAT(component_result_action_arg, BOOST_PP_INC(n)) =          \
-            component_result_action_base + BOOST_PP_INC(n),                   \
-    /**/
-
-    enum component_action
-    {
-        /// remotely callable member function identifiers
-        component_action_base = 1000,
-        component_action_arg0 = component_action_base + 0,
-        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_ARG_ENUM, _)
-
-        /// remotely callable member function identifiers with result
-        component_result_action_base = 2000,
-        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
-        component_result_action_arg0 = component_result_action_base + 0
-    };
-
-#undef HPX_FUNCTION_RETARG_ENUM
-#undef HPX_FUNCTION_ARG_ENUM
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic component action types allowing to hold a different

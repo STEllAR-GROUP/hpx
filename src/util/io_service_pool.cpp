@@ -191,16 +191,18 @@ namespace hpx { namespace util
         }
     }
 
-    boost::asio::io_service& io_service_pool::get_io_service()
+    boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
         boost::mutex::scoped_lock l(mtx_);
 
-        // Use a round-robin scheme to choose the next io_service to use.
-        boost::asio::io_service& io_service = *io_services_[next_io_service_];
-        ++next_io_service_;
-        if (next_io_service_ == pool_size_)
-            next_io_service_ = 0;
-        return io_service;
+        if (index == -1) {
+            // Use a round-robin scheme to choose the next io_service to use.
+            index = static_cast<int>(next_io_service_++);
+            if (next_io_service_ == pool_size_)
+                next_io_service_ = 0;
+        }
+
+        return *io_services_[index];
     }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -15,3 +15,18 @@ add_hpx_component(remote_object
 add_hpx_pseudo_dependencies(components.remote_object
                             remote_object_component)
 
+################################################################################
+# add headers to partial_preprocessing
+hpx_partial_preprocess_header(
+    "hpx/components/remote_object/distributed_new.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/components/remote_object/ctor_fun.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+hpx_partial_preprocess_header(
+    "hpx/components/remote_object/new.hpp"
+    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+)
+################################################################################

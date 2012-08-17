@@ -86,7 +86,7 @@ namespace hpx { namespace lcos
                     BOOST_PP_CAT(A, n)>::type>::type const &                  \
     /**/
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/components/dataflow/preprocessed/dataflow.hpp>
 #else
 
@@ -111,7 +111,7 @@ namespace hpx { namespace lcos
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #undef HPX_A
     private:

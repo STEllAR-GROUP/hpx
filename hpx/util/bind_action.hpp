@@ -35,7 +35,7 @@
     typename detail::env_value_type<BOOST_FWD_REF(BOOST_PP_CAT(D, N))>::type  \
 /**/
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/preprocessed/bind_action.hpp>
 #else
 
@@ -59,7 +59,7 @@
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #undef HPX_UTIL_BIND_EVAL
 #undef HPX_UTIL_BIND_REMOVE_REFERENCE

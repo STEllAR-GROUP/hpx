@@ -50,9 +50,10 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)
+    bool get_shutdown(HPX_STD_FUNCTION<void()>& shutdown_func, bool& pre_shutdown)
     {
         shutdown_func = shutdown;
+        pre_shutdown = false;       // run this as late as possible
         return true;
     }
 }

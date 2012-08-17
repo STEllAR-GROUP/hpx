@@ -1,0 +1,17 @@
+// Copyright (c) 2007-2012 Hartmut Kaiser
+// Copyright (c) 2012 Thomas Heller
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+@HPX_PREPROCESS_INCLUDE_HEADERS@
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 2, line: 0, output: "hpx_preprocessed_" HPX_LIMIT_STR ".touch")
+#endif
+
+// This file is used as a build dependency
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif

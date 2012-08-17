@@ -5,7 +5,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
-[section:exceptions Working with Exceptions]
+[section:error_handling Error Handling]
 
 Like in any other asynchronous invocation scheme it is important to be able to
 handle error conditions occurring while the asynchronous (and possibly remote)
@@ -19,6 +19,8 @@ The source code for this example can be found here:
 
 [c++]
 [import ../../examples/quickstart/error_handling.cpp]
+
+[heading:exceptions Working with Exceptions]
 
 For the following description we assume that the function `raise_exception()`
 is executed by invoking the plain action `raise_exception_type`:
@@ -37,7 +39,7 @@ the calling thread tries to wait for the result of the action by invoking
 either `future<>::get()` or the synchronous action invocation wrapper as shown
 here:
 
-[error_handling_diagnostic_information]
+[exception_diagnostic_information]
 
 [note The exception is transferred back to the invocation site even if it is executed
       on a different locality.]
@@ -56,9 +58,40 @@ diagnostics, or to output those using different formatting. For this case, __hpx
 exposes a set of lower level functions as demonstrated in the following code
 snippet:
 
+[exception_diagnostic_elements]
+
+[heading:error_code Working with Error Codes]
+
+Most of the API functions exposed by __hpx__ can be invoked in two different
+modes. By default those will throw an exception on error as described above.
+However, sometimes it is desireable not to throw an exception in case of an
+error condition. In this case an object instance of the `hpx::error_code` type
+can be passed as the last argument to the API function. In case of an error
+the error condition will be returned in that `hpx::error_code` instance. The
+following example demonstrates extracting the full diagnostic information
+without exception handling:
+
+[error_handling_diagnostic_information]
+
+[note The error information is transferred back to the invocation site even if
+      it is executed on a different locality.]
+
+This example show how an error can be handled without having to resolve to
+exceptions and that the returned [classref hpx::error_code `hpx::error_code`]
+instance can be used in a very similar way as the
+[classref hpx::exception `hpx::exception`] type above. Simply pass it to the
+[funcref hpx::diagnostic_information `hpx::diagnostic_information()`] which
+retrieves all available diagnostic information from the error code instance as
+a formatted string.
+
+Under certain circumstances it is desireable to output only some of the
+diagnostics, or to output those using different formatting. For this case, __hpx__
+exposes a set of lower level functions as demonstrated in the following code
+snippet:
+
 [error_handling_diagnostic_elements]
 
-Please refer to the documentation of
+For more information please refer to the documentation of
 [funcref hpx::get_locality_id `hpx::get_locality_id()`],
 [funcref hpx::get_host_name `hpx::get_host_name()`],
 [funcref hpx::get_process_id `hpx::get_process_id()`],

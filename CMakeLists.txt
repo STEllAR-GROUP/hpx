@@ -332,6 +332,8 @@ endif()
 ################################################################################
 hpx_include(Documentation)
 
+hpx_include(Preprocessing)
+
 ################################################################################
 # Warning configuration
 ################################################################################
@@ -389,18 +391,18 @@ if(NOT HPX_STACK_SIZE)
 else()
   set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
 endif()
-mark_as_advanced(HPX_STACK_SIZE)
+mark_as_advanced(FORCE HPX_STACK_SIZE)
 
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 
 ################################################################################
 # Disable the use of partially preprocessed header files
 ################################################################################
-hpx_option(HPX_NO_PREPROCESSED_FILES BOOL "Use preprocessed headers (default: ON)" ON ADVANCED)
+hpx_option(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
 
-if(HPX_NO_PREPROCESSED_FILES)
-  hpx_info("tls" "Use preprocessed headers are disabled.")
-  add_definitions(-DHPX_DONT_USE_PREPROCESSED_FILES)
+if(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+  hpx_info("ppheaders" "Use of preprocessed headers is disabled.")
+  add_definitions(-DHPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 endif()
 
 ################################################################################
@@ -1011,6 +1013,10 @@ if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
+if(HPX_AUTOMATIC_PREPROCESSING)
+  add_subdirectory(preprocess)
+endif()
+
 ################################################################################
 # installation instructions
 ################################################################################
@@ -1253,46 +1259,6 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION lib/pkgconfig)
 endif()
 
-if(DOXYGEN_FOUND)
-  # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
-  set(doxygen_inputs_list
-      "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
-      "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp"
-      "${hpx_SOURCE_DIR}/hpx/exception.hpp"
-      "${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp"
-      "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
-      "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
-      "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
-
-  foreach(doxygen_input ${doxygen_inputs_list})
-    set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
-  endforeach()
-  #hpx_info("doxygen" "${doxygen_inputs}")
-
-  set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
-  set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
-
-  set(doxygen_definition_list
-      "DOXYGEN:=1"
-      "BOOST_SCOPED_ENUM_START(x):=enum x"
-      "BOOST_SCOPED_ENUM_END="
-      "HPX_EXCEPTION_EXPORT="
-      "HPX_EXPORT="
-      "HPX_API_EXPORT="
-      "HPX_STD_FUNCTION=std::function"
-      "extern=")
-
-  foreach(doxygen_predef ${doxygen_definition_list})
-    set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
-  endforeach()
-  #hpx_info("doxygen" "${doxygen_definitions}")
-
-  hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
-  configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
-                 @ONLY)
-endif()
-
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
 
 file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
@@ -1310,4 +1276,5 @@ endif()
 
 unset(HPX_UNIT_TEST_LIST CACHE)
 unset(HPX_REGRESSION_TEST_LIST CACHE)
+
 

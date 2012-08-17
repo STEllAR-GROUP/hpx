@@ -27,7 +27,7 @@
 #endif
 
 #if !defined(BOOST_COROUTINE_NUM_HEAPS)
-#  define BOOST_COROUTINE_NUM_HEAPS    41
+#  define BOOST_COROUTINE_NUM_HEAPS    7
 #endif
 
 #endif

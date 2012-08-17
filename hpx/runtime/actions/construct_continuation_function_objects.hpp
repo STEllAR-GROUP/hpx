@@ -29,7 +29,7 @@ namespace detail
     struct construct_continuation_thread_functionN;
 }
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/actions/preprocessed/construct_continuation_function_objects.hpp>
 #else
 
@@ -58,7 +58,7 @@ namespace detail
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #endif
 

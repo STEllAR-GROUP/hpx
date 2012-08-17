@@ -227,102 +227,105 @@ namespace boost { namespace serialization
             ar & err_value & err_message;
         }
 
-        try {
-            switch (type) {
-            case hpx::util::std_exception:
-            case hpx::util::unknown_exception:
-                hpx::detail::rethrow_exception(hpx::detail::std_exception(what),
+        switch (type) {
+        case hpx::util::std_exception:
+        case hpx::util::unknown_exception:
+            e = hpx::detail::construct_exception(
+                    hpx::detail::std_exception(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            // standard exceptions
-            case hpx::util::std_runtime_error:
-                hpx::detail::rethrow_exception(std::runtime_error(what),
+        // standard exceptions
+        case hpx::util::std_runtime_error:
+            e = hpx::detail::construct_exception(
+                    std::runtime_error(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            case hpx::util::std_invalid_argument:
-                hpx::detail::rethrow_exception(std::invalid_argument(what),
+        case hpx::util::std_invalid_argument:
+            e = hpx::detail::construct_exception(
+                    std::invalid_argument(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            case hpx::util::std_out_of_range:
-                hpx::detail::rethrow_exception(std::out_of_range(what),
+        case hpx::util::std_out_of_range:
+            e = hpx::detail::construct_exception(
+                    std::out_of_range(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            case hpx::util::std_logic_error:
-                hpx::detail::rethrow_exception(std::logic_error(what),
+        case hpx::util::std_logic_error:
+            e = hpx::detail::construct_exception(
+                    std::logic_error(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            case hpx::util::std_bad_alloc:
-                hpx::detail::rethrow_exception(hpx::detail::bad_alloc(what),
+        case hpx::util::std_bad_alloc:
+            e = hpx::detail::construct_exception(
+                    hpx::detail::bad_alloc(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
 #ifndef BOOST_NO_TYPEID
-            case hpx::util::std_bad_cast:
-                hpx::detail::rethrow_exception(hpx::detail::bad_cast(what),
+        case hpx::util::std_bad_cast:
+            e = hpx::detail::construct_exception(
+                    hpx::detail::bad_cast(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            case hpx::util::std_bad_typeid:
-                hpx::detail::rethrow_exception(hpx::detail::bad_typeid(what),
+        case hpx::util::std_bad_typeid:
+            e = hpx::detail::construct_exception(hpx::detail::bad_typeid(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 #endif
-            case hpx::util::std_bad_exception:
-                hpx::detail::rethrow_exception(hpx::detail::bad_exception(what),
+        case hpx::util::std_bad_exception:
+            e = hpx::detail::construct_exception(
+                    hpx::detail::bad_exception(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            // boost exceptions
-            case hpx::util::boost_exception:
-                BOOST_ASSERT(false);    // shouldn't happen
-                break;
+        // boost exceptions
+        case hpx::util::boost_exception:
+            BOOST_ASSERT(false);    // shouldn't happen
+            break;
 
-            // boost::system::system_error
-            case hpx::util::boost_system_error:
-                hpx::detail::rethrow_exception(
+        // boost::system::system_error
+        case hpx::util::boost_system_error:
+            e = hpx::detail::construct_exception(
                     boost::system::system_error(err_value,
                         boost::system::get_system_category(), err_message),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
+            break;
 
-            // hpx::exception
-            case hpx::util::hpx_exception:
-                hpx::detail::rethrow_exception(
+        // hpx::exception
+        case hpx::util::hpx_exception:
+            e = hpx::detail::construct_exception(
                     hpx::exception(static_cast<hpx::error>(err_value),
                         what, hpx::rethrow),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
-                break;
-            }
-        }
-        catch (...) {
-            e = boost::current_exception();
+            break;
         }
     }
 

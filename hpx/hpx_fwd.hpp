@@ -673,8 +673,31 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
+    ///
+    /// The function \a get_num_localities returns the number of localities
+    /// currently connected to the console.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities
     HPX_API_EXPORT boost::uint32_t get_num_localities();
-    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
+
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    ///
+    /// The function \a get_num_localities returns the number of localities
+    /// currently connected to the console which support the creation of the
+    /// given component type.
+    ///
+    /// \param t  The component type for which the number of connected
+    ///           localities should be retrieved.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities
+    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type t);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
@@ -814,7 +837,14 @@ namespace hpx
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    // \brief Test whether the runtime system is currently running.
+    /// \brief Test whether the runtime system is currently running.
+    ///
+    /// This function returns whether the runtime system is currently running
+    /// or not, e.g.  whether the current state of the runtime system is
+    /// \a hpx::runtime::running
+    ///
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         return false otherwise.
     HPX_API_EXPORT bool is_running();
 }
 

@@ -13,7 +13,7 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable_ptr_base.hpp>
 #else
 
@@ -37,7 +37,7 @@
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #endif
 

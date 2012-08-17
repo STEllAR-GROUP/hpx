@@ -1,0 +1,36 @@
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2012 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(@HPX_PREPROCESS_GUARD@)
+#define @HPX_PREPROCESS_GUARD@
+
+#if @HPX_PREPROCESS_LIMIT@  <= 5
+#include <@HPX_PREPROCESS_HEADER@_5.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 10
+#include <@HPX_PREPROCESS_HEADER@_10.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 15
+#include <@HPX_PREPROCESS_HEADER@_15.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 20
+#include <@HPX_PREPROCESS_HEADER@_20.hpp>
+/*
+#elif @HPX_PREPROCESS_LIMIT@ <= 25
+#include <@HPX_PREPROCESS_HEADER@_25.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 30
+#include <@HPX_PREPROCESS_HEADER@_30.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 35
+#include <@HPX_PREPROCESS_HEADER@_35.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 40
+#include <@HPX_PREPROCESS_HEADER@_40.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 45
+#include <@HPX_PREPROCESS_HEADER@_45.hpp>
+#elif @HPX_PREPROCESS_LIMIT@ <= 50
+#include <@HPX_PREPROCESS_HEADER@_50.hpp>
+*/
+#else
+#error "@HPX_PREPROCESS_LIMIT@ out of bounds for preprocessed headers"
+#endif
+
+#endif

@@ -119,10 +119,11 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 namespace dataflow_module
 {
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
     {
         // return our startup-function if performance counters are required
         startup_func = hpx::lcos::server::detail::register_counter_types;
+        pre_startup = true;  // run 'register_counter_types' as pre-startup function
         return true;
     }
 }
