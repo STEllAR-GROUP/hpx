@@ -62,7 +62,10 @@ namespace hpx { namespace util
         void clear();
 
         /// \brief Get an io_service to use.
-        boost::asio::io_service& get_io_service();
+        boost::asio::io_service& get_io_service(int index = -1);
+
+        /// \brief Get number of threads associated with this I/O service.
+        std::size_t size() const { return pool_size_; }
 
     protected:
         ///

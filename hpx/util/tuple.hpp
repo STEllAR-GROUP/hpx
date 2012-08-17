@@ -213,7 +213,7 @@ namespace boost {
     }
 }
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/preprocessed/tuple.hpp>
 #else
 
@@ -237,7 +237,7 @@ namespace boost {
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #undef M0
 #undef M1

@@ -878,7 +878,9 @@ namespace hpx { namespace components { namespace server
             std::string instance (i->second.get_name());
             std::string component;
 
-            if (i->second.has_entry("name"))
+            if (i->second.has_entry("mangledname"))
+                component = i->second.get_entry("mangledname");
+            else if (i->second.has_entry("name"))
                 component = HPX_MANGLE_COMPONENT_NAME_STR(i->second.get_entry("name"));
             else
                 component = HPX_MANGLE_COMPONENT_NAME_STR(instance);
@@ -995,12 +997,24 @@ namespace hpx { namespace components { namespace server
                 startup_shutdown(pf.create("startup_shutdown"));
 
             startup_function_type startup;
-            if (startup_shutdown->get_startup_function(startup))
-                pre_startup_functions_.push_back(startup);
+            bool pre_startup = true;
+            if (startup_shutdown->get_startup_function(startup, pre_startup))
+            {
+                if (pre_startup)
+                    pre_startup_functions_.push_back(startup);
+                else
+                    startup_functions_.push_back(startup);
+            }
 
             shutdown_function_type s;
-            if (startup_shutdown->get_shutdown_function(s))
-                shutdown_functions_.push_back(s);
+            bool pre_shutdown = false;
+            if (startup_shutdown->get_shutdown_function(s, pre_shutdown))
+            {
+                if (pre_shutdown)
+                    pre_shutdown_functions_.push_back(s);
+                else
+                    shutdown_functions_.push_back(s);
+            }
         }
         catch (hpx::exception const&) {
             throw;
@@ -1068,10 +1082,6 @@ namespace hpx { namespace components { namespace server
             // get the handle of the library
             boost::plugin::dll d (lib.string(), component);
 
-            // get the factory
-            boost::plugin::plugin_factory<component_factory_base> pf (d,
-                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(factory)));
-
             // initialize the factory instance using the preferences from the
             // ini files
             util::section const* glob_ini = NULL;
@@ -1083,39 +1093,49 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            // create the component factory object
-            boost::shared_ptr<component_factory_base> factory (
-                pf.create(instance, glob_ini, component_ini, isenabled));
+            if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0")) {
+                // get the factory
+                boost::plugin::plugin_factory<component_factory_base> pf (d,
+                    BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(factory)));
 
-            component_type t = factory->get_component_type(
-                prefix, agas_client);
-            if (0 == t) {
-                LRT_(info) << "component refused to load: "  << instance;
-                return false;   // module refused to load
-            }
+                // create the component factory object, if not disabled
+                boost::shared_ptr<component_factory_base> factory (
+                    pf.create(instance, glob_ini, component_ini, isenabled));
 
-            // store component factory and module for later use
-            component_factory_type data(factory, d, isenabled);
-            std::pair<component_map_type::iterator, bool> p =
-                components_.insert(component_map_type::value_type(t, data));
-
-            if (components::get_derived_type(t) != 0) {
-            // insert three component types, the base type, the derived
-            // type and the combined one.
-                if (p.second) {
-                    p = components_.insert(component_map_type::value_type(
-                            components::get_derived_type(t), data));
+                component_type t = factory->get_component_type(
+                    prefix, agas_client);
+                if (0 == t) {
+                    LRT_(info) << "component refused to load: "  << instance;
+                    return false;   // module refused to load
                 }
-                if (p.second) {
-                    components_.insert(component_map_type::value_type(
-                            components::get_base_type(t), data));
-                }
-            }
 
-            if (!p.second) {
-                LRT_(fatal) << "duplicate component id: " << instance
-                    << ": " << components::get_component_type_name(t);
-                return false;   // duplicate component id?
+                // store component factory and module for later use
+                component_factory_type data(factory, d, isenabled);
+                std::pair<component_map_type::iterator, bool> p =
+                    components_.insert(component_map_type::value_type(t, data));
+
+                if (components::get_derived_type(t) != 0) {
+                // insert three component types, the base type, the derived
+                // type and the combined one.
+                    if (p.second) {
+                        p = components_.insert(component_map_type::value_type(
+                                components::get_derived_type(t), data));
+                    }
+                    if (p.second) {
+                        components_.insert(component_map_type::value_type(
+                                components::get_base_type(t), data));
+                    }
+                }
+
+                if (!p.second) {
+                    LRT_(fatal) << "duplicate component id: " << instance
+                        << ": " << components::get_component_type_name(t);
+                    return false;   // duplicate component id?
+                }
+
+                LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                           << ": " << instance << ": "
+                           << components::get_component_type_name(t);
             }
 
             // make sure startup/shutdown registration is called once for each
@@ -1125,10 +1145,6 @@ namespace hpx { namespace components { namespace server
                 load_commandline_options(d, options);
                 load_startup_shutdown_functions(d);
             }
-
-            LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                       << ": " << instance << ": "
-                       << components::get_component_type_name(t);
         }
         catch (hpx::exception const&) {
             throw;

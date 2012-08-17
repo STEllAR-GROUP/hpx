@@ -25,11 +25,11 @@
 #define HPX_PP_DO_ROUND_UP_8()  10
 #define HPX_PP_DO_ROUND_UP_9()  10
 #define HPX_PP_DO_ROUND_UP_10() 10
-#define HPX_PP_DO_ROUND_UP_11() 20
-#define HPX_PP_DO_ROUND_UP_12() 20
-#define HPX_PP_DO_ROUND_UP_13() 20
-#define HPX_PP_DO_ROUND_UP_14() 20
-#define HPX_PP_DO_ROUND_UP_15() 20
+#define HPX_PP_DO_ROUND_UP_11() 15
+#define HPX_PP_DO_ROUND_UP_12() 15
+#define HPX_PP_DO_ROUND_UP_13() 15
+#define HPX_PP_DO_ROUND_UP_14() 15
+#define HPX_PP_DO_ROUND_UP_15() 15
 #define HPX_PP_DO_ROUND_UP_16() 20
 #define HPX_PP_DO_ROUND_UP_17() 20
 #define HPX_PP_DO_ROUND_UP_18() 20

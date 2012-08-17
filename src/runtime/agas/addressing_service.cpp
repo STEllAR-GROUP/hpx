@@ -1472,9 +1472,7 @@ void addressing_service::update_cache(
 { // {{{
     if (!caching_)
     {
-        HPX_THROWS_IF(ec, service_unavailable
-          , "addressing_service::update_cache"
-          , "AGAS caching is disabled");
+        // if caching is disabled, we silently pretend success
         return;
     }
 
@@ -1518,9 +1516,7 @@ void addressing_service::update_cache(
 { // {{{
     if (!caching_)
     {
-        HPX_THROWS_IF(ec, service_unavailable
-          , "addressing_service::update_cache"
-          , "AGAS caching is disabled");
+        // if caching is disabled, we silently pretend success
         return;
     }
 

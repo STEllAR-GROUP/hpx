@@ -112,7 +112,7 @@ approximately 80 tickets (bugs, feature requests, etc.).
   all relevant localities.
 * Added API functions allowing to access elements of the diagnostic information
   embedded in the given exception: [funcref hpx::get_locality_id]`()`, [funcref hpx::get_host_name]`()`,
-  [funcref hpx::get_pid]`()`, [funcref hpx::get_function_name]`()`, [funcref hpx::get_file_name]`()`,
+  [funcref hpx::get_process_id]`()`, [funcref hpx::get_function_name]`()`, [funcref hpx::get_file_name]`()`,
   [funcref hpx::get_line_number]`()`, [funcref hpx::get_os_thread]`()`, [funcref hpx::get_thread_id]`()`, and
   [funcref hpx::get_thread_description]`()`.
 
@@ -137,7 +137,7 @@ Here is a list of the important tickets we closed for this release:
          unaware of this
 * #231 - Implement movable `boost::bind`
 * #232 - Implement movable `boost::function`
-* #236 - Allow binding [classref hpx::util::functions] to actions
+* #236 - Allow binding [classref hpx::util::function] to actions
 * #239 - Replace [^hpx::function] with [classref hpx::util::function]
 * #240 - Can't specify RemoteResult with lcos::async
 * #242 - REGISTER_TEMPLATE support for plain actions

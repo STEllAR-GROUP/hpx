@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace remote_object
     >::type BOOST_PP_CAT(a, N);                                                 \
 /**/
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/components/remote_object/preprocessed/ctor_fun.hpp>
 #else
 
@@ -103,7 +103,7 @@ namespace hpx { namespace components { namespace remote_object
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #undef HPX_REMOTE_OBJECT_M0
 #undef HPX_REMOTE_OBJECT_M1

@@ -536,4 +536,59 @@ namespace hpx { namespace util
 
         return retrieve_commandline_arguments(desc_commandline, vm);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::string embed_in_quotes(std::string const& s)
+    {
+        std::string result;
+        char quote = (s.find_first_of("\"") != std::string::npos) ? '\'' : '\"';
+
+        if (s.find_first_of("\t ") != std::string::npos)
+            return quote + s + quote;
+        return s;
+    }
+
+    void add_as_option(std::string& command_line, std::string const& k, 
+        std::string const& v)
+    {
+        command_line += "--" + k;
+        if (!v.empty()) 
+            command_line += "=" + v;
+    }
+
+    std::string 
+    reconstruct_command_line(boost::program_options::variables_map const &vm)
+    {
+        typedef std::pair<std::string, boost::program_options::variable_value> 
+            value_type;
+
+        std::string command_line;
+        BOOST_FOREACH(value_type const& v, vm)
+        {
+            boost::any const& value = v.second.value();
+            if (boost::any_cast<std::string>(&value)) {
+                add_as_option(command_line, v.first, 
+                    embed_in_quotes(v.second.as<std::string>()));
+            } 
+            else if (boost::any_cast<double>(&value)) {
+                add_as_option(command_line, v.first, 
+                    boost::lexical_cast<std::string>(v.second.as<double>()));
+            }
+            else if (boost::any_cast<int>(&value)) {
+                add_as_option(command_line, v.first, 
+                    boost::lexical_cast<std::string>(v.second.as<int>()));
+            }
+            else if (boost::any_cast<std::vector<std::string> >(&value)) {
+                std::vector<std::string> const& vec = 
+                    v.second.as<std::vector<std::string> >();
+                BOOST_FOREACH(std::string const& e, vec)
+                {
+                    add_as_option(command_line, v.first, embed_in_quotes(e));
+                }
+            }
+            if (!command_line.empty())
+                command_line += " ";
+        }
+        return command_line;
+    }
 }}

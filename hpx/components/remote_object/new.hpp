@@ -55,7 +55,7 @@ namespace hpx { namespace components
         return p.get_future();
     }
 
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/components/remote_object/preprocessed/new.hpp>
 #else
 
@@ -81,7 +81,7 @@ namespace hpx { namespace components
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 }}
 

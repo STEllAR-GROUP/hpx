@@ -30,6 +30,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    /// \cond NOINTERNAL
+    // forward declaration
+    class error_code;
+    class exception;
+    /// \endcond
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Generic error_conditions
     enum error
@@ -82,7 +88,7 @@ namespace hpx
         thread_not_interruptable = 46,
         duplicate_component_id = 47,
 
-        ///\cond NOINTERNAL
+        /// \cond NOINTERNAL
         last_error,
         error_upper_bound = 0x7fffL   // force this enum type to be at least 16 bits.
         /// \endcond
@@ -176,6 +182,10 @@ namespace hpx
                 return "";
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        boost::exception_ptr access_exception(error_code const&);
+
     } // namespace detail
     /// \endcond
 
@@ -220,6 +230,19 @@ namespace hpx
     }
     /// \endcond
 
+    /// \cond NODETAIL
+    namespace detail
+    {
+        // main function for throwing exceptions
+        template <typename Exception>
+        HPX_EXPORT boost::exception_ptr
+            get_exception(Exception const& e,
+                std::string const& func = "<unknown>",
+                std::string const& file = "<unknown>",
+                long line = -1);
+    }
+    /// \endcond
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hpx::error_code represents an arbitrary error condition.
     ///
@@ -250,20 +273,32 @@ namespace hpx
         ///
         /// \param e      The parameter \p e holds the hpx::error code the new
         ///               exception should encapsulate.
-        /// \param msg    The parameter \p msg holds the error message the new
-        ///               exception should encapsulate.
         /// \param mode   The parameter \p mode specifies whether the constructed
         ///               hpx::error_code belongs to the error category
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
         ///
-        /// \throws std#bad_alloc (if allocation of a copy of
-        ///         the passed string fails).
-        explicit error_code(error e, char const* msg = "", throwmode mode = plain)
-          : boost::system::error_code(make_system_error_code(e, mode))
-          , message_(msg)
-        {}
+        /// \throws nothing
+        inline explicit error_code(error e, throwmode mode = plain);
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param func   The name of the function where the error was raised.
+        /// \param file   The file name of the code where the error was raised.
+        /// \param line   The line number of the code line where the error was
+        ///               raised.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws nothing
+        inline error_code(error e, std::string const& func,
+                std::string const& file, long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
         ///
@@ -279,18 +314,86 @@ namespace hpx
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        error_code(error e, std::string const& msg, throwmode mode = plain)
-          : boost::system::error_code(make_system_error_code(e, mode))
-          , message_(msg)
-        {}
+        inline error_code(error e, char const* msg, throwmode mode = plain);
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param func   The name of the function where the error was raised.
+        /// \param file   The file name of the code where the error was raised.
+        /// \param line   The line number of the code line where the error was
+        ///               raised.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
+        inline error_code(error e, char const* msg, std::string const& func,
+                std::string const& file, long line, throwmode mode = plain);
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
+        inline error_code(error e, std::string const& msg, throwmode mode = plain);
+
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx::error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param func   The name of the function where the error was raised.
+        /// \param file   The file name of the code where the error was raised.
+        /// \param line   The line number of the code line where the error was
+        ///               raised.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
+        inline error_code(error e, std::string const& msg, std::string const& func,
+                std::string const& file, long line, throwmode mode = plain);
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///
         /// \throws nothing
-        std::string const& get_message() const { return message_; }
+        inline std::string get_message() const;
+
+        /// \brief Clear this error_code object.
+        /// The postconditions of invoking this method are
+        /// * value() == hpx::success and category() == hpx::get_hpx_category()
+        void clear()
+        {
+            this->boost::system::error_code::assign(success, get_hpx_category());
+            exception_ = boost::exception_ptr();
+        }
 
     private:
-        std::string message_;
+        friend boost::exception_ptr detail::access_exception(error_code const&);
+        friend class exception;
+
+        inline error_code(int err, hpx::exception const& e);
+        boost::exception_ptr exception_;
     };
 
     /// \brief Predefined error_code object used as "throw on error" tag.
@@ -320,7 +423,13 @@ namespace hpx
     inline error_code
     make_error_code(error e, throwmode mode = plain)
     {
-        return error_code(e, "", mode);
+        return error_code(e, mode);
+    }
+    inline error_code
+    make_error_code(error e, std::string const& func, std::string const& file,
+        long line, throwmode mode = plain)
+    {
+        return error_code(e, func, file, line, mode);
     }
 
     /// \brief Returns error_code(e, msg, mode).
@@ -329,6 +438,12 @@ namespace hpx
     {
         return error_code(e, msg, mode);
     }
+    inline error_code
+    make_error_code(error e, char const* msg, std::string const& func,
+        std::string const& file, long line, throwmode mode = plain)
+    {
+        return error_code(e, msg, func, file, line, mode);
+    }
 
     /// \brief Returns error_code(e, msg, mode).
     inline error_code
@@ -336,12 +451,19 @@ namespace hpx
     {
         return error_code(e, msg, mode);
     }
+    inline error_code
+    make_error_code(error e, std::string const& msg, std::string const& func,
+        std::string const& file, long line, throwmode mode = plain)
+    {
+        return error_code(e, msg, func, file, line, mode);
+    }
     ///@}
 
     /// \brief Returns error_code(hpx::success, "success", mode).
-    inline error_code make_success_code(throwmode mode = plain)
+    inline error_code
+    make_success_code(throwmode mode = plain)
     {
-        return error_code(success, "success", mode);
+        return error_code(mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -439,9 +561,8 @@ namespace hpx
         ///               (if mode is \a rethrow).
         error_code get_error_code(throwmode mode = plain) const throw()
         {
-            return make_error_code(static_cast<error>(
-                this->boost::system::system_error::code().value()),
-                this->boost::system::system_error::what(), mode);
+            return error_code(this->boost::system::system_error::code().value(),
+                *this);
         }
     };
 
@@ -611,15 +732,15 @@ namespace hpx
         typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
             throw_stacktrace;
 
-        // rethrow an exception, internal helper
+        // construct an exception, internal helper
         template <typename Exception>
-        BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
-        void rethrow_exception(Exception const& e,
-            std::string const& func, std::string const& file, long line,
-            std::string const& back_trace, boost::uint32_t node = 0,
-            std::string const& hostname = "", boost::int64_t pid = -1,
-            std::size_t shepherd = ~0, std::size_t thread_id = 0,
-            std::string const& thread_name = "");
+        HPX_EXPORT boost::exception_ptr
+            construct_exception(Exception const& e,
+                std::string const& func, std::string const& file, long line,
+                std::string const& back_trace, boost::uint32_t node = 0,
+                std::string const& hostname = "", boost::int64_t pid = -1,
+                std::size_t shepherd = ~0, std::size_t thread_id = 0,
+                std::string const& thread_name = "");
 
         // main function for throwing exceptions
         template <typename Exception>
@@ -662,8 +783,8 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \returns    The formatted string holding all of the available
     ///             diagnostic information stored in the given exception
@@ -679,6 +800,10 @@ namespace hpx
     ///             \a hpx::get_thread_description()
     ///
     HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
+
+    /// \copydoc diagnostic_information(hpx::exception const& e)
+    HPX_EXPORT std::string diagnostic_information(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
     HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
@@ -697,8 +822,8 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \returns    The locality id of the locality where the exception was
     ///             thrown. If the exception instance does not hold
@@ -714,6 +839,10 @@ namespace hpx
     ///             \a hpx::get_thread_description()
     ///
     HPX_EXPORT boost::uint32_t get_locality_id(hpx::exception const& e);
+
+    /// \copydoc get_locality_id(hpx::exception const& e)
+    HPX_EXPORT boost::uint32_t get_locality_id(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception const& e);
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception_ptr const& e);
@@ -729,8 +858,8 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \returns    The hostname of the locality where the exception was
     ///             thrown. If the exception instance does not hold
@@ -739,6 +868,10 @@ namespace hpx
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_host_name(hpx::exception const& e);
+
+    /// \copydoc get_host_name(hpx::exception const& e)
+    HPX_EXPORT std::string get_host_name(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_host_name(boost::exception const& e);
     HPX_EXPORT std::string get_host_name(boost::exception_ptr const& e);
@@ -747,7 +880,7 @@ namespace hpx
     /// \brief Return the (operating system) process id of the locality where
     ///        the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_process_id can be used to extract the
     /// diagnostic information element representing the process id as stored in
     /// the given exception instance.
     ///
@@ -758,12 +891,16 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
     ///
     HPX_EXPORT boost::int64_t get_process_id(hpx::exception const& e);
+
+    /// \copydoc get_process_id(hpx::exception const& e)
+    HPX_EXPORT boost::int64_t get_process_id(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT boost::int64_t get_process_id(boost::exception const& e);
     HPX_EXPORT boost::int64_t get_process_id(boost::exception_ptr const& e);
@@ -771,7 +908,7 @@ namespace hpx
 
     /// \brief Return the function name from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_function_name can be used to extract the
     /// diagnostic information element representing the name of the function
     /// as stored in the given exception instance.
     ///
@@ -782,12 +919,16 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
-    /// \throws     std#bad_alloc (if one of teh required allocations fails)
+    /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_function_name(hpx::exception const& e);
+
+    /// \copydoc get_function_name(hpx::exception const& e)
+    HPX_EXPORT std::string get_function_name(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_function_name(boost::exception const& e);
     HPX_EXPORT std::string get_function_name(boost::exception_ptr const& e);
@@ -796,7 +937,7 @@ namespace hpx
     /// \brief Return the (source code) file name of the function from which
     ///        the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_file_name can be used to extract the
     /// diagnostic information element representing the name of the source file
     /// as stored in the given exception instance.
     ///
@@ -808,12 +949,16 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
-    /// \throws     std#bad_alloc (if one of teh required allocations fails)
+    /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_file_name(hpx::exception const& e);
+
+    /// \copydoc get_file_name(hpx::exception const& e)
+    HPX_EXPORT std::string get_file_name(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_file_name(boost::exception const& e);
     HPX_EXPORT std::string get_file_name(boost::exception_ptr const& e);
@@ -822,7 +967,7 @@ namespace hpx
     /// \brief Return the line number in the (source code) file of the function
     ///        from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_line_number can be used to extract the
     /// diagnostic information element representing the line number
     /// as stored in the given exception instance.
     ///
@@ -833,12 +978,16 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
     ///
     HPX_EXPORT int get_line_number(hpx::exception const& e);
+
+    /// \copydoc get_line_number(hpx::exception const& e)
+    HPX_EXPORT int get_line_number(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT int get_line_number(boost::exception const& e);
     HPX_EXPORT int get_line_number(boost::exception_ptr const& e);
@@ -847,7 +996,7 @@ namespace hpx
     /// \brief Return the sequence number of the OS-thread used to execute
     ///        HPX-threads from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_os_thread can be used to extract the
     /// diagnostic information element representing the sequence number  of the
     /// OS-thread as stored in the given exception instance.
     ///
@@ -859,12 +1008,16 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
     ///
     HPX_EXPORT std::size_t get_os_thread(hpx::exception const& e);
+
+    /// \copydoc get_os_thread(hpx::exception const& e)
+    HPX_EXPORT std::size_t get_os_thread(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::size_t get_os_thread(boost::exception const& e);
     HPX_EXPORT std::size_t get_os_thread(boost::exception_ptr const& e);
@@ -873,7 +1026,7 @@ namespace hpx
     /// \brief Return the unique thread id of the HPX-thread from which the
     ///        exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_thread_id can be used to extract the
     /// diagnostic information element representing the HPX-thread id
     /// as stored in the given exception instance.
     ///
@@ -885,12 +1038,16 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
     ///
     HPX_EXPORT std::size_t get_thread_id(hpx::exception const& e);
+
+    /// \copydoc get_thread_id(hpx::exception const& e)
+    HPX_EXPORT std::size_t get_thread_id(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::size_t get_thread_id(boost::exception const& e);
     HPX_EXPORT std::size_t get_thread_id(boost::exception_ptr const& e);
@@ -899,7 +1056,7 @@ namespace hpx
     /// \brief Return any additionally available thread description of the
     ///        HPX-thread from which the exception was thrown.
     ///
-    /// The function \a hpx::get_host_name can be used to extract the
+    /// The function \a hpx::get_thread_description can be used to extract the
     /// diagnostic information element representing the additional thread
     /// description as stored in the given exception instance.
     ///
@@ -911,16 +1068,102 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: hpx::exception, \a boost::exception,
-    ///             or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
     ///
-    /// \throws     std#bad_alloc (if one of teh required allocations fails)
+    /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
     HPX_EXPORT std::string get_thread_description(hpx::exception const& e);
+
+    /// \copydoc get_thread_description(hpx::exception const& e)
+    HPX_EXPORT std::string get_thread_description(hpx::error_code const& e);
+
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_thread_description(boost::exception const& e);
     HPX_EXPORT std::string get_thread_description(boost::exception_ptr const& e);
     /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    // \cond NOINTERNAL
+    inline error_code::error_code(error e, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success)
+            exception_ = detail::get_exception(hpx::exception(e, "", mode));
+    }
+
+    inline error_code::error_code(error e, std::string const& func,
+            std::string const& file, long line, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success) {
+            exception_ = detail::get_exception(hpx::exception(e, "", mode),
+                func, file, line);
+        }
+    }
+
+    inline error_code::error_code(error e, char const* msg, throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success)
+            exception_ = detail::get_exception(hpx::exception(e, msg, mode));
+    }
+
+    inline error_code::error_code(error e, char const* msg,
+            std::string const& func, std::string const& file, long line,
+            throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success) {
+            exception_ = detail::get_exception(hpx::exception(e, msg, mode),
+                func, file, line);
+        }
+    }
+
+    inline error_code::error_code(error e, std::string const& msg,
+            throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success)
+            exception_ = detail::get_exception(hpx::exception(e, msg, mode));
+    }
+
+    inline error_code::error_code(error e, std::string const& msg,
+            std::string const& func, std::string const& file, long line,
+            throwmode mode)
+      : boost::system::error_code(make_system_error_code(e, mode))
+    {
+        if (e != success) {
+            exception_ = detail::get_exception(hpx::exception(e, msg, mode),
+                func, file, line);
+        }
+    }
+
+    inline error_code::error_code(int err, hpx::exception const& e)
+    {
+        this->boost::system::error_code::assign(err, get_hpx_category());
+        try {
+            throw e;
+        }
+        catch (...) {
+            exception_ = boost::current_exception();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::string error_code::get_message() const
+    {
+        if (exception_) {
+            try {
+                boost::rethrow_exception(exception_);
+            }
+            catch (boost::exception const& be) {
+                return dynamic_cast<std::exception const*>(&be)->what();
+            }
+        }
+        return "";
+    }
+    // \endcond
 }
 
 /// \cond NOEXTERNAL
@@ -963,7 +1206,8 @@ namespace boost
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
         boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
-        hpx::detail::throw_exception(except(static_cast<hpx::error>(errcode), msg, mode),  \
+        hpx::detail::throw_exception(                                         \
+            except(static_cast<hpx::error>(errcode), msg, mode),              \
             func, p__.string(), __LINE__);                                    \
     }                                                                         \
     /**/
@@ -984,7 +1228,9 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
         } else {                                                              \
-            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
+            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg, f,    \
+                p__.string(), __LINE__, hpx::rethrow);                        \
         }                                                                     \
     }                                                                         \
     /**/
@@ -1004,7 +1250,9 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);        \
         } else {                                                              \
-            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
+            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg,       \
+                BOOST_CURRENT_FUNCTION, p__.string(), __LINE__);              \
         }                                                                     \
     }                                                                         \
     /**/
@@ -1012,9 +1260,11 @@ namespace boost
 #define HPX_RETHROWS_IN_CURRENT_FUNC_IF(ec, errcode, msg)                     \
     {                                                                         \
         if (&ec == &hpx::throws) {                                            \
-            HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
+            HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);      \
         } else {                                                              \
-            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
+            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg,       \
+                BOOST_CURRENT_FUNCTION, p__.string(), __LINE__, hpx::rethrow);\
         }                                                                     \
     }                                                                         \
     /**/
@@ -1056,23 +1306,25 @@ namespace boost
 /// \brief Either throw a hpx::exception or initialize \a hpx::error_code from
 ///        the given parameters
 ///
-/// The macro \a HPX_THROWS_IF can be used to either throw a hpx::exception
+/// The macro \a HPX_THROWS_IF can be used to either throw a \a hpx::exception
 /// or to initialize a \a hpx::error_code from the given parameters. If
 /// &ec == &hpx::throws, the semantics of this macro are equivalent to
 /// \a HPX_THROW_EXCEPTION. If &ec != &hpx::throws, the \a hpx::error_code
 /// instance \p ec is initialized instead.
 ///
-/// The parameter \p errcode holds the hpx::error code the new exception should
-/// encapsulate. The parameter \p f is expected to hold the name of the
-/// function exception is thrown from and the parameter \p msg holds the error
-/// message the new exception should encapsulate.
+/// The parameter \p errcode holds the hpx::error code from which the new
+/// exception should be initialized. The parameter \p f is expected to hold the
+/// name of the function exception is thrown from and the parameter \p msg
+/// holds the error message the new exception should encapsulate.
 ///
 #define HPX_THROWS_IF(ec, errcode, f, msg)                                    \
     {                                                                         \
         if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, f, msg);                             \
         } else {                                                              \
-            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
+            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg, f,    \
+                p__.string(), __LINE__);                                      \
         }                                                                     \
     }                                                                         \
     /**/

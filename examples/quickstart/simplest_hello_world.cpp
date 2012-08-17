@@ -8,11 +8,9 @@
 // "Hello World!" once. That's all.
 
 //[simplest_hello_world_getting_started
-// Defining HPX_MAIN_IS_HPX_MAIN enables to use the plain C-main below as the
-// direct main HPX entry point.
-#define HPX_MAIN_IS_MAIN
-
-#include <hpx/hpx_init.hpp>
+// Including 'hpx/hpx_main.hpp' instead of the usual 'hpx/hpx_init.hpp' enables 
+// to use the plain C-main below as the direct main HPX entry point.
+#include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>
 
 int main()

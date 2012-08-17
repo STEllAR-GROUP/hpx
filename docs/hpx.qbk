@@ -132,12 +132,16 @@
 [def __loading_ini__            [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 [def __loading_components__     [link hpx.manual.init.configuration.loading_components Loading Components]]
 [def __component_example__      [link hpx.manual.init.configuration.component_example Application Specific Component Example]]
-[def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
+[def __exceptions__             [link hpx.manual.error_handling Error Handling]]
 [def __commandline__            [link hpx.manual.init.commandline __hpx__ Command Line Options]]
 
 [def __counter_names__          [link hpx.manual.performance_counters.names Performance Counter Names]]
 [def __consuming_counters__     [link hpx.manual.performance_counters.consuming Consuming Performance Counters]]
 [def __existing_counters__      [link hpx.manual.performance_counters.counters Existing Performance Counters]]
+
+[def __action_type_definition__ [link hpx.manual.applying_actions.action_type_definition Action Type Definition]]
+[def __action_invocation__      [link hpx.manual.applying_actions.action_invocation Action Invocation]]
+[def __action_error_handling__  [link hpx.manual.applying_actions.action_error_handling Action Error Handling ]]
 
 [/ Do not add any whitespace between [str]and the template body, it ends upin the
    generated docs, which may cause unwanted effects.]

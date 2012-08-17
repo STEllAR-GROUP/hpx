@@ -64,5 +64,5 @@ endforeach()
 
 set_target_properties(dataflow_test_exe
     PROPERTIES COMPILE_FLAGS
-    "-DHPX_LIMIT=13")
+    "-DHPX_ACTION_ARGUMENT_LIMIT=10")
 

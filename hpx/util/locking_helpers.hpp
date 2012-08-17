@@ -25,7 +25,7 @@
 #include <boost/thread/locks.hpp>
 
 // boost doesn't have an overload for more than 5 mutexes
-#if !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/preprocessed/locking_helpers.hpp>
 #else
 
@@ -42,7 +42,7 @@
 #  pragma wave option(output: null)
 #endif
 
-#endif // !defined(HPX_DONT_USE_PREPROCESSED_FILES)
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 #endif // HPX_LOCK_LIMIT >= 6
 

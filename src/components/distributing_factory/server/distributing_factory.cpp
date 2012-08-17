@@ -9,6 +9,7 @@
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
 #include <boost/serialization/vector.hpp>
+#include <boost/move/move.hpp>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +23,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         naming::gid_type locality_;
-        std::vector<lcos::future<naming::gid_type> > gids_;
+        lcos::future<std::vector<naming::gid_type > > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -58,7 +59,8 @@ namespace hpx { namespace components { namespace server
         // distribute the number of components to create evenly over all
         // available localities
         typedef std::vector<lazy_result> future_values_type;
-        typedef server::runtime_support::create_component_action action_type;
+        typedef server::runtime_support::bulk_create_components_action
+            action_type;
 
         // start an asynchronous operation for each of the localities
         future_values_type v;
@@ -77,14 +79,11 @@ namespace hpx { namespace components { namespace server
             if (numcreate == 0)
                 break;
 
-            // create one component at a time
+            // create components for each locality in one go
             v.push_back(future_values_type::value_type(fact.get_gid()));
-            for (std::size_t i = 0; i < numcreate; ++i)
-            {
-                lcos::packaged_action<action_type, naming::gid_type> p;
-                p.apply(fact, type, 1);
-                v.back().gids_.push_back(p.get_future());
-            }
+            lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
+            p.apply(fact, type, numcreate);
+            v.back().gids_ = p.get_future();
 
             created_count += numcreate;
             if (created_count >= count)
@@ -94,10 +93,10 @@ namespace hpx { namespace components { namespace server
         // now wait for the results
         remote_result_type results;
 
-        BOOST_FOREACH(lazy_result const& lr, v)
+        BOOST_FOREACH(lazy_result& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
-            lcos::wait(lr.gids_, results.back().gids_);
+            results.back().gids_ = boost::move(lr.gids_.move());
         }
 
         return results;
@@ -143,7 +142,8 @@ namespace hpx { namespace components { namespace server
         // distribute the number of components to create evenly over all
         // available localities
         typedef std::vector<lazy_result> future_values_type;
-        typedef server::runtime_support::create_component_action action_type;
+        typedef server::runtime_support::bulk_create_components_action
+            action_type;
 
         // start an asynchronous operation for each of the localities
         future_values_type v;
@@ -152,26 +152,21 @@ namespace hpx { namespace components { namespace server
              i < localities.size() && j < parts;
              i += parts_delta, ++j)
         {
-            // create one component at a time, overall, 'count' components
-            // for each partition
-            naming::id_type fact(localities[i]);
-
-            v.push_back(future_values_type::value_type(fact.get_gid()));
-            for (std::size_t k = 0; k < count; ++k)
-            {
-                lcos::packaged_action<action_type, naming::gid_type> p;
-                p.apply(fact, type, 1);
-                v.back().gids_.push_back(p.get_future());
-            }
+            // create components for each locality in one go, overall, 'count'
+            // components for each partition
+            v.push_back(future_values_type::value_type(localities[i].get_gid()));
+            lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
+            p.apply(localities[i], type, count);
+            v.back().gids_ = p.get_future();
         }
 
         // now wait for the results
         remote_result_type results;
 
-        BOOST_FOREACH(lazy_result const& lr, v)
+        BOOST_FOREACH(lazy_result& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
-            lcos::wait(lr.gids_, results.back().gids_);
+            results.back().gids_ = boost::move(lr.gids_.move());
         }
 
         return results;

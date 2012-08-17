@@ -22,6 +22,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/plugin.hpp>
 #include <boost/foreach.hpp>
+#include <boost/assign/std/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -197,14 +198,26 @@ namespace hpx { namespace util
                     pf.get_names(names);      // throws on error
 
                     std::vector<std::string> ini_data;
-
-                    // ask all registries
-                    BOOST_FOREACH(std::string const& s, names)
-                    {
-                        // create the component registry object
-                        boost::shared_ptr<components::component_registry_base>
-                            registry (pf.create(s));
-                        registry->get_component_info(ini_data);
+                    if (names.empty()) {
+                        // This HPX module does not export any factories, but
+                        // might export startup/shutdown functions. Create some
+                        // default configuration data.
+                        using namespace boost::assign;
+                        ini_data += std::string("[hpx.components.") + name + "]";
+                        ini_data += "mangledname = " + name;
+                        ini_data += "path = $[hpx.location]/lib/hpx/";
+                        ini_data += "no_factory = 1";
+                        ini_data += "enabled = 1";
+                    }
+                    else {
+                        // ask all registries
+                        BOOST_FOREACH(std::string const& s, names)
+                        {
+                            // create the component registry object
+                            boost::shared_ptr<components::component_registry_base>
+                                registry (pf.create(s));
+                            registry->get_component_info(ini_data);
+                        }
                     }
 
                     // incorporate all information from this module's

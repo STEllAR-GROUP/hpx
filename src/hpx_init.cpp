@@ -742,14 +742,14 @@ namespace hpx
                 return -1;
 
             // store unregistered command line arguments
+            std::string unregistered_options_cmd_line;
             if (!unregistered_options.empty()) {
                 typedef std::vector<std::string>::const_iterator iterator_type;
-                std::string options;
                 iterator_type  end = unregistered_options.end();
                 for (iterator_type  it = unregistered_options.begin(); it != end; ++it)
-                    options += " " + detail::enquote(*it);
+                    unregistered_options_cmd_line += " " + detail::enquote(*it);
                 ini_config += "hpx.unknown_cmd_line=" +
-                    detail::enquote(argv[0]) + options;
+                    detail::enquote(argv[0]) + unregistered_options_cmd_line;
             }
 
             // print version/copyright information
@@ -931,11 +931,6 @@ namespace hpx
                             "is not compatible with --hpx:agas");
                     }
                     node = vm["hpx:node"].as<std::size_t>();
-                    if (1 == num_localities && !vm.count("hpx:localities")) {
-                        throw std::logic_error("Command line option --hpx:node "
-                            "requires to specify the number of localities as "
-                            "well (for instance by using --hpx:localities)");
-                    }
                 }
                 if (env.agas_node() == node) {
                     // console node, by default runs AGAS
@@ -958,7 +953,7 @@ namespace hpx
                 }
                 // store node number in configuration
                 ini_config += "hpx.locality=" +
-                    boost::lexical_cast<std::string>(node + 1);
+                    boost::lexical_cast<std::string>(node);
             }
             else if (mode == hpx::runtime_mode_connect) {
                 // when connecting we need to select a unique port
@@ -1118,6 +1113,10 @@ namespace hpx
             // Store the program name and the command line.
             ini_config += "hpx.program_name=" + std::string(argv[0]);
             ini_config += "hpx.cmd_line=" + cmd_line;
+            ini_config += "hpx.reconstructed_cmd_line=" + 
+                detail::enquote(argv[0]) + " " + 
+                util::reconstruct_command_line(vm) + " " + 
+                unregistered_options_cmd_line;
 
             // Set number of OS threads in configuration.
             ini_config += "hpx.os_threads=" +

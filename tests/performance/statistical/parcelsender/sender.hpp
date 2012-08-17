@@ -77,7 +77,9 @@ public:
             hpx::actions::transfer_action<action_type>* action = 
                 new hpx::actions::transfer_action<action_type>(
                 hpx::threads::thread_priority_normal);
-            parcels[i] = new parcel(destination.get_gid(), action);
+            hpx::naming::address addr;
+            hpx::agas::is_local_address(destination, addr);
+            parcels[i] = new parcel(destination.get_gid(), addr, action);
         }
         
         init_parcels();
@@ -110,15 +112,17 @@ private:
             hpx::actions::transfer_action<action_type>* action = 
                 new hpx::actions::transfer_action<action_type>(
                 hpx::threads::thread_priority_normal);
-            parcels[i] = new parcel(gid, action);
+            hpx::naming::address addr;
+            hpx::agas::is_local_address(destination, addr);
+            parcels[i] = new parcel(gid, addr, action);
         }
     }
 
     void init_parcels(){
-        hpx::naming::address addr;
-        hpx::agas::is_local_address(destination, addr);
+        std::vector<hpx::naming::address> addr(1);
+        hpx::agas::is_local_address(destination, addr[0]);
         for(uint64_t i = 0; i < number; i++){
-            parcels[i]->set_destination_addr(addr);
+            parcels[i]->set_destination_addrs(addr);
         }
     }
     Package** packages;

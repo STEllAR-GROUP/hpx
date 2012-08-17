@@ -219,7 +219,7 @@ namespace performance_counters { namespace sine
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
     {
         // check whether the performance counters need to be enabled
         if (!need_perf_counters()) {
@@ -231,7 +231,8 @@ namespace performance_counters { namespace sine
         }
 
         // return our startup-function if performance counters are required
-        startup_func = startup;
+        startup_func = startup;   // function to run during startup
+        pre_startup = true;       // run 'startup' as pre-startup function
         return true;
     }
 }}
