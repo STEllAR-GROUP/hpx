@@ -7,9 +7,23 @@
 // to use the plain C-main below as the direct main HPX entry point.
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/util.hpp>
+
+#define NUMTESTS 10000
 
 int main(int argc, char* argv[])
 {
+    hpx::util::thread_aware_timer tat;
+
+    double elapsed = 0;
+    for (int i = 0; i < NUMTESTS; ++i) {
+        hpx::util::high_resolution_timer t;
+        tat.elapsed();
+        elapsed += t.elapsed();
+    }
+
+    hpx::cout << "Average time required to query the thread aware timer: "
+              << elapsed/NUMTESTS << "\n" << hpx::flush;
     return 0;
 }
 
