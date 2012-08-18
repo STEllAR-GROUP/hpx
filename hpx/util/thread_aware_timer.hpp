@@ -7,6 +7,7 @@
 #define HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
