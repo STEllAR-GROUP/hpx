@@ -6,7 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_init.hpp>
+// Including 'hpx/hpx_main.hpp' instead of the usual 'hpx/hpx_init.hpp' enables 
+// to use the plain C-main below as the direct main HPX entry point.
+#include <hpx/hpx_main.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
@@ -21,13 +23,13 @@
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// The purpose of this example is to execute a PX-thread printing "Hello world"
+// The purpose of this example is to execute a HPX-thread printing "Hello world"
 // once on each OS-thread on each of the connected localities.
 //
 // The function hello_world_foreman_action is executed once on each locality.
-// It schedules a PX-thread (encapsulating hello_world_worker) once for each
+// It schedules a HPX-thread (encapsulating hello_world_worker) once for each
 // OS-thread on that locality. The code make sure that the PX-thread gets
-// really executed by the requested OS-thread. While the PX-thread is scheduled
+// really executed by the requested OS-thread. While the HPX-thread is scheduled
 // to run on a particular OS-thread, we may have to retry as the PX-thread may
 // end up being 'stolen' by another OS-thread.
 
@@ -104,7 +106,7 @@ void hello_world_foreman()
         // is the index of the future in the vector, and the second is the
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
-        hpx::lcos::wait(futures,
+        hpx::wait(futures,
             [&](std::size_t, std::size_t t) {
                 if (std::size_t(-1) != t)
                     attendance.erase(t);
@@ -121,47 +123,31 @@ HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 //[hello_world_hpx_main
-//`Here is hpx_main:
-int hpx_main()
+//` Here is the main entry point. By using the include 'hpx/hpx_main.hpp' HPX 
+//` will invoke the plain old C-main() as its first HPX thread.
+int main()
 {
+    // Get a list of all available localities.
+    std::vector<hpx::naming::id_type> localities =
+        hpx::find_all_localities();
+
+    // Reserve storage space for futures, one for each locality.
+    std::vector<hpx::lcos::future<void> > futures;
+    futures.reserve(localities.size());
+
+    BOOST_FOREACH(hpx::naming::id_type const& node, localities)
     {
-        // Get a list of all available localities.
-        std::vector<hpx::naming::id_type> localities =
-            hpx::find_all_localities();
-
-        // Reserve storage space for futures, one for each locality.
-        std::vector<hpx::lcos::future<void> > futures;
-        futures.reserve(localities.size());
-
-        BOOST_FOREACH(hpx::naming::id_type const& node, localities)
-        {
-            // Asynchronously start a new task. The task is encapsulated in a
-            // future, which we can query to determine if the task has
-            // completed.
-            typedef hello_world_foreman_action action_type;
-            futures.push_back(hpx::async<action_type>(node));
-        }
-
-        // The non-callback version of hpx::lcos::wait takes a single parameter,
-        // a future of vectors to wait on. hpx::lcos::wait only returns when
-        // all of the futures have finished.
-        hpx::lcos::wait(futures);
+        // Asynchronously start a new task. The task is encapsulated in a
+        // future, which we can query to determine if the task has
+        // completed.
+        typedef hello_world_foreman_action action_type;
+        futures.push_back(hpx::async<action_type>(node));
     }
 
-    // Initiate shutdown of the runtime system.
-    return hpx::finalize();
+    // The non-callback version of hpx::lcos::wait takes a single parameter,
+    // a future of vectors to wait on. hpx::lcos::wait only returns when
+    // all of the futures have finished.
+    hpx::lcos::wait(futures);
+    return 0;
 }
 //]
-
-///////////////////////////////////////////////////////////////////////////////
-//[hello_world_main
-int main(int argc, char* argv[])
-{
-    return hpx::init(argc, argv);       // Initialize and run HPX.
-}
-//` In HPX `main` is used to initialize the runtime system and pass the command
-//` line arguments to the program. `hpx::init()` invokes `hpx_main` as a HPX
-//` thread after setting up HPX, which is where the logic of our program is
-//` encoded.
-//]
-

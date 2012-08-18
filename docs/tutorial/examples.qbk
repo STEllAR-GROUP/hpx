@@ -250,10 +250,9 @@ __pbs__ documentation.
 [c++]
 
 Now that you have compiled and run the code, lets look at how the code works,
-beginning with `main()` and [funcref hpx_main]`()`:
+beginning with `main()`:
 
 [import ../../examples/quickstart/hello_world.cpp]
-[hello_world_main]
 [hello_world_hpx_main]
 
 In this excerpt of the code we again see the use of futures. This time
