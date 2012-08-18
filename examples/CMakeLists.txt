@@ -31,6 +31,7 @@ set(subdirs
     nbody
     nqueen
     object_semaphore
+    oclm_test
     performance_counters
     queue
     quickstart
