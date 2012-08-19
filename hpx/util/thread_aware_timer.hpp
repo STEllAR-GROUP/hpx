@@ -11,12 +11,8 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/config.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/chrono/chrono.hpp>
-
-#include <stdexcept>
 
 namespace hpx { namespace util
 {
