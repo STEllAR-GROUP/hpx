@@ -45,7 +45,7 @@ namespace hpx { namespace util
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
@@ -189,7 +189,7 @@ namespace hpx { namespace util
         pre_initialize_ini();
 
         // set global config options
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         default_stacksize = init_default_stack_size();
@@ -211,7 +211,7 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         default_stacksize = init_default_stack_size();
@@ -232,7 +232,7 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         default_stacksize = init_default_stack_size();
@@ -443,7 +443,7 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_itt_notify_mode() const
     {
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
