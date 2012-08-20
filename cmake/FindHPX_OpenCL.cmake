@@ -8,7 +8,7 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(OpenCL
-  LIBRARIES OpenCL.lib
+  LIBRARIES OpenCL.lib cl libcl OpenCL libOpenCL
   LIBRARY_PATHS lib/x86_64 lib/x64
   HEADERS CL/opencl.h
   HEADER_PATHS include inc)

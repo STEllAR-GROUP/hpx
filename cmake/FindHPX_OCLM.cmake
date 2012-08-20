@@ -8,7 +8,7 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(OCLM
-  LIBRARIES oclm.lib
+  LIBRARIES oclm.lib oclm
   LIBRARY_PATHS lib/Debug lib/Release
   HEADERS oclm/oclm.hpp
   HEADER_PATHS include inc)
