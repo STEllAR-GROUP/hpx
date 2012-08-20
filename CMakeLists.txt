@@ -955,13 +955,14 @@ else()
       hpx_use_flag_if_available(-fno-builtin-posix_memalign)
     else()
       hpx_info("malloc" "Using system allocator.")
+
       hpx_warn("malloc"
-        "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+        "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
     endif()
   else()
     hpx_info("malloc" "Using system allocator.")
     hpx_warn("malloc"
-      "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+      "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()
 endif()
 
