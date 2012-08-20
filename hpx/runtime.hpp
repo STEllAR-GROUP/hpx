@@ -111,6 +111,7 @@ namespace hpx
         // OS thread
         struct tls_tag {};
         static hpx::util::thread_specific_ptr<runtime*, tls_tag> runtime_;
+        static util::thread_specific_ptr<std::string, tls_tag> thread_name_;
 
         /// \brief access configuration information
         util::runtime_configuration& get_config()
@@ -568,7 +569,7 @@ namespace hpx
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     private:
-        void init_tss(char const* context);
+        void init_tss(char const* context, std::size_t num);
         void deinit_tss();
 
     private:

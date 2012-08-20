@@ -87,6 +87,15 @@ bool use_ittnotify_api = false;
     if (use_ittnotify_api && __itt_mark_ptr) __itt_mark_ptr(mark, parameter); \
     /**/
 
+#define HPX_INTERNAL_ITT_THREAD_SET_NAME(name)                                \
+    if (use_ittnotify_api && __itt_thread_set_name_ptr)                       \
+        __itt_thread_set_name_ptr(name);                                      \
+    /**/
+#define HPX_INTERNAL_ITT_THREAD_IGNORE()                                      \
+    if (use_ittnotify_api && __itt_thread_ignore_ptr)                         \
+        __itt_thread_ignore_ptr(); \
+    /**/
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_MSVC) \
     || defined(__BORLANDC__) \
@@ -201,6 +210,17 @@ void itt_mark_off(int mark)
 void itt_mark(int mark, char const* par)
 {
     HPX_INTERNAL_ITT_MARK(mark, par);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void itt_thread_set_name(char const* name)
+{
+    HPX_INTERNAL_ITT_THREAD_SET_NAME(name);
+}
+
+void itt_thread_ignore()
+{
+    HPX_ITT_THREAD_IGNORE();
 }
 
 #endif // HPX_USE_ITT

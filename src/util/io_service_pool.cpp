@@ -22,7 +22,7 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size,
-            HPX_STD_FUNCTION<void()> on_start_thread,
+            HPX_STD_FUNCTION<void(std::size_t)> on_start_thread,
             HPX_STD_FUNCTION<void()> on_stop_thread,
             char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(pool_size),
@@ -49,7 +49,7 @@ namespace hpx { namespace util
         }
     }
 
-    io_service_pool::io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
+    io_service_pool::io_service_pool(HPX_STD_FUNCTION<void(std::size_t)> on_start_thread,
             HPX_STD_FUNCTION<void()> on_stop_thread, char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(2),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
@@ -77,7 +77,7 @@ namespace hpx { namespace util
     void io_service_pool::thread_run(std::size_t index)
     {
         if (on_start_thread_)
-            on_start_thread_();
+            on_start_thread_(index);
 
         // use this thread for the given io service
         io_services_[index]->run();   // run io service

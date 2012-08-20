@@ -165,6 +165,9 @@ namespace hpx
         boost::coroutines::thread_startup("main");
 
         counters_.reset(new performance_counters::registry(agas_client));
+
+        // register this thread with any possibly active Intel tool 
+        HPX_ITT_THREAD_SET_NAME("main");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -178,18 +181,18 @@ namespace hpx
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread"),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         parcel_pool_(rtcfg.get_thread_pool_size("parcel_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread"),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread"),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
             ini_.get_max_connections(), ini_.get_max_connections_per_loc()),
         scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread"),
+        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
@@ -529,10 +532,16 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
-        char const* context)
+        char const* context, std::size_t num)
     {
+        BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
+        runtime::thread_name_.reset(new std::string(
+            context + ("-" + boost::lexical_cast<std::string>(num))));
+
+        char const* name = runtime::thread_name_.get()->c_str();
+
         // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_.register_thread(context);
+        thread_support_.register_thread(name);
 
         // initialize our TSS
         this->runtime::init_tss();
@@ -541,7 +550,10 @@ namespace hpx
         applier_.init_tss();
 
         // initialize coroutines context switcher
-        boost::coroutines::thread_startup(context);
+        boost::coroutines::thread_startup(name);
+
+        // register this thread with any possibly active Intel tool 
+        HPX_ITT_THREAD_SET_NAME(name);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -558,6 +570,9 @@ namespace hpx
 
         // reset PAPI support
         thread_support_.unregister_thread();
+
+        // reset thread local storage
+        runtime::thread_name_.reset();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -621,6 +636,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
+    hpx::util::thread_specific_ptr<std::string, runtime::tls_tag> runtime::thread_name_;
 
     void runtime::init_tss()
     {

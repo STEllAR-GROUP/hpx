@@ -35,14 +35,14 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            HPX_STD_FUNCTION<void()> on_start_thread = HPX_STD_FUNCTION<void()>(),
+            HPX_STD_FUNCTION<void(std::size_t)> on_start_thread = HPX_STD_FUNCTION<void(std::size_t)>(),
             HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
             char const* pool_name = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
+        explicit io_service_pool(HPX_STD_FUNCTION<void(std::size_t)> on_start_thread,
             HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
             char const* pool_name = "");
 
@@ -98,7 +98,7 @@ namespace hpx { namespace util
         std::size_t const pool_size_;
 
         /// call this for each thread start/stop
-        HPX_STD_FUNCTION<void()> on_start_thread_;
+        HPX_STD_FUNCTION<void(std::size_t)> on_start_thread_;
         HPX_STD_FUNCTION<void()> on_stop_thread_;
 
 #if defined(DEBUG)

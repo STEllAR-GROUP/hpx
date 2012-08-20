@@ -35,6 +35,9 @@ struct __itt_frame_t;
 #define HPX_ITT_MARK_OFF(mark)                itt_mark_off(mark)
 #define HPX_ITT_MARK(mark, parameter)         itt_mark(mark, parameter)
 
+#define HPX_ITT_THREAD_SET_NAME(name)         itt_thread_set_name(name)
+#define HPX_ITT_THREAD_IGNORE()               itt_thread_ignore()
+
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 
@@ -64,6 +67,9 @@ HPX_EXPORT void itt_frame_destroy(__itt_frame_t* frame);
 HPX_EXPORT int itt_mark_create(char const*);
 HPX_EXPORT void itt_mark_off(int mark);
 HPX_EXPORT void itt_mark(int mark, char const*);
+
+HPX_EXPORT void itt_thread_set_name(char const*);
+HPX_EXPORT void itt_thread_ignore();
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
@@ -188,6 +194,9 @@ inline void itt_frame_destroy(__itt_frame_t*) {}
 inline int itt_mark_create(char const*) { return 0; }
 inline void itt_mark_off(int) {}
 inline void itt_mark(int, char const*) {}
+
+inline void itt_thread_set_name(char const*) {}
+inline void itt_thread_ignore() {}
 
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
