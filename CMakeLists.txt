@@ -213,9 +213,9 @@ endif()
 hpx_include(CompilerFlags)
 
 ################################################################################
-# SVN revision detection
+# Git commit detection
 ################################################################################
-include(HPX_SVNRevision)
+include(HPX_GitCommit)
 
 ################################################################################
 # Installation configuration
@@ -1043,7 +1043,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION include/hpx
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
@@ -1053,7 +1052,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
     PATTERN ".cmake.in" EXCLUDE
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   install( # install hpx python scripts
@@ -1064,7 +1062,6 @@ if(NOT HPX_NO_INSTALL)
                      WORLD_READ WORLD_EXECUTE
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   if(UNIX)
@@ -1086,7 +1083,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}/python
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   # create a symlink in share pointing to the latest HPX installation
@@ -1106,7 +1102,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION include
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   if(${BOOST_MINOR_VERSION} LESS 49)
@@ -1116,7 +1111,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1128,7 +1122,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1139,7 +1132,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1149,7 +1141,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1172,7 +1163,6 @@ if(NOT HPX_NO_INSTALL)
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
 
     install(
@@ -1185,7 +1175,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION share/hpx-${HPX_VERSION}/doc/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
 
     install(
@@ -1193,7 +1182,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION share/hpx-${HPX_VERSION}/doc/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 endif()

@@ -134,9 +134,9 @@ else()
       set(input_path ${${name}_SOURCE})
     endif()
 
-    set(svn_revision_option "")
-    if(SVN_REVISION AND NOT ${SVN_REVISION} STREQUAL "")
-      set(svn_revision_option "-D__hpx_svn_revision__=${SVN_REVISION}")
+    set(git_commit_option "")
+    if(GIT_COMMIT AND NOT ${GIT_COMMIT} STREQUAL "")
+      set(git_commit_option "-D__hpx_git_commit__=${GIT_COMMIT}")
     endif()
 
     set(doxygen_option "")
@@ -147,7 +147,7 @@ else()
     add_custom_command(OUTPUT ${name}.xml
       COMMAND ${QUICKBOOK_PROGRAM}
           "--output-file=${name}.xml"
-          "${svn_revision_option}"
+          "${git_commit_option}"
           "${doxygen_option}"
           "-D__hpx_source_dir__=${hpx_SOURCE_DIR}"
           "-D__hpx_binary_dir__=${CMAKE_BINARY_DIR}"

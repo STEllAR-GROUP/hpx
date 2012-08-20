@@ -52,7 +52,7 @@ namespace hpx
             "HPX - High Performance ParalleX\n"
             "An distributed and parallel runtime system for conventional machines\n"
             "implementing (parts of) the ParalleX execution model.\n\n"
-            "Copyright (C) 1998-2012 Hartmut Kaiser, Bryce Lelbach and others\n"
+            "Copyright (C) 1998-2012 Hartmut Kaiser, Bryce Adelstein-Lelbach and others\n"
             "The STE||AR Group, http://stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
@@ -62,10 +62,11 @@ namespace hpx
 
     std::string build_string()
     {
-        return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d)") %
+        return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d), Git: %s") %
             HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
             HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
-            (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10));
+            (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
+            HPX_GIT_COMMIT);
     }
 
     std::string boost_version()
