@@ -1277,6 +1277,11 @@ endif()
 
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
 
+# create a symlink in share pointing to the latest HPX installation
+execute_process(COMMAND
+  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
+  WORKING_DIRECTORY ${output_dir}/share)
+
 file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
            "[\n${HPX_UNIT_TEST_LIST}\n]\n")
 
