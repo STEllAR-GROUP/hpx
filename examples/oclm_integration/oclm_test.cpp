@@ -179,14 +179,15 @@ int hpx_main()
     std::cout << "Basic performance information output to logComplex.txt\n";
     std::cout << "Note: The basic tests are more to check the I/O rate of your OpenCL device. However, the complex tests can be very informative about the nature of memory access.\n"
         << "The first three functions in the .cl file are the basic tests, while the remaining three are the complex tests. Note how much longer it takes to access global memory rather than local memory.\n";
-    //check if we're using Windows
-
+   
     return hpx::finalize(); // Handles HPX shutdown
 }
 
 int main()
 {
-    int code = hpx::init();    
+    int code = hpx::init();     
+
+    //check if we're using Windows
     #if defined(__WIN32__) || defined(_WIN32) || defined(WIN32) || defined(__WINDOWS__) || defined(__TOS_WIN__)
         //if so, pause because the console usually closes at the end of execution
         system("Pause");
