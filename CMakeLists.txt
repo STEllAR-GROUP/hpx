@@ -38,6 +38,24 @@ set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration type (one o
 set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
 
 ################################################################################
+# Install include directory
+################################################################################
+MACRO(SUBDIRCOPY curdir)
+  FILE(GLOB children ${curdir}/ ${curdir}/*)
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+       # Install include subdirectories
+       FILE(GLOB files "${curdir}/${child}/*.hpp")
+       STRING(REPLACE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/include bindir ${curdir}/${child})
+       INSTALL(FILES ${files} DESTINATION ${bindir})
+       SUBDIRCOPY("${curdir}/${child}")
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
+
+SUBDIRCOPY(${CMAKE_SOURCE_DIR}/hpx/)
+
+################################################################################
 # project metadata
 ################################################################################
 project(hpx CXX)
@@ -309,6 +327,21 @@ endif()
 
 if(HPX_VERIFY_LOCKS)
   add_definitions(-DHPX_VERIFY_LOCKS)
+endif()
+
+################################################################################
+# OpenCL and OCLM
+################################################################################
+
+if (MSVC OR UNIX)
+
+   find_package(HPX_OpenCL)
+
+   if(${OpenCL_FOUND})
+      #OCLM Include
+      find_package(HPX_OCLM)
+   endif()
+
 endif()
 
 ################################################################################
