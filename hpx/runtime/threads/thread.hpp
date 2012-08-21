@@ -12,7 +12,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/spinlock_no_backoff.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 
 #include <boost/thread/thread.hpp>
@@ -31,7 +31,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT thread
     {
-        typedef lcos::local::spinlock mutex_type;
+        typedef lcos::local::spinlock_no_backoff mutex_type;
 
     public:
         class id;
