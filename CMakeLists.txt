@@ -56,6 +56,17 @@ ENDMACRO()
 SUBDIRCOPY(${CMAKE_SOURCE_DIR}/hpx/)
 
 ################################################################################
+# Include workaround macro
+################################################################################
+MACRO(INCLUDE_ALL name)
+   include_directories(${${name}_INCLUDE_DIR})
+   hpx_link_sys_directories(${${name}_LIBRARY_DIR})
+   string(REPLACE ${${name}_LIBRARY_DIR}/ "" targetLib ${${name}_LIBRARY})
+   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${targetLib})
+ENDMACRO()
+
+
+################################################################################
 # project metadata
 ################################################################################
 project(hpx CXX)
@@ -338,8 +349,12 @@ if (MSVC OR UNIX)
    find_package(HPX_OpenCL)
 
    if(${OpenCL_FOUND})
+      INCLUDE_ALL(OpenCL)
       #OCLM Include
       find_package(HPX_OCLM)
+      if(${OCLM_FOUND})
+         INCLUDE_ALL(OCLM)
+      endif()
    endif()
 
 endif()
