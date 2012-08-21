@@ -205,6 +205,11 @@ namespace hpx { namespace lcos { namespace local
             task_->set_exception(e);
         }
 
+        bool is_ready() const
+        {
+            return task_->is_ready();
+        }
+
     protected:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
@@ -306,6 +311,11 @@ namespace hpx { namespace lcos { namespace local
         bool valid() const BOOST_NOEXCEPT
         {
             return task_;
+        }
+
+        bool is_ready() const
+        {
+            return task_->is_ready();
         }
 
     private:
