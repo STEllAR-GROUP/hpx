@@ -59,7 +59,7 @@ SUBDIRCOPY(${CMAKE_SOURCE_DIR}/hpx/)
 # Include workaround macro
 ################################################################################
 MACRO(INCLUDE_ALL name)
-   include_directories(${${name}_INCLUDE_DIR})
+   hpx_include_directories(${${name}_INCLUDE_DIR})
    hpx_link_sys_directories(${${name}_LIBRARY_DIR})
    string(REPLACE ${${name}_LIBRARY_DIR}/ "" targetLib ${${name}_LIBRARY})
    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${targetLib})
@@ -185,7 +185,11 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+if (UNIX)
+   hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+else()
+   hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
+endif()
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -1248,8 +1252,13 @@ endif()
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
-set(HPX_LINK_DIRECTORIES
-    ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
+if (MSVC)
+   set(HPX_LINK_DIRECTORIES
+       ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}/lib/hpx ${HPX_LINK_DIRECTORIES})
+else()
+   set(HPX_LINK_DIRECTORIES
+       ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
+endif()
 set(HPX_INCLUDE_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
 
@@ -1263,12 +1272,14 @@ set(external_include_directories "")
 set(external_include_flags "")
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_link_directories "${external_link_directories} ${directory}")
   set(external_link_flags "${external_link_flags} -L${directory}")
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
@@ -1277,6 +1288,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
+  string(REPLACE " " "\\ " BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info
