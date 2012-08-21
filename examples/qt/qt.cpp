@@ -25,12 +25,10 @@ using hpx::flush;
 #include "widget.hpp"
 #include "hpx_qt.hpp"
 
-double runner()
+double runner(double now)
 {
-    high_resolution_timer t;
-
-    
-
+    high_resolution_timer t(now);
+    // TODO: do something cool here
     return t.elapsed();
 }
 
@@ -43,7 +41,7 @@ void run(widget * w, std::size_t num_threads)
     for(std::size_t i = 0; i < num_threads; ++i)
     {
         runner_action a;
-        futures[i] = hpx::async(a, hpx::find_here());
+        futures[i] = hpx::async(a, hpx::find_here(), high_resolution_timer::now());
     }
 
     hpx::wait(futures, [w](std::size_t i, double t){ w->add_label(i, t); });
