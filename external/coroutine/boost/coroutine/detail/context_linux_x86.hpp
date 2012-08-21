@@ -255,7 +255,7 @@ namespace boost { namespace coroutines {
 
       // global functions to be called for each OS-thread after it started
       // running and before it exits
-      static void thread_startup(char const* thread_type)
+      static void thread_startup(char const* /*thread_type*/)
       {
       }
 
