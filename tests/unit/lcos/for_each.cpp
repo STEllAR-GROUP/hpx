@@ -83,12 +83,10 @@ int main(int argc, char* argv[])
             "the number of vector elements to iterate over") ;
 
     // We force this test to use several threads by default.
-    /*
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
         boost::lexical_cast<std::string>(hpx::hardware_concurrency());
-        */
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv/*, cfg*/);
