@@ -1102,7 +1102,7 @@ if(NOT HPX_NO_INSTALL)
               external/endian/boost
               external/logging/boost
               external/plugin/boost
-    DESTINATION include
+    DESTINATION include/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".git" EXCLUDE)
@@ -1111,7 +1111,7 @@ if(NOT HPX_NO_INSTALL)
     # install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
       PATTERN ".git" EXCLUDE)
@@ -1122,7 +1122,7 @@ if(NOT HPX_NO_INSTALL)
     install(
       DIRECTORY external/atomic/boost
                 external/lockfree/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
       PATTERN ".git" EXCLUDE)
@@ -1141,7 +1141,7 @@ if(NOT HPX_NO_INSTALL)
   if(HPX_INTERNAL_CHRONO)
     install( # install Boost.Chrono headers if we're using our internal version
       DIRECTORY external/chrono/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
       PATTERN ".git" EXCLUDE)
@@ -1196,6 +1196,8 @@ set(HPX_LINK_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
+set(HPX_INCLUDE_DIRECTORIES
+    ${CMAKE_INSTALL_PREFIX}/include/hpx/external ${HPX_INCLUDE_DIRECTORIES})
 
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
