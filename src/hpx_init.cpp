@@ -873,7 +873,7 @@ namespace hpx
                     threads = boost::lexical_cast<std::size_t>(threads_str);
 
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                      num_threads > threads)
+                      threads > batch_threads)
                 {
                     std::cerr << "hpx::init: command line warning: --hpx:threads "
                             "used when running with "
