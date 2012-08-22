@@ -23,6 +23,7 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime_impl.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/function.hpp>

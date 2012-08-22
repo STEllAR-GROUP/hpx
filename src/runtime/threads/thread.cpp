@@ -8,6 +8,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>

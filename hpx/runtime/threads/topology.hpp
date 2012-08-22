@@ -10,8 +10,8 @@
 #if !defined(HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798)
 #define HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798
 
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/address.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
@@ -19,7 +19,17 @@
 namespace hpx { namespace threads
 {
 
-struct topology;
+struct topology
+{
+    virtual ~topology();
+
+    virtual std::size_t get_numa_node_number(std::size_t num_thread, error_code& ec = throws) const = 0;
+    virtual std::size_t get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual std::size_t get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual void set_thread_affinity(boost::thread& t, std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual void set_thread_affinity(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual std::size_t get_thread_affinity_mask_from_lva(naming::address::address_type, error_code& ec = throws) const = 0;
+};
 
 inline std::size_t least_significant_bit(boost::uint64_t mask)
 {
@@ -60,18 +70,6 @@ HPX_EXPORT topology const& get_topology();
 using threads::hardware_concurrency;
 
 }
-
-#if defined(HPX_HAVE_HWLOC)
-    #include <hpx/runtime/threads/policies/hwloc_topology.hpp>
-#elif defined(BOOST_WINDOWS)
-    #include <hpx/runtime/threads/policies/windows_topology.hpp>
-#elif defined(__APPLE__)
-    #include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif defined(__linux__) 
-    #include <hpx/runtime/threads/policies/linux_topology.hpp>
-#else
-    #include <hpx/runtime/threads/policies/noop_topology.hpp>
-#endif
 
 #endif // HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798
 
