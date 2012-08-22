@@ -25,7 +25,7 @@ macro(add_hpx_executable name)
 
   # add the executable build target
   if(NOT MSVC)
-    if(${${name}_ESSENTIAL})
+      if("${${name}_ESSENTIAL}" STREQUAL "TRUE")
       add_executable(${name}_exe
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
