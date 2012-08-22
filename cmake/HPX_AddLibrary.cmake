@@ -157,10 +157,22 @@ macro(add_hpx_library name)
       LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
   endif()
 
+  if(${name}_COMPILE_FLAGS)
+    set_property(TARGET ${name}_lib APPEND
+      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+  endif()
+
+  if(${name}_LINK_FLAGS)
+    set_property(TARGET ${name}_lib APPEND
+      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+  endif()
+
   if(HPX_COMPILE_FLAGS)
-    set_property(TARGET ${name}_lib APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
+    set_property(TARGET ${name}_lib APPEND
+      PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_lib APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
+      set_property(TARGET ${name}_lib APPEND
+        PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 

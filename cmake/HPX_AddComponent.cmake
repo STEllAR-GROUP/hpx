@@ -17,7 +17,7 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT;HEADER_GLOB;SOURCE_GLOB"
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT;HEADER_GLOB;SOURCE_GLOB"
     "ESSENTIAL;NOLIBS;AUTOGLOB" ${ARGN})
 
   if(NOT ${name}_SOURCE_ROOT)
@@ -156,10 +156,22 @@ macro(add_hpx_component name)
       LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
   endif()
 
+  if(${name}_COMPILE_FLAGS)
+    set_property(TARGET ${name}_component APPEND
+      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+  endif()
+
+  if(${name}_LINK_FLAGS)
+    set_property(TARGET ${name}_component APPEND
+      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+  endif()
+
   if(HPX_COMPILE_FLAGS)
-    set_property(TARGET ${name}_component APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
+    set_property(TARGET ${name}_component APPEND
+      PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_component APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
+      set_property(TARGET ${name}_component APPEND
+        PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 

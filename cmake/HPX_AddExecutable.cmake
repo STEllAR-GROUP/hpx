@@ -16,7 +16,7 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -65,10 +65,22 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
+  if(${name}_COMPILE_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+  endif()
+
+  if(${name}_LINK_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+  endif()
+
   if(HPX_COMPILE_FLAGS)
-    set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
+      set_property(TARGET ${name}_exe APPEND
+        PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 
@@ -79,12 +91,6 @@ macro(add_hpx_executable name)
                                      INSTALL_RPATH_USE_LINK_PATH TRUE
                                      INSTALL_RPATH ${HPX_RPATH})
   endif()
-
-#  set(libs "")
-
-#  if(NOT MSVC)
-#    set(libs ${BOOST_FOUND_LIBRARIES})
-#  endif()
 
   # linker instructions
   if(NOT ${${name}_NOLIBS})
