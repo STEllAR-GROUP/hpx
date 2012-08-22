@@ -27,7 +27,14 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
 # Build type (needs to be handled before project command below)
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+endif()
+
+# it _must_ go before project(OpenCV) in order to work
+if(WIN32)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Installation Directory")
+else()
+  set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation Directory")
 endif()
 
 set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
@@ -267,7 +274,7 @@ if(NOT HPX_NO_INSTALL)
     if(UNIX)
       set(CMAKE_INSTALL_PREFIX "/opt/hpx" CACHE PATH "Prefix prepended to install directories.")
     else()
-      set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+      set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Prefix prepended to install directories.")
     endif()
   endif()
 
