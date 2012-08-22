@@ -21,7 +21,7 @@ namespace hpx { namespace threads
 
 struct topology
 {
-    virtual ~topology();
+    virtual ~topology() {}
 
     virtual std::size_t get_numa_node_number(std::size_t num_thread, error_code& ec = throws) const = 0;
     virtual std::size_t get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
