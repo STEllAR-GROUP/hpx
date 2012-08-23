@@ -55,13 +55,13 @@ namespace jacobi
         )
         {
             row_range d = dst.get();
-            row_range s = src.get();
-            row_range t = top.get();
-            row_range b = bottom.get();
 
             std::vector<double>::iterator dst_ptr = d.begin();
+            row_range s = src.get();
             std::vector<double>::iterator src_ptr = s.begin();
+            row_range t = top.get();
             std::vector<double>::iterator top_ptr = t.begin();
+            row_range b = bottom.get();
             std::vector<double>::iterator bottom_ptr = b.begin();
 
             BOOST_ASSERT(

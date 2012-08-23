@@ -28,6 +28,8 @@ namespace jacobi
     )
     {
         BOOST_ASSERT(id);
+        BOOST_ASSERT(top.id);
+        BOOST_ASSERT(bottom.id);
         return
             hpx::async<server::stencil_iterator::setup_boundary_action>(
                 id

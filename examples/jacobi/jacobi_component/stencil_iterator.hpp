@@ -20,7 +20,7 @@ namespace jacobi
     {
         stencil_iterator() {}
 
-        ~stencil_iterator() { BOOST_ASSERT(id); }
+        ~stencil_iterator() { /*BOOST_ASSERT(id);*/ }
 
         hpx::lcos::future<void> init(
             jacobi::row const & r
