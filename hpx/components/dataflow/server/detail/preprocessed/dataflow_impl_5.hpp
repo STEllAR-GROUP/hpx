@@ -198,7 +198,7 @@
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
         lcos::local::spinlock & mtx;
@@ -492,7 +492,7 @@
         args_type slots;
         boost::uint32_t slots_set;
         std::vector<detail::component_wrapper_base *> future_slots;
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
         lcos::local::spinlock & mtx;
@@ -786,7 +786,7 @@
         args_type slots;
         boost::uint32_t slots_set;
         std::vector<detail::component_wrapper_base *> future_slots;
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
         lcos::local::spinlock & mtx;
@@ -1080,7 +1080,7 @@
         args_type slots;
         boost::uint32_t slots_set;
         std::vector<detail::component_wrapper_base *> future_slots;
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
         lcos::local::spinlock & mtx;
@@ -1374,7 +1374,7 @@
         args_type slots;
         boost::uint32_t slots_set;
         std::vector<detail::component_wrapper_base *> future_slots;
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
         lcos::local::spinlock & mtx;
@@ -1668,7 +1668,7 @@
         args_type slots;
         boost::uint32_t slots_set;
         std::vector<detail::component_wrapper_base *> future_slots;
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
         lcos::local::spinlock & mtx;

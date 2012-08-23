@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         spinlock() : v_(0)
         {
-            HPX_ITT_SYNC_CREATE(this, "test::spinlock", "");
+            HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");
         }
 
         spinlock(BOOST_RV_REF(spinlock) rhs)

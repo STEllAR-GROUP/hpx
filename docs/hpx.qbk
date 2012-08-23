@@ -177,8 +177,8 @@ and [*A]lgorithms [*R]esearch) is a research group at __lsu__'s __cct__. For
 a list of people working in this group and participating in writing this
 documentation see __people__.
 
-This documentation is automatically generated for __hpx__ __version__ (from SVN
-revision: __hpx_svn_revision__) by the Boost QuickBook documentation tool.
+This documentation is automatically generated for __hpx__ __version__ (from Git
+commit: __hpx_git_commit__) by the Boost QuickBook documentation tool.
 QuickBook can be found in the collection of __boost_tools__.
 
 [include preface.qbk]

@@ -21,68 +21,61 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
 
+namespace hpx { namespace lcos
+{
+    void base_lco::set_exception(boost::exception_ptr const& e)
+    {
+        // just rethrow the exception
+        boost::rethrow_exception(e);
+    }
+
+    void base_lco::connect(naming::id_type const &)
+    {
+    }
+
+    void base_lco::disconnect(naming::id_type const &)
+    {
+    }
+        
+    components::component_type base_lco::get_component_type()
+    {
+        return components::get_component_type<base_lco>();
+    }
+    void base_lco::set_component_type(components::component_type type)
+    {
+        components::set_component_type<base_lco>(type);
+    }
+
+    base_lco::~base_lco() {}
+    void base_lco::finalize() {}
+
+    void base_lco::set_event_nonvirt()
+    {
+        set_event();
+    }
+
+    void base_lco::set_exception_nonvirt (boost::exception_ptr const& e)
+    {
+        set_exception(e);
+    }
+        
+    void base_lco::connect_nonvirt(naming::id_type const & id)
+    {
+        connect(id);
+    }
+
+    void base_lco::disconnect_nonvirt(naming::id_type const & id)
+    {
+        disconnect(id);
+    }
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the base LCO actions
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_event_action, base_set_event_action)
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_exception_action, base_set_exception_action)
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::connect_action, base_connect_action)
 HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::disconnect_action, base_disconnect_action)
-
-///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::set_value_action,
-    set_value_action_gid_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::get_value_action,
-    get_value_action_gid_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::set_value_action,
-    set_value_action_vector_gid_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::get_value_action,
-    get_value_action_vector_gid_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_value_action,
-    set_value_action_id_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::get_value_action,
-    get_value_action_id_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_value_action,
-    set_value_action_vector_id_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::get_value_action,
-    get_value_action_vector_id_type)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<double>::set_value_action,
-    set_value_action_double)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<double>::get_value_action,
-    get_value_action_double)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<int>::set_value_action,
-    set_value_action_int)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<int>::get_value_action,
-    get_value_action_int)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<bool>::set_value_action,
-    set_value_action_bool)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<bool>::get_value_action,
-    get_value_action_bool)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::util::section>::set_value_action,
-    set_value_action_section)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::util::section>::get_value_action,
-    get_value_action_section)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::set_value_action,
-    set_value_action_void)
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::get_value_action,
-    get_value_action_void)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

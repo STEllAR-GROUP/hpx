@@ -16,7 +16,7 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -25,7 +25,7 @@ macro(add_hpx_executable name)
 
   # add the executable build target
   if(NOT MSVC)
-    if(${${name}_ESSENTIAL})
+      if("${${name}_ESSENTIAL}" STREQUAL "TRUE")
       add_executable(${name}_exe
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
@@ -42,6 +42,17 @@ macro(add_hpx_executable name)
     endif()
   endif()
 
+  if(MSVC)
+    set_target_properties(${name}_exe PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELEASE}
+      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HPX_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
+      RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL}
+      RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+  else()
+    set_target_properties(${name}_exe PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY})
+  endif()
+
   set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
 
   if(${name}_FOLDER)
@@ -54,10 +65,22 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
+  if(${name}_COMPILE_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+  endif()
+
+  if(${name}_LINK_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+  endif()
+
   if(HPX_COMPILE_FLAGS)
-    set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
+      set_property(TARGET ${name}_exe APPEND
+        PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 
@@ -68,12 +91,6 @@ macro(add_hpx_executable name)
                                      INSTALL_RPATH_USE_LINK_PATH TRUE
                                      INSTALL_RPATH ${HPX_RPATH})
   endif()
-
-#  set(libs "")
-
-#  if(NOT MSVC)
-#    set(libs ${BOOST_FOUND_LIBRARIES})
-#  endif()
 
   # linker instructions
   if(NOT ${${name}_NOLIBS})

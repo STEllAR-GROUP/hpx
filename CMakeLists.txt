@@ -213,9 +213,9 @@ endif()
 hpx_include(CompilerFlags)
 
 ################################################################################
-# SVN revision detection
+# Git commit detection
 ################################################################################
-include(HPX_SVNRevision)
+include(HPX_GitCommit)
 
 ################################################################################
 # Installation configuration
@@ -360,8 +360,24 @@ if(MSVC)
     if(CMAKE_ASM_MASM_COMPILER)
       hpx_info("swap_context" "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
     else()
-      hpx_warning("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
+      hpx_warn("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
       set(HPX_EMULATE_SWAP_CONTEXT OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
+    endif()
+  endif()
+
+  hpx_option(HPX_USE_ITT BOOL "Bind to Intel Amplifier Tool (default: OFF)" OFF ADVANCED)
+
+  if(HPX_USE_ITT)
+    find_package(HPX_Amplifier)
+    if(AMPLIFIER_FOUND)
+      hpx_info("itt" "Binding to Intel Amplifier tool is enabled.")
+      add_definitions(-DHPX_USE_ITT=1)
+      hpx_include_sys_directories(${AMPLIFIER_INCLUDE_DIR})
+      hpx_link_sys_directories(${AMPLIFIER_LIBRARY_DIR})
+      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${AMPLIFIER_LIBRARY})
+    else()
+      set(HPX_USE_ITT OFF FORCE)
+      hpx_warn("itt" "Binding to Intel Amplifier tool will be disabled, try setting the AMPLIFIER_ROOT variable to the Intel Amplifier installation directory.")
     endif()
   endif()
 endif()
@@ -765,6 +781,9 @@ else()
   if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
     hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
   endif()
+  
+  # Check if our libraries have unresolved symbols
+  hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
 
   ##############################################################################
   # GCC-only configuration
@@ -916,7 +935,7 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+        #hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
         hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
@@ -939,13 +958,14 @@ else()
       hpx_use_flag_if_available(-fno-builtin-posix_memalign)
     else()
       hpx_info("malloc" "Using system allocator.")
+
       hpx_warn("malloc"
-        "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+        "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
     endif()
   else()
     hpx_info("malloc" "Using system allocator.")
     hpx_warn("malloc"
-      "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+      "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()
 endif()
 
@@ -1026,7 +1046,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION include/hpx
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
@@ -1036,7 +1055,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
     PATTERN ".cmake.in" EXCLUDE
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   install( # install hpx python scripts
@@ -1047,7 +1065,6 @@ if(NOT HPX_NO_INSTALL)
                      WORLD_READ WORLD_EXECUTE
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   if(UNIX)
@@ -1069,7 +1086,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}/python
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   # create a symlink in share pointing to the latest HPX installation
@@ -1086,20 +1102,18 @@ if(NOT HPX_NO_INSTALL)
               external/endian/boost
               external/logging/boost
               external/plugin/boost
-    DESTINATION include
+    DESTINATION include/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   if(${BOOST_MINOR_VERSION} LESS 49)
     # install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1108,10 +1122,9 @@ if(NOT HPX_NO_INSTALL)
     install(
       DIRECTORY external/atomic/boost
                 external/lockfree/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1122,17 +1135,15 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
   if(HPX_INTERNAL_CHRONO)
     install( # install Boost.Chrono headers if we're using our internal version
       DIRECTORY external/chrono/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1155,7 +1166,6 @@ if(NOT HPX_NO_INSTALL)
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
 
     install(
@@ -1168,7 +1178,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION share/hpx-${HPX_VERSION}/doc/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
 
     install(
@@ -1176,7 +1185,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION share/hpx-${HPX_VERSION}/doc/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 endif()
@@ -1188,6 +1196,8 @@ set(HPX_LINK_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
+set(HPX_INCLUDE_DIRECTORIES
+    ${CMAKE_INSTALL_PREFIX}/include/hpx/external ${HPX_INCLUDE_DIRECTORIES})
 
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
@@ -1260,6 +1270,11 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
+
+# create a symlink in share pointing to the latest HPX installation
+execute_process(COMMAND
+  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
+  WORKING_DIRECTORY ${output_dir}/share)
 
 file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
            "[\n${HPX_UNIT_TEST_LIST}\n]\n")

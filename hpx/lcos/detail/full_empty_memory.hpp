@@ -11,9 +11,9 @@
 #include <boost/call_traits.hpp>
 #include <hpx/util/move.hpp>
 
-#include <hpx/util/full_empty_entry.hpp>
+#include <hpx/lcos/detail/full_empty_entry.hpp>
 
-namespace hpx { namespace util
+namespace hpx { namespace lcos { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a full_empty data type is a implementation of memory areas guarded
@@ -194,10 +194,10 @@ namespace hpx { namespace util
 //         }
 
     private:
-        detail::full_empty_entry<T> data_;
+        full_empty_entry<T> data_;
     };
 
-}}
+}}}
 
 #endif
 

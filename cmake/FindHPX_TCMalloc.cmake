@@ -12,14 +12,10 @@ endif()
 if(GOOGLE_PERFTOOLS_FOUND)
   hpx_find_package(TCMALLOC
     LIBRARIES tcmalloc libtcmalloc
-    LIBRARY_PATHS lib64 lib
-    HEADERS google/tcmalloc.h
-    HEADER_PATHS include)
+    LIBRARY_PATHS lib64 lib)
 else()
   hpx_find_package(TCMALLOC
     LIBRARIES tcmalloc_minimal libtcmalloc_minimal
-    LIBRARY_PATHS lib64 lib
-    HEADERS google/tcmalloc.h
-    HEADER_PATHS include)
+    LIBRARY_PATHS lib64 lib)
 endif()
 

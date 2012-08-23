@@ -275,13 +275,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_WINDOWS)
-#  define HPX_MANGLE_COMPONENT_NAME_PREFIX  libhpx_component_
 #  if defined(HPX_DEBUG)
 #    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      BOOST_PP_CAT(BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n), d)      \
+      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
       /**/
 #    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n + "d"          \
+      "lib" + n + "d"                                                         \
       /**/
 #    define HPX_MANGLE_NAME(n)                                                \
       BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
@@ -291,10 +290,10 @@
       /**/
 #  else
 #    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n)                       \
+      BOOST_PP_CAT(lib, n)                                                    \
       /**/
 #    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n                \
+      "lib" + n                                                               \
       /**/
 #    define HPX_MANGLE_NAME(n)                                                \
       BOOST_PP_CAT(lib, n)                                                    \

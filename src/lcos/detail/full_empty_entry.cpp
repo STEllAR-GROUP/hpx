@@ -5,14 +5,14 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/full_empty_entry.hpp>
+#include <hpx/lcos/detail/full_empty_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-namespace hpx { namespace util { namespace detail
+namespace hpx { namespace lcos { namespace detail
 {
     // the counter data instance
     full_empty_counter_data full_empty_counter_data_;

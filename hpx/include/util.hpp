@@ -7,10 +7,11 @@
 #define HPX_UTIL_DEC_21_2011_0340PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/locality_result.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/thread_aware_timer.hpp>
 
 #endif
 

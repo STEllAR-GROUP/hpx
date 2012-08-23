@@ -8,20 +8,26 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>
 
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
+    threads::thread_id_type const thread::uninitialized =
+        reinterpret_cast<threads::thread_id_type>(-1);
+
+    ///////////////////////////////////////////////////////////////////////////
     thread::thread() BOOST_NOEXCEPT
-      : id_(threads::invalid_thread_id)
+      : id_(uninitialized)
     {}
 
     thread::thread(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
       : id_(rhs.id_)
     {
-        rhs.id_ = threads::invalid_thread_id;
+        rhs.id_ = uninitialized;
     }
 
     thread& thread::operator=(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
@@ -35,10 +41,18 @@ namespace hpx
     {
         // If the thread is still running, we terminate the whole application
         // as we have no chance of reporting this error (we can't throw)
-        if (joinable()) {
+        threads::thread_id_type id = uninitialized;
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            std::swap(id_, id);
+        }
+
+        // if joinable
+        if (threads::invalid_thread_id != id && uninitialized != id) {
             try {
                 // free all registered exit-callback functions
-                threads::free_thread_exit_callbacks(id_);
+                threads::free_thread_exit_callbacks(id);
 
                 // report the error globally
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -131,7 +145,8 @@ namespace hpx
         }
 
         mutex_type::scoped_lock l(mtx_);
-        id_ = ident;
+        if (id_ == uninitialized)
+            id_ = ident;
     }
 
     static void resume_thread(threads::thread_id_type id)
@@ -151,7 +166,7 @@ namespace hpx
         this_thread::interruption_point();
 
         native_handle_type handle = native_handle();
-        if (handle != threads::invalid_thread_id)
+        if (handle != threads::invalid_thread_id && handle != uninitialized)
         {
             // register callback function to be called when thread exits
             native_handle_type this_id = threads::get_self().get_thread_id();
@@ -194,7 +209,7 @@ namespace hpx
 
         public:
             thread_task_base(threads::thread_id_type id)
-              : id_(threads::invalid_thread_id)
+              : id_(thread::uninitialized)
             {
                 if (threads::add_thread_exit_callback(id,
                         HPX_STD_BIND(&thread_task_base::thread_exit_function,
@@ -218,7 +233,8 @@ namespace hpx
 
             bool is_valid() const
             {
-                return id_ != threads::invalid_thread_id;
+                return id_ != threads::invalid_thread_id && 
+                       id_ != thread::uninitialized;
             }
 
             // cancellation support
@@ -256,7 +272,8 @@ namespace hpx
 
     lcos::future<void> thread::get_future(error_code& ec)
     {
-        if (id_ == threads::invalid_thread_id) {
+        if (id_ == threads::invalid_thread_id || id_ == thread::uninitialized) 
+        {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "NULL thread id encountered");
             return lcos::future<void>();

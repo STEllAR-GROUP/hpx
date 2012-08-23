@@ -18,7 +18,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/block_profiler.hpp>
-#include <hpx/util/full_empty_memory.hpp>
+//#include <hpx/lcos/detail/full_empty_memory.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>

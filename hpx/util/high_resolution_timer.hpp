@@ -6,347 +6,80 @@
 #if !defined(HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM)
 #define HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM
 
-#include <boost/config.hpp>
-#include <boost/throw_exception.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
+
 #include <boost/cstdint.hpp>
-
-#include <stdexcept>
-
-#if defined(BOOST_HAS_UNISTD_H)
-#include <unistd.h>
-#endif
-#include <time.h>
-
-#if defined(BOOST_WINDOWS)
-
-#include <limits>
-#include <windows.h>
+#include <boost/chrono/chrono.hpp>
 
 namespace hpx { namespace util
 {
-    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     //
     //  high_resolution_timer
     //      A timer object measures elapsed time.
-    //      CAUTION: Windows only!
-    //
-    ///////////////////////////////////////////////////////////////////////////////
+    //      
+    ///////////////////////////////////////////////////////////////////////////
     class high_resolution_timer
     {
     public:
         high_resolution_timer()
+          : start_time_(take_time_stamp())
         {
-            restart();
         }
 
         high_resolution_timer(double t)
-        {
-            LARGE_INTEGER frequency;
-            if (!QueryPerformanceFrequency(&frequency))
-                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
-
-            start_time.QuadPart = (LONGLONG)(t * frequency.QuadPart);
-        }
+          : start_time_(static_cast<boost::uint64_t>(t * 1e9))
+        {}
 
         high_resolution_timer(high_resolution_timer const& rhs)
-          : start_time(rhs.start_time)
-        {
-        }
+          : start_time_(rhs.start_time_)
+        {}
 
         static double now()
         {
-            SYSTEMTIME st;
-            GetSystemTime(&st);
-
-            FILETIME ft;
-            SystemTimeToFileTime(&st, &ft);
-
-            LARGE_INTEGER now;
-            now.LowPart = ft.dwLowDateTime;
-            now.HighPart = ft.dwHighDateTime;
-
-            // FileTime is in 100ns increments, result needs to be in [s]
-            return now.QuadPart * 1e-7;
+            return take_time_stamp() * 1e-9;
         }
 
         void restart()
         {
-            if (!QueryPerformanceCounter(&start_time))
-                boost::throw_exception(std::runtime_error("Couldn't initialize start_time"));
+            start_time_ = take_time_stamp();
         }
         double elapsed() const                  // return elapsed time in seconds
         {
-            LARGE_INTEGER now;
-            if (!QueryPerformanceCounter(&now))
-                boost::throw_exception(std::runtime_error("Couldn't get current time"));
-
-            LARGE_INTEGER frequency;
-            if (!QueryPerformanceFrequency(&frequency))
-                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
-
-            return double(now.QuadPart - start_time.QuadPart) / frequency.QuadPart;
+            return double(take_time_stamp() - start_time_) * 1e-9;
         }
 
         boost::int64_t elapsed_microseconds() const
         {
-            return boost::int64_t(1e6 * elapsed());
+            return boost::int64_t((take_time_stamp() - start_time_) * 1e-3);
         }
 
         boost::int64_t elapsed_nanoseconds() const
         {
-            return boost::int64_t(1e9 * elapsed());
+            return boost::int64_t(take_time_stamp() - start_time_);
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
         {
-            LARGE_INTEGER frequency;
-            if (!QueryPerformanceFrequency(&frequency))
-                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
-
-            return double((std::numeric_limits<LONGLONG>::max)() - start_time.QuadPart) /
-                double(frequency.QuadPart);
+            return (util::high_resolution_clock::max)() * 1e-9;
         }
 
-        double elapsed_min() const            // return minimum value for elapsed()
+        double elapsed_min() const   // return minimum value for elapsed()
         {
-            LARGE_INTEGER frequency;
-            if (!QueryPerformanceFrequency(&frequency))
-                boost::throw_exception(std::runtime_error("Couldn't acquire frequency"));
+            return (util::high_resolution_clock::min)() * 1e-9;
+        }
 
-            return 1.0 / frequency.QuadPart;
+    protected:
+        static boost::uint64_t take_time_stamp()
+        {
+            return util::high_resolution_clock::now();
         }
 
     private:
-        LARGE_INTEGER start_time;
+        boost::uint64_t start_time_;
     };
-
 }} // namespace hpx::util
-
-#elif defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 && defined(_POSIX_THREAD_CPUTIME)
-
-#if _POSIX_THREAD_CPUTIME > 0   // timer always supported
-
-namespace hpx { namespace util
-{
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //
-    //  high_resolution_timer
-    //      A timer object measures elapsed time.
-    //
-    ///////////////////////////////////////////////////////////////////////////////
-    class high_resolution_timer
-    {
-    public:
-        high_resolution_timer()
-        {
-            start_time.tv_sec = 0;
-            start_time.tv_nsec = 0;
-
-            restart();
-        }
-
-        high_resolution_timer(double t)
-        {
-            start_time.tv_sec = time_t(t);
-            start_time.tv_nsec = long(double(t - start_time.tv_sec) * 1e9);
-        }
-
-        high_resolution_timer(high_resolution_timer const& rhs)
-          : start_time(rhs.start_time)
-        {
-        }
-
-        static double now()
-        {
-            timespec now;
-            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
-                boost::throw_exception(std::runtime_error("Couldn't get current time"));
-            return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
-        }
-
-        void restart()
-        {
-            if (-1 == clock_gettime(CLOCK_REALTIME, &start_time))
-                boost::throw_exception(std::runtime_error("Couldn't initialize start_time"));
-        }
-        double elapsed() const                  // return elapsed time in seconds
-        {
-            timespec now;
-            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
-                boost::throw_exception(std::runtime_error("Couldn't get current time"));
-
-            if (now.tv_sec == start_time.tv_sec)
-                return double(now.tv_nsec - start_time.tv_nsec) * 1e-9;
-
-            return double(now.tv_sec - start_time.tv_sec) +
-                (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
-        }
-
-        boost::int64_t elapsed_microseconds() const
-        {
-            return boost::int64_t(1e6 * elapsed());
-        }
-
-        boost::int64_t elapsed_nanoseconds() const
-        {
-            return boost::int64_t(1e9 * elapsed());
-        }
-
-        double elapsed_max() const   // return estimated maximum value for elapsed()
-        {
-            return double((std::numeric_limits<time_t>::max)() - start_time.tv_sec);
-        }
-
-        double elapsed_min() const            // return minimum value for elapsed()
-        {
-            timespec resolution;
-            if (-1 == clock_getres(CLOCK_REALTIME, &resolution))
-                boost::throw_exception(std::runtime_error("Couldn't get resolution"));
-            return double(resolution.tv_sec + resolution.tv_nsec * 1e-9);
-        }
-
-    private:
-        timespec start_time;
-    };
-
-}} // namespace hpx::util
-
-#else   // _POSIX_THREAD_CPUTIME > 0
-
-#include <boost/timer.hpp>
-
-// availability of high performance timers must be checked at runtime
-namespace hpx { namespace util
-{
-    ///////////////////////////////////////////////////////////////////////////////
-    //
-    //  high_resolution_timer
-    //      A timer object measures elapsed time.
-    //
-    ///////////////////////////////////////////////////////////////////////////////
-    class high_resolution_timer
-    {
-    public:
-        high_resolution_timer()
-          : use_backup(sysconf(_SC_THREAD_CPUTIME) <= 0)
-        {
-            if (!use_backup) {
-                start_time.tv_sec = 0;
-                start_time.tv_nsec = 0;
-            }
-            restart();
-        }
-
-        high_resolution_timer(double t)
-          : use_backup(sysconf(_SC_THREAD_CPUTIME) <= 0)
-        {
-            if (!use_backup) {
-                start_time.tv_sec = time_t(t);
-                start_time.tv_nsec = long(double(t - double(start_time.tv_sec)) * 1e9);
-            }
-        }
-
-        high_resolution_timer(high_resolution_timer const& rhs)
-          : use_backup(sysconf(_SC_THREAD_CPUTIME) <= 0),
-            start_time(rhs.start_time)
-        {
-        }
-
-        static double now()
-        {
-            if (sysconf(_SC_THREAD_CPUTIME) <= 0)
-                return double(std::clock());
-
-            timespec now;
-            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
-                boost::throw_exception(std::runtime_error("Couldn't get current time"));
-            return double(now.tv_sec) + double(now.tv_nsec) * 1e-9;
-        }
-
-        void restart()
-        {
-            if (use_backup)
-                start_time_backup.restart();
-            else if (-1 == clock_gettime(CLOCK_REALTIME, &start_time))
-                boost::throw_exception(std::runtime_error("Couldn't initialize start_time"));
-        }
-        double elapsed() const                  // return elapsed time in seconds
-        {
-            if (use_backup)
-                return start_time_backup.elapsed();
-
-            timespec now_;
-            if (-1 == clock_gettime(CLOCK_REALTIME, &now_))
-                boost::throw_exception(std::runtime_error("Couldn't get current time"));
-
-            if (now_.tv_sec == start_time.tv_sec)
-                return double(now_.tv_nsec - start_time.tv_nsec) * 1e-9;
-
-            return double(now_.tv_sec - start_time.tv_sec) +
-                (double(now_.tv_nsec - start_time.tv_nsec) * 1e-9);
-        }
-
-        boost::int64_t elapsed_microseconds() const
-        {
-            return boost::int64_t(1e6 * elapsed());
-        }
-
-        boost::int64_t elapsed_nanoseconds() const
-        {
-            return boost::int64_t(1e9 * elapsed());
-        }
-
-        double elapsed_max() const   // return estimated maximum value for elapsed()
-        {
-            if (use_backup)
-                start_time_backup.elapsed_max();
-
-            return double((std::numeric_limits<time_t>::max)() - start_time.tv_sec);
-        }
-
-        double elapsed_min() const            // return minimum value for elapsed()
-        {
-            if (use_backup)
-                start_time_backup.elapsed_min();
-
-            timespec resolution;
-            if (-1 == clock_getres(CLOCK_REALTIME, &resolution))
-                boost::throw_exception(std::runtime_error("Couldn't get resolution"));
-            return double(resolution.tv_sec) + (double(resolution.tv_nsec) * 1e-9);
-        }
-
-    private:
-        bool use_backup;
-        timespec start_time;
-        boost::timer start_time_backup;
-    };
-
-}} // namespace hpx::util
-
-#endif  // _POSIX_THREAD_CPUTIME > 0
-
-#else   //  !defined(BOOST_WINDOWS) && (!defined(_POSIX_TIMERS)
-        //      || _POSIX_TIMERS <= 0
-        //      || !defined(_POSIX_THREAD_CPUTIME)
-        //      || _POSIX_THREAD_CPUTIME <= 0)
-
-//  For platforms other than Windows or Linux, simply fall back to boost::timer
-#include <boost/timer.hpp>
-
-namespace hpx { namespace util
-{
-    struct high_resolution_timer
-        : boost::timer
-    {
-        static double now()
-        {
-            return double(std::clock());
-        }
-    };
-}}
-
-#endif
 
 #endif
 

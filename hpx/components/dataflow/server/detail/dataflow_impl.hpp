@@ -502,7 +502,7 @@ namespace hpx { namespace traits
         std::vector<detail::component_wrapper_base *> future_slots;
 #endif
 
-        util::full_empty<data_type> result;
+        hpx::lcos::detail::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
 

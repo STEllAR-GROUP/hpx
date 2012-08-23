@@ -37,8 +37,8 @@
 
 #define HPX_VERSION_TAG          "-trunk"
 
-#if !defined(HPX_SVN_REVISION)
-    #define HPX_SVN_REVISION     "$Revision$"
+#if !defined(HPX_GIT_COMMIT)
+    #define HPX_GIT_COMMIT       "unknown"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -23,6 +23,7 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime_impl.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/function.hpp>
@@ -872,7 +873,7 @@ namespace hpx
                     threads = boost::lexical_cast<std::size_t>(threads_str);
 
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                      num_threads > threads)
+                      threads > batch_threads)
                 {
                     std::cerr << "hpx::init: command line warning: --hpx:threads "
                             "used when running with "

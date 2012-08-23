@@ -23,10 +23,10 @@
 #include <boost/intrusive/slist.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace detail
+namespace hpx { namespace lcos { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    enum full_empty
+    enum full_empty_state
     {
         empty = false,
         full = true
@@ -554,7 +554,7 @@ namespace hpx { namespace util { namespace detail
         queue_type read_and_empty_queue_;     // threads waiting in read_and_empty
         queue_type read_queue_;               // threads waiting in read
         value_type data_;                     // protected data
-        full_empty state_;                    // current full/empty state
+        full_empty_state state_;              // current full/empty state
     };
 }}}
 

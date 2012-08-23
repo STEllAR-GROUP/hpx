@@ -34,6 +34,7 @@ set(subdirs
     performance_counters
     queue
     quickstart
+    qt
     random_mem_access
     sheneos
     spell_check

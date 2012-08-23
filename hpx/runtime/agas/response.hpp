@@ -16,7 +16,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
