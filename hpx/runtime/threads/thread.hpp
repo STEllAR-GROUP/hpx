@@ -9,11 +9,11 @@
 #define HPX_THREADS_THREAD_APR_10_2012_0145PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/date_time_chrono.hpp>
-#include <hpx/lcos/local/spinlock_no_backoff.hpp>
 #include <hpx/traits/supports_result_of.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -31,9 +31,11 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT thread
     {
-        typedef lcos::local::spinlock_no_backoff mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
     public:
+        static threads::thread_id_type const uninitialized;
+
         class id;
         typedef threads::thread_id_type native_handle_type;
 
@@ -41,7 +43,7 @@ namespace hpx
 
         template <typename F>
         explicit thread(BOOST_FWD_REF(F) f)
-          : id_(threads::invalid_thread_id)
+          : id_(uninitialized)
         {
             start_thread(boost::move(HPX_STD_FUNCTION<void()>(boost::forward<F>(f))));
         }
@@ -79,7 +81,7 @@ namespace hpx
         bool joinable() const BOOST_NOEXCEPT
         {
             mutex_type::scoped_lock l(mtx_);
-            return threads::invalid_thread_id != id_;
+            return threads::invalid_thread_id != id_ && uninitialized != id_;
         }
 
         void join();
@@ -144,7 +146,7 @@ namespace hpx
         friend class thread;
 
     public:
-        id() BOOST_NOEXCEPT : id_(threads::invalid_thread_id) {}
+        id() BOOST_NOEXCEPT : id_(thread::uninitialized) {}
         explicit id(threads::thread_id_type i) BOOST_NOEXCEPT : id_(i) {}
     };
 
@@ -254,7 +256,7 @@ namespace hpx
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thread(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-      : id_(threads::invalid_thread_id)
+      : id_(uninitialized)
     {
         start_thread(HPX_STD_BIND(boost::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
