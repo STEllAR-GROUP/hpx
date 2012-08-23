@@ -9,6 +9,8 @@ set(HPX_PATCH_LEVEL   @HPX_PATCH_LEVEL@)
 set(HPX_VERSION       @HPX_VERSION@)
 set(HPX_SOVERSION     @HPX_SOVERSION@)
 
+set(HPX_EXTERNAL_CMAKE ON)
+
 set(HPX_FOUND ON CACHE BOOL "True if HPX was found")
 
 set(HPX_COMPILE_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@"

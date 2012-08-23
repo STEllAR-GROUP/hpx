@@ -55,6 +55,8 @@ endif()
 ################################################################################
 # CMake configuration
 ################################################################################
+set(HPX_INTERNAL_CMAKE ON)
+
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 
 # include additional macro definitions
