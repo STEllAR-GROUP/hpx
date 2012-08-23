@@ -13,7 +13,7 @@
          
 
 if ( $#ARGV < 0 ) {
-  print "Usage: ts.pl <filename> <module set 1 or 2> [number duplicates]\n";
+  print "Usage: ts.pl <filename> <module set 1 or 2; module set 2 is only used for random number generator > [number duplicates]\n";
   exit;
 } 
 
@@ -36,6 +36,9 @@ open(OUT,">$fileout") || die "Can't open $fileout \n";
 while (<IN>) {
   chomp;
   tr/A-Z/a-z/;
+  
+  # change everything to real*8 
+  $_ =~ s/real\(wp\)/real\(8\)/g;
 
   $src[$mcount] = $_;
   $mcount++;

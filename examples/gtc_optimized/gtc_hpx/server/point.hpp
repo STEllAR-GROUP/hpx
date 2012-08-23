@@ -47,6 +47,12 @@ namespace gtc { namespace server
                         std::vector<int> const& intparams,
                         std::vector<double> const& realparams);
 
+        void toroidal_sndleft(double *csend,double *creceive, int* mgrid);
+
+        void set_tsr_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<double> const& send);
+
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
@@ -54,6 +60,7 @@ namespace gtc { namespace server
         HPX_DEFINE_COMPONENT_ACTION(point, chargei_wrapper, chargei_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_params, set_params_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_tsr_data, set_tsr_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -68,6 +75,7 @@ namespace gtc { namespace server
         std::vector<double> realparams_;
         std::vector<double> dnireceive_;
         std::size_t in_toroidal_,in_particle_;
+        std::vector<double> tsr_receive_;
     };
 }}
 
@@ -87,6 +95,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::set_params_action,
     gtc_point_set_params_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_tsr_data_action,
+    gtc_point_set_tsr_data_action);
 
 #endif
 

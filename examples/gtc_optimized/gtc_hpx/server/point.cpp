@@ -49,6 +49,13 @@ extern "C" {
             void FNAME(chargei_7)(void* opaque_ptr_to_class);
             void FNAME(chargei_8)(void* opaque_ptr_to_class);
             void FNAME(chargei_9)(void* opaque_ptr_to_class);
+            void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send,double *receive,
+                                             int* mgrid) {
+                    // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
+                    // derived from point, then the world will end.
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->toroidal_sndleft(send,receive,mgrid);
+                    return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
@@ -82,12 +89,12 @@ namespace gtc { namespace server
       // prepare data array
       //n_.clear();
       //n_.resize(components.size());
-//#if 0
+#if 0
       // TEST
       int npartdom,ntoroidal;
       int hpx_left_pe, hpx_right_pe;
-      npartdom = 5;
-      ntoroidal = 2;
+      npartdom = 1;
+      ntoroidal = 10;
       int particle_domain_location=mype%npartdom;
       int toroidal_domain_location=mype/npartdom;
       int myrank_toroidal = toroidal_domain_location;
@@ -96,52 +103,52 @@ namespace gtc { namespace server
       }
       hpx_left_pe = (myrank_toroidal-1+ntoroidal)%ntoroidal;
       hpx_right_pe = (myrank_toroidal+1)%ntoroidal;
-//#endif
+#endif
 //#if 0
       int t1 = numberpe;
       int t2 = mype;
-      int t_npartdom,t_ntoroidal;
-      int t_hpx_left_pe, t_hpx_right_pe;
+      int npartdom,ntoroidal;
+      int hpx_left_pe, hpx_right_pe;
       switch(item_) {
         case 0:
           FNAME(setup_0)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 1:
           FNAME(setup_1)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 2:
           FNAME(setup_2)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 3:
           FNAME(setup_3)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 4:
           FNAME(setup_4)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 5:
           FNAME(setup_5)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 6:
           FNAME(setup_6)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 7:
           FNAME(setup_7)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 8:
           FNAME(setup_8)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
         case 9:
           FNAME(setup_9)(static_cast<void*>(this),
-            &t1,&t2,&t_npartdom,&t_ntoroidal,&t_hpx_left_pe,&t_hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
           break;
       }
 
@@ -171,6 +178,7 @@ namespace gtc { namespace server
           toroidal_comm_.push_back( components[i] );
         }
       }
+
 
       if ( partd_comm_.size() != (std::size_t) npartdom ) {
         std::cerr << " PROBLEM: partd_comm " << partd_comm_.size()
@@ -284,7 +292,6 @@ namespace gtc { namespace server
     {
        mutex_type::scoped_lock l(mtx_);
 
-       std::cout << " TEST set_params " << which << " " << generation << " _ " << generation_ << std::endl;
        // make sure this set operation has not arrived ahead of time
        while (generation > generation_)
        {
@@ -301,8 +308,6 @@ namespace gtc { namespace server
     void point::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
     {
       if ( in_particle_ ) {
-        std::cout << " HELLO WORLD FROM allreduce" << std::endl;
-  
         // create a new and-gate object
         gate_.init(partd_comm_.size());
 
@@ -334,7 +339,6 @@ namespace gtc { namespace server
         for (std::size_t i=0;i<dnireceive_.size();i++) {
           densityi[i] = dnireceive_[i]; 
         }
-        std::cout << " Finish TEST allreduce " << item_ << std::endl;
       }
     }
 
@@ -355,6 +359,71 @@ namespace gtc { namespace server
        }
 
        gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+    void point::toroidal_sndleft(double *csend,double *creceive, int* mgrid)
+    {
+      if ( in_toroidal_ ) {
+        // Send data to the left
+        // The sender: send data to the left 
+        // in a fire and forget fashion
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+
+        int vsize = *mgrid;
+        std::vector<double> send;
+        send.resize(vsize); 
+        tsr_receive_.resize(vsize); 
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = csend[i];
+        }
+
+        set_tsr_data_action set_tsr_data_;
+        std::cout << " TEST sending data from " << item_ << " to " << left_pe_ << std::endl;
+        hpx::apply(set_tsr_data_, toroidal_comm_[left_pe_], item_, generation, send);
+
+        // Now receive a message from the right
+        // create a new and-gate object
+        gate_.init(1);
+
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
+
+        // possibly do other stuff 
+        f.get();
+
+        for (std::size_t i=0;i<tsr_receive_.size();i++) {
+          creceive[i] = tsr_receive_[i]; 
+        }
+      }
+    }
+
+    void point::set_tsr_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send)
+    {
+       mutex_type::scoped_lock l(mtx_);
+       std::cout << " TEST which " << which << " item " << item_ << std::endl;
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       tsr_receive_ = send;
+
+       gate_.set(0);         // trigger corresponding and-gate input
     }
 
 }}

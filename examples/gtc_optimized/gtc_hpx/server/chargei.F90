@@ -11,6 +11,7 @@ subroutine chargei(ptr)
   integer ij,kk
 
   real(wp) dnitmp(0:mzeta,mgrid)
+  real(wp) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -19,11 +20,10 @@ subroutine chargei(ptr)
     enddo
   enddo
 
-  print*,' BEFORE ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' AFTER ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei
 

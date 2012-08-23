@@ -839,9 +839,9 @@ end subroutine broadcast_input_params
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' NOT EQUAL to npartdom=',npartdom
@@ -866,7 +866,5 @@ end subroutine broadcast_input_params
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' TEST left_pe ', left_pe
-  !print*,' TEST right_pe ',right_pe
 
 end subroutine set_particle_decomp

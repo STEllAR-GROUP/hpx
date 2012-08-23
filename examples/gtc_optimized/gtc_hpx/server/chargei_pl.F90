@@ -10,7 +10,8 @@ subroutine chargei_0(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -19,11 +20,10 @@ subroutine chargei_0(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_0
 
@@ -39,7 +39,8 @@ subroutine chargei_1(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -48,11 +49,10 @@ subroutine chargei_1(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_1
 
@@ -68,7 +68,8 @@ subroutine chargei_2(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -77,11 +78,10 @@ subroutine chargei_2(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_2
 
@@ -97,7 +97,8 @@ subroutine chargei_3(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -106,11 +107,10 @@ subroutine chargei_3(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_3
 
@@ -126,7 +126,8 @@ subroutine chargei_4(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -135,11 +136,10 @@ subroutine chargei_4(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_4
 
@@ -155,7 +155,8 @@ subroutine chargei_5(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -164,11 +165,10 @@ subroutine chargei_5(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_5
 
@@ -184,7 +184,8 @@ subroutine chargei_6(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -193,11 +194,10 @@ subroutine chargei_6(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_6
 
@@ -213,7 +213,8 @@ subroutine chargei_7(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -222,11 +223,10 @@ subroutine chargei_7(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_7
 
@@ -242,7 +242,8 @@ subroutine chargei_8(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -251,11 +252,10 @@ subroutine chargei_8(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_8
 
@@ -271,7 +271,8 @@ subroutine chargei_9(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(8) dnitmp(0:mzeta,mgrid)
+  real(8) recvr(mgrid)
 
   do ij=1,mgrid
     do kk=0,mzeta
@@ -280,11 +281,10 @@ subroutine chargei_9(ptr)
     enddo
   enddo
 
-  print*,' before ',mype, dnitmp(3,3)
-
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
-  print*,' after ', mype, densityi(3,3)
+  recvr = 0.0d0
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
 
 end subroutine chargei_9
 
