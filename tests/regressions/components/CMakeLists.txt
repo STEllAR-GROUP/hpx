@@ -9,11 +9,11 @@ set(tests)
 
 # Windows requires all symbols to be resolved at link time, this test does
 # not make sense on this platform.
-if(NOT MSVC)
-  set(tests
-      undefined_symbol_at_runtime
-     )
-endif()
+#if(NOT MSVC)
+#  set(tests
+#      undefined_symbol_at_runtime
+#     )
+#endif()
 
 foreach(test ${tests})
   set(sources

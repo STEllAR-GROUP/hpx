@@ -7,16 +7,16 @@
 # Windows requires all symbols to be resolved at link time, this test does not
 # make sense on this platform.
 if(NOT MSVC)
-  add_hpx_component(undefined_symbol
-    HEADER_GLOB "undefined_symbol.h*"
-    SOURCE_GLOB "undefined_symbol.c*"
-    FOLDER "Tests/Regressions/Components"
-    AUTOGLOB)
-
-  add_hpx_pseudo_dependencies(tests.regressions.components
-                              undefined_symbol_component)
-
-  set_target_properties(undefined_symbol_component
-      PROPERTIES LINK_FLAGS "-Wl,--allow-shlib-undefined")
+#  add_hpx_component(undefined_symbol
+#    HEADER_GLOB "undefined_symbol.h*"
+#    SOURCE_GLOB "undefined_symbol.c*"
+#    FOLDER "Tests/Regressions/Components"
+#    AUTOGLOB)
+#
+#  add_hpx_pseudo_dependencies(tests.regressions.components
+#                              undefined_symbol_component)
+#
+#  set_target_properties(undefined_symbol_component
+#      PROPERTIES LINK_FLAGS "-Wl,--allow-shlib-undefined")
 endif()
 
