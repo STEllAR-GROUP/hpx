@@ -19,12 +19,15 @@ namespace jacobi
     {
         void stencil_iterator::step()
         {
+
+            jacobi::row top = top_future[src].get();
+            jacobi::row bottom = bottom_future[src].get();
+            
             BOOST_ASSERT(top.id);
             BOOST_ASSERT(bottom.id);
             BOOST_ASSERT(top.id != bottom.id);
             BOOST_ASSERT(this->get_gid() != top.id);
             BOOST_ASSERT(this->get_gid() != bottom.id);
-            //std::cout << "beginning to run ...\n";
 
             std::vector<hpx::lcos::future<void> > fs;
             for(std::size_t x = 1; x < nx-1; x += line_block)
@@ -37,8 +40,8 @@ namespace jacobi
                           , this
                           , rows[dst].get(x, x_end)
                           , rows[src].get(x-1, x_end+1)
-                          , top.get_range(x, x_end)
-                          , bottom.get_range(x, x_end)
+                          , top.get(x, x_end)
+                          , bottom.get(x, x_end)
                         )
                     )
                 );
@@ -93,9 +96,10 @@ namespace jacobi
             }
         }
 
-        row_range stencil_iterator::get_range(std::size_t begin, std::size_t end)
+        jacobi::row stencil_iterator::get(std::size_t idx)
         {
-            return rows[src].get(begin, end).get();
+            BOOST_ASSERT(rows[idx].id);
+            return rows[idx];
         }
     }
 }
@@ -123,6 +127,6 @@ HPX_REGISTER_ACTION_EX(
 )
 
 HPX_REGISTER_ACTION_EX(
-    jacobi::server::stencil_iterator::get_range_action
-  , jacobi_server_stencil_iterator_get_range_action
+    jacobi::server::stencil_iterator::get_action
+  , jacobi_server_stencil_iterator_get_action
 )

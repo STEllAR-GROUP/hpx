@@ -40,6 +40,7 @@ namespace jacobi
 
             stencil_iterator(component_type * back_ptr)
                 : base_type(back_ptr)
+                , init_future(init_promise.get_future())
             {
             }
 
@@ -70,6 +71,7 @@ namespace jacobi
                 line_block = l;
                 src = 0;
                 dst = 1;
+                init_promise.set_value();
             }
 
 
@@ -78,13 +80,16 @@ namespace jacobi
               , jacobi::stencil_iterator const & b
             )
             {
-                top = t;
-                bottom = b;
+                init_future.get();
+                top_future[src]    = t.get(src);
+                top_future[dst]    = t.get(dst);
+                bottom_future[src] = b.get(src);
+                bottom_future[dst] = b.get(dst);
             }
 
             void step();
             
-            row_range get_range(std::size_t begin, std::size_t end);
+            jacobi::row get(std::size_t idx);
 
             void update(
                 hpx::lcos::future<row_range> dst
@@ -96,7 +101,7 @@ namespace jacobi
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, init, init_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, setup_boundary, setup_boundary_action);
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, step, step_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get_range, get_range_action);
+            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get, get_action);
 
             std::size_t y;
             std::size_t ny;
@@ -104,10 +109,11 @@ namespace jacobi
             std::size_t line_block;
             std::size_t src;
             std::size_t dst;
-            jacobi::stencil_iterator top;
+            hpx::lcos::promise<void> init_promise;
+            hpx::lcos::future<void> init_future;
+            hpx::lcos::future<jacobi::row> top_future[2];
             jacobi::row rows[2];
-            jacobi::stencil_iterator bottom;
-
+            hpx::lcos::future<jacobi::row> bottom_future[2];
 
         };
     }
@@ -129,8 +135,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 )
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    jacobi::server::stencil_iterator::get_range_action
-  , jacobi_server_stencil_iterator_get_range_action
+    jacobi::server::stencil_iterator::get_action
+  , jacobi_server_stencil_iterator_get_action
 )
 
 #endif

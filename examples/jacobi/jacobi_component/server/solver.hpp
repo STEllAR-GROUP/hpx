@@ -82,6 +82,7 @@ namespace jacobi
                     ++y;
                 }
                 BOOST_ASSERT(y == ny);
+                hpx::lcos::wait(init_futures);
 
                 std::vector<hpx::lcos::future<void> > boundary_futures;
                 hpx::lcos::wait(
