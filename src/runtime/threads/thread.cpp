@@ -25,9 +25,9 @@ namespace hpx
     {}
 
     thread::thread(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
-      : id_(rhs.id_)
+      : id_(uninitialized)
     {
-        rhs.id_ = uninitialized;
+        rhs.swap(*this);
     }
 
     thread& thread::operator=(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
