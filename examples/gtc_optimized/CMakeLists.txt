@@ -11,7 +11,8 @@ if(HDF5_CPP_FOUND)
   if(HDF5_THREAD_SAFE)
     if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
 
-        set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgfortran")
+        set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS} -lgfortran")
 
         add_subdirectory(gtc_hpx)
 

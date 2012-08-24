@@ -47,7 +47,8 @@ namespace gtc { namespace server
                         std::vector<int> const& intparams,
                         std::vector<double> const& realparams);
 
-        void toroidal_sndleft(double *csend,double *creceive, int* mgrid);
+        void toroidal_sndleft(double *csend, int* mgrid);
+        void toroidal_rcvright(double *creceive);
 
         void set_tsr_data(std::size_t which,
                           std::size_t generation,
