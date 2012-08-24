@@ -23,7 +23,8 @@ subroutine chargei(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei
 

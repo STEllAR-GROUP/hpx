@@ -23,7 +23,8 @@ subroutine chargei_0(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_0
 
@@ -52,7 +53,8 @@ subroutine chargei_1(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_1
 
@@ -81,7 +83,8 @@ subroutine chargei_2(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_2
 
@@ -110,7 +113,8 @@ subroutine chargei_3(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_3
 
@@ -139,7 +143,8 @@ subroutine chargei_4(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_4
 
@@ -168,7 +173,8 @@ subroutine chargei_5(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_5
 
@@ -197,7 +203,8 @@ subroutine chargei_6(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_6
 
@@ -226,7 +233,8 @@ subroutine chargei_7(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_7
 
@@ -255,7 +263,8 @@ subroutine chargei_8(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_8
 
@@ -284,7 +293,8 @@ subroutine chargei_9(ptr)
   call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),recvr,mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_9
 

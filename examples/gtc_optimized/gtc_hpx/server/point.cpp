@@ -49,12 +49,17 @@ extern "C" {
             void FNAME(chargei_7)(void* opaque_ptr_to_class);
             void FNAME(chargei_8)(void* opaque_ptr_to_class);
             void FNAME(chargei_9)(void* opaque_ptr_to_class);
-            void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send,double *receive,
-                                             int* mgrid) {
+            void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
-                    ptr_to_class->toroidal_sndleft(send,receive,mgrid);
+                    ptr_to_class->toroidal_sndleft(send,mgrid);
+                    return; };
+            void FNAME(rcvright_toroidal_cmm) (void* pfoo,double *receive) {
+                    // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
+                    // derived from point, then the world will end.
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->toroidal_rcvright(receive);
                     return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
@@ -162,21 +167,26 @@ namespace gtc { namespace server
       if ( my_pdl == (int) mype ) in_particle_ = 1;
       if ( my_tdl == (int) mype ) in_toroidal_ = 1;
 
+      left_pe_ = mype - 1;
+      right_pe_ = mype + 1;
+      if ( left_pe_ < 0 ) left_pe_ = components_.size()-1;
+      if ( right_pe_ > components_.size()-1 ) right_pe_ = 0;
+      toroidal_comm_ = components_;
+
       for (std::size_t i=0;i<numberpe;i++) {
         int particle_domain_location= i%npartdom;
         int toroidal_domain_location= i/npartdom;
         if ( toroidal_domain_location == my_tdl ) {
           partd_comm_.push_back( components[i] );
         }
-        if ( particle_domain_location == my_pdl ) {
+        //if ( particle_domain_location == my_pdl ) {
           // record the left gid
-          if ( particle_domain_location == hpx_left_pe ) left_pe_ = toroidal_comm_.size();
+          //if ( particle_domain_location == hpx_left_pe ) left_pe_ = toroidal_comm_.size();
 
           // record the right gid
-          if ( particle_domain_location == hpx_right_pe ) right_pe_ = toroidal_comm_.size();
-
-          toroidal_comm_.push_back( components[i] );
-        }
+          //if ( particle_domain_location == hpx_right_pe ) right_pe_ = toroidal_comm_.size();
+        //  toroidal_comm_.push_back( components[i] );
+       // }
       }
 
 
@@ -361,18 +371,12 @@ namespace gtc { namespace server
        gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::toroidal_sndleft(double *csend,double *creceive, int* mgrid)
+    void point::toroidal_sndleft(double *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
         // Send data to the left
         // The sender: send data to the left 
         // in a fire and forget fashion
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
-
         int vsize = *mgrid;
         std::vector<double> send;
         send.resize(vsize); 
@@ -382,10 +386,21 @@ namespace gtc { namespace server
           send[i] = csend[i];
         }
 
-        set_tsr_data_action set_tsr_data_;
-        std::cout << " TEST sending data from " << item_ << " to " << left_pe_ << std::endl;
-        hpx::apply(set_tsr_data_, toroidal_comm_[left_pe_], item_, generation, send);
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
 
+        set_tsr_data_action set_tsr_data_;
+        hpx::apply(set_tsr_data_, toroidal_comm_[left_pe_], item_, generation, send);
+      }
+    }
+
+    void point::toroidal_rcvright(double *creceive)
+    {
+      std::cout << " TEST A " << item_ << std::endl;
+      if ( in_toroidal_ ) {
         // Now receive a message from the right
         // create a new and-gate object
         gate_.init(1);
@@ -398,9 +413,12 @@ namespace gtc { namespace server
           ++generation_;
         }
 
+        std::cout << " TEST item " << item_ << std::endl;
+
         // possibly do other stuff 
         f.get();
 
+        std::cout << " TEST item " << item_ << std::endl;
         for (std::size_t i=0;i<tsr_receive_.size();i++) {
           creceive[i] = tsr_receive_[i]; 
         }
