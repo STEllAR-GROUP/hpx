@@ -149,7 +149,7 @@ namespace hpx
             util::runtime_configuration& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
-        topology_(
+        topology_(static_cast<threads::topology*>(
 #if defined(HPX_HAVE_HWLOC)
             new threads::hwloc_topology
 #elif defined(BOOST_WINDOWS)
@@ -161,7 +161,7 @@ namespace hpx
 #else
             new threads::noop_topology
 #endif
-        ),
+        )),
         state_(state_invalid)
     {
         // initialize thread mapping for external libraries (i.e. PAPI)
