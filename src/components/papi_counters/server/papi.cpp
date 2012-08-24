@@ -27,7 +27,6 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     papi_counter_type, papi_counter, "base_performance_counter");
-HPX_DEFINE_GET_COMPONENT_TYPE(papi_ns::server::papi_counter);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi { namespace server
@@ -54,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             "could not create PAPI event set", locstr);
         papi_call(PAPI_assign_eventset_component(evset_, 0),
             "cannot assign component index to event set", locstr);
-        unsigned long tid = tm.get_thread_id(tix);
+        long tid = tm.get_thread_id(tix);
         if (tid == tm.invalid_tid)
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 NS_STR "thread_counters::thread_counters()",
@@ -207,8 +206,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             "event "+cpe.countername_+" is not available on this platform", locstr);
         // find OS thread associated with the counter
         hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
-        boost::uint32_t tix = tm.get_thread_index(cpe.instancename_.c_str(),
-                                                  cpe.instanceindex_);
+        boost::format lab("%s-%d");
+        boost::uint32_t tix = tm.get_thread_index(
+            boost::str(lab % cpe.instancename_ % cpe.instanceindex_));
         if (tix == hpx::util::thread_mapper::invalid_index)
         {
             boost::format fmt("could not find %s#%d");

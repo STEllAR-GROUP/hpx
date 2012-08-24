@@ -14,7 +14,7 @@ set(subdirs
    )
 
 if(PAPI_FOUND)
-  set(subdirs ${subdirs} papi)
+  set(subdirs ${subdirs} papi_counters)
 endif()
 
 add_hpx_pseudo_target(components)
