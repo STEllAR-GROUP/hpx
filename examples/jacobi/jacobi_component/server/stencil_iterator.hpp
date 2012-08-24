@@ -40,7 +40,6 @@ namespace jacobi
 
             stencil_iterator(component_type * back_ptr)
                 : base_type(back_ptr)
-                , init_future(init_promise.get_future())
             {
             }
 
@@ -71,7 +70,6 @@ namespace jacobi
                 line_block = l;
                 src = 0;
                 dst = 1;
-                init_promise.set_value();
             }
 
 
@@ -80,7 +78,6 @@ namespace jacobi
               , jacobi::stencil_iterator const & b
             )
             {
-                init_future.get();
                 top_future[src]    = t.get(src);
                 top_future[dst]    = t.get(dst);
                 bottom_future[src] = b.get(src);
@@ -109,8 +106,6 @@ namespace jacobi
             std::size_t line_block;
             std::size_t src;
             std::size_t dst;
-            hpx::lcos::promise<void> init_promise;
-            hpx::lcos::future<void> init_future;
             hpx::lcos::future<jacobi::row> top_future[2];
             jacobi::row rows[2];
             hpx::lcos::future<jacobi::row> bottom_future[2];

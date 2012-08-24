@@ -82,7 +82,6 @@ namespace jacobi
                     ++y;
                 }
                 BOOST_ASSERT(y == ny);
-                hpx::lcos::wait(init_futures);
 
                 std::vector<hpx::lcos::future<void> > boundary_futures;
                 hpx::lcos::wait(
@@ -94,6 +93,8 @@ namespace jacobi
                             BOOST_ASSERT(stencil_iterators[y-1].id);
                             BOOST_ASSERT(stencil_iterators[y].id);
                             BOOST_ASSERT(stencil_iterators[y+1].id);
+                            hpx::lcos::wait(init_futures[y-1]);
+                            hpx::lcos::wait(init_futures[y+1]);
                             boundary_futures.push_back(
                                 stencil_iterators[y].setup_boundary(
                                     stencil_iterators[y-1]
