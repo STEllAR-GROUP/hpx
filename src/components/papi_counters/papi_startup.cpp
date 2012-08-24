@@ -85,26 +85,29 @@ namespace hpx { namespace performance_counters { namespace papi
     // bool is true when group is enumerated
     typedef std::pair<std::string, bool> thread_category;
 
+    template<typename T> void discard_result(T const&) { }
+
     // find thread categories
-    void find_thread_groups(std::vector<std::string> const& labels,
-                            std::vector<std::string>& tdesc)
+    void find_thread_groups(std::vector<std::string>& tdesc)
     {
-        std::vector<std::string>::const_iterator it;
+        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
         std::set<thread_category> cats;
-        for (it = labels.begin(); it != labels.end(); it++)
+        std::string label;
+        boost::uint32_t tix = 0;
+        while (!((label = tm.get_thread_label(tix++)).empty()))
         {
-            size_t pos = it->find_last_of('-');
-            if (pos == it->npos)
-                cats.insert(std::make_pair(*it, false));
+            size_t pos = label.find_last_of('-');
+            if (pos == label.npos)
+                cats.insert(std::make_pair(label, false));
             else
             {
-                char const *p = it->c_str();
+                char const *p = label.c_str();
                 char *end;
-                (void)strtol(p+pos+1, &end, 0);
+                discard_result(strtol(p+pos+1, &end, 0));
                 if (*end == 0)
-                    cats.insert(std::make_pair(it->substr(0, pos), true));
+                    cats.insert(std::make_pair(label.substr(0, pos), true));
                 else
-                    cats.insert(std::make_pair(*it, false));
+                    cats.insert(std::make_pair(label, false));
             }
         }
         std::set<thread_category>::iterator si;
@@ -158,10 +161,8 @@ namespace hpx { namespace performance_counters { namespace papi
         if (!status_is_valid(status)) return false;
 
         // obtain known OS thread labels
-        std::vector<std::string> labels, tdesc;
-        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
-        tm.get_registered_labels(labels);
-        find_thread_groups(labels, tdesc);
+        std::vector<std::string> tdesc;
+        find_thread_groups(tdesc);
 
         // fill in common path segments for all counters
         counter_path_elements cpe;

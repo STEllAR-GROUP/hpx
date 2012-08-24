@@ -115,7 +115,7 @@ namespace hpx { namespace util
         mutex_type::scoped_lock m(mtx_);
 
         label_map_type::right_map::const_iterator it = label_map_.right.find(tix);
-        return (it != label_map_.right.end())? it->second: invalid_label;
+        return (it == label_map_.right.end())? invalid_label: it->second;
     }
 
     boost::uint32_t thread_mapper::get_thread_index(std::string const& label) const
@@ -131,14 +131,5 @@ namespace hpx { namespace util
         mutex_type::scoped_lock m(mtx_);
 
         return static_cast<boost::uint32_t>(thread_info_.size());
-    }
-
-    void thread_mapper::get_registered_labels(std::vector<std::string>& labels) const
-    {
-        mutex_type::scoped_lock m(mtx_);
-
-        label_map_type::left_map::const_iterator it;
-        for (it = label_map_.left.begin(); it != label_map_.left.end(); ++it)
-            labels.push_back(it->first);
     }
 }}

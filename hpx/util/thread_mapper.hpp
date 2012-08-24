@@ -32,6 +32,14 @@ namespace hpx { namespace util
         // type for callback function invoked when thread is unregistered
         typedef boost::function1<bool, boost::uint32_t> callback_type;
 
+        // erroneous thread index
+        static boost::uint32_t invalid_index;
+        // erroneous low-level thread ID
+        static long int invalid_tid;
+        // empty label for failed lookups
+        static std::string invalid_label;
+
+
     private:
         // null callback
         static bool null_cb(boost::uint32_t);
@@ -70,13 +78,6 @@ namespace hpx { namespace util
         bool unmap_thread(thread_map_type::iterator&);
 
     public:
-        // erroneous thread index
-        static boost::uint32_t invalid_index;
-        // erroneous low-level thread ID
-        static long int invalid_tid;
-        // empty label for failed lookups
-        static std::string invalid_label;
-
         thread_mapper() { }
         ~thread_mapper();
 
@@ -104,9 +105,6 @@ namespace hpx { namespace util
 
         // returns the number of threads registered so far
         boost::uint32_t get_thread_count() const;
-
-        // retrieve all registered thread labels
-        void get_registered_labels(std::vector<std::string>&) const;
     };
 }}
 
