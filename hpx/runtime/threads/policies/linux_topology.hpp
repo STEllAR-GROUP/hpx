@@ -24,7 +24,7 @@
 namespace hpx { namespace threads
 {
 
-struct linux_topology
+struct linux_topology : topology
 {
     std::size_t get_numa_node_number(
         std::size_t thread_num
