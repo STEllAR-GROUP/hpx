@@ -12,7 +12,7 @@ hpx_include(IsTarget)
 
 macro(hpx_handle_component_dependencies components)
   if(NOT MSVC)
-    set(prefix "hpx_component_")
+#    set(prefix "hpx_component_")
   else()
     set(prefix "")
   endif()
