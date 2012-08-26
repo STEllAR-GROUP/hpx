@@ -454,7 +454,7 @@ namespace hpx {
     {
         BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
         runtime::thread_name_.reset(new std::string(
-            context + ("-" + boost::lexical_cast<std::string>(num))));
+            context + ("#" + boost::lexical_cast<std::string>(num))));
 
         char const* name = runtime::thread_name_.get()->c_str();
 
