@@ -27,7 +27,7 @@ if(MSVC AND ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /names:lowercase")
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # Make sure we use the proper druntime libraries in Debug build.
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /dbglibs /debug:full")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /dbglibs /debug:full /Od")
   endif()
   # Make sure the C++ linker will find the Fortran runtime libraries.
   link_directories("$ENV{IFORT_COMPILER12}/compiler/lib/intel64")
