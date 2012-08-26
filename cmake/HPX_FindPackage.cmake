@@ -33,6 +33,8 @@ macro(hpx_find_headers name)
     endforeach()
 
     if(${name}_ROOT)
+      #Avoid errors by replacing \ with /. \ sometimes found in root paths.
+      string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
       find_path(${name}_INCLUDE_DIR
         NAMES ${${name}_HEADERS}
         PATHS ${rooted_header_paths}
@@ -70,6 +72,8 @@ macro(hpx_find_package name)
   if(${name}_DISABLE)
     hpx_info("find_package.${name}" "Library search disabled by user.")
 
+    string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
+    
     if(NOT ${name}_ROOT)
       set(${name}_ROOT ${name}_ROOT-NOTFOUND)
     endif()
@@ -153,6 +157,12 @@ macro(hpx_find_package name)
       find_package_handle_standard_args(${name}
         DEFAULT_MSG ${name}_LIBRARY ${name}_INCLUDE_DIR)
 
+      # FIXME: workaround - sometimes finds library but not library_dir. This happens when the relative library path goes through two folders (ie: library dirs has a "/")
+      if(${name}_LIBRARY AND ${name}_INCLUDE_DIR)
+         get_filename_component(${name}_LIBRARY_DIR ${${name}_LIBRARY} PATH)
+         set(${name}_FOUND TRUE)
+         #it's really roundabout and messy, but should work on all systems.
+      endif()
       if(${name}_FOUND)
         get_filename_component(${name}_ROOT ${${name}_INCLUDE_DIR} PATH)
         get_filename_component(${name}_LIBRARY_DIR ${${name}_LIBRARY} PATH)

@@ -27,7 +27,14 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
 # Build type (needs to be handled before project command below)
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+endif()
+
+# it _must_ go before project(OpenCV) in order to work
+if(WIN32)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Installation Directory")
+else()
+  set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation Directory")
 endif()
 
 set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
@@ -36,6 +43,35 @@ set(HPX_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration type (one o
 # (at least for now, until we figure out how to use multiple build types in
 # the same project).
 set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
+
+################################################################################
+# Install include directory
+################################################################################
+MACRO(SUBDIRCOPY curdir)
+  FILE(GLOB children ${curdir}/ ${curdir}/*)
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+       # Install include subdirectories
+       FILE(GLOB files "${curdir}/${child}/*.hpp")
+       STRING(REPLACE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/include bindir ${curdir}/${child})
+       INSTALL(FILES ${files} DESTINATION ${bindir})
+       SUBDIRCOPY("${curdir}/${child}")
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
+
+SUBDIRCOPY(${CMAKE_SOURCE_DIR}/hpx/)
+
+################################################################################
+# Include workaround macro
+################################################################################
+MACRO(INCLUDE_ALL name)
+   hpx_include_directories(${${name}_INCLUDE_DIR})
+   hpx_link_sys_directories(${${name}_LIBRARY_DIR})
+   string(REPLACE ${${name}_LIBRARY_DIR}/ "" targetLib ${${name}_LIBRARY})
+   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${targetLib})
+ENDMACRO()
+
 
 ################################################################################
 # project metadata
@@ -158,7 +194,11 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+if (UNIX)
+   hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+else()
+   hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
+endif()
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -236,7 +276,7 @@ if(NOT HPX_NO_INSTALL)
     if(UNIX)
       set(CMAKE_INSTALL_PREFIX "/opt/hpx" CACHE PATH "Prefix prepended to install directories.")
     else()
-      set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+      set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Prefix prepended to install directories.")
     endif()
   endif()
 
@@ -311,6 +351,25 @@ endif()
 
 if(HPX_VERIFY_LOCKS)
   add_definitions(-DHPX_VERIFY_LOCKS)
+endif()
+
+################################################################################
+# OpenCL and OCLM
+################################################################################
+
+if (MSVC OR UNIX)
+
+   find_package(HPX_OpenCL)
+
+   if(${OpenCL_FOUND})
+      INCLUDE_ALL(OpenCL)
+      #OCLM Include
+      find_package(HPX_OCLM)
+      if(${OCLM_FOUND})
+         INCLUDE_ALL(OCLM)
+      endif()
+   endif()
+
 endif()
 
 ################################################################################
@@ -1194,8 +1253,13 @@ endif()
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
-set(HPX_LINK_DIRECTORIES
-    ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
+if (MSVC)
+   set(HPX_LINK_DIRECTORIES
+       ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}/lib/hpx ${HPX_LINK_DIRECTORIES})
+else()
+   set(HPX_LINK_DIRECTORIES
+       ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
+endif()
 set(HPX_INCLUDE_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
@@ -1211,12 +1275,14 @@ set(external_include_directories "")
 set(external_include_flags "")
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_link_directories "${external_link_directories} ${directory}")
   set(external_link_flags "${external_link_flags} -L${directory}")
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
@@ -1225,6 +1291,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
+  string(REPLACE " " "\\ " BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info
