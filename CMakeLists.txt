@@ -655,8 +655,8 @@ if(MSVC)
 ################################################################################
 else()
   # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
-  #hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
-  #                          NAME copy_dt_needed_entries)
+  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
+                            NAME copy_dt_needed_entries)
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
@@ -789,7 +789,7 @@ else()
   endif()
   
   # Check if our libraries have unresolved symbols
-  hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
+  #hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
 
   ##############################################################################
   # GCC-only configuration
