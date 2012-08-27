@@ -56,6 +56,7 @@ namespace hpx { namespace util
     boost::uint32_t thread_mapper::register_thread(char const *l)
     {
         mutex_type::scoped_lock m(mtx_);
+
         boost::thread::id id = boost::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         if (it != thread_map_.end())

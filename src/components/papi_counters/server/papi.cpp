@@ -7,7 +7,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/components/papi/server/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
@@ -205,23 +204,19 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         papi_call(PAPI_query_event(event_),
             "event "+cpe.countername_+" is not available on this platform", locstr);
         // find OS thread associated with the counter
-        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
-        boost::format lab("%s-%d");
-        boost::uint32_t tix = tm.get_thread_index(
-            boost::str(lab % cpe.instancename_ % cpe.instanceindex_));
+        std::string label;
+        boost::uint32_t tix = util::get_counter_thread(cpe, label);
         if (tix == hpx::util::thread_mapper::invalid_index)
         {
-            boost::format fmt("could not find %s#%d");
             HPX_THROW_EXCEPTION(hpx::no_success, locstr,
-                boost::str(fmt % cpe.instancename_ % cpe.instanceindex_));
+                "could not find thread "+label);
         }
         // associate low level counters object
         counters_ = get_thread_counters(tix);
         if (!counters_)
         {
-            boost::format fmt("failed to find low level counters for %s#%d");
             HPX_THROW_EXCEPTION(hpx::no_success, locstr,
-                boost::str(fmt % cpe.instancename_ % cpe.instanceindex_));
+                "failed to find low level counters for thread "+label);
         }
         // counting is not enabled here; it has to be started explicitly
     }

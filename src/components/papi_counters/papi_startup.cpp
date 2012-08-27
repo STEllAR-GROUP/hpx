@@ -56,14 +56,14 @@ namespace hpx { namespace performance_counters { namespace papi
         }
 
         // validate thread label taken from counter name
-        thread_mapper& tm = hpx::get_runtime().get_thread_mapper();
-        boost::format label("%s-%d");
-        boost::uint32_t tix = tm.get_thread_index(
-            str(label % paths.instancename_ % paths.instanceindex_));
+        std::string label;
+        boost::uint32_t tix = util::get_counter_thread(paths, label);
         if (tix == thread_mapper::invalid_index)
+        {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 NS_STR "create_papi_counter()",
                 "cannot find thread specified in "+info.fullname_);
+        }
         // create a local PAPI counter component
         hpx::naming::gid_type id;
         try
@@ -96,19 +96,11 @@ namespace hpx { namespace performance_counters { namespace papi
         boost::uint32_t tix = 0;
         while (!((label = tm.get_thread_label(tix++)).empty()))
         {
-            size_t pos = label.find_last_of('-');
+            size_t pos = label.find_last_of('#');
             if (pos == label.npos)
                 cats.insert(std::make_pair(label, false));
             else
-            {
-                char const *p = label.c_str();
-                char *end;
-                discard_result(strtol(p+pos+1, &end, 0));
-                if (*end == 0)
-                    cats.insert(std::make_pair(label.substr(0, pos), true));
-                else
-                    cats.insert(std::make_pair(label, false));
-            }
+	        cats.insert(std::make_pair(label.substr(0, pos), true));
         }
         std::set<thread_category>::iterator si;
         for (si = cats.begin(); si != cats.end(); si++)

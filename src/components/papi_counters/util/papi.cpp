@@ -288,4 +288,20 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         if (scope == "native" || scope == "all") list_native();
     }
 
+    boost::uint32_t get_counter_thread(counter_path_elements const& cpe,
+                                       std::string& label)
+    {
+        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
+        if (cpe.instanceindex_ < 0)
+        {
+            label = cpe.instancename_;
+        }
+        else
+        {
+            boost::format lab("%s#%d");
+            label = boost::str(lab % cpe.instancename_ % cpe.instanceindex_);
+        }
+        return tm.get_thread_index(label);
+    }
+
 }}}}
