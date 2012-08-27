@@ -10,20 +10,30 @@ subroutine chargei_0(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_0
@@ -40,20 +50,30 @@ subroutine chargei_1(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_1
@@ -70,20 +90,30 @@ subroutine chargei_2(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_2
@@ -100,20 +130,30 @@ subroutine chargei_3(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_3
@@ -130,20 +170,30 @@ subroutine chargei_4(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_4
@@ -160,20 +210,30 @@ subroutine chargei_5(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_5
@@ -190,20 +250,30 @@ subroutine chargei_6(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_6
@@ -220,20 +290,30 @@ subroutine chargei_7(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_7
@@ -250,20 +330,30 @@ subroutine chargei_8(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_8
@@ -280,20 +370,30 @@ subroutine chargei_9(ptr)
   type(c_ptr), intent(in), value :: ptr
   integer ij,kk
 
-  real(8) dnitmp(0:mzeta,mgrid)
-  real(8) recvr(mgrid)
+  integer n1,n2
+  !real(8) dnitmp(0:mzeta,mgrid)
+  !real(8) recvr(mgrid)
+  real(8) dnitmp(0:3,3)
+  real(8) recvr(3)
 
-  do ij=1,mgrid
-    do kk=0,mzeta
+  n1 = 3
+  n2 = 3
+
+  !do ij=1,mgrid
+  !  do kk=0,mzeta
+  do ij=1,n1
+    do kk=0,n2
       dnitmp(kk,ij)=mype*100.0 + ij
       densityi(kk,ij)=0.
     enddo
   enddo
 
-  call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  !call partd_allreduce_cmm(ptr,dnitmp,densityi,mgrid,mzeta+1);  
+  call partd_allreduce_cmm(ptr,dnitmp,densityi,n2,n1+1);  
 
   recvr = 0.0d0
-  call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  !call sndleft_toroidal_cmm(ptr,densityi(0,:),mgrid);  
+  call sndleft_toroidal_cmm(ptr,densityi(0,:),n2);  
   call rcvright_toroidal_cmm(ptr,recvr);  
 
 end subroutine chargei_9

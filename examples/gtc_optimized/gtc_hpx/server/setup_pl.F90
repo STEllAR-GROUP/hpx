@@ -866,7 +866,6 @@ end subroutine broadcast_input_params_0
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_0_0
 !========================================================================
@@ -1737,7 +1736,6 @@ end subroutine broadcast_input_params_1
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_1_1
 !========================================================================
@@ -2608,7 +2606,6 @@ end subroutine broadcast_input_params_2
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_2_2
 !========================================================================
@@ -3479,7 +3476,6 @@ end subroutine broadcast_input_params_3
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_3_3
 !========================================================================
@@ -4350,7 +4346,6 @@ end subroutine broadcast_input_params_4
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_4_4
 !========================================================================
@@ -5221,7 +5216,6 @@ end subroutine broadcast_input_params_5
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_5_5
 !========================================================================
@@ -6092,7 +6086,6 @@ end subroutine broadcast_input_params_6
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_6_6
 !========================================================================
@@ -6963,7 +6956,6 @@ end subroutine broadcast_input_params_7
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_7_7
 !========================================================================
@@ -7834,7 +7826,6 @@ end subroutine broadcast_input_params_8
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_8_8
 !========================================================================
@@ -8705,6 +8696,5 @@ end subroutine broadcast_input_params_9
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  print*,' test left_pe ', left_pe, ' right ', right_pe,' ',myrank_toroidal
 
 end subroutine set_particle_decomp_9_9

@@ -167,28 +167,25 @@ namespace gtc { namespace server
       if ( my_pdl == (int) mype ) in_particle_ = 1;
       if ( my_tdl == (int) mype ) in_toroidal_ = 1;
 
-      left_pe_ = mype - 1;
-      right_pe_ = mype + 1;
-      if ( left_pe_ < 0 ) left_pe_ = components_.size()-1;
-      if ( right_pe_ > components_.size()-1 ) right_pe_ = 0;
-      toroidal_comm_ = components_;
+      std::cout << " TEST in particle " << in_particle_ << " my_pdl " << my_pdl << " mype " << mype << std::endl;
 
       for (std::size_t i=0;i<numberpe;i++) {
         int particle_domain_location= i%npartdom;
         int toroidal_domain_location= i/npartdom;
-        if ( toroidal_domain_location == my_tdl ) {
-          partd_comm_.push_back( components[i] );
+ 
+        if ( particle_domain_location == my_pdl ) {
+          toroidal_comm_.push_back(components_[i]);
         }
-        //if ( particle_domain_location == my_pdl ) {
-          // record the left gid
-          //if ( particle_domain_location == hpx_left_pe ) left_pe_ = toroidal_comm_.size();
 
-          // record the right gid
-          //if ( particle_domain_location == hpx_right_pe ) right_pe_ = toroidal_comm_.size();
-        //  toroidal_comm_.push_back( components[i] );
-       // }
+        if ( toroidal_domain_location == my_tdl ) {
+          partd_comm_.push_back(components_[i]);         
+        }
       }
 
+      left_pe_ = hpx_left_pe;
+      right_pe_ = hpx_right_pe;
+
+      std::cout << " TEST left " << left_pe_ << " right " << right_pe_ << std::endl;
 
       if ( partd_comm_.size() != (std::size_t) npartdom ) {
         std::cerr << " PROBLEM: partd_comm " << partd_comm_.size()
@@ -399,7 +396,6 @@ namespace gtc { namespace server
 
     void point::toroidal_rcvright(double *creceive)
     {
-      std::cout << " TEST A " << item_ << std::endl;
       if ( in_toroidal_ ) {
         // Now receive a message from the right
         // create a new and-gate object
@@ -413,12 +409,11 @@ namespace gtc { namespace server
           ++generation_;
         }
 
-        std::cout << " TEST item " << item_ << std::endl;
-
+        std::cout << " TEST AA " << item_ << std::endl;
         // possibly do other stuff 
         f.get();
+        std::cout << " TEST BB " << item_ << std::endl;
 
-        std::cout << " TEST item " << item_ << std::endl;
         for (std::size_t i=0;i<tsr_receive_.size();i++) {
           creceive[i] = tsr_receive_[i]; 
         }
@@ -442,6 +437,7 @@ namespace gtc { namespace server
        tsr_receive_ = send;
 
        gate_.set(0);         // trigger corresponding and-gate input
+       std::cout << " TEST B " << item_ << std::endl;
     }
 
 }}
