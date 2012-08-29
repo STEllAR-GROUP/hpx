@@ -42,6 +42,9 @@ namespace gtc { namespace server
         void set_data(std::size_t item, std::size_t generation,
                               std::vector<double> const& data);
 
+        void set_tdata(std::size_t item, std::size_t generation,
+                              std::vector<double> const& data);
+
         void set_params(std::size_t which,
                         std::size_t generation,
                         std::vector<int> const& intparams,
@@ -49,6 +52,8 @@ namespace gtc { namespace server
 
         void toroidal_sndleft(double *csend, int* mgrid);
         void toroidal_rcvright(double *creceive);
+
+        void toroidal_allreduce(double *input,double *output, int* size);
 
         void set_tsr_data(std::size_t which,
                           std::size_t generation,
@@ -60,6 +65,7 @@ namespace gtc { namespace server
         HPX_DEFINE_COMPONENT_ACTION(point, setup_wrapper, setup_action);
         HPX_DEFINE_COMPONENT_ACTION(point, chargei_wrapper, chargei_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_tdata, set_tdata_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_params, set_params_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_tsr_data, set_tsr_data_action);
 
@@ -75,6 +81,7 @@ namespace gtc { namespace server
         std::vector<int> intparams_;
         std::vector<double> realparams_;
         std::vector<double> dnireceive_;
+        std::vector<double> treceive_;
         std::size_t in_toroidal_,in_particle_;
         std::vector<double> tsr_receive_;
     };
@@ -92,6 +99,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::set_data_action,
     gtc_point_set_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_tdata_action,
+    gtc_point_set_tdata_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::set_params_action,

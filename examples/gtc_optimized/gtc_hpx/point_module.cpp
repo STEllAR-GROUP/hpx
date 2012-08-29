@@ -40,6 +40,10 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_set_data_action);
 
 HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_tdata_action,
+    gtc_point_set_tdata_action);
+
+HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::set_params_action,
     gtc_point_set_params_action);
 

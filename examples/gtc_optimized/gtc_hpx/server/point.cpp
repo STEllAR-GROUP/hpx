@@ -68,6 +68,11 @@ extern "C" {
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->partd_allreduce(dnitmp,densityi,mgrid,mzetap1);
                     return; };
+            void FNAME(toroidal_allreduce_cmm) (void* pfoo,double *input,double *output,
+                                             int* size) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->toroidal_allreduce(input,output,size);
+                    return; };
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
                      int *integer_params,double *real_params,
                      int *n_integers,int *n_reals) {
@@ -103,9 +108,6 @@ namespace gtc { namespace server
       int particle_domain_location=mype%npartdom;
       int toroidal_domain_location=mype/npartdom;
       int myrank_toroidal = toroidal_domain_location;
-      if ( myrank_toroidal > particle_domain_location ) {
-        myrank_toroidal = particle_domain_location;
-      }
       hpx_left_pe = (myrank_toroidal-1+ntoroidal)%ntoroidal;
       hpx_right_pe = (myrank_toroidal+1)%ntoroidal;
 #endif
@@ -167,8 +169,6 @@ namespace gtc { namespace server
       if ( my_pdl == (int) mype ) in_particle_ = 1;
       if ( my_tdl == (int) mype ) in_toroidal_ = 1;
 
-      std::cout << " TEST in particle " << in_particle_ << " my_pdl " << my_pdl << " mype " << mype << std::endl;
-
       for (std::size_t i=0;i<numberpe;i++) {
         int particle_domain_location= i%npartdom;
         int toroidal_domain_location= i/npartdom;
@@ -184,8 +184,6 @@ namespace gtc { namespace server
 
       left_pe_ = hpx_left_pe;
       right_pe_ = hpx_right_pe;
-
-      std::cout << " TEST left " << left_pe_ << " right " << right_pe_ << std::endl;
 
       if ( partd_comm_.size() != (std::size_t) npartdom ) {
         std::cerr << " PROBLEM: partd_comm " << partd_comm_.size()
@@ -254,10 +252,10 @@ namespace gtc { namespace server
         f.get();
 
         // Copy the parameters to the fortran arrays
-        for (int i=0;i<intparams_.size();i++) {
+        for (std::size_t i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
         }
-        for (int i=0;i<realparams_.size();i++) {
+        for (std::size_t i=0;i<realparams_.size();i++) {
           real_params[i] = realparams_[i];
         }
       } else {
@@ -346,6 +344,11 @@ namespace gtc { namespace server
         for (std::size_t i=0;i<dnireceive_.size();i++) {
           densityi[i] = dnireceive_[i]; 
         }
+      } else {
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
       }
     }
 
@@ -404,15 +407,8 @@ namespace gtc { namespace server
         // synchronize with all operations to finish
         hpx::future<void> f = gate_.get_future();
 
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
-
-        std::cout << " TEST AA " << item_ << std::endl;
         // possibly do other stuff 
         f.get();
-        std::cout << " TEST BB " << item_ << std::endl;
 
         for (std::size_t i=0;i<tsr_receive_.size();i++) {
           creceive[i] = tsr_receive_[i]; 
@@ -425,7 +421,6 @@ namespace gtc { namespace server
                            std::vector<double> const& send)
     {
        mutex_type::scoped_lock l(mtx_);
-       std::cout << " TEST which " << which << " item " << item_ << std::endl;
 
        // make sure this set operation has not arrived ahead of time
        while (generation > generation_)
@@ -437,7 +432,67 @@ namespace gtc { namespace server
        tsr_receive_ = send;
 
        gate_.set(0);         // trigger corresponding and-gate input
-       std::cout << " TEST B " << item_ << std::endl;
+    }
+
+    void point::toroidal_allreduce(double *input,double *output, int* size)
+    {
+      if ( in_toroidal_ ) {
+        // create a new and-gate object
+        gate_.init(toroidal_comm_.size());
+
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+
+        int vsize = *size;
+        std::vector<double> send;
+        send.resize(vsize); 
+        treceive_.resize(vsize); 
+        std::fill( treceive_.begin(),treceive_.end(),0.0);
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = input[i];
+        }
+
+        set_tdata_action set_tdata_;
+        hpx::apply(set_tdata_, toroidal_comm_, item_, generation, send);
+
+        // possibly do other stuff while the allgather is going on...
+        f.get();
+
+        for (std::size_t i=0;i<treceive_.size();i++) {
+          output[i] = treceive_[i]; 
+        }
+      } else {
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
+      }
+    }
+
+    void point::set_tdata(std::size_t which,
+                std::size_t generation, std::vector<double> const& data)
+    {
+       mutex_type::scoped_lock l(mtx_);
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       for (std::size_t i=0;i<treceive_.size();i++) {
+         treceive_[i] += data[i];
+       }
+
+       gate_.set(which);         // trigger corresponding and-gate input
     }
 
 }}
