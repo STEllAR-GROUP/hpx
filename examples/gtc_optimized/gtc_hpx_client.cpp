@@ -65,14 +65,18 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Populate the client vectors.
         init(hpx::util::locality_results(blocks), components);
 
+        std::size_t mstep;
+        std::vector<std::size_t> vmstep;
         {
-          std::vector<hpx::lcos::future<void> > setup_phase;
+          std::vector<hpx::lcos::future<std::size_t> > setup_phase;
           gtc::server::point::setup_action setup;
           for (std::size_t i=0;i<num_partitions;i++) {
             setup_phase.push_back(hpx::async(setup,components[i],num_partitions,i,components));
           }
-          hpx::lcos::wait(setup_phase);
+          hpx::lcos::wait(setup_phase,vmstep);
         }
+
+        mstep = vmstep[0];
 
         {
           std::vector<hpx::lcos::future<void> > chargei_phase;
@@ -81,6 +85,23 @@ int hpx_main(boost::program_options::variables_map &vm)
             chargei_phase.push_back(hpx::async(chargei,components[i]));
           }
           hpx::lcos::wait(chargei_phase);
+        }
+
+        // Time loop
+        std::size_t idiag;
+       // for (std::size_t istep=1;istep<=mstep;istep++) {
+       //   for (std::size_t irk=1;irk<=2;irk++) {
+       //   }
+       // }
+        std::size_t istep,irk;
+        istep = 0; irk = 0;
+        {
+          std::vector<hpx::lcos::future<void> > timeloop_phase;
+          gtc::server::point::timeloop_action timeloop;
+          for (std::size_t i=0;i<num_partitions;i++) {
+            timeloop_phase.push_back(hpx::async(timeloop,components[i],istep,irk));
+          }
+          hpx::lcos::wait(timeloop_phase);
         }
 
     } // Ensure things go out of scope before hpx::finalize is called.

@@ -15,7 +15,7 @@ end module particle_decomp_0
 
     subroutine setup_0(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -30,7 +30,7 @@ end module particle_decomp_0
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -74,6 +74,7 @@ end module particle_decomp_0
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -885,7 +886,7 @@ end module particle_decomp_1
 
     subroutine setup_1(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -900,7 +901,7 @@ end module particle_decomp_1
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -944,6 +945,7 @@ end module particle_decomp_1
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -1755,7 +1757,7 @@ end module particle_decomp_2
 
     subroutine setup_2(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -1770,7 +1772,7 @@ end module particle_decomp_2
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -1814,6 +1816,7 @@ end module particle_decomp_2
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -2625,7 +2628,7 @@ end module particle_decomp_3
 
     subroutine setup_3(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -2640,7 +2643,7 @@ end module particle_decomp_3
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -2684,6 +2687,7 @@ end module particle_decomp_3
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -3495,7 +3499,7 @@ end module particle_decomp_4
 
     subroutine setup_4(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -3510,7 +3514,7 @@ end module particle_decomp_4
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -3554,6 +3558,7 @@ end module particle_decomp_4
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -4365,7 +4370,7 @@ end module particle_decomp_5
 
     subroutine setup_5(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -4380,7 +4385,7 @@ end module particle_decomp_5
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -4424,6 +4429,7 @@ end module particle_decomp_5
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -5235,7 +5241,7 @@ end module particle_decomp_6
 
     subroutine setup_6(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -5250,7 +5256,7 @@ end module particle_decomp_6
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -5294,6 +5300,7 @@ end module particle_decomp_6
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -6105,7 +6112,7 @@ end module particle_decomp_7
 
     subroutine setup_7(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -6120,7 +6127,7 @@ end module particle_decomp_7
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -6164,6 +6171,7 @@ end module particle_decomp_7
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -6975,7 +6983,7 @@ end module particle_decomp_8
 
     subroutine setup_8(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -6990,7 +6998,7 @@ end module particle_decomp_8
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -7034,6 +7042,7 @@ end module particle_decomp_8
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -7845,7 +7854,7 @@ end module particle_decomp_9
 
     subroutine setup_9(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -7860,7 +7869,7 @@ end module particle_decomp_9
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -7904,6 +7913,7 @@ end module particle_decomp_9
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2

@@ -15,7 +15,7 @@ end module particle_decomp
 
     Subroutine setup(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -30,7 +30,7 @@ end module particle_decomp
   TYPE(C_PTR), INTENT(IN), VALUE :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
   real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
@@ -74,6 +74,7 @@ end module particle_decomp
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2

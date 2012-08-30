@@ -32,6 +32,10 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_setup_action);
 
 HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::timeloop_action,
+    gtc_point_timeloop_action);
+
+HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::chargei_action,
     gtc_point_chargei_action);
 

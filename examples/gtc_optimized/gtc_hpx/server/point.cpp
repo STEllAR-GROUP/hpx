@@ -29,25 +29,25 @@ extern "C" {
             void FNAME(load_8)();
             void FNAME(load_9)();
             void FNAME(setup_0)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_1)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_2)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_3)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_4)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_5)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_6)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_7)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_8)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(setup_9)(void* opaque_ptr_to_class,
-                          int *,int *,int *,int *,int *, int *);
+                          int *,int *,int *,int *,int *, int *,int *);
             void FNAME(load)();
             void FNAME(chargei_0)(void* opaque_ptr_to_class);
             void FNAME(chargei_1)(void* opaque_ptr_to_class);
@@ -59,6 +59,16 @@ extern "C" {
             void FNAME(chargei_7)(void* opaque_ptr_to_class);
             void FNAME(chargei_8)(void* opaque_ptr_to_class);
             void FNAME(chargei_9)(void* opaque_ptr_to_class);
+            void FNAME(smooth_0)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_1)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_2)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_3)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_4)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_5)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_6)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_7)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_8)(void* opaque_ptr_to_class,int *);
+            void FNAME(smooth_9)(void* opaque_ptr_to_class,int *);
             void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
@@ -70,6 +80,14 @@ extern "C" {
                     // derived from point, then the world will end.
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->toroidal_rcvright(receive);
+                    return; };
+            void FNAME(sndright_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->toroidal_sndright(send,mgrid);
+                    return; };
+            void FNAME(rcvleft_toroidal_cmm) (void* pfoo,double *receive) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->toroidal_rcvleft(receive);
                     return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
@@ -97,7 +115,7 @@ extern "C" {
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-    void point::setup_wrapper(std::size_t numberpe,std::size_t mype,
+    std::size_t point::setup_wrapper(std::size_t numberpe,std::size_t mype,
                       std::vector<hpx::naming::id_type> const& components)
     {
       item_ = mype;
@@ -126,46 +144,47 @@ namespace gtc { namespace server
       int t2 = mype;
       int npartdom,ntoroidal;
       int hpx_left_pe, hpx_right_pe;
+      int mstep;
       switch(item_) {
         case 0:
           FNAME(setup_0)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 1:
           FNAME(setup_1)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 2:
           FNAME(setup_2)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 3:
           FNAME(setup_3)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 4:
           FNAME(setup_4)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 5:
           FNAME(setup_5)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 6:
           FNAME(setup_6)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 7:
           FNAME(setup_7)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 8:
           FNAME(setup_8)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
         case 9:
           FNAME(setup_9)(static_cast<void*>(this),
-            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe);
+            &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
           break;
       }
 
@@ -234,6 +253,9 @@ namespace gtc { namespace server
         std::cerr << " PROBLEM: toroidal_comm " << toroidal_comm_.size()
                      << " != ntoroidal " << ntoroidal << std::endl;
       }
+
+      std::size_t tmp = (std::size_t) mstep;
+      return tmp;
     }
 
     void point::chargei_wrapper()
@@ -435,6 +457,11 @@ namespace gtc { namespace server
 
         set_tsr_data_action set_tsr_data_;
         hpx::apply(set_tsr_data_, toroidal_comm_[left_pe_], item_, generation, send);
+      } else {
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
       }
     }
 
@@ -534,6 +561,53 @@ namespace gtc { namespace server
        }
 
        gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+    void point::timeloop(std::size_t istep, std::size_t irk)
+    {
+      // Call smooth(3) {{{
+      int flag = 3; 
+      switch(item_) {
+        case 0:
+          FNAME(smooth_0)(static_cast<void*>(this),&flag);
+          break;
+        case 1:
+          FNAME(smooth_1)(static_cast<void*>(this),&flag);
+          break;
+        case 2:
+          FNAME(smooth_2)(static_cast<void*>(this),&flag);
+          break;
+        case 3:
+          FNAME(smooth_3)(static_cast<void*>(this),&flag);
+          break;
+        case 4:
+          FNAME(smooth_4)(static_cast<void*>(this),&flag);
+          break;
+        case 5:
+          FNAME(smooth_5)(static_cast<void*>(this),&flag);
+          break;
+        case 6:
+          FNAME(smooth_6)(static_cast<void*>(this),&flag);
+          break;
+        case 7:
+          FNAME(smooth_7)(static_cast<void*>(this),&flag);
+          break;
+        case 8:
+          FNAME(smooth_8)(static_cast<void*>(this),&flag);
+          break;
+        case 9:
+          FNAME(smooth_9)(static_cast<void*>(this),&flag);
+          break;
+      }
+      // }}}
+    }
+
+    void point::toroidal_sndright(double *csend,int* mgrid)
+    {
+    }
+
+    void point::toroidal_rcvleft(double *creceive)
+    {
     }
 
 }}
