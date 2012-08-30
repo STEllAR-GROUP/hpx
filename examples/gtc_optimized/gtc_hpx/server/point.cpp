@@ -18,6 +18,16 @@
 #include <fstream>
 
 extern "C" {
+            void FNAME(load_0)();
+            void FNAME(load_1)();
+            void FNAME(load_2)();
+            void FNAME(load_3)();
+            void FNAME(load_4)();
+            void FNAME(load_5)();
+            void FNAME(load_6)();
+            void FNAME(load_7)();
+            void FNAME(load_8)();
+            void FNAME(load_9)();
             void FNAME(setup_0)(void* opaque_ptr_to_class,
                           int *,int *,int *,int *,int *, int *);
             void FNAME(setup_1)(void* opaque_ptr_to_class,
@@ -159,7 +169,38 @@ namespace gtc { namespace server
           break;
       }
 
-      //FNAME(load)();
+      switch(item_) {
+        case 0:
+          FNAME(load_0)();
+          break;
+        case 1:
+          FNAME(load_1)();
+          break;
+        case 2:
+          FNAME(load_2)();
+          break;
+        case 3:
+          FNAME(load_3)();
+          break;
+        case 4:
+          FNAME(load_4)();
+          break;
+        case 5:
+          FNAME(load_5)();
+          break;
+        case 6:
+          FNAME(load_6)();
+          break;
+        case 7:
+          FNAME(load_7)();
+          break;
+        case 8:
+          FNAME(load_8)();
+          break;
+        case 9:
+          FNAME(load_9)();
+          break;
+      }
 //#endif
 
       // Figure out the communicators: toroidal_comm and partd_comm
