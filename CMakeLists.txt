@@ -150,6 +150,8 @@ endif()
 hpx_include_directories(${hpx_SOURCE_DIR})
 if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+endif()
+if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
@@ -1127,7 +1129,16 @@ if(NOT HPX_NO_INSTALL)
     # install Boost.Atomic library for older Boost versions only
     install(
       DIRECTORY external/atomic/boost
-                external/lockfree/boost
+      DESTINATION include/hpx/external
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".git" EXCLUDE)
+  endif()
+
+  if(${BOOST_MINOR_VERSION} LESS 53)
+    # install Boost.Atomic library for older Boost versions only
+    install(
+      DIRECTORY external/lockfree/boost
       DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
