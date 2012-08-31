@@ -28,6 +28,8 @@ namespace jacobi
     )
     {
         BOOST_ASSERT(id);
+        BOOST_ASSERT(top.id);
+        BOOST_ASSERT(bottom.id);
         return
             hpx::async<server::stencil_iterator::setup_boundary_action>(
                 id
@@ -43,9 +45,9 @@ namespace jacobi
             hpx::async<server::stencil_iterator::step_action>(id);
     }
     
-    hpx::lcos::future<row_range> stencil_iterator::get_range(std::size_t begin, std::size_t end)
+    hpx::lcos::future<jacobi::row> stencil_iterator::get(std::size_t idx) const
     {
         BOOST_ASSERT(id);
-        return hpx::async<server::stencil_iterator::get_range_action>(id, begin, end);
+        return hpx::async<server::stencil_iterator::get_action>(id, idx);
     }
 }

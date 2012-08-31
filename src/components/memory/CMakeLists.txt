@@ -9,6 +9,7 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/memory")
 add_hpx_component(memory
   FOLDER "Core/Components"
   HEADER_ROOT ${root}
+  ESSENTIAL
   AUTOGLOB)
 
 add_hpx_pseudo_dependencies(components.memory

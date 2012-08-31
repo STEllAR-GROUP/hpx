@@ -7,15 +7,15 @@
 
 set(root "${hpx_SOURCE_DIR}/hpx/components/papi")
 
-add_hpx_library_headers(papi
+add_hpx_library_headers(papi_counters
   GLOB_RECURSE GLOBS "${root}/*.hpp")
 
-add_hpx_library_sources(papi
+add_hpx_library_sources(papi_counters
   GLOB_RECURSE GLOBS "*.cpp")
 
-add_hpx_component(papi
-  SOURCES ${papi_SOURCES}
-  HEADERS ${papi_HEADERS}
+add_hpx_component(papi_counters
+  SOURCES ${papi_counters_SOURCES}
+  HEADERS ${papi_counters_HEADERS}
   DEPENDENCIES ${PAPI_LIBRARY}
   FOLDER "Core"
   HEADER_ROOT ${root}

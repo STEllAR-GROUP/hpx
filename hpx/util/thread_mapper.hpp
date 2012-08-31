@@ -13,12 +13,12 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cstring>
 
 #include <boost/thread.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/function.hpp>
+#include <boost/bimap.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -32,90 +32,57 @@ namespace hpx { namespace util
         // type for callback function invoked when thread is unregistered
         typedef boost::function1<bool, boost::uint32_t> callback_type;
 
+        // erroneous thread index
+        static boost::uint32_t invalid_index;
+        // erroneous low-level thread ID
+        static long int invalid_tid;
+        // empty label for failed lookups
+        static std::string invalid_label;
+
+
     private:
         // null callback
         static bool null_cb(boost::uint32_t);
 
-        // internal thread ID
-        struct thread_id
-        {
-            char const *label_;         // label of thread group
-            boost::uint32_t instance_;  // number of thread instance within group
-
-            thread_id(): label_(0), instance_(static_cast<boost::uint32_t>(-1)) { }
-            thread_id(char const *l, boost::uint32_t i):
-                label_(l), instance_(i) { }
-        };
-
         // thread-specific data
-        struct thread_data: public thread_id
+        struct thread_data
         {
-            // associated thread ID that can be passed to PAPI_attach;
+            // associated system thread ID that can be passed to PAPI_attach;
             // typically an ID of a kernel thread
             long int tid_;
             // callback function invoked when unregistering a thread
             callback_type cleanup_;
 
-            thread_data(): tid_(invalid_tid), cleanup_(boost::ref(null_cb)) { }
-            thread_data(char const *gr, boost::uint32_t inst, long int tid):
-                thread_id(gr, inst), tid_(tid), cleanup_(boost::ref(null_cb)) { }
-        };
-
-        // comparator lexicographically ordering thread labels
-        // (uniqueness of pointers to labels cannot be guaranteed)
-        struct label_cmp
-        {
-            bool operator()(char const *s1, char const *s2) const
-            {
-                return strcmp(s1, s2) < 0;
-            }
-        };
-
-        // thread_id comparator
-        struct id_cmp
-        {
-            bool operator()(thread_id const& d1, thread_id const& d2) const
-            {
-                return (d1.instance_ < d2.instance_) ||
-                       ((d1.instance_ == d2.instance_) &&
-                        (strcmp(d1.label_, d2.label_) < 0));
-            }
+            thread_data(long int tid = invalid_tid):
+                tid_(tid), cleanup_(boost::ref(null_cb)) { }
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::map<boost::thread::id, boost::uint32_t> thread_map_type;
-        typedef std::map<char const *, boost::uint32_t, label_cmp> label_count_type;
-        typedef std::map<thread_id, boost::uint32_t, id_cmp> label_map_type;
+        typedef boost::bimap<std::string, boost::uint32_t> label_map_type;
 
         // main lock
         mutable mutex_type mtx_;
-        // mapping from boost thread IDs to small integer indices
+        // mapping from boost thread IDs to thread indices
         thread_map_type thread_map_;
-        // thread counts for each thread category
-        label_count_type label_count_;
-        // label to thread lookup
+        // mapping between HPX thread labels and thread indices
         label_map_type label_map_;
         // table of thread specific data
         std::vector<thread_data> thread_info_;
 
     protected:
         // retrieve low level ID of caller thread (system dependent)
-        long int get_papi_thread_id();
+        long int get_system_thread_id();
 
         // unmap thread being unregistered
         bool unmap_thread(thread_map_type::iterator&);
 
     public:
-        // erroneous thread index
-        static boost::uint32_t invalid_index;
-        // erroneous low-level thread ID
-        static long int invalid_tid;
-
         thread_mapper() { }
         ~thread_mapper();
 
-        // registers invoking OS thread and assigns it a unique index
-        boost::uint32_t register_thread(char const *label = "unspecified-thread");
+        // registers invoking OS thread with a unique label
+        boost::uint32_t register_thread(char const *label);
 
         // unregisters the calling OS thread
         bool unregister_thread();
@@ -130,21 +97,14 @@ namespace hpx { namespace util
         // returns low level thread id
         long int get_thread_id(boost::uint32_t tix) const;
 
-        // returns the group label of thread tix
-        char const *get_thread_label(boost::uint32_t tix) const;
+        // returns the label of registered thread tix
+        std::string const& get_thread_label(boost::uint32_t tix) const;
 
-        // returns the instance number of thread tix
-        boost::uint32_t get_thread_instance(boost::uint32_t tix) const;
-
-        // returns unique index based on group label and instance number
-        boost::uint32_t get_thread_index(char const *grp,
-                                       boost::uint32_t inst) const;
+        // returns unique index based on registered thread label
+        boost::uint32_t get_thread_index(std::string const&) const;
 
         // returns the number of threads registered so far
         boost::uint32_t get_thread_count() const;
-
-        // retrieve all registered thread labels
-        void get_registered_labels(std::vector<char const *>&) const;
     };
 }}
 

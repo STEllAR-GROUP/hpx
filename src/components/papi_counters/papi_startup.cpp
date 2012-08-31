@@ -56,13 +56,14 @@ namespace hpx { namespace performance_counters { namespace papi
         }
 
         // validate thread label taken from counter name
-        thread_mapper& tm = hpx::get_runtime().get_thread_mapper();
-        boost::uint32_t tix =
-            tm.get_thread_index(paths.instancename_.c_str(), paths.instanceindex_);
+        std::string label;
+        boost::uint32_t tix = util::get_counter_thread(paths, label);
         if (tix == thread_mapper::invalid_index)
+        {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 NS_STR "create_papi_counter()",
                 "cannot find thread specified in "+info.fullname_);
+        }
         // create a local PAPI counter component
         hpx::naming::gid_type id;
         try
@@ -81,9 +82,34 @@ namespace hpx { namespace performance_counters { namespace papi
         return id;
     }
 
+    // bool is true when group is enumerated
+    typedef std::pair<std::string, bool> thread_category;
+
+    template<typename T> void discard_result(T const&) { }
+
+    // find thread categories
+    void find_thread_groups(std::vector<std::string>& tdesc)
+    {
+        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
+        std::set<thread_category> cats;
+        std::string label;
+        boost::uint32_t tix = 0;
+        while (!((label = tm.get_thread_label(tix++)).empty()))
+        {
+            size_t pos = label.find_last_of('#');
+            if (pos == label.npos)
+                cats.insert(std::make_pair(label, false));
+            else
+	        cats.insert(std::make_pair(label.substr(0, pos), true));
+        }
+        std::set<thread_category>::iterator si;
+        for (si = cats.begin(); si != cats.end(); si++)
+            tdesc.push_back(si->second? si->first+"#<*>": si->first);
+    }
+
     template<class T>
     bool discover_events(counter_path_elements& cpe,
-        std::vector<char const *> const& labels,
+        std::vector<std::string> const& tdesc,
         hpx::performance_counters::counter_info& info,
         T& gen,
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
@@ -93,12 +119,11 @@ namespace hpx { namespace performance_counters { namespace papi
             boost::make_generator_iterator(gen);
         for ( ; *gi != 0; ++gi)
         {
-            std::vector<char const *>::const_iterator it;
+            std::vector<std::string>::const_iterator it;
             // iterate over known thread names
-            for (it = labels.begin(); it != labels.end(); ++it)
+            for (it = tdesc.begin(); it != tdesc.end(); ++it)
             {
                 cpe.instancename_ = *it;
-                cpe.instancename_ += "#<*>";
                 cpe.countername_ = (*gi)->symbol;
 
                 hpx::performance_counters::counter_status status =
@@ -127,10 +152,9 @@ namespace hpx { namespace performance_counters { namespace papi
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        // obtain known OS thread categories
-        std::vector<char const *> labels;
-        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
-        tm.get_registered_labels(labels);
+        // obtain known OS thread labels
+        std::vector<std::string> tdesc;
+        find_thread_groups(tdesc);
 
         // fill in common path segments for all counters
         counter_path_elements cpe;
@@ -142,14 +166,14 @@ namespace hpx { namespace performance_counters { namespace papi
         // enumerate PAPI presets
         {
             util::all_preset_info_gen gen;
-            if (!discover_events(cpe, labels, cnt_info, gen, f, ec))
+            if (!discover_events(cpe, tdesc, cnt_info, gen, f, ec))
                 return false;
         }
         // enumerate PAPI native events
         for (int ci = 0; ci < PAPI_num_components(); ++ci)
         {
             util::native_info_gen gen(ci);
-            if (!discover_events(cpe, labels, cnt_info, gen, f, ec))
+            if (!discover_events(cpe, tdesc, cnt_info, gen, f, ec))
                 return false;
         }
 
@@ -211,7 +235,7 @@ namespace hpx { namespace performance_counters { namespace papi
         }
     }
 
-    bool check_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    bool check_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
     {
         // PAPI initialization
         if (PAPI_is_initialized() == PAPI_NOT_INITED)
@@ -229,6 +253,7 @@ namespace hpx { namespace performance_counters { namespace papi
         if (util::check_options(vm))
         { // perform full module startup (counters will be used)
             startup_func = startup;
+            pre_startup = true;
             return true;
         }
 

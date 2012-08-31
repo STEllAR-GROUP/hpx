@@ -1,5 +1,6 @@
 //  Copyright (c)        2012 Zach Byerly
 //  Copyright (c) 2011 - 2012 Bryce Adelstein-Lelbach
+//  Copyright (c) 2012    Jonathan Parziale
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -59,39 +60,7 @@ double x_max = 0.0;
 double dx = 0.0;
 double cfl_factor = 0.0;
 double cfl_predict_factor = 0.0;
-
-
-// this is a single element of a "time array" that will be 1D array
-// containing information about timestep size. the index will be
-// the integer timestep number, so time_array[timestep].dt will be
-// the timestep size at that timestep
-struct time_element{
-  // default constructor
-  time_element()
-    : mtx()
-    , dt(0.0)
-    , elapsed_time(0.0)
-    , computed(false)
-  {}
-
-  // copy constructor
-  time_element(
-       time_element const& other
-       )
-    : mtx()
-    , dt(other.dt)                     // timestep size
-    , elapsed_time(other.elapsed_time) // elapsed time
-    , computed(other.computed)
-  {}
-
-  hpx::lcos::local::mutex mtx;
-  double dt;
-  double elapsed_time;
-  bool computed;
-};
-// declaring time_array
-boost::scoped_ptr<std::vector<time_element> > time_array;
-
+double ptime;
 
 // this is the fundimental element of the hydrodynamics code, the
 // individual cell.  It stores all of the variables that the code
@@ -153,10 +122,102 @@ struct cell{
   double tau;
   bool computed;
 };
+// this is a single element of a "time array" that will be 1D array
+// containing information about timestep size. the index will be
+// the integer timestep number, so time_array[timestep].dt will be
+// the timestep size at that timestep
+struct time_element{
+  // default constructor
+  time_element()
+    : dt(0.0)
+    , elapsed_time(0.0)
+    , computed(false),fluid(0),fluid_future(0)
+  {}
+  
+  time_element(boost::uint64_t number_of_cells)
+      :fluid_future(number_of_cells)
+      ,fluid(number_of_cells)
+      {}
+  // copy constructor
+  time_element(
+       time_element const& other
+       )
+    : dt(other.dt)                     // timestep size
+    , elapsed_time(other.elapsed_time) // elapsed time
+    , computed(other.computed)
+    ,fluid_future(other.fluid_future)
+    ,fluid(other.fluid)
+    {}
+   
+  time_element& operator=(time_element const& rhs)
+  {
+    if (this != &rhs) 
+    {
+      dt = rhs.dt;
+      elapsed_time = rhs.elapsed_time;
+      computed = rhs.computed;
+      fluid=rhs.fluid;
+      fluid_future=rhs.fluid_future;
+
+    }
+    return *this;
+  }
+
+  hpx::lcos::local::mutex mtx;
+  double dt;
+  double elapsed_time;
+  bool computed;
+  double physics_time;
+  std::vector<hpx::lcos::future<cell> > fluid_future;//future for each cell 
+  std::vector<cell> fluid;
+};
+// declaring time_array
+
+
+
+
+// Object to store the Fluid seperated in cell and computed by a Time Zone of tie Steps
+// Will store the 2d grid created by the division of the fluid into cells and the computation over time
+// Will be able to Retrieve,remove,add a timestep to the grid
+
+class One_Dimension_Grid
+{
+public:
+    One_Dimension_Grid():number_t_steps(0),number_of_cells(0),time_array(0)
+    {}
+    One_Dimension_Grid(boost::uint64_t num_cells,boost::uint64_t num_time_steps):number_t_steps(num_time_steps),number_of_cells(num_cells)
+    {}
+    // ~One_Dimension_Grid();
+    std::vector<future<cell> > GetTimeStepVector(boost::uint64_t time_step_row);//takes the timesteps position in the vector
+    void remove_bottom_time_step();//takes the timesteps position in the vector
+    void addNewTimeStep();
+    std::vector<time_element> time_array;//pointer to the Grid we will create whden the user starts a simulation
+
+private:
+    
+   boost::uint64_t number_t_steps;
+   boost::uint64_t number_of_cells;
+
+};
+void One_Dimension_Grid::remove_bottom_time_step()
+{
+    time_array.pop_back();
+}
+void One_Dimension_Grid::addNewTimeStep()
+{
+    time_array.insert(time_array.begin(),time_array.at(nx-1));
+}
+/*One_Dimension_Grid::~One_Dimension_Grid()
+{
+    for(boost::uint64_t i=0;i<nt;i++)
+    {
+        time_array.pop_back();
+    }
+    delete &time_array;
+}*/
 
 // declaring grid of all cells for all timesteps
-std::vector<std::vector<cell> > grid;
-
+One_Dimension_Grid grid;
 // forward declaration of the compute function
 cell compute(boost::uint64_t timestep, boost::uint64_t location);
 double timestep_size(boost::uint64_t timestep);
@@ -179,7 +240,7 @@ typedef plain_result_action2<
 // This generates the required boilerplate we need for remote invocation.
 HPX_REGISTER_PLAIN_ACTION(compute_action);
 
-typedef future<cell> compute_future;
+typedef hpx::lcos::future<cell> compute_future;
 
 // this will return the timestep size.  The timestep index will refer to the
 // timestep where it will be USED rather than the timestep where it was
@@ -187,12 +248,12 @@ typedef future<cell> compute_future;
 double timestep_size(boost::uint64_t timestep)
 {
   // locking
-  hpx::lcos::local::mutex::scoped_lock l((*time_array)[timestep].mtx);
+
+  hpx::lcos::local::mutex::scoped_lock l(grid.time_array.at(timestep).mtx);
 
   // if it has already been calculated, then just return the value
-  if ((*time_array)[timestep].computed)
-    return (*time_array)[timestep].dt;
-
+  if (grid.time_array.at(timestep).computed)
+  {return grid.time_array.at(timestep).dt;}
   //  cout << (boost::format("calculating timestep, ts=%1% \n") % timestep) << flush;
 
 
@@ -200,25 +261,54 @@ double timestep_size(boost::uint64_t timestep)
   // decide the timestep
   if (timestep < n_predict)
     {
-      (*time_array)[timestep].computed = true;
-      (*time_array)[timestep].dt = dx*0.033;// this should be fine unless
-      // the initial conditions are changed
-      return (*time_array)[timestep].dt;
+      grid.time_array.at(timestep).computed = true;
+      grid.time_array.at(timestep).dt = dx*0.033;// this should be fine unless
+        // the initial conditions are changed
+        if(timestep>0&&grid.time_array.at(timestep-1).computed)
+            grid.time_array[timestep].physics_time = (grid.time_array.at(timestep-1).physics_time+grid.time_array.at(timestep).dt);
+  //    time_array[timestep].dt = cfl_predict_factor*dt_cfl;
+        else if(timestep==0)
+        {
+            grid.time_array.at(timestep).physics_time=grid.time_array.at(timestep).dt;
+        }
+      return grid.time_array.at(timestep).dt;
     }
 
   // send back the compute futures for the whole grid
   // n_predict timesteps previous to the one we want to decide
   // the timestep for
   //  cout << (boost::format("pushing back futures for ts calc, ts=%1% \n") % timestep) << flush;
-  std::vector<future<cell> > futures;
+  if(timestep>=n_predict)
+  {
   for (boost::uint64_t i=0;i<nx;i++)
-    futures.push_back(async<compute_action>(here,timestep-n_predict,i));
+      grid.time_array.at(timestep).fluid_future.push_back(async<compute_action>(here,timestep-n_predict,i));
+  }
+  
+  double dt_cfl = 1000.0;
+   wait(grid.time_array.at(timestep).fluid_future, [&](std::size_t i, cell const& this_cell)
+      {
+      //      if (i == 0)
+      //  cout << (boost::format("futures fulfilled for timestep %1%\n") % timestep) << flush;
+      // look at all of the cells at a timestep, then pick the smallest
+      // dt_cfl = cfl_factor*dx/(soundspeed+absolute_velocity)
+      double abs_velocity = this_cell.mom/this_cell.rho;
+      double pressure = get_pressure(this_cell);
+      double soundspeed = sqrt(fluid_gamma*pressure/this_cell.rho);
+      double dt_cfl_here = cfl_factor*dx/(soundspeed+abs_velocity);
+      if (dt_cfl_here <=  0.0)
+        {
+          cout << (boost::format("error: CFL value can't be zero")) << flush;
+          //error, quit everything
+        }
+      if (dt_cfl_here < dt_cfl)
+        dt_cfl = dt_cfl_here;
+     });
 
   // initialize dt_cfl to some arbitrary high value
-  double dt_cfl = 1000.0;
+ 
 
   // wait for an array of futures
-  wait(futures, [&](std::size_t i, cell const& this_cell)
+  /*wait(grid.time_array, [&](std::size_t i, cell const& this_cell)
     {
       //      if (i == 0)
       //  cout << (boost::format("futures fulfilled for timestep %1%\n") % timestep) << flush;
@@ -236,10 +326,10 @@ double timestep_size(boost::uint64_t timestep)
       if (dt_cfl_here < dt_cfl)
         dt_cfl = dt_cfl_here;
     });
+*/
 
 
-
-  if (dt_cfl > 999.0)
+  if(dt_cfl > 999.0)
     {
       cout << (boost::format("error: CFL value too high")) << flush;
       // error, quit everything
@@ -247,25 +337,23 @@ double timestep_size(boost::uint64_t timestep)
 
   // we don't want to let the timestep increase too quickly, so
   // we only let it increase by 25% each timestep
-  (*time_array)[timestep].computed = true;
-  (*time_array)[timestep].dt = (std::min)(
+  grid.time_array.at(timestep).computed = true;
+  grid.time_array.at(timestep).dt = (std::min)(
                                      cfl_predict_factor*dt_cfl
                                      ,
-                                     1.25*(*time_array)[timestep-1].dt);
-  //    (*time_array)[timestep].dt = cfl_predict_factor*dt_cfl;
+                                     1.25*grid.time_array.at(timestep-1).dt);
 
-
-  //  cout << (boost::format("timestep = %1%, dt = %2%\n") % timestep % (*time_array)[timestep].dt) << flush;
-  return (*time_array)[timestep].dt;
+  //  cout << (boost::format("timestep = %1%, dt = %2%\n") % timestep % time_array[timestep].dt) << flush;
+  return grid.time_array[timestep].dt;
 }
 
 cell compute(boost::uint64_t timestep, boost::uint64_t location)
 {
-  hpx::lcos::local::mutex::scoped_lock l(grid[timestep][location].mtx);
+    hpx::lcos::local::mutex::scoped_lock l(grid.time_array.at(timestep).fluid.at(location).mtx);
 
   // if it is already computed then just return the value
-  if (grid[timestep][location].computed == true)
-    return grid[timestep][location];
+    if (grid.time_array.at(timestep).fluid.at(location).computed == true)
+        return grid.time_array.at(timestep).fluid.at(location);
 
   //  cout << (boost::format("computing new value, loc = %1%,ts=%2% \n") % location % timestep) << flush;
 
@@ -273,23 +361,26 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   if (timestep == 0)
     {
       //  cout << (boost::format("calling initial_sod, loc = %1%,ts=%2% \n") % location % timestep) << flush;
-      grid[timestep][location] = initial_sod(location);
+        grid.time_array.at(timestep).fluid.at(location) = initial_sod(location);
       //  cout << (boost::format("returning value, loc = %1%,ts=%2% \n") % location % timestep) << flush;
-      grid[timestep][location].computed = true;
-      return grid[timestep][location];
+        grid.time_array.at(timestep).fluid.at(location).computed = true;
+        return grid.time_array.at(timestep).fluid.at(location);
     }
 
    //boundary conditions (using sod shock tube boundaries)
   if ( (location == 0) || (location == nx-1) )
     {
-      grid[timestep][location] = initial_sod(location);
-      grid[timestep][location].computed = true;
-      return grid[timestep][location];
+      grid.time_array.at(timestep).fluid.at(location) = initial_sod(location);
+      grid.time_array.at(timestep).fluid.at(location).computed = true;
+      return grid.time_array.at(timestep).fluid.at(location);
     }
 
   //now we have to actually compute some values.
 
   //these are the dependencies, or "stencil"
+  if(timestep<0)
+        return grid.time_array.at(timestep).fluid.at(location);
+
   compute_future nleft = async<compute_action>(here,timestep-1,location-1);
   compute_future nmiddle = async<compute_action>(here,timestep-1,location);
   compute_future nright = async<compute_action>(here,timestep-1,location+1);
@@ -396,9 +487,23 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   //  if (location == 1)
   //    cout << (boost::format("calculating timestep = %1%\n") % timestep) << flush;
 
-  grid[timestep][location] = now;
-  grid[timestep][location].computed = true;
-  return grid[timestep][location];
+  grid.time_array.at(timestep).fluid.at(location) = now;
+  grid.time_array.at(timestep).fluid.at(location).computed = true;
+  bool time_step_complete= false;
+  for(boost::uint64_t i=0;i<nx;i++)
+  {
+      if(grid.time_array[0].fluid.at(i).computed&&grid.time_array[1].fluid.at(i).computed)
+        time_step_complete=true;
+      else
+          time_step_complete=false;
+  }
+  if(time_step_complete&&!grid.time_array.at(nt-1).physics_time>=ptime)
+  {
+      grid.remove_bottom_time_step();
+      grid.addNewTimeStep();
+  }
+  
+  return grid.time_array.at(timestep).fluid.at(location);
 }
 
 double get_pressure(cell input)
@@ -527,13 +632,14 @@ int hpx_main(
     variables_map& vm
     )
 {
-
+    {
   here = find_here();
 
   // some physics parameters
   nx = vm["nx-value"].as<boost::uint64_t>();
   nt = vm["nt-value"].as<boost::uint64_t>();
   n_predict = vm["npredict-value"].as<boost::uint64_t>();
+  ptime=vm["ptime-value"].as<double>();
   fluid_gamma = 1.4;
 
   x_min = -0.5;
@@ -548,26 +654,26 @@ int hpx_main(
   cout << (boost::format("n_predict = %1%\n") % n_predict) << flush;
 
   // allocating the time array
-  time_array.reset(new std::vector<time_element>(nt));
+  grid.time_array = std::vector<time_element>(nt);
 
   // allocating the grid 2d array of all of the cells for all timesteps
-  grid = std::vector<std::vector<cell> >(nt, std::vector<cell>(nx));
-
+  for(boost::uint64_t i=0;i<nt;i++)
   {
+      grid.time_array[i].fluid=std::vector<cell>(nx);
+  }
     //HPX stuff goes here
 
     // Keep track of the time required to execute.
     high_resolution_timer t;
 
-    std::vector<future<cell> > futures;
+    timestep_size(0);
     for (boost::uint64_t i=0;i<nx;i++)
-      futures.push_back(async<compute_action>(here,nt-1,i));
-
+           grid.time_array[0].fluid_future.push_back(async<compute_action>(here,nt-1,i));
     // open file for output
     std::ofstream outfile;
     outfile.open ("output.dat");
 
-    wait(futures, [&](std::size_t i, cell n)
+    wait(grid.time_array[0].fluid_future, [&](std::size_t i, cell n)
          { double x_here = (i-0.5)*dx+x_min;
            double pressure_here = get_pressure(n);
            //double tauoverrho = n.tau/n.rho;
@@ -588,13 +694,13 @@ int hpx_main(
 
     boost::uint64_t i;
     // writing the "time array" to a file
-    (*time_array)[0].elapsed_time = (*time_array)[0].dt;
+    grid.time_array[0].elapsed_time = grid.time_array[0].dt;
     for (i=1;i<nt;i++)
-      (*time_array)[i].elapsed_time = (*time_array)[i-1].elapsed_time + (*time_array)[i].dt;
+      grid.time_array[i].elapsed_time = grid.time_array[i-1].elapsed_time + grid.time_array[i].dt;
 
     for (i =0;i<nt;i++)
       {
-        outfile2 << (boost::format("%1% %2% %3%\n") % i % (*time_array)[i].dt % (*time_array)[i].elapsed_time) << flush;
+        outfile2 << (boost::format("%1% %2% %3%\n") % i % grid.time_array[i].dt % grid.time_array[i].elapsed_time) << flush;
       }
     outfile2.close();
 
@@ -605,22 +711,24 @@ int hpx_main(
     for (i =0;i<nx;i++)
       {
         double x_here = (i-0.5)*dx+x_min;
-        cell analytic = get_analytic(x_here,(*time_array)[nt-1].elapsed_time);
+        cell analytic = get_analytic(x_here,grid.time_array[nt-1].elapsed_time);
         double velocity_here = analytic.mom/analytic.rho;
         double tauoverrho = analytic.tau/analytic.rho;
         double pressure_here = get_pressure(analytic);
         analytic_file << (boost::format("%1% %2% %3% %4% %5%\n") % x_here % analytic.rho % pressure_here % tauoverrho % velocity_here) << flush;
-        total_mass += grid[nt-1][i].rho*dx;
+        total_mass += grid.time_array[nt-1].fluid[i].rho*dx;
       }
     analytic_file.close();
 
     cout << (boost::format("total mass = %1%\n") % total_mass ) << flush;
-
-    char const* fmt0 = "code elapsed time: %1%\n";
-    std::cout << (boost::format(fmt0) % (*time_array)[nt-1].elapsed_time);
-
     char const* fmt = "wall elapsed time: %1% [s]\n";
     std::cout << (boost::format(fmt) % t.elapsed());
+    char const* fmt0 = "code elapsed time: %1%\n";
+    double t_code_time= grid.time_array[0].elapsed_time;
+    
+        t_code_time+=grid.time_array[nt-1].elapsed_time;
+    
+      std::cout << (boost::format(fmt0) %  t_code_time);
 
 
   }
@@ -640,16 +748,20 @@ int main(
 
   cmdline.add_options()
     ( "nx-value"
-      , value<boost::uint64_t>()->default_value(50)
+      , value<boost::uint64_t>()->default_value(5)
       , "nx parameter of the wave equation")
 
     ( "nt-value"
-      , value<boost::uint64_t>()->default_value(100)
+      , value<boost::uint64_t>()->default_value(10)
       , "nt parameter of the wave equation")
 
     ( "npredict-value"
       , value<boost::uint64_t>()->default_value(10)
       , "prediction parameter of the wave equation")
+          
+      ( "ptime-value"
+      , value<double>()->default_value(2.50)
+      , "Physics time to run the simulation to")
     ;
 
 

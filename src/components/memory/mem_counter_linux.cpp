@@ -8,6 +8,9 @@
 
 #if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__)
 
+#include <sys/mman.h>
+#include <sys/param.h>
+
 #include <hpx/exception.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -99,13 +102,13 @@ namespace hpx { namespace performance_counters { namespace memory
             if (!infile.is_open())
             {
                 HPX_THROW_EXCEPTION(
-                    hpx::bad_request
-                    "hpx::performance_counters::memory::read_psm_resident"
+                    hpx::bad_request,
+                    "hpx::performance_counters::memory::read_psm_resident",
                     boost::str(boost::format("unable to open statm file '%s'") % filename));
                 return boost::uint64_t(-1);
             }
 
-            in_string << infile;
+            infile >> in_string;
         }
 
         proc_statm psm;
@@ -114,14 +117,14 @@ namespace hpx { namespace performance_counters { namespace memory
         bool r = phrase_parse(itr, end, psg, space, psm);
         if (!r) {
             HPX_THROW_EXCEPTION(
-                hpx::invalid_data
-                "hpx::performance_counters::memory::read_psm_vm"
+                hpx::invalid_data,
+                "hpx::performance_counters::memory::read_psm_vm",
                 boost::str(boost::format("failed to parse '%s'") % filename));
             return boost::uint64_t(-1);
         }
 
-        // psm.size is in blocks, but we need to return the number of bytes
-        return psm.size * 4096;
+        // psm.size is in pages, but we need to return the number of bytes
+        return psm.size * EXEC_PAGESIZE;
     }
 
     // returns resident memory value
@@ -141,13 +144,13 @@ namespace hpx { namespace performance_counters { namespace memory
             if (!infile.is_open())
             {
                 HPX_THROW_EXCEPTION(
-                    hpx::bad_request
-                    "hpx::performance_counters::memory::read_psm_resident"
+                    hpx::bad_request,
+                    "hpx::performance_counters::memory::read_psm_resident",
                     boost::str(boost::format("unable to open statm file '%s'") % filename));
                 return boost::uint64_t(-1);
             }
 
-            in_string << infile;
+            infile >> in_string;
         }
 
         proc_statm psm;
@@ -156,18 +159,16 @@ namespace hpx { namespace performance_counters { namespace memory
         bool r = phrase_parse(itr, end, psg, space, psm);
         if (!r) {
             HPX_THROW_EXCEPTION(
-                hpx::invalid_data
-                "hpx::performance_counters::memory::read_psm_resident"
+                hpx::invalid_data,
+                "hpx::performance_counters::memory::read_psm_resident",
                 boost::str(boost::format("failed to parse '%s'") % filename));
             return boost::uint64_t(-1);
         }
 
-        // psm.size is in blocks, but we need to return the number of bytes
-        return psm.resident * 4096;
+        // psm.resident is in pages, but we need to return the number of bytes
+        return psm.resident * EXEC_PAGESIZE;
     }
 }}}
 
 #endif
 
-#if defined(BOOST_WINDOWS)
-#endif

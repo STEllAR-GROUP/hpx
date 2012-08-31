@@ -33,6 +33,7 @@ macro(hpx_find_headers name)
     endforeach()
 
     if(${name}_ROOT)
+      string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
       find_path(${name}_INCLUDE_DIR
         NAMES ${${name}_HEADERS}
         PATHS ${rooted_header_paths}
@@ -72,6 +73,8 @@ macro(hpx_find_package name)
 
     if(NOT ${name}_ROOT)
       set(${name}_ROOT ${name}_ROOT-NOTFOUND)
+    else()
+      string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
     endif()
 
     if(NOT ${name}_LIBRARY)

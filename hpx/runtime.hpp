@@ -140,8 +140,6 @@ namespace hpx
         void register_counter_types();
 
         ///////////////////////////////////////////////////////////////////////
-        virtual util::io_service_pool& get_io_pool() = 0;
-
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
@@ -181,9 +179,9 @@ namespace hpx
 
         /// Access one of the internal thread pools (io_service instances)
         /// HPX is using to perform specific tasks. The three possible values
-        /// for the argument \p name are "io_pool", "parcel_pool", and
-        /// "timer_pool". For any other argument value the function wil return
-        /// zero.
+        /// for the argument \p name are "main_pool", "io_pool", "parcel_pool",
+        /// and "timer_pool". For any other argument value the function will
+        /// return zero.
         virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
 
     protected:

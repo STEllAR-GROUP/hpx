@@ -32,6 +32,10 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_setup_action);
 
 HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::timeloop_action,
+    gtc_point_timeloop_action);
+
+HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::chargei_action,
     gtc_point_chargei_action);
 
@@ -40,5 +44,13 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_set_data_action);
 
 HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_tdata_action,
+    gtc_point_set_tdata_action);
+
+HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::set_params_action,
     gtc_point_set_params_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_tsr_data_action,
+    gtc_point_set_tsr_data_action);

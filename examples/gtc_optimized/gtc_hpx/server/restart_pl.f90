@@ -8,7 +8,7 @@ subroutine restart_write_0
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -125,7 +125,7 @@ subroutine restart_write_1
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -242,7 +242,7 @@ subroutine restart_write_2
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -359,7 +359,7 @@ subroutine restart_write_3
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -476,7 +476,7 @@ subroutine restart_write_4
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -593,7 +593,7 @@ subroutine restart_write_5
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -710,7 +710,7 @@ subroutine restart_write_6
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -827,7 +827,7 @@ subroutine restart_write_7
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -944,7 +944,7 @@ subroutine restart_write_8
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 
@@ -1061,7 +1061,7 @@ subroutine restart_write_9
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(8) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 

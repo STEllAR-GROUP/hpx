@@ -25,9 +25,9 @@ namespace hpx
     {}
 
     thread::thread(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
-      : id_(rhs.id_)
+      : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
-        rhs.id_ = uninitialized;
+        rhs.swap(*this);
     }
 
     thread& thread::operator=(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
@@ -41,7 +41,7 @@ namespace hpx
     {
         // If the thread is still running, we terminate the whole application
         // as we have no chance of reporting this error (we can't throw)
-        threads::thread_id_type id = uninitialized;
+        threads::thread_id_type id = threads::invalid_thread_id;
 
         {
             mutex_type::scoped_lock l(mtx_);

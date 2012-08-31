@@ -19,6 +19,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/config/export_definitions.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/exception.hpp>
 
 namespace hpx { namespace performance_counters { namespace papi { namespace util
@@ -217,6 +218,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     // list locally available events with detailed information
     void list_events(std::string const& scope);
+
+    // get relevant thread label and index from counter description
+    boost::uint32_t get_counter_thread(counter_path_elements const&, std::string&);
 
 }}}}
 

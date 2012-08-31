@@ -67,10 +67,10 @@ namespace hpx { namespace util
         /// \brief Get number of threads associated with this I/O service.
         std::size_t size() const { return pool_size_; }
 
-    protected:
-        ///
+        /// \brief Activate the thread \a index for this thread pool
         void thread_run(std::size_t index);
 
+    protected:
         void stop_locked();
         void join_locked();
         void clear_locked();

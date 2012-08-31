@@ -6,15 +6,21 @@
 
 add_hpx_component(sender
     SOURCES "parcelsender/sender.cpp"
-    FOLDER "Benchmarks/parcel_sr_analysis")
+    FOLDER "Benchmarks/parcel_sr_analysis"
+    DEPENDENCIES iostreams_component
+    )
 
 add_hpx_component(receiver
     SOURCES "parcelreceiver/receiver.cpp"
-    FOLDER "Benchmarks/parcel_sr_analysis")
+    FOLDER "Benchmarks/parcel_sr_analysis"
+    DEPENDENCIES iostreams_component
+    )
 
 add_hpx_component(empty
     SOURCES "emptycomponent/emptycomponent.cpp"
-    FOLDER "Benchmarks/distrib_factory_cdcomp_analysis.cpp")
+    FOLDER "Benchmarks/distrib_factory_cdcomp_analysis.cpp"
+    DEPENDENCIES iostreams_component
+    )
 
 set(benchmarks
 #    apply_scheduling_analysis

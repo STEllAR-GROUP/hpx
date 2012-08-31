@@ -20,7 +20,7 @@ namespace jacobi
     {
         stencil_iterator() {}
 
-        ~stencil_iterator() { BOOST_ASSERT(id); }
+        ~stencil_iterator() { /*BOOST_ASSERT(id);*/ }
 
         hpx::lcos::future<void> init(
             jacobi::row const & r
@@ -33,7 +33,7 @@ namespace jacobi
 
         hpx::lcos::future<void> step();
 
-        hpx::lcos::future<row_range> get_range(std::size_t begin, std::size_t end);
+        hpx::lcos::future<jacobi::row> get(std::size_t idx) const;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

@@ -55,6 +55,8 @@ endif()
 ################################################################################
 # CMake configuration
 ################################################################################
+set(HPX_INTERNAL_CMAKE ON)
+
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 
 # include additional macro definitions
@@ -156,7 +158,11 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+if(UNIX)
+  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+else()
+  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
+endif()
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -783,7 +789,7 @@ else()
   endif()
   
   # Check if our libraries have unresolved symbols
-  hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
+  #hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
 
   ##############################################################################
   # GCC-only configuration
@@ -1209,12 +1215,14 @@ set(external_include_directories "")
 set(external_include_flags "")
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_link_directories "${external_link_directories} ${directory}")
   set(external_link_flags "${external_link_flags} -L${directory}")
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
@@ -1223,6 +1231,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
+  string(REPLACE " " "\\ " BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info

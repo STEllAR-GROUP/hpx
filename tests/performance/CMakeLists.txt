@@ -25,7 +25,7 @@ set(benchmarks
 if(MSVC)
   set(boost_library_dependencies)
 else()
-  set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY})
+    set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY} ${BOOST_SYSTEM_LIBRARY} ${BOOST_CHRONO_LIBRARY})
 endif()
 
 if(OPENMP_FOUND)
