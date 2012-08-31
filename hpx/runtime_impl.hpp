@@ -49,6 +49,9 @@ namespace hpx {
         threads::thread_state run_helper(
             HPX_STD_FUNCTION<runtime::hpx_main_function_type> func, int& result);
 
+        void wait_helper(boost::mutex& mtx, boost::condition& cond,
+            bool& running);
+
     public:
         typedef SchedulingPolicy scheduling_policy_type;
         typedef NotificationPolicy notification_policy_type;
@@ -286,11 +289,6 @@ namespace hpx {
             return thread_manager_->get_executed_threads(num);
         }
 
-        util::io_service_pool& get_io_pool()
-        {
-            return io_pool_;
-        }
-
         std::size_t get_runtime_support_lva() const
         {
             return reinterpret_cast<std::size_t>(&runtime_support_);
@@ -360,9 +358,9 @@ namespace hpx {
 
         /// Access one of the internal thread pools (io_service instances)
         /// HPX is using to perform specific tasks. The three possible values
-        /// for the argument \p name are "io_pool", "parcel_pool", and
-        /// "timer_pool". For any other argument value the function will return
-        /// zero.
+        /// for the argument \p name are "main_pool", "io_pool", "parcel_pool",
+        /// and "timer_pool". For any other argument value the function will
+        /// return zero.
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     private:
@@ -373,6 +371,7 @@ namespace hpx {
         util::unique_ids id_pool;
         runtime_mode mode_;
         int result_;
+        util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
         util::io_service_pool parcel_pool_;
         util::io_service_pool timer_pool_;

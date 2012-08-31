@@ -98,6 +98,9 @@ namespace hpx {
             runtime_mode locality_mode, init_scheduler_type const& init)
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
+        main_pool_(1,
+            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1),
+            boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
             boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
@@ -264,7 +267,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static void wait_helper(components::server::runtime_support& rts,
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::wait_helper(
         boost::mutex& mtx, boost::condition& cond, bool& running)
     {
         // signal successful initialization
@@ -275,7 +279,10 @@ namespace hpx {
         }
 
         // wait for termination
-        rts.wait();
+        runtime_support_.wait();
+
+        // stop main thread pool
+        main_pool_.stop();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -287,11 +294,11 @@ namespace hpx {
         boost::mutex mtx;
         boost::condition cond;
         bool running = false;
+
         boost::thread t (boost::bind(
-                    &wait_helper, boost::ref(runtime_support_),
-                    boost::ref(mtx), boost::ref(cond), boost::ref(running)
-                )
-            );
+                &runtime_impl<SchedulingPolicy, NotificationPolicy>::wait_helper,
+                this, boost::ref(mtx), boost::ref(cond), boost::ref(running)
+            ));
 
         // wait for the thread to run
         {
@@ -299,6 +306,9 @@ namespace hpx {
             if (!running)
                 cond.wait(lk);
         }
+
+        // use main thread to drive main thread pool
+        main_pool_.thread_run(0);
 
         // block main thread
         t.join();
@@ -470,7 +480,7 @@ namespace hpx {
         // initialize coroutines context switcher
         boost::coroutines::thread_startup(name);
 
-        // register this thread with any possibly active Intel tool 
+        // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
     }
 
@@ -548,6 +558,8 @@ namespace hpx {
             return &parcel_pool_;
         if (service_name == "timer_pool")
             return &timer_pool_;
+        if (service_name == "main_pool")
+            return &main_pool_;
 
         return 0;
     }

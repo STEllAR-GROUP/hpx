@@ -23,7 +23,7 @@
     #include <hpx/runtime/threads/policies/windows_topology.hpp>
 #elif defined(__APPLE__)
     #include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif defined(__linux__) 
+#elif defined(__linux__)
     #include <hpx/runtime/threads/policies/linux_topology.hpp>
 #else
     #include <hpx/runtime/threads/policies/noop_topology.hpp>
@@ -149,34 +149,25 @@ namespace hpx
             util::runtime_configuration& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
-        topology_(static_cast<threads::topology*>(
+        topology_(
 #if defined(HPX_HAVE_HWLOC)
             new threads::hwloc_topology
 #elif defined(BOOST_WINDOWS)
             new threads::windows_topology
 #elif defined(__APPLE__)
             new threads::macosx_topology
-#elif defined(__linux__) 
+#elif defined(__linux__)
             new threads::linux_topology
 #else
             new threads::noop_topology
 #endif
-        )),
+        ),
         state_(state_invalid)
     {
-        // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_.register_thread("main");
-
         // initialize our TSS
         runtime::init_tss();
 
-        // initialize coroutines context switcher
-        boost::coroutines::thread_startup("main");
-
         counters_.reset(new performance_counters::registry(agas_client));
-
-        // register this thread with any possibly active Intel tool 
-        HPX_ITT_THREAD_SET_NAME("main");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -190,11 +181,13 @@ namespace hpx
     void runtime::init_tss()
     {
         // initialize our TSS
-        BOOST_ASSERT(NULL == runtime::runtime_.get());    // shouldn't be initialized yet
-        BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
+        if (NULL == runtime::runtime_.get())
+        {
+            BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
 
-        runtime::runtime_.reset(new runtime* (this));
-        threads::coroutine_type::impl_type::init_self();
+            runtime::runtime_.reset(new runtime* (this));
+            threads::coroutine_type::impl_type::init_self();
+        }
     }
 
     void runtime::deinit_tss()
@@ -325,7 +318,6 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         return (NULL == rt) ? 0 : rt->get_instance_number();
-//        return get_runtime().get_instance_number();
     }
 
     std::string get_config_entry(std::string const& key, std::string const& dflt)
@@ -470,7 +462,7 @@ namespace hpx
             return numa_sensitive;
         return false;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     bool keep_factory_alive(components::component_type type)
     {

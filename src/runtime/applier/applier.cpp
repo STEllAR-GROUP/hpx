@@ -314,8 +314,8 @@ namespace hpx { namespace applier
 
     void applier::init_tss()
     {
-        BOOST_ASSERT(NULL == applier::applier_.get());    // shouldn't be initialized yet
-        applier::applier_.reset(new applier* (this));
+        if (NULL == applier::applier_.get())
+            applier::applier_.reset(new applier* (this));
     }
 
     void applier::deinit_tss()
