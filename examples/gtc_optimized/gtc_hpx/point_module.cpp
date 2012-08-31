@@ -52,5 +52,9 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_set_params_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtc_point_type::wrapped_type::set_tsr_data_action,
-    gtc_point_set_tsr_data_action);
+    gtc_point_type::wrapped_type::set_sendleft_data_action,
+    gtc_point_set_sendleft_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_sendright_data_action,
+    gtc_point_set_sendright_data_action);
