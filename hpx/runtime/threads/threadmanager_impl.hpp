@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -25,6 +24,7 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

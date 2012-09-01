@@ -13,13 +13,13 @@
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/atomic.hpp>
-#include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 #ifdef HPX_ACCEL_QUEUING

@@ -147,7 +147,7 @@ if(${HPX_INTERNAL_CHRONO})
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
-if(${BOOST_MINOR_VERSION} LESS 53)
+if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
@@ -187,7 +187,11 @@ add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
-add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+if(${BOOST_MINOR_VERSION} LESS 52)
+  add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+#else()
+#  add_definitions(-DBOOST_LOCKFREE_NO_HDR_ATOMIC)
+endif()
 
 ################################################################################
 # Compiler detection code
@@ -620,6 +624,10 @@ if(MSVC)
   ##############################################################################
   if(HPX_WARNINGS)
     hpx_append_flag(-W3)
+
+    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
+    # which is benign
+    hpx_append_flag(-wd4307)
 
     # According to the ifort Windows manual, W3 isn't supported
     hpx_append_flag(-W1 LANGUAGES Fortran)
@@ -1135,7 +1143,7 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
-  if(${BOOST_MINOR_VERSION} LESS 53)
+  if(${BOOST_MINOR_VERSION} LESS 52)
     # install Boost.Atomic library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
