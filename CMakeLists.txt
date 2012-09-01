@@ -115,22 +115,10 @@ set(BOOST_LIBRARIES date_time
                     system
                     thread)
 
-if(${BOOST_MINOR_VERSION} LESS 49)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
-endif()
-
 # Decide whether to use internal version of Boost.Chrono
 if(${BOOST_MINOR_VERSION} LESS 47)
   hpx_warn("boost" "Using internal version of Boost.Chrono, setting HPX_INTERNAL_CHRONO=ON.")
   set(HPX_INTERNAL_CHRONO ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
-endif()
-
-if(${HPX_INTERNAL_CHRONO})
-  add_definitions(-DHPX_INTERNAL_CHRONO)
-  add_definitions(-DBOOST_CHRONO_NO_LIB)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
-else()
-  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 
 # Decide whether to use internal version of Boost.Move
@@ -139,17 +127,25 @@ if(${BOOST_MINOR_VERSION} LESS 48)
   set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" FORCE)
 endif()
 
-if(${HPX_INTERNAL_MOVE})
-  add_definitions(-DHPX_INTERNAL_MOVE)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
-endif()
-
 ################################################################################
 # search path configuration
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
+if(${HPX_INTERNAL_MOVE})
+  add_definitions(-DHPX_INTERNAL_MOVE)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
+endif()
 if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
+endif()
+if(${HPX_INTERNAL_CHRONO})
+  add_definitions(-DHPX_INTERNAL_CHRONO)
+  add_definitions(-DBOOST_CHRONO_NO_LIB)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
@@ -160,6 +156,10 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
+if(${BOOST_MINOR_VERSION} LESS 49)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
+endif()
+
 if(UNIX)
   hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 else()
