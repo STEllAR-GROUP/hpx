@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/coroutine/coroutine.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config.hpp>
@@ -222,7 +222,7 @@ namespace hpx
         }
         /// \endcond
 
-        typedef boost::coroutines::coroutine<
+        typedef util::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;

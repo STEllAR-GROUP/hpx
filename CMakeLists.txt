@@ -127,11 +127,16 @@ if(${BOOST_MINOR_VERSION} LESS 48)
   set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" FORCE)
 endif()
 
+# Decide whether to use Boost.Context for coroutine implementation
+if(${BOOST_MINOR_VERSION} GREATER 50)
+  hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+endif()
+
 ################################################################################
 # search path configuration
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
-if(${HPX_INTERNAL_MOVE})
+if(HPX_INTERNAL_MOVE)
   add_definitions(-DHPX_INTERNAL_MOVE)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
@@ -140,18 +145,21 @@ if(${BOOST_MINOR_VERSION} LESS 52)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
 endif()
-if(${HPX_INTERNAL_CHRONO})
+if(HPX_INTERNAL_CHRONO)
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
+if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
+  add_definitions("-DHPX_COROUTINE_USE_GENERIC_CONTEXT=1")
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
+endif()
 if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
@@ -175,10 +183,9 @@ hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
-add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
+add_definitions(-DHPX_COROUTINE_ARG_MAX=2)
 if(NOT MSVC)
-  add_definitions(-DBOOST_COROUTINE_NO_SEPARATE_CALL_SITES)
+  add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
@@ -657,7 +664,7 @@ if(MSVC)
 
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
+  add_definitions(-DHPX_COROUTINE_USE_FIBERS)
   add_definitions(-DPSAPI_VERSION=1)
 
 ################################################################################
@@ -814,7 +821,7 @@ else()
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-          add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+          add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
           hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
         endif()
@@ -1114,7 +1121,6 @@ if(NOT HPX_NO_INSTALL)
 
   install( # install external dependencies
     DIRECTORY external/cache/boost
-              external/coroutine/boost
               external/endian/boost
               external/logging/boost
               external/plugin/boost

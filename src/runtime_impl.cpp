@@ -28,9 +28,9 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
 #include <io.h>
 #endif
 
@@ -204,7 +204,7 @@ namespace hpx {
         HPX_STD_FUNCTION<hpx_main_function_type> func,
         std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
-#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
         // needs to be called to avoid problems at system startup
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);
@@ -478,7 +478,7 @@ namespace hpx {
         applier_.init_tss();
 
         // initialize coroutines context switcher
-        boost::coroutines::thread_startup(name);
+        hpx::util::coroutines::thread_startup(name);
 
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
@@ -488,7 +488,7 @@ namespace hpx {
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
     {
         // initialize coroutines context switcher
-        boost::coroutines::thread_shutdown();
+        hpx::util::coroutines::thread_shutdown();
 
         // reset applier TSS
         applier_.deinit_tss();

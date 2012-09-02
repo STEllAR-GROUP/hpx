@@ -29,12 +29,12 @@
     #include <hpx/runtime/threads/policies/noop_topology.hpp>
 #endif
 
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #if defined(HPX_HAVE_STACKTRACES)
 #include <boost/backtrace.hpp>
 #endif
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
 #include <io.h>
 #endif
 

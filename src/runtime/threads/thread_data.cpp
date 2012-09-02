@@ -11,7 +11,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ namespace hpx { namespace threads
 
     thread_self::impl_type* get_ctx_ptr()
     {
-        return boost::coroutines::detail::coroutine_accessor::get_impl(get_self());
+        return hpx::util::coroutines::detail::coroutine_accessor::get_impl(get_self());
     }
 
     thread_self* get_self_ptr_checked(error_code& ec)

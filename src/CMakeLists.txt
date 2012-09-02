@@ -80,7 +80,7 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
   EXCLUDE ".*portable_binary_.*archive[.]cpp"
   APPEND)
 add_hpx_library_sources(hpx
@@ -111,11 +111,11 @@ endif()
 
 if(NOT MSVC)
   add_hpx_library_sources(hpx_external
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp"
+    GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/coroutine/swapcontext.cpp"
     APPEND)
 else()
   if(HPX_EMULATE_SWAP_CONTEXT)
-    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/switch_to_fiber.asm")
+    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(
@@ -338,7 +338,7 @@ set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY=\"${name}\""
   "HPX_EXPORTS"
-  "BOOST_COROUTINE_EXPORTS")
+  "HPX_COROUTINE_EXPORTS")
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx_serialization)
@@ -403,7 +403,7 @@ set_property(TARGET hpx APPEND
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER"
-  "BOOST_COROUTINE_EXPORTS") # Do we still need this?
+  "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx)

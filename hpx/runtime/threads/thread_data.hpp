@@ -14,7 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/coroutine/coroutine.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 #include <boost/thread/shared_mutex.hpp>
