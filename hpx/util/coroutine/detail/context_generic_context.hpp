@@ -69,14 +69,14 @@ namespace hpx { namespace util { namespace coroutines
                 ctx_.fc_stack.size = (stack_size == -1) ? 
                     boost::ctx::minimum_stacksize() : std::size_t(stack_size);
 #endif
-                ctx_.fc_stack.base = alloc_.allocate(ctx_.fc_stack.size);
+                ctx_.fc_stack.sp = alloc_.allocate(ctx_.fc_stack.size);
                 boost::ctx::make_fcontext(&ctx_, &trampoline<Functor>);
             }
 
             ~fcontext_context_impl()
             {
                 if (ctx_.fc_stack.size) {
-                    alloc_.deallocate(ctx_.fc_stack.base, ctx_.fc_stack.size);
+                    alloc_.deallocate(ctx_.fc_stack.sp, ctx_.fc_stack.size);
                     ctx_.fc_stack.size = 0;
                 }
             }
@@ -90,7 +90,7 @@ namespace hpx { namespace util { namespace coroutines
             void reset_stack() {}
             void rebind_stack() 
             {
-                if (ctx_.fc_stack.base) 
+                if (ctx_.fc_stack.sp) 
                     increment_stack_recycle_count();
             }
 
