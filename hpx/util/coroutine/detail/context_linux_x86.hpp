@@ -12,7 +12,7 @@
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
-#include <boost/detail/atomic_count.hpp>
+#include <boost/atomic.hpp>
 
 #include <sys/param.h>
 #include <cstdlib>
