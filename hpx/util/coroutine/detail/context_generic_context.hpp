@@ -75,7 +75,8 @@ namespace hpx { namespace util { namespace coroutines
 
             ~fcontext_context_impl()
             {
-                if (ctx_.fc_stack.size) {
+                if (ctx_.fc_stack.size) 
+                {
                     alloc_.deallocate(ctx_.fc_stack.sp, ctx_.fc_stack.size);
                     ctx_.fc_stack.size = 0;
                 }
