@@ -61,15 +61,16 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, 
-        typename Freelist = caching_freelist_t, 
-        typename Alloc = lockfree::allocator<std::allocator<void> > >
+        typename Freelist = caching_freelist_t, typename Alloc = std::allocator<void> >
     class fifo;
 
     template <typename T, typename Alloc>
     class fifo<T, caching_freelist_t, Alloc>
-      : public queue<T, lockfree::fixed_sized<false>, Alloc>
+      : public queue<T, lockfree::fixed_sized<false>, lockfree::allocator<Alloc> >
     {
-        typedef queue<T, lockfree::fixed_sized<false>, Alloc> base_type;
+        typedef queue<
+            T, lockfree::fixed_sized<false>, lockfree::allocator<Alloc> 
+        > base_type;
 
     public:
         fifo() {}
@@ -91,9 +92,11 @@ namespace boost { namespace lockfree
 
     template <typename T, typename Alloc>
     class fifo<T, static_freelist_t, Alloc>
-      : public queue<T, lockfree::fixed_sized<true>, Alloc>
+      : public queue<T, lockfree::fixed_sized<true>, lockfree::capacity<1000>, 
+            lockfree::allocator<Alloc> >
     {
-        typedef queue<T, lockfree::fixed_sized<true>, Alloc> base_type;
+        typedef queue<T, lockfree::fixed_sized<true>, lockfree::capacity<1000>, 
+            lockfree::allocator<Alloc> > base_type;
 
     public:
         fifo() {}

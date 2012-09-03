@@ -252,7 +252,7 @@ struct thread_deque
     thread_deque(std::size_t max_count = max_thread_count)
       : work_items_(),
         work_items_count_(0),
-        terminated_items_(),
+        terminated_items_(128),
         max_count_((0 == max_count)
                   ? static_cast<std::size_t>(max_thread_count)
                   : max_count),

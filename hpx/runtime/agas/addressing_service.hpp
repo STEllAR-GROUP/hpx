@@ -188,6 +188,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
+        hosted_data_type()
+          : promise_pool_(16)
+        {}
+
         void register_counter_types()
         {
             server::primary_namespace::register_counter_types();

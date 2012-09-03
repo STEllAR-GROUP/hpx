@@ -592,6 +592,7 @@ big_boot_barrier::big_boot_barrier(
                ? (ini_.get_num_localities() - 1)
                : 0)
              : 1)
+  , thunks(16)
 {
     pp_.register_event_handler(boost::bind(&early_parcel_sink, _2));
 }
