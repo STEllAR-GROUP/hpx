@@ -12,17 +12,17 @@
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
-#include <boost/atomic.hpp>
-
 #include <sys/param.h>
 #include <cstdlib>
 #include <cstddef>
 #include <boost/cstdint.hpp>
+#include <boost/assert.hpp>
+#include <boost/atomic.hpp>
+
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 #include <hpx/util/coroutine/detail/static.hpp>
-#include <boost/assert.hpp>
 
 /*
  * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
@@ -188,6 +188,12 @@ namespace hpx { namespace util { namespace coroutines
       {
         if(m_stack)
           posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
+      }
+
+      // Return the size of the reserved stack address space.
+      std::ptrdiff_t get_stacksize() const
+      {
+          return m_stack_size;
       }
 
       void reset_stack()
