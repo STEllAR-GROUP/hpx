@@ -74,3 +74,11 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::set_int_comm_allreduce_data_action,
     gtc_point_set_int_comm_allreduce_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_int_sendright_data_action,
+    gtc_point_set_int_sendright_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::set_int_sendleft_data_action,
+    gtc_point_set_int_sendleft_data_action);

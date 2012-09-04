@@ -84,6 +84,17 @@ namespace gtc { namespace server
         void set_int_comm_allreduce_data(std::size_t which,
                 std::size_t generation, std::vector<int> const& data);
 
+        void int_toroidal_sndright(int *csend, int* mgrid);
+        void int_toroidal_rcvleft(int *creceive);
+        void set_int_sendright_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<int> const& send);
+        void set_int_sendleft_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<int> const& send);
+        void int_toroidal_sndleft(int *csend, int* mgrid);
+        void int_toroidal_rcvright(int *creceive);
+
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
@@ -99,6 +110,8 @@ namespace gtc { namespace server
         HPX_DEFINE_COMPONENT_ACTION(point, set_toroidal_scatter_data, set_toroidal_scatter_data_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_comm_allreduce_data, set_comm_allreduce_data_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_int_comm_allreduce_data, set_int_comm_allreduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_int_sendright_data, set_int_sendright_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_int_sendleft_data, set_int_sendleft_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -120,6 +133,8 @@ namespace gtc { namespace server
         std::vector<double> toroidal_scatter_receive_;
         std::vector<double> comm_allreduce_receive_;
         std::vector<int> int_comm_allreduce_receive_;
+        std::vector<int> int_sendright_receive_;
+        std::vector<int> int_sendleft_receive_;
     };
 }}
 
@@ -171,6 +186,14 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::set_int_comm_allreduce_data_action,
     gtc_point_set_int_comm_allreduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_int_sendright_data_action,
+    gtc_point_set_int_sendright_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_int_sendleft_data_action,
+    gtc_point_set_int_sendleft_data_action);
 
 #endif
 

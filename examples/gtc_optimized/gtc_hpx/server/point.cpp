@@ -89,6 +89,16 @@ extern "C" {
             void FNAME(pushi_7)(void* opaque_ptr_to_class);
             void FNAME(pushi_8)(void* opaque_ptr_to_class);
             void FNAME(pushi_9)(void* opaque_ptr_to_class);
+            void FNAME(shifti_0)(void* opaque_ptr_to_class);
+            void FNAME(shifti_1)(void* opaque_ptr_to_class);
+            void FNAME(shifti_2)(void* opaque_ptr_to_class);
+            void FNAME(shifti_3)(void* opaque_ptr_to_class);
+            void FNAME(shifti_4)(void* opaque_ptr_to_class);
+            void FNAME(shifti_5)(void* opaque_ptr_to_class);
+            void FNAME(shifti_6)(void* opaque_ptr_to_class);
+            void FNAME(shifti_7)(void* opaque_ptr_to_class);
+            void FNAME(shifti_8)(void* opaque_ptr_to_class);
+            void FNAME(shifti_9)(void* opaque_ptr_to_class);
             void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
@@ -159,6 +169,24 @@ extern "C" {
                                              int* msize) {
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->int_comm_allreduce(in,out,msize);
+                    return; };
+            void FNAME(int_sndright_toroidal_cmm) (void* pfoo,int *send, int* mgrid) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->int_toroidal_sndright(send,mgrid);
+                    return; };
+            void FNAME(int_rcvleft_toroidal_cmm) (void* pfoo,int *receive) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->int_toroidal_rcvleft(receive);
+                    return; };
+            void FNAME(int_sndleft_toroidal_cmm) (void* pfoo,int *send, int* mgrid) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->int_toroidal_sndleft(send,mgrid);
+                    return; };
+            void FNAME(int_rcvright_toroidal_cmm) (void* pfoo,int *receive) {
+                    // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
+                    // derived from point, then the world will end.
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->int_toroidal_rcvright(receive);
                     return; };
 }
 
@@ -720,7 +748,42 @@ namespace gtc { namespace server
           break;
       }
       // }}}
-
+#if 0      
+      // Call shifti {{{
+      switch(item_) {
+        case 0:
+          FNAME(shifti_0)(static_cast<void*>(this));
+          break;
+        case 1:
+          FNAME(shifti_1)(static_cast<void*>(this));
+          break;
+        case 2:
+          FNAME(shifti_2)(static_cast<void*>(this));
+          break;
+        case 3:
+          FNAME(shifti_3)(static_cast<void*>(this));
+          break;
+        case 4:
+          FNAME(shifti_4)(static_cast<void*>(this));
+          break;
+        case 5:
+          FNAME(shifti_5)(static_cast<void*>(this));
+          break;
+        case 6:
+          FNAME(shifti_6)(static_cast<void*>(this));
+          break;
+        case 7:
+          FNAME(shifti_7)(static_cast<void*>(this));
+          break;
+        case 8:
+          FNAME(shifti_8)(static_cast<void*>(this));
+          break;
+        case 9:
+          FNAME(shifti_9)(static_cast<void*>(this));
+          break;
+      }
+      // }}}
+#endif
     }
 
     void point::toroidal_sndright(double *csend,int* mgrid)
@@ -1046,6 +1109,143 @@ namespace gtc { namespace server
        }
 
        gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+    void point::int_toroidal_sndright(int *csend,int* mgrid)
+    {
+      if ( in_toroidal_ ) {
+        // Send data to the right
+        // The sender: send data to the left 
+        // in a fire and forget fashion
+        int vsize = *mgrid;
+        std::vector<int> send;
+        send.resize(vsize); 
+        int_sendright_receive_.resize(vsize); 
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = csend[i];
+        }
+
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+
+        set_int_sendright_data_action set_int_sendright_data_;
+        hpx::apply(set_int_sendright_data_, 
+             toroidal_comm_[right_pe_], item_, generation, send);
+      } else {
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
+      }
+    }
+
+    void point::int_toroidal_rcvleft(int *creceive)
+    {
+      if ( in_toroidal_ ) {
+        // Now receive a message from the right
+        // create a new and-gate object
+        gate_.init(1);
+
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        // possibly do other stuff 
+        f.get();
+
+        for (std::size_t i=0;i<int_sendright_receive_.size();i++) {
+          creceive[i] = int_sendright_receive_[i]; 
+        }
+      }
+    }
+
+    void point::set_int_sendright_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& send)
+    {
+       mutex_type::scoped_lock l(mtx_);
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       int_sendright_receive_ = send;
+
+       gate_.set(0);         // trigger corresponding and-gate input
+    }
+
+    void point::int_toroidal_sndleft(int *csend,int* mgrid)
+    {
+      if ( in_toroidal_ ) {
+        // Send data to the left
+        // The sender: send data to the left 
+        // in a fire and forget fashion
+        int vsize = *mgrid;
+        std::vector<int> send;
+        send.resize(vsize); 
+        int_sendleft_receive_.resize(vsize); 
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = csend[i];
+        }
+
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+
+        set_int_sendleft_data_action set_int_sendleft_data_;
+        hpx::apply(set_int_sendleft_data_, toroidal_comm_[left_pe_], item_, generation, send);
+      } else {
+        {
+          mutex_type::scoped_lock l(mtx_);
+          ++generation_;
+        }
+      }
+    }
+
+    void point::int_toroidal_rcvright(int *creceive)
+    {
+      if ( in_toroidal_ ) {
+        // Now receive a message from the right
+        // create a new and-gate object
+        gate_.init(1);
+
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        // possibly do other stuff 
+        f.get();
+
+        for (std::size_t i=0;i<int_sendleft_receive_.size();i++) {
+          creceive[i] = int_sendleft_receive_[i]; 
+        }
+      }
+    }
+
+    void point::set_int_sendleft_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& send)
+    {
+       mutex_type::scoped_lock l(mtx_);
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       int_sendleft_receive_ = send;
+
+       gate_.set(0);         // trigger corresponding and-gate input
     }
 
 }}
