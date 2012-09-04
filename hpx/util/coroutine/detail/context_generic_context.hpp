@@ -60,15 +60,8 @@ namespace hpx { namespace util { namespace coroutines
             explicit fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
               : cb_(reinterpret_cast<intptr_t>(&cb))
             {
-#if defined(BOOST_WINDOWS)
-//              Boost.Context on Windows currently enforces a minimum stack 
-//              size of 64k, there is no way to specify a smaller stack size.
-//              This will be adjusted after Boost.Context has been fixed.
-                ctx_.fc_stack.size = boost::ctx::minimum_stacksize();
-#else
                 ctx_.fc_stack.size = (stack_size == -1) ? 
-                    boost::ctx::minimum_stacksize() : std::size_t(stack_size);
-#endif
+                    alloc_.minimum_stacksize() : std::size_t(stack_size);
                 ctx_.fc_stack.sp = alloc_.allocate(ctx_.fc_stack.size);
                 boost::ctx::make_fcontext(&ctx_, &trampoline<Functor>);
             }
@@ -80,6 +73,12 @@ namespace hpx { namespace util { namespace coroutines
                     alloc_.deallocate(ctx_.fc_stack.sp, ctx_.fc_stack.size);
                     ctx_.fc_stack.size = 0;
                 }
+            }
+
+            // Return the size of the reserved stack address space.
+            std::ptrdiff_t get_stacksize() const
+            {
+                return ctx_.fc_stack.size;
             }
 
             // global functions to be called for each OS-thread after it started

@@ -53,6 +53,14 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct is_action;
 
+    // Customization point for action priority
+    template <typename Action, typename Enable = void>
+    struct action_priority;
+
+    // Customization point for action stack size
+    template <typename Action, typename Enable = void>
+    struct action_stacksize;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct is_future;

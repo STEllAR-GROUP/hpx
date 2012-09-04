@@ -36,16 +36,16 @@
 
 #include <cstddef>
 #include <boost/optional.hpp>
+#include <boost/config.hpp>
+#include <boost/move/move.hpp>
+
+#include <hpx/config.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/argument_unpacker.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/coroutine/detail/context_base.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
 #include <hpx/util/coroutine/detail/static.hpp>
-
-#include <boost/config.hpp>
-#include <boost/move/move.hpp>
-
 #include <hpx/util/thread_specific_ptr.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
@@ -367,31 +367,55 @@ private:
   private:
     struct heap_tag {};
 
+    template <std::size_t NumHeaps>
     static heap_type& get_heap(std::size_t i)
     {
         // ensure thread-safe initialization
-        static_<heap_type, heap_tag, HPX_COROUTINE_NUM_HEAPS> heap;
+        static_<heap_type, heap_tag, NumHeaps> heap;
         return heap.get(i);
     }
 
-  public:
-    static coroutine_impl_wrapper* allocate(std::size_t i)
+    static heap_type& get_heap(std::size_t i, ptrdiff_t stacksize)
     {
-        return get_heap(i).allocate();
+        if (stacksize > HPX_MEDIUM_STACK_SIZE)
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/4>(i % (HPX_COROUTINE_NUM_HEAPS/4));
+
+        if (stacksize > HPX_SMALL_STACK_SIZE)
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/2>(i % (HPX_COROUTINE_NUM_HEAPS/2));
+
+        return get_heap<HPX_COROUTINE_NUM_HEAPS>(i % HPX_COROUTINE_NUM_HEAPS);
     }
-    static coroutine_impl_wrapper* try_allocate(std::size_t i)
+
+  public:
+    static std::size_t get_heap_count(ptrdiff_t stacksize)
     {
-        return get_heap(i).try_allocate();
+        if (stacksize > HPX_MEDIUM_STACK_SIZE)
+            return HPX_COROUTINE_NUM_HEAPS/4;
+
+        if (stacksize > HPX_SMALL_STACK_SIZE)
+            return HPX_COROUTINE_NUM_HEAPS/2;
+
+        return HPX_COROUTINE_NUM_HEAPS;
+    }
+
+    static coroutine_impl_wrapper* allocate(std::size_t i, ptrdiff_t stacksize)
+    {
+        return get_heap(i, stacksize).allocate();
+    }
+    static coroutine_impl_wrapper* try_allocate(std::size_t i, ptrdiff_t stacksize)
+    {
+        return get_heap(i, stacksize).try_allocate();
     }
     static void deallocate(coroutine_impl_wrapper* wrapper, std::size_t i)
     {
-        get_heap(i).deallocate(wrapper);
+        ptrdiff_t stacksize = wrapper->get_stacksize();
+        get_heap(i, stacksize).deallocate(wrapper);
     }
 
 #if defined(_DEBUG)
-    static heap_type const* get_first_heap_address()
+    static heap_type const* get_first_heap_address(ptrdiff_t stacksize)
     {
-        return &get_heap(0);
+        return &get_heap(0, stacksize);
     }
 #endif
 
@@ -412,16 +436,18 @@ private:
           functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
 
       // start looking at the matching heap
-      std::size_t const heap_num = (std::size_t(id)/8) % HPX_COROUTINE_NUM_HEAPS;
+      std::size_t const heap_count = wrapper_type::get_heap_count(stack_size);
+      std::size_t const heap_num = std::size_t(id)/8;
 
       // look through all heaps to find an available coroutine object
-      wrapper_type* wrapper = wrapper_type::allocate(heap_num);
-      for (std::size_t i = 1; i < HPX_COROUTINE_NUM_HEAPS && !wrapper; ++i) {
-          wrapper = wrapper_type::try_allocate((heap_num + i) % HPX_COROUTINE_NUM_HEAPS);
+      wrapper_type* wrapper = wrapper_type::allocate(heap_num, stack_size);
+      for (std::size_t i = 1; i < heap_count && !wrapper; ++i) {
+          wrapper = wrapper_type::try_allocate(heap_num + i, stack_size);
       }
 
 #if defined(_DEBUG)
-      wrapper_type::heap_type const* heaps = wrapper_type::get_first_heap_address();
+      wrapper_type::heap_type const* heaps = 
+          wrapper_type::get_first_heap_address(stack_size);
 #endif
 
       // allocate a new coroutine object, if non is available (or all heaps are locked)
@@ -443,10 +469,11 @@ private:
 #if defined(_DEBUG)
       typedef coroutine_impl_wrapper<
           functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
-      wrapper_type::heap_type const* heaps = wrapper_type::get_first_heap_address();
+      wrapper_type::heap_type const* heaps = 
+          wrapper_type::get_first_heap_address(p->get_stacksize());
 #endif
       // always hand the stack back to the matching heap
-      deallocate(p, (std::size_t(p->get_thread_id())/8) % HPX_COROUTINE_NUM_HEAPS);
+      deallocate(p, std::size_t(p->get_thread_id())/8);
   }
 
 

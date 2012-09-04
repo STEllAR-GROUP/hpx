@@ -226,6 +226,12 @@ namespace hpx { namespace util { namespace coroutines {
                 free_stack(m_stack, m_stack_size);
         }
 
+        // Return the size of the reserved stack address space.
+        std::ptrdiff_t get_stacksize() const
+        {
+            return m_stack_size;
+        }
+
         // global functions to be called for each OS-thread after it started
         // running and before it exits
         static void thread_startup(char const* thread_type) {}
@@ -238,7 +244,7 @@ namespace hpx { namespace util { namespace coroutines {
                 increment_stack_recycle_count();
         }
 
-        typedef boost::atomic_uint64_t counter_type;
+        typedef boost::detail::atomic_count counter_type;
 
         static boost::uint64_t get_stack_unbind_count()
         {

@@ -18,76 +18,6 @@
 
 namespace hpx { namespace applier { namespace detail
 {
-//     ///////////////////////////////////////////////////////////////////////
-//     template <typename Action,
-//         typename DirectExecute = typename Action::direct_execution>
-//     struct apply_helper0;
-//
-//     template <typename Action>
-//     struct apply_helper0<Action, boost::mpl::false_>
-//     {
-//         static void
-//         call (Action* act, naming::address::address_type lva,
-//             threads::thread_priority priority)
-//         {
-//             hpx::applier::register_work_plain(act->get_thread_function(lva),
-//                 actions::detail::get_action_name<Action>(), lva,
-//                 threads::pending, priority);
-//         }
-//
-//         static void
-//         call (naming::address::address_type lva,
-//             threads::thread_priority priority)
-//         {
-//             hpx::applier::register_work_plain(
-//                 Action::construct_thread_function(lva),
-//                 actions::detail::get_action_name<Action>(), lva,
-//                 threads::pending, priority);
-//         }
-//
-//         static void
-//         call (actions::continuation_type& c, naming::address::address_type lva,
-//             threads::thread_priority priority)
-//         {
-//             hpx::applier::register_work_plain(
-//                 Action::construct_thread_function(c, lva),
-//                 actions::detail::get_action_name<Action>(), lva,
-//                 threads::pending, priority);
-//         }
-//     };
-//
-//     template <typename Action>
-//     struct apply_helper0<Action, boost::mpl::true_>
-//     {
-//         static void
-//         call (Action* act, naming::address::address_type lva,
-//             threads::thread_priority /*priority*/)
-//         {
-//             BOOST_ASSERT(false);    // shouldn't be called at all
-//         }
-//
-//         // If local and to be directly executed, just call the function
-//         static void
-//         call (naming::address::address_type lva,
-//             threads::thread_priority /*priority*/)
-//         {
-//             Action::execute_function(lva);
-//         }
-//
-//         static void
-//         call (actions::continuation_type& c, naming::address::address_type lva,
-//             threads::thread_priority /*priority*/)
-//         {
-//             try {
-//                 c->trigger(boost::move(Action::execute_function(lva)));
-//             }
-//             catch (hpx::exception const& e) {
-//                 // make sure hpx::exceptions are propagated back to the client
-//                 c->trigger_error(boost::current_exception());
-//             }
-//         }
-//     };
-
     ///////////////////////////////////////////////////////////////////////
     template <typename Action,
         typename DirectExecute = typename Action::direct_execution>
@@ -105,7 +35,8 @@ namespace hpx { namespace applier { namespace detail
                 boost::move(Action::construct_thread_function(
                     lva, boost::forward<Arguments>(args))),
                 actions::detail::get_action_name<Action>(), lva,
-                threads::pending, priority);
+                threads::pending, priority, std::size_t(-1), 
+                static_cast<threads::thread_stacksize>(traits::action_stacksize<Action>::value));
         }
 
         template <typename Arguments>
@@ -117,7 +48,8 @@ namespace hpx { namespace applier { namespace detail
                 boost::move(Action::construct_thread_function(c, lva,
                     boost::forward<Arguments>(args))),
                 actions::detail::get_action_name<Action>(), lva,
-                threads::pending, priority);
+                threads::pending, priority, std::size_t(-1), 
+                static_cast<threads::thread_stacksize>(traits::action_stacksize<Action>::value));
         }
     };
 

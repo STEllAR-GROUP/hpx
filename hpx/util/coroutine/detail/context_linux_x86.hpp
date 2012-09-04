@@ -12,12 +12,14 @@
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
+
 #include <sys/param.h>
 #include <cstdlib>
 #include <cstddef>
+
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
-#include <boost/atomic.hpp>
+#include <boost/detail/atomic_count.hpp>
 
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
@@ -210,7 +212,7 @@ namespace hpx { namespace util { namespace coroutines
           increment_stack_recycle_count();
       }
 
-      typedef boost::atomic_uint64_t counter_type;
+      typedef boost::detail::atomic_count counter_type;
 
       static counter_type& get_stack_unbind_counter()
       {

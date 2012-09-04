@@ -13,6 +13,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/traits/action_priority.hpp>
+#include <hpx/traits/action_stacksize.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -170,6 +172,9 @@ namespace hpx { namespace actions
         /// Return the thread priority this action has to be executed with
         virtual threads::thread_priority get_thread_priority() const = 0;
 
+        /// Return the thread stacksize this action has to be executed with
+        virtual threads::thread_stacksize get_thread_stacksize() const = 0;
+
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
@@ -184,6 +189,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         // Figure out what priority the action has to be be associated with
         // A dynamically specified default priority results in using the static
         // Priority.
@@ -212,6 +218,36 @@ namespace hpx { namespace actions
                 return priority;
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // Figure out what stacksize the action has to be be associated with
+        // A dynamically specified default stacksize results in using the static
+        // Stacksize.
+        template <threads::thread_stacksize Stacksize>
+        struct thread_stacksize
+        {
+            static threads::thread_stacksize
+            call(threads::thread_stacksize stacksize)
+            {
+                if (stacksize == threads::thread_stacksize_default)
+                    return Stacksize;
+                return stacksize;
+            }
+        };
+
+        // If the static Stacksize is default, a dynamically specified default
+        // stacksize results in using the normal stacksize.
+        template <>
+        struct thread_stacksize<threads::thread_stacksize_default>
+        {
+            static threads::thread_stacksize
+            call(threads::thread_stacksize stacksize)
+            {
+                if (stacksize == threads::thread_stacksize_default)
+                    return threads::thread_stacksize_minimal;
+                return stacksize;
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -230,7 +266,12 @@ namespace hpx { namespace actions
         // This is the priority value this action has been instantiated with
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
-        enum { priority_value = Action::priority_value };
+        enum { priority_value = traits::action_priority<Action>::value };
+
+        // This is the stacksize value this action has been instantiated with
+        // (statically). This value might be different from the stacksize member
+        // holding the runtime value an action has been created with
+        enum { stacksize_value = traits::action_stacksize<Action>::value };
 
         typedef typename Action::direct_execution direct_execution;
 
@@ -245,8 +286,12 @@ namespace hpx { namespace actions
             parent_phase_(threads::get_parent_phase()),
             priority_(
                 detail::thread_priority<
-                    static_cast<threads::thread_priority>(Action::priority_value)
-                >::call(priority))
+                    static_cast<threads::thread_priority>(priority_value)
+                >::call(priority)),
+            stacksize_(
+                detail::thread_stacksize<
+                    static_cast<threads::thread_stacksize>(stacksize_value)
+                >::call(threads::thread_stacksize_default))
         {}
 
         template <typename Arg0>
@@ -257,8 +302,12 @@ namespace hpx { namespace actions
             parent_phase_(threads::get_parent_phase()),
             priority_(
                 detail::thread_priority<
-                    static_cast<threads::thread_priority>(Action::priority_value)
-                >::call(threads::thread_priority_default))
+                    static_cast<threads::thread_priority>(priority_value)
+                >::call(threads::thread_priority_default)),
+            stacksize_(
+                detail::thread_stacksize<
+                    static_cast<threads::thread_stacksize>(stacksize_value)
+                >::call(threads::thread_stacksize_default))
         {}
 
         template <typename Arg0>
@@ -269,8 +318,12 @@ namespace hpx { namespace actions
             parent_phase_(threads::get_parent_phase()),
             priority_(
                 detail::thread_priority<
-                    static_cast<threads::thread_priority>(Action::priority_value)
-                >::call(priority))
+                    static_cast<threads::thread_priority>(priority_value)
+                >::call(priority)),
+            stacksize_(
+                detail::thread_stacksize<
+                    static_cast<threads::thread_stacksize>(stacksize_value)
+                >::call(threads::thread_stacksize_default))
         {}
 
         // bring in the rest of the constructors
@@ -385,6 +438,12 @@ namespace hpx { namespace actions
             return priority_;
         }
 
+        /// Return the thread stacksize this action has to be executed with
+        threads::thread_stacksize get_thread_stacksize() const
+        {
+            return stacksize_;
+        }
+
         /// Return all data needed for thread initialization
         threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
@@ -396,6 +455,7 @@ namespace hpx { namespace actions
             data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
             data.priority = priority_;
+            data.stacksize = threads::get_stack_size(stacksize_);
             return data;
         }
 
@@ -409,6 +469,7 @@ namespace hpx { namespace actions
             data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
             data.priority = priority_;
+            data.stacksize = threads::get_stack_size(stacksize_);
             return data;
         }
 
@@ -440,6 +501,7 @@ namespace hpx { namespace actions
             ar & parent_id_;
             ar & parent_phase_;
             ar & priority_;
+            ar & stacksize_;
         }
 
     private:
@@ -455,6 +517,7 @@ namespace hpx { namespace actions
         std::size_t parent_id_;
         std::size_t parent_phase_;
         threads::thread_priority priority_;
+        threads::thread_stacksize stacksize_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -475,10 +538,8 @@ namespace hpx { namespace actions
     /// \tparam Result            return type
     /// \tparam Arguments         arguments (fusion vector)
     /// \tparam Derived           derived action class
-    /// \tparam threads::thread_priority Priority default priority
-    template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived,
-        threads::thread_priority Priority>
+    template <typename Component, int ActionCode, typename Result,
+        typename Arguments, typename Derived>
     struct action
     {
         typedef Component component_type;
@@ -490,12 +551,7 @@ namespace hpx { namespace actions
 
         // This is the action code (id) of this action. It is exposed to allow
         // generic handling of actions.
-        enum { value = Action };
-
-        // This is the priority value this action has been instantiated with
-        // (statically). This value might be different from the priority member
-        // holding the runtime value an action has been created with
-        enum { priority_value = Priority };
+        enum { value = ActionCode };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Func, typename Arguments_>
@@ -572,13 +628,6 @@ namespace hpx { namespace actions
         struct action_type
           : boost::mpl::if_<boost::is_same<Derived, this_type>, Action, Derived>
         {};
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename Action>
-        struct make_base_action : Action {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -836,6 +885,40 @@ namespace hpx { namespace actions
         TEMPLATE, hpx::actions::transfer_action<HPX_UTIL_STRIP(TYPE)>)        \
 /**/
 #endif
+
+#define HPX_ACTION_USES_SMALL_STACK(action)                                   \
+namespace hpx { namespace traits                                              \
+{                                                                             \
+    template <>                                                               \
+    struct action_stacksize<action>                                           \
+    {                                                                         \
+        enum { value = threads::thread_stacksize_small };                     \
+    };                                                                        \
+}}                                                                            \
+/**/
+
+#define HPX_ACTION_USES_MEDIUM_STACK(action)                                  \
+namespace hpx { namespace traits                                              \
+{                                                                             \
+    template <>                                                               \
+    struct action_stacksize<action>                                           \
+    {                                                                         \
+        enum { value = threads::thread_stacksize_medium };                    \
+    };                                                                        \
+}}                                                                            \
+/**/
+
+#define HPX_ACTION_USES_LARGE_STACK(action)                                   \
+namespace hpx { namespace traits                                              \
+{                                                                             \
+    template <>                                                               \
+    struct action_stacksize<action>                                           \
+    {                                                                         \
+        enum { value = threads::thread_stacksize_large };                     \
+    };                                                                        \
+}}                                                                            \
+/**/
+
 
 /// \endcond
 

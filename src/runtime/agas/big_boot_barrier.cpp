@@ -221,28 +221,57 @@ void notify_worker(notification_header const& header);
 typedef actions::plain_action1<
     registration_header const&
   , register_console
-  , threads::thread_priority_critical
 > register_console_action;
 
 typedef actions::plain_action1<
     notification_header const&
   , notify_console
-  , threads::thread_priority_critical
 > notify_console_action;
 
 typedef actions::plain_action1<
     registration_header const&
   , register_worker
-  , threads::thread_priority_critical
 > register_worker_action;
 
 typedef actions::plain_action1<
     notification_header const&
   , notify_worker
-  , threads::thread_priority_critical
 > notify_worker_action;
 // }}}
 
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <>
+    struct action_priority<agas::register_console_action>
+    {
+        enum { value = threads::thread_priority_critical };
+    };
+
+    template <>
+    struct action_priority<agas::notify_console_action>
+    {
+        enum { value = threads::thread_priority_critical };
+    };
+
+    template <>
+    struct action_priority<agas::register_worker_action>
+    {
+        enum { value = threads::thread_priority_critical };
+    };
+
+    template <>
+    struct action_priority<agas::notify_worker_action>
+    {
+        enum { value = threads::thread_priority_critical };
+    };
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace agas
+{
 // {{{ early action definitions
 // remote call to AGAS
 // TODO: pass data members from the notification header to the client API instead

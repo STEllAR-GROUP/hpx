@@ -527,6 +527,12 @@ namespace hpx { namespace threads
     {
         return get_runtime().get_config().get_default_stack_size();
     }
+
+    // shortcut for runtime_configuration::get_stack_size
+    std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize)
+    {
+        return get_runtime().get_config().get_stack_size(stacksize);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

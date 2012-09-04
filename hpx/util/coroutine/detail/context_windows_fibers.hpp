@@ -198,11 +198,12 @@ namespace hpx { namespace util { namespace coroutines
       explicit
       fibers_context_impl(Functor& cb, std::ptrdiff_t stack_size)
         : fibers_context_impl_base(
-              CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
+              CreateFiberEx(default_stack_size,
                   stack_size == -1 ? default_stack_size : stack_size, 0,
                   static_cast<LPFIBER_START_ROUTINE>(&trampoline<Functor>),
                   static_cast<LPVOID>(&cb))
-          )
+          ),
+          stacksize_(stack_size == -1 ? default_stack_size : stack_size)
       {
         if (0 == m_ctx) {
           boost::throw_exception(boost::system::system_error(
@@ -218,6 +219,12 @@ namespace hpx { namespace util { namespace coroutines
       {
         if (m_ctx)
           DeleteFiber(m_ctx);
+      }
+
+      // Return the size of the reserved stack address space.
+      std::ptrdiff_t get_stacksize() const
+      {
+          return stacksize_;
       }
 
       void reset_stack()
@@ -249,6 +256,9 @@ namespace hpx { namespace util { namespace coroutines
       // running and before it exits
       static void thread_startup(char const* thread_type) {}
       static void thread_shutdown() {}
+
+    private:
+      std::ptrdiff_t stacksize_;
     };
 
     typedef fibers_context_impl context_impl;

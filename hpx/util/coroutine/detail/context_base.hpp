@@ -65,8 +65,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       boost::atomic_uint64_t& get(std::size_t i)
       {
-          BOOST_ASSERT(i < HPX_COROUTINE_NUM_HEAPS);
-          return m_allocation_counter[i];
+          return m_allocation_counter[i % HPX_COROUTINE_NUM_HEAPS];
       }
 
       boost::atomic_uint64_t m_allocation_counter[HPX_COROUTINE_NUM_HEAPS];
