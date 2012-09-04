@@ -26,7 +26,7 @@ if(MSVC AND ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
   # Make sure all Fortran symbols are lower case for Windows Intel ifort compiler.
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /names:lowercase")
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    # Make sure we use the proper druntime libraries in Debug build.
+    # Make sure we use the proper runtime libraries in Debug build.
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /dbglibs /debug:full /Od")
   endif()
   # Make sure the C++ linker will find the Fortran runtime libraries.
