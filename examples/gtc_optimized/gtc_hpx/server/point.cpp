@@ -79,6 +79,16 @@ extern "C" {
             void FNAME(fieldr_7)(void* opaque_ptr_to_class);
             void FNAME(fieldr_8)(void* opaque_ptr_to_class);
             void FNAME(fieldr_9)(void* opaque_ptr_to_class);
+            void FNAME(pushi_0)(void* opaque_ptr_to_class);
+            void FNAME(pushi_1)(void* opaque_ptr_to_class);
+            void FNAME(pushi_2)(void* opaque_ptr_to_class);
+            void FNAME(pushi_3)(void* opaque_ptr_to_class);
+            void FNAME(pushi_4)(void* opaque_ptr_to_class);
+            void FNAME(pushi_5)(void* opaque_ptr_to_class);
+            void FNAME(pushi_6)(void* opaque_ptr_to_class);
+            void FNAME(pushi_7)(void* opaque_ptr_to_class);
+            void FNAME(pushi_8)(void* opaque_ptr_to_class);
+            void FNAME(pushi_9)(void* opaque_ptr_to_class);
             void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
@@ -139,6 +149,16 @@ extern "C" {
                                                      int* dst) {
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->toroidal_scatter_receive(output,dst);
+                    return; };
+            void FNAME(comm_allreduce_cmm) (void* pfoo,double *in,double *out,
+                                             int* msize) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->comm_allreduce(in,out,msize);
+                    return; };
+            void FNAME(int_comm_allreduce_cmm) (void* pfoo,int *in,int *out,
+                                             int* msize) {
+                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    ptr_to_class->int_comm_allreduce(in,out,msize);
                     return; };
 }
 
@@ -665,6 +685,42 @@ namespace gtc { namespace server
           break;
       }
       // }}}
+
+      // Call pushi {{{
+      switch(item_) {
+        case 0:
+          FNAME(pushi_0)(static_cast<void*>(this));
+          break;
+        case 1:
+          FNAME(pushi_1)(static_cast<void*>(this));
+          break;
+        case 2:
+          FNAME(pushi_2)(static_cast<void*>(this));
+          break;
+        case 3:
+          FNAME(pushi_3)(static_cast<void*>(this));
+          break;
+        case 4:
+          FNAME(pushi_4)(static_cast<void*>(this));
+          break;
+        case 5:
+          FNAME(pushi_5)(static_cast<void*>(this));
+          break;
+        case 6:
+          FNAME(pushi_6)(static_cast<void*>(this));
+          break;
+        case 7:
+          FNAME(pushi_7)(static_cast<void*>(this));
+          break;
+        case 8:
+          FNAME(pushi_8)(static_cast<void*>(this));
+          break;
+        case 9:
+          FNAME(pushi_9)(static_cast<void*>(this));
+          break;
+      }
+      // }}}
+
     }
 
     void point::toroidal_sndright(double *csend,int* mgrid)
@@ -882,6 +938,114 @@ namespace gtc { namespace server
        }
 
        gate_.set(0);         // trigger corresponding and-gate input
+    }
+
+    void point::comm_allreduce(double *in,double *out, int* msize)
+    {
+        // create a new and-gate object
+        gate_.init(components_.size());
+
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+
+        int vsize = *msize;
+        std::vector<double> send;
+        send.resize(vsize); 
+        comm_allreduce_receive_.resize(vsize); 
+        std::fill( comm_allreduce_receive_.begin(),comm_allreduce_receive_.end(),0.0);
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = in[i];
+        }
+
+        set_comm_allreduce_data_action set_data_;
+        hpx::apply(set_data_, components_, item_, generation, send);
+
+        // possibly do other stuff while the allgather is going on...
+        f.get();
+
+        for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
+          out[i] = comm_allreduce_receive_[i]; 
+        }
+    }
+
+    void point::set_comm_allreduce_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data)
+    {
+       mutex_type::scoped_lock l(mtx_);
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
+         comm_allreduce_receive_[i] += data[i];
+       }
+
+       gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+    void point::int_comm_allreduce(int *in,int *out, int* msize)
+    {
+        // create a new and-gate object
+        gate_.init(components_.size());
+
+        // synchronize with all operations to finish
+        hpx::future<void> f = gate_.get_future();
+
+        std::size_t generation = 0;
+        {
+          mutex_type::scoped_lock l(mtx_);
+          generation = ++generation_;
+        }
+
+        int vsize = *msize;
+        std::vector<int> send;
+        send.resize(vsize); 
+        int_comm_allreduce_receive_.resize(vsize); 
+        std::fill( int_comm_allreduce_receive_.begin(),int_comm_allreduce_receive_.end(),0);
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = in[i];
+        }
+
+        set_int_comm_allreduce_data_action set_data_;
+        hpx::apply(set_data_, components_, item_, generation, send);
+
+        // possibly do other stuff while the allgather is going on...
+        f.get();
+
+        for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
+          out[i] = int_comm_allreduce_receive_[i]; 
+        }
+    }
+
+    void point::set_int_comm_allreduce_data(std::size_t which,
+                std::size_t generation, std::vector<int> const& data)
+    {
+       mutex_type::scoped_lock l(mtx_);
+
+       // make sure this set operation has not arrived ahead of time
+       while (generation > generation_)
+       {
+         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+         hpx::this_thread::suspend();
+       }
+
+       for (std::size_t i=0;i<int_comm_allreduce_receive_.size();i++) {
+         int_comm_allreduce_receive_[i] += data[i];
+       }
+
+       gate_.set(which);         // trigger corresponding and-gate input
     }
 
 }}
