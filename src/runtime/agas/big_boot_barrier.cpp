@@ -241,37 +241,28 @@ typedef actions::plain_action1<
 
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    template <>
-    struct action_priority<agas::register_console_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
+using hpx::agas::register_console_action;
+using hpx::agas::notify_console_action;
+using hpx::agas::register_worker_action;
+using hpx::agas::notify_worker_action;
 
-    template <>
-    struct action_priority<agas::notify_console_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
+HPX_ACTION_HAS_CRITICAL_PRIORITY(register_console_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_console_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_action);
 
-    template <>
-    struct action_priority<agas::register_worker_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
+HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action,
+    register_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action,
+    notify_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action,
+    register_worker_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action,
+    notify_worker_action, hpx::components::factory_enabled)
 
-    template <>
-    struct action_priority<agas::notify_worker_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
 {
+
 // {{{ early action definitions
 // remote call to AGAS
 // TODO: pass data members from the notification header to the client API instead
@@ -576,25 +567,6 @@ void notify_worker(notification_header const& header)
             new lcos::packaged_action<server::primary_namespace::service_action>);
 }
 // }}}
-
-}}
-
-using hpx::agas::register_console_action;
-using hpx::agas::notify_console_action;
-using hpx::agas::register_worker_action;
-using hpx::agas::notify_worker_action;
-
-HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action,
-    register_console_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action,
-    notify_console_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action,
-    register_worker_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action,
-    notify_worker_action, hpx::components::factory_enabled)
-
-namespace hpx { namespace agas
-{
 
 void big_boot_barrier::spin()
 {

@@ -176,60 +176,38 @@ namespace hpx { namespace performance_counters { namespace server
     };
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct action_priority<performance_counters::server::base_performance_counter::get_counter_info_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-
-    template <>
-    struct action_priority<performance_counters::server::base_performance_counter::get_counter_value_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-
-    template <>
-    struct action_priority<performance_counters::server::base_performance_counter::set_counter_value_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-
-    template <>
-    struct action_priority<performance_counters::server::base_performance_counter::reset_counter_value_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-
-    template <>
-    struct action_priority<performance_counters::server::base_performance_counter::start_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-
-    template <>
-    struct action_priority<performance_counters::server::base_performance_counter::stop_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-}}
-
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter::get_counter_info_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
     performance_counter_get_counter_info_action)
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter::get_counter_value_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
     performance_counter_get_counter_value_action)
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter::set_counter_value_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
     performance_counter_set_counter_value_action)
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter::reset_counter_value_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
     performance_counter_reset_counter_value_action)
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter::start_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::start_action,
     performance_counter_start_action)
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::performance_counters::server::base_performance_counter::stop_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::stop_action,
     performance_counter_stop_action)

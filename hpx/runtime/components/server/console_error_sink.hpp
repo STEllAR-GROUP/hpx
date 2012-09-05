@@ -26,16 +26,9 @@ namespace hpx { namespace components { namespace server
     > console_error_sink_action;
 }}}
 
-namespace hpx { namespace traits
-{
-    template <>
-    struct action_priority<components::server::console_error_sink_action>
-    {
-        enum { value = threads::thread_priority_critical };
-    };
-}}
-
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::components::server::console_error_sink_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(
-    hpx::components::server::console_error_sink_action)
+    hpx::components::server::console_error_sink_action);
 
 #endif

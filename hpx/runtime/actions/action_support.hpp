@@ -886,39 +886,49 @@ namespace hpx { namespace actions
 /**/
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_ACTION_USES_STACK(action, size)                                   \
+    namespace hpx { namespace traits                                          \
+    {                                                                         \
+        template <>                                                           \
+        struct action_stacksize<action>                                       \
+        {                                                                     \
+            enum { value = size };                                            \
+        };                                                                    \
+    }}                                                                        \
+/**/
+
 #define HPX_ACTION_USES_SMALL_STACK(action)                                   \
-namespace hpx { namespace traits                                              \
-{                                                                             \
-    template <>                                                               \
-    struct action_stacksize<action>                                           \
-    {                                                                         \
-        enum { value = threads::thread_stacksize_small };                     \
-    };                                                                        \
-}}                                                                            \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_small)            \
 /**/
-
 #define HPX_ACTION_USES_MEDIUM_STACK(action)                                  \
-namespace hpx { namespace traits                                              \
-{                                                                             \
-    template <>                                                               \
-    struct action_stacksize<action>                                           \
-    {                                                                         \
-        enum { value = threads::thread_stacksize_medium };                    \
-    };                                                                        \
-}}                                                                            \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_medium)           \
 /**/
-
 #define HPX_ACTION_USES_LARGE_STACK(action)                                   \
-namespace hpx { namespace traits                                              \
-{                                                                             \
-    template <>                                                               \
-    struct action_stacksize<action>                                           \
-    {                                                                         \
-        enum { value = threads::thread_stacksize_large };                     \
-    };                                                                        \
-}}                                                                            \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_large)            \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_ACTION_HAS_PRIORITY(action, priority)                             \
+    namespace hpx { namespace traits                                          \
+    {                                                                         \
+        template <>                                                           \
+        struct action_priority<action>                                        \
+        {                                                                     \
+            enum { value = priority };                                        \
+        };                                                                    \
+    }}                                                                        \
+/**/
+
+#define HPX_ACTION_HAS_LOW_PRIORITY(action)                                   \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_low)             \
+/**/
+#define HPX_ACTION_HAS_NORMAL_PRIORITY(action)                                \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_normal)          \
+/**/
+#define HPX_ACTION_HAS_CRITICAL_PRIORITY(action)                              \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_critical)        \
+/**/
 
 /// \endcond
 

@@ -143,19 +143,17 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::setup_action,
     gtc_point_setup_action);
 
+// ensure sufficient stack space for chargei_action
+HPX_ACTION_USES_LARGE_STACK(gtc::server::point::timeloop_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::timeloop_action,
     gtc_point_timeloop_action);
 
-// ensure sufficient stack space for chargei_action
-HPX_ACTION_USES_LARGE_STACK(gtc::server::point::timeloop_action);
-
+// ensure sufficient stack space for timeloop_action
+HPX_ACTION_USES_LARGE_STACK(gtc::server::point::chargei_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::chargei_action,
     gtc_point_chargei_action);
-
-// ensure sufficient stack space for timeloop_action
-HPX_ACTION_USES_LARGE_STACK(gtc::server::point::chargei_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::set_data_action,
