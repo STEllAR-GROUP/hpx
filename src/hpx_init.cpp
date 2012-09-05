@@ -809,20 +809,26 @@ namespace hpx
                 mapnames.use_transform(transform_function_type(iftransform));
             }
 
+            bool using_nodelist = false;
+
             if (vm.count("hpx:nodefile")) {
                 if (vm.count("hpx:nodes")) {
                     throw std::logic_error("Ambiguous command line options. "
                         "Do not specify more than one of the --hpx:nodefile and "
                         "--hpx:nodes options at the same time.");
                 }
+                using_nodelist = true;
                 ini_config += "hpx.nodefile=" +
                     env.init_from_file(vm["hpx:nodefile"].as<std::string>(), agas_host);
             }
             else if (vm.count("hpx:nodes")) {
+                using_nodelist = true;
                 ini_config += "hpx.nodes=" + env.init_from_nodelist(
                     vm["hpx:nodes"].as<std::vector<std::string> >(), agas_host);
             }
+            // FIXME: What if I don't want to use the node list with SLURM?
             else if (env.found_batch_environment()) {
+                using_nodelist = true;
                 ini_config += "hpx.nodes=" + env.init_from_environment(agas_host);
             }
 
@@ -850,15 +856,18 @@ namespace hpx
                 "hpx.os_threads", batch_threads);
 
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                  num_threads > batch_threads)
+                using_nodelist && (num_threads > batch_threads))
             {
                 std::cerr << "hpx::init: command line warning: "
                        "--hpx:ini=hpx.os_threads used when running with "
                     << env.get_batch_name()
-                    << ", requesting a larger number of threads than cores have "
-                       "been assigned by "
+                    << ", requesting a larger number of threads ("
+                    << num_threads
+                    << ") than cores have been assigned by "
                     << env.get_batch_name()
-                    << ", the application might not run properly."
+                    << " ("
+                    << batch_threads
+                    << "), the application might not run properly."
                     << std::endl;
             }
 
@@ -873,14 +882,18 @@ namespace hpx
                     threads = boost::lexical_cast<std::size_t>(threads_str);
 
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                      threads > batch_threads)
+                    using_nodelist && (threads > batch_threads))
                 {
                     std::cerr << "hpx::init: command line warning: --hpx:threads "
                             "used when running with "
                         << env.get_batch_name() << ", requesting a larger "
-                           "number of threads than cores have been assigned by "
+                           "number of threads ("
+                        << threads
+                        << ") than cores have been assigned by "
                         << env.get_batch_name()
-                        << ", the application might not run properly."
+                        << " ("
+                        << batch_threads
+                        << "), the application might not run properly."
                         << std::endl;
                 }
                 num_threads = threads;
@@ -892,7 +905,7 @@ namespace hpx
                 "hpx.localities", batch_localities);
 
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                    batch_localities != num_localities)
+                using_nodelist && (batch_localities != num_localities))
             {
                 std::cerr << "hpx::init: command line warning: "
                         "--hpx:ini=hpx.localities used when running with "
@@ -906,7 +919,7 @@ namespace hpx
             if (vm.count("hpx:localities")) {
                 std::size_t localities = vm["hpx:localities"].as<std::size_t>();
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                        localities != num_localities)
+                    using_nodelist && (localities != num_localities))
                 {
                     std::cerr << "hpx::init: command line warning: --hpx:localities "
                             "used when running with " << env.get_batch_name()
