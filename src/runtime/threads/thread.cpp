@@ -366,10 +366,11 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         restore_interruption::restore_interruption(disable_interruption& d)
+          : interruption_was_enabled_(d.interruption_was_enabled_)
         {
-            if (!d.interruption_was_enabled_)
+            if (!interruption_was_enabled_)
             {
-                d.interruption_was_enabled_ =
+                interruption_was_enabled_ =
                     threads::set_thread_interruption_enabled(
                         threads::get_self_id(), true);
             }
@@ -380,7 +381,7 @@ namespace hpx
             threads::thread_self* p = threads::get_self_ptr();
             if (p) {
                 threads::set_thread_interruption_enabled(
-                    p->get_thread_id(), d.interruption_was_enabled_);
+                    p->get_thread_id(), interruption_was_enabled_);
             }
         }
     }

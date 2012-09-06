@@ -238,6 +238,8 @@ namespace hpx
             restore_interruption(restore_interruption const&);
             restore_interruption& operator=(restore_interruption const&);
 
+            bool interruption_was_enabled_;
+
         public:
             explicit restore_interruption(disable_interruption& d);
             ~restore_interruption();
