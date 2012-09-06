@@ -47,13 +47,18 @@ namespace hpx
 {
     void handle_termination(char const* reason)
     {
-        std::cerr << "Received " << (reason ? reason : "unknown signal")
+        std::cerr 
 #if defined(HPX_HAVE_STACKTRACES)
-                  << ", " << hpx::detail::backtrace()
-#else
-                  << "."
+            << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
 #endif
-                  << std::endl;
+            << "[what]: " << (reason ? reason : "Unknown signal") << "\n"
+            << "[version]: " << build_string() << "\n"
+            << "[boost]: " << boost_version() << "\n"
+            << "[build-type]: " << build_type() << "\n"
+            << "[date]: " << build_date_time() << "\n"
+            << "[platform]: " << boost_platform() << "\n"
+            << "[compiler]: " << boost_compiler() << "\n"
+            << "[stdlib]: " << boost_stdlib() << "\n";
         std::abort();
     }
 
@@ -89,7 +94,6 @@ namespace hpx
 
 #else
 
-//#include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,14 +102,19 @@ namespace hpx
 {
     HPX_EXPORT void termination_handler(int signum)
     {
-        char* c = strsignal(signum);
-        std::cerr << "Received " << (c ? c : "unknown signal")
+        char* reason = strsignal(signum);
+        std::cerr 
 #if defined(HPX_HAVE_STACKTRACES)
-                  << ", " << hpx::detail::backtrace()
-#else
-                  << "."
+            << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
 #endif
-                  << std::endl;
+            << "[what]: " << (reason ? reason : "Unknown signal") << "\n"
+            << "[version]: " << build_string() << "\n"
+            << "[boost]: " << boost_version() << "\n"
+            << "[build-type]: " << build_type() << "\n"
+            << "[date]: " << build_date_time() << "\n"
+            << "[platform]: " << boost_platform() << "\n"
+            << "[compiler]: " << boost_compiler() << "\n"
+            << "[stdlib]: " << boost_stdlib() << "\n";
         std::abort();
     }
 }

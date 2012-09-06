@@ -646,6 +646,7 @@ namespace hpx
             sigemptyset(&new_action.sa_mask);
             new_action.sa_flags = 0;
 
+            sigaction(SIGINT, &new_action, NULL);  // Interrupted 
             sigaction(SIGBUS, &new_action, NULL);  // Bus error
             sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
             sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
