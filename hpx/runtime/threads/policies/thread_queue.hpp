@@ -424,7 +424,6 @@ namespace hpx { namespace threads { namespace policies
         {
             if (thrd->is_created_from(&memory_pool_)) {
                 thread_id_type id = thrd->get_thread_id();
-                reinterpret_cast<thread_data*>(id)->reset();     // reset bound function object
                 terminated_items_.enqueue(id);
                 return true;
             }

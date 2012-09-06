@@ -35,6 +35,7 @@
 #endif
 
 #include <cstddef>
+#include <boost/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/config.hpp>
 #include <boost/move/move.hpp>
@@ -240,7 +241,13 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         m_fun(boost::forward<Functor>(f))
     {}
 
-    void operator()() {
+    ~coroutine_impl_wrapper()
+    {
+        BOOST_ASSERT(!m_fun);   // functor should have been reset by now
+    }
+
+    void operator()() 
+    {
       typedef typename super_type::context_exit_status
         context_exit_status;
       context_exit_status status = super_type::ctx_exited_return;
@@ -251,19 +258,28 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         try {
           this->check_exit_state();
           do_call<result_type>();
-        } catch (exit_exception const&) {
+        } 
+        catch (exit_exception const&) {
           status = super_type::ctx_exited_exit;
           tinfo = boost::current_exception();
-        } catch (boost::exception const&) {
+          this->reset();            // reset functor
+        } 
+        catch (boost::exception const&) {
           status = super_type::ctx_exited_abnormally;
           tinfo = boost::current_exception();
-        } catch (std::exception const&) {
+          this->reset();
+        } 
+        catch (std::exception const&) {
           status = super_type::ctx_exited_abnormally;
           tinfo = boost::current_exception();
-        } catch (...) {
+          this->reset();
+        } 
+        catch (...) {
           status = super_type::ctx_exited_abnormally;
           tinfo = boost::current_exception();
+          this->reset();
         }
+
         this->do_return(status, tinfo);
       } while (this->m_state == super_type::ctx_running);
 
@@ -295,7 +311,7 @@ private:
      * This is for void result types.
      * Can throw if m_fun throws. At least it can throw exit_exception.
      */
-    template<typename ResultType>
+    template <typename ResultType>
     typename boost::enable_if<boost::is_void<ResultType> >::type
     do_call(dummy<0> = 0)
     {
@@ -313,7 +329,7 @@ private:
           self_type self(this);
           reset_self_on_exit on_exit(&self);
           detail::unpack(m_fun, *this->args(),
-             detail::trait_tag<typename coroutine_type::arg_slot_traits>());
+              detail::trait_tag<typename coroutine_type::arg_slot_traits>());
       }
 
       this->m_result_last = result_slot_type();
@@ -321,7 +337,7 @@ private:
     }
 
     // Same as above, but for non void result types.
-    template<typename ResultType>
+    template <typename ResultType>
     typename boost::disable_if<boost::is_void<ResultType> >::type
     do_call(dummy<1> = 1)
     {
@@ -339,8 +355,17 @@ private:
           this->m_result_last = boost::in_place(result_slot_type(
                   detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
               ));
+
+          // if this thread returned 'terminated' we need to reset the functor
+          // and the bound arguments
+          //
+          // Note: threads::terminated == 5
+          //
+          if (this->m_result_last && boost::get<0>(this->m_result_last.get()) == 5)
+              this->reset();
       }
 
+      // return value to other side of the fence
       this->bind_result(&*this->m_result_last);
     }
 
