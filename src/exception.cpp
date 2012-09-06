@@ -238,7 +238,7 @@ namespace hpx
             boost::get_error_info<hpx::detail::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
-            strm << "[stack_trace]: " << *back_trace << "\n";
+            strm << "[stack-trace]: " << *back_trace << "\n";
         }
 
         // Try a cast to std::exception - this should handle boost.system
