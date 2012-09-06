@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/stringstream.hpp>
 
 #include <boost/version.hpp>
 #include <boost/format.hpp>
@@ -57,6 +58,20 @@ namespace hpx
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
 
         return copyright;
+    }
+
+    // Returns the HPX full build information string.
+    std::string full_build_string()
+    {
+        hpx::util::osstream strm;
+        strm << "[version]: " << build_string() << "\n"
+             << "[boost]: " << boost_version() << "\n"
+             << "[build-type]: " << build_type() << "\n"
+             << "[date]: " << build_date_time() << "\n"
+             << "[platform]: " << boost_platform() << "\n"
+             << "[compiler]: " << boost_compiler() << "\n"
+             << "[stdlib]: " << boost_stdlib() << "\n";
+        return util::osstream_get_string(strm);
     }
 
     std::string build_string()

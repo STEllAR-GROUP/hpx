@@ -306,16 +306,8 @@ namespace hpx
         if (thread_description && !thread_description->empty())
             strm << "[thread-description]: " << *thread_description << "\n";
 
-        // add system information
-        // FIXME: collect at throw site
-        strm << "[version]: " << build_string() << "\n";
-        strm << "[boost]: " << boost_version() << "\n";
-        strm << "[build-type]: " << build_type() << "\n";
-        strm << "[date]: " << build_date_time() << "\n";
-        strm << "[platform]: " << boost_platform() << "\n";
-        strm << "[compiler]: " << boost_compiler() << "\n";
-        strm << "[stdlib]: " << boost_stdlib() << "\n";
-
+        // add full build information
+        strm << full_build_string();
         return util::osstream_get_string(strm);
     }
 

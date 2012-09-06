@@ -51,14 +51,9 @@ namespace hpx
 #if defined(HPX_HAVE_STACKTRACES)
             << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
 #endif
-            << "[what]: " << (reason ? reason : "Unknown signal") << "\n"
-            << "[version]: " << build_string() << "\n"
-            << "[boost]: " << boost_version() << "\n"
-            << "[build-type]: " << build_type() << "\n"
-            << "[date]: " << build_date_time() << "\n"
-            << "[platform]: " << boost_platform() << "\n"
-            << "[compiler]: " << boost_compiler() << "\n"
-            << "[stdlib]: " << boost_stdlib() << "\n";
+            << "[what]: " << (reason ? reason : "Unknown reason") << "\n"
+            << full_build_string();           // add full build information
+
         std::abort();
     }
 
@@ -108,13 +103,8 @@ namespace hpx
             << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
 #endif
             << "[what]: " << (reason ? reason : "Unknown signal") << "\n"
-            << "[version]: " << build_string() << "\n"
-            << "[boost]: " << boost_version() << "\n"
-            << "[build-type]: " << build_type() << "\n"
-            << "[date]: " << build_date_time() << "\n"
-            << "[platform]: " << boost_platform() << "\n"
-            << "[compiler]: " << boost_compiler() << "\n"
-            << "[stdlib]: " << boost_stdlib() << "\n";
+            << full_build_string();           // add full build information
+
         std::abort();
     }
 }
