@@ -198,7 +198,7 @@ namespace hpx { namespace util { namespace coroutines
       explicit
       fibers_context_impl(Functor& cb, std::ptrdiff_t stack_size)
         : fibers_context_impl_base(
-              CreateFiberEx(default_stack_size,
+              CreateFiberEx(stack_size == -1 ? default_stack_size : stack_size,
                   stack_size == -1 ? default_stack_size : stack_size, 0,
                   static_cast<LPFIBER_START_ROUTINE>(&trampoline<Functor>),
                   static_cast<LPVOID>(&cb))
