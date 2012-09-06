@@ -97,6 +97,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0)));
+            return true; 
+        }
         template <typename Action, typename Arg0>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0)
@@ -159,8 +173,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -571,6 +586,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -633,8 +662,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -1045,6 +1075,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -1107,8 +1151,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -1519,6 +1564,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -1581,8 +1640,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -1993,6 +2053,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -2055,8 +2129,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3 , arg4);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -2467,6 +2542,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -2529,8 +2618,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3 , arg4 , arg5);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -2941,6 +3031,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -3003,8 +3107,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3 , arg4 , arg5 , arg6);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -3415,6 +3520,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
@@ -3477,8 +3596,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -3889,6 +4009,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
@@ -3951,8 +4085,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }
@@ -4363,6 +4498,20 @@ namespace hpx
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 )));
             return true; 
         }
+        
+        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9)
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9)));
+            return true; 
+        }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
         inline bool
         apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
@@ -4425,8 +4574,9 @@ namespace hpx
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 )); 
+                    
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        arg0 , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7 , arg8 , arg9);
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }

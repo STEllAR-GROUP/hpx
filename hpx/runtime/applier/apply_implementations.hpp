@@ -153,6 +153,23 @@ namespace hpx
             return true;     // no parcel has been sent (dest is local)
         }
 
+        // same as above, but taking all arguments by value
+        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        inline bool
+        apply_l_p_val(naming::address const& addr, threads::thread_priority priority,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, arg))
+        {
+            typedef typename hpx::actions::extract_action<Action>::type action_type;
+
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<
+                    typename action_type::component_type>()));
+
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::forward_as_tuple(HPX_ENUM_MOVE_ARGS(N, arg)));
+            return true;     // no parcel has been sent (dest is local)
+        }
+
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_l (naming::address const& addr, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -221,8 +238,9 @@ namespace hpx
             // at least one destination is local
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
-                    applier::detail::apply_l_p<Action>(addrs[i], priority,
-                        HPX_ENUM_FORWARD_ARGS(N, Arg, arg));   // apply locally
+                    // apply locally, do not move arguments
+                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
+                        BOOST_PP_ENUM_PARAMS(N, arg));
                 }
                 gids.push_back(applier::detail::convert_to_gid(ids[i]));
             }

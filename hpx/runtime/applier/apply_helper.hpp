@@ -36,7 +36,8 @@ namespace hpx { namespace applier { namespace detail
                     lva, boost::forward<Arguments>(args))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority, std::size_t(-1), 
-                static_cast<threads::thread_stacksize>(traits::action_stacksize<Action>::value));
+                static_cast<threads::thread_stacksize>(
+                    traits::action_stacksize<Action>::value));
         }
 
         template <typename Arguments>
@@ -49,7 +50,8 @@ namespace hpx { namespace applier { namespace detail
                     boost::forward<Arguments>(args))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority, std::size_t(-1), 
-                static_cast<threads::thread_stacksize>(traits::action_stacksize<Action>::value));
+                static_cast<threads::thread_stacksize>(
+                    traits::action_stacksize<Action>::value));
         }
     };
 
