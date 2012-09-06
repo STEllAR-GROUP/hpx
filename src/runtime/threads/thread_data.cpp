@@ -93,15 +93,16 @@ namespace hpx { namespace threads { namespace detail
     void thread_data::free_thread_exit_callbacks()
     {
         thread_mutex_type::scoped_lock l(this);
+
+        // exit functions should have been executed
+        BOOST_ASSERT(!exit_funcs_ || ran_exit_funcs_);
+
         while (exit_funcs_)
         {
             thread_exit_callback_node* const current_node = exit_funcs_;
             exit_funcs_ = current_node->next_;
             delete current_node;
         }
-
-        // exit functions should have been executed
-        BOOST_ASSERT(ran_exit_funcs_);
     }
 }}}
 
