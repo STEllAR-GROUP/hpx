@@ -34,7 +34,6 @@ set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_stacksize_PARAMETERS LOCALITIES 2)
-set(thread_stacksize_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
