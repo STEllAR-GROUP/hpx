@@ -286,7 +286,6 @@ namespace hpx
         typename Action                                                       \
       BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename T)              \
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     bool apply(                                                               \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
