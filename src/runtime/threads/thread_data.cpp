@@ -75,12 +75,13 @@ namespace hpx { namespace threads { namespace detail
             }
             delete current_node;
         }
+        ran_exit_funcs_ = true;
     }
 
     bool thread_data::add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
     {
         thread_mutex_type::scoped_lock l(this);
-        if (get_state() == terminated)
+        if (ran_exit_funcs_ || get_state() == terminated)
             return false;
 
         thread_exit_callback_node* new_node =
@@ -98,6 +99,9 @@ namespace hpx { namespace threads { namespace detail
             exit_funcs_ = current_node->next_;
             delete current_node;
         }
+
+        // exit functions should have been executed
+        BOOST_ASSERT(ran_exit_funcs_);
     }
 }}}
 

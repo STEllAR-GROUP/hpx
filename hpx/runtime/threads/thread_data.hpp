@@ -155,6 +155,7 @@ namespace hpx { namespace threads { namespace detail
             pool_(&pool),
             requested_interrupt_(false),
             enabled_interrupt_(true),
+            ran_exit_funcs_(false),
             exit_funcs_(0)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
@@ -184,7 +185,7 @@ namespace hpx { namespace threads { namespace detail
             parent_locality_id_(0), parent_thread_id_(0),
             parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0),
             requested_interrupt_(false), enabled_interrupt_(false),
-            exit_funcs_(0)
+            ran_exit_funcs_(false), exit_funcs_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -449,6 +450,7 @@ namespace hpx { namespace threads { namespace detail
 
         bool requested_interrupt_;
         bool enabled_interrupt_;
+        bool ran_exit_funcs_;
         thread_exit_callback_node* exit_funcs_;
     };
 
