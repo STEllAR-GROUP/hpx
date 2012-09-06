@@ -379,21 +379,26 @@ namespace hpx { namespace threads { namespace detail
         // handle thread interruption
         bool interruption_requested() const
         {
+            thread_mutex_type::scoped_lock l(this);
             return requested_interrupt_;
         }
 
         bool interruption_enabled() const
         {
+            thread_mutex_type::scoped_lock l(this);
             return enabled_interrupt_;
         }
 
-        void set_interruption_enabled(bool enable)
+        bool set_interruption_enabled(bool enable)
         {
-            enabled_interrupt_ = enable;
+            thread_mutex_type::scoped_lock l(this);
+            std::swap(enabled_interrupt_, enable);
+            return enable;
         }
 
         void interrupt()
         {
+            thread_mutex_type::scoped_lock l(this);
             if (!enabled_interrupt_) {
                 HPX_THROW_EXCEPTION(thread_not_interruptable,
                     "detail::thread_data::interrupt",
@@ -732,11 +737,10 @@ namespace hpx { namespace threads
             return t ? t->interruption_enabled() : false;
         }
 
-        void set_interruption_enabled(bool enable)
+        bool set_interruption_enabled(bool enable)
         {
             detail::thread_data* t = get();
-            if (t)
-                t->set_interruption_enabled(enable);
+            return t ? t->set_interruption_enabled(enable) : false;
         }
 
         void interrupt()

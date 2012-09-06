@@ -346,7 +346,9 @@ namespace hpx
           : interruption_was_enabled_(interruption_enabled())
         {
             if (interruption_was_enabled_) {
-                threads::set_thread_interruption_enabled(threads::get_self_id(), false);
+                interruption_was_enabled_ = 
+                    threads::set_thread_interruption_enabled(
+                        threads::get_self_id(), false);
             }
         }
 

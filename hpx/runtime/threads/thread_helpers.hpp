@@ -189,7 +189,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT bool get_thread_interruption_enabled(thread_id_type id,
         error_code& ec = throws);
 
-    HPX_API_EXPORT void set_thread_interruption_enabled(thread_id_type id,
+    HPX_API_EXPORT bool set_thread_interruption_enabled(thread_id_type id,
         bool enable, error_code& ec = throws);
 
     HPX_API_EXPORT bool get_thread_interruption_requested(thread_id_type id,

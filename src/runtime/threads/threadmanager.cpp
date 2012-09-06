@@ -565,7 +565,7 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_interruption_enabled(thread_id_type id, bool enable, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
@@ -580,7 +580,8 @@ namespace hpx { namespace threads
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
-            thrd->set_interruption_enabled(enable);
+            return thrd->set_interruption_enabled(enable);
+        return false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

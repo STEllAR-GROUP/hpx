@@ -129,7 +129,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_interruption_enabled(id, ec);
     }
 
-    void set_thread_interruption_enabled(thread_id_type id, bool enable,
+    bool set_thread_interruption_enabled(thread_id_type id, bool enable,
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -138,9 +138,9 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_thread_interruption_enabled",
                 "global applier object is not accessible");
-            return;
+            return false;
         }
-        app->get_thread_manager().set_interruption_enabled(id, enable, ec);
+        return app->get_thread_manager().set_interruption_enabled(id, enable, ec);
     }
 
     bool get_thread_interruption_requested(thread_id_type id, error_code& ec)

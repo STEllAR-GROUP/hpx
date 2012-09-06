@@ -157,7 +157,7 @@ namespace hpx { namespace threads
         /// interrupted.
         ///
         /// \param id       [in] The thread id of the thread to query.
-        void set_interruption_enabled(thread_id_type id, bool enable,
+        bool set_interruption_enabled(thread_id_type id, bool enable,
             error_code& ec = throws);
 
         /// The get_interruption_requested function is part of the thread related
