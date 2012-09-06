@@ -21,7 +21,7 @@
 #include <boost/preprocessor/iterate.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/hpx/preprocessed/apply.hpp>
+#  include <hpx/preprocessed/apply.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
