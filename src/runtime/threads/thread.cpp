@@ -166,15 +166,18 @@ namespace hpx
         this_thread::interruption_point();
 
         native_handle_type handle = native_handle();
-        if (handle != threads::invalid_thread_id && handle != uninitialized)
+        if (handle != threads::invalid_thread_id)
         {
+            // the thread object should have been initialized at this point
+            BOOST_ASSERT(uninitialized != handle);
+
             // register callback function to be called when thread exits
             native_handle_type this_id = threads::get_self().get_thread_id();
             if (threads::add_thread_exit_callback(handle,
                     HPX_STD_BIND(&resume_thread, this_id)))
             {
                 // wait for thread to be terminated
-                this_thread::suspend(threads::suspended);
+                this_thread::suspend(threads::suspended, "thread::join");
             }
         }
 
@@ -295,7 +298,7 @@ namespace hpx
     {
         void yield() BOOST_NOEXCEPT
         {
-            this_thread::suspend();
+            this_thread::suspend(threads::pending, "this_thread::yield");
         }
 
         thread::id get_id() BOOST_NOEXCEPT
@@ -333,12 +336,12 @@ namespace hpx
 
         void sleep_until(boost::posix_time::ptime const& at)
         {
-            this_thread::suspend(at);
+            this_thread::suspend(at, "this_thread::sleep_until");
         }
 
         void sleep_for(boost::posix_time::time_duration const& p)
         {
-            this_thread::suspend(p);
+            this_thread::suspend(p, "this_thread::sleep_for");
         }
 
         ///////////////////////////////////////////////////////////////////////
