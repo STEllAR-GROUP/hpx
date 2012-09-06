@@ -52,8 +52,7 @@ namespace hpx
             "HPX - High Performance ParalleX\n"
             "An distributed and parallel runtime system for conventional machines\n"
             "implementing (parts of) the ParalleX execution model.\n\n"
-            "Copyright (C) 1998-2012 Hartmut Kaiser, Bryce Adelstein-Lelbach and others\n"
-            "The STE||AR Group, http://stellar.cct.lsu.edu\n\n"
+            "Copyright (C) 1998-2012 The STE||AR Group, Louisiana State University, http://stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
 
