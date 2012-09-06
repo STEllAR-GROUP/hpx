@@ -426,8 +426,10 @@ namespace gtc { namespace server
         }
 
         set_params_action set_params_;
-        hpx::apply(set_params_, all_but_root, item_, generation,
-                        intparams,realparams);
+        for (std::size_t i=0;i<all_but_root.size();i++) {
+          hpx::apply(set_params_, all_but_root[i], item_, generation,
+                     intparams,realparams);
+        }
       }
     }
 
@@ -477,7 +479,9 @@ namespace gtc { namespace server
         }
 
         set_data_action set_data_;
-        hpx::apply(set_data_, partd_comm_, item_, generation, dnisend);
+        for (std::size_t i=0;i<partd_comm_.size();i++) {
+          hpx::apply(set_data_, partd_comm_[i], item_, generation, dnisend);
+        }
 
         // possibly do other stuff while the allgather is going on...
         f.get();
@@ -606,7 +610,9 @@ namespace gtc { namespace server
         }
 
         set_tdata_action set_tdata_;
-        hpx::apply(set_tdata_, toroidal_comm_, item_, generation, send);
+        for (std::size_t i=0;i<toroidal_comm_.size();i++) {
+          hpx::apply(set_tdata_, toroidal_comm_[i], item_, generation, send);
+        }
 
         // possibly do other stuff while the allgather is going on...
         f.get();
@@ -953,8 +959,10 @@ namespace gtc { namespace server
           }
 
           set_toroidal_scatter_data_action set_toroidal_scatter_data_;
-          hpx::apply(set_toroidal_scatter_data_, 
-               toroidal_comm_, item_, generation, send);
+          for (std::size_t i=0;i<toroidal_comm_.size();i++) {
+            hpx::apply(set_toroidal_scatter_data_, 
+               toroidal_comm_[i], item_, generation, send);
+          }
         }
       } else {
         {
@@ -1028,7 +1036,9 @@ namespace gtc { namespace server
         }
 
         set_comm_allreduce_data_action set_data_;
-        hpx::apply(set_data_, components_, item_, generation, send);
+        for (std::size_t i=0;i<components_.size();i++) {
+          hpx::apply(set_data_, components_[i], item_, generation, send);
+        }
 
         // possibly do other stuff while the allgather is going on...
         f.get();
@@ -1082,7 +1092,9 @@ namespace gtc { namespace server
         }
 
         set_int_comm_allreduce_data_action set_data_;
-        hpx::apply(set_data_, components_, item_, generation, send);
+        for (std::size_t i=0;i<components_.size();i++) {
+          hpx::apply(set_data_, components_[i], item_, generation, send);
+        }
 
         // possibly do other stuff while the allgather is going on...
         f.get();
