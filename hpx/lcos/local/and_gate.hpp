@@ -51,12 +51,24 @@ namespace hpx { namespace lcos { namespace local
         }
 
         /// \brief re-initialize the gate with a different number of inputs
-        void init(std::size_t count)
+        void init(std::size_t count, error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
-            received_segments_.reset();         // reset all existing bits
+
+            if (0 != received_segments_.count())
+            {
+                // reset happens while part of the slots are filled
+                HPX_THROWS_IF(ec, bad_parameter, "and_gate::init",
+                    "initializing this and_gate while slots are filled");
+                return;
+            }
+
             received_segments_.resize(count);   // resize the bitmap
+            received_segments_.reset();         // reset all existing bits
             promise_ = promise<void>();         // renew promise
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         /// \brief Set the data which has to go into the segment \a which.
@@ -88,6 +100,9 @@ namespace hpx { namespace lcos { namespace local
                 received_segments_.reset();     // reset data store
                 promise_ = promise<void>();     // renew promise
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         /// \brief get a future allowing to wait for the gate to fire
