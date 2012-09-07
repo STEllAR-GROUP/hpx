@@ -57,11 +57,43 @@ namespace gtc { namespace server
 
         void toroidal_allreduce(double *input,double *output, int* size);
 
-        void set_tsr_data(std::size_t which,
+        void set_sendleft_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<double> const& send);
+
+        void set_sendright_data(std::size_t which,
                           std::size_t generation,
                           std::vector<double> const& send);
 
         void timeloop(std::size_t, std::size_t);
+        void toroidal_gather(double *csend, int *size,int *dst);
+        void toroidal_gather_receive(double *creceive, int *dst);
+        void set_toroidal_gather_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<double> const& send);
+        void toroidal_scatter(double *csend, int *size,int *src);
+        void toroidal_scatter_receive(double *creceive, int *src);
+        void set_toroidal_scatter_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<double> const& send);
+
+        void comm_allreduce(double *in,double *out, int* msize);
+        void int_comm_allreduce(int *in,int *out, int* msize);
+        void set_comm_allreduce_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data);
+        void set_int_comm_allreduce_data(std::size_t which,
+                std::size_t generation, std::vector<int> const& data);
+
+        void int_toroidal_sndright(int *csend, int* mgrid);
+        void int_toroidal_rcvleft(int *creceive);
+        void set_int_sendright_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<int> const& send);
+        void set_int_sendleft_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<int> const& send);
+        void int_toroidal_sndleft(int *csend, int* mgrid);
+        void int_toroidal_rcvright(int *creceive);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -72,7 +104,14 @@ namespace gtc { namespace server
         HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_tdata, set_tdata_action);
         HPX_DEFINE_COMPONENT_ACTION(point, set_params, set_params_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_tsr_data, set_tsr_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_sendleft_data, set_sendleft_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_sendright_data, set_sendright_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_toroidal_gather_data, set_toroidal_gather_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_toroidal_scatter_data, set_toroidal_scatter_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_comm_allreduce_data, set_comm_allreduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_int_comm_allreduce_data, set_int_comm_allreduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_int_sendright_data, set_int_sendright_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_int_sendleft_data, set_int_sendleft_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -88,7 +127,14 @@ namespace gtc { namespace server
         std::vector<double> dnireceive_;
         std::vector<double> treceive_;
         std::size_t in_toroidal_,in_particle_;
-        std::vector<double> tsr_receive_;
+        std::vector<double> sendleft_receive_;
+        std::vector<double> sendright_receive_;
+        std::vector<double> toroidal_gather_receive_;
+        std::vector<double> toroidal_scatter_receive_;
+        std::vector<double> comm_allreduce_receive_;
+        std::vector<int> int_comm_allreduce_receive_;
+        std::vector<int> int_sendright_receive_;
+        std::vector<int> int_sendleft_receive_;
     };
 }}
 
@@ -97,10 +143,14 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::setup_action,
     gtc_point_setup_action);
 
+// ensure sufficient stack space for chargei_action
+HPX_ACTION_USES_LARGE_STACK(gtc::server::point::timeloop_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::timeloop_action,
     gtc_point_timeloop_action);
 
+// ensure sufficient stack space for timeloop_action
+HPX_ACTION_USES_LARGE_STACK(gtc::server::point::chargei_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc::server::point::chargei_action,
     gtc_point_chargei_action);
@@ -118,8 +168,36 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtc_point_set_params_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_tsr_data_action,
-    gtc_point_set_tsr_data_action);
+    gtc::server::point::set_sendleft_data_action,
+    gtc_point_set_sendleft_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_sendright_data_action,
+    gtc_point_set_sendright_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_toroidal_gather_data_action,
+    gtc_point_set_toroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_toroidal_scatter_data_action,
+    gtc_point_set_toroidal_scatter_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_comm_allreduce_data_action,
+    gtc_point_set_comm_allreduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_int_comm_allreduce_data_action,
+    gtc_point_set_int_comm_allreduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_int_sendright_data_action,
+    gtc_point_set_int_sendright_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtc::server::point::set_int_sendleft_data_action,
+    gtc_point_set_int_sendleft_data_action);
 
 #endif
 

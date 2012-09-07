@@ -313,7 +313,8 @@ subroutine smooth_0(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -339,7 +340,9 @@ subroutine smooth_0(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -381,6 +384,8 @@ subroutine smooth_0(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -476,7 +481,8 @@ subroutine smooth_0(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -487,6 +493,8 @@ subroutine smooth_0(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -495,7 +503,8 @@ subroutine smooth_0(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -821,7 +830,8 @@ subroutine smooth_1(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -847,7 +857,9 @@ subroutine smooth_1(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -889,6 +901,8 @@ subroutine smooth_1(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -984,7 +998,8 @@ subroutine smooth_1(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -995,6 +1010,8 @@ subroutine smooth_1(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -1003,7 +1020,8 @@ subroutine smooth_1(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -1329,7 +1347,8 @@ subroutine smooth_2(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -1355,7 +1374,9 @@ subroutine smooth_2(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -1397,6 +1418,8 @@ subroutine smooth_2(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -1492,7 +1515,8 @@ subroutine smooth_2(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -1503,6 +1527,8 @@ subroutine smooth_2(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -1511,7 +1537,8 @@ subroutine smooth_2(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -1837,7 +1864,8 @@ subroutine smooth_3(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -1863,7 +1891,9 @@ subroutine smooth_3(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -1905,6 +1935,8 @@ subroutine smooth_3(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -2000,7 +2032,8 @@ subroutine smooth_3(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -2011,6 +2044,8 @@ subroutine smooth_3(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -2019,7 +2054,8 @@ subroutine smooth_3(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -2345,7 +2381,8 @@ subroutine smooth_4(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -2371,7 +2408,9 @@ subroutine smooth_4(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -2413,6 +2452,8 @@ subroutine smooth_4(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -2508,7 +2549,8 @@ subroutine smooth_4(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -2519,6 +2561,8 @@ subroutine smooth_4(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -2527,7 +2571,8 @@ subroutine smooth_4(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -2853,7 +2898,8 @@ subroutine smooth_5(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -2879,7 +2925,9 @@ subroutine smooth_5(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -2921,6 +2969,8 @@ subroutine smooth_5(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -3016,7 +3066,8 @@ subroutine smooth_5(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -3027,6 +3078,8 @@ subroutine smooth_5(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -3035,7 +3088,8 @@ subroutine smooth_5(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -3361,7 +3415,8 @@ subroutine smooth_6(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -3387,7 +3442,9 @@ subroutine smooth_6(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -3429,6 +3486,8 @@ subroutine smooth_6(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -3524,7 +3583,8 @@ subroutine smooth_6(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -3535,6 +3595,8 @@ subroutine smooth_6(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -3543,7 +3605,8 @@ subroutine smooth_6(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -3869,7 +3932,8 @@ subroutine smooth_7(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -3895,7 +3959,9 @@ subroutine smooth_7(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -3937,6 +4003,8 @@ subroutine smooth_7(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -4032,7 +4100,8 @@ subroutine smooth_7(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -4043,6 +4112,8 @@ subroutine smooth_7(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -4051,7 +4122,8 @@ subroutine smooth_7(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -4377,7 +4449,8 @@ subroutine smooth_8(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -4403,7 +4476,9 @@ subroutine smooth_8(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -4445,6 +4520,8 @@ subroutine smooth_8(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -4540,7 +4617,8 @@ subroutine smooth_8(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -4551,6 +4629,8 @@ subroutine smooth_8(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -4559,7 +4639,8 @@ subroutine smooth_8(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)
@@ -4885,7 +4966,8 @@ subroutine smooth_9(ptr,iflag)
            
            !call mpi_gather(eachzeta,icount,mpi_rsize,allzeta,icount,&
            !          mpi_rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -4911,7 +4993,9 @@ subroutine smooth_9(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -4953,6 +5037,8 @@ subroutine smooth_9(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call mpi_scatter(allzeta,icount,mpi_rsize,eachzeta,&
             !       icount,mpi_rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -5048,7 +5134,8 @@ subroutine smooth_9(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -5059,6 +5146,8 @@ subroutine smooth_9(ptr,iflag)
      icount=meachtheta*num_mode
      !call mpi_gather(y_eigen,icount,mpi_csize,yt,icount,&
      !     mpi_csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -5067,7 +5156,8 @@ subroutine smooth_9(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)

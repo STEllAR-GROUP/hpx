@@ -10,22 +10,20 @@ set(tests
     thread_launching
     thread_mf
     thread_rescheduling
+    thread_stacksize
    )
 
 if(HPX_CXX11_LAMBDAS)
   set(tests ${tests} thread_affinity)
-endif()
 
-set(thread_affinity_FLAGS
-    DEPENDENCIES iostreams_component)
+  set(thread_affinity_FLAGS
+      DEPENDENCIES iostreams_component)
+  set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
+endif()
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(thread_affinity_FLAGS
-    DEPENDENCIES iostreams_component)
-set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_id_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -34,6 +32,8 @@ set(thread_launching_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_stacksize_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources

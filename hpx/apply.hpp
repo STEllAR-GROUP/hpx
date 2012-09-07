@@ -21,7 +21,7 @@
 #include <boost/preprocessor/iterate.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/hpx/preprocessed/apply.hpp>
+#  include <hpx/preprocessed/apply.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
@@ -285,7 +285,6 @@ namespace hpx
     template <                                                                \
         typename Action                                                       \
       BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename T)              \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     bool apply(                                                               \

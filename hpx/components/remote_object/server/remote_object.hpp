@@ -81,7 +81,6 @@ namespace hpx { namespace components { namespace server
           , remote_object::remote_object_apply
           , F const &
           , &remote_object::apply1<F>
-          , hpx::threads::thread_priority_default
           , remote_object_apply_action1<F>
         >
     {};
@@ -96,7 +95,6 @@ namespace hpx { namespace components { namespace server
           , F const &
           , A const &
           , &remote_object::apply2<F, A>
-          , hpx::threads::thread_priority_default
           , remote_object_apply_action2<F, A>
         >
     {};

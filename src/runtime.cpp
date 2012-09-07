@@ -29,12 +29,12 @@
     #include <hpx/runtime/threads/policies/noop_topology.hpp>
 #endif
 
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #if defined(HPX_HAVE_STACKTRACES)
 #include <boost/backtrace.hpp>
 #endif
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
 #include <io.h>
 #endif
 
@@ -47,13 +47,13 @@ namespace hpx
 {
     void handle_termination(char const* reason)
     {
-        std::cerr << "Received " << (reason ? reason : "unknown signal")
+        std::cerr 
 #if defined(HPX_HAVE_STACKTRACES)
-                  << ", " << hpx::detail::backtrace()
-#else
-                  << "."
+            << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
 #endif
-                  << std::endl;
+            << "[what]: " << (reason ? reason : "Unknown reason") << "\n"
+            << full_build_string();           // add full build information
+
         std::abort();
     }
 
@@ -89,7 +89,6 @@ namespace hpx
 
 #else
 
-//#include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,14 +97,14 @@ namespace hpx
 {
     HPX_EXPORT void termination_handler(int signum)
     {
-        char* c = strsignal(signum);
-        std::cerr << "Received " << (c ? c : "unknown signal")
+        char* reason = strsignal(signum);
+        std::cerr 
 #if defined(HPX_HAVE_STACKTRACES)
-                  << ", " << hpx::detail::backtrace()
-#else
-                  << "."
+            << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
 #endif
-                  << std::endl;
+            << "[what]: " << (reason ? reason : "Unknown signal") << "\n"
+            << full_build_string();           // add full build information
+
         std::abort();
     }
 }
@@ -526,6 +525,12 @@ namespace hpx { namespace threads
     std::ptrdiff_t get_default_stack_size()
     {
         return get_runtime().get_config().get_default_stack_size();
+    }
+
+    // shortcut for runtime_configuration::get_stack_size
+    std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize)
+    {
+        return get_runtime().get_config().get_stack_size(stacksize);
     }
 }}
 

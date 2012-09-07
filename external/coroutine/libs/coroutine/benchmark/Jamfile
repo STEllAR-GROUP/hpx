@@ -1,6 +1,0 @@
-project benchmark ;
-
-exe call_overhead : call_overhead.cpp out_of_line.cpp ../build//boost_coroutine
-                  : <include>../../.. ;
-
-

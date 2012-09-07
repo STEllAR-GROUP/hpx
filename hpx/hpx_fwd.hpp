@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/coroutine/coroutine.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config.hpp>
@@ -183,6 +183,12 @@ namespace hpx
                                      garbage collected */
         };
 
+        /// \cond NODETAIL
+        ///   Please note that if you change the value of threads::terminated 
+        ///   above, you will need to adjust do_call(dummy<1> = 1) in 
+        ///   util/coroutine /detail/coroutine_impl.hpp as well.
+        /// \endcond
+
         /// \enum thread_priority
         enum thread_priority
         {
@@ -214,6 +220,16 @@ namespace hpx
 
         typedef thread_state_enum thread_function_type(thread_state_ex_enum);
 
+        /// \enum thread_stacksize
+        enum thread_stacksize
+        {
+            thread_stacksize_default = 0,       ///< use default stack size
+            thread_stacksize_minimal = 1,       ///< use minimally possible stack size (default)
+            thread_stacksize_small = thread_stacksize_minimal,  ///< use small stack size 
+            thread_stacksize_medium = 2,        ///< use medium sized stack size
+            thread_stacksize_large = 3          ///< use large stack size
+        };
+
         ///////////////////////////////////////////////////////////////////////
         /// \cond NODETAIL
         namespace detail
@@ -222,7 +238,7 @@ namespace hpx
         }
         /// \endcond
 
-        typedef boost::coroutines::coroutine<
+        typedef util::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
@@ -292,7 +308,7 @@ namespace hpx
         class HPX_API_EXPORT action_manager;
 
         template <typename Component, int Action, typename Result,
-            typename Arguments, typename Derived, threads::thread_priority Priority>
+            typename Arguments, typename Derived>
         struct action;
     }
 

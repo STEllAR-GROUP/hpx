@@ -1,10 +1,9 @@
 subroutine fftr1d(isign,irank,scale,x,y,icount)
-  use precision
   implicit none
   integer, intent(in) :: isign,irank,icount
-  real(wp), intent(in) :: scale
-  real(wp), intent(inout), dimension(0:irank-1) :: x
-  complex(wp), intent(inout), dimension(0:irank/2) :: y
+  real(8), intent(in) :: scale
+  real(8), intent(inout), dimension(0:irank-1) :: x
+  complex(8), intent(inout), dimension(0:irank/2) :: y
 
   if (icount.gt.0.and.icount.le.3) then
      if(isign==1)then
@@ -18,12 +17,11 @@ end subroutine fftr1d
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! only for parallel direction
 subroutine fftc1d(isign,irank,scale,x)
-  use precision
   implicit none
   integer, intent(in) :: isign,irank
-  real(wp), intent(in) :: scale
-  complex(wp), intent(inout), dimension(0:irank-1) :: x
-  complex(wp),  dimension(0:irank-1) :: y
+  real(8), intent(in) :: scale
+  complex(8), intent(inout), dimension(0:irank-1) :: x
+  complex(8),  dimension(0:irank-1) :: y
 
   call c2cfftgl(isign,irank,scale,x,y)
   x=y
@@ -36,14 +34,13 @@ Subroutine r2cfftgl(isign,n,scale,rin,cout)
 ! rin: real array to be transformed,cout=\int{rin*exp(-i*k*x)}dx
 ! cout: complex array of output for Fourier modes=[0,n/2+1], normalized by n
 
-  use precision
   implicit none
   integer,intent(in) :: n,isign
-  real(wp),intent(in) :: rin(n)
-  real(wp),intent(in) :: scale
-  complex(wp),intent(out) :: cout(n/2+1)  
+  real(8),intent(in) :: rin(n)
+  real(8),intent(in) :: scale
+  complex(8),intent(out) :: cout(n/2+1)  
   integer i
-  complex(wp),dimension(n) :: fdata,dwork
+  complex(8),dimension(n) :: fdata,dwork
   
   do i=1,n
      fdata(i)=cmplx(rin(i),0.0)
@@ -63,14 +60,13 @@ Subroutine c2rfftgl(isign,n,scale,cin,rout)
 ! cin: complex array of Fourier modes=[0,n/2+1] to be transformed
 ! rout: real array for output, rout=\int{cin*exp(ikx)}dk
 
-  use precision
   implicit none
   integer,intent(in) :: isign,n
-  real(wp),intent(in) :: scale
+  real(8),intent(in) :: scale
   complex,intent(in) :: cin(n/2+1)
-  real(wp),intent(out) :: rout(n)  
+  real(8),intent(out) :: rout(n)  
   integer i
-  complex(wp),dimension(n) :: fdata,dwork
+  complex(8),dimension(n) :: fdata,dwork
   
   do i=1,n/2+1
      fdata(i)=cin(i)
@@ -96,13 +92,12 @@ Subroutine c2cfftgl(isign,n,scale,cin,cout)
 ! cin: complex array to be transformed, cout=\int{cin*exp(ifft*i*k*x)}dx
 ! cout: complex array of output for Fourier modes=[0,n-1], normalized by n
 
-  use precision
   implicit none
   integer,intent(in) :: isign,n
-  complex(wp),intent(in),dimension(n) :: cin
-  complex(wp),intent(out),dimension(n) :: cout
-  complex(wp),dimension(n) :: dwork
-  real(wp) :: cfac,scale
+  complex(8),intent(in),dimension(n) :: cin
+  complex(8),intent(out),dimension(n) :: cout
+  complex(8),dimension(n) :: dwork
+  real(8) :: cfac,scale
   integer i
   
   cout=cin
@@ -140,7 +135,6 @@ end
 
 SUBROUTINE SPCFFT(U,N,ISIGN,WORK,INTERP)
 
-  use precision
 
 ! VARIABLES
 ! ---------
@@ -159,10 +153,10 @@ SUBROUTINE SPCFFT(U,N,ISIGN,WORK,INTERP)
     I,        &  ! DO loop index.
     ISIGN        ! sign of transform
 
-  REAL(wp)    &
+  REAL(8)    &
     INTERP       ! interpolation factor
 
-  COMPLEX(wp) &
+  COMPLEX(8) &
     U(*),     &  !  Vector to be transformed
     WORK(*)      !  Working storage.
 
@@ -269,7 +263,6 @@ END
 
 SUBROUTINE SPCPFT( A, B, C, UIN, UOUT, ISIGN )
 
-  use precision
 
 ! VARIABLES
 ! ---------
@@ -287,9 +280,9 @@ SUBROUTINE SPCPFT( A, B, C, UIN, UOUT, ISIGN )
     JCR,     &      !  |
     JC              !  Dummy index.
 
-  REAL(doubleprec)   ANGLE
+  REAL(8)   ANGLE
 
-  COMPLEX(wp)   &
+  COMPLEX(8)   &
     UIN(B,C,A), &   !  Input vector.
     UOUT(B,A,C),&   !  Output vector.
     DELTA,      &   !  Fourier transform kernel.
@@ -302,7 +295,7 @@ SUBROUTINE SPCPFT( A, B, C, UIN, UOUT, ISIGN )
 ! Initialize run time parameters.
 
 
-  ANGLE =8.0_doubleprec*ATAN(1.0_doubleprec) / REAL( A * C, doubleprec )
+  ANGLE =8.0d0*ATAN(1.0d0) / REAL( A * C, 8)
   OMEGA = CMPLX( 1.0, 0.0 )
 
 ! Check the ISIGN of the transform.

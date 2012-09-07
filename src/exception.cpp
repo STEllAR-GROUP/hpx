@@ -238,7 +238,7 @@ namespace hpx
             boost::get_error_info<hpx::detail::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
-            strm << "[stack_trace]: " << *back_trace << "\n";
+            strm << "[stack-trace]: " << *back_trace << "\n";
         }
 
         // Try a cast to std::exception - this should handle boost.system
@@ -306,16 +306,8 @@ namespace hpx
         if (thread_description && !thread_description->empty())
             strm << "[thread-description]: " << *thread_description << "\n";
 
-        // add system information
-        // FIXME: collect at throw site
-        strm << "[version]: " << build_string() << "\n";
-        strm << "[boost]: " << boost_version() << "\n";
-        strm << "[build-type]: " << build_type() << "\n";
-        strm << "[date]: " << build_date_time() << "\n";
-        strm << "[platform]: " << boost_platform() << "\n";
-        strm << "[compiler]: " << boost_compiler() << "\n";
-        strm << "[stdlib]: " << boost_stdlib() << "\n";
-
+        // add full build information
+        strm << full_build_string();
         return util::osstream_get_string(strm);
     }
 

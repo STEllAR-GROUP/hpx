@@ -384,16 +384,26 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_DEFAULT_STACK_SIZE)
+#if !defined(HPX_SMALL_STACK_SIZE)
 #  if defined(BOOST_WINDOWS)
-#    define HPX_DEFAULT_STACK_SIZE 0x4000
+#    define HPX_SMALL_STACK_SIZE 0x4000           // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_DEFAULT_STACK_SIZE 0x10000
+#      define HPX_SMALL_STACK_SIZE 0x10000        // 64kByte
 #    else
-#      define HPX_DEFAULT_STACK_SIZE 0x8000
+#      define HPX_SMALL_STACK_SIZE 0x8000         // 32kByte
 #    endif
 #  endif
+#endif
+
+#if !defined(HPX_DEFAULT_STACK_SIZE)
+#  define HPX_DEFAULT_STACK_SIZE  HPX_SMALL_STACK_SIZE
+#endif
+#if !defined(HPX_MEDIUM_STACK_SIZE)
+#  define HPX_MEDIUM_STACK_SIZE   0x030000        // 256kByte
+#endif
+#if !defined(HPX_LARGE_STACK_SIZE)
+#  define HPX_LARGE_STACK_SIZE    0x800000        // 8MByte
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

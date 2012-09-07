@@ -115,22 +115,10 @@ set(BOOST_LIBRARIES date_time
                     system
                     thread)
 
-if(${BOOST_MINOR_VERSION} LESS 49)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
-endif()
-
 # Decide whether to use internal version of Boost.Chrono
 if(${BOOST_MINOR_VERSION} LESS 47)
   hpx_warn("boost" "Using internal version of Boost.Chrono, setting HPX_INTERNAL_CHRONO=ON.")
   set(HPX_INTERNAL_CHRONO ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
-endif()
-
-if(${HPX_INTERNAL_CHRONO})
-  add_definitions(-DHPX_INTERNAL_CHRONO)
-  add_definitions(-DBOOST_CHRONO_NO_LIB)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
-else()
-  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 
 # Decide whether to use internal version of Boost.Move
@@ -139,25 +127,47 @@ if(${BOOST_MINOR_VERSION} LESS 48)
   set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" FORCE)
 endif()
 
-if(${HPX_INTERNAL_MOVE})
-  add_definitions(-DHPX_INTERNAL_MOVE)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
+# Decide whether to use Boost.Context for coroutine implementation
+if(${BOOST_MINOR_VERSION} GREATER 50)
+  hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
 endif()
 
 ################################################################################
 # search path configuration
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
+if(HPX_INTERNAL_MOVE)
+  add_definitions(-DHPX_INTERNAL_MOVE)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
+endif()
 if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
+endif()
+if(HPX_INTERNAL_CHRONO)
+  add_definitions(-DHPX_INTERNAL_CHRONO)
+  add_definitions(-DBOOST_CHRONO_NO_LIB)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
+endif()
+if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
+  add_definitions("-DHPX_COROUTINE_USE_GENERIC_CONTEXT=1")
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
+endif()
+if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
+if(${BOOST_MINOR_VERSION} LESS 49)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
+endif()
+
 if(UNIX)
   hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 else()
@@ -173,10 +183,9 @@ hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
-add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
+add_definitions(-DHPX_COROUTINE_ARG_MAX=2)
 if(NOT MSVC)
-  add_definitions(-DBOOST_COROUTINE_NO_SEPARATE_CALL_SITES)
+  add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
@@ -185,7 +194,11 @@ add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
-add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+if(${BOOST_MINOR_VERSION} LESS 52)
+  add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+#else()
+#  add_definitions(-DBOOST_LOCKFREE_NO_HDR_ATOMIC)
+endif()
 
 ################################################################################
 # Compiler detection code
@@ -619,6 +632,10 @@ if(MSVC)
   if(HPX_WARNINGS)
     hpx_append_flag(-W3)
 
+    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
+    # which is benign
+    hpx_append_flag(-wd4307)
+
     # According to the ifort Windows manual, W3 isn't supported
     hpx_append_flag(-W1 LANGUAGES Fortran)
   endif()
@@ -647,7 +664,7 @@ if(MSVC)
 
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
+  add_definitions(-DHPX_COROUTINE_USE_FIBERS)
   add_definitions(-DPSAPI_VERSION=1)
 
 ################################################################################
@@ -804,7 +821,7 @@ else()
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-          add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+          add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
           hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
         endif()
@@ -1104,7 +1121,6 @@ if(NOT HPX_NO_INSTALL)
 
   install( # install external dependencies
     DIRECTORY external/cache/boost
-              external/coroutine/boost
               external/endian/boost
               external/logging/boost
               external/plugin/boost
@@ -1127,7 +1143,16 @@ if(NOT HPX_NO_INSTALL)
     # install Boost.Atomic library for older Boost versions only
     install(
       DIRECTORY external/atomic/boost
-                external/lockfree/boost
+      DESTINATION include/hpx/external
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".git" EXCLUDE)
+  endif()
+
+  if(${BOOST_MINOR_VERSION} LESS 52)
+    # install Boost.Atomic library for older Boost versions only
+    install(
+      DIRECTORY external/lockfree/boost
       DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"

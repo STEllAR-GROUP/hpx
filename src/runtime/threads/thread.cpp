@@ -17,7 +17,7 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type const thread::uninitialized =
-        reinterpret_cast<threads::thread_id_type>(-1);
+        reinterpret_cast<threads::thread_id_type>(0);
 
     ///////////////////////////////////////////////////////////////////////////
     thread::thread() BOOST_NOEXCEPT
@@ -166,15 +166,18 @@ namespace hpx
         this_thread::interruption_point();
 
         native_handle_type handle = native_handle();
-        if (handle != threads::invalid_thread_id && handle != uninitialized)
+        if (handle != threads::invalid_thread_id)
         {
+            // the thread object should have been initialized at this point
+            BOOST_ASSERT(uninitialized != handle);
+
             // register callback function to be called when thread exits
             native_handle_type this_id = threads::get_self().get_thread_id();
             if (threads::add_thread_exit_callback(handle,
                     HPX_STD_BIND(&resume_thread, this_id)))
             {
                 // wait for thread to be terminated
-                this_thread::suspend(threads::suspended);
+                this_thread::suspend(threads::suspended, "thread::join");
             }
         }
 
@@ -295,7 +298,7 @@ namespace hpx
     {
         void yield() BOOST_NOEXCEPT
         {
-            this_thread::suspend();
+            this_thread::suspend(threads::pending, "this_thread::yield");
         }
 
         thread::id get_id() BOOST_NOEXCEPT
@@ -333,12 +336,12 @@ namespace hpx
 
         void sleep_until(boost::posix_time::ptime const& at)
         {
-            this_thread::suspend(at);
+            this_thread::suspend(at, "this_thread::sleep_until");
         }
 
         void sleep_for(boost::posix_time::time_duration const& p)
         {
-            this_thread::suspend(p);
+            this_thread::suspend(p, "this_thread::sleep_for");
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -346,7 +349,9 @@ namespace hpx
           : interruption_was_enabled_(interruption_enabled())
         {
             if (interruption_was_enabled_) {
-                threads::set_thread_interruption_enabled(threads::get_self_id(), false);
+                interruption_was_enabled_ = 
+                    threads::set_thread_interruption_enabled(
+                        threads::get_self_id(), false);
             }
         }
 
@@ -361,11 +366,13 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         restore_interruption::restore_interruption(disable_interruption& d)
+          : interruption_was_enabled_(d.interruption_was_enabled_)
         {
-            if (d.interruption_was_enabled_)
+            if (!interruption_was_enabled_)
             {
-                threads::set_thread_interruption_enabled(
-                    threads::get_self_id(), true);
+                interruption_was_enabled_ =
+                    threads::set_thread_interruption_enabled(
+                        threads::get_self_id(), true);
             }
         }
 
@@ -374,7 +381,7 @@ namespace hpx
             threads::thread_self* p = threads::get_self_ptr();
             if (p) {
                 threads::set_thread_interruption_enabled(
-                    p->get_thread_id(), false);
+                    p->get_thread_id(), interruption_was_enabled_);
             }
         }
     }

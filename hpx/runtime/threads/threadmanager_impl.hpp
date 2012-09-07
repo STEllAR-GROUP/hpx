@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -25,6 +24,7 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -157,7 +157,7 @@ namespace hpx { namespace threads
         /// interrupted.
         ///
         /// \param id       [in] The thread id of the thread to query.
-        void set_interruption_enabled(thread_id_type id, bool enable,
+        bool set_interruption_enabled(thread_id_type id, bool enable,
             error_code& ec = throws);
 
         /// The get_interruption_requested function is part of the thread related

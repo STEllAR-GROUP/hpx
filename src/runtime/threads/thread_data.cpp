@@ -11,7 +11,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,12 +75,13 @@ namespace hpx { namespace threads { namespace detail
             }
             delete current_node;
         }
+        ran_exit_funcs_ = true;
     }
 
     bool thread_data::add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
     {
         thread_mutex_type::scoped_lock l(this);
-        if (get_state() == terminated)
+        if (ran_exit_funcs_ || get_state() == terminated)
             return false;
 
         thread_exit_callback_node* new_node =
@@ -92,6 +93,10 @@ namespace hpx { namespace threads { namespace detail
     void thread_data::free_thread_exit_callbacks()
     {
         thread_mutex_type::scoped_lock l(this);
+
+        // exit functions should have been executed
+        BOOST_ASSERT(!exit_funcs_ || ran_exit_funcs_);
+
         while (exit_funcs_)
         {
             thread_exit_callback_node* const current_node = exit_funcs_;
@@ -153,7 +158,7 @@ namespace hpx { namespace threads
 
     thread_self::impl_type* get_ctx_ptr()
     {
-        return boost::coroutines::detail::coroutine_accessor::get_impl(get_self());
+        return hpx::util::coroutines::detail::coroutine_accessor::get_impl(get_self());
     }
 
     thread_self* get_self_ptr_checked(error_code& ec)

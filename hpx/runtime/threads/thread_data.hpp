@@ -14,7 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/coroutine/coroutine.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -30,6 +30,7 @@
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <stack>
@@ -154,6 +155,7 @@ namespace hpx { namespace threads { namespace detail
             pool_(&pool),
             requested_interrupt_(false),
             enabled_interrupt_(true),
+            ran_exit_funcs_(false),
             exit_funcs_(0)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
@@ -183,7 +185,7 @@ namespace hpx { namespace threads { namespace detail
             parent_locality_id_(0), parent_thread_id_(0),
             parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0),
             requested_interrupt_(false), enabled_interrupt_(false),
-            exit_funcs_(0)
+            ran_exit_funcs_(false), exit_funcs_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
@@ -378,21 +380,26 @@ namespace hpx { namespace threads { namespace detail
         // handle thread interruption
         bool interruption_requested() const
         {
+            thread_mutex_type::scoped_lock l(this);
             return requested_interrupt_;
         }
 
         bool interruption_enabled() const
         {
+            thread_mutex_type::scoped_lock l(this);
             return enabled_interrupt_;
         }
 
-        void set_interruption_enabled(bool enable)
+        bool set_interruption_enabled(bool enable)
         {
-            enabled_interrupt_ = enable;
+            thread_mutex_type::scoped_lock l(this);
+            std::swap(enabled_interrupt_, enable);
+            return enable;
         }
 
         void interrupt()
         {
+            thread_mutex_type::scoped_lock l(this);
             if (!enabled_interrupt_) {
                 HPX_THROW_EXCEPTION(thread_not_interruptable,
                     "detail::thread_data::interrupt",
@@ -443,6 +450,7 @@ namespace hpx { namespace threads { namespace detail
 
         bool requested_interrupt_;
         bool enabled_interrupt_;
+        bool ran_exit_funcs_;
         thread_exit_callback_node* exit_funcs_;
     };
 
@@ -731,11 +739,10 @@ namespace hpx { namespace threads
             return t ? t->interruption_enabled() : false;
         }
 
-        void set_interruption_enabled(bool enable)
+        bool set_interruption_enabled(bool enable)
         {
             detail::thread_data* t = get();
-            if (t)
-                t->set_interruption_enabled(enable);
+            return t ? t->set_interruption_enabled(enable) : false;
         }
 
         void interrupt()
@@ -794,7 +801,8 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type const invalid_thread_id = 0;
+    thread_id_type const invalid_thread_id = 
+        reinterpret_cast<threads::thread_id_type>(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     // This is a special helper class encapsulating the memory pools used for

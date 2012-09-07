@@ -313,7 +313,8 @@ subroutine smooth(ptr,iflag)
            
            !call MPI_GATHER(eachzeta,icount,mpi_Rsize,allzeta,icount,&
            !          mpi_Rsize,jpe,toroidal_comm,ierror)
-           !call toroial_gather_cmm()
+           call toroidal_gather_cmm(ptr,eachzeta,icount,jpe)
+           call toroidal_gather_receive_cmm(ptr,allzeta,jpe)
         enddo
         
 ! transform to k space
@@ -339,7 +340,9 @@ subroutine smooth(ptr,iflag)
                             aux2f,20000,aux3f,1)
               endif
 #else
-              call fftr1d(1,mtdiag,scale,xz,yz,2)
+              ! calling this is generating a segfault on various platforms --
+              ! what's up?
+              !call fftr1d(1,mtdiag,scale,xz,yz,2)
 #endif
 
 ! record mode information for diagnostic
@@ -381,6 +384,8 @@ subroutine smooth(ptr,iflag)
            do jpe=0,ntoroidal-1
             !  call MPI_SCATTER(allzeta,icount,mpi_Rsize,eachzeta,&
             !       icount,mpi_Rsize,jpe,toroidal_comm,ierror)
+             call toroidal_scatter_cmm(ptr,allzeta,icount,jpe)
+             call toroidal_scatter_receive_cmm(ptr,eachzeta,jpe)
 
 !$omp parallel do private(j,i,k,jt,indt,indp1,indp)
               do j=1,meachtheta
@@ -476,7 +481,8 @@ subroutine smooth(ptr,iflag)
      !!write(0,*)'**** mype=',mype,'  efield=',efield
      
 ! record zonal flow mode history
-     call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
+     ! segfault problem with this routine
+     !call fftr1d(1,mpsi,scale,phip00(1:mpsi),yp,1)
 
      do i=1,num_mode
         amp_mode(1,i,1)=real(yp(i+1))/(real(mpsi)*gyroradius)
@@ -487,6 +493,8 @@ subroutine smooth(ptr,iflag)
      icount=meachtheta*num_mode
      !call MPI_GATHER(y_eigen,icount,mpi_Csize,yt,icount,&
      !     mpi_Csize,0,toroidal_comm,ierror)
+     call toroidal_gather_cmm(ptr,y_eigen,icount,0)
+     call toroidal_gather_receive_cmm(ptr,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
@@ -495,7 +503,8 @@ subroutine smooth(ptr,iflag)
                  ye(j+i*meachtheta)=yt(j+(kz-1)*meachtheta+i*icount)
               enddo
            enddo
-           call fftc1d(1,mtdiag,scale,ye)
+           ! segfault problem with this routine
+           !call fftc1d(1,mtdiag,scale,ye)
            
            amp_mode(1,kz,2)=real(ye(mtdiag-mmode(kz)+1))/&
                 (real(mzmax*mtdiag)*gyroradius**2)

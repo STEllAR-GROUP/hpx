@@ -13,13 +13,13 @@
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/atomic.hpp>
-#include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 #ifdef HPX_ACCEL_QUEUING
@@ -281,12 +281,13 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
         thread_queue(std::size_t max_count = max_thread_count)
-          : work_items_(/*"work_items"*/),
+          : work_items_(128),
             work_items_count_(0),
-            terminated_items_(/*"terminated_items"*/),
+            terminated_items_(128),
             max_count_((0 == max_count)
                       ? static_cast<std::size_t>(max_thread_count)
                       : max_count),
+            new_tasks_(128),
             new_tasks_count_(0),
             add_new_logger_("thread_queue::add_new")
         {}
@@ -423,7 +424,6 @@ namespace hpx { namespace threads { namespace policies
         {
             if (thrd->is_created_from(&memory_pool_)) {
                 thread_id_type id = thrd->get_thread_id();
-                reinterpret_cast<thread_data*>(id)->reset();     // reset bound function object
                 terminated_items_.enqueue(id);
                 return true;
             }

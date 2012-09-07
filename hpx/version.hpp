@@ -77,6 +77,9 @@ namespace hpx
     // Returns the tag.
     HPX_EXPORT std::string tag();
 
+    // Returns the HPX full build information string.
+    HPX_EXPORT std::string full_build_string();
+
     // Returns the HPX version string.
     HPX_EXPORT std::string build_string();
 

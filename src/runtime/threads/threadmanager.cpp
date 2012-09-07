@@ -565,7 +565,7 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_interruption_enabled(thread_id_type id, bool enable, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
@@ -580,7 +580,8 @@ namespace hpx { namespace threads
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
-            thrd->set_interruption_enabled(enable);
+            return thrd->set_interruption_enabled(enable);
+        return false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1117,7 +1118,7 @@ namespace hpx { namespace threads
 //             if (!status_is_valid(status) || !f(i, ec) || ec)
 //                 return false;
 //
-//             for (std::size_t t = 0; t < BOOST_COROUTINE_NUM_HEAPS; ++t)
+//             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_HEAPS; ++t)
 //             {
 //                 p.instancename_ = "allocator";
 //                 p.instanceindex_ = static_cast<boost::int32_t>(t);
@@ -1289,7 +1290,7 @@ namespace hpx { namespace threads
               &coroutine_type::impl_type::get_stack_recycle_count,
               HPX_STD_FUNCTION<boost::uint64_t()>(), "", 0
             },
-#if !defined(BOOST_WINDOWS)
+#if !defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
             // /threads(locality#%d/total}/count/stack-unbinds
             { "count/stack-unbinds",
               &coroutine_type::impl_type::get_stack_unbind_count,
@@ -1301,7 +1302,7 @@ namespace hpx { namespace threads
             { "count/objects",
               &coroutine_type::impl_type::get_allocation_count_all,
               HPX_STD_BIND(&coroutine_type::impl_type::get_allocation_count, paths.instanceindex_),
-              "allocator", BOOST_COROUTINE_NUM_HEAPS
+              "allocator", HPX_COROUTINE_NUM_HEAPS
             },
         };
         std::size_t const data_size = sizeof(data)/sizeof(data[0]);
@@ -1391,7 +1392,7 @@ namespace hpx { namespace threads
               counts_creator, &performance_counters::locality_counter_discoverer,
               ""
             },
-#if !defined(BOOST_WINDOWS)
+#if !defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
             { "/threads/count/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
@@ -1440,7 +1441,7 @@ namespace hpx { namespace threads
         }
 
         // run the work queue
-        boost::coroutines::prepare_main_thread main_thread;
+        hpx::util::coroutines::prepare_main_thread main_thread;
 
         boost::int64_t& executed_threads = executed_threads_[num_thread];
         boost::uint64_t& tfunc_time = tfunc_times[num_thread];

@@ -12,7 +12,6 @@
 
 #include <vector>
 
-#include <boost/lockfree/fifo.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
 #include <boost/cache/local_cache.hpp>
@@ -39,6 +38,7 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
@@ -188,6 +188,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
+        hosted_data_type()
+          : promise_pool_(16)
+        {}
+
         void register_counter_types()
         {
             server::primary_namespace::register_counter_types();

@@ -32,8 +32,9 @@ namespace hpx { namespace actions
     template <typename Action>
     threads::thread_priority action_priority()
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_t;
-        return static_cast<threads::thread_priority>(action_t::priority_value);
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        return static_cast<threads::thread_priority>(
+            traits::action_priority<action_type>::value);
     }
 }}
 
@@ -218,7 +219,7 @@ namespace hpx
         typename Arguments, typename Derived, threads::thread_priority Priority>
     inline bool apply (
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>());
@@ -269,10 +270,10 @@ namespace hpx
     }
 
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority>
+        typename Arguments, typename Derived>
     inline bool apply (
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > /*act*/, std::vector<naming::id_type> const& gids)
     {
         return apply_p<Derived>(gids, actions::action_priority<Derived>());
@@ -431,10 +432,10 @@ namespace hpx
     }
 
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority>
+        typename Arguments, typename Derived>
     inline bool apply (actions::continuation* c,
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid)
     {
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>());

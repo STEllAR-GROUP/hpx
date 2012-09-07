@@ -10,15 +10,16 @@
 #include <map>
 #include <memory>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
+#include <hpx/util/lockfree/deque.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/atomic.hpp>
-#include <boost/lockfree/deque.hpp>
-#include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 // TODO: add branch prediction and function heat
@@ -251,7 +252,7 @@ struct thread_deque
     thread_deque(std::size_t max_count = max_thread_count)
       : work_items_(),
         work_items_count_(0),
-        terminated_items_(),
+        terminated_items_(128),
         max_count_((0 == max_count)
                   ? static_cast<std::size_t>(max_thread_count)
                   : max_count),
@@ -367,7 +368,6 @@ struct thread_deque
     {
         if (thrd->is_created_from(&memory_pool_)) {
             thread_id_type id = thrd->get_thread_id();
-            reinterpret_cast<thread_data*>(id)->reset();     // reset bound function object
             terminated_items_.enqueue(id);
             return true;
         }
