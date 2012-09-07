@@ -801,7 +801,8 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type const invalid_thread_id = 0;
+    thread_id_type const invalid_thread_id = 
+        reinterpret_cast<threads::thread_id_type>(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     // This is a special helper class encapsulating the memory pools used for

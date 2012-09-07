@@ -17,6 +17,7 @@ using boost::program_options::options_description;
 ///////////////////////////////////////////////////////////////////////////////
 void do_nothing()
 {
+    hpx::this_thread::suspend(100);     // wait for 100 ms
 }
 
 void test_thread_id_for_default_constructed_thread_is_default_constructed_id()

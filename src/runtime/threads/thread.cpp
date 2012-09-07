@@ -17,7 +17,7 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type const thread::uninitialized =
-        reinterpret_cast<threads::thread_id_type>(-1);
+        reinterpret_cast<threads::thread_id_type>(0);
 
     ///////////////////////////////////////////////////////////////////////////
     thread::thread() BOOST_NOEXCEPT
