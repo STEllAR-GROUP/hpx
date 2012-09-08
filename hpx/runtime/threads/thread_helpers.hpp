@@ -122,12 +122,12 @@ namespace hpx { namespace threads
     ///                   value will be the string "<unknown>".
     HPX_API_EXPORT std::string get_thread_description(thread_id_type id,
         error_code& ec = throws);
-    HPX_API_EXPORT void set_thread_description(thread_id_type id,
+    HPX_API_EXPORT std::string set_thread_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
 
     HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id,
         error_code& ec = throws);
-    HPX_API_EXPORT void set_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT std::string set_thread_lco_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////

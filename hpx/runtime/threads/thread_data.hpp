@@ -288,13 +288,18 @@ namespace hpx { namespace threads { namespace detail
             thread_mutex_type::scoped_lock l(this);
             return description_;
         }
-        void set_description(char const* desc)
+        std::string set_description(char const* desc)
         {
             thread_mutex_type::scoped_lock l(this);
-            if (desc)
-                description_ = desc;
-            else
-                description_.clear();
+            if (desc) {
+                std::string value(desc);
+                std::swap(description_, value);
+                return value;
+            }
+
+            std::string value;
+            std::swap(description_, value);
+            return value;
         }
 
         std::string get_lco_description() const
@@ -302,13 +307,18 @@ namespace hpx { namespace threads { namespace detail
             thread_mutex_type::scoped_lock l(this);
             return lco_description_;
         }
-        void set_lco_description(char const* lco_description)
+        std::string set_lco_description(char const* lco_description)
         {
             thread_mutex_type::scoped_lock l(this);
-            if (lco_description)
-                lco_description_ = lco_description;
-            else
-                lco_description_.clear();
+            if (lco_description) {
+                std::string value(lco_description);
+                std::swap(lco_description_, value);
+                return value;
+            }
+
+            std::string value;
+            std::swap(lco_description_, value);
+            return value;
         }
 
         boost::uint32_t get_parent_locality_id() const
@@ -708,11 +718,10 @@ namespace hpx { namespace threads
             detail::thread_data const* t = get();
             return t ? t->get_description() : "<terminated>";
         }
-        void set_description(char const* desc = 0)
+        std::string set_description(char const* desc = 0)
         {
             detail::thread_data* t = get();
-            if (t)
-                t->set_description(desc);
+            return t ? t->set_description(desc) : std::string();
         }
 
         std::string get_lco_description() const
@@ -720,11 +729,10 @@ namespace hpx { namespace threads
             detail::thread_data const* t = get();
             return t ? t->get_lco_description() : "<terminated>";
         }
-        void set_lco_description(char const* lco_description = 0)
+        std::string set_lco_description(char const* lco_description = 0)
         {
             detail::thread_data* t = get();
-            if (t)
-                t->set_lco_description(lco_description);
+            return t ? t->set_lco_description(lco_description) : std::string();
         }
 
         bool interruption_requested() const
@@ -801,7 +809,7 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type const invalid_thread_id = 
+    thread_id_type const invalid_thread_id =
         reinterpret_cast<threads::thread_id_type>(-1);
 
     ///////////////////////////////////////////////////////////////////////////

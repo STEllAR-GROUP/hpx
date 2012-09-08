@@ -199,10 +199,10 @@ namespace hpx { namespace threads
         ///                 thread is not known to the threadmanager the return
         ///                 value will be the string "<unknown>".
         virtual std::string get_description(thread_id_type id) const = 0;
-        virtual void set_description(thread_id_type id, char const* desc = 0) = 0;
+        virtual std::string set_description(thread_id_type id, char const* desc = 0) = 0;
 
         virtual std::string get_lco_description(thread_id_type id) const = 0;
-        virtual void set_lco_description(thread_id_type id, char const* desc = 0) = 0;
+        virtual std::string set_lco_description(thread_id_type id, char const* desc = 0) = 0;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds

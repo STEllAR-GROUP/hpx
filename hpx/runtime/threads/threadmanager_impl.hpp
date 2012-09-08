@@ -376,10 +376,10 @@ namespace hpx { namespace threads
         ///                 thread is not known to the thread-manager the return
         ///                 value will be the string "<unknown>".
         std::string get_description(thread_id_type id) const;
-        void set_description(thread_id_type id, char const* desc = 0);
+        std::string set_description(thread_id_type id, char const* desc = 0);
 
         std::string get_lco_description(thread_id_type id) const;
-        void set_lco_description(thread_id_type id, char const* desc = 0);
+        std::string set_lco_description(thread_id_type id, char const* desc = 0);
 
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate() const;

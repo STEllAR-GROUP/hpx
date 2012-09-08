@@ -500,19 +500,21 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_description(thread_id_type id, char const* desc)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_description",
                 "NULL thread id encountered");
+            return std::string();
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
-            thrd->set_description(desc);
+            return thrd->set_description(desc);
+        return std::string();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -523,6 +525,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_lco_description",
                 "NULL thread id encountered");
+            return std::string();
         }
 
         // we know that the id is actually the pointer to the thread
@@ -531,19 +534,21 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_lco_description(thread_id_type id, char const* desc)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_lco_description",
                 "NULL thread id encountered");
+            return std::string();
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
-            thrd->set_lco_description(desc);
+            return thrd->set_lco_description(desc);
+        return std::string();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -554,6 +559,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_interruption_enabled",
                 "NULL thread id encountered");
+            return false;
         }
 
         if (&ec != &throws)
