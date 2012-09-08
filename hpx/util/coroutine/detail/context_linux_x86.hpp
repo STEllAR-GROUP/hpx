@@ -16,7 +16,9 @@
 #include <sys/param.h>
 #include <cstdlib>
 #include <cstddef>
+#include <stdexcept>
 
+#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -147,8 +149,20 @@ namespace hpx { namespace util { namespace coroutines
                       : stack_size),
           m_stack(0)
       {
-        BOOST_ASSERT(0 == (m_stack_size % EXEC_PAGESIZE));
-        BOOST_ASSERT(m_stack_size >= 0);
+        if (0 != (m_stack_size % EXEC_PAGESIZE))
+        {
+            throw std::runtime_error(
+                boost::str(boost::format(
+                    "stack size of %1% is not page aligned, page size is %2%")
+                    % m_stack_size % EXEC_PAGESIZE));
+        }
+
+        if (0 >= m_stack_size)
+        {
+            throw std::runtime_error(
+                boost::str(boost::format("stack size of %1% is invalid") % m_stack_size));
+        }
+
         m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
         BOOST_ASSERT(m_stack);
         m_sp = (static_cast<void**>(m_stack) + static_cast<std::size_t>(m_stack_size)/sizeof(void*));
