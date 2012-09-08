@@ -124,14 +124,17 @@ namespace hpx { namespace lcos
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
-            future_data_ = other.future_data_;
+            if (this != &other)
+                future_data_ = other.future_data_;
             return *this;
         }
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            future_data_ = other.future_data_;
-            other.future_data_.reset();
+            if (this != &other) {
+                future_data_ = boost::move(other.future_data_);
+                other.future_data_.reset();
+            }
             return *this;
         }
 
@@ -309,14 +312,18 @@ namespace hpx { namespace lcos
 
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
-            future_data_ = other.future_data_;
+            if (this != &other)
+                future_data_ = other.future_data_;
             return *this;
         }
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            future_data_ = other.future_data_;
-            other.future_data_.reset();
+            if (this != &other)
+            {
+                future_data_ = boost::move(other.future_data_);
+                other.future_data_.reset();
+            }
             return *this;
         }
 

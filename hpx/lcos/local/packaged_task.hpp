@@ -143,8 +143,12 @@ namespace hpx { namespace lcos { namespace local
         promise& operator=(BOOST_RV_REF(promise) rhs)
         {
             if (this != &rhs) {
+                if (task_)
+                    task_->deleting_owner();
+
                 task_ = boost::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
+
                 rhs.task_.reset();
                 rhs.future_obtained_ = false;
             }
@@ -205,6 +209,11 @@ namespace hpx { namespace lcos { namespace local
             task_->set_exception(e);
         }
 
+        bool valid() const BOOST_NOEXCEPT
+        {
+            return task_;
+        }
+
         bool is_ready() const
         {
             return task_->is_ready();
@@ -248,10 +257,16 @@ namespace hpx { namespace lcos { namespace local
 
         promise& operator=(BOOST_RV_REF(promise) rhs)
         {
-            task_ = rhs.task_;
-            future_obtained_ = rhs.future_obtained_;
-            rhs.task_.reset();
-            rhs.future_obtained_ = false;
+            if (this != &rhs) {
+                if (task_)
+                    task_->deleting_owner();
+
+                task_ = rhs.task_;
+                future_obtained_ = rhs.future_obtained_;
+
+                rhs.task_.reset();
+                rhs.future_obtained_ = false;
+            }
             return *this;
         }
 
@@ -371,8 +386,12 @@ namespace hpx { namespace lcos { namespace local
         packaged_task& operator=(BOOST_RV_REF(packaged_task) rhs)
         {
             if (this != &rhs) {
+                if (task_)
+                    task_->deleting_owner();
+
                 task_ = boost::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
+
                 rhs.task_.reset();
                 rhs.future_obtained_ = false;
             }
@@ -480,8 +499,12 @@ namespace hpx { namespace lcos { namespace local
         futures_factory& operator=(BOOST_RV_REF(futures_factory) rhs)
         {
             if (this != &rhs) {
+                if (task_ && !future_obtained_)
+                    task_->deleting_owner();
+
                 task_ = boost::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
+
                 rhs.task_.reset();
                 rhs.future_obtained_ = false;
             }
