@@ -8,10 +8,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/function.hpp>
+// #include <hpx/lcos/local/conditional_trigger.hpp>
 
 #include <boost/dynamic_bitset.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <boost/move/move.hpp>
 #include <boost/assert.hpp>
 
@@ -37,7 +36,9 @@ namespace hpx { namespace lcos { namespace local
 
         and_gate(BOOST_RV_REF(and_gate) rhs)
           : received_segments_(boost::move(rhs.received_segments_)),
-            promise_(boost::move(rhs.promise_)), generation_(rhs.generation_)
+            promise_(boost::move(rhs.promise_)),
+            generation_(rhs.generation_) //,
+//             condition_(boost::move(rhs.condition_))
         {
             rhs.generation_ = std::size_t(-1);
         }
@@ -50,21 +51,22 @@ namespace hpx { namespace lcos { namespace local
                 promise_ = boost::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
+//                 condition_ = boost::move(rhs.condition_);
             }
             return *this;
         }
 
-        /// \brief re-initialize the gate with a different number of inputs
-        std::size_t init(std::size_t count, error_code& ec = hpx::throws)
-        {
-            mutex_type::scoped_lock l(this->mtx_);
-            init_locked(count, ec);
-            if (ec)
-                return std::size_t(-1);
-
-            BOOST_ASSERT(generation_ != std::size_t(-1));
-            return ++generation_;
-        }
+//         /// \brief re-initialize the gate with a different number of inputs
+//         std::size_t init(std::size_t count, error_code& ec = hpx::throws)
+//         {
+//             mutex_type::scoped_lock l(this->mtx_);
+//             init_locked(count, ec);
+//             if (ec)
+//                 return std::size_t(-1);
+//
+//             BOOST_ASSERT(generation_ != std::size_t(-1));
+//             return ++generation_;
+//         }
 
         /// \brief get a future allowing to wait for the gate to fire
         future<void> get_future(std::size_t count, error_code& ec = hpx::throws)
@@ -74,13 +76,16 @@ namespace hpx { namespace lcos { namespace local
             if (!ec) {
                 BOOST_ASSERT(generation_ != std::size_t(-1));
                 ++generation_;
-                return promise_.get_future(ec);
+
+//                 condition_.set(ec);   // re-check/trigger condition, if needed
+//                 if (!ec)
+                    return promise_.get_future(ec);
             }
             return hpx::future<void>();
         }
 
         /// \brief Set the data which has to go into the segment \a which.
-        void set(std::size_t which, error_code& ec = throws)
+        bool set(std::size_t which, error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
             if (which >= received_segments_.size())
@@ -88,15 +93,18 @@ namespace hpx { namespace lcos { namespace local
                 // out of bounds index
                 HPX_THROWS_IF(ec, bad_parameter, "and_gate::set",
                     "index is out of range for this and_gate");
-                return;
+                return false;
             }
             if (received_segments_.test(which))
             {
                 // segment already filled, logic error
                 HPX_THROWS_IF(ec, bad_parameter, "and_gate::set",
                     "input with the given index has already been triggered");
-                return;
+                return false;
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             // set the corresponding bit
             received_segments_.set(which);
@@ -104,41 +112,67 @@ namespace hpx { namespace lcos { namespace local
             if (received_segments_.count() == received_segments_.size())
             {
                 // we have received the last missing segment
+//                 condition_.reset();
                 promise_.set_value();           // fire event
+                promise_ = promise<void>();
                 received_segments_.reset();     // reset data store
-//                 promise_ = promise<void>();     // renew promise
+                return true;
+            }
+
+            return false;
+        }
+
+//     protected:
+//         bool test_condition(std::size_t generation)
+//         {
+//             return !(generation > generation_);
+//         }
+
+    public:
+        /// \brief Wait for the generational counter to reach the requested
+        ///        stage.
+        void synchronize(std::size_t generation,
+            char const* function_name = "and_gate::synchronize",
+            error_code& ec= throws)
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            if (generation < generation_)
+            {
+                HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
+                    "sequencing error, generational counter too small");
+                return;
+            }
+
+           // make sure this set operation has not arrived ahead of time
+//             if (!test_condition(generation))
+//             {
+//                 future<void> f = condition_.get_future(util::bind(
+//                         &and_gate::test_condition, this, generation));
+//
+//                 hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+//                 f.get();
+//             }
+
+            while (generation > generation_)
+            {
+                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                hpx::this_thread::suspend(hpx::threads::pending, function_name);
             }
 
             if (&ec != &throws)
                 ec = make_success_code();
         }
 
-        ///
-        void synchronize(std::size_t generation,
-            char const* function = "generational_gate::verify_generation")
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            if (generation < generation_)
-            {
-                HPX_THROW_EXCEPTION(hpx::invalid_status, function,
-                    "sequencing error, generational counter too small");
-                return;
-            }
-
-           // make sure this set operation has not arrived ahead of time
-            while (generation > generation_)
-            {
-                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                hpx::this_thread::suspend(hpx::threads::pending, function);
-            }
-        }
-
         std::size_t next_generation()
         {
             mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(generation_ != std::size_t(-1));
-            return ++generation_;
+            std::size_t retval = ++generation_;
+
+//             condition_.set();     // re-check/trigger condition, if needed
+
+            return retval;
         }
 
         std::size_t generation() const
@@ -160,19 +194,17 @@ namespace hpx { namespace lcos { namespace local
 
             received_segments_.resize(count);   // resize the bitmap
             received_segments_.reset();         // reset all existing bits
-            promise_ = promise<void>();         // renew promise
 
             if (&ec != &throws)
                 ec = make_success_code();
         }
 
-    protected:
-        mutable mutex_type mtx_;
-
     private:
+        mutable mutex_type mtx_;
         boost::dynamic_bitset<> received_segments_;
         lcos::local::promise<void> promise_;
         std::size_t generation_;
+//         conditional_trigger condition_;
     };
 }}}
 
