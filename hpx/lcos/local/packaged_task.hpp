@@ -144,7 +144,15 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs) {
                 if (task_)
+                {
+                    if (task_->is_ready() && !future_obtained_)
+                    {
+                        task_->set_error(broken_promise,
+                            "promise<Result>::operator=()",
+                            "deleting owner before future has been retrieved");
+                    }
                     task_->deleting_owner();
+                }
 
                 task_ = boost::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
@@ -259,7 +267,15 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs) {
                 if (task_)
+                {
+                    if (task_->is_ready() && !future_obtained_)
+                    {
+                        task_->set_error(broken_promise,
+                            "promise<void>::operator=()",
+                            "deleting owner before future has been retrieved");
+                    }
                     task_->deleting_owner();
+                }
 
                 task_ = rhs.task_;
                 future_obtained_ = rhs.future_obtained_;
@@ -286,7 +302,7 @@ namespace hpx { namespace lcos { namespace local
 
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
-                    "promise<Result>::get_future",
+                    "promise<void>::get_future",
                     "future already has been retrieved from this promise");
                 return lcos::future<void>();
             }
@@ -387,7 +403,15 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs) {
                 if (task_)
+                {
+                    if (task_->is_ready() && !future_obtained_)
+                    {
+                        task_->set_error(broken_promise,
+                            "packaged_task<Result()>::operator=()",
+                            "deleting owner before future has been retrieved");
+                    }
                     task_->deleting_owner();
+                }
 
                 task_ = boost::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
@@ -403,7 +427,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
-                    "packaged_task<Func>::operator()",
+                    "packaged_task<Result()>::operator()",
                     "packaged_task invalid (has it been moved?)");
                 return;
             }
@@ -421,13 +445,13 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
-                    "packaged_task<Func>::get_future",
+                    "packaged_task<Result()>::get_future",
                     "packaged_task invalid (has it been moved?)");
                 return lcos::future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
-                    "packaged_task<Func>::get_future",
+                    "packaged_task<Result()>::get_future",
                     "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }
@@ -516,7 +540,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
-                    "futures_factory<Func>::operator()",
+                    "futures_factory<Result()>::operator()",
                     "futures_factory invalid (has it been moved?)");
                 return;
             }
@@ -528,7 +552,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
-                    "futures_factory<Func>::apply()",
+                    "futures_factory<Result()>::apply()",
                     "futures_factory invalid (has it been moved?)");
                 return;
             }
@@ -546,13 +570,13 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
-                    "futures_factory<Func>::get_future",
+                    "futures_factory<Result()>::get_future",
                     "futures_factory invalid (has it been moved?)");
                 return lcos::future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
-                    "futures_factory<Func>::get_future",
+                    "futures_factory<Result()>::get_future",
                     "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }
