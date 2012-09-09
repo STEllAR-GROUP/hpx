@@ -140,7 +140,7 @@ extern "C" {
                     ptr_to_class->broadcast_parameters(integer_params,
                               real_params, n_integers,n_reals);
                     return; };
-            void FNAME(toroidal_gather_cmm) (void* pfoo,double *input, 
+            void FNAME(toroidal_gather_cmm) (void* pfoo,double *input,
                                              int* size,int* dst) {
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->toroidal_gather(input,size,dst);
@@ -150,7 +150,7 @@ extern "C" {
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->toroidal_gather_receive(output,dst);
                     return; };
-            void FNAME(toroidal_scatter_cmm) (void* pfoo,double *input, 
+            void FNAME(toroidal_scatter_cmm) (void* pfoo,double *input,
                                              int* size,int* src) {
                     gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
                     ptr_to_class->toroidal_scatter(input,size,src);
@@ -191,6 +191,12 @@ extern "C" {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+inline void set_description(char const* test_name)
+{
+    hpx::threads::set_thread_description(hpx::threads::get_self_id(), test_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
     std::size_t point::setup_wrapper(std::size_t numberpe,std::size_t mype,
@@ -198,7 +204,6 @@ namespace gtc { namespace server
     {
       item_ = mype;
       components_ = components;
-      generation_ = 0;
       in_toroidal_ = 0;
       in_particle_ = 0;
 
@@ -218,8 +223,8 @@ namespace gtc { namespace server
       hpx_right_pe = (myrank_toroidal+1)%ntoroidal;
 #endif
 //#if 0
-      int t1 = numberpe;
-      int t2 = mype;
+      int t1 = static_cast<int>(numberpe);
+      int t2 = static_cast<int>(mype);
       int npartdom,ntoroidal;
       int hpx_left_pe, hpx_right_pe;
       int mstep;
@@ -301,22 +306,22 @@ namespace gtc { namespace server
 //#endif
 
       // Figure out the communicators: toroidal_comm and partd_comm
-      int my_pdl = mype%npartdom;
-      int my_tdl = mype/npartdom;
+      std::size_t my_pdl = mype%npartdom;
+      std::size_t my_tdl = mype/npartdom;
 
-      if ( my_pdl == (int) mype ) in_particle_ = 1;
-      if ( my_tdl == (int) mype ) in_toroidal_ = 1;
+      if ( my_pdl == mype ) in_particle_ = 1;
+      if ( my_tdl == mype ) in_toroidal_ = 1;
 
       for (std::size_t i=0;i<numberpe;i++) {
-        int particle_domain_location= i%npartdom;
-        int toroidal_domain_location= i/npartdom;
- 
+        std::size_t particle_domain_location = i%npartdom;
+        std::size_t toroidal_domain_location = i/npartdom;
+
         if ( particle_domain_location == my_pdl ) {
           toroidal_comm_.push_back(components_[i]);
         }
 
         if ( toroidal_domain_location == my_tdl ) {
-          partd_comm_.push_back(components_[i]);         
+          partd_comm_.push_back(components_[i]);
         }
       }
 
@@ -379,16 +384,8 @@ namespace gtc { namespace server
       int nreal = *n_reals;
 
       if ( item_ != 0 ) {
-        // create a new and-gate object
-        gate_.init(1);
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        hpx::future<void> f = broadcast_gate_.get_future(1);
 
         f.get();
 
@@ -402,11 +399,8 @@ namespace gtc { namespace server
       } else {
         // The sender:  broadcast the parameters to the other components
         // in a fire and forget fashion
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
+        std::size_t generation = broadcast_gate_.next_generation();
+
         std::vector<int> intparams;
         std::vector<double> realparams;
         intparams.resize(nint);
@@ -438,40 +432,28 @@ namespace gtc { namespace server
                            std::vector<int> const& intparams,
                            std::vector<double> const& realparams)
     {
-       mutex_type::scoped_lock l(mtx_);
+        broadcast_gate_.synchronize(generation, "point::set_params");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            intparams_ = intparams;
+            realparams_ = realparams;
+        }
 
-       intparams_ = intparams;
-       realparams_ = realparams;
-
-       gate_.set(which);         // trigger corresponding and-gate input
+        broadcast_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void point::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
     {
       if ( in_particle_ ) {
-        // create a new and-gate object
-        gate_.init(partd_comm_.size());
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
+        hpx::future<void> f = allreduce_gate_.get_future(partd_comm_.size());
+        std::size_t generation = allreduce_gate_.generation();
 
         int vsize = (*mgrid)*(*mzetap1);
         std::vector<double> dnisend;
-        dnisend.resize(vsize); 
-        dnireceive_.resize(vsize); 
+        dnisend.resize(vsize);
+        dnireceive_.resize(vsize);
         std::fill( dnireceive_.begin(),dnireceive_.end(),0.0);
 
         for (std::size_t i=0;i<dnisend.size();i++) {
@@ -486,82 +468,73 @@ namespace gtc { namespace server
         // possibly do other stuff while the allgather is going on...
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<dnireceive_.size();i++) {
-          densityi[i] = dnireceive_[i]; 
+          densityi[i] = dnireceive_[i];
         }
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        allreduce_gate_.next_generation();
       }
     }
 
     void point::set_data(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
-       mutex_type::scoped_lock l(mtx_);
+        allreduce_gate_.synchronize(generation, "point::set_data");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<dnireceive_.size();i++)
+                dnireceive_[i] += data[i];
+        }
 
-       for (std::size_t i=0;i<dnireceive_.size();i++) {
-         dnireceive_[i] += data[i];
-       }
-
-       gate_.set(which);         // trigger corresponding and-gate input
+        allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void point::toroidal_sndleft(double *csend,int* mgrid)
     {
+      std::cout << "toroidal_sndleft: " << item_ << " -> " << left_pe_
+                << " (g: " << sndleft_gate_.generation() << "), "
+                << in_toroidal_ << std::endl;
+
       if ( in_toroidal_ ) {
+        // create a new and-gate object
+        sndleft_future_ = sndleft_gate_.get_future(1);
+        std::size_t generation = sndleft_gate_.generation();
+
         // Send data to the left
-        // The sender: send data to the left 
+        // The sender: send data to the left
         // in a fire and forget fashion
         int vsize = *mgrid;
         std::vector<double> send;
-        send.resize(vsize); 
-        sendleft_receive_.resize(vsize); 
+        send.resize(vsize);
+        sendleft_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
         }
 
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
-
         set_sendleft_data_action set_sendleft_data_;
-        hpx::apply(set_sendleft_data_, toroidal_comm_[left_pe_], item_, generation, send);
+        hpx::apply(set_sendleft_data_, toroidal_comm_[left_pe_], item_,
+            generation, send);
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        sndleft_gate_.next_generation();
       }
     }
 
     void point::toroidal_rcvright(double *creceive)
     {
+//       std::cout << "toroidal_rcvleft: " << item_
+//                 << " (g: " << generation_ << "), "
+//                 << in_toroidal_ << std::endl;
+
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        // create a new and-gate object
-        gate_.init(1);
+        sndleft_future_.get();
 
-        // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        // possibly do other stuff 
-        f.get();
-
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<sendleft_receive_.size();i++) {
-          creceive[i] = sendleft_receive_[i]; 
+          creceive[i] = sendleft_receive_[i];
         }
       }
     }
@@ -570,39 +543,31 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-       mutex_type::scoped_lock l(mtx_);
+        std::cout << "set_sendleft_data: " << item_ << " <- " << which
+                << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
+                << std::endl;
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        sndleft_gate_.synchronize(generation, "point::set_sendleft_data");
 
-       sendleft_receive_ = send;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            sendleft_receive_ = send;
+        }
 
-       gate_.set(0);         // trigger corresponding and-gate input
+        sndleft_gate_.set(0);         // trigger corresponding and-gate input
     }
 
     void point::toroidal_allreduce(double *input,double *output, int* size)
     {
       if ( in_toroidal_ ) {
-        // create a new and-gate object
-        gate_.init(toroidal_comm_.size());
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
+        hpx::future<void> f = allreduce_gate_.get_future(toroidal_comm_.size());
+        std::size_t generation = allreduce_gate_.generation();
 
         int vsize = *size;
         std::vector<double> send;
-        send.resize(vsize); 
-        treceive_.resize(vsize); 
+        send.resize(vsize);
+        treceive_.resize(vsize);
         std::fill( treceive_.begin(),treceive_.end(),0.0);
 
         for (std::size_t i=0;i<send.size();i++) {
@@ -617,40 +582,36 @@ namespace gtc { namespace server
         // possibly do other stuff while the allgather is going on...
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<treceive_.size();i++) {
-          output[i] = treceive_[i]; 
+          output[i] = treceive_[i];
         }
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        allreduce_gate_.next_generation();
       }
     }
 
     void point::set_tdata(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
-       mutex_type::scoped_lock l(mtx_);
+        allreduce_gate_.synchronize(generation, "point::set_tdata");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<treceive_.size();i++)
+                treceive_[i] += data[i];
+        }
 
-       for (std::size_t i=0;i<treceive_.size();i++) {
-         treceive_[i] += data[i];
-       }
-
-       gate_.set(which);         // trigger corresponding and-gate input
+        allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void point::timeloop(std::size_t istep, std::size_t irk)
     {
+      set_description("smooth");
+//       std::cout << "smooth: " << item_ << std::endl;
+
       // Call smooth(3) {{{
-      int flag = 3; 
+      int flag = 3;
       switch(item_) {
         case 0:
           FNAME(smooth_0)(static_cast<void*>(this),&flag);
@@ -684,7 +645,10 @@ namespace gtc { namespace server
           break;
       }
       // }}}
-      
+
+      set_description("field");
+//       std::cout << "field: " << item_ << std::endl;
+
       // Call field {{{
       switch(item_) {
         case 0:
@@ -720,6 +684,9 @@ namespace gtc { namespace server
       }
       // }}}
 
+      set_description("pushi");
+//       std::cout << "pushi: " << item_ << std::endl;
+
       // Call pushi {{{
       switch(item_) {
         case 0:
@@ -754,7 +721,11 @@ namespace gtc { namespace server
           break;
       }
       // }}}
-#if 0      
+
+      set_description("shifti");
+//       std::cout << "shifti: " << item_ << std::endl;
+
+#if 0
       // Call shifti {{{
       switch(item_) {
         case 0:
@@ -794,51 +765,48 @@ namespace gtc { namespace server
 
     void point::toroidal_sndright(double *csend,int* mgrid)
     {
+      std::cout << "toroidal_sndright: " << item_ << " -> " << right_pe_
+                << " (g: " << sndright_gate_.generation() << "), "
+                << in_toroidal_ << std::endl;
+
       if ( in_toroidal_ ) {
+        // create a new and-gate object
+        sndright_future_ = sndright_gate_.get_future(1);
+        std::size_t generation = sndright_gate_.generation();
+
         // Send data to the right
-        // The sender: send data to the left 
+        // The sender: send data to the left
         // in a fire and forget fashion
         int vsize = *mgrid;
         std::vector<double> send;
-        send.resize(vsize); 
-        sendright_receive_.resize(vsize); 
+        send.resize(vsize);
+        sendright_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
         }
 
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
-
         set_sendright_data_action set_sendright_data_;
-        hpx::apply(set_sendright_data_, 
+        hpx::apply(set_sendright_data_,
              toroidal_comm_[right_pe_], item_, generation, send);
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        sndright_gate_.next_generation();
       }
     }
 
     void point::toroidal_rcvleft(double *creceive)
     {
+//       std::cout << "toroidal_rcvleft: " << item_
+//                 << " (g: " << generation_ << "), "
+//                 << in_toroidal_ << std::endl;
+
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        // create a new and-gate object
-        gate_.init(1);
+        sndright_future_.get();
 
-        // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        // possibly do other stuff 
-        f.get();
-
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<sendright_receive_.size();i++) {
-          creceive[i] = sendright_receive_[i]; 
+          creceive[i] = sendright_receive_[i];
         }
       }
     }
@@ -847,70 +815,63 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-       mutex_type::scoped_lock l(mtx_);
+        std::cout << "set_sendright_data: " << item_ << " <- " << which
+                << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
+                << std::endl;
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        sndright_gate_.synchronize(generation, "point::set_sendright_data");
 
-       sendright_receive_ = send;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            sendright_receive_ = send;
+        }
 
-       gate_.set(0);         // trigger corresponding and-gate input
+        sndright_gate_.set(0);         // trigger corresponding and-gate input
     }
 
     void point::toroidal_gather(double *csend, int *tsize,int *tdst)
     {
-      
+      std::cout << "toroidal_gather: " << item_
+                << " (g: " << gather_gate_.generation() << "), "
+                << in_toroidal_ << std::endl;
+
       if ( in_toroidal_ ) {
+        // create a new and-gate object
+        gather_future_ = gather_gate_.get_future(toroidal_comm_.size());
+        std::size_t generation = gather_gate_.generation();
+
         // Send data to dst
-        // The sender: send data to the left 
+        // The sender: send data to the left
         // in a fire and forget fashion
         int vsize = *tsize;
         int dst = *tdst;
         std::vector<double> send;
-        send.resize(vsize); 
-        toroidal_gather_receive_.resize(toroidal_comm_.size()*vsize); 
+        send.resize(vsize);
+        toroidal_gather_receive_.resize(toroidal_comm_.size()*vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
         }
 
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
-
         set_toroidal_gather_data_action set_toroidal_gather_data_;
-        hpx::apply(set_toroidal_gather_data_, 
+        hpx::apply(set_toroidal_gather_data_,
              toroidal_comm_[dst], item_, generation, send);
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        gather_gate_.next_generation();
       }
-      
+
     }
 
     void point::toroidal_gather_receive(double *creceive, int *cdst)
     {
       int dst = *cdst;
       if ( dst == item_ ) {
-        // create a new and-gate object
-        gate_.init(toroidal_comm_.size());
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
+        gather_future_.get();
 
-        // possibly do other stuff 
-        f.get();
-
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<toroidal_gather_receive_.size();i++) {
-          creceive[i] = toroidal_gather_receive_[i]; 
+          creceive[i] = toroidal_gather_receive_[i];
         }
       }
     }
@@ -919,39 +880,36 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-       mutex_type::scoped_lock l(mtx_);
+        std::cout << "set_toroidal_gather_data: " << item_ << " <- " << which
+                << " (g: " << gather_gate_.generation() << ", " << generation << ")"
+                << std::endl;
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        gather_gate_.synchronize(generation, "point::set_toroidal_gather_data");
 
-       for (std::size_t i=0;i<send.size();i++) {
-         toroidal_gather_receive_[which*send.size()+i] = send[i];
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<send.size();i++)
+                toroidal_gather_receive_[which*send.size()+i] = send[i];
+        }
 
-       gate_.set(which);         // trigger corresponding and-gate input
+        gather_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void point::toroidal_scatter(double *csend, int *tsize,int *tsrc)
     {
       int src = *tsrc;
       if ( src == item_ ) {
+        // create a new and-gate object
+        scatter_future_ = scatter_gate_.get_future(1);
+        std::size_t generation = scatter_gate_.generation();
+
         // Send data to everyone in toroidal
-        // The sender: send data to the left 
+        // The sender: send data to the left
         // in a fire and forget fashion
         int vsize = *tsize;
         std::vector<double> send;
-        send.resize(vsize); 
-        toroidal_scatter_receive_.resize(vsize); 
-
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
+        send.resize(vsize);
+        toroidal_scatter_receive_.resize(vsize);
 
         for (std::size_t step=0;step<toroidal_comm_.size();step++) {
           for (std::size_t i=0;i<send.size();i++) {
@@ -960,33 +918,25 @@ namespace gtc { namespace server
 
           set_toroidal_scatter_data_action set_toroidal_scatter_data_;
           for (std::size_t i=0;i<toroidal_comm_.size();i++) {
-            hpx::apply(set_toroidal_scatter_data_, 
+            hpx::apply(set_toroidal_scatter_data_,
                toroidal_comm_[i], item_, generation, send);
           }
         }
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        scatter_gate_.next_generation();
       }
-      
+
     }
 
     void point::toroidal_scatter_receive(double *creceive, int *cdst)
     {
       if ( in_toroidal_ ) {
-        // create a new and-gate object
-        gate_.init(1);
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
+        scatter_future_.get();
 
-        // possibly do other stuff 
-        f.get();
-
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<toroidal_scatter_receive_.size();i++) {
-          creceive[i] = toroidal_scatter_receive_[i]; 
+          creceive[i] = toroidal_scatter_receive_[i];
         }
       }
     }
@@ -995,40 +945,27 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-       mutex_type::scoped_lock l(mtx_);
+        scatter_gate_.synchronize(generation, "point::set_toroidal_scatter_data");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<send.size();i++)
+                toroidal_scatter_receive_[i] = send[i];
+        }
 
-       for (std::size_t i=0;i<send.size();i++) {
-         toroidal_scatter_receive_[i] = send[i];
-       }
-
-       gate_.set(0);         // trigger corresponding and-gate input
+        scatter_gate_.set(0);         // trigger corresponding and-gate input
     }
 
     void point::comm_allreduce(double *in,double *out, int* msize)
     {
-        // create a new and-gate object
-        gate_.init(components_.size());
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
+        hpx::future<void> f = allreduce_gate_.get_future(components_.size());
+        std::size_t generation = allreduce_gate_.generation();
 
         int vsize = *msize;
         std::vector<double> send;
-        send.resize(vsize); 
-        comm_allreduce_receive_.resize(vsize); 
+        send.resize(vsize);
+        comm_allreduce_receive_.resize(vsize);
         std::fill( comm_allreduce_receive_.begin(),comm_allreduce_receive_.end(),0.0);
 
         for (std::size_t i=0;i<send.size();i++) {
@@ -1043,48 +980,36 @@ namespace gtc { namespace server
         // possibly do other stuff while the allgather is going on...
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
-          out[i] = comm_allreduce_receive_[i]; 
+          out[i] = comm_allreduce_receive_[i];
         }
     }
 
     void point::set_comm_allreduce_data(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
-       mutex_type::scoped_lock l(mtx_);
+        allreduce_gate_.synchronize(generation, "point::set_comm_allreduce_data");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<comm_allreduce_receive_.size();i++)
+                comm_allreduce_receive_[i] += data[i];
+        }
 
-       for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
-         comm_allreduce_receive_[i] += data[i];
-       }
-
-       gate_.set(which);         // trigger corresponding and-gate input
+        allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void point::int_comm_allreduce(int *in,int *out, int* msize)
     {
-        // create a new and-gate object
-        gate_.init(components_.size());
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
+        hpx::future<void> f = allreduce_gate_.get_future(components_.size());
+        std::size_t generation = allreduce_gate_.generation();
 
         int vsize = *msize;
         std::vector<int> send;
-        send.resize(vsize); 
-        int_comm_allreduce_receive_.resize(vsize); 
+        send.resize(vsize);
+        int_comm_allreduce_receive_.resize(vsize);
         std::fill( int_comm_allreduce_receive_.begin(),int_comm_allreduce_receive_.end(),0);
 
         for (std::size_t i=0;i<send.size();i++) {
@@ -1099,59 +1024,49 @@ namespace gtc { namespace server
         // possibly do other stuff while the allgather is going on...
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
-          out[i] = int_comm_allreduce_receive_[i]; 
+          out[i] = int_comm_allreduce_receive_[i];
         }
     }
 
     void point::set_int_comm_allreduce_data(std::size_t which,
                 std::size_t generation, std::vector<int> const& data)
     {
-       mutex_type::scoped_lock l(mtx_);
+        allreduce_gate_.synchronize(generation, "point::set_int_comm_allreduce_data");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<int_comm_allreduce_receive_.size();i++)
+                int_comm_allreduce_receive_[i] += data[i];
+        }
 
-       for (std::size_t i=0;i<int_comm_allreduce_receive_.size();i++) {
-         int_comm_allreduce_receive_[i] += data[i];
-       }
-
-       gate_.set(which);         // trigger corresponding and-gate input
+        allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void point::int_toroidal_sndright(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
+        // create a new and-gate object
+        std::size_t generation = sndright_gate_.init(1);
+
         // Send data to the right
-        // The sender: send data to the left 
+        // The sender: send data to the left
         // in a fire and forget fashion
         int vsize = *mgrid;
         std::vector<int> send;
-        send.resize(vsize); 
-        int_sendright_receive_.resize(vsize); 
+        send.resize(vsize);
+        int_sendright_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
         }
 
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
-
         set_int_sendright_data_action set_int_sendright_data_;
-        hpx::apply(set_int_sendright_data_, 
+        hpx::apply(set_int_sendright_data_,
              toroidal_comm_[right_pe_], item_, generation, send);
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        sndright_gate_.next_generation();
       }
     }
 
@@ -1159,17 +1074,16 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        // create a new and-gate object
-        gate_.init(1);
 
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
+        hpx::future<void> f = sndright_gate_.get_future();
 
-        // possibly do other stuff 
+        // possibly do other stuff
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<int_sendright_receive_.size();i++) {
-          creceive[i] = int_sendright_receive_[i]; 
+          creceive[i] = int_sendright_receive_[i];
         }
       }
     }
@@ -1178,48 +1092,38 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<int> const& send)
     {
-       mutex_type::scoped_lock l(mtx_);
+        sndright_gate_.synchronize(generation, "point::set_int_sendright_data");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            int_sendright_receive_ = send;
+        }
 
-       int_sendright_receive_ = send;
-
-       gate_.set(0);         // trigger corresponding and-gate input
+        sndright_gate_.set(0);         // trigger corresponding and-gate input
     }
 
     void point::int_toroidal_sndleft(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
+        // create a new and-gate object
+        std::size_t generation = sndleft_gate_.init(1);
+
         // Send data to the left
-        // The sender: send data to the left 
+        // The sender: send data to the left
         // in a fire and forget fashion
         int vsize = *mgrid;
         std::vector<int> send;
-        send.resize(vsize); 
-        int_sendleft_receive_.resize(vsize); 
+        send.resize(vsize);
+        int_sendleft_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
         }
 
-        std::size_t generation = 0;
-        {
-          mutex_type::scoped_lock l(mtx_);
-          generation = ++generation_;
-        }
-
         set_int_sendleft_data_action set_int_sendleft_data_;
         hpx::apply(set_int_sendleft_data_, toroidal_comm_[left_pe_], item_, generation, send);
       } else {
-        {
-          mutex_type::scoped_lock l(mtx_);
-          ++generation_;
-        }
+        sndleft_gate_.next_generation();
       }
     }
 
@@ -1227,17 +1131,16 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        // create a new and-gate object
-        gate_.init(1);
 
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
+        hpx::future<void> f = sndleft_gate_.get_future();
 
-        // possibly do other stuff 
+        // possibly do other stuff
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<int_sendleft_receive_.size();i++) {
-          creceive[i] = int_sendleft_receive_[i]; 
+          creceive[i] = int_sendleft_receive_[i];
         }
       }
     }
@@ -1246,18 +1149,14 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<int> const& send)
     {
-       mutex_type::scoped_lock l(mtx_);
+        sndleft_gate_.synchronize(generation, "point::set_int_sendleft_data");
 
-       // make sure this set operation has not arrived ahead of time
-       while (generation > generation_)
-       {
-         hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-         hpx::this_thread::suspend();
-       }
+        {
+            mutex_type::scoped_lock l(mtx_);
+            int_sendleft_receive_ = send;
+        }
 
-       int_sendleft_receive_ = send;
-
-       gate_.set(0);         // trigger corresponding and-gate input
+        sndleft_gate_.set(0);         // trigger corresponding and-gate input
     }
 
 }}

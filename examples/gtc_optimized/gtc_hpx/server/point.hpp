@@ -21,7 +21,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
       : public hpx::components::managed_component_base<point>
@@ -118,9 +117,19 @@ namespace gtc { namespace server
         std::size_t item_;
         std::vector<hpx::naming::id_type> toroidal_comm_,partd_comm_;
         std::size_t left_pe_,right_pe_;
-        hpx::lcos::local::and_gate gate_; // synchronization gate
+
+        hpx::lcos::local::and_gate allreduce_gate_;     // synchronization gates
+        hpx::lcos::local::and_gate sndleft_gate_;
+        hpx::future<void> sndleft_future_;
+        hpx::lcos::local::and_gate sndright_gate_;
+        hpx::future<void> sndright_future_;
+        hpx::lcos::local::and_gate gather_gate_;
+        hpx::future<void> gather_future_;
+        hpx::lcos::local::and_gate scatter_gate_;
+        hpx::future<void> scatter_future_;
+        hpx::lcos::local::and_gate broadcast_gate_;
+
         std::vector<hpx::naming::id_type> components_;
-        std::size_t generation_;
         mutable mutex_type mtx_;
         std::vector<int> intparams_;
         std::vector<double> realparams_;
