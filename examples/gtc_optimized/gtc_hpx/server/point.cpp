@@ -837,8 +837,14 @@ namespace gtc { namespace server
 
       if ( in_toroidal_ ) {
         // create a new and-gate object
-        gather_future_ = gather_gate_.get_future(toroidal_comm_.size());
-        std::size_t generation = gather_gate_.generation();
+        std::size_t generation = 0;
+        if ( *tdst == item_ ) {
+          gather_future_ = gather_gate_.get_future(toroidal_comm_.size());
+          generation = gather_gate_.generation();
+        }
+        else {
+          generation = gather_gate_.next_generation();
+        }
 
         // Send data to dst
         // The sender: send data to the left
