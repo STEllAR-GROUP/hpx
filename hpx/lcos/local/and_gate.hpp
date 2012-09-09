@@ -13,13 +13,14 @@
 #include <boost/dynamic_bitset.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/move/move.hpp>
+#include <boost/assert.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////
     struct and_gate
     {
-    private:
+    protected:
         typedef lcos::local::spinlock mutex_type;
 
     private:
@@ -30,14 +31,15 @@ namespace hpx { namespace lcos { namespace local
         ///        the number of participants to synchronize the control flow
         ///        with.
         and_gate(std::size_t count = 0)
-          : received_segments_(count)
+          : received_segments_(count), generation_(0)
         {
         }
 
         and_gate(BOOST_RV_REF(and_gate) rhs)
           : received_segments_(boost::move(rhs.received_segments_)),
-            promise_(boost::move(rhs.promise_))
+            promise_(boost::move(rhs.promise_)), generation_(rhs.generation_)
         {
+            rhs.generation_ = std::size_t(-1);
         }
 
         and_gate& operator=(BOOST_RV_REF(and_gate) rhs)
@@ -46,29 +48,22 @@ namespace hpx { namespace lcos { namespace local
             {
                 received_segments_ = boost::move(rhs.received_segments_);
                 promise_ = boost::move(rhs.promise_);
+                generation_ = rhs.generation_;
+                rhs.generation_ = std::size_t(-1);
             }
             return *this;
         }
 
         /// \brief re-initialize the gate with a different number of inputs
-        void init(std::size_t count, error_code& ec = throws)
+        std::size_t init(std::size_t count, error_code& ec = hpx::throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this->mtx_);
+            init_locked(count, ec);
+            if (ec)
+                return std::size_t(-1);
 
-            if (0 != received_segments_.count())
-            {
-                // reset happens while part of the slots are filled
-                HPX_THROWS_IF(ec, bad_parameter, "and_gate::init",
-                    "initializing this and_gate while slots are filled");
-                return;
-            }
-
-            received_segments_.resize(count);   // resize the bitmap
-            received_segments_.reset();         // reset all existing bits
-            promise_ = promise<void>();         // renew promise
-
-            if (&ec != &throws)
-                ec = make_success_code();
+            BOOST_ASSERT(generation_ != std::size_t(-1));
+            return ++generation_;
         }
 
         /// \brief Set the data which has to go into the segment \a which.
@@ -113,10 +108,77 @@ namespace hpx { namespace lcos { namespace local
             return promise_.get_future(ec);
         }
 
-    private:
+        future<void> get_future(std::size_t count, error_code& ec = hpx::throws)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            init_locked(count, ec);
+            if (!ec) {
+                BOOST_ASSERT(generation_ != std::size_t(-1));
+                ++generation_;
+                return promise_.get_future(ec);
+            }
+            return hpx::future<void>();
+        }
+
+        void synchronize(std::size_t generation,
+            char const* function = "generational_gate::verify_generation")
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            if (generation < generation_)
+            {
+                HPX_THROW_EXCEPTION(hpx::invalid_status, function,
+                    "sequencing error, generational counter too small");
+                return;
+            }
+
+           // make sure this set operation has not arrived ahead of time
+            while (generation > generation_)
+            {
+                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                hpx::this_thread::suspend(hpx::threads::pending, function);
+            }
+        }
+
+        std::size_t next_generation()
+        {
+            mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(generation_ != std::size_t(-1));
+            return ++generation_;
+        }
+
+        std::size_t generation() const
+        {
+            mutex_type::scoped_lock l(mtx_);
+            return generation_;
+        }
+
+    protected:
+        void init_locked(std::size_t count, error_code& ec = throws)
+        {
+            if (0 != received_segments_.count())
+            {
+                // reset happens while part of the slots are filled
+                HPX_THROWS_IF(ec, bad_parameter, "and_gate::init",
+                    "initializing this and_gate while slots are filled");
+                return;
+            }
+
+            received_segments_.resize(count);   // resize the bitmap
+            received_segments_.reset();         // reset all existing bits
+            promise_ = promise<void>();         // renew promise
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
+    protected:
         mutable mutex_type mtx_;
+
+    private:
         boost::dynamic_bitset<> received_segments_;
         lcos::local::promise<void> promise_;
+        std::size_t generation_;
     };
 }}}
 
