@@ -34,9 +34,6 @@ namespace ag { namespace server
         // prepare data array
         n_.clear();
         n_.resize(components.size());
-
-        // create a new and-gate object
-        gate_.init(components_.size());
     }
 
     void allgather_and_gate::compute(int num_loops)
@@ -54,13 +51,8 @@ namespace ag { namespace server
     void allgather_and_gate::allgather(double value)
     {
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
-
-        std::size_t generation = 0;
-        {
-            mutex_type::scoped_lock l(mtx_);
-            generation = ++generation_;
-        }
+        hpx::future<void> f = gate_.get_future(components_.size());
+        std::size_t generation = gate_.generation();
 
         // Send our value to all participants of this allgather operation. We
         // assume components_, rank_ and value to be constant, thus no locking
@@ -76,24 +68,21 @@ namespace ag { namespace server
     void allgather_and_gate::set_data(std::size_t which,
         std::size_t generation, double data)
     {
-        mutex_type::scoped_lock l(mtx_);
+        gate_.synchronize(generation, "allgather_and_gate::set_data");
 
-        // make sure this set operation has not arrived ahead of time
-        while (generation > generation_)
         {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            hpx::this_thread::suspend();
-        }
+            mutex_type::scoped_lock l(mtx_);
 
-        if (which >= n_.size())
-        {
-            // index out of bounds...
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "allgather_and_gate::set_data",
-                "index is out of range for this allgather operation");
-            return;
+            if (which >= n_.size())
+            {
+                // index out of bounds...
+                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                    "allgather_and_gate::set_data",
+                    "index is out of range for this allgather operation");
+                return;
+            }
+            n_[which] = data;         // set the received data
         }
-        n_[which] = data;         // set the received data
 
         gate_.set(which);         // trigger corresponding and-gate input
     }

@@ -1048,7 +1048,8 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // create a new and-gate object
-        std::size_t generation = sndright_gate_.init(1);
+        sndright_future_ = sndright_gate_.get_future(1);
+        std::size_t generation = sndright_gate_.generation();
 
         // Send data to the right
         // The sender: send data to the left
@@ -1074,12 +1075,7 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-
-        // synchronize with all operations to finish
-        hpx::future<void> f = sndright_gate_.get_future();
-
-        // possibly do other stuff
-        f.get();
+        sndright_future_.get();
 
         mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<int_sendright_receive_.size();i++) {
@@ -1106,7 +1102,8 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // create a new and-gate object
-        std::size_t generation = sndleft_gate_.init(1);
+        sndleft_future_ = sndleft_gate_.get_future(1);
+        std::size_t generation = sndleft_gate_.generation();
 
         // Send data to the left
         // The sender: send data to the left
@@ -1131,12 +1128,7 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-
-        // synchronize with all operations to finish
-        hpx::future<void> f = sndleft_gate_.get_future();
-
-        // possibly do other stuff
-        f.get();
+        sndleft_future_.get();
 
         mutex_type::scoped_lock l(mtx_);
         for (std::size_t i=0;i<int_sendleft_receive_.size();i++) {

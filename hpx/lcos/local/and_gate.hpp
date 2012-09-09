@@ -66,6 +66,19 @@ namespace hpx { namespace lcos { namespace local
             return ++generation_;
         }
 
+        /// \brief get a future allowing to wait for the gate to fire
+        future<void> get_future(std::size_t count, error_code& ec = hpx::throws)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            init_locked(count, ec);
+            if (!ec) {
+                BOOST_ASSERT(generation_ != std::size_t(-1));
+                ++generation_;
+                return promise_.get_future(ec);
+            }
+            return hpx::future<void>();
+        }
+
         /// \brief Set the data which has to go into the segment \a which.
         void set(std::size_t which, error_code& ec = throws)
         {
@@ -93,33 +106,14 @@ namespace hpx { namespace lcos { namespace local
                 // we have received the last missing segment
                 promise_.set_value();           // fire event
                 received_segments_.reset();     // reset data store
-                promise_ = promise<void>();     // renew promise
+//                 promise_ = promise<void>();     // renew promise
             }
 
             if (&ec != &throws)
                 ec = make_success_code();
         }
 
-        /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(error_code& ec = throws)
-        {
-            // create new promise and return the future
-            mutex_type::scoped_lock l(mtx_);
-            return promise_.get_future(ec);
-        }
-
-        future<void> get_future(std::size_t count, error_code& ec = hpx::throws)
-        {
-            mutex_type::scoped_lock l(mtx_);
-            init_locked(count, ec);
-            if (!ec) {
-                BOOST_ASSERT(generation_ != std::size_t(-1));
-                ++generation_;
-                return promise_.get_future(ec);
-            }
-            return hpx::future<void>();
-        }
-
+        ///
         void synchronize(std::size_t generation,
             char const* function = "generational_gate::verify_generation")
         {

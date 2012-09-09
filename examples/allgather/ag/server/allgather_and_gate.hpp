@@ -26,7 +26,6 @@ namespace ag { namespace server
 
     public:
         allgather_and_gate()
-          : generation_(0)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -51,7 +50,6 @@ namespace ag { namespace server
         mutable mutex_type mtx_;
 
         std::size_t rank_;                // our rank
-        std::size_t generation_;          // generational counter of all-gather ops
 
         std::vector<double> n_;                         // all-gathered values
         std::vector<hpx::naming::id_type> components_;  // components for allgather
