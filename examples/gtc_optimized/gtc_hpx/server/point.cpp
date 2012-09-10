@@ -494,9 +494,9 @@ namespace gtc { namespace server
 
     void point::toroidal_sndleft(double *csend,int* mgrid)
     {
-      std::cout << "toroidal_sndleft: " << item_ << " -> " << left_pe_
-                << " (g: " << sndleft_gate_.generation() << "), "
-                << in_toroidal_ << std::endl;
+//       std::cout << "toroidal_sndleft: " << item_ << " -> " << left_pe_
+//                 << " (g: " << sndleft_gate_.generation() << "), "
+//                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
         int vsize = *mgrid;
@@ -545,9 +545,9 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-        std::cout << "set_sendleft_data: " << item_ << " <- " << which
-                << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
-                << std::endl;
+//         std::cout << "set_sendleft_data: " << item_ << " <- " << which
+//                 << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
+//                 << std::endl;
 
         sndleft_gate_.synchronize(generation, "point::set_sendleft_data");
 
@@ -768,9 +768,9 @@ namespace gtc { namespace server
 
     void point::toroidal_sndright(double *csend,int* mgrid)
     {
-      std::cout << "toroidal_sndright: " << item_ << " -> " << right_pe_
-                << " (g: " << sndright_gate_.generation() << "), "
-                << in_toroidal_ << std::endl;
+//       std::cout << "toroidal_sndright: " << item_ << " -> " << right_pe_
+//                 << " (g: " << sndright_gate_.generation() << "), "
+//                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
         // create a new and-gate object
@@ -819,9 +819,9 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-        std::cout << "set_sendright_data: " << item_ << " <- " << which
-                << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
-                << std::endl;
+//         std::cout << "set_sendright_data: " << item_ << " <- " << which
+//                 << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
+//                 << std::endl;
 
         sndright_gate_.synchronize(generation, "point::set_sendright_data");
 
@@ -835,9 +835,9 @@ namespace gtc { namespace server
 
     void point::toroidal_gather(double *csend, int *tsize,int *tdst)
     {
-      std::cout << "toroidal_gather: " << item_
-                << " (g: " << gather_gate_.generation() << "), "
-                << in_toroidal_ << std::endl;
+//       std::cout << "toroidal_gather: " << item_
+//                 << " (g: " << gather_gate_.generation() << "), "
+//                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
         int vsize = *tsize;
@@ -891,9 +891,9 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-        std::cout << "set_toroidal_gather_data: " << item_ << " <- " << which
-                << " (g: " << gather_gate_.generation() << ", " << generation << ")"
-                << std::endl;
+//         std::cout << "set_toroidal_gather_data: " << item_ << " <- " << which
+//                 << " (g: " << gather_gate_.generation() << ", " << generation << ")"
+//                 << std::endl;
 
         gather_gate_.synchronize(generation, "point::set_toroidal_gather_data");
 
