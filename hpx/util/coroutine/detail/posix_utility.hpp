@@ -64,28 +64,23 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 #   endif
 #   pragma GCC diagnostic ignored "-Wold-style-cast"
 #   pragma GCC diagnostic ignored "-pedantic"
-#   pragma GCC diagnostic ignored "-Wpointer-arith"
 #endif
 
   inline
   void *
   alloc_stack(std::size_t size) {
     void * stack = ::mmap(NULL,
-                          size + EXEC_PAGESIZE,
+                          size,
                           PROT_EXEC|PROT_READ|PROT_WRITE,
                           MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
                           -1,
                           0
                           );
 
-    // Add a guard page.
-    ::mprotect(stack, EXEC_PAGESIZE, PROT_NONE);
-
-    if (stack == MAP_FAILED) {
+    if(stack == MAP_FAILED) {
       throw std::bad_alloc();
     }
-
-    return stack + (EXEC_PAGESIZE / sizeof(void*));
+    return stack;
   }
 
   inline
@@ -116,7 +111,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
   inline
   void free_stack(void* stack, std::size_t size) {
-    ::munmap(stack - (EXEC_PAGESIZE / sizeof(void*)), size + EXEC_PAGESIZE);
+    ::munmap(stack, size);
   }
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)

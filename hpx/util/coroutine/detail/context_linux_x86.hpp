@@ -49,6 +49,18 @@ extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace coroutines 
 {
+    namespace very_detail
+    {
+        template <typename TO, typename FROM> 
+        TO nasty_cast(FROM f)
+        {
+            union {
+                FROM f; TO t;
+            } u;
+            u.f = f;
+            return u.t;
+        }
+    }
 
   // some platforms need special preparation of the main thread
   struct prepare_main_thread
@@ -59,16 +71,6 @@ namespace hpx { namespace util { namespace coroutines
 
   namespace detail { namespace lx
   {
-    template <typename TO, typename FROM> 
-    TO nasty_cast(FROM f)
-    {
-      union {
-        FROM f; TO t;
-      } u;
-      u.f = f;
-      return u.t;
-    }
-
     template<typename T>
     void trampoline(T* fun);
 
@@ -178,7 +180,7 @@ namespace hpx { namespace util { namespace coroutines
 
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = nasty_cast<void*>( funp );// return addr (here: start addr)
+        *--m_sp = very_detail::nasty_cast<void*>( funp );// return addr (here: start addr)
         *--m_sp = 0;       // rbp
         *--m_sp = 0;       // rbx
         *--m_sp = 0;       // rsi
@@ -190,7 +192,7 @@ namespace hpx { namespace util { namespace coroutines
 #else
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = nasty_cast<void*>( funp );// return addr (here: start addr)
+        *--m_sp = very_detail::nasty_cast<void*>( funp );// return addr (here: start addr)
         *--m_sp = 0;       // ebp
         *--m_sp = 0;       // ebx
         *--m_sp = 0;       // esi
