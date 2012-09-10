@@ -24,11 +24,14 @@
 #endif
 
 #include <boost/format.hpp>
+#include <boost/foreach.hpp>
 
 #include <stdexcept>
+#include <algorithm>
 
 namespace hpx { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
     std::string backtrace()
     {
 #if defined(HPX_HAVE_STACKTRACES)
@@ -38,6 +41,49 @@ namespace hpx { namespace detail
 #endif
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    //  Figure out the size of the given environment
+    inline int get_arraylen(char** array)
+    {
+        int count = 0;
+        if (NULL != array) {
+            while(NULL != array[count])
+                ++count;   // simply count the environment strings
+        }
+        return count;
+    }
+
+    inline std::string get_execution_environment()
+    {
+        std::vector<std::string> env;
+
+#if defined(BOOST_WINDOWS)
+        int len = get_arraylen(_environ);
+        env.reserve(len);
+        std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__AIX__)
+        int len = get_arraylen(environ);
+        env.reserve(len);
+        std::copy(&environ[0], &environ[len], std::back_inserter(env));
+#elif defined(__APPLE__)
+        int len = get_arraylen(environ);
+        env.reserve(len);
+        std::copy(&environ[0], &environ[len], std::back_inserter(env));
+#else
+#error "Don't know, how to access the execution environment on this platform"
+#endif
+
+        std::sort(env.begin(), env.end());
+
+        std::string retval = boost::str(boost::format("%d entries:\n") % env.size());
+        BOOST_FOREACH(std::string const& s, env)
+        {
+            retval += "  " + s + "\n";
+        }
+        return retval;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
     inline boost::shared_ptr<boost::exception>
     make_exception_ptr(Exception const& e)
@@ -52,7 +98,8 @@ namespace hpx { namespace detail
         Exception const& e, std::string const& func,
         std::string const& file, long line, std::string const& back_trace,
         boost::uint32_t node, std::string const& hostname_, boost::int64_t pid_,
-        std::size_t shepherd, std::size_t thread_id, std::string const& thread_name)
+        std::size_t shepherd, std::size_t thread_id,
+        std::string const& thread_name, std::string const& env)
     {
         // create a boost::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
@@ -68,7 +115,8 @@ namespace hpx { namespace detail
                     << hpx::detail::throw_thread_name(thread_name)
                     << hpx::detail::throw_function(func)
                     << hpx::detail::throw_file(file)
-                    << hpx::detail::throw_line(static_cast<int>(line)));
+                    << hpx::detail::throw_line(static_cast<int>(line))
+                    << hpx::detail::throw_env(env));
         }
         catch (...) {
             return boost::current_exception();
@@ -112,8 +160,9 @@ namespace hpx { namespace detail
             thread_name = threads::get_thread_description(self->get_thread_id());
         }
 
+        std::string env(get_execution_environment());
         return construct_exception(e, func, file, line, back_trace, node,
-            hostname_, pid_, shepherd, thread_id, thread_name);
+            hostname_, pid_, shepherd, thread_id, thread_name, env);
     }
 
     template <typename Exception>
@@ -240,6 +289,11 @@ namespace hpx
             // FIXME: add indentation to stack frame information
             strm << "[stack-trace]: " << *back_trace << "\n";
         }
+
+        std::string const* env =
+            boost::get_error_info<hpx::detail::throw_env>(e);
+        if (env && !env->empty())
+            strm << "[env]: " << *env;
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.

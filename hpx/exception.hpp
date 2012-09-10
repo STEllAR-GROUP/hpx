@@ -672,6 +672,7 @@ namespace hpx
         struct tag_throw_file {};
         struct tag_throw_function {};
         struct tag_throw_stacktrace {};
+        struct tag_throw_env {};
 
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
@@ -732,6 +733,12 @@ namespace hpx
         typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
             throw_stacktrace;
 
+        // Stores the full execution environment of the locality the exception
+        // has been raised in. This information will show up in error messages
+        // under the [env] tag.
+        typedef boost::error_info<detail::tag_throw_env, std::string>
+            throw_env;
+
         // construct an exception, internal helper
         template <typename Exception>
         HPX_EXPORT boost::exception_ptr
@@ -740,7 +747,8 @@ namespace hpx
                 std::string const& back_trace, boost::uint32_t node = 0,
                 std::string const& hostname = "", boost::int64_t pid = -1,
                 std::size_t shepherd = ~0, std::size_t thread_id = 0,
-                std::string const& thread_name = "");
+                std::string const& thread_name = "",
+                std::string const& env = "");
 
         // main function for throwing exceptions
         template <typename Exception>
