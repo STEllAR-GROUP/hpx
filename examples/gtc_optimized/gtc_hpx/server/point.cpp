@@ -446,14 +446,15 @@ namespace gtc { namespace server
     void point::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
     {
       if ( in_particle_ ) {
+        int vsize = (*mgrid)*(*mzetap1);
+        dnireceive_.resize(vsize);
+
         // synchronize with all operations to finish
         hpx::future<void> f = allreduce_gate_.get_future(partd_comm_.size());
         std::size_t generation = allreduce_gate_.generation();
 
-        int vsize = (*mgrid)*(*mzetap1);
         std::vector<double> dnisend;
         dnisend.resize(vsize);
-        dnireceive_.resize(vsize);
         std::fill( dnireceive_.begin(),dnireceive_.end(),0.0);
 
         for (std::size_t i=0;i<dnisend.size();i++) {
@@ -498,6 +499,9 @@ namespace gtc { namespace server
                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
+        int vsize = *mgrid;
+        sendleft_receive_.resize(vsize);
+
         // create a new and-gate object
         sndleft_future_ = sndleft_gate_.get_future(1);
         std::size_t generation = sndleft_gate_.generation();
@@ -505,10 +509,8 @@ namespace gtc { namespace server
         // Send data to the left
         // The sender: send data to the left
         // in a fire and forget fashion
-        int vsize = *mgrid;
         std::vector<double> send;
         send.resize(vsize);
-        sendleft_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
@@ -560,14 +562,15 @@ namespace gtc { namespace server
     void point::toroidal_allreduce(double *input,double *output, int* size)
     {
       if ( in_toroidal_ ) {
+        int vsize = *size;
+        treceive_.resize(vsize);
+
         // synchronize with all operations to finish
         hpx::future<void> f = allreduce_gate_.get_future(toroidal_comm_.size());
         std::size_t generation = allreduce_gate_.generation();
 
-        int vsize = *size;
         std::vector<double> send;
         send.resize(vsize);
-        treceive_.resize(vsize);
         std::fill( treceive_.begin(),treceive_.end(),0.0);
 
         for (std::size_t i=0;i<send.size();i++) {
@@ -771,16 +774,17 @@ namespace gtc { namespace server
 
       if ( in_toroidal_ ) {
         // create a new and-gate object
+        int vsize = *mgrid;
+        sendright_receive_.resize(vsize);
+
         sndright_future_ = sndright_gate_.get_future(1);
         std::size_t generation = sndright_gate_.generation();
 
         // Send data to the right
         // The sender: send data to the left
         // in a fire and forget fashion
-        int vsize = *mgrid;
         std::vector<double> send;
         send.resize(vsize);
-        sendright_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
@@ -836,9 +840,12 @@ namespace gtc { namespace server
                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
+        int vsize = *tsize;
+
         // create a new and-gate object
         std::size_t generation = 0;
         if ( *tdst == item_ ) {
+          toroidal_gather_receive_.resize(toroidal_comm_.size()*vsize);
           gather_future_ = gather_gate_.get_future(toroidal_comm_.size());
           generation = gather_gate_.generation();
         }
@@ -849,11 +856,9 @@ namespace gtc { namespace server
         // Send data to dst
         // The sender: send data to the left
         // in a fire and forget fashion
-        int vsize = *tsize;
         int dst = *tdst;
         std::vector<double> send;
         send.resize(vsize);
-        toroidal_gather_receive_.resize(toroidal_comm_.size()*vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
@@ -906,16 +911,17 @@ namespace gtc { namespace server
       int src = *tsrc;
       if ( src == item_ ) {
         // create a new and-gate object
+        int vsize = *tsize;
+        toroidal_scatter_receive_.resize(vsize);
+
         scatter_future_ = scatter_gate_.get_future(1);
         std::size_t generation = scatter_gate_.generation();
 
         // Send data to everyone in toroidal
         // The sender: send data to the left
         // in a fire and forget fashion
-        int vsize = *tsize;
         std::vector<double> send;
         send.resize(vsize);
-        toroidal_scatter_receive_.resize(vsize);
 
         for (std::size_t step=0;step<toroidal_comm_.size();step++) {
           for (std::size_t i=0;i<send.size();i++) {
@@ -965,13 +971,14 @@ namespace gtc { namespace server
     void point::comm_allreduce(double *in,double *out, int* msize)
     {
         // synchronize with all operations to finish
+        int vsize = *msize;
+        comm_allreduce_receive_.resize(vsize);
+
         hpx::future<void> f = allreduce_gate_.get_future(components_.size());
         std::size_t generation = allreduce_gate_.generation();
 
-        int vsize = *msize;
         std::vector<double> send;
         send.resize(vsize);
-        comm_allreduce_receive_.resize(vsize);
         std::fill( comm_allreduce_receive_.begin(),comm_allreduce_receive_.end(),0.0);
 
         for (std::size_t i=0;i<send.size();i++) {
@@ -1009,13 +1016,14 @@ namespace gtc { namespace server
     void point::int_comm_allreduce(int *in,int *out, int* msize)
     {
         // synchronize with all operations to finish
+        int vsize = *msize;
+        int_comm_allreduce_receive_.resize(vsize);
+
         hpx::future<void> f = allreduce_gate_.get_future(components_.size());
         std::size_t generation = allreduce_gate_.generation();
 
-        int vsize = *msize;
         std::vector<int> send;
         send.resize(vsize);
-        int_comm_allreduce_receive_.resize(vsize);
         std::fill( int_comm_allreduce_receive_.begin(),int_comm_allreduce_receive_.end(),0);
 
         for (std::size_t i=0;i<send.size();i++) {
@@ -1053,6 +1061,9 @@ namespace gtc { namespace server
     void point::int_toroidal_sndright(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
+        int vsize = *mgrid;
+        int_sendright_receive_.resize(vsize);
+
         // create a new and-gate object
         sndright_future_ = sndright_gate_.get_future(1);
         std::size_t generation = sndright_gate_.generation();
@@ -1060,10 +1071,8 @@ namespace gtc { namespace server
         // Send data to the right
         // The sender: send data to the left
         // in a fire and forget fashion
-        int vsize = *mgrid;
         std::vector<int> send;
         send.resize(vsize);
-        int_sendright_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
@@ -1107,6 +1116,9 @@ namespace gtc { namespace server
     void point::int_toroidal_sndleft(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
+        int vsize = *mgrid;
+        int_sendleft_receive_.resize(vsize);
+
         // create a new and-gate object
         sndleft_future_ = sndleft_gate_.get_future(1);
         std::size_t generation = sndleft_gate_.generation();
@@ -1114,10 +1126,8 @@ namespace gtc { namespace server
         // Send data to the left
         // The sender: send data to the left
         // in a fire and forget fashion
-        int vsize = *mgrid;
         std::vector<int> send;
         send.resize(vsize);
-        int_sendleft_receive_.resize(vsize);
 
         for (std::size_t i=0;i<send.size();i++) {
           send[i] = csend[i];
