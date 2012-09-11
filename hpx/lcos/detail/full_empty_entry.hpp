@@ -397,7 +397,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // set the data
-            data_ = boost::forward<Data>(src);
+            data_ = boost::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full
