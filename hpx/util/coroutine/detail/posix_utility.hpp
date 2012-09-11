@@ -58,34 +58,26 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#   if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#       pragma GCC diagnostic push
-#   endif
-#   pragma GCC diagnostic ignored "-Wold-style-cast"
-#   pragma GCC diagnostic ignored "-pedantic"
-#   pragma GCC diagnostic ignored "-Wpointer-arith"
-#endif
-
   inline
-  void *
+  void*
   alloc_stack(std::size_t size) {
-    void * stack = ::mmap(NULL,
-                          size + EXEC_PAGESIZE,
-                          PROT_EXEC|PROT_READ|PROT_WRITE,
-                          MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
-                          -1,
-                          0
-                          );
+    void* real_stack = ::mmap(NULL,
+                              size + EXEC_PAGESIZE,
+                              PROT_EXEC|PROT_READ|PROT_WRITE,
+                              MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
+                              -1,
+                              0
+                              );
 
-    // Add a guard page.
-    ::mprotect(stack, EXEC_PAGESIZE, PROT_NONE);
-
-    if (stack == MAP_FAILED) {
+    if (real_stack == MAP_FAILED) {
       throw std::bad_alloc();
     }
 
-    return stack + (EXEC_PAGESIZE / sizeof(void*));
+    // Add a guard page.
+    ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
+
+    void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE / sizeof(void*));
+    return static_cast<void*>(stack);
   }
 
   inline
@@ -116,14 +108,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
   inline
   void free_stack(void* stack, std::size_t size) {
-    ::munmap(stack - (EXEC_PAGESIZE / sizeof(void*)), size + EXEC_PAGESIZE);
+    void** real_stack = static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
+    ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
   }
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 #else  // non-mmap()
 
   //this should be a fine default.
