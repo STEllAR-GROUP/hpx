@@ -128,7 +128,15 @@ namespace hpx { namespace lcos { namespace local
         ~promise()
         {
             if (task_)
+            {
+                if (task_->is_ready() && !future_obtained_)
+                {
+                    task_->set_error(broken_promise,
+                        "promise<Result>::operator=()",
+                        "deleting owner before future has been retrieved");
+                }
                 task_->deleting_owner();
+            }
         }
 
         // Assignment
@@ -251,7 +259,15 @@ namespace hpx { namespace lcos { namespace local
         ~promise()
         {
             if (task_)
+            {
+                if (task_->is_ready() && !future_obtained_)
+                {
+                    task_->set_error(broken_promise,
+                        "promise<Result>::operator=()",
+                        "deleting owner before future has been retrieved");
+                }
                 task_->deleting_owner();
+            }
         }
 
         // Assignment
@@ -388,7 +404,15 @@ namespace hpx { namespace lcos { namespace local
         ~packaged_task()
         {
             if (task_)
+            {
+                if (task_->is_ready() && !future_obtained_)
+                {
+                    task_->set_error(broken_promise,
+                        "packaged_task<Result()>::operator=()",
+                        "deleting owner before future has been retrieved");
+                }
                 task_->deleting_owner();
+            }
         }
 
         packaged_task(BOOST_RV_REF(packaged_task) rhs)
