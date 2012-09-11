@@ -315,8 +315,8 @@ namespace hpx { namespace lcos { namespace detail
                             boost::forward<T>(result))));
 
                         // invoke the callback (continuation) function
-                        on_completed_(f);
                         set_on_completed_ = false;
+                        on_completed_(f);
                         on_completed_.reset();
                         return;
                     }
@@ -344,8 +344,8 @@ namespace hpx { namespace lcos { namespace detail
                     data_.set(e);
 
                     // invoke the callback (continuation) function
-                    on_completed_(f);
                     set_on_completed_ = false;
+                    on_completed_(f);
                     on_completed_.reset();
                     return;
                 }
