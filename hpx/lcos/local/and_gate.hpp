@@ -69,7 +69,8 @@ namespace hpx { namespace lcos { namespace local
 //         }
 
         /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(std::size_t count, error_code& ec = hpx::throws)
+        future<void> get_future(std::size_t count, 
+            std::size_t* generation = 0, error_code& ec = hpx::throws)
         {
             mutex_type::scoped_lock l(mtx_);
             init_locked(count, ec);
@@ -79,7 +80,9 @@ namespace hpx { namespace lcos { namespace local
 
 //                 condition_.set(ec);   // re-check/trigger condition, if needed
 //                 if (!ec)
-                    return promise_.get_future(ec);
+                if (generation)
+                    *generation = generation_;
+                return promise_.get_future(ec);
             }
             return hpx::future<void>();
         }
