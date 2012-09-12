@@ -16,7 +16,7 @@
 
 namespace hpx { namespace lcos { namespace local
 {
-    struct no_mutex 
+    struct no_mutex
     {
         typedef boost::unique_lock<no_mutex> scoped_lock;
         typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
-                mutex_type::scoped_lock l(rhs.mtx_);
+                typename mutex_type::scoped_lock l(rhs.mtx_);
                 received_segments_ = boost::move(rhs.received_segments_);
                 promise_ = boost::move(rhs.promise_);
                 generation_ = rhs.generation_;
@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace local
 //         /// \brief re-initialize the gate with a different number of inputs
 //         std::size_t init(std::size_t count, error_code& ec = hpx::throws)
 //         {
-//             mutex_type::scoped_lock l(this->mtx_);
+//             typename mutex_type::scoped_lock l(this->mtx_);
 //             init_locked(count, ec);
 //             if (ec)
 //                 return std::size_t(-1);
@@ -80,10 +80,10 @@ namespace hpx { namespace lcos { namespace local
 //         }
 
         /// \brief get a future allowing to wait for the gate to fire
-        future<void> get_future(std::size_t count, 
+        future<void> get_future(std::size_t count,
             std::size_t* generation = 0, error_code& ec = hpx::throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             init_locked(count, ec);
             if (!ec) {
                 BOOST_ASSERT(generation_ != std::size_t(-1));
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Set the data which has to go into the segment \a which.
         bool set(std::size_t which, error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             if (which >= received_segments_.size())
             {
                 // out of bounds index
@@ -145,11 +145,11 @@ namespace hpx { namespace lcos { namespace local
     public:
         /// \brief Wait for the generational counter to reach the requested
         ///        stage.
-        void synchronize(std::size_t generation, 
+        void synchronize(std::size_t generation,
             char const* function_name = "and_gate::synchronize",
             error_code& ec= throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             synchronize(generation, l, function_name, ec);
         }
 
@@ -187,7 +187,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t next_generation()
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -198,7 +198,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             return generation_;
         }
 
