@@ -38,10 +38,10 @@ namespace hpx
     }
 
     error_code throws;        // "throw on error" special error_code;
-                              //  note that it doesn't matter if this
-                              //  isn't initialized before use since
-                              //  the only use is to take its
-                              //  address for comparison purposes
+                              //
+                              // Note that it doesn't matter if this isn't 
+                              // initialized before use since the only use is 
+                              // to take its address for comparison purposes.
 
     exception_list::exception_list()
     {}

@@ -366,7 +366,7 @@ namespace hpx { namespace components { namespace server
             // we don't know anything about this component
             hpx::util::osstream strm;
 
-            error_code ec;
+            error_code ec(lightweight);
             strm << "attempt to destroy component " << gid
                  << " of invalid/unknown type: "
                  << components::get_component_type_name(type) << " ("
@@ -702,7 +702,7 @@ namespace hpx { namespace components { namespace server
             naming::resolver_client& agas_client =
                 get_runtime().get_agas_client();
 
-            error_code ec;
+            error_code ec(lightweight);
             agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
             agas_client.unbind(appl.get_memory_raw_gid(), ec);
 

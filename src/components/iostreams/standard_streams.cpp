@@ -82,7 +82,7 @@ namespace hpx { namespace iostreams
                 // FIXME: Use an error code here?
                 if (!agas::resolve_name(cout_name, gid))
                 {
-                    error_code ec;
+                    error_code ec(lightweight);
                     naming::id_type console = agas::get_console_locality(ec);
                     if (HPX_UNLIKELY(ec || !console))
                     {

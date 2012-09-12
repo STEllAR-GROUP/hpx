@@ -49,7 +49,7 @@ void handle_interruption_using_error_code()
     hpx::thread t(hpx::util::bind(interrupt_do_it, ca));
 
     // start some lengthy action, to be interrupted
-    hpx::error_code ec;
+    hpx::error_code ec(lightweight);
     ca.do_it(ec);
 
     // we should get an error reporting hpx::thread_interrupted

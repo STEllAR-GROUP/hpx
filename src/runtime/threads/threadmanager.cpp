@@ -329,7 +329,7 @@ namespace hpx { namespace threads
         }
 
         // just retry, set_state will create new thread if target is still active
-        error_code ec;      // do not throw
+        error_code ec(lightweight);      // do not throw
         set_state(id, newstate, newstate_ex, priority, ec);
         return terminated;
     }
@@ -724,7 +724,7 @@ namespace hpx { namespace threads
         }
 
         // then re-activate the thread holding the deadline_timer
-        error_code ec;    // do not throw
+        error_code ec(lightweight);    // do not throw
         set_state(timer_id, pending, wait_timeout, thread_priority_normal, ec);
         return terminated;
     }
@@ -1437,7 +1437,7 @@ namespace hpx { namespace threads
         LTM_(info) << "tfunc(" << num_thread
                    << "): will run on processing unit: " << pu_num;
 
-        error_code ec;
+        error_code ec(lightweight);
         topology_.set_thread_affinity(pu_num, scheduler_.numa_sensitive(), ec);
 
         if (ec)
@@ -1622,7 +1622,7 @@ namespace hpx { namespace threads
                     &threadmanager_impl::tfunc, this, thread_num)));
 
                 // set the new threads affinity (on Windows systems)
-                error_code ec;
+                error_code ec(lightweight);
                 topology_.set_thread_affinity(threads_.back(), pu_num,
                     scheduler_.numa_sensitive(), ec);
 

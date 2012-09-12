@@ -129,7 +129,7 @@ namespace hpx { namespace lcos { namespace local
                                 << "(" << id << "): " << threads::get_thread_description(id);
 
                         // forcefully abort thread, do not throw
-                        error_code ec;
+                        error_code ec(lightweight);
                         threads::set_thread_state(id, threads::pending,
                             threads::wait_abort, threads::thread_priority_normal, ec);
                         if (ec)

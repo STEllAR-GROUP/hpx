@@ -507,7 +507,7 @@ namespace hpx { namespace actions
     private:
         static boost::uint32_t get_locality_id()
         {
-            error_code ec;      // ignore any errors
+            error_code ec(lightweight);      // ignore any errors
             return hpx::get_locality_id(ec);
         }
 

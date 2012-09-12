@@ -290,7 +290,7 @@ struct request
         naming::locality l;
 
         // Don't let the first attempt throw.
-        error_code first_try;
+        error_code first_try(lightweight);
         l = get_data<subtype_locality_count, 0>(first_try);
 
         // If the first try failed, check again.
