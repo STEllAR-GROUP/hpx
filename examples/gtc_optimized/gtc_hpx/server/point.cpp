@@ -451,7 +451,7 @@ namespace gtc { namespace server
 
         // synchronize with all operations to finish
         std::size_t generation = 0;
-        hpx::future<void> f = allreduce_gate_.get_future(partd_comm_.size(), 
+        hpx::future<void> f = allreduce_gate_.get_future(partd_comm_.size(),
             &generation);
 
         std::vector<double> dnisend;
@@ -500,27 +500,32 @@ namespace gtc { namespace server
 //                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
-        int vsize = *mgrid;
-        sendleft_receive_.resize(vsize);
-
         // create a new and-gate object
         std::size_t generation = 0;
-        sndleft_future_ = sndleft_gate_.get_future(1, &generation);
-
-        // Send data to the left
-        // The sender: send data to the left
-        // in a fire and forget fashion
         std::vector<double> send;
-        send.resize(vsize);
 
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            int vsize = *mgrid;
+            sendleft_receive_.resize(vsize);
+            sndleft_future_ = sndleft_gate_.get_future(1, &generation);
+
+            // Send data to the left
+            // The sender: send data to the left
+            // in a fire and forget fashion
+            send.resize(vsize);
+
+            for (std::size_t i=0;i<send.size();i++) {
+              send[i] = csend[i];
+            }
         }
 
         set_sendleft_data_action set_sendleft_data_;
         hpx::apply(set_sendleft_data_, toroidal_comm_[left_pe_], item_,
             generation, send);
       } else {
+        mutex_type::scoped_lock l(mtx_);
         sndleft_gate_.next_generation();
       }
     }
@@ -529,14 +534,19 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        sndleft_future_.get();
-
         mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = sndleft_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
         for (std::size_t i=0;i<sendleft_receive_.size();i++) {
           creceive[i] = sendleft_receive_[i];
         }
-//         std::cout << "toroidal_rcvright: " << item_ 
-//                   << " (g: " << sndleft_gate_.generation() << ")" 
+//         std::cout << "toroidal_rcvright: " << item_
+//                   << " (g: " << sndleft_gate_.generation() << ")"
 //                   << std::endl;
       }
     }
@@ -549,13 +559,9 @@ namespace gtc { namespace server
                 << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
                 << std::endl;
 
-        sndleft_gate_.synchronize(generation, "point::set_sendleft_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            sendleft_receive_ = send;
-        }
-
+        mutex_type::scoped_lock l(mtx_);
+        sndleft_gate_.synchronize(generation, l, "point::set_sendleft_data");
+        sendleft_receive_ = send;
         sndleft_gate_.set(0);         // trigger corresponding and-gate input
     }
 
@@ -774,27 +780,31 @@ namespace gtc { namespace server
 //                 << in_toroidal_ << std::endl;
 
       if ( in_toroidal_ ) {
-        // create a new and-gate object
-        int vsize = *mgrid;
-        sendright_receive_.resize(vsize);
-
         std::size_t generation = 0;
-        sndright_future_ = sndright_gate_.get_future(1, &generation);
-
-        // Send data to the right
-        // The sender: send data to the left
-        // in a fire and forget fashion
         std::vector<double> send;
-        send.resize(vsize);
 
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            int vsize = *mgrid;
+            sendright_receive_.resize(vsize);
+            sndright_future_ = sndright_gate_.get_future(1, &generation);
+
+            // Send data to the right
+            // The sender: send data to the left
+            // in a fire and forget fashion
+            send.resize(vsize);
+
+            for (std::size_t i=0;i<send.size();i++) {
+              send[i] = csend[i];
+            }
         }
 
         set_sendright_data_action set_sendright_data_;
         hpx::apply(set_sendright_data_,
              toroidal_comm_[right_pe_], item_, generation, send);
       } else {
+        mutex_type::scoped_lock l(mtx_);
         sndright_gate_.next_generation();
       }
     }
@@ -807,13 +817,18 @@ namespace gtc { namespace server
 
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        sndright_future_.get();
-
         mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = sndright_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
         for (std::size_t i=0;i<sendright_receive_.size();i++) {
           creceive[i] = sendright_receive_[i];
         }
-//         std::cout << "toroidal_rcvleft: " << item_ 
+//         std::cout << "toroidal_rcvleft: " << item_
 //                   << " (g: " << sndright_gate_.generation() << ")"
 //                   << std::endl;
       }
@@ -823,17 +838,14 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
+        mutex_type::scoped_lock l(mtx_);
+
         std::cout << "set_sendright_data: " << item_ << " <- " << which
                 << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
                 << std::endl;
 
-        sndright_gate_.synchronize(generation, "point::set_sendright_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            sendright_receive_ = send;
-        }
-
+        sndright_gate_.synchronize(generation, l, "point::set_sendright_data");
+        sendright_receive_ = send;
         sndright_gate_.set(0);         // trigger corresponding and-gate input
     }
 
@@ -850,7 +862,7 @@ namespace gtc { namespace server
         std::size_t generation = 0;
         if ( *tdst == item_ ) {
           toroidal_gather_receive_.resize(toroidal_comm_.size()*vsize);
-          gather_future_ = gather_gate_.get_future(toroidal_comm_.size(), 
+          gather_future_ = gather_gate_.get_future(toroidal_comm_.size(),
               &generation);
         }
         else {
@@ -979,7 +991,7 @@ namespace gtc { namespace server
         comm_allreduce_receive_.resize(vsize);
 
         std::size_t generation = 0;
-        hpx::future<void> f = allreduce_gate_.get_future(components_.size(), 
+        hpx::future<void> f = allreduce_gate_.get_future(components_.size(),
             &generation);
 
         std::vector<double> send;
@@ -1025,7 +1037,7 @@ namespace gtc { namespace server
         int_comm_allreduce_receive_.resize(vsize);
 
         std::size_t generation = 0;
-        hpx::future<void> f = allreduce_gate_.get_future(components_.size(), 
+        hpx::future<void> f = allreduce_gate_.get_future(components_.size(),
             &generation);
 
         std::vector<int> send;
@@ -1067,27 +1079,32 @@ namespace gtc { namespace server
     void point::int_toroidal_sndright(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
-        int vsize = *mgrid;
-        int_sendright_receive_.resize(vsize);
 
-        // create a new and-gate object
         std::size_t generation = 0;
-        sndright_future_ = sndright_gate_.get_future(1, &generation);
-
-        // Send data to the right
-        // The sender: send data to the left
-        // in a fire and forget fashion
         std::vector<int> send;
-        send.resize(vsize);
 
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            int vsize = *mgrid;
+            int_sendright_receive_.resize(vsize);
+            sndright_future_ = sndright_gate_.get_future(1, &generation);
+
+            // Send data to the right
+            // The sender: send data to the left
+            // in a fire and forget fashion
+            send.resize(vsize);
+
+            for (std::size_t i=0;i<send.size();i++) {
+              send[i] = csend[i];
+            }
         }
 
         set_int_sendright_data_action set_int_sendright_data_;
         hpx::apply(set_int_sendright_data_,
              toroidal_comm_[right_pe_], item_, generation, send);
       } else {
+        mutex_type::scoped_lock l(mtx_);
         sndright_gate_.next_generation();
       }
     }
@@ -1096,9 +1113,14 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        sndright_future_.get();
-
         mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = sndright_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
         for (std::size_t i=0;i<int_sendright_receive_.size();i++) {
           creceive[i] = int_sendright_receive_[i];
         }
@@ -1109,39 +1131,41 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<int> const& send)
     {
-        sndright_gate_.synchronize(generation, "point::set_int_sendright_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            int_sendright_receive_ = send;
-        }
-
+        mutex_type::scoped_lock l(mtx_);
+        sndright_gate_.synchronize(generation, l, "point::set_int_sendright_data");
+        int_sendright_receive_ = send;
         sndright_gate_.set(0);         // trigger corresponding and-gate input
     }
 
     void point::int_toroidal_sndleft(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
-        int vsize = *mgrid;
-        int_sendleft_receive_.resize(vsize);
-
-        // create a new and-gate object
         std::size_t generation = 0;
-        sndleft_future_ = sndleft_gate_.get_future(1, &generation);
-
-        // Send data to the left
-        // The sender: send data to the left
-        // in a fire and forget fashion
         std::vector<int> send;
-        send.resize(vsize);
 
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            int vsize = *mgrid;
+            int_sendleft_receive_.resize(vsize);
+
+            // create a new and-gate object
+            sndleft_future_ = sndleft_gate_.get_future(1, &generation);
+
+            // Send data to the left
+            // The sender: send data to the left
+            // in a fire and forget fashion
+            send.resize(vsize);
+
+            for (std::size_t i=0;i<send.size();i++) {
+              send[i] = csend[i];
+            }
         }
 
         set_int_sendleft_data_action set_int_sendleft_data_;
         hpx::apply(set_int_sendleft_data_, toroidal_comm_[left_pe_], item_, generation, send);
       } else {
+        mutex_type::scoped_lock l(mtx_);
         sndleft_gate_.next_generation();
       }
     }
@@ -1150,9 +1174,14 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
-        sndleft_future_.get();
-
         mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = sndleft_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
         for (std::size_t i=0;i<int_sendleft_receive_.size();i++) {
           creceive[i] = int_sendleft_receive_[i];
         }
@@ -1163,13 +1192,9 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<int> const& send)
     {
-        sndleft_gate_.synchronize(generation, "point::set_int_sendleft_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            int_sendleft_receive_ = send;
-        }
-
+        mutex_type::scoped_lock l(mtx_);
+        sndleft_gate_.synchronize(generation, l, "point::set_int_sendleft_data");
+        int_sendleft_receive_ = send;
         sndleft_gate_.set(0);         // trigger corresponding and-gate input
     }
 

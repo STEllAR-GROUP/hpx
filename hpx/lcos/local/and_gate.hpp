@@ -16,11 +16,21 @@
 
 namespace hpx { namespace lcos { namespace local
 {
+    struct no_mutex 
+    {
+        typedef boost::unique_lock<no_mutex> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
+
+        void lock() {}
+        void unlock() {}
+    };
+
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Mutex = lcos::local::spinlock>
     struct and_gate
     {
     protected:
-        typedef lcos::local::spinlock mutex_type;
+        typedef Mutex mutex_type;
 
     private:
         BOOST_MOVABLE_BUT_NOT_COPYABLE(and_gate)
@@ -47,6 +57,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
+                mutex_type::scoped_lock l(rhs.mtx_);
                 received_segments_ = boost::move(rhs.received_segments_);
                 promise_ = boost::move(rhs.promise_);
                 generation_ = rhs.generation_;
@@ -134,12 +145,19 @@ namespace hpx { namespace lcos { namespace local
     public:
         /// \brief Wait for the generational counter to reach the requested
         ///        stage.
-        void synchronize(std::size_t generation,
+        void synchronize(std::size_t generation, 
             char const* function_name = "and_gate::synchronize",
             error_code& ec= throws)
         {
             mutex_type::scoped_lock l(mtx_);
+            synchronize(generation, l, function_name, ec);
+        }
 
+        template <typename Lock>
+        void synchronize(std::size_t generation, Lock& l,
+            char const* function_name = "and_gate::synchronize",
+            error_code& ec= throws)
+        {
             if (generation < generation_)
             {
                 HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
@@ -159,7 +177,7 @@ namespace hpx { namespace lcos { namespace local
 
             while (generation > generation_)
             {
-                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                hpx::util::unlock_the_lock<Lock> ul(l);
                 hpx::this_thread::suspend(hpx::threads::pending, function_name);
             }
 
