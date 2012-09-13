@@ -718,7 +718,10 @@ namespace hpx
                     return -1;
 
                 // re-initialize runtime configuration object
-                rtcfg.reconfigure(prevm["hpx:config"].as<std::string>());
+                if (prevm.count("hpx:config"))
+                    rtcfg.reconfigure(prevm["hpx:config"].as<std::string>());
+                else
+                    rtcfg.reconfigure("");
 
                 // Make sure any aliases defined on the command line get used
                 // for the option analysis below.
