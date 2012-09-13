@@ -412,25 +412,6 @@ if(HPX_NATIVE_TLS)
 endif()
 
 ################################################################################
-# pxthread stack size
-################################################################################
-if(NOT HPX_STACK_SIZE)
-  if(MSVC)
-    set(HPX_STACK_SIZE "0x4000" CACHE STRING "HPX-thread stack size" FORCE)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
-     "CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
-  else()
-    set(HPX_STACK_SIZE "0x8000" CACHE STRING "HPX-thread stack size" FORCE)
-  endif()
-else()
-  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
-endif()
-mark_as_advanced(FORCE HPX_STACK_SIZE)
-
-add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
-
-################################################################################
 # Disable the use of partially preprocessed header files
 ################################################################################
 hpx_option(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
