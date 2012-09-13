@@ -178,7 +178,7 @@ namespace hpx { namespace lcos { namespace local
             while (generation > generation_)
             {
                 hpx::util::unlock_the_lock<Lock> ul(l);
-                hpx::this_thread::suspend(hpx::threads::pending, function_name);
+                hpx::this_thread::suspend(1, function_name);
             }
 
             if (&ec != &throws)
