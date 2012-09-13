@@ -88,24 +88,29 @@ HPX_ACTION_USES_LARGE_STACK(test_large_stacksize_action)
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    {
-        test_default_stacksize_action test_action;
-        test_action(hpx::find_here());
-    }
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
+    BOOST_FOREACH(hpx::id_type id, localities)
     {
-        test_small_stacksize_action test_action;
-        test_action(hpx::find_here());
-    }
-
-    {
-        test_medium_stacksize_action test_action;
-        test_action(hpx::find_here());
-    }
-
-    {
-        test_large_stacksize_action test_action;
-        test_action(hpx::find_here());
+        {
+            test_default_stacksize_action test_action;
+            test_action(id);
+        }
+    
+        {
+            test_small_stacksize_action test_action;
+            test_action(id);
+        }
+    
+        {
+            test_medium_stacksize_action test_action;
+            test_action(id);
+        }
+    
+        {
+            test_large_stacksize_action test_action;
+            test_action(id);
+        }
     }
 
     return hpx::util::report_errors();
