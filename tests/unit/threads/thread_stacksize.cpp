@@ -12,7 +12,7 @@
 #if defined(HPX_DEBUG)
     enum { management_space = 0x1600 };
 #else
-    enum { management_space = management_space };
+    enum { management_space = 0x800 };
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
