@@ -555,9 +555,9 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
-        std::cout << "set_sendleft_data: " << item_ << " <- " << which
-                << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
-                << std::endl;
+//         std::cout << "set_sendleft_data: " << item_ << " <- " << which
+//                 << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
+//                 << std::endl;
 
         mutex_type::scoped_lock l(mtx_);
         sndleft_gate_.synchronize(generation, l, "point::set_sendleft_data");
@@ -840,9 +840,9 @@ namespace gtc { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        std::cout << "set_sendright_data: " << item_ << " <- " << which
-                << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
-                << std::endl;
+//         std::cout << "set_sendright_data: " << item_ << " <- " << which
+//                 << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
+//                 << std::endl;
 
         sndright_gate_.synchronize(generation, l, "point::set_sendright_data");
         sendright_receive_ = send;
