@@ -10,9 +10,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#include "gtc_hpx/server/point.hpp"
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
+
+#include "gtc_hpx/server/partition.hpp"
 
 extern "C" {void FNAME(gtc_wrapper)(); }
 
@@ -50,7 +50,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Get the component type for our point component.
         hpx::components::component_type block_type =
-        hpx::components::get_component_type<gtc::server::point>();
+        hpx::components::get_component_type<gtc::server::partition>();
 
         hpx::components::distributing_factory factory;
         factory.create(hpx::find_here());
@@ -69,7 +69,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<std::size_t> vmstep;
         {
           std::vector<hpx::lcos::future<std::size_t> > setup_phase;
-          gtc::server::point::setup_action setup;
+          gtc::server::partition::setup_action setup;
           for (std::size_t i=0;i<num_partitions;i++) {
             setup_phase.push_back(hpx::async(setup,components[i],num_partitions,i,components));
           }
@@ -80,7 +80,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         {
           std::vector<hpx::lcos::future<void> > chargei_phase;
-          gtc::server::point::chargei_action chargei;
+          gtc::server::partition::chargei_action chargei;
           for (std::size_t i=0;i<num_partitions;i++) {
             chargei_phase.push_back(hpx::async(chargei,components[i]));
           }
@@ -97,7 +97,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         istep = 0; irk = 0;
         {
           std::vector<hpx::lcos::future<void> > timeloop_phase;
-          gtc::server::point::timeloop_action timeloop;
+          gtc::server::partition::timeloop_action timeloop;
           for (std::size_t i=0;i<num_partitions;i++) {
             timeloop_phase.push_back(hpx::async(timeloop,components[i],istep,irk));
           }

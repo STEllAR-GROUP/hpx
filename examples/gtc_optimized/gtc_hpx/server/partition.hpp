@@ -22,11 +22,11 @@
 namespace gtc { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_COMPONENT_EXPORT point
-      : public hpx::components::managed_component_base<point>
+    class HPX_COMPONENT_EXPORT partition
+      : public hpx::components::managed_component_base<partition>
     {
     public:
-        point()
+        partition()
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -97,20 +97,20 @@ namespace gtc { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(point, setup_wrapper, setup_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, timeloop, timeloop_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, chargei_wrapper, chargei_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_data, set_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_tdata, set_tdata_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_params, set_params_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_sendleft_data, set_sendleft_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_sendright_data, set_sendright_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_toroidal_gather_data, set_toroidal_gather_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_toroidal_scatter_data, set_toroidal_scatter_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_comm_allreduce_data, set_comm_allreduce_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_int_comm_allreduce_data, set_int_comm_allreduce_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_int_sendright_data, set_int_sendright_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(point, set_int_sendleft_data, set_int_sendleft_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, setup_wrapper, setup_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, timeloop, timeloop_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, chargei_wrapper, chargei_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_data, set_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_tdata, set_tdata_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_params, set_params_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_sendleft_data, set_sendleft_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_sendright_data, set_sendright_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_gather_data, set_toroidal_gather_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_scatter_data, set_toroidal_scatter_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_comm_allreduce_data, set_comm_allreduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_comm_allreduce_data, set_int_comm_allreduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sendright_data, set_int_sendright_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sendleft_data, set_int_sendleft_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -149,63 +149,63 @@ namespace gtc { namespace server
 
 // Declaration of serialization support for the actions
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::setup_action,
+    gtc::server::partition::setup_action,
     gtc_point_setup_action);
 
 // ensure sufficient stack space for chargei_action
-HPX_ACTION_USES_LARGE_STACK(gtc::server::point::timeloop_action);
+HPX_ACTION_USES_LARGE_STACK(gtc::server::partition::timeloop_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::timeloop_action,
+    gtc::server::partition::timeloop_action,
     gtc_point_timeloop_action);
 
 // ensure sufficient stack space for timeloop_action
-HPX_ACTION_USES_LARGE_STACK(gtc::server::point::chargei_action);
+HPX_ACTION_USES_LARGE_STACK(gtc::server::partition::chargei_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::chargei_action,
+    gtc::server::partition::chargei_action,
     gtc_point_chargei_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_data_action,
+    gtc::server::partition::set_data_action,
     gtc_point_set_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_tdata_action,
+    gtc::server::partition::set_tdata_action,
     gtc_point_set_tdata_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_params_action,
+    gtc::server::partition::set_params_action,
     gtc_point_set_params_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_sendleft_data_action,
+    gtc::server::partition::set_sendleft_data_action,
     gtc_point_set_sendleft_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_sendright_data_action,
+    gtc::server::partition::set_sendright_data_action,
     gtc_point_set_sendright_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_toroidal_gather_data_action,
+    gtc::server::partition::set_toroidal_gather_data_action,
     gtc_point_set_toroidal_gather_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_toroidal_scatter_data_action,
+    gtc::server::partition::set_toroidal_scatter_data_action,
     gtc_point_set_toroidal_scatter_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_comm_allreduce_data_action,
+    gtc::server::partition::set_comm_allreduce_data_action,
     gtc_point_set_comm_allreduce_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_int_comm_allreduce_data_action,
+    gtc::server::partition::set_int_comm_allreduce_data_action,
     gtc_point_set_int_comm_allreduce_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_int_sendright_data_action,
+    gtc::server::partition::set_int_sendright_data_action,
     gtc_point_set_int_sendright_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtc::server::point::set_int_sendleft_data_action,
+    gtc::server::partition::set_int_sendleft_data_action,
     gtc_point_set_int_sendleft_data_action);
 
 #endif

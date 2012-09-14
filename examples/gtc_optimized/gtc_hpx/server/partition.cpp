@@ -9,7 +9,7 @@
 #include <hpx/lcos/future_wait.hpp>
 
 #include "../../fname.h"
-#include "point.hpp"
+#include "partition.hpp"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -102,33 +102,33 @@ extern "C" {
             void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_sndleft(send,mgrid);
                     return; };
             void FNAME(rcvright_toroidal_cmm) (void* pfoo,double *receive) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_rcvright(receive);
                     return; };
             void FNAME(sndright_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_sndright(send,mgrid);
                     return; };
             void FNAME(rcvleft_toroidal_cmm) (void* pfoo,double *receive) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_rcvleft(receive);
                     return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->partd_allreduce(dnitmp,densityi,mgrid,mzetap1);
                     return; };
             void FNAME(toroidal_allreduce_cmm) (void* pfoo,double *input,double *output,
                                              int* size) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_allreduce(input,output,size);
                     return; };
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
@@ -136,56 +136,56 @@ extern "C" {
                      int *n_integers,int *n_reals) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->broadcast_parameters(integer_params,
                               real_params, n_integers,n_reals);
                     return; };
             void FNAME(toroidal_gather_cmm) (void* pfoo,double *input,
                                              int* size,int* dst) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_gather(input,size,dst);
                     return; };
             void FNAME(toroidal_gather_receive_cmm) (void* pfoo,double *output,
                                                      int* dst) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_gather_receive(output,dst);
                     return; };
             void FNAME(toroidal_scatter_cmm) (void* pfoo,double *input,
                                              int* size,int* src) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_scatter(input,size,src);
                     return; };
             void FNAME(toroidal_scatter_receive_cmm) (void* pfoo,double *output,
                                                      int* dst) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->toroidal_scatter_receive(output,dst);
                     return; };
             void FNAME(comm_allreduce_cmm) (void* pfoo,double *in,double *out,
                                              int* msize) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->comm_allreduce(in,out,msize);
                     return; };
             void FNAME(int_comm_allreduce_cmm) (void* pfoo,int *in,int *out,
                                              int* msize) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->int_comm_allreduce(in,out,msize);
                     return; };
             void FNAME(int_sndright_toroidal_cmm) (void* pfoo,int *send, int* mgrid) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->int_toroidal_sndright(send,mgrid);
                     return; };
             void FNAME(int_rcvleft_toroidal_cmm) (void* pfoo,int *receive) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->int_toroidal_rcvleft(receive);
                     return; };
             void FNAME(int_sndleft_toroidal_cmm) (void* pfoo,int *send, int* mgrid) {
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->int_toroidal_sndleft(send,mgrid);
                     return; };
             void FNAME(int_rcvright_toroidal_cmm) (void* pfoo,int *receive) {
                     // Cast to gtc::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
-                    gtc::server::point *ptr_to_class = *static_cast<gtc::server::point**>(pfoo);
+                    gtc::server::partition *ptr_to_class = *static_cast<gtc::server::partition**>(pfoo);
                     ptr_to_class->int_toroidal_rcvright(receive);
                     return; };
 }
@@ -199,7 +199,7 @@ inline void set_description(char const* test_name)
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-    std::size_t point::setup_wrapper(std::size_t numberpe,std::size_t mype,
+    std::size_t partition::setup_wrapper(std::size_t numberpe,std::size_t mype,
                       std::vector<hpx::naming::id_type> const& components)
     {
       item_ = mype;
@@ -341,7 +341,7 @@ namespace gtc { namespace server
       return tmp;
     }
 
-    void point::chargei_wrapper()
+    void partition::chargei_wrapper()
     {
       switch(item_) {
         case 0:
@@ -377,7 +377,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::broadcast_parameters(int *integer_params,double *real_params,
+    void partition::broadcast_parameters(int *integer_params,double *real_params,
                              int *n_integers,int *n_reals)
     {
       int nint = *n_integers;
@@ -427,7 +427,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_params(std::size_t which,
+    void partition::set_params(std::size_t which,
                            std::size_t generation,
                            std::vector<int> const& intparams,
                            std::vector<double> const& realparams)
@@ -443,7 +443,7 @@ namespace gtc { namespace server
         broadcast_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
+    void partition::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
     {
       if ( in_particle_ ) {
         int vsize = (*mgrid)*(*mzetap1);
@@ -479,7 +479,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_data(std::size_t which,
+    void partition::set_data(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
         allreduce_gate_.synchronize(generation, "point::set_data");
@@ -493,7 +493,7 @@ namespace gtc { namespace server
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::toroidal_sndleft(double *csend,int* mgrid)
+    void partition::toroidal_sndleft(double *csend,int* mgrid)
     {
 //       std::cout << "toroidal_sndleft: " << item_ << " -> " << left_pe_
 //                 << " (g: " << sndleft_gate_.generation() << "), "
@@ -530,7 +530,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::toroidal_rcvright(double *creceive)
+    void partition::toroidal_rcvright(double *creceive)
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
@@ -551,7 +551,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_sendleft_data(std::size_t which,
+    void partition::set_sendleft_data(std::size_t which,
                            std::size_t generation,
                            std::vector<double> const& send)
     {
@@ -565,7 +565,7 @@ namespace gtc { namespace server
         sndleft_gate_.set(0);         // trigger corresponding and-gate input
     }
 
-    void point::toroidal_allreduce(double *input,double *output, int* size)
+    void partition::toroidal_allreduce(double *input,double *output, int* size)
     {
       if ( in_toroidal_ ) {
         int vsize = *size;
@@ -601,7 +601,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_tdata(std::size_t which,
+    void partition::set_tdata(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
         allreduce_gate_.synchronize(generation, "point::set_tdata");
@@ -615,7 +615,7 @@ namespace gtc { namespace server
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::timeloop(std::size_t istep, std::size_t irk)
+    void partition::timeloop(std::size_t istep, std::size_t irk)
     {
       set_description("smooth");
 //       std::cout << "smooth: " << item_ << std::endl;
@@ -773,7 +773,7 @@ namespace gtc { namespace server
 #endif
     }
 
-    void point::toroidal_sndright(double *csend,int* mgrid)
+    void partition::toroidal_sndright(double *csend,int* mgrid)
     {
 //       std::cout << "toroidal_sndright: " << item_ << " -> " << right_pe_
 //                 << " (g: " << sndright_gate_.generation() << "), "
@@ -809,7 +809,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::toroidal_rcvleft(double *creceive)
+    void partition::toroidal_rcvleft(double *creceive)
     {
 //       std::cout << "toroidal_rcvleft: " << item_
 //                 << " (g: " << sndright_gate_.generation() << "), "
@@ -834,7 +834,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_sendright_data(std::size_t which,
+    void partition::set_sendright_data(std::size_t which,
                            std::size_t generation,
                            std::vector<double> const& send)
     {
@@ -849,7 +849,7 @@ namespace gtc { namespace server
         sndright_gate_.set(0);         // trigger corresponding and-gate input
     }
 
-    void point::toroidal_gather(double *csend, int *tsize,int *tdst)
+    void partition::toroidal_gather(double *csend, int *tsize,int *tdst)
     {
 //       std::cout << "toroidal_gather: " << item_
 //                 << " (g: " << gather_gate_.generation() << "), "
@@ -889,7 +889,7 @@ namespace gtc { namespace server
 
     }
 
-    void point::toroidal_gather_receive(double *creceive, int *cdst)
+    void partition::toroidal_gather_receive(double *creceive, int *cdst)
     {
       int dst = *cdst;
       if ( dst == item_ ) {
@@ -903,7 +903,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_toroidal_gather_data(std::size_t which,
+    void partition::set_toroidal_gather_data(std::size_t which,
                            std::size_t generation,
                            std::vector<double> const& send)
     {
@@ -922,7 +922,7 @@ namespace gtc { namespace server
         gather_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::toroidal_scatter(double *csend, int *tsize,int *tsrc)
+    void partition::toroidal_scatter(double *csend, int *tsize,int *tsrc)
     {
       int src = *tsrc;
       if ( src == item_ ) {
@@ -956,7 +956,7 @@ namespace gtc { namespace server
 
     }
 
-    void point::toroidal_scatter_receive(double *creceive, int *cdst)
+    void partition::toroidal_scatter_receive(double *creceive, int *cdst)
     {
       if ( in_toroidal_ ) {
         // synchronize with all operations to finish
@@ -969,7 +969,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_toroidal_scatter_data(std::size_t which,
+    void partition::set_toroidal_scatter_data(std::size_t which,
                            std::size_t generation,
                            std::vector<double> const& send)
     {
@@ -984,7 +984,7 @@ namespace gtc { namespace server
         scatter_gate_.set(0);         // trigger corresponding and-gate input
     }
 
-    void point::comm_allreduce(double *in,double *out, int* msize)
+    void partition::comm_allreduce(double *in,double *out, int* msize)
     {
         // synchronize with all operations to finish
         int vsize = *msize;
@@ -1016,7 +1016,7 @@ namespace gtc { namespace server
         }
     }
 
-    void point::set_comm_allreduce_data(std::size_t which,
+    void partition::set_comm_allreduce_data(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
         allreduce_gate_.synchronize(generation, "point::set_comm_allreduce_data");
@@ -1030,7 +1030,7 @@ namespace gtc { namespace server
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::int_comm_allreduce(int *in,int *out, int* msize)
+    void partition::int_comm_allreduce(int *in,int *out, int* msize)
     {
         // synchronize with all operations to finish
         int vsize = *msize;
@@ -1062,7 +1062,7 @@ namespace gtc { namespace server
         }
     }
 
-    void point::set_int_comm_allreduce_data(std::size_t which,
+    void partition::set_int_comm_allreduce_data(std::size_t which,
                 std::size_t generation, std::vector<int> const& data)
     {
         allreduce_gate_.synchronize(generation, "point::set_int_comm_allreduce_data");
@@ -1076,7 +1076,7 @@ namespace gtc { namespace server
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void point::int_toroidal_sndright(int *csend,int* mgrid)
+    void partition::int_toroidal_sndright(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
 
@@ -1109,7 +1109,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::int_toroidal_rcvleft(int *creceive)
+    void partition::int_toroidal_rcvleft(int *creceive)
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
@@ -1127,7 +1127,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_int_sendright_data(std::size_t which,
+    void partition::set_int_sendright_data(std::size_t which,
                            std::size_t generation,
                            std::vector<int> const& send)
     {
@@ -1137,7 +1137,7 @@ namespace gtc { namespace server
         sndright_gate_.set(0);         // trigger corresponding and-gate input
     }
 
-    void point::int_toroidal_sndleft(int *csend,int* mgrid)
+    void partition::int_toroidal_sndleft(int *csend,int* mgrid)
     {
       if ( in_toroidal_ ) {
         std::size_t generation = 0;
@@ -1170,7 +1170,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::int_toroidal_rcvright(int *creceive)
+    void partition::int_toroidal_rcvright(int *creceive)
     {
       if ( in_toroidal_ ) {
         // Now receive a message from the right
@@ -1188,7 +1188,7 @@ namespace gtc { namespace server
       }
     }
 
-    void point::set_int_sendleft_data(std::size_t which,
+    void partition::set_int_sendleft_data(std::size_t which,
                            std::size_t generation,
                            std::vector<int> const& send)
     {

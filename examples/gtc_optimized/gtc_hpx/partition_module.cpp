@@ -13,7 +13,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
-#include "server/point.hpp"
+#include "server/partition.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -21,7 +21,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<
-    gtc::server::point
+    gtc::server::partition
 > gtc_point_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(gtc_point_type, gtc_point);
