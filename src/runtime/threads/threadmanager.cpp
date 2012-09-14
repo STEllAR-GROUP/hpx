@@ -765,8 +765,7 @@ namespace hpx { namespace threads
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id,
-            thread_state(pending), thread_state_ex(wait_timeout), priority,
-            boost::ref(throws)));
+            pending, wait_timeout, priority, boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns 'signaled the timer has been canceled, otherwise
@@ -1428,7 +1427,8 @@ namespace hpx { namespace threads
 
         manage_active_thread_count count(thread_count_);
 
-        std::size_t idle_loop_count = 0;
+        boost::int64_t idle_loop_count = 0;
+        boost::int64_t busy_loop_count = 0;
 
         // set affinity on Linux systems or when using hwloc
         topology const& topology_ = get_topology();
@@ -1463,6 +1463,7 @@ namespace hpx { namespace threads
                     state_.load() == running, idle_loop_count, thrd))
             {
                 idle_loop_count = 0;
+                ++busy_loop_count;
 
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state()
@@ -1555,17 +1556,20 @@ namespace hpx { namespace threads
                 // references go out of scope.
                 // FIXME: what has to be done with depleted PX threads?
                 if (state_val == depleted || state_val == terminated)
-                    scheduler_.destroy_thread(thrd);
+                    scheduler_.destroy_thread(thrd, busy_loop_count);
 
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
             }
 
             // if nothing else has to be done either wait or terminate
-            else if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
-            {
-                // if we need to terminate, unregister the counter first
-                count.exit();
-                break;
+            else {
+                busy_loop_count = 0;
+                if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
+                {
+                    // if we need to terminate, unregister the counter first
+                    count.exit();
+                    break;
+                }
             }
         }
 

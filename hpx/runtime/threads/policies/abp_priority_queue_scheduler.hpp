@@ -185,7 +185,7 @@ namespace hpx { namespace threads { namespace policies
         // Return the next thread to be executed, return false if none is available
         // TODO: shouldn't we try to fill the queue before stealing?
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread_data*& thrd)
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             // master thread only: first try to get a priority thread
             std::size_t high_priority_queue_size = high_priority_queues_.size();
@@ -266,20 +266,20 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd)
+        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
             {
-                if (high_priority_queues_[i]->destroy_thread(thrd))
+                if (high_priority_queues_[i]->destroy_thread(thrd, busy_count))
                     return true;
             }
 
-            if (low_priority_queue_.destroy_thread(thrd))
+            if (low_priority_queue_.destroy_thread(thrd, busy_count))
                 return true;
 
             for (std::size_t i = 0; i < queues_.size(); ++i)
             {
-                if (queues_[i]->destroy_thread(thrd))
+                if (queues_[i]->destroy_thread(thrd, busy_count))
                     return true;
             }
             return false;
@@ -350,7 +350,7 @@ namespace hpx { namespace threads { namespace policies
 
         // Note that this is more like terminate_or_add_new
         bool wait_or_add_new(std::size_t num_thread, bool running,
-                             std::size_t& idle_loop_count)
+                             boost::int64_t& idle_loop_count)
         {
             BOOST_ASSERT(num_thread < queues_.size());
 

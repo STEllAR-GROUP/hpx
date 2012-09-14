@@ -166,9 +166,7 @@ namespace hpx { namespace threads { namespace policies
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
                     ++added;
-                    enqueue(work_items_, t, num_thread);
-                    ++work_items_count_;
-                    do_some_work();         // wake up sleeping threads
+                    schedule_thread(t, num_thread);
                 }
             }
 
@@ -248,18 +246,34 @@ namespace hpx { namespace threads { namespace policies
 
         /// This function makes sure all threads which are marked for deletion
         /// (state is terminated) are properly destroyed
-        // FIXME: seg faults at shutdown on Linux.
-        bool cleanup_terminated_locked()
+        bool cleanup_terminated_locked(bool delete_all = false)
         {
             if (thread_map_.empty())
                 return true;
 
-            {
-                boost::int64_t delete_count = max_delete_count;   // delete only this many threads
+            if (delete_all) {
+                // delete all threads
+                thread_id_type todelete;
+                while (terminated_items_.dequeue(todelete))
+                {
+                    --terminated_items_count_;
+                    bool deleted = thread_map_.erase(todelete) ? true : false;
+                    BOOST_ASSERT(deleted);
+                }
+            }
+            else {
+                // delete only this many threads
+                boost::int64_t delete_count = 
+                    (std::max)(terminated_items_count_ / 10, 
+                        static_cast<boost::int64_t>(max_delete_count));
+
                 thread_id_type todelete;
                 while (delete_count && terminated_items_.dequeue(todelete))
                 {
-                    if (thread_map_.erase(todelete))
+                    --terminated_items_count_;
+                    bool deleted = thread_map_.erase(todelete) ? true : false;
+                    BOOST_ASSERT(deleted);
+                    if (deleted)
                         --delete_count;
                 }
             }
@@ -267,10 +281,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
     public:
-        bool cleanup_terminated()
+        bool cleanup_terminated(bool delete_all = false)
         {
             mutex_type::scoped_lock lk(mtx_);
-            return cleanup_terminated_locked();
+            return cleanup_terminated_locked(delete_all);
         }
 
         // The maximum number of active threads this thread manager should
@@ -284,6 +298,7 @@ namespace hpx { namespace threads { namespace policies
           : work_items_(128),
             work_items_count_(0),
             terminated_items_(128),
+            terminated_items_count_(0),
             max_count_((0 == max_count)
                       ? static_cast<std::size_t>(max_thread_count)
                       : max_count),
@@ -378,8 +393,8 @@ namespace hpx { namespace threads { namespace policies
                 enqueue(work_items_, trd, num_thread);
                 {
                     ++work_items_count_;
-                  if (count == work_items_count_)
-                    break;
+                    if (count == work_items_count_)
+                        break;
                 }
             }
         }
@@ -420,11 +435,19 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd)
+        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
             if (thrd->is_created_from(&memory_pool_)) {
                 thread_id_type id = thrd->get_thread_id();
                 terminated_items_.enqueue(id);
+
+                boost::int64_t count = ++terminated_items_count_;
+                if (busy_count > HPX_BUSY_LOOP_COUNT_MAX ||
+                    count > HPX_BUSY_LOOP_COUNT_MAX / 10)
+                {
+                    busy_count = 0;
+                    cleanup_terminated(true);   // clean up all terminated threads
+                }
                 return true;
             }
             return false;
@@ -474,7 +497,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         inline bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, std::size_t& added,
+            boost::int64_t& idle_loop_count, std::size_t& added,
             thread_queue* addfrom_ = 0) HPX_HOT;
 
         /// This function gets called by the threadmanager whenever new work
@@ -488,7 +511,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         bool dump_suspended_threads(std::size_t num_thread
-          , std::size_t& idle_loop_count, bool running)
+          , boost::int64_t& idle_loop_count, bool running)
         {
             mutex_type::scoped_lock lk(mtx_);
             return detail::dump_suspended_threads(num_thread, thread_map_
@@ -516,6 +539,7 @@ namespace hpx { namespace threads { namespace policies
         work_items_type work_items_;        ///< list of active work items
         boost::atomic<boost::int64_t> work_items_count_; ///< count of active work items
         thread_id_queue_type terminated_items_;   ///< list of terminated threads
+        boost::atomic<boost::int64_t> terminated_items_count_; ///< count of terminated items
 
         std::size_t max_count_;             ///< maximum number of existing PX-threads
         task_items_type new_tasks_;         ///< list of new tasks to run
@@ -530,7 +554,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     template <>
     inline bool thread_queue<false>::wait_or_add_new(std::size_t num_thread,
-        bool running, std::size_t& idle_loop_count, std::size_t& added,
+        bool running, boost::int64_t& idle_loop_count, std::size_t& added,
         thread_queue* addfrom_)
     {
         // this thread acquired the lock, do maintenance, if needed
@@ -557,25 +581,26 @@ namespace hpx { namespace threads { namespace policies
             // stop running after all PX threads have been terminated
             thread_queue* addfrom = addfrom_ ? addfrom_ : this;
             bool added_new = add_new_always(added, addfrom, num_thread);
-            if (!added_new && !running) {
+            if (!added_new) {
                 // Before exiting each of the OS threads deletes the
                 // remaining terminated PX threads
-                if (cleanup_terminated_locked()) {
+                bool canexit = cleanup_terminated_locked(true);
+                if (!running && canexit) {
                     // we don't have any registered work items anymore
                     //do_some_work();       // notify possibly waiting threads
                     return true;            // terminate scheduling loop
                 }
-            }
-            else {
-                cleanup_terminated_locked();
+                return false;
             }
         }
+
+        cleanup_terminated_locked();
         return false;
     }
 
     template <>
     inline bool thread_queue<true>::wait_or_add_new(std::size_t num_thread,
-        bool running, std::size_t& idle_loop_count, std::size_t& added,
+        bool running, boost::int64_t& idle_loop_count, std::size_t& added,
         thread_queue* addfrom_)
     {
         thread_queue* addfrom = addfrom_ ? addfrom_ : this;
@@ -623,7 +648,7 @@ namespace hpx { namespace threads { namespace policies
             if (!added_new && !running) {
                 // Before exiting each of the OS threads deletes the
                 // remaining terminated PX threads
-                if (cleanup_terminated_locked()) {
+                if (cleanup_terminated_locked(true)) {
                     // we don't have any registered work items anymore
                     do_some_work();       // notify possibly waiting threads
                     terminate = true;
@@ -662,7 +687,7 @@ namespace hpx { namespace threads { namespace policies
 
                 namespace bpt = boost::posix_time;
                 BOOST_ASSERT(10*idle_loop_count <
-                    static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+                    static_cast<boost::int64_t>((std::numeric_limits<boost::int64_t>::max)()));
                 bool timed_out = !cond_.timed_wait(lk,
                     bpt::microseconds(static_cast<boost::int64_t>(10*idle_loop_count)));
 

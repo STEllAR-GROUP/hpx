@@ -366,6 +366,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Count number of busy thread manager loop executions before forcefully 
+// cleaning up terminated thread objects
+#if !defined(HPX_BUSY_LOOP_COUNT_MAX)
+#  define HPX_BUSY_LOOP_COUNT_MAX 20000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WRAPPER_HEAP_STEP)
 #  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif
