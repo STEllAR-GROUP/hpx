@@ -51,8 +51,8 @@ namespace ag { namespace server
     void allgather_and_gate::allgather(double value)
     {
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future(components_.size());
-        std::size_t generation = gate_.generation();
+        std::size_t generation = 0;
+        hpx::future<void> f = gate_.get_future(components_.size(), &generation);
 
         // Send our value to all participants of this allgather operation. We
         // assume components_, rank_ and value to be constant, thus no locking

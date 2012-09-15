@@ -54,7 +54,7 @@ namespace ag { namespace server
         std::vector<double> n_;                         // all-gathered values
         std::vector<hpx::naming::id_type> components_;  // components for allgather
 
-        hpx::lcos::local::and_gate<mutex_type> gate_; // synchronization gate
+        hpx::lcos::local::and_gate gate_; // synchronization gate
     };
 }}
 
