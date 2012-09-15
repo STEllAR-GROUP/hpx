@@ -456,8 +456,7 @@ namespace gtc { namespace server
             &generation);
 
         std::vector<double> dnisend;
-        dnisend.resize(vsize);
-        std::fill( dnireceive_.begin(),dnireceive_.end(),0.0);
+        dnisend.resize(vsize, 0.0);
 
         for (std::size_t i=0;i<dnisend.size();i++) {
           dnisend[i] = dnitmp[i];
