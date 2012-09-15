@@ -228,13 +228,47 @@
 /// This defines the default number of OS-threads created for the different
 /// internal thread pools
 #if !defined(HPX_NUM_IO_POOL_THREADS)
-#define HPX_NUM_IO_POOL_THREADS 2
+#  define HPX_NUM_IO_POOL_THREADS 2
 #endif
 #if !defined(HPX_NUM_PARCEL_POOL_THREADS)
-#define HPX_NUM_PARCEL_POOL_THREADS 2
+#  define HPX_NUM_PARCEL_POOL_THREADS 2
 #endif
 #if !defined(HPX_NUM_TIMER_POOL_THREADS)
-#define HPX_NUM_TIMER_POOL_THREADS 2
+#  define HPX_NUM_TIMER_POOL_THREADS 2
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable minimal thread deadlock detection in debug builds only.
+#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the parent thread information in debug builds 
+/// only.
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the thread description in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_DESCRIPTION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the target address of the data the thread is 
+/// accessing in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

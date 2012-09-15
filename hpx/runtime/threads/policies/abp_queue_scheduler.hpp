@@ -261,6 +261,7 @@ struct abp_queue_scheduler : boost::noncopyable
             if (0 != added) return result;
         }
 
+#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
         // no new work is available, are we deadlocked?
         if (/*0 == num_thread &&*/ LHPX_ENABLED(error)) {
             bool suspended_only = true;
@@ -283,6 +284,7 @@ struct abp_queue_scheduler : boost::noncopyable
                 }
             }
         }
+#endif
         return result;
     }
 

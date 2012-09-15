@@ -182,6 +182,7 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
@@ -192,6 +193,7 @@ namespace hpx { namespace threads
         }
         if (0 == data.parent_locality_id)
             data.parent_locality_id = get_locality_id();
+#endif
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -263,6 +265,7 @@ namespace hpx { namespace threads
                    << get_thread_priority_name(data.priority) << "), "
                    << "description(" << data.description << ")";
 
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
@@ -273,6 +276,7 @@ namespace hpx { namespace threads
         }
         if (0 == data.parent_locality_id)
             data.parent_locality_id = get_locality_id();
+#endif
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put

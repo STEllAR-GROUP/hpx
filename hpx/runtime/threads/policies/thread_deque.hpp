@@ -493,9 +493,13 @@ struct thread_deque
     bool dump_suspended_threads(std::size_t num_thread
       , boost::int64_t& idle_loop_count, bool running)
     {
+#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+        return false;
+#else
         mutex_type::scoped_lock lk(mtx_);
         return detail::dump_suspended_threads(num_thread, thread_map_
           , idle_loop_count, running);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////

@@ -243,6 +243,12 @@ namespace hpx
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
 
+        ///////////////////////////////////////////////////////////////////////
+        /// \cond NODETAIL
+        thread_id_type const invalid_thread_id =
+            reinterpret_cast<thread_id_type>(-1);
+        /// \endcond
+
         /// The function \a get_self returns a reference to the (OS thread
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self& get_self();
@@ -266,20 +272,36 @@ namespace hpx
         /// The function \a get_parent_id returns the PX thread id of the
         /// currents thread parent (or zero if the current thread is not a
         /// PX thread).
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       being defined.
         HPX_API_EXPORT thread_id_type get_parent_id();
 
         /// The function \a get_parent_phase returns the PX phase of the
         /// currents thread parent (or zero if the current thread is not a
         /// PX thread).
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       being defined.
         HPX_API_EXPORT std::size_t get_parent_phase();
 
         /// The function \a get_parent_locality_id returns the id of the locality of
         /// the currents thread parent (or zero if the current thread is not a
         /// PX thread).
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       being defined.
         HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
 
         /// The function \a get_self_component_id returns the lva of the
         /// component the current thread is acting on
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+        ///       being defined.
         HPX_API_EXPORT boost::uint64_t get_self_component_id();
 
         /// The function \a get_thread_manager returns a reference to the

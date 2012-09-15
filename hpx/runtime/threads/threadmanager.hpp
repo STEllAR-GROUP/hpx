@@ -34,7 +34,7 @@ namespace hpx { namespace threads
     struct register_thread_tag {};
     struct register_work_tag {};
     struct set_state_tag {};
-    
+
     struct thread_init_data;
 
     ///////////////////////////////////////////////////////////////////////////

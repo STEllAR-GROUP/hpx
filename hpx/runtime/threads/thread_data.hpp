@@ -14,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/assert.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
@@ -36,71 +37,72 @@
 #include <stack>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace detail
+namespace hpx { namespace threads 
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Why do we use std::stack + a lock here?
-    template <typename CoroutineImpl>
-    struct coroutine_allocator
+    namespace detail
     {
-        typedef util::spinlock mutex_type;
-
-        coroutine_allocator()
-        {}
-
-        CoroutineImpl* get()
+        ///////////////////////////////////////////////////////////////////////////
+        // Why do we use std::stack + a lock here?
+        template <typename CoroutineImpl>
+        struct coroutine_allocator
         {
-            mutex_type::scoped_lock l(mtx_);
-            return get_locked();
-        }
+            typedef util::spinlock mutex_type;
 
-        CoroutineImpl* try_get()
+            coroutine_allocator()
+            {}
+
+            CoroutineImpl* get()
+            {
+                mutex_type::scoped_lock l(mtx_);
+                return get_locked();
+            }
+
+            CoroutineImpl* try_get()
+            {
+                mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
+                if (!l)
+                    return NULL;
+                return get_locked();
+            }
+
+            void deallocate(CoroutineImpl* c)
+            {
+                mutex_type::scoped_lock l(mtx_);
+                heap_.push(c);
+            }
+
+        private:
+            CoroutineImpl* get_locked()
+            {
+                if (heap_.empty())
+                    return NULL;
+
+                CoroutineImpl* next = heap_.top();
+                heap_.pop();
+                return next;
+            }
+
+            mutex_type mtx_;
+            std::stack<CoroutineImpl*> heap_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////////
+        struct thread_exit_callback_node
         {
-            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
-            if (!l)
-                return NULL;
-            return get_locked();
-        }
+            HPX_STD_FUNCTION<void()> f_;
+            thread_exit_callback_node* next_;
 
-        void deallocate(CoroutineImpl* c)
-        {
-            mutex_type::scoped_lock l(mtx_);
-            heap_.push(c);
-        }
+            thread_exit_callback_node(HPX_STD_FUNCTION<void()> const& f,
+                    thread_exit_callback_node* next)
+              : f_(f), next_(next)
+            {}
 
-    private:
-        CoroutineImpl* get_locked()
-        {
-            if (heap_.empty())
-                return NULL;
-
-            CoroutineImpl* next = heap_.top();
-            heap_.pop();
-            return next;
-        }
-
-        mutex_type mtx_;
-        std::stack<CoroutineImpl*> heap_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct thread_exit_callback_node
-    {
-        HPX_STD_FUNCTION<void()> f_;
-        thread_exit_callback_node* next_;
-
-        thread_exit_callback_node(HPX_STD_FUNCTION<void()> const& f,
-                thread_exit_callback_node* next)
-          : f_(f), next_(next)
-        {}
-
-        void operator()()
-        {
-            f_();
-        }
-    };
-
-}
+            void operator()()
+            {
+                f_();
+            }
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// A \a thread is the representation of a ParalleX thread. It's a first
@@ -129,7 +131,7 @@ namespace hpx { namespace threads { namespace detail
 
         typedef boost::lockfree::caching_freelist<thread_data> pool_type;
 
-        struct tag {}; 
+        struct tag {};
         typedef util::spinlock_pool<tag> mutex_type;
 
         /// Construct a new \a thread
@@ -138,22 +140,31 @@ namespace hpx { namespace threads { namespace detail
           : coroutine_(boost::move(init_data.func), this_(), init_data.stacksize),
             current_state_(thread_state(newstate)),
             current_state_ex_(thread_state_ex(wait_signaled)),
+#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+            component_id_(init_data.lva),
+#endif
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
             description_(init_data.description ? init_data.description : ""),
             lco_description_(""),
+#endif
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             parent_locality_id_(init_data.parent_locality_id),
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
-            component_id_(init_data.lva),
+#endif
+#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
             marked_state_(unknown),
+#endif
             pool_(&pool),
             requested_interrupt_(false),
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
             exit_funcs_(0)
         {
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << init_data.description << ")";
+            LTM_(debug) << "thread::thread(" << this << "), description(" 
+                        << get_description() << ")";
 
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -166,6 +177,7 @@ namespace hpx { namespace threads { namespace detail
             }
             if (0 == parent_locality_id_)
                 parent_locality_id_ = get_locality_id();
+#endif
         }
 
         ~thread_data()
@@ -175,7 +187,6 @@ namespace hpx { namespace threads { namespace detail
                         << get_description() << "), phase("
                         << get_thread_phase() << ")";
         }
-
 
         /// \brief Execute the thread function
         ///
@@ -328,10 +339,39 @@ namespace hpx { namespace threads { namespace detail
             return coroutine_.get_thread_phase();
         }
 
+        /// Return the id of the component this thread is running in
+        naming::address::address_type get_component_id() const
+        {
+#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+            return 0;
+#else
+            return component_id_;
+#endif
+        }
+
+#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+        char const* get_description() const
+        {
+            return "<unknown>";
+        }
+        char const* set_description(char const* value)
+        {
+            return "<unknown>";
+        }
+
+        char const* get_lco_description() const
+        {
+            return "<unknown>";
+        }
+        char const* set_lco_description(char const* value)
+        {
+            return "<unknown>";
+        }
+#else
         char const* get_description() const
         {
             mutex_type::scoped_lock l(this);
-            return description_;
+            return description_ ? description_ : "<unknown>";
         }
         char const* set_description(char const* value)
         {
@@ -343,7 +383,7 @@ namespace hpx { namespace threads { namespace detail
         char const* get_lco_description() const
         {
             mutex_type::scoped_lock l(this);
-            return lco_description_;
+            return lco_description_ ? lco_description_ : "<unknown>";
         }
         char const* set_lco_description(char const* value)
         {
@@ -351,7 +391,27 @@ namespace hpx { namespace threads { namespace detail
             std::swap(lco_description_, value);
             return value;
         }
+#endif
 
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+        /// Return the locality of the parent thread
+        boost::uint32_t get_parent_locality_id() const
+        {
+            return naming::invalid_locality_id;
+        }
+
+        /// Return the thread id of the parent thread
+        thread_id_type get_parent_thread_id() const
+        {
+            return threads::invalid_thread_id;
+        }
+
+        /// Return the phase of the parent thread
+        std::size_t get_parent_thread_phase() const
+        {
+            return 0;
+        }
+#else
         /// Return the locality of the parent thread
         boost::uint32_t get_parent_locality_id() const
         {
@@ -369,13 +429,9 @@ namespace hpx { namespace threads { namespace detail
         {
             return parent_thread_phase_;
         }
+#endif
 
-        /// Return the id of the component this thread is running in
-        naming::address::address_type get_component_id() const
-        {
-            return component_id_;
-        }
-
+#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
         void set_marked_state(thread_state mark) const
         {
             marked_state_ = mark;
@@ -384,6 +440,7 @@ namespace hpx { namespace threads { namespace detail
         {
             return marked_state_;
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Memory management
@@ -393,6 +450,7 @@ namespace hpx { namespace threads { namespace detail
         // Won't be called.
         static void* operator new(std::size_t) throw()
         {
+            BOOST_ASSERT(false);
             return NULL;
         }
 
@@ -457,14 +515,24 @@ namespace hpx { namespace threads { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information 
+#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+        naming::address::address_type const component_id_;
+#endif
+
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
         char const* description_;
         char const* lco_description_;
+#endif
 
+#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         boost::uint32_t parent_locality_id_;
         thread_id_type parent_thread_id_;
         std::size_t parent_thread_phase_;
-        naming::address::address_type const component_id_;
+#endif
+
+#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
         mutable thread_state marked_state_;
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         pool_type* pool_;
@@ -478,9 +546,6 @@ namespace hpx { namespace threads { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type const invalid_thread_id =
-        reinterpret_cast<threads::thread_id_type>(-1);
-
     typedef thread_data::pool_type thread_pool;
 }}
 

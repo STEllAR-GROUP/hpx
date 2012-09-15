@@ -514,9 +514,13 @@ namespace hpx { namespace threads { namespace policies
         bool dump_suspended_threads(std::size_t num_thread
           , boost::int64_t& idle_loop_count, bool running)
         {
+#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+            return false;
+#else
             mutex_type::scoped_lock lk(mtx_);
             return detail::dump_suspended_threads(num_thread, thread_map_
               , idle_loop_count, running);
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -664,11 +668,13 @@ namespace hpx { namespace threads { namespace policies
             }
 
             if (added_new) {
+#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
                 // dump list of suspended threads once a second
                 if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
                     detail::dump_suspended_threads(num_thread, thread_map_,
                         idle_loop_count, running);
                 }
+#endif
                 break;    // we got work, exit loop
             }
 
@@ -680,11 +686,13 @@ namespace hpx { namespace threads { namespace policies
                 LTM_(debug) << "tfunc(" << num_thread
                            << "): queues empty, entering wait";
 
+#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
                 // dump list of suspended threads once a second
                 if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
                     detail::dump_suspended_threads(num_thread, thread_map_,
                         idle_loop_count, running);
                 }
+#endif
 
                 namespace bpt = boost::posix_time;
                 BOOST_ASSERT(10*idle_loop_count <
