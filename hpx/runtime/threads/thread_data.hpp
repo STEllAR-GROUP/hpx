@@ -129,7 +129,8 @@ namespace hpx { namespace threads { namespace detail
 
         typedef boost::lockfree::caching_freelist<thread_data> pool_type;
 
-        typedef util::spinlock mutex_type;
+        struct tag {}; 
+        typedef util::spinlock_pool<tag> mutex_type;
 
         /// Construct a new \a thread
         thread_data(thread_init_data& init_data, 
@@ -329,24 +330,24 @@ namespace hpx { namespace threads { namespace detail
 
         char const* get_description() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             return description_;
         }
         char const* set_description(char const* value)
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             std::swap(description_, value);
             return value;
         }
 
         char const* get_lco_description() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             return lco_description_;
         }
         char const* set_lco_description(char const* value)
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             std::swap(lco_description_, value);
             return value;
         }
@@ -416,26 +417,26 @@ namespace hpx { namespace threads { namespace detail
         // handle thread interruption
         bool interruption_requested() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             return requested_interrupt_;
         }
 
         bool interruption_enabled() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             return enabled_interrupt_;
         }
 
         bool set_interruption_enabled(bool enable)
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             std::swap(enabled_interrupt_, enable);
             return enable;
         }
 
         void interrupt()
         {
-            mutex_type::scoped_lock l(mtx_);
+            mutex_type::scoped_lock l(this);
             if (!enabled_interrupt_) {
                 HPX_THROW_EXCEPTION(thread_not_interruptable,
                     "thread_data::interrupt",
@@ -450,8 +451,6 @@ namespace hpx { namespace threads { namespace detail
         void free_thread_exit_callbacks();
 
     private:
-        mutable mutex_type mtx_; // Usually sizeof(spinlock) <= sizeof(void*)
-
         coroutine_type coroutine_;
         mutable boost::atomic<thread_state> current_state_;
         mutable boost::atomic<thread_state_ex> current_state_ex_;

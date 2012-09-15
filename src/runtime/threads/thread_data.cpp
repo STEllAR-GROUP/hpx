@@ -41,7 +41,7 @@ namespace hpx { namespace threads
 
     void thread_data::run_thread_exit_callbacks()
     {
-        mutex_type::scoped_lock l(mtx_);
+        mutex_type::scoped_lock l(this);
         while (exit_funcs_)
         {
             detail::thread_exit_callback_node* const current_node = exit_funcs_;
@@ -57,7 +57,7 @@ namespace hpx { namespace threads
 
     bool thread_data::add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
     {
-        mutex_type::scoped_lock l(mtx_);
+        mutex_type::scoped_lock l(this);
         if (ran_exit_funcs_ || get_state() == terminated)
             return false;
 
@@ -69,7 +69,7 @@ namespace hpx { namespace threads
 
     void thread_data::free_thread_exit_callbacks()
     {
-        mutex_type::scoped_lock l(mtx_);
+        mutex_type::scoped_lock l(this);
 
         // Exit functions should have been executed.
         BOOST_ASSERT(!exit_funcs_ || ran_exit_funcs_);
