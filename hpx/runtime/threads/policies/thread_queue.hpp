@@ -151,9 +151,9 @@ namespace hpx { namespace threads { namespace policies
                     thread_map_.insert(id, thrd.get());
 
                 if (HPX_UNLIKELY(!p.second)) {
-                    HPX_THROW_EXCEPTION(hpx::no_success,
+                    HPX_THROW_EXCEPTION(hpx::out_of_memory,
                         "threadmanager::add_new",
-                        "Couldn't add new thread to the map of threads");
+                        "Couldn't add new thread to the thread map");
                     return false;
                 }
 
@@ -351,7 +351,7 @@ namespace hpx { namespace threads { namespace policies
                     thread_map_.insert(id, thrd.get());
 
                 if (HPX_UNLIKELY(!p.second)) {
-                    HPX_THROWS_IF(ec, hpx::no_success,
+                    HPX_THROWS_IF(ec, hpx::out_of_memory,
                         "threadmanager::register_thread",
                         "Couldn't add new thread to the map of threads");
                     return invalid_thread_id;
@@ -373,9 +373,9 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for
             // later thread creation
-            ++new_tasks_count_;
             new_tasks_.enqueue(
                 new task_description(boost::move(data), initial_state));
+            ++new_tasks_count_;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -406,11 +406,11 @@ namespace hpx { namespace threads { namespace policies
             while (src->new_tasks_.dequeue(td))
             {
                 --src->new_tasks_count_;
-                if(new_tasks_.enqueue(td))
+                if (new_tasks_.enqueue(td))
                 {
-                  ++new_tasks_count_;
-                  if (count == new_tasks_count_)
-                    break;
+                    ++new_tasks_count_;
+                    if (count == new_tasks_count_)
+                        break;
                 }
             }
         }

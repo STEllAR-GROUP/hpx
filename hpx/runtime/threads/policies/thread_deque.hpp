@@ -108,7 +108,7 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROW_EXCEPTION(hpx::no_success,
+                HPX_THROW_EXCEPTION(hpx::out_of_memory,
                     "threadmanager::add_new",
                     "Couldn't add new thread to the map of threads");
                 return 0;
@@ -163,7 +163,7 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROW_EXCEPTION(hpx::no_success,
+                HPX_THROW_EXCEPTION(hpx::out_of_memory,
                     "threadmanager::add_new",
                     "Couldn't add new thread to the map of threads");
                 return 0;
@@ -252,13 +252,14 @@ struct thread_deque
     enum { max_thread_count = 1000 };
 
     thread_deque(std::size_t max_count = max_thread_count)
-      : work_items_(),
+      : work_items_(128),
         work_items_count_(0),
         terminated_items_(128),
         terminated_items_count_(0),
         max_count_((0 == max_count)
                   ? static_cast<std::size_t>(max_thread_count)
                   : max_count),
+        new_tasks_(128),
         new_tasks_count_(0),
         add_new_logger_("thread_deque::add_new")
     {}
@@ -304,7 +305,7 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROWS_IF(ec, hpx::no_success,
+                HPX_THROWS_IF(ec, hpx::out_of_memory,
                     "threadmanager::register_thread",
                     "Couldn't add new thread to the map of threads");
                 return invalid_thread_id;
