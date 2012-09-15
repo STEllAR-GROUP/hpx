@@ -984,7 +984,7 @@ namespace gtc { namespace server
                            std::vector<double> const& send)
     {
         mutex_type::scoped_lock l(mtx_);
-        scatter_gate_.synchronize(generation, "point::set_toroidal_scatter_data");
+        scatter_gate_.synchronize(generation, l, "point::set_toroidal_scatter_data");
         toroidal_scatter_receive_ = send;
         scatter_gate_.set();         // trigger corresponding and-gate input
     }

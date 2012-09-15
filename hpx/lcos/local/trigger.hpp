@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/assert.hpp>
@@ -16,22 +17,23 @@
 namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct trigger
+    template <typename Mutex = lcos::local::spinlock >
+    struct base_trigger
     {
     protected:
-        typedef lcos::local::spinlock mutex_type;
+        typedef Mutex mutex_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(trigger)
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(base_trigger)
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
-        trigger()
+        base_trigger()
           : generation_(0)
         {
         }
 
-        trigger(BOOST_RV_REF(trigger) rhs)
+        base_trigger(BOOST_RV_REF(base_trigger) rhs)
           : promise_(boost::move(rhs.promise_)),
             generation_(rhs.generation_),
             conditions_(boost::move(rhs.conditions_))
@@ -39,11 +41,11 @@ namespace hpx { namespace lcos { namespace local
             rhs.generation_ = std::size_t(-1);
         }
 
-        trigger& operator=(BOOST_RV_REF(trigger) rhs)
+        base_trigger& operator=(BOOST_RV_REF(base_trigger) rhs)
         {
             if (this != &rhs)
             {
-                mutex_type::scoped_lock l(rhs.mtx_);
+                typename mutex_type::scoped_lock l(rhs.mtx_);
                 promise_ = boost::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
@@ -71,7 +73,7 @@ namespace hpx { namespace lcos { namespace local
         future<void> get_future(std::size_t* generation = 0, 
             error_code& ec = hpx::throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
 
             BOOST_ASSERT(generation_ != std::size_t(-1));
             ++generation_;
@@ -88,7 +90,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Trigger this object.
         bool set(error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
 
             if (promise_.is_ready())
             {
@@ -110,7 +112,7 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
-    protected:
+    private:
         bool test_condition(std::size_t generation)
         {
             return !(generation > generation_);
@@ -118,7 +120,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct manage_condition
         {
-            manage_condition(trigger& gate, conditional_trigger& cond)
+            manage_condition(base_trigger& gate, conditional_trigger& cond)
               : this_(gate)
             {
                 this_.conditions_.push_back(&cond);
@@ -137,24 +139,25 @@ namespace hpx { namespace lcos { namespace local
                 return (*it_)->get_future(func, ec);
             }
 
-            trigger& this_;
+            base_trigger& this_;
             condition_list_type::iterator it_;
         };
 
     public:
         /// \brief Wait for the generational counter to reach the requested
         ///        stage.
-//         void synchronize(std::size_t generation,
-//             char const* function_name = "and_gate::synchronize",
-//             error_code& ec= throws)
-//         {
-//             mutex_type::scoped_lock l(mtx_);
-//             synchronize(generation, l, function_name, ec);
-//         }
+        void synchronize(std::size_t generation,
+            char const* function_name = "base_and_gate<>::synchronize",
+            error_code& ec= throws)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+            synchronize(generation, l, function_name, ec);
+        }
 
+    protected:
         template <typename Lock>
         void synchronize(std::size_t generation, Lock& l,
-            char const* function_name = "and_gate::synchronize",
+            char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
             BOOST_ASSERT(l.owns_lock());
@@ -173,7 +176,7 @@ namespace hpx { namespace lcos { namespace local
                 manage_condition cond(*this, c);
 
                 future<void> f = cond.get_future(util::bind(
-                        &trigger::test_condition, this, generation));
+                        &base_trigger::test_condition, this, generation));
 
                 {
                     hpx::util::unlock_the_lock<Lock> ul(l);
@@ -185,9 +188,10 @@ namespace hpx { namespace lcos { namespace local
                 ec = make_success_code();
         }
 
+    public:
         std::size_t next_generation()
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -198,7 +202,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             return generation_;
         }
 
@@ -207,6 +211,42 @@ namespace hpx { namespace lcos { namespace local
         lcos::local::promise<void> promise_;
         std::size_t generation_;
         condition_list_type conditions_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Note: This type is not thread-safe. It has to be protected from 
+    //       concurrent access by different threads by the code using instances 
+    //       of this type.
+    struct trigger : public base_trigger<no_mutex>
+    {
+    private:
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(trigger)
+        typedef base_trigger<no_mutex> base_type;
+
+    public:
+        trigger()
+        {
+        }
+
+        trigger(BOOST_RV_REF(trigger) rhs)
+          : base_type(boost::move(static_cast<base_type&>(rhs)))
+        {
+        }
+
+        trigger& operator=(BOOST_RV_REF(trigger) rhs)
+        {
+            if (this != &rhs)
+                static_cast<base_type&>(*this) = boost::move(rhs);
+            return *this;
+        }
+
+        template <typename Lock>
+        void synchronize(std::size_t generation, Lock& l,
+            char const* function_name = "trigger::synchronize",
+            error_code& ec= throws)
+        {
+            this->base_type::synchronize(generation, l, function_name, ec);
+        }
     };
 }}}
 

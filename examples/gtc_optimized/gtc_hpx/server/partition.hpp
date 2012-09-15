@@ -114,20 +114,22 @@ namespace gtc { namespace server
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::lcos::local::base_and_gate<> and_gate_type;
+
         std::size_t item_;
         std::vector<hpx::naming::id_type> toroidal_comm_,partd_comm_;
         std::size_t left_pe_,right_pe_;
 
-        hpx::lcos::local::and_gate allreduce_gate_;     // synchronization gates
+        and_gate_type allreduce_gate_;     // synchronization gates
         hpx::lcos::local::trigger sndleft_gate_;
         hpx::future<void> sndleft_future_;
         hpx::lcos::local::trigger sndright_gate_;
         hpx::future<void> sndright_future_;
-        hpx::lcos::local::and_gate gather_gate_;
+        and_gate_type gather_gate_;
         hpx::future<void> gather_future_;
         hpx::lcos::local::trigger scatter_gate_;
         hpx::future<void> scatter_future_;
-        hpx::lcos::local::and_gate broadcast_gate_;
+        and_gate_type broadcast_gate_;
 
         std::vector<hpx::naming::id_type> components_;
         mutable mutex_type mtx_;

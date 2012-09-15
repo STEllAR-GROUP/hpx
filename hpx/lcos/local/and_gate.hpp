@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/move/move.hpp>
@@ -20,25 +21,26 @@
 namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct and_gate
+    template <typename Mutex = lcos::local::spinlock>
+    struct base_and_gate
     {
     protected:
-        typedef lcos::local::spinlock mutex_type;
+        typedef Mutex mutex_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(and_gate)
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(base_and_gate)
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
-        /// \brief This constructor initializes the and_gate object from the
+        /// \brief This constructor initializes the base_and_gate object from the
         ///        the number of participants to synchronize the control flow
         ///        with.
-        and_gate(std::size_t count = 0)
+        base_and_gate(std::size_t count = 0)
           : received_segments_(count), generation_(0)
         {
         }
 
-        and_gate(BOOST_RV_REF(and_gate) rhs)
+        base_and_gate(BOOST_RV_REF(base_and_gate) rhs)
           : received_segments_(boost::move(rhs.received_segments_)),
             promise_(boost::move(rhs.promise_)),
             generation_(rhs.generation_),
@@ -47,11 +49,11 @@ namespace hpx { namespace lcos { namespace local
             rhs.generation_ = std::size_t(-1);
         }
 
-        and_gate& operator=(BOOST_RV_REF(and_gate) rhs)
+        base_and_gate& operator=(BOOST_RV_REF(base_and_gate) rhs)
         {
             if (this != &rhs)
             {
-                mutex_type::scoped_lock l(rhs.mtx_);
+                typename mutex_type::scoped_lock l(rhs.mtx_);
                 received_segments_ = boost::move(rhs.received_segments_);
                 promise_ = boost::move(rhs.promise_);
                 generation_ = rhs.generation_;
@@ -80,7 +82,7 @@ namespace hpx { namespace lcos { namespace local
         future<void> get_future(std::size_t count,
             std::size_t* generation = 0, error_code& ec = hpx::throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             init_locked(count, ec);
             if (!ec) {
                 BOOST_ASSERT(generation_ != std::size_t(-1));
@@ -99,18 +101,18 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Set the data which has to go into the segment \a which.
         bool set(std::size_t which, error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             if (which >= received_segments_.size())
             {
                 // out of bounds index
-                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set",
-                    "index is out of range for this and_gate");
+                HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
+                    "index is out of range for this base_and_gate");
                 return false;
             }
             if (received_segments_.test(which))
             {
                 // segment already filled, logic error
-                HPX_THROWS_IF(ec, bad_parameter, "and_gate::set",
+                HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
                     "input with the given index has already been triggered");
                 return false;
             }
@@ -141,7 +143,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct manage_condition
         {
-            manage_condition(and_gate& gate, conditional_trigger& cond)
+            manage_condition(base_and_gate& gate, conditional_trigger& cond)
               : this_(gate)
             {
                 this_.conditions_.push_back(&cond);
@@ -160,7 +162,7 @@ namespace hpx { namespace lcos { namespace local
                 return (*it_)->get_future(func, ec);
             }
 
-            and_gate& this_;
+            base_and_gate& this_;
             condition_list_type::iterator it_;
         };
 
@@ -168,17 +170,17 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Wait for the generational counter to reach the requested
         ///        stage.
         void synchronize(std::size_t generation,
-            char const* function_name = "and_gate::synchronize",
+            char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             synchronize(generation, l, function_name, ec);
         }
 
     protected:
         template <typename Lock>
         void synchronize(std::size_t generation, Lock& l,
-            char const* function_name = "and_gate::synchronize",
+            char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
             BOOST_ASSERT(l.owns_lock());
@@ -197,7 +199,7 @@ namespace hpx { namespace lcos { namespace local
                 manage_condition cond(*this, c);
 
                 future<void> f = cond.get_future(util::bind(
-                        &and_gate::test_condition, this, generation));
+                        &base_and_gate::test_condition, this, generation));
 
                 {
                     hpx::util::unlock_the_lock<Lock> ul(l);
@@ -212,7 +214,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         std::size_t next_generation()
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -223,7 +225,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             return generation_;
         }
 
@@ -233,8 +235,8 @@ namespace hpx { namespace lcos { namespace local
             if (0 != received_segments_.count())
             {
                 // reset happens while part of the slots are filled
-                HPX_THROWS_IF(ec, bad_parameter, "and_gate::init",
-                    "initializing this and_gate while slots are filled");
+                HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::init",
+                    "initializing this base_and_gate while slots are filled");
                 return;
             }
 
@@ -251,6 +253,43 @@ namespace hpx { namespace lcos { namespace local
         lcos::local::promise<void> promise_;
         std::size_t generation_;
         condition_list_type conditions_;
+    };
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Note: This type is not thread-safe. It has to be protected from 
+    //       concurrent access by different threads by the code using instances 
+    //       of this type.
+    struct and_gate : public base_and_gate<no_mutex>
+    {
+    private:
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(and_gate)
+        typedef base_and_gate<no_mutex> base_type;
+
+    public:
+        and_gate()
+        {
+        }
+
+        and_gate(BOOST_RV_REF(and_gate) rhs)
+          : base_type(boost::move(static_cast<base_type&>(rhs)))
+        {
+        }
+
+        and_gate& operator=(BOOST_RV_REF(and_gate) rhs)
+        {
+            if (this != &rhs)
+                static_cast<base_type&>(*this) = boost::move(rhs);
+            return *this;
+        }
+
+        template <typename Lock>
+        void synchronize(std::size_t generation, Lock& l,
+            char const* function_name = "and_gate::synchronize",
+            error_code& ec= throws)
+        {
+            this->base_type::synchronize(generation, l, function_name, ec);
+        }
     };
 }}}
 
