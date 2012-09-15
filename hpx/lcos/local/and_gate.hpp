@@ -209,6 +209,7 @@ namespace hpx { namespace lcos { namespace local
                 ec = make_success_code();
         }
 
+    public:
         std::size_t next_generation()
         {
             mutex_type::scoped_lock l(mtx_);
