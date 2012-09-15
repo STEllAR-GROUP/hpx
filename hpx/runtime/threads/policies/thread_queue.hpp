@@ -109,7 +109,7 @@ namespace hpx { namespace threads { namespace policies
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef boost::ptr_map<
-            thread_id_type, thread_data, std::less<thread_id_type>, heap_clone_allocator
+            thread_id_type, thread_data, std::less<thread_id_type> 
         > thread_map_type;
 
         // this is the type of the queue of new tasks not yet converted to
@@ -258,7 +258,8 @@ namespace hpx { namespace threads { namespace policies
                 {
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) ? true : false;
-                    BOOST_ASSERT(deleted);
+                    if (HPX_UNLIKELY(!deleted))
+                        BOOST_ASSERT(false);
                 }
             }
             else {
@@ -304,6 +305,7 @@ namespace hpx { namespace threads { namespace policies
                       : max_count),
             new_tasks_(128),
             new_tasks_count_(0),
+            memory_pool_(64),
             add_new_logger_("thread_queue::add_new")
         {}
 

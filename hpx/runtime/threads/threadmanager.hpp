@@ -174,19 +174,6 @@ namespace hpx { namespace threads
             thread_priority priority = thread_priority_normal,
             error_code& ec = throws) = 0;
 
-        /// The function get_thread_gid is part of the thread related API
-        /// allows to query the GID of one of the threads known to the
-        /// threadmanager.
-        ///
-        /// \param id         [in] The thread id of the thread the state should
-        ///                   be modified for.
-        ///
-        /// \returns          This function returns the GID of the
-        ///                   thread referenced by the \a id parameter. If the
-        ///                   thread is not known to the threadmanager the
-        ///                   return value will be \a naming::invalid_id.
-        virtual naming::id_type get_thread_gid(thread_id_type id) = 0;
-
         /// The get_description function is part of the thread related API and
         /// allows to query the description of one of the threads known to the
         /// threadmanager
@@ -198,11 +185,11 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the
         ///                 thread is not known to the threadmanager the return
         ///                 value will be the string "<unknown>".
-        virtual std::string get_description(thread_id_type id) const = 0;
-        virtual std::string set_description(thread_id_type id, char const* desc = 0) = 0;
+        virtual char const* get_description(thread_id_type id) const = 0;
+        virtual char const* set_description(thread_id_type id, char const* desc = 0) = 0;
 
-        virtual std::string get_lco_description(thread_id_type id) const = 0;
-        virtual std::string set_lco_description(thread_id_type id, char const* desc = 0) = 0;
+        virtual char const* get_lco_description(thread_id_type id) const = 0;
+        virtual char const* set_lco_description(thread_id_type id, char const* desc = 0) = 0;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds

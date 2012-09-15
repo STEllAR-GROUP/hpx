@@ -362,7 +362,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (NULL == thrd->get()) {
+        if (!thrd) {
             if (&ec != &throws)
                 ec = make_success_code();
             return thread_state(terminated);     // this thread has already been terminated
@@ -475,7 +475,7 @@ namespace hpx { namespace threads
     {
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_state() : thread_state(terminated);
+        return thrd ? thrd->get_state() : thread_state(terminated);
     }
 
     /// The get_phase function is part of the thread related API. It
@@ -486,71 +486,71 @@ namespace hpx { namespace threads
     {
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_thread_phase() : std::size_t(~0);
+        return thrd ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
     /// The get_description function is part of the thread related API and
     /// allows to query the description of one of the threads known to the
     /// threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_description() : "<unknown>";
+        return thrd ? thrd->get_description() : "<unknown>";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_description(thread_id_type id, char const* desc)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_description",
                 "NULL thread id encountered");
-            return std::string();
+            return NULL; 
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get())
+        if (thrd)
             return thrd->set_description(desc);
-        return std::string();
+        return NULL; 
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_lco_description(thread_id_type id) const
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_lco_description",
                 "NULL thread id encountered");
-            return std::string();
+            return NULL;
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_lco_description() : "<unknown>";
+        return thrd ? thrd->get_lco_description() : "<unknown>";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_lco_description(thread_id_type id, char const* desc)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_lco_description",
                 "NULL thread id encountered");
-            return std::string();
+            return NULL; 
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get())
+        if (thrd)
             return thrd->set_lco_description(desc);
-        return std::string();
+        return NULL;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -569,7 +569,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->interruption_enabled() : false;
+        return thrd ? thrd->interruption_enabled() : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -587,7 +587,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get())
+        if (thrd)
             return thrd->set_interruption_enabled(enable);
         return false;
     }
@@ -608,7 +608,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->interruption_requested() : false;
+        return thrd ? thrd->interruption_requested() : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -627,7 +627,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get()) {
+        if (thrd) {
             thrd->interrupt();      // notify thread
 
             // set thread state to pending, if the thread is currently active,
@@ -840,24 +840,6 @@ namespace hpx { namespace threads
             boost::bind(f, this, from_now, id, newstate, newstate_ex, priority),
             "at_timer (from now)", 0, priority);
         return register_thread(data, pending, true, ec);
-    }
-
-    /// Retrieve the global id of the given thread
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    naming::id_type
-    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_thread_gid(thread_id_type id)
-    {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::get_thread_gid",
-                "NULL thread id encountered");
-            return naming::invalid_id;
-        }
-
-        // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_gid() : naming::invalid_id;
     }
 
     // helper class for switching thread state in and out during execution

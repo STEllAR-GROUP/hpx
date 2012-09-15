@@ -211,7 +211,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::string get_thread_description(thread_id_type id, error_code& ec)
+    char const* get_thread_description(thread_id_type id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -219,7 +219,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_thread_description",
                 "global applier object is not accessible");
-            return std::string();
+            return NULL; 
         }
 
         if (&ec != &throws)
@@ -227,7 +227,7 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_description(id);
     }
-    std::string set_thread_description(thread_id_type id, char const* desc,
+    char const* set_thread_description(thread_id_type id, char const* desc,
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -236,7 +236,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::set_thread_description",
                 "global applier object is not accessible");
-            return std::string();
+            return NULL; 
         }
 
         if (&ec != &throws)
@@ -245,7 +245,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_description(id, desc);
     }
 
-    std::string get_thread_lco_description(thread_id_type id, error_code& ec)
+    char const* get_thread_lco_description(thread_id_type id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -253,7 +253,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_thread_lco_description",
                 "global applier object is not accessible");
-            return std::string();
+            return NULL; 
         }
 
         if (&ec != &throws)
@@ -261,7 +261,7 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_lco_description(id);
     }
-    std::string set_thread_lco_description(thread_id_type id, char const* desc,
+    char const* set_thread_lco_description(thread_id_type id, char const* desc,
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -270,31 +270,13 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::set_thread_lco_description",
                 "global applier object is not accessible");
-            return std::string();
+            return NULL;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return app->get_thread_manager().set_lco_description(id, desc);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    naming::id_type get_thread_gid(thread_id_type id, error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::get_thread_gid",
-                "global applier object is not accessible");
-            return naming::invalid_id;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_thread_gid(id);
     }
 }}
 
@@ -314,12 +296,11 @@ namespace hpx { namespace this_thread
 
             ~reset_lco_description()
             {
-                threads::set_thread_lco_description(id_, 
-                    old_desc_.empty() ? 0 : old_desc_.c_str(), ec_);
+                threads::set_thread_lco_description(id_, old_desc_, ec_);
             }
 
             threads::thread_id_type id_;
-            std::string old_desc_;
+            char const* old_desc_;
             error_code& ec_;
         };
     }
