@@ -455,6 +455,8 @@ namespace hpx { namespace threads
         thrd->set_state(new_state);
 
         if (new_state == pending) {
+            // FIXME: Passing a specific target thread may screw with the round
+            // robin queuing.
             scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
             do_some_work();
         }
@@ -768,7 +770,7 @@ namespace hpx { namespace threads
             pending, wait_timeout, priority, boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
-        // if it returns 'signaled the timer has been canceled, otherwise
+        // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
         bool oldvalue = false;
         thread_state_ex_enum statex = self.yield(suspended);
@@ -1534,6 +1536,8 @@ namespace hpx { namespace threads
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
+                        // FIXME: Passing a specific target thread may screw
+                        // with the round robin queuing.
                         scheduler_.schedule_thread_last(thrd, num_thread);
                         do_some_work(num_thread);
                     }
@@ -1548,6 +1552,8 @@ namespace hpx { namespace threads
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
+                    // FIXME: Passing a specific target thread may screw
+                    // with the round robin queuing.
                     scheduler_.schedule_thread(thrd, num_thread);
                 }
 
