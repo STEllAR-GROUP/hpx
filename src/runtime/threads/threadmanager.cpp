@@ -455,7 +455,7 @@ namespace hpx { namespace threads
         thrd->set_state(new_state);
 
         if (new_state == pending) {
-            // FIXME: Passing a specific target thread may interfere with the 
+            // REVIEW: Passing a specific target thread may interfere with the 
             // round robin queuing.
             scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
             do_some_work();
@@ -726,6 +726,7 @@ namespace hpx { namespace threads
         }
 
         // then re-activate the thread holding the deadline_timer
+        // REVIEW: Why do we ignore errors here?
         error_code ec(lightweight);    // do not throw
         set_state(timer_id, pending, wait_timeout, thread_priority_normal, ec);
         return terminated;
@@ -1536,7 +1537,7 @@ namespace hpx { namespace threads
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
-                        // FIXME: Passing a specific target thread may screw
+                        // REVIEW: Passing a specific target thread may screw
                         // with the round robin queuing.
                         scheduler_.schedule_thread_last(thrd, num_thread);
                         do_some_work(num_thread);
@@ -1552,7 +1553,7 @@ namespace hpx { namespace threads
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
-                    // FIXME: Passing a specific target thread may screw
+                    // REVIEW: Passing a specific target thread may screw
                     // with the round robin queuing.
                     scheduler_.schedule_thread(thrd, num_thread);
                 }
@@ -1560,7 +1561,7 @@ namespace hpx { namespace threads
                 // Remove the mapping from thread_map_ if PX thread is depleted
                 // or terminated, this will delete the PX thread as all
                 // references go out of scope.
-                // FIXME: what has to be done with depleted PX threads?
+                // REVIEW: what has to be done with depleted PX threads?
                 if (state_val == depleted || state_val == terminated)
                     scheduler_.destroy_thread(thrd, busy_loop_count);
 
