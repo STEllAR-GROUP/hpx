@@ -393,11 +393,8 @@ namespace hpx { namespace threads { namespace policies
             {
                 --src->work_items_count_;
                 enqueue(work_items_, trd, num_thread);
-                {
-                    ++work_items_count_;
-                    if (count == work_items_count_)
-                        break;
-                }
+                if (count == ++work_items_count_)
+                    break;
             }
         }
 
@@ -421,7 +418,8 @@ namespace hpx { namespace threads { namespace policies
         /// available
         bool get_next_thread(threads::thread_data*& thrd, std::size_t num_thread)
         {
-            if (dequeue(work_items_, thrd, num_thread)) {
+            if (dequeue(work_items_, thrd, num_thread)) 
+            {
                 --work_items_count_;
                 return true;
             }
@@ -439,7 +437,8 @@ namespace hpx { namespace threads { namespace policies
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
-            if (thrd->is_created_from(&memory_pool_)) {
+            if (thrd->is_created_from(&memory_pool_)) 
+            {
                 thread_id_type id = thrd->get_thread_id();
                 terminated_items_.enqueue(id);
 
