@@ -30,8 +30,7 @@ using hpx::finalize;
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-void barrier_test(id_type const& id, boost::atomic<std::size_t>& c,
-                  std::size_t pxthreads)
+void barrier_test(id_type const& id, boost::atomic<std::size_t>& c)
 {
     ++c;
     // wait for all threads to enter the barrier
@@ -68,7 +67,7 @@ int hpx_main(variables_map& vm)
 
         for (std::size_t j = 0; j < pxthreads; ++j)
             register_work(boost::bind 
-                (&barrier_test, b.get_gid(), boost::ref(c), pxthreads));
+                (&barrier_test, b.get_gid(), boost::ref(c)));
 
         b.wait(); // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c.load());
@@ -87,9 +86,9 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(1 << 6), 
+        ("pxthreads,T", value<std::size_t>()->default_value(64), 
             "the number of PX threads to invoke")
-        ("iterations", value<std::size_t>()->default_value(1 << 6), 
+        ("iterations", value<std::size_t>()->default_value(64), 
             "the number of times to repeat the test") 
         ;
 
