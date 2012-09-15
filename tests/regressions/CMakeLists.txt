@@ -8,6 +8,7 @@ set(subdirs
     agas
     actions
     lcos
+    threads
     util
    )
 
