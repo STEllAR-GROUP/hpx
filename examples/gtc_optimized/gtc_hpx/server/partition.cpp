@@ -229,7 +229,7 @@ namespace gtc { namespace server
       int npartdom,ntoroidal;
       int hpx_left_pe, hpx_right_pe;
       int mstep;
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(setup_0)(static_cast<void*>(this),
             &t1,&t2,&npartdom,&ntoroidal,&hpx_left_pe,&hpx_right_pe,&mstep);
@@ -272,7 +272,7 @@ namespace gtc { namespace server
           break;
       }
 
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(load_0)();
           break;
@@ -344,7 +344,7 @@ namespace gtc { namespace server
 
     void partition::chargei_wrapper()
     {
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(chargei_0)(static_cast<void*>(this));
           break;
@@ -623,7 +623,7 @@ namespace gtc { namespace server
 
       // Call smooth(3) {{{
       int flag = 3;
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(smooth_0)(static_cast<void*>(this),&flag);
           break;
@@ -661,7 +661,7 @@ namespace gtc { namespace server
 //       std::cout << "field: " << item_ << std::endl;
 
       // Call field {{{
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(fieldr_0)(static_cast<void*>(this));
           break;
@@ -699,7 +699,7 @@ namespace gtc { namespace server
 //       std::cout << "pushi: " << item_ << std::endl;
 
       // Call pushi {{{
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(pushi_0)(static_cast<void*>(this));
           break;
@@ -738,7 +738,7 @@ namespace gtc { namespace server
 
 #if 0
       // Call shifti {{{
-      switch(item_) {
+      switch(item_%10) {
         case 0:
           FNAME(shifti_0)(static_cast<void*>(this));
           break;
