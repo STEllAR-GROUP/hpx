@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/async.hpp>
+
 #include <hpx/lcos/future_wait.hpp>
 
 #include "../../fname.h"
@@ -509,7 +510,7 @@ namespace gtc { namespace server
 
             int vsize = *mgrid;
             sendleft_receive_.resize(vsize);
-            sndleft_future_ = sndleft_gate_.get_future(1, &generation);
+            sndleft_future_ = sndleft_gate_.get_future(&generation);
 
             // Send data to the left
             // The sender: send data to the left
@@ -562,7 +563,7 @@ namespace gtc { namespace server
         mutex_type::scoped_lock l(mtx_);
         sndleft_gate_.synchronize(generation, l, "point::set_sendleft_data");
         sendleft_receive_ = send;
-        sndleft_gate_.set(0);         // trigger corresponding and-gate input
+        sndleft_gate_.set();         // trigger corresponding and-gate input
     }
 
     void partition::toroidal_allreduce(double *input,double *output, int* size)
@@ -788,7 +789,7 @@ namespace gtc { namespace server
 
             int vsize = *mgrid;
             sendright_receive_.resize(vsize);
-            sndright_future_ = sndright_gate_.get_future(1, &generation);
+            sndright_future_ = sndright_gate_.get_future(&generation);
 
             // Send data to the right
             // The sender: send data to the left
@@ -846,7 +847,7 @@ namespace gtc { namespace server
 
         sndright_gate_.synchronize(generation, l, "point::set_sendright_data");
         sendright_receive_ = send;
-        sndright_gate_.set(0);         // trigger corresponding and-gate input
+        sndright_gate_.set();         // trigger corresponding and-gate input
     }
 
     void partition::toroidal_gather(double *csend, int *tsize,int *tdst)
@@ -927,28 +928,33 @@ namespace gtc { namespace server
       int src = *tsrc;
       if ( src == item_ ) {
         // create a new and-gate object
-        int vsize = *tsize;
-        toroidal_scatter_receive_.resize(vsize);
-
         std::size_t generation = 0;
-        scatter_future_ = scatter_gate_.get_future(1, &generation);
-
-        // Send data to everyone in toroidal
-        // The sender: send data to the left
-        // in a fire and forget fashion
         std::vector<double> send;
-        send.resize(vsize);
 
-        for (std::size_t step=0;step<toroidal_comm_.size();step++) {
-          for (std::size_t i=0;i<send.size();i++) {
-            send[i] = csend[i+step*vsize];
-          }
+        {
+          mutex_type::scoped_lock l(mtx_);
 
-          set_toroidal_scatter_data_action set_toroidal_scatter_data_;
-          for (std::size_t i=0;i<toroidal_comm_.size();i++) {
-            hpx::apply(set_toroidal_scatter_data_,
-               toroidal_comm_[i], item_, generation, send);
+          int vsize = *tsize;
+          toroidal_scatter_receive_.resize(vsize);
+
+          scatter_future_ = scatter_gate_.get_future(&generation);
+
+          // Send data to everyone in toroidal
+          // The sender: send data to the left
+          // in a fire and forget fashion
+          send.resize(vsize);
+
+          for (std::size_t step=0;step<toroidal_comm_.size();step++) {
+            for (std::size_t i=0;i<send.size();i++) {
+              send[i] = csend[i+step*vsize];
+            }
           }
+        }
+
+        set_toroidal_scatter_data_action set_toroidal_scatter_data_;
+        for (std::size_t i=0;i<toroidal_comm_.size();i++) {
+          hpx::apply(set_toroidal_scatter_data_,
+              toroidal_comm_[i], item_, generation, send);
         }
       } else {
         scatter_gate_.next_generation();
@@ -960,9 +966,14 @@ namespace gtc { namespace server
     {
       if ( in_toroidal_ ) {
         // synchronize with all operations to finish
-        scatter_future_.get();
-
         mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = scatter_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
         for (std::size_t i=0;i<toroidal_scatter_receive_.size();i++) {
           creceive[i] = toroidal_scatter_receive_[i];
         }
@@ -973,15 +984,10 @@ namespace gtc { namespace server
                            std::size_t generation,
                            std::vector<double> const& send)
     {
+        mutex_type::scoped_lock l(mtx_);
         scatter_gate_.synchronize(generation, "point::set_toroidal_scatter_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            for (std::size_t i=0;i<send.size();i++)
-                toroidal_scatter_receive_[i] = send[i];
-        }
-
-        scatter_gate_.set(0);         // trigger corresponding and-gate input
+        toroidal_scatter_receive_ = send;
+        scatter_gate_.set();         // trigger corresponding and-gate input
     }
 
     void partition::comm_allreduce(double *in,double *out, int* msize)
@@ -1088,7 +1094,7 @@ namespace gtc { namespace server
 
             int vsize = *mgrid;
             int_sendright_receive_.resize(vsize);
-            sndright_future_ = sndright_gate_.get_future(1, &generation);
+            sndright_future_ = sndright_gate_.get_future(&generation);
 
             // Send data to the right
             // The sender: send data to the left
@@ -1134,7 +1140,7 @@ namespace gtc { namespace server
         mutex_type::scoped_lock l(mtx_);
         sndright_gate_.synchronize(generation, l, "point::set_int_sendright_data");
         int_sendright_receive_ = send;
-        sndright_gate_.set(0);         // trigger corresponding and-gate input
+        sndright_gate_.set();         // trigger corresponding and-gate input
     }
 
     void partition::int_toroidal_sndleft(int *csend,int* mgrid)
@@ -1150,7 +1156,7 @@ namespace gtc { namespace server
             int_sendleft_receive_.resize(vsize);
 
             // create a new and-gate object
-            sndleft_future_ = sndleft_gate_.get_future(1, &generation);
+            sndleft_future_ = sndleft_gate_.get_future(&generation);
 
             // Send data to the left
             // The sender: send data to the left
@@ -1163,7 +1169,8 @@ namespace gtc { namespace server
         }
 
         set_int_sendleft_data_action set_int_sendleft_data_;
-        hpx::apply(set_int_sendleft_data_, toroidal_comm_[left_pe_], item_, generation, send);
+        hpx::apply(set_int_sendleft_data_, toroidal_comm_[left_pe_], item_, 
+            generation, send);
       } else {
         mutex_type::scoped_lock l(mtx_);
         sndleft_gate_.next_generation();
@@ -1195,7 +1202,7 @@ namespace gtc { namespace server
         mutex_type::scoped_lock l(mtx_);
         sndleft_gate_.synchronize(generation, l, "point::set_int_sendleft_data");
         int_sendleft_receive_ = send;
-        sndleft_gate_.set(0);         // trigger corresponding and-gate input
+        sndleft_gate_.set();         // trigger corresponding and-gate input
     }
 
 }}
