@@ -455,8 +455,8 @@ namespace hpx { namespace threads
         thrd->set_state(new_state);
 
         if (new_state == pending) {
-            // FIXME: Passing a specific target thread may screw with the round
-            // robin queuing.
+            // FIXME: Passing a specific target thread may interfere with the 
+            // round robin queuing.
             scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
             do_some_work();
         }
