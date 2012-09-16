@@ -175,12 +175,14 @@ namespace hpx { namespace threads
             }
         }
 
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "threadmanager_impl::register_thread", "description is NULL");
             return invalid_thread_id;
         }
+#endif
 
 #if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         if (0 == data.parent_id) {
@@ -212,8 +214,11 @@ namespace hpx { namespace threads
 
         LTM_(info) << "register_thread(" << newid << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
-                   << "run_now(" << (run_now ? "true" : "false") << "), "
-                   << "description(" << data.description << ")";
+                   << "run_now(" << (run_now ? "true" : "false")
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+                   << "), description(" << data.description 
+#endif
+                   << ")";
 
         return newid;
     }
@@ -253,17 +258,22 @@ namespace hpx { namespace threads
             }
         }
 
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "threadmanager_impl::register_work", "description is NULL");
             return;
         }
+#endif
 
         LTM_(info) << "register_work: initial_state("
                    << get_thread_state_name(initial_state) << "), thread_priority("
-                   << get_thread_priority_name(data.priority) << "), "
-                   << "description(" << data.description << ")";
+                   << get_thread_priority_name(data.priority)
+#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+                   << "), description(" << data.description 
+#endif
+                   << ")";
 
 #if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
         if (0 == data.parent_id) {
