@@ -542,9 +542,9 @@ namespace hpx { namespace actions
             // Always serialize the parent information to maintain binary 
             // compatibility on the  wire.
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
-            boost::uint32_t parent_locality_id_ = naming::invalid_locality_id;
-            threads::thread_id_type parent_thread_id_ = threads::invalid_thread_id;
-            std::size_t parent_thread_phase_ = 0;
+            boost::uint32_t parent_locality_ = naming::invalid_locality_id;
+            threads::thread_id_type parent_thread_ = threads::invalid_thread_id;
+            std::size_t parent_phase_ = 0;
 #endif
             ar & parent_locality_;
             ar & parent_id_;
