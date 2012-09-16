@@ -543,7 +543,7 @@ namespace hpx { namespace actions
             // compatibility on the  wire.
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
             boost::uint32_t parent_locality_id_ = naming::invalid_locality_id;
-            thread_id_type parent_thread_id_ = threads::invalid_thread_id;
+            threads::thread_id_type parent_thread_id_ = threads::invalid_thread_id;
             std::size_t parent_thread_phase_ = 0;
 #endif
             ar & parent_locality_;
