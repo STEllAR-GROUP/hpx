@@ -49,12 +49,12 @@ namespace ag { namespace server
     private:
         mutable mutex_type mtx_;
 
-        std::size_t rank_;                // our rank
+        std::size_t rank_;                              // our rank
 
         std::vector<double> n_;                         // all-gathered values
         std::vector<hpx::naming::id_type> components_;  // components for allgather
 
-        hpx::lcos::local::and_gate gate_; // synchronization gate
+        hpx::lcos::local::base_and_gate<> gate_;        // synchronization gate
     };
 }}
 
