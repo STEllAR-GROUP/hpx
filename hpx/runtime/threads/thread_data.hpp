@@ -446,18 +446,13 @@ namespace hpx { namespace threads
         // Memory management
         static void* operator new(std::size_t size, pool_type&);
         static void operator delete(void* p, std::size_t size);
+        static void operator delete(void*, pool_type&);
 
         // Won't be called.
         static void* operator new(std::size_t) throw()
         {
             BOOST_ASSERT(false);
             return NULL;
-        }
-
-        // Won't be called.
-        static void operator delete(void*, pool_type&)
-        {
-            BOOST_ASSERT(false);
         }
 
         bool is_created_from(void* pool) const

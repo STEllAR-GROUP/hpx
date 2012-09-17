@@ -18,7 +18,7 @@
 namespace hpx { namespace threads 
 {
     ///////////////////////////////////////////////////////////////////////////
-    void *thread_data::operator new(std::size_t size, thread_pool& pool)
+    void* thread_data::operator new(std::size_t size, thread_pool& pool)
     {
         BOOST_ASSERT(sizeof(thread_data) == size);
 
@@ -37,6 +37,12 @@ namespace hpx { namespace threads
             thread_data* pt = reinterpret_cast<thread_data*>(p);
             pt->pool_->deallocate(pt);
         }
+    }
+
+    void thread_data::operator delete(void *p, thread_pool& pool)
+    {
+        if (0 != p) 
+            pool.deallocate(reinterpret_cast<thread_data*>(p));
     }
 
     void thread_data::run_thread_exit_callbacks()
