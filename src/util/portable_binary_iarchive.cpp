@@ -46,8 +46,7 @@
 namespace hpx { namespace util
 {
 
-HPX_ALWAYS_EXPORT void
-portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
+void portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
 {
     char size;
     l = 0;
@@ -82,8 +81,8 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
         l = -l;
 }
 
-HPX_ALWAYS_EXPORT void
-portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
+void portable_binary_iarchive::load_override(
+    boost::archive::class_name_type& t, int)
 {
     std::string cn;
     cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
@@ -106,7 +105,7 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
-HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
+void portable_binary_iarchive::init(unsigned int flags)
 {
     if (0 == (flags & boost::archive::no_header))
     {
@@ -174,6 +173,7 @@ template class HPX_ALWAYS_EXPORT
 
 } // namespace archive
 } // namespace boost
+
 #endif
 
 // explicitly instantiate for this type of stream

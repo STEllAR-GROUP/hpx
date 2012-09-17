@@ -35,6 +35,7 @@ namespace hox { namespace util
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <istream>
+#include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
 
@@ -122,14 +123,13 @@ public:
     friend archive_base_t;
     friend primitive_base_t; // since with override load below
     friend class boost::archive::detail::interface_iarchive<
-        portable_binary_iarchive
-    >;
+        portable_binary_iarchive>;
     friend class boost::archive::load_access;
 protected:
 #endif
     unsigned int m_flags;
     HPX_ALWAYS_EXPORT void
-    load_impl(boost::intmax_t & l, char maxsize);
+    load_impl(boost::intmax_t& l, char maxsize);
 
     // default fall through for any types not specified here
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -206,6 +206,9 @@ protected:
     void load(unsigned char & t) {
         this->primitive_base_t::load(t);
     }
+    void load(signed char & t) {
+        this->primitive_base_t::load(t);
+    }
 
     // intermediate level to support override of operators
     // for templates in the absence of partial function
@@ -253,6 +256,49 @@ public:
         m_flags(0)
     {
         init(flags);
+    }
+
+    // the optimized load_array dispatches to load_binary 
+    template <typename T>
+    void load_array(boost::serialization::array<T>& a, unsigned int)
+    {
+        // If we need to potentially flip bytes we serialize each element 
+        // separately.
+#ifdef BOOST_BIG_ENDIAN
+        if (m_flags & endian_little) {
+            for (std::size_t i = 0; i != a.count(); ++i)
+                load(a.address()[i]);
+        }
+#else
+        if (m_flags & endian_big) {
+            for (std::size_t i = 0; i != a.count(); ++i)
+                load(a.address()[i]);
+        }
+#endif
+        else {
+            this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(T));
+        }
+    }
+
+    void load_array(boost::serialization::array<float>& a, unsigned int)
+    {
+        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(float));
+    }
+    void load_array(boost::serialization::array<double>& a, unsigned int)
+    {
+        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(double));
+    }
+    void load_array(boost::serialization::array<char>& a, unsigned int)
+    {
+        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(char));
+    }
+    void load_array(boost::serialization::array<unsigned char>& a, unsigned int)
+    {
+        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(unsigned char));
+    }
+    void load_array(boost::serialization::array<signed char>& a, signed int)
+    {
+        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(signed char));
     }
 };
 
