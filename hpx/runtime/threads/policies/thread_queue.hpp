@@ -157,17 +157,17 @@ namespace hpx { namespace threads { namespace policies
                     return false;
                 }
 
-                // transfer ownership to map
-                threads::thread_data* t = thrd.release();
-
                 // only insert the thread into the work-items queue if it is in
                 // pending state
                 if (state == pending) {
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
                     ++added;
-                    schedule_thread(t, num_thread);
+                    schedule_thread(thrd.get(), num_thread);
                 }
+
+                // transfer ownership to map
+                thrd.release();
             }
 
             if (added) {
