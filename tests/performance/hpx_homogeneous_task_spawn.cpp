@@ -35,8 +35,7 @@ using hpx::flush;
 // Command-line variables.
 boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
-boost::uint64_t current_trial = 0;
-boost::uint64_t total_trials = 1; 
+bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 void worker()
@@ -52,30 +51,28 @@ void print_results(
   , double walltime
     )
 {
-    if (current_trial == 0)
-    {
-        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-        std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    if (header)
+        cout << "OS-threads,Tasks,Delay (iterations),"
+                "Total Walltime (seconds),Walltime per Task (seconds)\n"
+             << flush;
 
-        cout << ( boost::format("%-21s %-21s %-21s %10.10s")
-                % cores_str % tasks_str % delay_str % walltime);
-    }
+    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
 
-    else
-        cout << (boost::format(", %10.10s") % walltime); 
-
-    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
-        cout << "\n";
-
-    cout << flush;
+    cout << ( boost::format("%-21s %-21s %-21s %10.12s, %10.12s\n")
+            % cores_str % tasks_str % delay_str
+            % walltime % (walltime / tasks)) << flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
-    variables_map&
+    variables_map& vm
     )
 {
+    if (vm.count("no-header"))
+        header = false;
+
     {
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
@@ -96,8 +93,7 @@ int hpx_main(
         print_results(get_os_thread_count(), t.elapsed());
     }
 
-    finalize();
-    return 0;
+    return finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,14 +113,9 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
-        
-        ( "current-trial"
-        , value<boost::uint64_t>(&current_trial)->default_value(0)
-        , "current trial")
 
-        ( "total-trials"
-        , value<boost::uint64_t>(&total_trials)->default_value(1)
-        , "total number of trial runs")
+        ( "no-header"
+        , "do not print out the csv header row")
         ;
 
     // Initialize and run HPX.
