@@ -12,6 +12,8 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/function.hpp>
 
 #endif
 

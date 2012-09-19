@@ -16,7 +16,7 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS;NOHPXINIT" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -99,13 +99,17 @@ macro(add_hpx_executable name)
     if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
       set(hpx_libs
         hpx${HPX_DEBUG_POSTFIX}
-        hpx_init${HPX_DEBUG_POSTFIX}
         hpx_serialization${HPX_DEBUG_POSTFIX})
+      if(NOT ${${name}_NOHPXINIT})
+        set(hpx_libs ${hpx_libs} hpx_init${HPX_DEBUG_POSTFIX})
+      endif()
     else()
       set(hpx_libs
         hpx
-        hpx_init
         hpx_serialization)
+      if(NOT ${${name}_NOHPXINIT})
+        set(hpx_libs ${hpx_libs} hpx_init)
+      endif()
     endif()
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
