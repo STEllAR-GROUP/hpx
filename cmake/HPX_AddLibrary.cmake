@@ -15,8 +15,12 @@ hpx_include(Message
 macro(add_hpx_library name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB"
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;LANGUAGE"
     "ESSENTIAL;NOLIBS;AUTOGLOB;STATIC" ${ARGN})
+
+  if(NOT ${name}_LANGUAGE)
+    set(${name}_LANGUAGE CXX)
+  endif() 
 
   if(${${name}_AUTOGLOB})
     if(NOT ${name}_SOURCE_ROOT)
@@ -31,6 +35,7 @@ macro(add_hpx_library name)
 
     if(NOT ${name}_SOURCE_GLOB)
       set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp"
+                              "${${name}_SOURCE_ROOT}/*.c"
                               "${${name}_SOURCE_ROOT}/*.f"
                               "${${name}_SOURCE_ROOT}/*.F"
                               "${${name}_SOURCE_ROOT}/*.f77"
@@ -53,7 +58,8 @@ macro(add_hpx_library name)
       TARGETS ${${name}_SOURCES})
 
     if(NOT (${name}_HEADER_GLOB OR ${${name}_HEADER_GLOB} STREQUAL ""))
-      set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp")
+      set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp"
+                              "${${name}_HEADER_ROOT}/*.h")
     endif()
     hpx_debug("add_library.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
@@ -106,8 +112,6 @@ macro(add_hpx_library name)
     set(hpx_lib hpx hpx_serialization)
   endif()
 
-  set(prefix "")
-
   if(NOT MSVC)
     if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
@@ -119,7 +123,6 @@ macro(add_hpx_library name)
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
     endif()
-    set(prefix "hpx_")
   else()
     if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
@@ -137,9 +140,9 @@ macro(add_hpx_library name)
     SOVERSION ${HPX_SOVERSION}
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${prefix}${name})
+    OUTPUT_NAME ${name})
 
-  if(HPX_INTERNAL_CMAKE)
+  if(HPX_INTERNAL_CMAKE AND NOT ${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties(${name}_lib PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
@@ -156,8 +159,30 @@ macro(add_hpx_library name)
         LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
     else()
       set_target_properties(${name}_lib PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY}
+        RUNTIME_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY}
+        ARCHIVE_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY}
         LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
+    endif()
+  elseif(${name}_OUTPUT_SUFFIX)
+    if(MSVC)
+      set_target_properties(${name}_lib PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}
+        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}
+        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX}
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}
+        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}
+        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX})
+    else()
+      set_target_properties(${name}_lib PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX}
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX})
     endif()
   endif()
 
@@ -171,12 +196,12 @@ macro(add_hpx_library name)
       PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
 
-  if(HPX_COMPILE_FLAGS)
+  if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
     set_property(TARGET ${name}_lib APPEND
-      PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
+      PROPERTY COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     if(NOT MSVC)
       set_property(TARGET ${name}_lib APPEND
-        PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
+        PROPERTY LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     endif()
   endif()
 
