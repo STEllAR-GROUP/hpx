@@ -57,13 +57,13 @@ macro(add_hpx_library name)
       ROOT ${${name}_SOURCE_ROOT}
       TARGETS ${${name}_SOURCES})
 
-    if(NOT (${name}_HEADER_GLOB OR ${${name}_HEADER_GLOB} STREQUAL ""))
+    if(NOT ${name}_HEADER_GLOB)
       set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp"
                               "${${name}_HEADER_ROOT}/*.h")
     endif()
     hpx_debug("add_library.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
-    if(NOT ${${name}_HEADER_GLOB} STREQUAL "")
+    if(NOT ${name}_HEADER_GLOB)
       add_hpx_library_headers(${name}_lib
         GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
       hpx_debug("add_library.${name}" "${${name}_lib_HEADERS}: ${${${name}_lib_HEADERS}}")
