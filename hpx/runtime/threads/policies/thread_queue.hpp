@@ -125,6 +125,12 @@ namespace hpx { namespace threads { namespace policies
         std::size_t add_new(boost::int64_t add_count, thread_queue* addfrom,
             std::size_t num_thread)
         {
+#if defined(HPX_DEBUG)
+            // make sure our mutex is locked at this point
+            mutex_type::scoped_try_lock l(mtx_);
+            BOOST_ASSERT(!l);
+#endif
+
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
 
@@ -165,6 +171,10 @@ namespace hpx { namespace threads { namespace policies
                     ++added;
                     schedule_thread(thrd.get(), num_thread);
                 }
+
+                // this thread has to be in the map now
+                BOOST_ASSERT(thread_map_.find(id) != thread_map_.end());
+                BOOST_ASSERT(thrd->is_created_from(&memory_pool_));
 
                 // transfer ownership to map
                 thrd.release();
@@ -248,6 +258,12 @@ namespace hpx { namespace threads { namespace policies
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated_locked(bool delete_all = false)
         {
+#if defined(HPX_DEBUG)
+            // make sure our mutex is locked at this point
+            mutex_type::scoped_try_lock l(mtx_);
+            BOOST_ASSERT(!l);
+#endif
+
             if (thread_map_.empty())
                 return true;
 
@@ -256,10 +272,13 @@ namespace hpx { namespace threads { namespace policies
                 thread_id_type todelete;
                 while (terminated_items_.dequeue(todelete))
                 {
+                    // this thread has to be in this map 
+                    BOOST_ASSERT(thread_map_.find(todelete) != thread_map_.end());
+
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) ? true : false;
-                    if (HPX_UNLIKELY(!deleted))
-                        BOOST_ASSERT(false);
+                    (void)deleted;
+                    BOOST_ASSERT(deleted);
                 }
             }
             else {
@@ -271,6 +290,9 @@ namespace hpx { namespace threads { namespace policies
                 thread_id_type todelete;
                 while (delete_count && terminated_items_.dequeue(todelete))
                 {
+                    // this thread has to be in this map 
+                    BOOST_ASSERT(thread_map_.find(todelete) != thread_map_.end());
+
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) ? true : false;
                     BOOST_ASSERT(deleted);
@@ -362,6 +384,10 @@ namespace hpx { namespace threads { namespace policies
                 // push the new thread in the pending queue thread
                 if (initial_state == pending)
                     schedule_thread(thrd.get(), num_thread);
+
+                // this thread has to be in the map now
+                BOOST_ASSERT(thread_map_.find(id) != thread_map_.end());
+                BOOST_ASSERT(thrd->is_created_from(&memory_pool_));
 
                 do_some_work();       // try to execute the new work item
                 thrd.release();       // release ownership to the map

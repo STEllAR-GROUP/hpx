@@ -183,6 +183,7 @@ namespace hpx { namespace threads
         ~thread_data()
         {
             free_thread_exit_callbacks();
+            pool_ = 0;
             LTM_(debug) << "~thread(" << this << "), description("
                         << get_description() << "), phase("
                         << get_thread_phase() << ")";
