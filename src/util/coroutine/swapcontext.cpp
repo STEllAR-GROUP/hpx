@@ -11,7 +11,7 @@
 #elif defined(__x86_64__) || defined(__amd64__)
 #include "swapcontext64.ipp"
 #else
-#error Undefined platform 
+#error Unsupported platform 
 #endif
 
 #endif
