@@ -24,7 +24,7 @@ macro(add_hpx_executable name)
   hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
-  if(NOT ${${name}_LANGUAGE})
+  if(NOT ${name}_LANGUAGE)
     set(${name}_LANGUAGE CXX)
   endif()
 
