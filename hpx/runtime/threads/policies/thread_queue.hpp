@@ -625,7 +625,10 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        cleanup_terminated_locked();
+        {
+            mutex_type::scoped_lock lk(mtx_);
+            cleanup_terminated_locked();
+        }
         return false;
     }
 

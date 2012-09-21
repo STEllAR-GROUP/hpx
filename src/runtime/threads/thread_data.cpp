@@ -35,6 +35,7 @@ namespace hpx { namespace threads
         BOOST_ASSERT(sizeof(thread_data) == size);
         if (0 != p) {
             thread_data* pt = reinterpret_cast<thread_data*>(p);
+            BOOST_ASSERT(pt->pool_);
             pt->pool_->deallocate(pt);
         }
     }
