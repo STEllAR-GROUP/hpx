@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_A07C7784_8AD2_4A12_B5BA_174DFBE03222)
-#define HPX_A07C7784_8AD2_4A12_B5BA_174DFBE03222
+#if !defined(HPX_B17381B2_EB3A_431C_9BE5_B992FC5966A3)
+#define HPX_B17381B2_EB3A_431C_9BE5_B992FC5966A3
 
 #include <vector>
 #include <queue>
