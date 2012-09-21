@@ -22,6 +22,7 @@ set(subdirs
     fortran_threadsafe
     gtc
     gtc_optimized
+    gtcx
     gravity
     heartbeat
     hplpx
