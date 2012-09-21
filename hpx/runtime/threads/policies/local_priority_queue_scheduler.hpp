@@ -319,14 +319,18 @@ namespace hpx { namespace threads { namespace policies
                     return true;
             }
 
-            if (low_priority_queue_.destroy_thread(thrd, busy_count))
-                return true;
-
             for (std::size_t i = 0; i < queues_.size(); ++i)
             {
                 if (queues_[i]->destroy_thread(thrd, busy_count))
                     return true;
             }
+
+            if (low_priority_queue_.destroy_thread(thrd, busy_count))
+                return true;
+
+            // the thread has to belong to one of the queues, always
+            BOOST_ASSERT(false);
+
             return false;
         }
 

@@ -258,12 +258,6 @@ namespace hpx { namespace threads { namespace policies
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated_locked(bool delete_all = false)
         {
-#if defined(HPX_DEBUG)
-            // make sure our mutex is locked at this point
-            mutex_type::scoped_try_lock l(mtx_);
-            BOOST_ASSERT(!l);
-#endif
-
             if (thread_map_.empty())
                 return true;
 
@@ -623,10 +617,6 @@ namespace hpx { namespace threads { namespace policies
                 }
                 return false;
             }
-        }
-
-        {
-            mutex_type::scoped_lock lk(mtx_);
             cleanup_terminated_locked();
         }
         return false;
