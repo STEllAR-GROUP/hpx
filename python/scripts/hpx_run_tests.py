@@ -130,8 +130,6 @@ if __name__ == '__main__':
     results = [] # [ cmd, cmd_passed, exit_code, timed_out, output ]
     cmds = {}
 
-    all_passed = True
-
     if not osp.exists(full_name):
       print "-", "Failed (test not found)"
 
