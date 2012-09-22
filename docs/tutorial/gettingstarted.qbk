@@ -438,16 +438,30 @@ module. Here is a code snippet demonstrating this.
 
 [teletype]
 ``
+    # Require a recent version of cmake
+    cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+
+    # This project is C++ based.
+    project(your_app CXX)
+
     # This adds the HPX cmake configuration directory to the search path.
     set(CMAKE_MODULE_PATH
         ${CMAKE_MODULE_PATH}
-        ${HPX_ROOT}/share/cmake-2.8/Modules)
+        ${HPX_ROOT}/share/cmake-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}/Modules)
 
-    # Instruct cmake to find the HPX installation
+    # Instruct cmake to find the HPX settings
     find_package(HPX)
 
     include_directories(${HPX_INCLUDE_DIR})
     link_directories(${HPX_LIBRARY_DIR})
+``
+
+This cmake script assumes that the location of the HPX installation is set 
+as the value of HPX_ROOT whic is best done by passing it on the command line 
+while invoking cmake:
+
+``
+    cmake -DHPX_ROOT=<HPX installations directory> ...
 ``
 
 Alternatively, if you wish to require HPX for your project, replace the
