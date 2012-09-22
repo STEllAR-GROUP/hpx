@@ -4,12 +4,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 find_package(Qt4)
-include(${QT_USE_FILE})
-    
-if(HPX_CXX11_LAMBDAS AND QT4_FOUND)
 
-    QT4_WRAP_CPP(QT_MOC_SOURCES widget.hpp hpx_qt.hpp OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
-    include_directories(./)
+if(HPX_CXX11_LAMBDAS AND QT4_FOUND)
+  include(${QT_USE_FILE})
+    
+  QT4_WRAP_CPP(QT_MOC_SOURCES widget.hpp hpx_qt.hpp OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
+  include_directories(./)
 
   set(qt_sources
       qt.cpp
@@ -32,11 +32,8 @@ if(HPX_CXX11_LAMBDAS AND QT4_FOUND)
   add_hpx_pseudo_target(examples.qt.qt)
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.qt
-                              examples.qt.qt)
+  add_hpx_pseudo_dependencies(examples.qt examples.qt.qt)
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.qt.qt
-                              qt_exe)
-
+  add_hpx_pseudo_dependencies(examples.qt.qt qt_exe)
 endif()
