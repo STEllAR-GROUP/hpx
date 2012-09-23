@@ -379,7 +379,7 @@
 #endif
 
 #if !defined(HPX_APPLICATION_NAME)
-#  define HPX_APPLICATION_NAME "unknown HPX application"
+#  define HPX_APPLICATION_NAME unknown_HPX_application
 #endif
 
 #if !defined(HPX_APPLICATION_STRING)
