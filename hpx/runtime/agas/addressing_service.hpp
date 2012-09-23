@@ -949,6 +949,26 @@ public:
         return resolve(id.get_gid(), addr, ec);
     }
 
+    naming::address resolve(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve(id, addr, ec);
+        return addr; 
+    }
+
+    naming::address resolve(
+        naming::id_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve(id.get_gid(), addr, ec);
+        return addr; 
+    }
+
     bool resolve_full(
         naming::gid_type const& id
       , naming::address& addr
@@ -964,13 +984,44 @@ public:
         return resolve_full(id.get_gid(), addr, ec);
     }
 
+    naming::address resolve_full(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve_full(id, addr, ec);
+        return addr; 
+    }
+
+    naming::address resolve_full(
+        naming::id_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve_full(id.get_gid(), addr, ec);
+        return addr; 
+    }
+
     bool resolve_cached(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
         );
 
-    // same, but bulk operation
+    bool resolve_cached(
+        naming::id_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        )
+    {
+        return resolve_cached(id.get_gid(), addr, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Bulk version.
+    // TODO: Add versions that take std::vector<id_type> for convenience.
     bool resolve(
         std::vector<naming::gid_type> const& gids
       , std::vector<naming::address>& addrs
@@ -978,14 +1029,14 @@ public:
       , error_code& ec = throws
         )
     {
-        // Try the cache
+        // Try the cache.
         if (caching_)
         {
             bool all_resolved = resolve_cached(gids, addrs, locals, ec);
             if (ec)
                 return false;
             if (all_resolved)
-                return true;    //nothing more to do
+                return true; // Nothing more to do.
         }
 
         return resolve_full(gids, addrs, locals, ec);
@@ -1320,19 +1371,36 @@ public:
         std::string const& name
         );
 
-    void update_cache(
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void insert_cache_entry(
         naming::gid_type const& gid
       , gva const& gva
       , error_code& ec = throws
         );
 
-    void update_cache(
+    void insert_cache_entry(
         naming::gid_type const& gid
-      , naming::locality const& l
-      , components::component_type t
-      , boost::uint64_t addr
-      , boost::uint64_t count = 1
+      , naming::address const& addr
       , error_code& ec = throws
+        )
+    {
+        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        insert_cache_entry(gid, g, ec);
+    }
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void update_cache_entry(
+        naming::gid_type const& gid
+      , gva const& gva
+      , error_code& ec = throws
+        );
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void clear_cache(
+        error_code& ec = throws
         );
 
     bool route_parcel(

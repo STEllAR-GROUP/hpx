@@ -46,11 +46,12 @@ namespace hpx { namespace components { namespace server
         Component* c = static_cast<Component*>(Component::create(count));
         naming::gid_type gid = c->get_base_gid();
         if (gid) {
-            // register the new object in the local AGAS cache
-            naming::resolver_client& cl = naming::get_agas_client();
-            cl.update_cache(gid, cl.get_here(),
-                components::get_component_type<typename Component::wrapped_type>(),
-                reinterpret_cast<boost::uint64_t>(c), count, ec);
+            // NOTE: This code is unnecessary, the address is already in the
+            // cache, because bind_range/bind caches it. 
+            //naming::resolver_client& cl = naming::get_agas_client();
+            //cl.update_cache(gid, cl.get_here(),
+            //    components::get_component_type<typename Component::wrapped_type>(),
+            //    reinterpret_cast<boost::uint64_t>(c), count, ec);
 
             // everything is ok, return the new id
             if (&ec != &throws)
@@ -79,11 +80,12 @@ namespace hpx { namespace components { namespace server
         ctor(c);
         naming::gid_type gid = c->get_base_gid();
         if (gid) {
-            // register the new object in the local AGAS cache
-            naming::resolver_client& cl = naming::get_agas_client();
-            cl.update_cache(gid, cl.get_here(),
-                components::get_component_type<typename Component::wrapped_type>(),
-                reinterpret_cast<boost::uint64_t>(c), 1, ec);
+            // NOTE: This code is unnecessary, the address is already in the
+            // cache, because bind_range/bind caches it. 
+            //naming::resolver_client& cl = naming::get_agas_client();
+            //cl.update_cache(gid, cl.get_here(),
+            //    components::get_component_type<typename Component::wrapped_type>(),
+            //    reinterpret_cast<boost::uint64_t>(c), 1, ec);
 
             // everything is ok, return the new id
             if (&ec != &throws)

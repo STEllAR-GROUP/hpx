@@ -89,8 +89,8 @@ HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action)
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::runtime_support::update_agas_cache_action,
-    update_agas_cache_action)
+    hpx::components::server::runtime_support::insert_agas_cache_entry_action,
+    insert_agas_cache_entry_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action)
@@ -533,11 +533,10 @@ namespace hpx { namespace components { namespace server
 
     /// \brief Insert the given name mapping into the AGAS cache of this
     ///        locality.
-    void runtime_support::update_agas_cache(naming::gid_type const& gid,
+    void runtime_support::insert_agas_cache_entry(naming::gid_type const& gid,
         naming::address const& addr)
     {
-        naming::get_agas_client().update_cache(gid, addr.locality_,
-            addr.type_, addr.address_);
+        naming::get_agas_client().insert_cache_entry(gid, addr);
     }
 
     ///////////////////////////////////////////////////////////////////////////
