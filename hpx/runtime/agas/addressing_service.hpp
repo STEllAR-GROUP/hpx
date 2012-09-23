@@ -1408,7 +1408,7 @@ public:
         )
     {
         const gva g(addr.locality_, addr.type_, 1, addr.address_);
-        insert_cache_entry(gid, g, ec);
+        update_cache_entry(gid, g, ec);
     }
 
     /// \warning This function is for internal use only. It is dangerous and
