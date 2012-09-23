@@ -12,7 +12,7 @@ set(benchmarks
     hpx_heterogeneous_task_spawn
     print_heterogeneous_payloads
     sizeof
-    function
+    function_object_wrapper_overhead
    )
 
 if(MSVC)
@@ -111,12 +111,12 @@ set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
-      packaged_task_overhead
+      future_overhead
       spinlock_overhead1
       spinlock_overhead2
      )
 
-  set(packaged_task_overhead_FLAGS DEPENDENCIES iostreams_component)
+  set(future_overhead_FLAGS DEPENDENCIES iostreams_component)
 
   set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
 
