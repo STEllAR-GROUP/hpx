@@ -28,6 +28,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/move.hpp>
 
+#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 #include <boost/mpl/bool.hpp>
