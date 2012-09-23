@@ -22,7 +22,7 @@ namespace hpx { namespace threads
     {
         BOOST_ASSERT(sizeof(thread_data) == size);
 
-        void *ret = pool.allocate();
+        void *ret = reinterpret_cast<void*>(pool.allocate());
         if (0 == ret)
             HPX_THROW_EXCEPTION(out_of_memory,
                 "thread_data::operator new",
@@ -33,7 +33,9 @@ namespace hpx { namespace threads
     void thread_data::operator delete(void *p, std::size_t size)
     {
         BOOST_ASSERT(sizeof(thread_data) == size);
-        if (0 != p) {
+
+        if (0 != p)
+        {
             thread_data* pt = reinterpret_cast<thread_data*>(p);
             BOOST_ASSERT(pt->pool_);
             pt->pool_->deallocate(pt);
@@ -42,7 +44,7 @@ namespace hpx { namespace threads
 
     void thread_data::operator delete(void *p, thread_pool& pool)
     {
-        if (0 != p) 
+        if (0 != p)
             pool.deallocate(reinterpret_cast<thread_data*>(p));
     }
 
@@ -133,7 +135,7 @@ namespace hpx { namespace threads
         return (0 != self) ? self->get_thread_id() : threads::invalid_thread_id;
     }
 
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
     thread_id_type get_parent_id()
     {
         return threads::invalid_thread_id;
@@ -176,7 +178,7 @@ namespace hpx { namespace threads
 
     naming::address::address_type get_self_component_id()
     {
-#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if !HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         return 0;
 #else
         thread_self* self = get_self_ptr();

@@ -39,9 +39,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads 
 {
+    struct thread_data;
+
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         // Why do we use std::stack + a lock here?
         template <typename CoroutineImpl>
         struct coroutine_allocator
@@ -86,7 +88,7 @@ namespace hpx { namespace threads
             std::stack<CoroutineImpl*> heap_;
         };
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         struct thread_exit_callback_node
         {
             HPX_STD_FUNCTION<void()> f_;
@@ -140,19 +142,19 @@ namespace hpx { namespace threads
           : coroutine_(boost::move(init_data.func), this_(), init_data.stacksize),
             current_state_(thread_state(newstate)),
             current_state_ex_(thread_state_ex(wait_signaled)),
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             component_id_(init_data.lva),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
             description_(init_data.description ? init_data.description : ""),
             lco_description_(""),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id_(init_data.parent_locality_id),
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
 #endif
-#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             marked_state_(unknown),
 #endif
             pool_(&pool),
@@ -164,7 +166,7 @@ namespace hpx { namespace threads
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << get_description() << ")";
 
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -342,14 +344,14 @@ namespace hpx { namespace threads
         /// Return the id of the component this thread is running in
         naming::address::address_type get_component_id() const
         {
-#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if !HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             return 0;
 #else
             return component_id_;
 #endif
         }
 
-#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if !HPX_THREAD_MAINTAIN_DESCRIPTION
         char const* get_description() const
         {
             return "<unknown>";
@@ -393,7 +395,7 @@ namespace hpx { namespace threads
         }
 #endif
 
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         /// Return the locality of the parent thread
         boost::uint32_t get_parent_locality_id() const
         {
@@ -431,7 +433,7 @@ namespace hpx { namespace threads
         }
 #endif
 
-#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         void set_marked_state(thread_state mark) const
         {
             marked_state_ = mark;
@@ -493,7 +495,7 @@ namespace hpx { namespace threads
             if (!enabled_interrupt_) {
                 HPX_THROW_EXCEPTION(thread_not_interruptable,
                     "thread_data::interrupt",
-                    "Interrupts are disabled for this thread.");
+                    "interrupts are disabled for this thread");
                 return;
             }
             requested_interrupt_ = true;
@@ -510,22 +512,22 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information 
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         naming::address::address_type const component_id_;
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
         char const* description_;
         char const* lco_description_;
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_id_;
         thread_id_type parent_thread_id_;
         std::size_t parent_thread_phase_;
 #endif
 
-#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         mutable thread_state marked_state_;
 #endif
 
