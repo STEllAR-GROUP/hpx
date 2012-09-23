@@ -1379,6 +1379,8 @@ public:
       , error_code& ec = throws
         );
 
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
     void insert_cache_entry(
         naming::gid_type const& gid
       , naming::address const& addr
@@ -1396,6 +1398,18 @@ public:
       , gva const& gva
       , error_code& ec = throws
         );
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void update_cache_entry(
+        naming::gid_type const& gid
+      , naming::address const& addr
+      , error_code& ec = throws
+        )
+    {
+        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        insert_cache_entry(gid, g, ec);
+    }
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
