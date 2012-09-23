@@ -327,7 +327,9 @@ else()
 endif()
 
 if(HPX_VERIFY_LOCKS)
-  add_definitions(-DHPX_VERIFY_LOCKS)
+  add_definitions(-DHPX_VERIFY_LOCKS=1)
+else()
+  add_definitions(-DHPX_VERIFY_LOCKS=0)
 endif()
 
 ################################################################################
