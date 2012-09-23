@@ -130,10 +130,10 @@ namespace hpx { namespace threads
     thread_id_type get_self_id()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ? self->get_thread_id() : 0;
+        return (0 != self) ? self->get_thread_id() : threads::invalid_thread_id;
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
     thread_id_type get_parent_id()
     {
         return threads::invalid_thread_id;
@@ -153,14 +153,16 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_id() : 0;
+            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_id() : 
+            threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_phase() : 0;
+            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_phase() : 
+            0;
     }
 
     boost::uint32_t get_parent_locality_id()
