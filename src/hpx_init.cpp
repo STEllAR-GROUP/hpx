@@ -34,6 +34,7 @@
 
 #include <iostream>
 #include <vector>
+#include <new>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -208,6 +209,8 @@ namespace hpx
 #else
     extern void termination_handler(int signum);
 #endif
+
+    extern void new_handler();
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -635,7 +638,7 @@ namespace hpx
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        void set_signal_handlers()
+        void set_error_handlers()
         {
 #if defined(BOOST_WINDOWS)
             // Set console control handler to allow server to be stopped.
@@ -654,6 +657,8 @@ namespace hpx
             sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault
             sigaction(SIGSYS, &new_action, NULL);  // Bad syscall
 #endif
+
+            std::set_new_handler(hpx::new_handler);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -690,7 +695,7 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         int result = 0;
-        detail::set_signal_handlers();
+        detail::set_error_handlers();
 
         try {
             // load basic ini configuration information to allow for command-
