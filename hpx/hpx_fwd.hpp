@@ -423,31 +423,42 @@ namespace hpx
         enum component_enum_type
         {
             component_invalid = -1,
-            component_runtime_support = 0,  // runtime support (needed to create components, etc.)
-            component_memory = 1,           // general memory address
-            component_memory_block = 2,     // general memory block
 
-            // LCO's
-            component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
+            // Runtime support component (provides system services such as
+            // component creation, etc). One per locality. 
+            component_runtime_support = 0,  
+
+            // Pseudo-component for direct access to local virtual memory.
+            component_memory = 1,
+
+            // Generic memory blocks. 
+            component_memory_block = 2,
+
+            // Base component for LCOs that do not produce a value.
+            component_base_lco = 3,         
+
+            // Base component for LCOs that do produce values. 
             component_base_lco_with_value = 4,
-                                            ///< base LCO's blocking on a value
-            component_future =              ///< a future executing the action and
-                                            ///< allowing to wait for the result
-                ((5 << 16) | component_base_lco_with_value),
-            component_value_adaptor = 6,    ///< an adaptor to access specific slot of an LCO
-            component_barrier =             ///< a LCO implementing a barrier
-                ((7 << 16) | component_base_lco),
-            component_thread =              ///< a ParalleX thread
-                ((8 << 16) | component_base_lco_with_value),
 
-            component_agas_primary_namespace = 12,
-            component_agas_component_namespace = 13,
-            component_agas_symbol_namespace = 14,
+            // Synchronization barrier LCO.
+            component_barrier = ((5 << 16) | component_base_lco),
+
+            // An LCO representing a value which may not have been computed yet.
+            component_promise = ((6 << 16) | component_base_lco_with_value),
+
+            // AGAS primary address resolution services.
+            component_agas_primary_namespace = 7,
+
+            // AGAS global type system.
+            component_agas_component_namespace = 8,
+
+            // AGAS symbolic naming services.
+            component_agas_symbol_namespace = 9,
 
             component_last,
             component_first_dynamic = component_last,
 
-            // force this enum type to be at least 32 bits.
+            // Force this enum type to be at least 32 bits.
             component_upper_bound = 0x7fffffffL
         };
 
@@ -856,7 +867,7 @@ namespace hpx
     ///
     /// This function returns the id of the current locality.
     ///
-    /// \param ec         [in,out] this represents the error status on exit,
+    /// \param ec         [in,out] This represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
