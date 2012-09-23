@@ -276,6 +276,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
+    // FIXME: Better name
     naming::gid_type const& local_locality(error_code& ec = throws) const
     {
         if (locality_ == naming::invalid_gid) {
@@ -286,6 +287,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         return locality_;
     }
 
+    // FIXME: Better name
     void local_locality(naming::gid_type const& g)
     {
         locality_ = g;
@@ -601,12 +603,8 @@ public:
     ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns \a true, if this global id
-    ///                   got associated with an local address for the
-    ///                   first time. It returns \a false, if the global id
-    ///                   was associated with another local address earlier
-    ///                   and the given local address replaced the
-    ///                   previously associated local address. Any error
-    ///                   results in an exception thrown from this function.
+    ///                   got associated with an local address. It returns
+    ///                   \a false otherwise. 
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -647,10 +645,8 @@ public:
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \returns          This function returns \a true if the given range
-    ///                   has been successfully bound and returns \a false
-    ///                   otherwise. Any error results in an exception
-    ///                   thrown from this function.
+    /// \returns          This function returns \a true, if the given range
+    ///                   was successfully bound. It returns \a false otherwise. 
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
