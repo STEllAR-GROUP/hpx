@@ -531,9 +531,7 @@ endif()
 if(MSVC)
   foreach(language CXX C Fortran)
     set(CMAKE_${language}_FLAGS_DEBUG
-        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG") 
-    set(CMAKE_${language}_FLAGS_DEBUG
-        "${CMAKE_${language}_FLAGS_DEBUG} -Od -Zi -Oy- -MDd -RTC1")
+        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG -Od -Zi -MDd")
     set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
         "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
     set(CMAKE_${language}_FLAGS_MINSIZEREL
@@ -541,6 +539,9 @@ if(MSVC)
     set(CMAKE_${language}_FLAGS_RELEASE
         "${CMAKE_${language}_FLAGS_RELEASE} -Ox -MD -GL")
   endforeach()
+
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -RTC1")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -RTC1")
 
   # Exceptions
   hpx_append_flag(-EHsc)
@@ -631,7 +632,7 @@ if(MSVC)
   endif()
 
   # Display full paths in diagnostics
-  hpx_append_flag(-FC LANGUAGES C CXX Fortran)
+  hpx_append_flag(-FC LANGUAGES C CXX)
 
   ##############################################################################
   # Macro definitions for system headers
