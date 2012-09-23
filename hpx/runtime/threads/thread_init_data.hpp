@@ -21,13 +21,13 @@ namespace hpx { namespace threads
     {
         thread_init_data()
           : func(),
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             lva(0), 
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
             description(0), 
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id(0), parent_id(0), parent_phase(0), 
 #endif
             priority(thread_priority_normal),
@@ -37,13 +37,13 @@ namespace hpx { namespace threads
 
         thread_init_data(BOOST_RV_REF(thread_init_data) rhs)
           : func(boost::move(rhs.func)),
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             lva(rhs.lva),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
             description(rhs.description), 
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
             parent_phase(rhs.parent_phase), 
 #endif
@@ -59,13 +59,13 @@ namespace hpx { namespace threads
                 std::size_t os_thread = std::size_t(-1),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1))
           : func(boost::forward<F>(f)), 
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             lva(lva_), 
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
             description(desc), 
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id(0), parent_id(0), parent_phase(0),
 #endif
             priority(priority_), num_os_thread(os_thread),
@@ -75,13 +75,13 @@ namespace hpx { namespace threads
 
         HPX_STD_FUNCTION<threads::thread_function_type> func;
 
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         naming::address::address_type lva;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
         char const* description;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_id;
         threads::thread_id_type parent_id;
         std::size_t parent_phase;
