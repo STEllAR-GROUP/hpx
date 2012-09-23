@@ -175,7 +175,7 @@ namespace hpx { namespace threads
             }
         }
 
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -184,7 +184,7 @@ namespace hpx { namespace threads
         }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
@@ -215,7 +215,7 @@ namespace hpx { namespace threads
         LTM_(info) << "register_thread(" << newid << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
                    << "run_now(" << (run_now ? "true" : "false")
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
                    << "), description(" << data.description 
 #endif
                    << ")";
@@ -258,7 +258,7 @@ namespace hpx { namespace threads
             }
         }
 
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -270,12 +270,12 @@ namespace hpx { namespace threads
         LTM_(info) << "register_work: initial_state("
                    << get_thread_state_name(initial_state) << "), thread_priority("
                    << get_thread_priority_name(data.priority)
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
                    << "), description(" << data.description 
 #endif
                    << ")";
 
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
