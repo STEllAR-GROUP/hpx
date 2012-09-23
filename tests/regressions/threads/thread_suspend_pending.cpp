@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(0x8000), 
+        ("pxthreads,T", value<std::size_t>()->default_value(0x1000), 
             "the number of PX threads to invoke")
         ("iterations", value<std::size_t>()->default_value(64), 
             "the number of iterations to execute in each thread")
