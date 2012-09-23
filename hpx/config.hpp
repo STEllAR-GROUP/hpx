@@ -272,6 +272,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// By default, enable guard pages. 
+#if !defined(HPX_THREAD_GUARD_PAGE)
+#  define HPX_THREAD_GUARD_PAGE 1
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // This defines the default installation location, should be set by build system
 #if !defined(HPX_PREFIX)
 #  define HPX_PREFIX "."

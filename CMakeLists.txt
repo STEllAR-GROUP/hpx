@@ -332,6 +332,14 @@ else()
   add_definitions(-DHPX_VERIFY_LOCKS=0)
 endif()
 
+hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
+
+if(HPX_THREAD_GUARD_PAGE)
+  add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
+else()
+  add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
+endif()
+
 ################################################################################
 # PAPI event counters
 ################################################################################

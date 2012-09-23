@@ -49,6 +49,7 @@
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <errno.h>
 #endif
 
 /**
@@ -70,14 +71,23 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
                               );
 
     if (real_stack == MAP_FAILED) {
-      throw std::bad_alloc();
+      if (ENOMEM == errno)
+        throw std::runtime_error("mmap() failed to allocate thread stack due "
+                                 "to insufficient resources, "
+                                 "/proc/sys/vm/max_map_count may be too low");
+      else
+        throw std::runtime_error("mmap() failed to allocate thread stack");
     }
 
+#if HPX_THREAD_GUARD_PAGE
     // Add a guard page.
     ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
 
     void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE / sizeof(void*));
     return static_cast<void*>(stack);
+#else
+    return real_stack;
+#endif
   }
 
   inline
@@ -108,8 +118,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
   inline
   void free_stack(void* stack, std::size_t size) {
+#if HPX_THREAD_GUARD_PAGE
     void** real_stack = static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
     ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
+#else
+    ::munmap(stack, size);
+#endif
   }
 
 #else  // non-mmap()
