@@ -269,7 +269,7 @@ namespace hpx { namespace threads { namespace policies
                         idle_loop_count, added, queues_[idx]) && result;
                 }
 
-#if defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
                 // no new work is available, are we deadlocked?
                 if (HPX_UNLIKELY(0 == added /*&& 0 == num_thread*/ && LHPX_ENABLED(error))) {
                     bool suspended_only = true;

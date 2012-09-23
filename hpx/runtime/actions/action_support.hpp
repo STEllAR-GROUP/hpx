@@ -281,7 +281,7 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         explicit transfer_action(threads::thread_priority priority)
           : arguments_(),
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -299,7 +299,7 @@ namespace hpx { namespace actions
         template <typename Arg0>
         explicit transfer_action(BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -317,7 +317,7 @@ namespace hpx { namespace actions
         template <typename Arg0>
         transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -333,7 +333,7 @@ namespace hpx { namespace actions
         {}
 
         // bring in the rest of the constructors
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         #include <hpx/runtime/actions/transfer_action_constructors.hpp>
 #else
         #include <hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp>
@@ -424,7 +424,7 @@ namespace hpx { namespace actions
                 cont, lva, arguments_));
         }
 
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         /// Return the locality of the parent thread
         boost::uint32_t get_parent_locality_id() const
         {
@@ -480,13 +480,13 @@ namespace hpx { namespace actions
             threads::thread_init_data& data)
         {
             data.func = boost::move(Action::construct_thread_function(lva, arguments_));
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             data.lva = lva;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
             data.description = detail::get_action_name<derived_type>();
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
@@ -500,13 +500,13 @@ namespace hpx { namespace actions
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = boost::move(Action::construct_thread_function(cont, lva, arguments_));
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             data.lva = lva;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
             data.description = detail::get_action_name<derived_type>();
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
@@ -540,8 +540,8 @@ namespace hpx { namespace actions
             util::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary 
-            // compatibility on the  wire.
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+            // compatibility on the wire.
+#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             boost::uint32_t parent_locality_ = naming::invalid_locality_id;
             std::size_t parent_id_ = std::size_t(-1);
             std::size_t parent_phase_ = 0;
@@ -563,7 +563,7 @@ namespace hpx { namespace actions
 
     protected:
         arguments_type arguments_;
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_;
         std::size_t parent_id_;
         std::size_t parent_phase_;

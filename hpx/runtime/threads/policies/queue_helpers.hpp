@@ -33,7 +33,7 @@ namespace detail
     bool dump_suspended_threads(std::size_t num_thread,
         Map& tm, boost::int64_t& idle_loop_count, bool running)
     {
-#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         (void)tm;
         (void)idle_loop_count;
         (void)running;
@@ -82,7 +82,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif
@@ -100,7 +100,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif
