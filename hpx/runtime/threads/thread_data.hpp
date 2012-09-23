@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads 
 {
-    struct thread_data;
+    class thread_data;
 
     namespace detail
     {
