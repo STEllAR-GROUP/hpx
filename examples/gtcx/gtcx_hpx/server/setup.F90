@@ -1316,7 +1316,7 @@ end subroutine broadcast_input_params
 
   count_t = 1
   count_p = 1
-  do i=1,numberpe
+  do i=0,numberpe-1
     p_rank=mod(i,npartdom)
     t_rank=i/npartdom
     if ( p_rank .eq. myrank_partd ) then
