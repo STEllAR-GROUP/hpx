@@ -6,49 +6,55 @@
 
 add_subdirectory(components)
 
-if(UNIX AND HPX_WARNINGS)
-  hpx_use_flag_if_available(-Wextra)
+if(UNIX)
+  hpx_use_flag_if_available(-fPIC)
+  hpx_use_flag_if_available(-pie)
 
-  # We never want trampolines
-  hpx_use_flag_if_available(-Wtrampolines)
-
-  # These are usually benign and can't be suppressed because of
-  # interface requirements
-  hpx_use_flag_if_available(-Wno-unused-parameter)
-
-  # There are ignored qualifiers in Boost, so we have to ignore them
-  hpx_use_flag_if_available(-Wno-ignored-qualifiers)
-
-  # Be extra strict about format checks
-  # Boost.Logging is built on fprintf, sadly
-  hpx_use_flag_if_available(-Wformat=2)
-  hpx_use_flag_if_available(-Wno-format-nonliteral)
-
-  # Self initialization is dangerous
-  hpx_use_flag_if_available(-Winit-self)
-
-  # For portability
-  hpx_use_flag_if_available(-Wdouble-promotion)
-
-  # Warn about casting that violates qualifiers or alignment
-  hpx_use_flag_if_available(-Wcast-qual)
-  hpx_use_flag_if_available(-Wcast-align)
-
-  hpx_use_flag_if_available(-Werror=trampolines)
-  hpx_use_flag_if_available(-Werror=parentheses)
-  hpx_use_flag_if_available(-Werror=reorder)
-  hpx_use_flag_if_available(-Werror=return-type)
-  hpx_use_flag_if_available(-Werror=sequence-point)
-
-  if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
-    # Uninitialized variables are bad, earlier compilers issue spurious warnings
-    hpx_use_flag_if_available(-Werror=uninitialized)
+  if(HPX_WARNINGS)
+    hpx_use_flag_if_available(-Wextra)
+  
+    # We never want trampolines
+    hpx_use_flag_if_available(-Wtrampolines)
+  
+    # These are usually benign and can't be suppressed because of
+    # interface requirements
+    hpx_use_flag_if_available(-Wno-unused-parameter)
+  
+    # There are ignored qualifiers in Boost, so we have to ignore them
+    hpx_use_flag_if_available(-Wno-ignored-qualifiers)
+  
+    # Be extra strict about format checks
+    # Boost.Logging is built on fprintf, sadly
+    hpx_use_flag_if_available(-Wformat=2)
+    hpx_use_flag_if_available(-Wno-format-nonliteral)
+  
+    # Self initialization is dangerous
+    hpx_use_flag_if_available(-Winit-self)
+  
+    # For portability
+    hpx_use_flag_if_available(-Wdouble-promotion)
+  
+    # Warn about casting that violates qualifiers or alignment
+    hpx_use_flag_if_available(-Wcast-qual)
+    hpx_use_flag_if_available(-Wcast-align)
+  
+    hpx_use_flag_if_available(-Werror=trampolines)
+    hpx_use_flag_if_available(-Werror=parentheses)
+    hpx_use_flag_if_available(-Werror=reorder)
+    hpx_use_flag_if_available(-Werror=return-type)
+    hpx_use_flag_if_available(-Werror=sequence-point)
+  
+    if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
+      # Uninitialized variables are bad, earlier compilers issue spurious
+      # warnings
+      hpx_use_flag_if_available(-Werror=uninitialized)
+    endif()
+  
+    hpx_use_flag_if_available(-Werror=missing-field-initializers)
+    hpx_use_flag_if_available(-Werror=format)
+    hpx_use_flag_if_available(-Werror=missing-braces)
+    hpx_use_flag_if_available(-Werror=sign-compare)
   endif()
-
-  hpx_use_flag_if_available(-Werror=missing-field-initializers)
-  hpx_use_flag_if_available(-Werror=format)
-  hpx_use_flag_if_available(-Werror=missing-braces)
-  hpx_use_flag_if_available(-Werror=sign-compare)
 endif()
 
 foreach(lib ${hpx_LIBRARIES})
