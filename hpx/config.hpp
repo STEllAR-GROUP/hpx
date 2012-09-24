@@ -228,13 +228,53 @@
 /// This defines the default number of OS-threads created for the different
 /// internal thread pools
 #if !defined(HPX_NUM_IO_POOL_THREADS)
-#define HPX_NUM_IO_POOL_THREADS 2
+#  define HPX_NUM_IO_POOL_THREADS 2
 #endif
 #if !defined(HPX_NUM_PARCEL_POOL_THREADS)
-#define HPX_NUM_PARCEL_POOL_THREADS 2
+#  define HPX_NUM_PARCEL_POOL_THREADS 2
 #endif
 #if !defined(HPX_NUM_TIMER_POOL_THREADS)
-#define HPX_NUM_TIMER_POOL_THREADS 2
+#  define HPX_NUM_TIMER_POOL_THREADS 2
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable minimal thread deadlock detection in debug builds only.
+#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the parent thread information in debug builds 
+/// only.
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the thread description in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_DESCRIPTION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the target address of the data the thread is 
+/// accessing in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable guard pages. 
+#if !defined(HPX_THREAD_GUARD_PAGE)
+#  define HPX_THREAD_GUARD_PAGE 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -339,7 +379,7 @@
 #endif
 
 #if !defined(HPX_APPLICATION_NAME)
-#  define HPX_APPLICATION_NAME "unknown HPX application"
+#  define HPX_APPLICATION_NAME unknown_HPX_application
 #endif
 
 #if !defined(HPX_APPLICATION_STRING)
@@ -363,6 +403,13 @@
 // Count number of empty (no PX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
 #  define HPX_IDLE_LOOP_COUNT_MAX 20000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Count number of busy thread manager loop executions before forcefully 
+// cleaning up terminated thread objects
+#if !defined(HPX_BUSY_LOOP_COUNT_MAX)
+#  define HPX_BUSY_LOOP_COUNT_MAX 20000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

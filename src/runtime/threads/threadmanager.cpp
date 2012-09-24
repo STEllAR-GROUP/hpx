@@ -175,13 +175,16 @@ namespace hpx { namespace threads
             }
         }
 
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "threadmanager_impl::register_thread", "description is NULL");
             return invalid_thread_id;
         }
+#endif
 
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
@@ -192,6 +195,7 @@ namespace hpx { namespace threads
         }
         if (0 == data.parent_locality_id)
             data.parent_locality_id = get_locality_id();
+#endif
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -210,8 +214,11 @@ namespace hpx { namespace threads
 
         LTM_(info) << "register_thread(" << newid << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
-                   << "run_now(" << (run_now ? "true" : "false") << "), "
-                   << "description(" << data.description << ")";
+                   << "run_now(" << (run_now ? "true" : "false")
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+                   << "), description(" << data.description 
+#endif
+                   << ")";
 
         return newid;
     }
@@ -251,18 +258,24 @@ namespace hpx { namespace threads
             }
         }
 
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "threadmanager_impl::register_work", "description is NULL");
             return;
         }
+#endif
 
         LTM_(info) << "register_work: initial_state("
                    << get_thread_state_name(initial_state) << "), thread_priority("
-                   << get_thread_priority_name(data.priority) << "), "
-                   << "description(" << data.description << ")";
+                   << get_thread_priority_name(data.priority)
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+                   << "), description(" << data.description 
+#endif
+                   << ")";
 
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         if (0 == data.parent_id) {
             thread_self* self = get_self_ptr();
             if (self)
@@ -273,6 +286,7 @@ namespace hpx { namespace threads
         }
         if (0 == data.parent_locality_id)
             data.parent_locality_id = get_locality_id();
+#endif
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -329,7 +343,7 @@ namespace hpx { namespace threads
         }
 
         // just retry, set_state will create new thread if target is still active
-        error_code ec;      // do not throw
+        error_code ec(lightweight);      // do not throw
         set_state(id, newstate, newstate_ex, priority, ec);
         return terminated;
     }
@@ -362,7 +376,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (NULL == thrd->get()) {
+        if (!thrd) {
             if (&ec != &throws)
                 ec = make_success_code();
             return thread_state(terminated);     // this thread has already been terminated
@@ -455,6 +469,8 @@ namespace hpx { namespace threads
         thrd->set_state(new_state);
 
         if (new_state == pending) {
+            // REVIEW: Passing a specific target thread may interfere with the 
+            // round robin queuing.
             scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
             do_some_work();
         }
@@ -473,7 +489,7 @@ namespace hpx { namespace threads
     {
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_state() : thread_state(terminated);
+        return thrd ? thrd->get_state() : thread_state(terminated);
     }
 
     /// The get_phase function is part of the thread related API. It
@@ -484,66 +500,71 @@ namespace hpx { namespace threads
     {
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_thread_phase() : std::size_t(~0);
+        return thrd ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
     /// The get_description function is part of the thread related API and
     /// allows to query the description of one of the threads known to the
     /// threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_description() : "<unknown>";
+        return thrd ? thrd->get_description() : "<unknown>";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_description(thread_id_type id, char const* desc)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_description",
                 "NULL thread id encountered");
+            return NULL; 
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get())
-            thrd->set_description(desc);
+        if (thrd)
+            return thrd->set_description(desc);
+        return NULL; 
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    std::string threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_lco_description(thread_id_type id) const
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_lco_description",
                 "NULL thread id encountered");
+            return NULL;
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_lco_description() : "<unknown>";
+        return thrd ? thrd->get_lco_description() : "<unknown>";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_lco_description(thread_id_type id, char const* desc)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_lco_description",
                 "NULL thread id encountered");
+            return NULL; 
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get())
-            thrd->set_lco_description(desc);
+        if (thrd)
+            return thrd->set_lco_description(desc);
+        return NULL;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -554,6 +575,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_interruption_enabled",
                 "NULL thread id encountered");
+            return false;
         }
 
         if (&ec != &throws)
@@ -561,7 +583,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->interruption_enabled() : false;
+        return thrd ? thrd->interruption_enabled() : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -579,7 +601,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get())
+        if (thrd)
             return thrd->set_interruption_enabled(enable);
         return false;
     }
@@ -600,7 +622,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->interruption_requested() : false;
+        return thrd ? thrd->interruption_requested() : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -619,7 +641,7 @@ namespace hpx { namespace threads
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (thrd->get()) {
+        if (thrd) {
             thrd->interrupt();      // notify thread
 
             // set thread state to pending, if the thread is currently active,
@@ -718,7 +740,8 @@ namespace hpx { namespace threads
         }
 
         // then re-activate the thread holding the deadline_timer
-        error_code ec;    // do not throw
+        // REVIEW: Why do we ignore errors here?
+        error_code ec(lightweight);    // do not throw
         set_state(timer_id, pending, wait_timeout, thread_priority_normal, ec);
         return terminated;
     }
@@ -759,11 +782,10 @@ namespace hpx { namespace threads
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id,
-            thread_state(pending), thread_state_ex(wait_timeout), priority,
-            boost::ref(throws)));
+            pending, wait_timeout, priority, boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
-        // if it returns 'signaled the timer has been canceled, otherwise
+        // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
         bool oldvalue = false;
         thread_state_ex_enum statex = self.yield(suspended);
@@ -832,24 +854,6 @@ namespace hpx { namespace threads
             boost::bind(f, this, from_now, id, newstate, newstate_ex, priority),
             "at_timer (from now)", 0, priority);
         return register_thread(data, pending, true, ec);
-    }
-
-    /// Retrieve the global id of the given thread
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    naming::id_type
-    threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_thread_gid(thread_id_type id)
-    {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::get_thread_gid",
-                "NULL thread id encountered");
-            return naming::invalid_id;
-        }
-
-        // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        return thrd->get() ? thrd->get_gid() : naming::invalid_id;
     }
 
     // helper class for switching thread state in and out during execution
@@ -1422,7 +1426,8 @@ namespace hpx { namespace threads
 
         manage_active_thread_count count(thread_count_);
 
-        std::size_t idle_loop_count = 0;
+        boost::int64_t idle_loop_count = 0;
+        boost::int64_t busy_loop_count = 0;
 
         // set affinity on Linux systems or when using hwloc
         topology const& topology_ = get_topology();
@@ -1431,7 +1436,7 @@ namespace hpx { namespace threads
         LTM_(info) << "tfunc(" << num_thread
                    << "): will run on processing unit: " << pu_num;
 
-        error_code ec;
+        error_code ec(lightweight);
         topology_.set_thread_affinity(pu_num, scheduler_.numa_sensitive(), ec);
 
         if (ec)
@@ -1457,6 +1462,7 @@ namespace hpx { namespace threads
                     state_.load() == running, idle_loop_count, thrd))
             {
                 idle_loop_count = 0;
+                ++busy_loop_count;
 
                 // Only pending PX threads will be executed.
                 // Any non-pending PX threads are leftovers from a set_state()
@@ -1527,6 +1533,8 @@ namespace hpx { namespace threads
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
+                        // REVIEW: Passing a specific target thread may screw
+                        // with the round robin queuing.
                         scheduler_.schedule_thread_last(thrd, num_thread);
                         do_some_work(num_thread);
                     }
@@ -1541,25 +1549,30 @@ namespace hpx { namespace threads
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
+                    // REVIEW: Passing a specific target thread may screw
+                    // with the round robin queuing.
                     scheduler_.schedule_thread(thrd, num_thread);
                 }
 
                 // Remove the mapping from thread_map_ if PX thread is depleted
                 // or terminated, this will delete the PX thread as all
                 // references go out of scope.
-                // FIXME: what has to be done with depleted PX threads?
+                // REVIEW: what has to be done with depleted PX threads?
                 if (state_val == depleted || state_val == terminated)
-                    scheduler_.destroy_thread(thrd);
+                    scheduler_.destroy_thread(thrd, busy_loop_count);
 
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
             }
 
             // if nothing else has to be done either wait or terminate
-            else if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
-            {
-                // if we need to terminate, unregister the counter first
-                count.exit();
-                break;
+            else {
+                busy_loop_count = 0;
+                if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
+                {
+                    // if we need to terminate, unregister the counter first
+                    count.exit();
+                    break;
+                }
             }
         }
 
@@ -1616,7 +1629,7 @@ namespace hpx { namespace threads
                     &threadmanager_impl::tfunc, this, thread_num)));
 
                 // set the new threads affinity (on Windows systems)
-                error_code ec;
+                error_code ec(lightweight);
                 topology_.set_thread_affinity(threads_.back(), pu_num,
                     scheduler_.numa_sensitive(), ec);
 

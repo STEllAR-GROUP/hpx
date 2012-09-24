@@ -123,7 +123,7 @@ namespace hpx { namespace lcos { namespace detail
                         << "(" << id << "): " << thrd->get_description();
 
                 // forcefully abort thread, do not throw
-                error_code ec;
+                error_code ec(lightweight);
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_abort, threads::thread_priority_normal, ec);
                 if (ec) {
@@ -397,7 +397,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // set the data
-            data_ = boost::forward<Data>(src);
+            data_ = boost::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full

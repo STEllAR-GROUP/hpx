@@ -6,7 +6,6 @@
 #if !defined(HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM)
 #define HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/cstdint.hpp>

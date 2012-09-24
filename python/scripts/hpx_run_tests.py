@@ -16,6 +16,8 @@ from optparse import OptionParser
 
 from errno import ENOENT
 
+import signal, re
+
 if osp.exists(osp.join(sys.path[0], "../hpx")):
   sys.path.append(osp.join(sys.path[0], ".."))
 if osp.exists(osp.join(sys.path[0], "../share/hpx/python/hpx")):
@@ -28,6 +30,17 @@ from hpx.process import process, process_group
 #
 # format: [ name, timeout, success, nodes, threads_per_node, args ] 
 # types:  [ string, float or None, bool, int, int, list ]
+
+signal_map = dict((-1 * k, v) for v, k in signal.__dict__.iteritems() \
+                           if re.match("SIG[A-Z]*$", v))
+
+def exit_decode(exit_code):
+  # In Bash on Linux, programs exit with a code of -1 * signal when an unhandled
+  # signal occurs.
+  if exit_code < 0 and exit_code in signal_map:
+    return signal_map[exit_code]
+  else:
+    return exit_code
 
 def create_path(name, prefix="", suffix=""):
   return osp.expandvars(prefix + name + suffix)
@@ -119,6 +132,8 @@ if __name__ == '__main__':
 
     if not osp.exists(full_name):
       print "-", "Failed (test not found)"
+
+      all_passed = False
 
       if "always" == options.log or "fail" == options.log:
         f = None
@@ -214,7 +229,7 @@ if __name__ == '__main__':
         print >> f, ("#" * 80)
         print >> f, "Command:", result[0] 
         print >> f, "Result:", ("Passed" if result[1] else "Failed")
-        print >> f, "Exit code:", result[2]
+        print >> f, "Exit code:", exit_decode(result[2])
         print >> f, "Timed out:", result[3]
         print >> f, ("#" * 80)
 

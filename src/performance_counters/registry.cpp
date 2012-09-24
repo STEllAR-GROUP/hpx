@@ -33,7 +33,7 @@ namespace hpx { namespace performance_counters
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
             counter_path_elements p;
-            error_code ec;
+            error_code ec(lightweight);
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
                 it = countertypes_.find(p.objectname_);
@@ -47,7 +47,7 @@ namespace hpx { namespace performance_counters
         counter_type_map_type::const_iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
             counter_path_elements p;
-            error_code ec;
+            error_code ec(lightweight);
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
                 it = countertypes_.find("/"+p.objectname_);

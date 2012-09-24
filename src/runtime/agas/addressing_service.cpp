@@ -735,13 +735,13 @@ bool addressing_service::bind_range(
         {
             if (range_caching_)
                 // Put the range into the cache.
-                update_cache(lower_id, g, ec);
+                insert_cache_entry(lower_id, g, ec);
 
             else
             {
                 // Only put the first GID in the range into the cache.
                 gva const first_g = g.resolve(lower_id, lower_id);
-                update_cache(lower_id, first_g, ec);
+                insert_cache_entry(lower_id, first_g, ec);
             }
         }
 
@@ -823,13 +823,21 @@ bool addressing_service::is_local_address(
   , error_code& ec
     )
 {
-    if (&ec != &throws)
-        ec = make_success_code();
+    naming::address addr;
 
-    // For now we fall back to the primitive implementation which just compares
-    // the prefixes. That will have to be changed, though.
-    return naming::get_locality_id_from_gid(local_locality())
-        == naming::get_locality_id_from_gid(id);
+    // Resolve the address of the GID.
+    if (!resolve(id, addr, ec))
+    {
+        HPX_THROWS_IF(ec, unknown_component_address
+          , "addressing_service::is_local_address"
+          , boost::str(boost::format("cannot resolve gid(%1%)") % id));
+        return false;
+    }
+
+    if (ec)
+        return false;
+
+    return addr.locality_ == here_;
 }
 
 bool addressing_service::is_local_address(
@@ -882,13 +890,15 @@ bool addressing_service::is_local_address_cached(
   , error_code& ec
     )
 {
-    if (&ec != &throws)
-        ec = make_success_code();
+    naming::address addr;
 
-    // For now we fall back to the primitive implementation which just compares
-    // the prefixes. That will have to be changed, though.
-    return naming::get_locality_id_from_gid(local_locality())
-        == naming::get_locality_id_from_gid(id);
+    // Try to resolve the address of the GID.
+    // NOTE: We do not throw here for a reason; it is perfectly valid for the
+    // GID to not be found in the cache.
+    if (!resolve_cached(id, addr, ec) || ec)
+        return false;
+
+    return addr.locality_ == here_;
 }
 
 bool addressing_service::is_local_address_cached(
@@ -910,6 +920,7 @@ bool addressing_service::is_local_lva_encoded_address(
     naming::gid_type const& id
     )
 {
+    // NOTE: This should still be migration safe.
     return naming::strip_credit_from_gid(id.get_msb())
         == local_locality().get_msb();
 }
@@ -1012,10 +1023,10 @@ bool addressing_service::resolve_full(
         {
             if (range_caching_)
                 // Put the gva range into the cache.
-                update_cache(rep.get_base_gid(), rep.get_gva(), ec);
+                insert_cache_entry(rep.get_base_gid(), rep.get_gva(), ec);
             else
                 // Put the fully resolve gva into the cache.
-                update_cache(id, g, ec);
+                insert_cache_entry(id, g, ec);
         }
 
         if (ec)
@@ -1181,10 +1192,12 @@ bool addressing_service::resolve_full(
             {
                 if (range_caching_)
                     // Put the gva range into the cache.
-                    update_cache(reps[j].get_base_gid(), reps[j].get_gva(), ec);
+                    // REVIEW: This may cause collisions in the cache.
+                    insert_cache_entry(reps[j].get_base_gid(), reps[j].get_gva(), ec);
                 else
-                    // Put the fully resolve gva into the cache.
-                    update_cache(gids[i], g, ec);
+                    // Put the fully resolved gva into the cache.
+                    // REVIEW: This may cause collisions in the cache.
+                    insert_cache_entry(gids[i], g, ec);
             }
 
             if (ec)
@@ -1464,7 +1477,7 @@ bool addressing_service::iterate_ids(
     }
 } // }}}
 
-void addressing_service::update_cache(
+void addressing_service::insert_cache_entry(
     naming::gid_type const& gid
   , gva const& g
   , error_code& ec
@@ -1472,7 +1485,7 @@ void addressing_service::update_cache(
 { // {{{
     if (!caching_)
     {
-        // if caching is disabled, we silently pretend success
+        // If caching is disabled, we silently pretend success.
         return;
     }
 
@@ -1482,13 +1495,31 @@ void addressing_service::update_cache(
         const boost::uint64_t count = (g.count ? g.count : 1);
 
         LAS_(debug) <<
-            ( boost::format("updating cache, gid(%1%), count(%2%)")
+            ( boost::format("inserting entry into cache, gid(%1%), count(%2%)")
             % gid % count);
 
         mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        gva_cache_key key(gid, count);
-        gva_cache_.insert(key, g);
+        const gva_cache_key key(gid, count);
+
+        if (!gva_cache_.insert(key, g))
+        {
+            // Figure out who we collided with.
+            gva_cache_key idbase;
+            gva_cache_type::entry_type e;
+
+            if (!gva_cache_.get_entry(key, idbase, e))
+                // This is impossible under sane conditions.
+                HPX_THROWS_IF(ec, invalid_data
+                  , "addressing_service::insert_cache_entry"
+                  , "data corruption or lock error occurred in cache");
+
+            LAS_(warning) <<
+                ( boost::format(
+                    "aborting insert due to key collision in cache, "
+                    "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                ) % gid % count % idbase.get_gid() % idbase.get_count());
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1496,7 +1527,7 @@ void addressing_service::update_cache(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::update_cache"
+              , "addressing_service::insert_cache_entry"
               , e.what());
         }
         else {
@@ -1505,34 +1536,60 @@ void addressing_service::update_cache(
     }
 } // }}}
 
-void addressing_service::update_cache(
+bool check_for_collisions(
+    addressing_service::gva_cache_key const& new_key
+  , addressing_service::gva_cache_key const& old_key
+    )
+{
+    return (new_key.get_gid() == old_key.get_gid())
+        && (old_key.get_count() == old_key.get_count());
+}
+
+void addressing_service::update_cache_entry(
     naming::gid_type const& gid
-  , naming::locality const& l
-  , components::component_type t
-  , boost::uint64_t addr
-  , boost::uint64_t count
+  , gva const& g
   , error_code& ec
     )
 { // {{{
     if (!caching_)
     {
-        // if caching is disabled, we silently pretend success
+        // If caching is disabled, we silently pretend success.
         return;
     }
 
     try {
         // The entry in AGAS for a locality's RTS component has a count of 0,
         // so we convert it to 1 here so that the cache doesn't break.
-        const boost::uint64_t real_count = (count ? count : 1);
+        const boost::uint64_t count = (g.count ? g.count : 1);
 
         LAS_(debug) <<
-            ( boost::format("updating cache, gid(%1%), count(%2%)")
-            % gid % real_count);
+            ( boost::format(
+                "updating cache entry (will override existing entry for this "
+                "GID), gid(%1%), count(%2%)"
+            ) % gid % count);
 
         mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        gva_cache_key key(gid, real_count);
-        gva_cache_.insert(key, gva(l, t, real_count, addr));
+        const gva_cache_key key(gid, count);
+
+        if (!gva_cache_.update_if(key, g, check_for_collisions))
+        {
+            // Figure out who we collided with.
+            gva_cache_key idbase;
+            gva_cache_type::entry_type e;
+
+            if (!gva_cache_.get_entry(key, idbase, e))
+                // This is impossible under sane conditions.
+                HPX_THROWS_IF(ec, invalid_data
+                  , "addressing_service::update_cache_entry"
+                  , "data corruption or lock error occurred in cache");
+
+            LAS_(warning) <<
+                ( boost::format(
+                    "aborting update due to key collision in cache, "
+                    "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                ) % gid % count % idbase.get_gid() % idbase.get_count());
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1540,7 +1597,39 @@ void addressing_service::update_cache(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::update_cache"
+              , "addressing_service::update_cache_entry"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+} // }}}
+
+void addressing_service::clear_cache(
+    error_code& ec
+    )
+{ // {{{
+    if (!caching_)
+    {
+        // If caching is disabled, we silently pretend success.
+        return;
+    }
+
+    try {
+        LAS_(warning) << "clearing cache";
+
+        mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        gva_cache_.clear();
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::clear_cache"
               , e.what());
         }
         else {

@@ -528,7 +528,7 @@ namespace hpx { namespace performance_counters
         naming::gid_type create_counter_local(counter_info const& info)
         {
             // find create function for given counter
-            error_code ec;
+            error_code ec(lightweight);
 
             HPX_STD_FUNCTION<create_counter_func> f;
             get_runtime().get_counter_registry().get_counter_create_function(

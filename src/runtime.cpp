@@ -114,6 +114,12 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    HPX_EXPORT void new_handler()
+    {
+        HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
+            "new allocator failed to allocate memory");
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace strings
     {
@@ -387,11 +393,8 @@ namespace hpx
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type);
 
-        if (locality_ids.empty()) {
-            HPX_THROW_EXCEPTION(hpx::bad_component_type, "find_locality",
-                "no locality supporting sheneos configuration component found");
+        if (locality_ids.empty()) 
             return naming::invalid_id;
-        }
 
         // chose first locality to host the object
         return locality_ids.front();

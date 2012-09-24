@@ -120,32 +120,15 @@ namespace hpx { namespace threads
     ///                   thread referenced by the \a id parameter. If the
     ///                   thread is not known to the thread-manager the return
     ///                   value will be the string "<unknown>".
-    HPX_API_EXPORT std::string get_thread_description(thread_id_type id,
+    HPX_API_EXPORT char const* get_thread_description(thread_id_type id,
         error_code& ec = throws);
-    HPX_API_EXPORT void set_thread_description(thread_id_type id,
+    HPX_API_EXPORT char const* set_thread_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
 
-    HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT char const* get_thread_lco_description(thread_id_type id,
         error_code& ec = throws);
-    HPX_API_EXPORT void set_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT char const* set_thread_lco_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// The function get_thread_gid is part of the thread related API
-    /// allows to query the GID of one of the threads known to the
-    /// thread-manager.
-    ///
-    /// \param id         [in] The thread id of the thread being queried.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \returns          This function returns the GID of the
-    ///                   thread referenced by the \a id parameter. If the
-    ///                   thread is not known to the thread-manager the return
-    ///                   value will be \a naming::invalid_id.
-    HPX_API_EXPORT naming::id_type get_thread_gid(thread_id_type id,
-        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API. It

@@ -49,6 +49,7 @@
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <errno.h>
 #endif
 
 /**
@@ -58,29 +59,35 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#   if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#       pragma GCC diagnostic push
-#   endif
-#   pragma GCC diagnostic ignored "-Wold-style-cast"
-#   pragma GCC diagnostic ignored "-pedantic"
-#endif
-
   inline
-  void *
+  void*
   alloc_stack(std::size_t size) {
-    void * stack = ::mmap(NULL,
-                          size,
-                          PROT_EXEC|PROT_READ|PROT_WRITE,
-                          MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
-                          -1,
-                          0
-                          );
+    void* real_stack = ::mmap(NULL,
+                              size + EXEC_PAGESIZE,
+                              PROT_EXEC|PROT_READ|PROT_WRITE,
+                              MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,
+                              -1,
+                              0
+                              );
 
-    if(stack == MAP_FAILED) {
-      throw std::bad_alloc();
+    if (real_stack == MAP_FAILED) {
+      if (ENOMEM == errno)
+        throw std::runtime_error("mmap() failed to allocate thread stack due "
+                                 "to insufficient resources, "
+                                 "/proc/sys/vm/max_map_count may be too low");
+      else
+        throw std::runtime_error("mmap() failed to allocate thread stack");
     }
-    return stack;
+
+#if HPX_THREAD_GUARD_PAGE
+    // Add a guard page.
+    ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
+
+    void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE / sizeof(void*));
+    return static_cast<void*>(stack);
+#else
+    return real_stack;
+#endif
   }
 
   inline
@@ -111,14 +118,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
   inline
   void free_stack(void* stack, std::size_t size) {
+#if HPX_THREAD_GUARD_PAGE
+    void** real_stack = static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
+    ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
+#else
     ::munmap(stack, size);
+#endif
   }
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 #else  // non-mmap()
 
   //this should be a fine default.

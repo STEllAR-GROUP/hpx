@@ -20,17 +20,34 @@ namespace hpx { namespace threads
     struct thread_init_data
     {
         thread_init_data()
-          : description(0), lva(0), parent_locality_id(0), parent_id(0),
-            parent_phase(0), priority(thread_priority_normal),
+          : func(),
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+            lva(0), 
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+            description(0), 
+#endif
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+            parent_locality_id(0), parent_id(0), parent_phase(0), 
+#endif
+            priority(thread_priority_normal),
             num_os_thread(std::size_t(-1)),
             stacksize(get_default_stack_size())
         {}
 
         thread_init_data(BOOST_RV_REF(thread_init_data) rhs)
           : func(boost::move(rhs.func)),
-            description(rhs.description), lva(rhs.lva),
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+            lva(rhs.lva),
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+            description(rhs.description), 
+#endif
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
-            parent_phase(rhs.parent_phase), priority(rhs.priority),
+            parent_phase(rhs.parent_phase), 
+#endif
+            priority(rhs.priority),
             num_os_thread(rhs.num_os_thread),
             stacksize(rhs.stacksize)
         {}
@@ -41,19 +58,35 @@ namespace hpx { namespace threads
                 thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1))
-          : func(boost::forward<F>(f)), description(desc),
-            lva(lva_), parent_locality_id(0), parent_id(0), parent_phase(0),
+          : func(boost::forward<F>(f)), 
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+            lva(lva_), 
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+            description(desc), 
+#endif
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+            parent_locality_id(0), parent_id(0), parent_phase(0),
+#endif
             priority(priority_), num_os_thread(os_thread),
             stacksize(stacksize_ == std::ptrdiff_t(-1) ?
                 get_default_stack_size() : stacksize_)
         {}
 
         HPX_STD_FUNCTION<threads::thread_function_type> func;
-        char const* description;
+
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         naming::address::address_type lva;
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+        char const* description;
+#endif
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_id;
         threads::thread_id_type parent_id;
         std::size_t parent_phase;
+#endif
+
         thread_priority priority;
         std::size_t num_os_thread;
         std::ptrdiff_t stacksize;

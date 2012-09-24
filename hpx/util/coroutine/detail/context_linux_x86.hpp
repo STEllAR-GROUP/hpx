@@ -16,7 +16,9 @@
 #include <sys/param.h>
 #include <cstdlib>
 #include <cstddef>
+#include <stdexcept>
 
+#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -47,18 +49,6 @@ extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace coroutines 
 {
-    namespace very_detail
-    {
-        template <typename TO, typename FROM> 
-        TO nasty_cast(FROM f)
-        {
-            union {
-                FROM f; TO t;
-            } u;
-            u.f = f;
-            return u.t;
-        }
-    }
 
   // some platforms need special preparation of the main thread
   struct prepare_main_thread
@@ -69,6 +59,16 @@ namespace hpx { namespace util { namespace coroutines
 
   namespace detail { namespace lx
   {
+    template <typename TO, typename FROM> 
+    TO nasty_cast(FROM f)
+    {
+      union {
+        FROM f; TO t;
+      } u;
+      u.f = f;
+      return u.t;
+    }
+
     template<typename T>
     void trampoline(T* fun);
 
@@ -147,8 +147,20 @@ namespace hpx { namespace util { namespace coroutines
                       : stack_size),
           m_stack(0)
       {
-        BOOST_ASSERT(0 == (m_stack_size % EXEC_PAGESIZE));
-        BOOST_ASSERT(m_stack_size >= 0);
+        if (0 != (m_stack_size % EXEC_PAGESIZE))
+        {
+            throw std::runtime_error(
+                boost::str(boost::format(
+                    "stack size of %1% is not page aligned, page size is %2%")
+                    % m_stack_size % EXEC_PAGESIZE));
+        }
+
+        if (0 >= m_stack_size)
+        {
+            throw std::runtime_error(
+                boost::str(boost::format("stack size of %1% is invalid") % m_stack_size));
+        }
+
         m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
         BOOST_ASSERT(m_stack);
         m_sp = (static_cast<void**>(m_stack) + static_cast<std::size_t>(m_stack_size)/sizeof(void*));
@@ -166,7 +178,7 @@ namespace hpx { namespace util { namespace coroutines
 
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = very_detail::nasty_cast<void*>( funp );// return addr (here: start addr)
+        *--m_sp = nasty_cast<void*>( funp );// return addr (here: start addr)
         *--m_sp = 0;       // rbp
         *--m_sp = 0;       // rbx
         *--m_sp = 0;       // rsi
@@ -178,7 +190,7 @@ namespace hpx { namespace util { namespace coroutines
 #else
         *--m_sp = &cb;     // parm 0 of trampoline;
         *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = very_detail::nasty_cast<void*>( funp );// return addr (here: start addr)
+        *--m_sp = nasty_cast<void*>( funp );// return addr (here: start addr)
         *--m_sp = 0;       // ebp
         *--m_sp = 0;       // ebx
         *--m_sp = 0;       // esi

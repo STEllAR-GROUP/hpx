@@ -66,7 +66,7 @@ struct thread_deque
 
     // this is the type of a map holding all threads (except depleted ones)
     typedef boost::ptr_map<
-        thread_id_type, thread_data, std::less<thread_id_type>, heap_clone_allocator
+        thread_id_type, thread_data, std::less<thread_id_type>
     > thread_map_type;
 
     // this is the type of the queue of new tasks not yet converted to
@@ -108,14 +108,11 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROW_EXCEPTION(hpx::no_success,
+                HPX_THROW_EXCEPTION(hpx::out_of_memory,
                     "threadmanager::add_new",
                     "Couldn't add new thread to the map of threads");
                 return 0;
             }
-
-            // transfer ownership to map
-            threads::thread_data* t = thrd.release();
 
             // only insert the thread into the work-items queue if it is in
             // pending state
@@ -123,9 +120,11 @@ struct thread_deque
                 // pushing the new thread into the pending queue of the
                 // specified thread_queue
                 ++added;
-                enqueue(work_items_, t);
-                ++work_items_count_;
+                schedule_thread(thrd.get());
             }
+
+            // transfer ownership to map
+            thrd.release();
         }
 
         if (added)
@@ -164,14 +163,11 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROW_EXCEPTION(hpx::no_success,
+                HPX_THROW_EXCEPTION(hpx::out_of_memory,
                     "threadmanager::add_new",
                     "Couldn't add new thread to the map of threads");
                 return 0;
             }
-
-            // transfer ownership to map
-            threads::thread_data* t = thrd.release();
 
             // only insert the thread into the work-items queue if it is in
             // pending state
@@ -179,9 +175,11 @@ struct thread_deque
                 // pushing the new thread into the pending queue of the
                 // specified thread_queue
                 ++added;
-                enqueue(work_items_, t);
-                ++work_items_count_;
+                schedule_thread(thrd.get());
             }
+
+            // transfer ownership to map
+            thrd.release();
         }
 
         if (added)
@@ -221,14 +219,18 @@ struct thread_deque
 
     // This function makes sure all threads which are marked for deletion
     // (state is terminated) are properly destroyed
-    bool cleanup_terminated_locked()
+    bool cleanup_terminated_locked(bool delete_all = false)
     {
         {
             // delete only this many threads
-            boost::int64_t delete_count = max_delete_count;
+            boost::int64_t delete_count = 
+                (std::max)(terminated_items_count_ / 10, 
+                    static_cast<boost::int64_t>(max_delete_count));
             thread_id_type todelete;
-            while (delete_count && terminated_items_.dequeue(todelete))
+            while ((delete_all || delete_count) && 
+                terminated_items_.dequeue(todelete))
             {
+                --terminated_items_count_;
                 if (thread_map_.erase(todelete))
                     --delete_count;
             }
@@ -250,13 +252,16 @@ struct thread_deque
     enum { max_thread_count = 1000 };
 
     thread_deque(std::size_t max_count = max_thread_count)
-      : work_items_(),
+      : work_items_(128),
         work_items_count_(0),
         terminated_items_(128),
+        terminated_items_count_(0),
         max_count_((0 == max_count)
                   ? static_cast<std::size_t>(max_thread_count)
                   : max_count),
+        new_tasks_(128),
         new_tasks_count_(0),
+        memory_pool_(64),
         add_new_logger_("thread_deque::add_new")
     {}
 
@@ -301,7 +306,7 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROWS_IF(ec, hpx::no_success,
+                HPX_THROWS_IF(ec, hpx::out_of_memory,
                     "threadmanager::register_thread",
                     "Couldn't add new thread to the map of threads");
                 return invalid_thread_id;
@@ -364,11 +369,13 @@ struct thread_deque
     }
 
     // Destroy the passed thread as it has been terminated
-    bool destroy_thread(threads::thread_data* thrd)
+    bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
     {
         if (thrd->is_created_from(&memory_pool_)) {
             thread_id_type id = thrd->get_thread_id();
             terminated_items_.enqueue(id);
+            if (++terminated_items_count_ > busy_count / 10)
+                cleanup_terminated();
             return true;
         }
         return false;
@@ -426,22 +433,20 @@ struct thread_deque
             added += addednew;
 
             // stop running after all PX threads have been terminated
-            if (!(added != 0) && !running) {
+            if (added == 0) {
                 // Before exiting each of the OS threads deletes the
                 // remaining terminated PX threads
-                if (cleanup_terminated_locked())
+                bool canexit = cleanup_terminated_locked(true);
+                if (!running && canexit) 
                     return true;
 
-                LTM_(debug) << "tfunc(" << num_thread
-                            << "): threadmap not empty";
+//                 LTM_(debug) << "tfunc(" << num_thread
+//                             << "): threadmap not empty";
             }
-
-            else {
-                cleanup_terminated_locked();
-                return false;
-            }
+            return false;
         }
 
+        cleanup_terminated_locked();
         return false;
     }
 
@@ -486,11 +491,15 @@ struct thread_deque
 
     ///////////////////////////////////////////////////////////////////////
     bool dump_suspended_threads(std::size_t num_thread
-      , std::size_t& idle_loop_count, bool running)
+      , boost::int64_t& idle_loop_count, bool running)
     {
+#if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+        return false;
+#else
         mutex_type::scoped_lock lk(mtx_);
         return detail::dump_suspended_threads(num_thread, thread_map_
           , idle_loop_count, running);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -513,6 +522,7 @@ private:
     work_items_type work_items_;        ///< list of active work items
     boost::atomic<boost::int64_t> work_items_count_;    ///< count of active work items
     thread_id_queue_type terminated_items_;   ///< list of terminated threads
+    boost::atomic<boost::int64_t> terminated_items_count_;    ///< count of terminated items
 
     std::size_t max_count_;             ///< maximum number of existing PX-threads
     task_items_type new_tasks_;         ///< list of new tasks to run

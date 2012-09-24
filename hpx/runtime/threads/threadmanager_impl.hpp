@@ -303,19 +303,6 @@ namespace hpx { namespace threads
         ///                 value will be ~0.
         std::size_t get_phase(thread_id_type id);
 
-        /// The function get_thread_gid is part of the thread related API
-        /// allows to query the GID of one of the threads known to the
-        /// threadmanager.
-        ///
-        /// \param id         [in] The thread id of the thread the state should
-        ///                   be modified for.
-        ///
-        /// \returns          This function returns the GID of the
-        ///                   thread referenced by the \a id parameter. If the
-        ///                   thread is not known to the threadmanager the
-        ///                   return value will be \a naming::invalid_id.
-        naming::id_type get_thread_gid(thread_id_type id);
-
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (at the given time)
         /// \brief  Set the thread state of the \a thread referenced by the
@@ -375,11 +362,11 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the
         ///                 thread is not known to the thread-manager the return
         ///                 value will be the string "<unknown>".
-        std::string get_description(thread_id_type id) const;
-        void set_description(thread_id_type id, char const* desc = 0);
+        char const* get_description(thread_id_type id) const;
+        char const* set_description(thread_id_type id, char const* desc = 0);
 
-        std::string get_lco_description(thread_id_type id) const;
-        void set_lco_description(thread_id_type id, char const* desc = 0);
+        char const* get_lco_description(thread_id_type id) const;
+        char const* set_lco_description(thread_id_type id, char const* desc = 0);
 
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate() const;

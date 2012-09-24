@@ -35,7 +35,7 @@ namespace hpx { namespace util
     reverse_bytes(char size, char *address){
         char * first = address;
         char * last = first + size - 1;
-        for(;first < last;++first, --last){
+        for(/**/; first < last; ++first, --last){
             char x = *last;
             *last = *first;
             *first = x;

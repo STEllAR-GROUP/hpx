@@ -41,8 +41,9 @@ namespace boost { namespace serialization
         std::string throw_thread_name_;
         std::string throw_function_;
         std::string throw_file_;
-        std::string back_trace_;
+        std::string throw_back_trace_;
         int throw_line_ = 0;
+        std::string throw_env_;
 
         // retrieve information related to boost::exception
         try {
@@ -75,52 +76,50 @@ namespace boost { namespace serialization
 
             int const* line =
                 boost::get_error_info<boost::throw_line>(e);
-            if (line) {
+            if (line)
                 throw_line_ = *line;
-            }
 
             boost::uint32_t const* locality =
                 boost::get_error_info<hpx::detail::throw_locality>(e);
-            if (locality) {
+            if (locality)
                 throw_locality_ = *locality;
-            }
 
             std::string const* hostname_ =
                 boost::get_error_info<hpx::detail::throw_hostname>(e);
-            if (hostname_) {
+            if (hostname_)
                 throw_hostname_ = *hostname_;
-            }
 
             boost::int64_t const* pid_ =
                 boost::get_error_info<hpx::detail::throw_pid>(e);
-            if (pid_) {
+            if (pid_)
                 throw_pid_ = *pid_;
-            }
 
             std::size_t const* shepherd =
                 boost::get_error_info<hpx::detail::throw_shepherd>(e);
-            if (shepherd) {
+            if (shepherd)
                 throw_shepherd_ = *shepherd;
-            }
 
             std::size_t const* thread_id =
                 boost::get_error_info<hpx::detail::throw_thread_id>(e);
-            if (thread_id) {
+            if (thread_id)
                 throw_thread_id_ = *thread_id;
-            }
 
             std::string const* thread_name =
                 boost::get_error_info<hpx::detail::throw_thread_name>(e);
-            if (thread_name) {
+            if (thread_name)
                 throw_thread_name_ = *thread_name;
-            }
 
 #if defined(HPX_HAVE_STACKTRACES)
             std::string const* back_trace =
                 boost::get_error_info<hpx::detail::throw_stacktrace>(e);
             if (back_trace)
-                back_trace_ = *back_trace;
+                throw_back_trace_ = *back_trace;
 #endif
+
+            std::string const* env_ =
+                boost::get_error_info<hpx::detail::throw_env>(e);
+            if (env_)
+                throw_env_ = *env_;
         }
 
         // figure out concrete underlying exception type
@@ -187,7 +186,8 @@ namespace boost { namespace serialization
 
         ar & type & what & throw_function_ & throw_file_ & throw_line_
            & throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_
-           & throw_thread_id_ & throw_thread_name_ & back_trace_;
+           & throw_thread_id_ & throw_thread_name_ & throw_back_trace_
+           & throw_env_;
         if (hpx::util::hpx_exception == type) {
             ar & err_value;
         }
@@ -214,12 +214,14 @@ namespace boost { namespace serialization
         std::string throw_thread_name_;
         std::string throw_function_;
         std::string throw_file_;
-        std::string back_trace_;
+        std::string throw_back_trace_;
         int throw_line_ = 0;
+        std::string throw_env_;
 
         ar & type & what & throw_function_ & throw_file_ & throw_line_
            & throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_
-           & throw_thread_id_ & throw_thread_name_ & back_trace_;
+           & throw_thread_id_ & throw_thread_name_ & throw_back_trace_
+           & throw_env_;
         if (hpx::util::hpx_exception == type) {
             ar & err_value;
         }
@@ -228,78 +230,88 @@ namespace boost { namespace serialization
         }
 
         switch (type) {
+        default:
         case hpx::util::std_exception:
         case hpx::util::unknown_exception:
             e = hpx::detail::construct_exception(
                     hpx::detail::std_exception(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         // standard exceptions
         case hpx::util::std_runtime_error:
             e = hpx::detail::construct_exception(
                     std::runtime_error(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         case hpx::util::std_invalid_argument:
             e = hpx::detail::construct_exception(
                     std::invalid_argument(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         case hpx::util::std_out_of_range:
             e = hpx::detail::construct_exception(
                     std::out_of_range(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         case hpx::util::std_logic_error:
             e = hpx::detail::construct_exception(
                     std::logic_error(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         case hpx::util::std_bad_alloc:
             e = hpx::detail::construct_exception(
                     hpx::detail::bad_alloc(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
 #ifndef BOOST_NO_TYPEID
         case hpx::util::std_bad_cast:
             e = hpx::detail::construct_exception(
                     hpx::detail::bad_cast(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         case hpx::util::std_bad_typeid:
             e = hpx::detail::construct_exception(hpx::detail::bad_typeid(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 #endif
         case hpx::util::std_bad_exception:
             e = hpx::detail::construct_exception(
                     hpx::detail::bad_exception(what),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         // boost exceptions
@@ -312,9 +324,10 @@ namespace boost { namespace serialization
             e = hpx::detail::construct_exception(
                     boost::system::system_error(err_value,
                         boost::system::get_system_category(), err_message),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
 
         // hpx::exception
@@ -322,9 +335,10 @@ namespace boost { namespace serialization
             e = hpx::detail::construct_exception(
                     hpx::exception(static_cast<hpx::error>(err_value),
                         what, hpx::rethrow),
-                    throw_function_, throw_file_, throw_line_, back_trace_,
+                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
-                    throw_shepherd_, throw_thread_id_, throw_thread_name_);
+                    throw_shepherd_, throw_thread_id_, throw_thread_name_,
+                    throw_env_);
             break;
         }
     }

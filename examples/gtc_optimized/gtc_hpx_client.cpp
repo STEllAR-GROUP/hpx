@@ -3,24 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include<iostream>
-#include<vector>
-#include<math.h>
+#include <iostream>
+#include <vector>
+#include <math.h>
 #include "fname.h"
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#include "gtc_hpx/server/point.hpp"
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-extern "C" {void FNAME(gtc_wrapper)(); }
-
-bool fexists(std::string const filename)
-{
-  std::ifstream ifile(filename);
-  return ifile ? true : false;
-}
+#include "gtc_hpx/server/partition.hpp"
 
 /// This function initializes a vector of \a gtc::point clients,
 /// connecting them to components created with
@@ -44,18 +36,18 @@ int hpx_main(boost::program_options::variables_map &vm)
         // example.
         hpx::util::high_resolution_timer t;
 
-        ///////////////////////////////////////////////////////////////////////
-        // Retrieve the command line options.
-        std::string const parfilename = vm["file"].as<std::string>();
-
         // Get the component type for our point component.
         hpx::components::component_type block_type =
-        hpx::components::get_component_type<gtc::server::point>();
+        hpx::components::get_component_type<gtc::server::partition>();
 
         hpx::components::distributing_factory factory;
         factory.create(hpx::find_here());
 
-        std::size_t num_partitions = 10;
+        std::size_t num_partitions = 10 * hpx::find_all_localities(block_type).size();
+        BOOST_ASSERT(num_partitions);
+
+        std::cout << "num_partitions = " << num_partitions << "\n";
+
         hpx::components::distributing_factory::result_type blocks =
                                   factory.create_components(block_type, num_partitions);
 
@@ -69,7 +61,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<std::size_t> vmstep;
         {
           std::vector<hpx::lcos::future<std::size_t> > setup_phase;
-          gtc::server::point::setup_action setup;
+          gtc::server::partition::setup_action setup;
           for (std::size_t i=0;i<num_partitions;i++) {
             setup_phase.push_back(hpx::async(setup,components[i],num_partitions,i,components));
           }
@@ -80,7 +72,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         {
           std::vector<hpx::lcos::future<void> > chargei_phase;
-          gtc::server::point::chargei_action chargei;
+          gtc::server::partition::chargei_action chargei;
           for (std::size_t i=0;i<num_partitions;i++) {
             chargei_phase.push_back(hpx::async(chargei,components[i]));
           }
@@ -88,7 +80,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         // Time loop
-        std::size_t idiag;
+       // std::size_t idiag;
        // for (std::size_t istep=1;istep<=mstep;istep++) {
        //   for (std::size_t irk=1;irk<=2;irk++) {
        //   }
@@ -97,7 +89,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         istep = 0; irk = 0;
         {
           std::vector<hpx::lcos::future<void> > timeloop_phase;
-          gtc::server::point::timeloop_action timeloop;
+          gtc::server::partition::timeloop_action timeloop;
           for (std::size_t i=0;i<num_partitions;i++) {
             timeloop_phase.push_back(hpx::async(timeloop,components[i],istep,irk));
           }
@@ -118,10 +110,6 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-
-    desc_commandline.add_options()
-        ("file", value<std::string>()->default_value(
-                "exp_flush.dat"));
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }

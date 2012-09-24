@@ -20,7 +20,7 @@ namespace hpx { namespace agas
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  bool register_name(
+HPX_API_EXPORT bool register_name(
     std::string const& name
   , naming::id_type const& gid
   , error_code& ec = throws
@@ -36,47 +36,47 @@ inline bool register_name(
     return register_name(name, tmp, ec);
 }
 
-HPX_API_EXPORT  lcos::future<bool, response> register_name_async(
+HPX_API_EXPORT lcos::future<bool, response> register_name_async(
     std::string const& name
   , naming::id_type const& id
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  bool unregister_name(
+HPX_API_EXPORT bool unregister_name(
     std::string const& name
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT  bool unregister_name(
+HPX_API_EXPORT bool unregister_name(
     std::string const& name
   , naming::id_type& gid
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT  lcos::future<naming::id_type, response> unregister_name_async(
+HPX_API_EXPORT lcos::future<naming::id_type, response> unregister_name_async(
     std::string const& name
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  bool resolve_name(
+HPX_API_EXPORT bool resolve_name(
     std::string const& name
   , naming::id_type& gid
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT  bool resolve_name(
+HPX_API_EXPORT bool resolve_name(
     std::string const& name
   , naming::gid_type& gid
   , error_code& ec = throws
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  bool is_local_address(
+HPX_API_EXPORT bool is_local_address(
     naming::gid_type const& gid
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT  bool is_local_address(
+HPX_API_EXPORT bool is_local_address(
     naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec = throws
@@ -100,8 +100,7 @@ inline bool is_local_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// \brief Returns true if at least one referenced id_type is local
-
+/// \brief Returns true if at least one referenced id_type is local
 HPX_API_EXPORT bool is_local_address(
     std::vector<naming::id_type> const& ids
   , std::vector<naming::address>& addrs
@@ -113,12 +112,12 @@ HPX_API_EXPORT bool is_local_address(
 HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  bool is_local_address_cached(
+HPX_API_EXPORT bool is_local_address_cached(
     naming::gid_type const& gid
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT  bool is_local_address_cached(
+HPX_API_EXPORT bool is_local_address_cached(
     naming::gid_type const& gid
   , naming::address& addr
   , error_code& ec = throws
@@ -142,7 +141,7 @@ inline bool is_local_address_cached(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  bool is_local_lva_encoded_address(
+HPX_API_EXPORT bool is_local_lva_encoded_address(
     naming::gid_type const& gid
     );
 
@@ -154,32 +153,32 @@ inline bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT  void garbage_collect_non_blocking(
+HPX_API_EXPORT void garbage_collect_non_blocking(
     error_code& ec = throws
     );
 
-HPX_API_EXPORT  void garbage_collect(
+HPX_API_EXPORT void garbage_collect(
     error_code& ec = throws
     );
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Invoke an asynchronous garbage collection step on the given target
 ///        locality.
-HPX_API_EXPORT  void garbage_collect_non_blocking(
+HPX_API_EXPORT void garbage_collect_non_blocking(
     naming::id_type const& id
   , error_code& ec = throws
     );
 
 /// \brief Invoke a synchronous garbage collection step on the given target
 ///        locality.
-HPX_API_EXPORT  void garbage_collect(
+HPX_API_EXPORT void garbage_collect(
     naming::id_type const& id
   , error_code& ec = throws
     );
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Return an id_type referring to the console locality.
-HPX_API_EXPORT  naming::id_type get_console_locality(
+HPX_API_EXPORT naming::id_type get_console_locality(
     error_code& ec = throws
     );
 }}

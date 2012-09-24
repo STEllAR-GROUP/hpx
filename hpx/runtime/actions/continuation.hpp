@@ -18,6 +18,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/archive/detail/check.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -165,7 +166,7 @@ namespace boost { namespace archive { namespace detail
     inline void check_object_tracking<hpx::actions::continuation>() {}
 
     template <>
-    void inline check_pointer_tracking<hpx::actions::continuation>() {}
+    inline void check_pointer_tracking<hpx::actions::continuation>() {}
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -28,6 +28,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/move.hpp>
 
+#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 #include <boost/mpl/bool.hpp>
@@ -97,6 +98,8 @@ namespace hpx { namespace util
     >
     struct function : function_base<Sig, IArchive, OArchive>
     {
+        using function_base<Sig, IArchive, OArchive>::reset;
+
         typedef function_base<Sig, IArchive, OArchive> base_type;
         function() : base_type() {}
 
@@ -136,6 +139,8 @@ namespace hpx { namespace util
             this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
             return *this;
         }
+
+        void clear() { reset(); }
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(function)
@@ -181,6 +186,8 @@ namespace hpx { namespace util
     >
     struct function<Sig, void, void> : function_base<Sig, void, void>
     {
+        using function_base<Sig, void, void>::reset;
+
         typedef function_base<Sig, void, void> base_type;
         function() : base_type() {}
 
@@ -221,6 +228,8 @@ namespace hpx { namespace util
             return *this;
         }
 
+        void clear() { reset(); }
+
     private:
         BOOST_COPYABLE_AND_MOVABLE(function)
     };
@@ -231,6 +240,8 @@ namespace hpx { namespace util
     >
     struct function_nonser : function_base<Sig, void, void>
     {
+        using function_base<Sig, void, void>::reset;
+
         typedef function_base<Sig, void, void> base_type;
         function_nonser() : base_type() {}
 
@@ -270,6 +281,8 @@ namespace hpx { namespace util
             this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
             return *this;
         }
+
+        void clear() { reset(); }
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_nonser)

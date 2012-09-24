@@ -65,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_future };
+        enum { value = components::component_promise };
 
         promise()
           : back_ptr_(0)
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_future };
+        enum { value = components::component_promise };
 
         promise()
           : back_ptr_(0)

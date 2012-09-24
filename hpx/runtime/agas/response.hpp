@@ -201,7 +201,7 @@ struct response
         gva g;
 
         // Don't let the first attempt throw.
-        error_code first_try;
+        error_code first_try(lightweight);
         g = get_data<subtype_gid_gva, 1>(first_try);
 
         // If the first try failed, check again.
@@ -234,7 +234,7 @@ struct response
         boost::uint32_t prefix;
 
         // Don't let the first attempt throw.
-        error_code first_try;
+        error_code first_try(lightweight);
         prefix = get_data<subtype_gid_gid_prefix, 2>(first_try);
 
         // If the first try failed, check again.

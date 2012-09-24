@@ -246,7 +246,8 @@ namespace hpx {
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func,
                 boost::ref(result_)),
-            "run_helper");
+            "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
+            threads::get_stack_size(threads::thread_stacksize_medium));
         thread_manager_->register_thread(data);
         this->runtime::start();
         // }}}

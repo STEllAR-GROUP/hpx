@@ -40,7 +40,7 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuratio
 ################################################################################
 # project metadata
 ################################################################################
-project(hpx CXX)
+project(hpx CXX C)
 
 set(HPX_MAJOR_VERSION 1)
 set(HPX_MINOR_VERSION 0)
@@ -327,7 +327,17 @@ else()
 endif()
 
 if(HPX_VERIFY_LOCKS)
-  add_definitions(-DHPX_VERIFY_LOCKS)
+  add_definitions(-DHPX_VERIFY_LOCKS=1)
+else()
+  add_definitions(-DHPX_VERIFY_LOCKS=0)
+endif()
+
+hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
+
+if(HPX_THREAD_GUARD_PAGE)
+  add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
+else()
+  add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
 endif()
 
 ################################################################################
@@ -412,25 +422,6 @@ if(HPX_NATIVE_TLS)
 endif()
 
 ################################################################################
-# pxthread stack size
-################################################################################
-if(NOT HPX_STACK_SIZE)
-  if(MSVC)
-    set(HPX_STACK_SIZE "0x4000" CACHE STRING "HPX-thread stack size" FORCE)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
-     "CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
-  else()
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
-  endif()
-else()
-  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
-endif()
-mark_as_advanced(FORCE HPX_STACK_SIZE)
-
-add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
-
-################################################################################
 # Disable the use of partially preprocessed header files
 ################################################################################
 hpx_option(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
@@ -444,7 +435,7 @@ endif()
 # Compiler configuration
 ################################################################################
 # Clear CMake defaults
-foreach(language CXX Fortran)
+foreach(language CXX C Fortran)
   set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
@@ -453,6 +444,16 @@ endforeach()
 
 if(MSVC)
   add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
+  foreach(language CXX C Fortran)
+    set(CMAKE_${language}_FLAGS_DEBUG
+        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG") 
+    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS") 
+    set(CMAKE_${language}_FLAGS_MINSIZEREL
+        "${CMAKE_${language}_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE ASSERTS") 
+    set(CMAKE_${language}_FLAGS_RELEASE
+        "${CMAKE_${language}_FLAGS_RELEASE} -DNDEBUG -DBOOST_DISABLE_ASSERTS") 
+  endforeach()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
@@ -538,19 +539,19 @@ endif()
 # MSVC configuration
 ################################################################################
 if(MSVC)
-  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(CMAKE_CXX_FLAGS_DEBUG
-        "${CMAKE_CXX_FLAGS_DEBUG} -Od -Zi -Oy- -MDd -RTC1")
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
-        "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL
-        "${CMAKE_CXX_FLAGS_MINSIZEREL} -O1 -MD")
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS_RELEASE
-        "${CMAKE_CXX_FLAGS_RELEASE} -Ox -MD -GL")
-  endif()
+  foreach(language CXX C Fortran)
+    set(CMAKE_${language}_FLAGS_DEBUG
+        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG -Od -Zi -MDd")
+    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
+    set(CMAKE_${language}_FLAGS_MINSIZEREL
+        "${CMAKE_${language}_FLAGS_MINSIZEREL} -O1 -MD")
+    set(CMAKE_${language}_FLAGS_RELEASE
+        "${CMAKE_${language}_FLAGS_RELEASE} -Ox -MD -GL")
+  endforeach()
+
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -RTC1")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -RTC1")
 
   # Exceptions
   hpx_append_flag(-EHsc)
@@ -558,11 +559,11 @@ if(MSVC)
   # Runtime type information
   hpx_append_flag(-GR)
 
-  # Multiproccessor build
-  hpx_append_flag(-MP)
+  # Multiprocessor build
+  hpx_append_flag(-MP LANGUAGES CXX C Fortran)
 
   # Increase the maximum size of object file sections
-  hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
+  hpx_append_flag(-bigobj LANGUAGES CXX C Fortran)
 
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} psapi shlwapi)
 
@@ -630,7 +631,7 @@ if(MSVC)
   # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
-    hpx_append_flag(-W3)
+    hpx_append_flag(-W3 LANGUAGES C CXX)
 
     # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
     # which is benign
@@ -641,7 +642,7 @@ if(MSVC)
   endif()
 
   # Display full paths in diagnostics
-  hpx_append_flag(-FC)
+  hpx_append_flag(-FC LANGUAGES C CXX)
 
   ##############################################################################
   # Macro definitions for system headers
@@ -672,48 +673,48 @@ if(MSVC)
 ################################################################################
 else()
   # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
-  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
+  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX C Fortran
                             NAME copy_dt_needed_entries)
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
-    hpx_use_flag_if_available(-O0 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O0 LANGUAGES CXX C Fortran)
 
     # Generate debugging information
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
 
     # Keep the frame pointer
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX C Fortran)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
 
     # Generate debugging information
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
 
     # No tail call optimizations
-    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX C Fortran)
 
     # Don't allocate registers for wide types (e.g. 128bit ints) independently
-    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX C Fortran)
 
     # Disable register allocation webs, which make debugging impossible
-    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-web LANGUAGES CXX C Fortran)
 
     # Disable register renaming
-    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
-    hpx_use_flag_if_available(-Os LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
   endif()
 
   ##############################################################################
@@ -721,7 +722,7 @@ else()
   ##############################################################################
   if(HPX_STACKTRACES)
     # Export all visible symbols, not just those that are used
-    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
   endif()
 
   ##############################################################################
@@ -770,33 +771,33 @@ else()
   # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
-    hpx_use_flag_if_available(-Wall LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-Wsign-promo)
+    hpx_use_flag_if_available(-Wall LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX C)
   endif()
 
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
-  hpx_use_flag_if_available(-Werror=vla)
+  hpx_use_flag_if_available(-Werror=vla LANGUAGES CXX C)
 
   # No return statement in a non-void function can lead to garbage return values
   # in GCC.
-  hpx_use_flag_if_available(-Werror=return-type)
+  hpx_use_flag_if_available(-Werror=return-type LANGUAGES CXX C)
 
   # Show the flags that toggle each warning
-  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX C Fortran)
 
   # We get false positives all over the place with this. Also, detection for
   # this flag fails with GCC 4.4 and 4.5.
   if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
-    hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
-    hpx_use_flag_if_available(-Wno-unused-but-set-variable)
+    hpx_use_flag_if_available(-Wno-unused-but-set-parameter LANGUAGES CXX C)
+    hpx_use_flag_if_available(-Wno-unused-but-set-variable LANGUAGES CXX C)
 
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
-    hpx_use_flag_if_available(-Werror=uninitialized)
+    hpx_use_flag_if_available(-Werror=uninitialized LANGUAGES CXX C)
   endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics
-  hpx_use_flag_if_available(-Wno-sync-nand)
+  hpx_use_flag_if_available(-Wno-sync-nand LANGUAGES CXX C)
 
   # Silence warnings about deleting polymorphic objects with non-virtual dtors.
   # These come from within Boost. Detection for this flag fails with GCC 4.4,
@@ -823,7 +824,7 @@ else()
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-          hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
+          hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
         endif()
       endif()
     endif()
@@ -836,17 +837,19 @@ else()
              OFF ADVANCED)
 
   if(NOT HPX_MICROARCH_OPTIMIZATIONS)
-    if(NOT HPX_CXX_FLAG_MARCH_NATIVE)
-      set(HPX_CXX_FLAG_MARCH_NATIVE OFF)
-    endif()
-
-    if(NOT HPX_CXX_FLAG_MCX16)
-      set(HPX_CXX_FLAG_MCX16 OFF)
-    endif()
-
-    if(NOT HPX_CXX_FLAG_MCX16)
-      set(HPX_CXX_FLAG_MCX16 OFF)
-    endif()
+    foreach(language CXX C Fortran)
+      if(NOT HPX_${language}_FLAG_MARCH_NATIVE)
+        set(HPX_${language}_FLAG_MARCH_NATIVE OFF)
+      endif()
+  
+      if(NOT HPX_${language}_FLAG_MCX16)
+        set(HPX_${language}_FLAG_MCX16 OFF)
+      endif()
+  
+      if(NOT HPX_${language}_FLAG_MCX16)
+        set(HPX_${language}_FLAG_MCX16 OFF)
+      endif()
+    endforeach()
 
     if(NOT HPX_SSE2)
       set(HPX_SSE2 OFF)
@@ -861,13 +864,13 @@ else()
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
   # this flag is used, the generated binaries will be less portable.
-  hpx_use_flag_if_available(-march=native LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-march=native LANGUAGES CXX C Fortran)
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
   # It allows us to do double quadword (128bit) atomic compare and swap
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
-  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX C Fortran)
 
   if(HPX_CXX_FLAG_MCX16)
     add_definitions(-DHPX_HAVE_GNU_SYNC_16)
@@ -896,7 +899,7 @@ else()
                 BOOST_ATOMIC_HAVE_SSE2)
 
   if(HPX_SSE2)
-    hpx_use_flag_if_available(-msse2 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-msse2 LANGUAGES CXX C Fortran)
   endif()
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -920,7 +923,7 @@ else()
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
-  hpx_use_flag_if_available(-pthread)
+  hpx_use_flag_if_available(-pthread LANGUAGES CXX C)
 
   hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
              "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
@@ -970,15 +973,15 @@ else()
         add_definitions(-DHPX_JEMALLOC)
       endif()
 
-      hpx_use_flag_if_available(-fno-builtin-cfree)
-      hpx_use_flag_if_available(-fno-builtin-pvalloc)
-      hpx_use_flag_if_available(-fno-builtin-malloc)
-      hpx_use_flag_if_available(-fno-builtin-free)
-      hpx_use_flag_if_available(-fno-builtin-calloc)
-      hpx_use_flag_if_available(-fno-builtin-realloc)
-      hpx_use_flag_if_available(-fno-builtin-valloc)
-      hpx_use_flag_if_available(-fno-builtin-memalign)
-      hpx_use_flag_if_available(-fno-builtin-posix_memalign)
+      hpx_use_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-free LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-calloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-realloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-valloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-memalign LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
     else()
       hpx_info("malloc" "Using system allocator.")
 

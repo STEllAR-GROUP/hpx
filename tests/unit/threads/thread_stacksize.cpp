@@ -7,15 +7,24 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+// Define the amount of stack space that we need to reserve for management
+// purposes.
+#if defined(HPX_DEBUG)
+    enum { management_space = 0x1600 };
+#else
+    enum { management_space = 0x800 };
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 void test_default_stacksize()
 {
+    HPX_TEST(hpx::threads::get_self_ptr()); 
     // verify that sufficient stack has been allocated
-    HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >= 
+    HPX_TEST_EQ(hpx::threads::get_ctx_ptr()->get_stacksize(), 
         hpx::get_runtime().get_config().get_default_stack_size());
 
-    // allocate HPX_DEFAULT_STACK_SIZE memory on the stack 
-    char array[HPX_DEFAULT_STACK_SIZE-256];
+    // allocate HPX_DEFAULT_STACK_SIZE - management_space memory on the stack 
+    char array[HPX_DEFAULT_STACK_SIZE-management_space];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -25,13 +34,14 @@ HPX_PLAIN_ACTION(test_default_stacksize, test_default_stacksize_action)
 ///////////////////////////////////////////////////////////////////////////////
 void test_small_stacksize()
 {
+    HPX_TEST(hpx::threads::get_self_ptr()); 
     // verify that sufficient stack has been allocated
-    HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >= 
+    HPX_TEST_EQ(hpx::threads::get_ctx_ptr()->get_stacksize(),
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_small));
 
-    // allocate HPX_SMALL_STACK_SIZE memory on the stack 
-    char array[HPX_SMALL_STACK_SIZE-0x100];
+    // allocate HPX_SMALL_STACK_SIZE - management_space memory on the stack 
+    char array[HPX_SMALL_STACK_SIZE-management_space];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -42,13 +52,14 @@ HPX_ACTION_USES_SMALL_STACK(test_small_stacksize_action)
 ///////////////////////////////////////////////////////////////////////////////
 void test_medium_stacksize()
 {
+    HPX_TEST(hpx::threads::get_self_ptr()); 
     // verify that sufficient stack has been allocated
-    HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >= 
+    HPX_TEST_EQ(hpx::threads::get_ctx_ptr()->get_stacksize(), 
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_medium));
 
-    // allocate HPX_MEDIUM_STACK_SIZE * 0.6 memory on the stack 
-    char array[(HPX_MEDIUM_STACK_SIZE*2)/3];
+    // allocate HPX_MEDIUM_STACK_SIZE - management_space memory on the stack 
+    char array[HPX_MEDIUM_STACK_SIZE-management_space];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -59,13 +70,14 @@ HPX_ACTION_USES_MEDIUM_STACK(test_medium_stacksize_action)
 ///////////////////////////////////////////////////////////////////////////////
 void test_large_stacksize()
 {
+    HPX_TEST(hpx::threads::get_self_ptr()); 
     // verify that sufficient stack has been allocated
     HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >= 
         hpx::get_runtime().get_config().get_stack_size(
             hpx::threads::thread_stacksize_large));
 
-    // allocate HPX_LARGE_STACK_SIZE * 0.6 memory on the stack 
-    char array[(HPX_LARGE_STACK_SIZE*2)/3];
+    // allocate HPX_LARGE_STACK_SIZE - management_space memory on the stack 
+    char array[HPX_LARGE_STACK_SIZE-management_space];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -74,36 +86,31 @@ HPX_PLAIN_ACTION(test_large_stacksize, test_large_stacksize_action)
 HPX_ACTION_USES_LARGE_STACK(test_large_stacksize_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
+    BOOST_FOREACH(hpx::id_type id, localities)
     {
-        test_default_stacksize_action test_action;
-        test_action(hpx::find_here());
-        if (!localities.empty())
-            test_action(localities[0]);
-    }
-
-    {
-        test_small_stacksize_action test_action;
-        test_action(hpx::find_here());
-        if (!localities.empty())
-            test_action(localities[0]);
-    }
-
-    {
-        test_medium_stacksize_action test_action;
-        test_action(hpx::find_here());
-        if (!localities.empty())
-            test_action(localities[0]);
-    }
-
-    {
-      test_large_stacksize_action test_action;
-      test_action(hpx::find_here());
-        if (!localities.empty())
-            test_action(localities[0]);
+        {
+            test_default_stacksize_action test_action;
+            test_action(id);
+        }
+    
+        {
+            test_small_stacksize_action test_action;
+            test_action(id);
+        }
+    
+        {
+            test_medium_stacksize_action test_action;
+            test_action(id);
+        }
+    
+        {
+            test_large_stacksize_action test_action;
+            test_action(id);
+        }
     }
 
     return hpx::util::report_errors();

@@ -7,7 +7,6 @@
 #ifndef HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 #define HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/serialization/base_object.hpp>

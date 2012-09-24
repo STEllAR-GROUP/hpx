@@ -40,9 +40,8 @@ boost::uint64_t tasks = 500000;
 boost::uint64_t min_delay = 0;
 boost::uint64_t max_delay = 0;
 boost::uint64_t total_delay = 0;
-boost::uint64_t current_trial = 0;
-boost::uint64_t total_trials = 1;
 boost::uint64_t seed = 0;
+bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -50,32 +49,28 @@ void print_results(
   , double walltime
     )
 {
-    if (current_trial == 0)
-    {
-        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-        std::string const seed_str  = boost::str(boost::format("%lu,") % seed);
-        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+    if (header)
+        cout << "OS-threads,Seed,Tasks,Minimum Delay (iterations),"
+                "Maximum Delay (iterations),Total Delay (iterations),"
+                "Total Walltime (seconds),Walltime per Task (seconds)\n"
+             << flush;
 
-        std::string const min_delay_str
-            = boost::str(boost::format("%lu,") % min_delay);
-        std::string const max_delay_str
-            = boost::str(boost::format("%lu,") % max_delay);
-        std::string const total_delay_str
-            = boost::str(boost::format("%lu,") % total_delay);
+    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+    std::string const seed_str  = boost::str(boost::format("%lu,") % seed);
+    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
 
-        cout << ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.10s")
-                % cores_str % seed_str % tasks_str
-                % min_delay_str % max_delay_str % total_delay_str
-                % walltime);
-    }
+    std::string const min_delay_str
+        = boost::str(boost::format("%lu,") % min_delay);
+    std::string const max_delay_str
+        = boost::str(boost::format("%lu,") % max_delay);
+    std::string const total_delay_str
+        = boost::str(boost::format("%lu,") % total_delay);
 
-    else
-        cout << (boost::format(", %10.10s") % walltime);
-
-    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
-        cout << "\n";
-
-    cout << flush;
+    cout <<
+        ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.12s\n")
+        % cores_str % seed_str % tasks_str
+        % min_delay_str % max_delay_str % total_delay_str
+        % walltime % (walltime / tasks)) << flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,14 +101,18 @@ void worker(
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
-    variables_map&
+    variables_map& vm
     )
 {
+    if (vm.count("no-header"))
+        header = false;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Initialize the PRNG seed.
+    if (!seed)
+        seed = boost::uint64_t(std::time(0));
+
     {
-        ///////////////////////////////////////////////////////////////////////
-        // Initialize the PRNG seed.
-        if (!seed)
-            seed = boost::uint64_t(std::time(0));
 
         ///////////////////////////////////////////////////////////////////////
         // Validate command-line arguments.
@@ -258,18 +257,13 @@ int main(
         , value<boost::uint64_t>(&total_delay)->default_value(0)
         , "total number of delay iterations to be executed")
 
-        ( "current-trial"
-        , value<boost::uint64_t>(&current_trial)->default_value(0)
-        , "current trial")
-
-        ( "total-trials"
-        , value<boost::uint64_t>(&total_trials)->default_value(1)
-        , "total number of trial runs")
-
         ( "seed"
         , value<boost::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "
           "choosen based on the current system time)")
+
+        ( "no-header"
+        , "do not print out the csv header row")
         ;
 
     // Initialize and run HPX.

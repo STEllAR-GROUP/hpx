@@ -115,23 +115,26 @@ namespace hpx { namespace lcos
         // extension: init from given value, set future to ready right away
         future(Result const& init)
         {
-            lcos::detail::future_data<Result, RemoteResult>* p =
+            boost::intrusive_ptr<future_data_type> p =
                 new lcos::detail::future_data<Result, RemoteResult>();
-            p->set_data(boost::move(init));
+            static_cast<lcos::detail::future_data<Result, RemoteResult> *>(p.get())->set_data(boost::move(init));
             future_data_ = p;
         }
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
-            future_data_ = other.future_data_;
+            if (this != &other)
+                future_data_ = other.future_data_;
             return *this;
         }
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            future_data_ = other.future_data_;
-            other.future_data_.reset();
+            if (this != &other) {
+                future_data_ = boost::move(other.future_data_);
+                other.future_data_.reset();
+            }
             return *this;
         }
 
@@ -281,9 +284,9 @@ namespace hpx { namespace lcos
 
         future(int)
         {
-            lcos::detail::future_data<void, util::unused_type>* p =
+            boost::intrusive_ptr<future_data_type> p =
                 new lcos::detail::future_data<void, util::unused_type>();
-            p->set_data(util::unused);
+            static_cast<lcos::detail::future_data<void, util::unused_type> *>(p.get())->set_data(util::unused);
             future_data_ = p;
         }
 
@@ -309,14 +312,18 @@ namespace hpx { namespace lcos
 
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
-            future_data_ = other.future_data_;
+            if (this != &other)
+                future_data_ = other.future_data_;
             return *this;
         }
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            future_data_ = other.future_data_;
-            other.future_data_.reset();
+            if (this != &other)
+            {
+                future_data_ = boost::move(other.future_data_);
+                other.future_data_.reset();
+            }
             return *this;
         }
 

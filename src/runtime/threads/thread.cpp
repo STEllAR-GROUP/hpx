@@ -123,11 +123,11 @@ namespace hpx
             HPX_STD_BIND(&thread::thread_function_nullary, boost::move(func)),
             "thread::thread_function_nullary");
 
-        error_code ec;
+        error_code ec(lightweight);
         threads::thread_id_type ident = hpx::get_runtime().get_thread_manager().
             register_thread(data, threads::suspended, true, ec);
         if (ec) {
-            HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
+            HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
                 "Could not create thread");
             return;
         }

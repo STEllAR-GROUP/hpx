@@ -20,3 +20,9 @@ add_hpx_component(managed_refcnt_checker
   FOLDER "Tests/Unit/AGAS"
   AUTOGLOB)
 
+add_hpx_component(simple_mobile_object
+  HEADER_GLOB "${root}/simple_mobile_object.h*"
+  SOURCE_GLOB "${root}/simple_mobile_object.c*"
+  FOLDER "Tests/Unit/AGAS"
+  AUTOGLOB)
+
