@@ -136,7 +136,7 @@ inline void set_description(char const* test_name)
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtcx { namespace server
 {
-    void partition::loop(std::size_t numberpe,std::size_t mype,
+    void partition::loop_wrapper(std::size_t numberpe,std::size_t mype,
                       std::vector<hpx::naming::id_type> const& components)
     {
       item_ = mype;

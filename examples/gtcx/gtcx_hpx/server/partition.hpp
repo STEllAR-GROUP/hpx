@@ -34,7 +34,7 @@ namespace gtcx { namespace server
 
         void set_toroidal_cmm(int *send,int*length);
         void set_partd_cmm(int *send,int*length);
-        void loop(std::size_t numberpe,std::size_t mype,
+        void loop_wrapper(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
         void partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1);
         void broadcast_parameters(int *integer_params,double *real_params,
@@ -101,7 +101,7 @@ namespace gtcx { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(partition, loop, loop_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, loop_wrapper, loop_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_data, set_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_tdata, set_tdata_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_params, set_params_action);
