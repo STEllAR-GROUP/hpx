@@ -89,7 +89,7 @@ inline void register_counter_types()
      LBT_(info) << "(3rd stage) pre_main: registered parcelset performance "
                    "counter types";
 
-     util::detail::register_counter_types();
+     hpx::lcos::detail::register_counter_types();
      LBT_(info) << "(3rd stage) pre_main: registered full_empty_entry "
                    "performance counter types";
 }

@@ -105,7 +105,7 @@ namespace boost {
             return _URC_NO_REASON;
         }
 
-        std::size_t trace(void **array,std::size_t n)
+        BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
             trace_data d(array,n);
 
@@ -120,14 +120,14 @@ namespace boost {
         
         #elif defined(BOOST_HAVE_EXECINFO)
 
-        std::size_t trace(void **array,std::size_t n)
+        BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
             return :: backtrace(array,n);
         }
 
         #elif defined(BOOST_MSVC)
 
-        std::size_t trace(void **array,std::size_t n)
+        BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
             if(n>=63)
                 n=62;
@@ -136,7 +136,7 @@ namespace boost {
 
         #else
 
-        std::size_t trace(void ** /*array*/,std::size_t /*n*/)
+        BOOST_BACKTRACE_DECL std::size_t trace(void ** /*array*/,std::size_t /*n*/)
         {
             return 0;
         }
@@ -145,7 +145,7 @@ namespace boost {
 
         #if defined(BOOST_HAVE_DLFCN) && defined(BOOST_HAVE_ABI_CXA_DEMANGLE)
 
-        std::string get_symbol(void *ptr)
+        BOOST_BACKTRACE_DECL std::string get_symbol(void *ptr)
         {
             if(!ptr)
                 return std::string();
@@ -181,7 +181,7 @@ namespace boost {
            return res.str();
         }
 
-        std::string get_symbols(void *const *addresses,std::size_t size)
+        BOOST_BACKTRACE_DECL std::string get_symbols(void *const *addresses,std::size_t size)
         {
             std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -193,7 +193,7 @@ namespace boost {
             }
             return res;
         }
-        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -206,7 +206,7 @@ namespace boost {
         }
 
         #elif defined(BOOST_HAVE_EXECINFO)
-        std::string get_symbol(void *address)
+        BOOST_BACKTRACE_DECL std::string get_symbol(void *address)
         {
             char ** ptr = backtrace_symbols(&address,1);
             try {
@@ -223,7 +223,7 @@ namespace boost {
             }
         }
 
-        std::string get_symbols(void * const *address,std::size_t size)
+        BOOST_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size)
         {
             char ** ptr = backtrace_symbols(address,size);
             try {
@@ -245,7 +245,7 @@ namespace boost {
         }
 
 
-        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             char ** ptr = backtrace_symbols(addresses,size);
             out << size << ((1==size)?" frame:":" frames:");
@@ -284,7 +284,7 @@ namespace boost {
             }
         }
 
-        std::string get_symbol(void *ptr)
+        BOOST_BACKTRACE_DECL std::string get_symbol(void *ptr)
         {
             if(ptr==0)
                 return std::string();
@@ -313,7 +313,7 @@ namespace boost {
             return ss.str();
         }
 
-        std::string get_symbols(void *const *addresses,std::size_t size)
+        BOOST_BACKTRACE_DECL std::string get_symbols(void *const *addresses,std::size_t size)
         {
             std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -325,7 +325,7 @@ namespace boost {
             }
             return res;
         }
-        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -339,7 +339,7 @@ namespace boost {
 
         #else
 
-        std::string get_symbol(void *ptr)
+        BOOST_BACKTRACE_DECL std::string get_symbol(void *ptr)
         {
             if(!ptr)
                 return std::string();
@@ -349,7 +349,7 @@ namespace boost {
             return res.str();
         }
 
-        std::string get_symbols(void *const *ptrs,std::size_t size)
+        BOOST_BACKTRACE_DECL std::string get_symbols(void *const *ptrs,std::size_t size)
         {
             if(!ptrs)
                 return std::string();
@@ -359,7 +359,7 @@ namespace boost {
             return res.str();
         }
 
-        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {

@@ -20,7 +20,7 @@ namespace hpx { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-#if defined(HPX_VERIFY_LOCKS)
+#if HPX_VERIFY_LOCKS
     struct register_locks
     {
         typedef boost::ptr_map<void const*, util::register_lock_data>

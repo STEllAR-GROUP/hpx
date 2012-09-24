@@ -40,7 +40,7 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuratio
 ################################################################################
 # project metadata
 ################################################################################
-project(hpx CXX)
+project(hpx CXX C)
 
 set(HPX_MAJOR_VERSION 1)
 set(HPX_MINOR_VERSION 0)
@@ -55,6 +55,8 @@ endif()
 ################################################################################
 # CMake configuration
 ################################################################################
+set(HPX_INTERNAL_CMAKE ON)
+
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 
 # include additional macro definitions
@@ -113,22 +115,10 @@ set(BOOST_LIBRARIES date_time
                     system
                     thread)
 
-if(${BOOST_MINOR_VERSION} LESS 49)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
-endif()
-
 # Decide whether to use internal version of Boost.Chrono
 if(${BOOST_MINOR_VERSION} LESS 47)
   hpx_warn("boost" "Using internal version of Boost.Chrono, setting HPX_INTERNAL_CHRONO=ON.")
   set(HPX_INTERNAL_CHRONO ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
-endif()
-
-if(${HPX_INTERNAL_CHRONO})
-  add_definitions(-DHPX_INTERNAL_CHRONO)
-  add_definitions(-DBOOST_CHRONO_NO_LIB)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
-else()
-  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 
 # Decide whether to use internal version of Boost.Move
@@ -137,26 +127,52 @@ if(${BOOST_MINOR_VERSION} LESS 48)
   set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" FORCE)
 endif()
 
-if(${HPX_INTERNAL_MOVE})
-  add_definitions(-DHPX_INTERNAL_MOVE)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
+# Decide whether to use Boost.Context for coroutine implementation
+if(${BOOST_MINOR_VERSION} GREATER 50)
+  hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
 endif()
 
 ################################################################################
 # search path configuration
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
+if(HPX_INTERNAL_MOVE)
+  add_definitions(-DHPX_INTERNAL_MOVE)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
+endif()
 if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
+endif()
+if(HPX_INTERNAL_CHRONO)
+  add_definitions(-DHPX_INTERNAL_CHRONO)
+  add_definitions(-DBOOST_CHRONO_NO_LIB)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
+endif()
+if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
+  add_definitions("-DHPX_COROUTINE_USE_GENERIC_CONTEXT=1")
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
+endif()
+if(${BOOST_MINOR_VERSION} LESS 52)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+if(${BOOST_MINOR_VERSION} LESS 49)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
+endif()
+
+if(UNIX)
+  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+else()
+  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
+endif()
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -167,10 +183,9 @@ hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
-add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
+add_definitions(-DHPX_COROUTINE_ARG_MAX=2)
 if(NOT MSVC)
-  add_definitions(-DBOOST_COROUTINE_NO_SEPARATE_CALL_SITES)
+  add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
@@ -179,7 +194,11 @@ add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
-add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+if(${BOOST_MINOR_VERSION} LESS 52)
+  add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+#else()
+#  add_definitions(-DBOOST_LOCKFREE_NO_HDR_ATOMIC)
+endif()
 
 ################################################################################
 # Compiler detection code
@@ -213,9 +232,9 @@ endif()
 hpx_include(CompilerFlags)
 
 ################################################################################
-# SVN revision detection
+# Git commit detection
 ################################################################################
-include(HPX_SVNRevision)
+include(HPX_GitCommit)
 
 ################################################################################
 # Installation configuration
@@ -308,7 +327,17 @@ else()
 endif()
 
 if(HPX_VERIFY_LOCKS)
-  add_definitions(-DHPX_VERIFY_LOCKS)
+  add_definitions(-DHPX_VERIFY_LOCKS=1)
+else()
+  add_definitions(-DHPX_VERIFY_LOCKS=0)
+endif()
+
+hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
+
+if(HPX_THREAD_GUARD_PAGE)
+  add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
+else()
+  add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
 endif()
 
 ################################################################################
@@ -360,8 +389,24 @@ if(MSVC)
     if(CMAKE_ASM_MASM_COMPILER)
       hpx_info("swap_context" "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
     else()
-      hpx_warning("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
+      hpx_warn("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
       set(HPX_EMULATE_SWAP_CONTEXT OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
+    endif()
+  endif()
+
+  hpx_option(HPX_USE_ITT BOOL "Bind to Intel Amplifier Tool (default: OFF)" OFF ADVANCED)
+
+  if(HPX_USE_ITT)
+    find_package(HPX_Amplifier)
+    if(AMPLIFIER_FOUND)
+      hpx_info("itt" "Binding to Intel Amplifier tool is enabled.")
+      add_definitions(-DHPX_USE_ITT=1)
+      hpx_include_sys_directories(${AMPLIFIER_INCLUDE_DIR})
+      hpx_link_sys_directories(${AMPLIFIER_LIBRARY_DIR})
+      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${AMPLIFIER_LIBRARY})
+    else()
+      set(HPX_USE_ITT OFF FORCE)
+      hpx_warn("itt" "Binding to Intel Amplifier tool will be disabled, try setting the AMPLIFIER_ROOT variable to the Intel Amplifier installation directory.")
     endif()
   endif()
 endif()
@@ -377,25 +422,6 @@ if(HPX_NATIVE_TLS)
 endif()
 
 ################################################################################
-# pxthread stack size
-################################################################################
-if(NOT HPX_STACK_SIZE)
-  if(MSVC)
-    set(HPX_STACK_SIZE "0x4000" CACHE STRING "HPX-thread stack size" FORCE)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
-     "CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
-  else()
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
-  endif()
-else()
-  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
-endif()
-mark_as_advanced(FORCE HPX_STACK_SIZE)
-
-add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
-
-################################################################################
 # Disable the use of partially preprocessed header files
 ################################################################################
 hpx_option(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
@@ -409,7 +435,7 @@ endif()
 # Compiler configuration
 ################################################################################
 # Clear CMake defaults
-foreach(language CXX Fortran)
+foreach(language CXX C Fortran)
   set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
@@ -418,6 +444,16 @@ endforeach()
 
 if(MSVC)
   add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
+  foreach(language CXX C Fortran)
+    set(CMAKE_${language}_FLAGS_DEBUG
+        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG") 
+    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS") 
+    set(CMAKE_${language}_FLAGS_MINSIZEREL
+        "${CMAKE_${language}_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE ASSERTS") 
+    set(CMAKE_${language}_FLAGS_RELEASE
+        "${CMAKE_${language}_FLAGS_RELEASE} -DNDEBUG -DBOOST_DISABLE_ASSERTS") 
+  endforeach()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
@@ -503,19 +539,19 @@ endif()
 # MSVC configuration
 ################################################################################
 if(MSVC)
-  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(CMAKE_CXX_FLAGS_DEBUG
-        "${CMAKE_CXX_FLAGS_DEBUG} -Od -Zi -Oy- -MDd -RTC1")
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
-        "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL
-        "${CMAKE_CXX_FLAGS_MINSIZEREL} -O1 -MD")
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS_RELEASE
-        "${CMAKE_CXX_FLAGS_RELEASE} -Ox -MD -GL")
-  endif()
+  foreach(language CXX C Fortran)
+    set(CMAKE_${language}_FLAGS_DEBUG
+        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG -Od -Zi -MDd")
+    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
+    set(CMAKE_${language}_FLAGS_MINSIZEREL
+        "${CMAKE_${language}_FLAGS_MINSIZEREL} -O1 -MD")
+    set(CMAKE_${language}_FLAGS_RELEASE
+        "${CMAKE_${language}_FLAGS_RELEASE} -Ox -MD -GL")
+  endforeach()
+
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -RTC1")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -RTC1")
 
   # Exceptions
   hpx_append_flag(-EHsc)
@@ -523,11 +559,11 @@ if(MSVC)
   # Runtime type information
   hpx_append_flag(-GR)
 
-  # Multiproccessor build
-  hpx_append_flag(-MP)
+  # Multiprocessor build
+  hpx_append_flag(-MP LANGUAGES CXX C Fortran)
 
   # Increase the maximum size of object file sections
-  hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
+  hpx_append_flag(-bigobj LANGUAGES CXX C Fortran)
 
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} psapi shlwapi)
 
@@ -595,14 +631,18 @@ if(MSVC)
   # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
-    hpx_append_flag(-W3)
+    hpx_append_flag(-W3 LANGUAGES C CXX)
+
+    # Boost.Lockfree triggers 'warning C4307: '+' : integral constant overflow'
+    # which is benign
+    hpx_append_flag(-wd4307)
 
     # According to the ifort Windows manual, W3 isn't supported
     hpx_append_flag(-W1 LANGUAGES Fortran)
   endif()
 
   # Display full paths in diagnostics
-  hpx_append_flag(-FC)
+  hpx_append_flag(-FC LANGUAGES C CXX)
 
   ##############################################################################
   # Macro definitions for system headers
@@ -625,7 +665,7 @@ if(MSVC)
 
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
+  add_definitions(-DHPX_COROUTINE_USE_FIBERS)
   add_definitions(-DPSAPI_VERSION=1)
 
 ################################################################################
@@ -633,48 +673,48 @@ if(MSVC)
 ################################################################################
 else()
   # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
-  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
+  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX C Fortran
                             NAME copy_dt_needed_entries)
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
-    hpx_use_flag_if_available(-O0 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O0 LANGUAGES CXX C Fortran)
 
     # Generate debugging information
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
 
     # Keep the frame pointer
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX C Fortran)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
 
     # Generate debugging information
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
 
     # No tail call optimizations
-    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX C Fortran)
 
     # Don't allocate registers for wide types (e.g. 128bit ints) independently
-    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX C Fortran)
 
     # Disable register allocation webs, which make debugging impossible
-    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-web LANGUAGES CXX C Fortran)
 
     # Disable register renaming
-    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
-    hpx_use_flag_if_available(-Os LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
   endif()
 
   ##############################################################################
@@ -682,7 +722,7 @@ else()
   ##############################################################################
   if(HPX_STACKTRACES)
     # Export all visible symbols, not just those that are used
-    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
   endif()
 
   ##############################################################################
@@ -731,33 +771,33 @@ else()
   # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
-    hpx_use_flag_if_available(-Wall LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-Wsign-promo)
+    hpx_use_flag_if_available(-Wall LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX C)
   endif()
 
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
-  hpx_use_flag_if_available(-Werror=vla)
+  hpx_use_flag_if_available(-Werror=vla LANGUAGES CXX C)
 
   # No return statement in a non-void function can lead to garbage return values
   # in GCC.
-  hpx_use_flag_if_available(-Werror=return-type)
+  hpx_use_flag_if_available(-Werror=return-type LANGUAGES CXX C)
 
   # Show the flags that toggle each warning
-  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX C Fortran)
 
   # We get false positives all over the place with this. Also, detection for
   # this flag fails with GCC 4.4 and 4.5.
   if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
-    hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
-    hpx_use_flag_if_available(-Wno-unused-but-set-variable)
+    hpx_use_flag_if_available(-Wno-unused-but-set-parameter LANGUAGES CXX C)
+    hpx_use_flag_if_available(-Wno-unused-but-set-variable LANGUAGES CXX C)
 
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
-    hpx_use_flag_if_available(-Werror=uninitialized)
+    hpx_use_flag_if_available(-Werror=uninitialized LANGUAGES CXX C)
   endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics
-  hpx_use_flag_if_available(-Wno-sync-nand)
+  hpx_use_flag_if_available(-Wno-sync-nand LANGUAGES CXX C)
 
   # Silence warnings about deleting polymorphic objects with non-virtual dtors.
   # These come from within Boost. Detection for this flag fails with GCC 4.4,
@@ -765,6 +805,9 @@ else()
   if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
     hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
   endif()
+  
+  # Check if our libraries have unresolved symbols
+  #hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
 
   ##############################################################################
   # GCC-only configuration
@@ -779,9 +822,9 @@ else()
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-          add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+          add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-          hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
+          hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
         endif()
       endif()
     endif()
@@ -794,17 +837,19 @@ else()
              OFF ADVANCED)
 
   if(NOT HPX_MICROARCH_OPTIMIZATIONS)
-    if(NOT HPX_CXX_FLAG_MARCH_NATIVE)
-      set(HPX_CXX_FLAG_MARCH_NATIVE OFF)
-    endif()
-
-    if(NOT HPX_CXX_FLAG_MCX16)
-      set(HPX_CXX_FLAG_MCX16 OFF)
-    endif()
-
-    if(NOT HPX_CXX_FLAG_MCX16)
-      set(HPX_CXX_FLAG_MCX16 OFF)
-    endif()
+    foreach(language CXX C Fortran)
+      if(NOT HPX_${language}_FLAG_MARCH_NATIVE)
+        set(HPX_${language}_FLAG_MARCH_NATIVE OFF)
+      endif()
+  
+      if(NOT HPX_${language}_FLAG_MCX16)
+        set(HPX_${language}_FLAG_MCX16 OFF)
+      endif()
+  
+      if(NOT HPX_${language}_FLAG_MCX16)
+        set(HPX_${language}_FLAG_MCX16 OFF)
+      endif()
+    endforeach()
 
     if(NOT HPX_SSE2)
       set(HPX_SSE2 OFF)
@@ -819,13 +864,13 @@ else()
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
   # this flag is used, the generated binaries will be less portable.
-  hpx_use_flag_if_available(-march=native LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-march=native LANGUAGES CXX C Fortran)
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
   # It allows us to do double quadword (128bit) atomic compare and swap
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
-  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX C Fortran)
 
   if(HPX_CXX_FLAG_MCX16)
     add_definitions(-DHPX_HAVE_GNU_SYNC_16)
@@ -854,7 +899,7 @@ else()
                 BOOST_ATOMIC_HAVE_SSE2)
 
   if(HPX_SSE2)
-    hpx_use_flag_if_available(-msse2 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-msse2 LANGUAGES CXX C Fortran)
   endif()
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -878,7 +923,7 @@ else()
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
 
-  hpx_use_flag_if_available(-pthread)
+  hpx_use_flag_if_available(-pthread LANGUAGES CXX C)
 
   hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
              "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
@@ -916,7 +961,7 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+        #hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
         hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
@@ -928,24 +973,25 @@ else()
         add_definitions(-DHPX_JEMALLOC)
       endif()
 
-      hpx_use_flag_if_available(-fno-builtin-cfree)
-      hpx_use_flag_if_available(-fno-builtin-pvalloc)
-      hpx_use_flag_if_available(-fno-builtin-malloc)
-      hpx_use_flag_if_available(-fno-builtin-free)
-      hpx_use_flag_if_available(-fno-builtin-calloc)
-      hpx_use_flag_if_available(-fno-builtin-realloc)
-      hpx_use_flag_if_available(-fno-builtin-valloc)
-      hpx_use_flag_if_available(-fno-builtin-memalign)
-      hpx_use_flag_if_available(-fno-builtin-posix_memalign)
+      hpx_use_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-free LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-calloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-realloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-valloc LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-memalign LANGUAGES CXX C)
+      hpx_use_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
     else()
       hpx_info("malloc" "Using system allocator.")
+
       hpx_warn("malloc"
-        "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+        "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
     endif()
   else()
     hpx_info("malloc" "Using system allocator.")
     hpx_warn("malloc"
-      "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+      "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()
 endif()
 
@@ -1026,7 +1072,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION include/hpx
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
@@ -1036,7 +1081,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
     PATTERN ".cmake.in" EXCLUDE
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   install( # install hpx python scripts
@@ -1047,7 +1091,6 @@ if(NOT HPX_NO_INSTALL)
                      WORLD_READ WORLD_EXECUTE
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   if(UNIX)
@@ -1069,7 +1112,6 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}/python
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   # create a symlink in share pointing to the latest HPX installation
@@ -1082,24 +1124,21 @@ if(NOT HPX_NO_INSTALL)
 
   install( # install external dependencies
     DIRECTORY external/cache/boost
-              external/coroutine/boost
               external/endian/boost
               external/logging/boost
               external/plugin/boost
-    DESTINATION include
+    DESTINATION include/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
   if(${BOOST_MINOR_VERSION} LESS 49)
     # install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1107,11 +1146,19 @@ if(NOT HPX_NO_INSTALL)
     # install Boost.Atomic library for older Boost versions only
     install(
       DIRECTORY external/atomic/boost
-                external/lockfree/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+  endif()
+
+  if(${BOOST_MINOR_VERSION} LESS 52)
+    # install Boost.Atomic library for older Boost versions only
+    install(
+      DIRECTORY external/lockfree/boost
+      DESTINATION include/hpx/external
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1122,17 +1169,15 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
   if(HPX_INTERNAL_CHRONO)
     install( # install Boost.Chrono headers if we're using our internal version
       DIRECTORY external/chrono/boost
-      DESTINATION include
+      DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 
@@ -1155,7 +1200,6 @@ if(NOT HPX_NO_INSTALL)
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
 
     install(
@@ -1168,7 +1212,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION share/hpx-${HPX_VERSION}/doc/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
 
     install(
@@ -1176,7 +1219,6 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION share/hpx-${HPX_VERSION}/doc/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
-      PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
 endif()
@@ -1188,6 +1230,8 @@ set(HPX_LINK_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
     ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
+set(HPX_INCLUDE_DIRECTORIES
+    ${CMAKE_INSTALL_PREFIX}/include/hpx/external ${HPX_INCLUDE_DIRECTORIES})
 
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
@@ -1199,12 +1243,14 @@ set(external_include_directories "")
 set(external_include_flags "")
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_link_directories "${external_link_directories} ${directory}")
   set(external_link_flags "${external_link_flags} -L${directory}")
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
+  string(REPLACE " " "\\ " directory ${directory})
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
@@ -1213,6 +1259,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
+  string(REPLACE " " "\\ " BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info
@@ -1260,6 +1307,11 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
+
+# create a symlink in share pointing to the latest HPX installation
+execute_process(COMMAND
+  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
+  WORKING_DIRECTORY ${output_dir}/share)
 
 file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
            "[\n${HPX_UNIT_TEST_LIST}\n]\n")

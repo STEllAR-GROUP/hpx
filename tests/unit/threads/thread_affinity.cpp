@@ -11,13 +11,13 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <vector>
 #include <list>
 #include <set>
 
+#include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 
@@ -37,9 +37,9 @@ std::size_t thread_affinity_worker(std::size_t desired)
         std::size_t desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
 
         std::size_t idx = 0;
-        for(std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+        for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
         {
-            if(desired_mask & (static_cast<std::size_t>(1) << i))
+            if (desired_mask & (static_cast<std::size_t>(1) << i))
             {
                 idx = i;
             }
@@ -105,6 +105,12 @@ std::size_t thread_affinity_worker(std::size_t desired)
 
 HPX_PLAIN_ACTION(thread_affinity_worker, thread_affinity_worker_action)
 
+void check_in(std::set<std::size_t>& attendance, std::size_t, std::size_t t)
+{
+    if (std::size_t(-1) != t)
+        attendance.erase(t);
+}
+
 void thread_affinity_foreman()
 {
     // Get the number of worker OS-threads in use by this locality.
@@ -148,10 +154,7 @@ void thread_affinity_foreman()
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
         hpx::lcos::wait(futures,
-            [&](std::size_t, std::size_t t) {
-                if (std::size_t(-1) != t)
-                    attendance.erase(t);
-            });
+            boost::bind(&check_in, boost::ref(attendance), ::_1, ::_2));
     }
 }
 

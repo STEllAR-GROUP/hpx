@@ -668,7 +668,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0
     >
     detail::bound_action1<
@@ -677,7 +677,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0
     )
@@ -1380,7 +1380,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1
     >
     detail::bound_action2<
@@ -1389,7 +1389,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
     )
@@ -2092,7 +2092,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2
     >
     detail::bound_action3<
@@ -2101,7 +2101,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
     )
@@ -2804,7 +2804,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     detail::bound_action4<
@@ -2813,7 +2813,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
     )
@@ -3516,7 +3516,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     detail::bound_action5<
@@ -3525,7 +3525,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
     )
@@ -4228,7 +4228,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
     detail::bound_action6<
@@ -4237,7 +4237,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
     )
@@ -4940,7 +4940,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
     detail::bound_action7<
@@ -4949,7 +4949,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
     )
@@ -5652,7 +5652,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
     detail::bound_action8<
@@ -5661,7 +5661,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
     )
@@ -6364,7 +6364,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
     detail::bound_action9<
@@ -6373,7 +6373,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8
     )
@@ -7076,7 +7076,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
     detail::bound_action10<
@@ -7085,7 +7085,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9
     )
@@ -7788,7 +7788,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
     >
     detail::bound_action11<
@@ -7797,7 +7797,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10
     )
@@ -8500,7 +8500,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
     >
     detail::bound_action12<
@@ -8509,7 +8509,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11
     )
@@ -9212,7 +9212,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
     >
     detail::bound_action13<
@@ -9221,7 +9221,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12
     )
@@ -9924,7 +9924,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
     >
     detail::bound_action14<
@@ -9933,7 +9933,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13
     )
@@ -10636,7 +10636,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
     >
     detail::bound_action15<
@@ -10645,7 +10645,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14
     )
@@ -11348,7 +11348,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
     >
     detail::bound_action16<
@@ -11357,7 +11357,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15
     )
@@ -12060,7 +12060,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
     >
     detail::bound_action17<
@@ -12069,7 +12069,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16
     )
@@ -12772,7 +12772,7 @@ namespace hpx { namespace util
     }
     
     template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority
+        typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
     >
     detail::bound_action18<
@@ -12781,7 +12781,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived, Priority
+            Component, Action, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17
     )

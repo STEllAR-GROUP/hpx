@@ -12,7 +12,6 @@
 
 #include <vector>
 
-#include <boost/lockfree/fifo.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
 #include <boost/cache/local_cache.hpp>
@@ -39,6 +38,7 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
@@ -188,6 +188,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
+        hosted_data_type()
+          : promise_pool_(16)
+        {}
+
         void register_counter_types()
         {
             server::primary_namespace::register_counter_types();
@@ -272,6 +276,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
+    // FIXME: Better name
     naming::gid_type const& local_locality(error_code& ec = throws) const
     {
         if (locality_ == naming::invalid_gid) {
@@ -282,6 +287,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         return locality_;
     }
 
+    // FIXME: Better name
     void local_locality(naming::gid_type const& g)
     {
         locality_ = g;
@@ -597,12 +603,8 @@ public:
     ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns \a true, if this global id
-    ///                   got associated with an local address for the
-    ///                   first time. It returns \a false, if the global id
-    ///                   was associated with another local address earlier
-    ///                   and the given local address replaced the
-    ///                   previously associated local address. Any error
-    ///                   results in an exception thrown from this function.
+    ///                   got associated with an local address. It returns
+    ///                   \a false otherwise. 
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -643,10 +645,8 @@ public:
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \returns          This function returns \a true if the given range
-    ///                   has been successfully bound and returns \a false
-    ///                   otherwise. Any error results in an exception
-    ///                   thrown from this function.
+    /// \returns          This function returns \a true, if the given range
+    ///                   was successfully bound. It returns \a false otherwise. 
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -945,6 +945,26 @@ public:
         return resolve(id.get_gid(), addr, ec);
     }
 
+    naming::address resolve(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve(id, addr, ec);
+        return addr; 
+    }
+
+    naming::address resolve(
+        naming::id_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve(id.get_gid(), addr, ec);
+        return addr; 
+    }
+
     bool resolve_full(
         naming::gid_type const& id
       , naming::address& addr
@@ -960,13 +980,44 @@ public:
         return resolve_full(id.get_gid(), addr, ec);
     }
 
+    naming::address resolve_full(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve_full(id, addr, ec);
+        return addr; 
+    }
+
+    naming::address resolve_full(
+        naming::id_type const& id
+      , error_code& ec = throws
+        )
+    {
+        naming::address addr;
+        resolve_full(id.get_gid(), addr, ec);
+        return addr; 
+    }
+
     bool resolve_cached(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
         );
 
-    // same, but bulk operation
+    bool resolve_cached(
+        naming::id_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        )
+    {
+        return resolve_cached(id.get_gid(), addr, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Bulk version.
+    // TODO: Add versions that take std::vector<id_type> for convenience.
     bool resolve(
         std::vector<naming::gid_type> const& gids
       , std::vector<naming::address>& addrs
@@ -974,14 +1025,14 @@ public:
       , error_code& ec = throws
         )
     {
-        // Try the cache
+        // Try the cache.
         if (caching_)
         {
             bool all_resolved = resolve_cached(gids, addrs, locals, ec);
             if (ec)
                 return false;
             if (all_resolved)
-                return true;    //nothing more to do
+                return true; // Nothing more to do.
         }
 
         return resolve_full(gids, addrs, locals, ec);
@@ -1316,19 +1367,50 @@ public:
         std::string const& name
         );
 
-    void update_cache(
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void insert_cache_entry(
         naming::gid_type const& gid
       , gva const& gva
       , error_code& ec = throws
         );
 
-    void update_cache(
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void insert_cache_entry(
         naming::gid_type const& gid
-      , naming::locality const& l
-      , components::component_type t
-      , boost::uint64_t addr
-      , boost::uint64_t count = 1
+      , naming::address const& addr
       , error_code& ec = throws
+        )
+    {
+        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        insert_cache_entry(gid, g, ec);
+    }
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void update_cache_entry(
+        naming::gid_type const& gid
+      , gva const& gva
+      , error_code& ec = throws
+        );
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void update_cache_entry(
+        naming::gid_type const& gid
+      , naming::address const& addr
+      , error_code& ec = throws
+        )
+    {
+        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        update_cache_entry(gid, g, ec);
+    }
+
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void clear_cache(
+        error_code& ec = throws
         );
 
     bool route_parcel(

@@ -53,7 +53,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority_value))
+                >::call(priority_value)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -66,7 +70,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority))
+                >::call(priority)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
 
 #undef N

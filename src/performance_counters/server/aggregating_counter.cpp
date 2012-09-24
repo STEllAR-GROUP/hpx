@@ -160,7 +160,7 @@ namespace hpx { namespace performance_counters { namespace server
 
             if (!base_counter_id_) {
                 // get or create the base counter
-                error_code ec;
+                error_code ec(lightweight);
                 base_counter_id_ = get_counter(base_counter_name_, ec);
                 if (HPX_UNLIKELY(ec || !base_counter_id_))
                 {

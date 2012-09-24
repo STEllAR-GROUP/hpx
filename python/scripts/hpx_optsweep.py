@@ -17,12 +17,11 @@ from types import *
 from operator import *
 from datetime import datetime
 from pickle import dump
-from hpx_version import HPX_VERSION
 
 if osp.exists(osp.join(sys.path[0], "../hpx")):
   sys.path.append(osp.join(sys.path[0], ".."))
-if osp.exists(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):
-  sys.path.append(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python"))
+if osp.exists(osp.join(sys.path[0], "../share/hpx/python/hpx")):
+  sys.path.append(osp.join(sys.path[0], "../share/hpx/python"))
 
 from hpx.process import process
 

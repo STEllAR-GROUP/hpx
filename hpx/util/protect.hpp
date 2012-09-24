@@ -11,6 +11,7 @@
 
 #include <boost/config.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 namespace hpx { namespace util { namespace detail
 {

@@ -15,7 +15,7 @@ end module particle_decomp_0
 
     subroutine setup_0(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -30,9 +30,9 @@ end module particle_decomp_0
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -51,7 +51,7 @@ end module particle_decomp_0
     use diagnosis_array_0
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_0
   end interface
 
@@ -74,6 +74,7 @@ end module particle_decomp_0
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -392,7 +393,7 @@ end subroutine setup_0
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -416,7 +417,7 @@ end subroutine setup_0
     use diagnosis_array_0
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_0
   end interface
 !
@@ -554,9 +555,9 @@ end subroutine read_input_params_0
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -839,9 +840,9 @@ end subroutine broadcast_input_params_0
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -866,8 +867,6 @@ end subroutine broadcast_input_params_0
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_0_0
 !========================================================================
@@ -887,7 +886,7 @@ end module particle_decomp_1
 
     subroutine setup_1(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -902,9 +901,9 @@ end module particle_decomp_1
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -923,7 +922,7 @@ end module particle_decomp_1
     use diagnosis_array_1
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_1
   end interface
 
@@ -946,6 +945,7 @@ end module particle_decomp_1
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -1264,7 +1264,7 @@ end subroutine setup_1
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -1288,7 +1288,7 @@ end subroutine setup_1
     use diagnosis_array_1
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_1
   end interface
 !
@@ -1426,9 +1426,9 @@ end subroutine read_input_params_1
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -1711,9 +1711,9 @@ end subroutine broadcast_input_params_1
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -1738,8 +1738,6 @@ end subroutine broadcast_input_params_1
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_1_1
 !========================================================================
@@ -1759,7 +1757,7 @@ end module particle_decomp_2
 
     subroutine setup_2(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -1774,9 +1772,9 @@ end module particle_decomp_2
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -1795,7 +1793,7 @@ end module particle_decomp_2
     use diagnosis_array_2
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_2
   end interface
 
@@ -1818,6 +1816,7 @@ end module particle_decomp_2
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -2136,7 +2135,7 @@ end subroutine setup_2
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -2160,7 +2159,7 @@ end subroutine setup_2
     use diagnosis_array_2
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_2
   end interface
 !
@@ -2298,9 +2297,9 @@ end subroutine read_input_params_2
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -2583,9 +2582,9 @@ end subroutine broadcast_input_params_2
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -2610,8 +2609,6 @@ end subroutine broadcast_input_params_2
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_2_2
 !========================================================================
@@ -2631,7 +2628,7 @@ end module particle_decomp_3
 
     subroutine setup_3(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -2646,9 +2643,9 @@ end module particle_decomp_3
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -2667,7 +2664,7 @@ end module particle_decomp_3
     use diagnosis_array_3
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_3
   end interface
 
@@ -2690,6 +2687,7 @@ end module particle_decomp_3
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -3008,7 +3006,7 @@ end subroutine setup_3
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -3032,7 +3030,7 @@ end subroutine setup_3
     use diagnosis_array_3
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_3
   end interface
 !
@@ -3170,9 +3168,9 @@ end subroutine read_input_params_3
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -3455,9 +3453,9 @@ end subroutine broadcast_input_params_3
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -3482,8 +3480,6 @@ end subroutine broadcast_input_params_3
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_3_3
 !========================================================================
@@ -3503,7 +3499,7 @@ end module particle_decomp_4
 
     subroutine setup_4(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -3518,9 +3514,9 @@ end module particle_decomp_4
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -3539,7 +3535,7 @@ end module particle_decomp_4
     use diagnosis_array_4
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_4
   end interface
 
@@ -3562,6 +3558,7 @@ end module particle_decomp_4
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -3880,7 +3877,7 @@ end subroutine setup_4
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -3904,7 +3901,7 @@ end subroutine setup_4
     use diagnosis_array_4
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_4
   end interface
 !
@@ -4042,9 +4039,9 @@ end subroutine read_input_params_4
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -4327,9 +4324,9 @@ end subroutine broadcast_input_params_4
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -4354,8 +4351,6 @@ end subroutine broadcast_input_params_4
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_4_4
 !========================================================================
@@ -4375,7 +4370,7 @@ end module particle_decomp_5
 
     subroutine setup_5(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -4390,9 +4385,9 @@ end module particle_decomp_5
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -4411,7 +4406,7 @@ end module particle_decomp_5
     use diagnosis_array_5
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_5
   end interface
 
@@ -4434,6 +4429,7 @@ end module particle_decomp_5
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -4752,7 +4748,7 @@ end subroutine setup_5
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -4776,7 +4772,7 @@ end subroutine setup_5
     use diagnosis_array_5
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_5
   end interface
 !
@@ -4914,9 +4910,9 @@ end subroutine read_input_params_5
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -5199,9 +5195,9 @@ end subroutine broadcast_input_params_5
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -5226,8 +5222,6 @@ end subroutine broadcast_input_params_5
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_5_5
 !========================================================================
@@ -5247,7 +5241,7 @@ end module particle_decomp_6
 
     subroutine setup_6(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -5262,9 +5256,9 @@ end module particle_decomp_6
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -5283,7 +5277,7 @@ end module particle_decomp_6
     use diagnosis_array_6
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_6
   end interface
 
@@ -5306,6 +5300,7 @@ end module particle_decomp_6
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -5624,7 +5619,7 @@ end subroutine setup_6
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -5648,7 +5643,7 @@ end subroutine setup_6
     use diagnosis_array_6
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_6
   end interface
 !
@@ -5786,9 +5781,9 @@ end subroutine read_input_params_6
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -6071,9 +6066,9 @@ end subroutine broadcast_input_params_6
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -6098,8 +6093,6 @@ end subroutine broadcast_input_params_6
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_6_6
 !========================================================================
@@ -6119,7 +6112,7 @@ end module particle_decomp_7
 
     subroutine setup_7(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -6134,9 +6127,9 @@ end module particle_decomp_7
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -6155,7 +6148,7 @@ end module particle_decomp_7
     use diagnosis_array_7
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_7
   end interface
 
@@ -6178,6 +6171,7 @@ end module particle_decomp_7
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -6496,7 +6490,7 @@ end subroutine setup_7
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -6520,7 +6514,7 @@ end subroutine setup_7
     use diagnosis_array_7
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_7
   end interface
 !
@@ -6658,9 +6652,9 @@ end subroutine read_input_params_7
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -6943,9 +6937,9 @@ end subroutine broadcast_input_params_7
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -6970,8 +6964,6 @@ end subroutine broadcast_input_params_7
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_7_7
 !========================================================================
@@ -6991,7 +6983,7 @@ end module particle_decomp_8
 
     subroutine setup_8(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -7006,9 +6998,9 @@ end module particle_decomp_8
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -7027,7 +7019,7 @@ end module particle_decomp_8
     use diagnosis_array_8
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_8
   end interface
 
@@ -7050,6 +7042,7 @@ end module particle_decomp_8
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -7368,7 +7361,7 @@ end subroutine setup_8
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -7392,7 +7385,7 @@ end subroutine setup_8
     use diagnosis_array_8
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_8
   end interface
 !
@@ -7530,9 +7523,9 @@ end subroutine read_input_params_8
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -7815,9 +7808,9 @@ end subroutine broadcast_input_params_8
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -7842,8 +7835,6 @@ end subroutine broadcast_input_params_8
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_8_8
 !========================================================================
@@ -7863,7 +7854,7 @@ end module particle_decomp_9
 
     subroutine setup_9(ptr, &
                      hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal, &
-                     hpx_left_pe, hpx_right_pe)
+                     hpx_left_pe, hpx_right_pe, hpx_mstep)
 
 !========================================================================
 
@@ -7878,9 +7869,9 @@ end module particle_decomp_9
   type(c_ptr), intent(in), value :: ptr
 
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
-  integer mi_local,me_local,hpx_left_pe, hpx_right_pe
+  integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(8) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   character(len=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -7899,7 +7890,7 @@ end module particle_decomp_9
     use diagnosis_array_9
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine read_input_params_9
   end interface
 
@@ -7922,6 +7913,7 @@ end module particle_decomp_9
 ! numerical constant
   pi=4.0_wp*atan(1.0_wp)
   mstep=max(2,mstep)
+  hpx_mstep = mstep
   msnap=min(msnap,mstep/ndiag)
   isnap=mstep/msnap
   idiag1=mpsi/2
@@ -8240,7 +8232,7 @@ end subroutine setup_9
   type(c_ptr), intent(in), value :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
   character(len=10) date, time
 
 #ifdef _openmp
@@ -8264,7 +8256,7 @@ end subroutine setup_9
     use diagnosis_array_9
     type(c_ptr), intent(in), value :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(inout) :: r0,b0,temperature,edensity0
+    real(8),intent(inout) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params_9
   end interface
 !
@@ -8402,9 +8394,9 @@ end subroutine read_input_params_9
   type(c_ptr), intent(in), value :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(8) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(inout) :: r0,b0,temperature,edensity0
+  real(8),intent(inout) :: r0,b0,temperature,edensity0
 
 ! the master process, mype=0, holds all the input parameters. we need
 ! to broadcast their values to the other processes. instead of issuing
@@ -8687,9 +8679,9 @@ end subroutine broadcast_input_params_9
   myrank_toroidal = toroidal_domain_location
   myrank_partd = particle_domain_location
 
-  if ( myrank_toroidal .gt. particle_domain_location ) then
-    myrank_toroidal = particle_domain_location
-  end if
+  !if ( myrank_toroidal .gt. particle_domain_location ) then
+  !  myrank_toroidal = particle_domain_location
+  !end if
 
 !  if(nproc_partd/=npartdom)then
 !    write(0,*)'*** nproc_partd=',nproc_partd,' not equal to npartdom=',npartdom
@@ -8714,7 +8706,5 @@ end subroutine broadcast_input_params_9
   right_pe=mod(myrank_toroidal+1,ntoroidal)
   hpx_left_pe = left_pe
   hpx_right_pe = right_pe
-  !print*,' test left_pe ', left_pe
-  !print*,' test right_pe ',right_pe
 
 end subroutine set_particle_decomp_9_9

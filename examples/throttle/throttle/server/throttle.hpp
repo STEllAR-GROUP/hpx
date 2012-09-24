@@ -50,20 +50,9 @@ namespace throttle { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
-            throttle, throttle_suspend, std::size_t,
-            &throttle::suspend, hpx::threads::thread_priority_critical
-        > suspend_action;
-
-        typedef hpx::actions::action1<
-            throttle, throttle_resume, std::size_t,
-            &throttle::resume, hpx::threads::thread_priority_critical
-        > resume_action;
-
-        typedef hpx::actions::result_action1<
-            throttle const, bool, throttle_is_suspended, std::size_t,
-            &throttle::is_suspended, hpx::threads::thread_priority_critical
-        > is_suspended_action;
+        HPX_DEFINE_COMPONENT_ACTION(throttle, suspend, suspend_action);
+        HPX_DEFINE_COMPONENT_ACTION(throttle, resume, resume_action);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(throttle, is_suspended, is_suspended_action);
 
     private:
         // this function is periodically scheduled as a worker thread with the
@@ -81,12 +70,17 @@ namespace throttle { namespace server
     };
 }}
 
+HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::suspend_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     throttle::server::throttle::suspend_action
   , throttle_suspend_action);
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::resume_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     throttle::server::throttle::resume_action
   , throttle_resume_action);
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::is_suspended_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     throttle::server::throttle::is_suspended_action
   , throttle_is_suspended_action);

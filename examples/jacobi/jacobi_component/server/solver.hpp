@@ -75,7 +75,7 @@ namespace jacobi
                 std::size_t y = 0;
                 BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(si_allocated))
                 {
-                    std::cout << y << " " << id << "\n";
+                    //std::cout << y << " " << id << "\n";
                     jacobi::stencil_iterator r; r.id = id;
                     init_futures.push_back(r.init(g.rows[y], y, nx, ny, line_block));
                     stencil_iterators.push_back(r);
@@ -93,6 +93,8 @@ namespace jacobi
                             BOOST_ASSERT(stencil_iterators[y-1].id);
                             BOOST_ASSERT(stencil_iterators[y].id);
                             BOOST_ASSERT(stencil_iterators[y+1].id);
+                            hpx::lcos::wait(init_futures[y-1]);
+                            hpx::lcos::wait(init_futures[y+1]);
                             boundary_futures.push_back(
                                 stencil_iterators[y].setup_boundary(
                                     stencil_iterators[y-1]

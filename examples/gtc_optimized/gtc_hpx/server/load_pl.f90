@@ -7,9 +7,9 @@ subroutine load_0
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -185,9 +185,9 @@ subroutine load_1
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -363,9 +363,9 @@ subroutine load_2
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -541,9 +541,9 @@ subroutine load_3
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -719,9 +719,9 @@ subroutine load_4
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -897,9 +897,9 @@ subroutine load_5
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -1075,9 +1075,9 @@ subroutine load_6
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -1253,9 +1253,9 @@ subroutine load_7
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -1431,9 +1431,9 @@ subroutine load_8
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator
@@ -1609,9 +1609,9 @@ subroutine load_9
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(8) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(8) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! initialize random number generator

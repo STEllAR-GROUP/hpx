@@ -18,7 +18,7 @@ namespace hpx { namespace performance_counters
 {
     void counter_type_shutdown(boost::shared_ptr<manage_counter_type> const& p)
     {
-        error_code ec;
+        error_code ec(lightweight);
         p->uninstall(ec);
     }
 

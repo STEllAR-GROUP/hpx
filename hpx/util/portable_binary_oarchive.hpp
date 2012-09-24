@@ -35,6 +35,7 @@ namespace hox { namespace util
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <ostream>
+#include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
 
@@ -136,60 +137,64 @@ protected:
 
     // default fall through for any types not specified here
     template<class T>
-    HPX_SERIALIZATION_EXPORT void save(const T & val) {
+    void save(const T & val) {
         boost::intmax_t t = static_cast<boost::intmax_t>(val);
         save_impl(t, sizeof(T));
     }
-    HPX_SERIALIZATION_EXPORT void save(const std::string & t) {
+    void save(const std::string & t) {
         this->primitive_base_t::save(t);
     }
 #if BOOST_VERSION >= 104400
-    HPX_SERIALIZATION_EXPORT void save(const boost::archive::class_id_type & t) {
+    void save(const boost::archive::class_id_type & t) {
         /*boost::int16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
-    HPX_SERIALIZATION_EXPORT void save(const boost::archive::object_id_type & t) {
+    void save(const boost::archive::object_id_type & t) {
         /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    HPX_SERIALIZATION_EXPORT void save(const boost::archive::tracking_type & t) {
+    void save(const boost::archive::tracking_type & t) {
         bool l = t;
         this->primitive_base_t::save(l);
     }
-    HPX_SERIALIZATION_EXPORT void save(const boost::archive::version_type & t) {
+    void save(const boost::archive::version_type & t) {
         /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    HPX_SERIALIZATION_EXPORT void save(const boost::archive::library_version_type & t) {
+    void save(const boost::archive::library_version_type & t) {
         /*boost::uint16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
-    HPX_SERIALIZATION_EXPORT void save(const boost::serialization::item_version_type & t) {
+    void save(const boost::serialization::item_version_type & t) {
         boost::intmax_t l = t;
         save_impl(l, sizeof(boost::intmax_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    HPX_SERIALIZATION_EXPORT void save(const std::wstring & t) {
+    void save(const std::wstring & t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    HPX_SERIALIZATION_EXPORT void save(const float & t) {
+    void save(const float & t) {
         this->primitive_base_t::save(t);
         // floats not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    HPX_SERIALIZATION_EXPORT void save(const double & t) {
+    void save(const double & t) {
         this->primitive_base_t::save(t);
         // doubles not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    HPX_SERIALIZATION_EXPORT void save(const char & t) {
+    void save(const char & t) {
         this->primitive_base_t::save(t);
     }
-    HPX_SERIALIZATION_EXPORT void save(const unsigned char & t) {
+    void save(const unsigned char & t) {
         this->primitive_base_t::save(t);
     }
+    void save(const signed char & t) {
+        this->primitive_base_t::save(t);
+    }
+
 
     // default processing - kick back to base class.  Note the
     // extra stuff to get it passed borland compilers
@@ -209,8 +214,7 @@ protected:
     // binary files don't include the optional information
     void save_override(const boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void
-    init(unsigned int flags);
+    HPX_ALWAYS_EXPORT void init(unsigned int flags);
 
 public:
     portable_binary_oarchive(std::ostream & os, unsigned flags = 0)
@@ -238,6 +242,51 @@ public:
         m_flags(0)
     {
         init(flags);
+    }
+
+    // the optimized save_array dispatches to save_binary 
+
+    // default fall through for any types not specified here
+    template <typename T>
+    void save_array(boost::serialization::array<T> const& a, unsigned int)
+    {
+        // If we need to potentially flip bytes we serialize each element 
+        // separately.
+#ifdef BOOST_BIG_ENDIAN
+        if (m_flags & endian_little) {
+            for (std::size_t i = 0; i != a.count(); ++i)
+                save(a.address()[i]);
+        }
+#else
+        if (m_flags & endian_big) {
+            for (std::size_t i = 0; i != a.count(); ++i)
+                save(a.address()[i]);
+        }
+#endif
+        else {
+            this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(T));
+        }
+    }
+
+    void save_array(boost::serialization::array<float> const& a, unsigned int)
+    {
+        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(float));
+    }
+    void save_array(boost::serialization::array<double> const& a, unsigned int)
+    {
+        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(double));
+    }
+    void save_array(boost::serialization::array<char> const& a, unsigned int)
+    {
+        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(char));
+    }
+    void save_array(boost::serialization::array<unsigned char> const& a, unsigned int)
+    {
+        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(unsigned char));
+    }
+    void save_array(boost::serialization::array<signed char> const& a, unsigned int)
+    {
+        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(signed char));
     }
 };
 

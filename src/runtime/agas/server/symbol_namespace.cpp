@@ -179,7 +179,7 @@ void symbol_namespace::finalize()
 {
     if (!instance_name_.empty())
     {
-        error_code ec;
+        error_code ec(lightweight);
         agas::unregister_name(instance_name_, ec);
     }
 }

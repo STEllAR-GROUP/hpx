@@ -68,8 +68,7 @@ namespace bfs { namespace server
 
         typedef hpx::actions::result_action0<
             concurrent_bgl_graph, std::vector<std::size_t>, graph_get_parents,
-            &concurrent_bgl_graph::get_parents,
-            hpx::threads::thread_priority_critical
+            &concurrent_bgl_graph::get_parents
         > get_parents_action;
 
         typedef hpx::actions::action0<
@@ -95,6 +94,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::concurrent_bgl_graph::get_parents_action,
     bfs_concurrent_bgl_graph_get_parents_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    bfs::server::concurrent_bgl_graph::get_parents_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::concurrent_bgl_graph::reset_action,

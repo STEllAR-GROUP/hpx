@@ -120,32 +120,15 @@ namespace hpx { namespace threads
     ///                   thread referenced by the \a id parameter. If the
     ///                   thread is not known to the thread-manager the return
     ///                   value will be the string "<unknown>".
-    HPX_API_EXPORT std::string get_thread_description(thread_id_type id,
+    HPX_API_EXPORT char const* get_thread_description(thread_id_type id,
         error_code& ec = throws);
-    HPX_API_EXPORT void set_thread_description(thread_id_type id,
+    HPX_API_EXPORT char const* set_thread_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
 
-    HPX_API_EXPORT std::string get_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT char const* get_thread_lco_description(thread_id_type id,
         error_code& ec = throws);
-    HPX_API_EXPORT void set_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT char const* set_thread_lco_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// The function get_thread_gid is part of the thread related API
-    /// allows to query the GID of one of the threads known to the
-    /// thread-manager.
-    ///
-    /// \param id         [in] The thread id of the thread being queried.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
-    ///
-    /// \returns          This function returns the GID of the
-    ///                   thread referenced by the \a id parameter. If the
-    ///                   thread is not known to the thread-manager the return
-    ///                   value will be \a naming::invalid_id.
-    HPX_API_EXPORT naming::id_type get_thread_gid(thread_id_type id,
-        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API. It
@@ -189,7 +172,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT bool get_thread_interruption_enabled(thread_id_type id,
         error_code& ec = throws);
 
-    HPX_API_EXPORT void set_thread_interruption_enabled(thread_id_type id,
+    HPX_API_EXPORT bool set_thread_interruption_enabled(thread_id_type id,
         bool enable, error_code& ec = throws);
 
     HPX_API_EXPORT bool get_thread_interruption_requested(thread_id_type id,
@@ -366,7 +349,9 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
+        std::size_t os_thread = std::size_t(-1), 
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
@@ -387,7 +372,9 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
+        std::size_t os_thread = std::size_t(-1), 
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
@@ -406,7 +393,9 @@ namespace hpx { namespace applier
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
+        std::size_t os_thread = std::size_t(-1), 
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data.
@@ -474,7 +463,9 @@ namespace hpx { namespace applier
         char const* description = 0, naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
+        std::size_t os_thread = std::size_t(-1), 
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
@@ -494,7 +485,9 @@ namespace hpx { namespace applier
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
+        std::size_t os_thread = std::size_t(-1), 
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
@@ -512,7 +505,9 @@ namespace hpx { namespace applier
         BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
+        std::size_t os_thread = std::size_t(-1), 
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the

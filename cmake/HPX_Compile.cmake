@@ -76,8 +76,6 @@ macro(hpx_compile name)
               "${${name}_SOURCE}"
               ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT
-      #OUTPUT_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout
-      #ERROR_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr
       ERROR_VARIABLE ${name}_STDERR
       OUTPUT_VARIABLE ${name}_STDOUT
       OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -90,10 +88,10 @@ macro(hpx_compile name)
               set(${name}_RESULT "1")
             endif()
           endif()
-          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr ${name}_STDERR)
+          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stderr ${${name}_STDERR})
       endif()
       if(${name}_STDOUT)
-          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout ${name}_STDOUT)
+          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stdout ${${name}_STDOUT})
       endif()
   endif()
 endmacro()

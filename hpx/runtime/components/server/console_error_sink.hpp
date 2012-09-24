@@ -22,13 +22,13 @@ namespace hpx { namespace components { namespace server
     void console_error_sink(boost::exception_ptr const&);
 
     typedef actions::plain_action1<
-        boost::exception_ptr const&, console_error_sink,
-        threads::thread_priority_critical
+        boost::exception_ptr const&, console_error_sink
     > console_error_sink_action;
 }}}
 
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    hpx::components::server::console_error_sink_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(
-    hpx::components::server::console_error_sink_action
-)
+    hpx::components::server::console_error_sink_action);
 
 #endif

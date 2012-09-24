@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/coroutine/coroutine.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config.hpp>
@@ -183,6 +183,12 @@ namespace hpx
                                      garbage collected */
         };
 
+        /// \cond NODETAIL
+        ///   Please note that if you change the value of threads::terminated 
+        ///   above, you will need to adjust do_call(dummy<1> = 1) in 
+        ///   util/coroutine /detail/coroutine_impl.hpp as well.
+        /// \endcond
+
         /// \enum thread_priority
         enum thread_priority
         {
@@ -214,6 +220,16 @@ namespace hpx
 
         typedef thread_state_enum thread_function_type(thread_state_ex_enum);
 
+        /// \enum thread_stacksize
+        enum thread_stacksize
+        {
+            thread_stacksize_default = 0,       ///< use default stack size
+            thread_stacksize_minimal = 1,       ///< use minimally possible stack size (default)
+            thread_stacksize_small = thread_stacksize_minimal,  ///< use small stack size 
+            thread_stacksize_medium = 2,        ///< use medium sized stack size
+            thread_stacksize_large = 3          ///< use large stack size
+        };
+
         ///////////////////////////////////////////////////////////////////////
         /// \cond NODETAIL
         namespace detail
@@ -222,10 +238,16 @@ namespace hpx
         }
         /// \endcond
 
-        typedef boost::coroutines::coroutine<
+        typedef util::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
         typedef coroutine_type::self thread_self;
+
+        ///////////////////////////////////////////////////////////////////////
+        /// \cond NODETAIL
+        thread_id_type const invalid_thread_id =
+            reinterpret_cast<thread_id_type>(-1);
+        /// \endcond
 
         /// The function \a get_self returns a reference to the (OS thread
         /// specific) self reference to the current PX thread.
@@ -250,20 +272,36 @@ namespace hpx
         /// The function \a get_parent_id returns the PX thread id of the
         /// currents thread parent (or zero if the current thread is not a
         /// PX thread).
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       being defined.
         HPX_API_EXPORT thread_id_type get_parent_id();
 
         /// The function \a get_parent_phase returns the PX phase of the
         /// currents thread parent (or zero if the current thread is not a
         /// PX thread).
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       being defined.
         HPX_API_EXPORT std::size_t get_parent_phase();
 
         /// The function \a get_parent_locality_id returns the id of the locality of
         /// the currents thread parent (or zero if the current thread is not a
         /// PX thread).
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       being defined.
         HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
 
         /// The function \a get_self_component_id returns the lva of the
         /// component the current thread is acting on
+        ///
+        /// \note This function will return a meaningful value only if the  
+        ///       code was compiled with HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+        ///       being defined.
         HPX_API_EXPORT boost::uint64_t get_self_component_id();
 
         /// The function \a get_thread_manager returns a reference to the
@@ -292,7 +330,7 @@ namespace hpx
         class HPX_API_EXPORT action_manager;
 
         template <typename Component, int Action, typename Result,
-            typename Arguments, typename Derived, threads::thread_priority Priority>
+            typename Arguments, typename Derived>
         struct action;
     }
 
@@ -385,31 +423,42 @@ namespace hpx
         enum component_enum_type
         {
             component_invalid = -1,
-            component_runtime_support = 0,  // runtime support (needed to create components, etc.)
-            component_memory = 1,           // general memory address
-            component_memory_block = 2,     // general memory block
 
-            // LCO's
-            component_base_lco = 3,         ///< the base of all LCO's not waiting on a value
+            // Runtime support component (provides system services such as
+            // component creation, etc). One per locality. 
+            component_runtime_support = 0,  
+
+            // Pseudo-component for direct access to local virtual memory.
+            component_memory = 1,
+
+            // Generic memory blocks. 
+            component_memory_block = 2,
+
+            // Base component for LCOs that do not produce a value.
+            component_base_lco = 3,         
+
+            // Base component for LCOs that do produce values. 
             component_base_lco_with_value = 4,
-                                            ///< base LCO's blocking on a value
-            component_future =              ///< a future executing the action and
-                                            ///< allowing to wait for the result
-                ((5 << 16) | component_base_lco_with_value),
-            component_value_adaptor = 6,    ///< an adaptor to access specific slot of an LCO
-            component_barrier =             ///< a LCO implementing a barrier
-                ((7 << 16) | component_base_lco),
-            component_thread =              ///< a ParalleX thread
-                ((8 << 16) | component_base_lco_with_value),
 
-            component_agas_primary_namespace = 12,
-            component_agas_component_namespace = 13,
-            component_agas_symbol_namespace = 14,
+            // Synchronization barrier LCO.
+            component_barrier = ((5 << 16) | component_base_lco),
+
+            // An LCO representing a value which may not have been computed yet.
+            component_promise = ((6 << 16) | component_base_lco_with_value),
+
+            // AGAS primary address resolution services.
+            component_agas_primary_namespace = 7,
+
+            // AGAS global type system.
+            component_agas_component_namespace = 8,
+
+            // AGAS symbolic naming services.
+            component_agas_symbol_namespace = 9,
 
             component_last,
             component_first_dynamic = component_last,
 
-            // force this enum type to be at least 32 bits.
+            // Force this enum type to be at least 32 bits.
             component_upper_bound = 0x7fffffffL
         };
 
@@ -818,7 +867,7 @@ namespace hpx
     ///
     /// This function returns the id of the current locality.
     ///
-    /// \param ec         [in,out] this represents the error status on exit,
+    /// \param ec         [in,out] This represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///

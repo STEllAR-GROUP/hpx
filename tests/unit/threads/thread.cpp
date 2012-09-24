@@ -7,6 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threadmanager.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
@@ -14,6 +15,12 @@
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
+
+///////////////////////////////////////////////////////////////////////////////
+inline void set_description(char const* test_name)
+{
+    hpx::threads::set_thread_description(hpx::threads::get_self_id(), test_name);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 inline int
@@ -66,6 +73,8 @@ void comparison_thread(hpx::thread::id parent)
 ///////////////////////////////////////////////////////////////////////////////
 void test_sleep()
 {
+    set_description("test_sleep");
+
     boost::posix_time::ptime now =
         boost::date_time::second_clock<boost::posix_time::ptime>::universal_time();
     hpx::this_thread::sleep_for(boost::posix_time::seconds(3));
@@ -86,6 +95,7 @@ void do_test_creation()
 
 void test_creation()
 {
+    set_description("test_creation");
     timed_test(&do_test_creation, 1);
 }
 
@@ -99,59 +109,88 @@ void do_test_id_comparison()
 
 void test_id_comparison()
 {
+    set_description("test_id_comparison");
     timed_test(&do_test_id_comparison, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void interruption_point_thread(hpx::lcos::local::mutex* m, bool* failed)
+void interruption_point_thread(hpx::lcos::local::barrier* b, 
+    hpx::lcos::local::mutex* m, bool* failed)
 {
-    hpx::lcos::local::mutex::scoped_lock lk(*m);
-    hpx::this_thread::interruption_point();
-    *failed = true;
+    try {
+        hpx::lcos::local::mutex::scoped_lock lk(*m);
+        hpx::this_thread::interruption_point();
+        *failed = true;
+    }
+    catch(...) {
+        b->wait();
+        throw;
+    }
+    b->wait();
 }
 
 void do_test_thread_interrupts_at_interruption_point()
 {
     hpx::lcos::local::mutex m;
+    hpx::lcos::local::barrier b(2);
     bool failed = false;
     hpx::lcos::local::mutex::scoped_lock lk(m);
     hpx::thread thrd(
-        HPX_STD_BIND(&interruption_point_thread, &m, &failed));
+        HPX_STD_BIND(&interruption_point_thread, &b, &m, &failed));
     thrd.interrupt();
     lk.unlock();
+
+    b.wait();       // Make sure the test thread has been executed, as join is 
+                    // a interruption point which might get triggered.
+
     thrd.join();
     HPX_TEST(!failed);
 }
 
 void test_thread_interrupts_at_interruption_point()
 {
+    set_description("test_thread_interrupts_at_interruption_point");
     timed_test(&do_test_thread_interrupts_at_interruption_point, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void disabled_interruption_point_thread(hpx::lcos::local::mutex* m, bool* failed)
+void disabled_interruption_point_thread(hpx::lcos::local::mutex* m, 
+    hpx::lcos::local::barrier* b, bool* failed)
 {
-    hpx::lcos::local::mutex::scoped_lock lk(*m);
     hpx::this_thread::disable_interruption dc;
-    hpx::this_thread::interruption_point();
-    *failed = false;
+    try {
+        hpx::lcos::local::mutex::scoped_lock lk(*m);
+        hpx::this_thread::interruption_point();
+        *failed = false;
+    }
+    catch(...) {
+        b->wait();
+        throw;
+    }
+    b->wait();
 }
 
 void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
     hpx::lcos::local::mutex m;
+    hpx::lcos::local::barrier b(2);
     bool failed = true;
     hpx::lcos::local::mutex::scoped_lock lk(m);
     hpx::thread thrd(
-        HPX_STD_BIND(&disabled_interruption_point_thread, &m, &failed));
+        HPX_STD_BIND(&disabled_interruption_point_thread, &m, &b, &failed));
     thrd.interrupt();
     lk.unlock();
+
+    b.wait();       // Make sure the test thread has been executed, as join is 
+                    // a interruption point which might get triggered.
+
     thrd.join();
     HPX_TEST(!failed);
 }
 
 void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
+    set_description("test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point");
     timed_test(&do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point, 1);
 }
 
@@ -182,6 +221,7 @@ void do_test_creation_through_reference_wrapper()
 
 void test_creation_through_reference_wrapper()
 {
+    set_description("test_creation_through_reference_wrapper");
     timed_test(&do_test_creation_through_reference_wrapper, 1);
 }
 
@@ -237,6 +277,8 @@ void test_creation_through_reference_wrapper()
 
 void test_swap()
 {
+    set_description("test_swap");
+
     hpx::thread t1(&simple_thread);
     hpx::thread t2(&simple_thread);
     hpx::thread::id id1 = t1.get_id();

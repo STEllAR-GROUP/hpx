@@ -7,8 +7,8 @@
 set(subdirs
     agas
     actions
-    components
     lcos
+    threads
     util
    )
 

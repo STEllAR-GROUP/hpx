@@ -101,7 +101,7 @@ function get_random_number_0()
   use global_parameters_0
   use rng_gtc_0
   implicit none
-  real(wp) :: get_random_number_0
+  real(8) :: get_random_number_0
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -214,7 +214,7 @@ function get_random_number_1()
   use global_parameters_1
   use rng_gtc_1
   implicit none
-  real(wp) :: get_random_number_1
+  real(8) :: get_random_number_1
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -327,7 +327,7 @@ function get_random_number_2()
   use global_parameters_2
   use rng_gtc_2
   implicit none
-  real(wp) :: get_random_number_2
+  real(8) :: get_random_number_2
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -440,7 +440,7 @@ function get_random_number_3()
   use global_parameters_3
   use rng_gtc_3
   implicit none
-  real(wp) :: get_random_number_3
+  real(8) :: get_random_number_3
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -553,7 +553,7 @@ function get_random_number_4()
   use global_parameters_4
   use rng_gtc_4
   implicit none
-  real(wp) :: get_random_number_4
+  real(8) :: get_random_number_4
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -666,7 +666,7 @@ function get_random_number_5()
   use global_parameters_5
   use rng_gtc_5
   implicit none
-  real(wp) :: get_random_number_5
+  real(8) :: get_random_number_5
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -779,7 +779,7 @@ function get_random_number_6()
   use global_parameters_6
   use rng_gtc_6
   implicit none
-  real(wp) :: get_random_number_6
+  real(8) :: get_random_number_6
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -892,7 +892,7 @@ function get_random_number_7()
   use global_parameters_7
   use rng_gtc_7
   implicit none
-  real(wp) :: get_random_number_7
+  real(8) :: get_random_number_7
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -1005,7 +1005,7 @@ function get_random_number_8()
   use global_parameters_8
   use rng_gtc_8
   implicit none
-  real(wp) :: get_random_number_8
+  real(8) :: get_random_number_8
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator
@@ -1118,7 +1118,7 @@ function get_random_number_9()
   use global_parameters_9
   use rng_gtc_9
   implicit none
-  real(wp) :: get_random_number_9
+  real(8) :: get_random_number_9
 
   if(rng_control==0)then
    ! use fortran's intrinsic random number generator

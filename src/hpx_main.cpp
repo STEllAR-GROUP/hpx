@@ -28,7 +28,7 @@ int hpx_main()
     // Copy all arguments which are not hpx related to a temporary array
     boost::scoped_array<char*> argv(new char*[args.size()]);
     std::size_t argcount = 0;
-    for(std::size_t i = 0; i < args.size(); ++i)
+    for (std::size_t i = 0; i < args.size(); ++i)
     {
         if (0 != args[i].find("--hpx:"))
             argv[argcount++] = const_cast<char*>(args[i].data());

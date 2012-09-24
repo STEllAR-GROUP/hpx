@@ -39,6 +39,7 @@ using hpx::util::high_resolution_timer;
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t tasks = 64;
 boost::uint64_t delay = 0;
+bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 void worker()
@@ -50,20 +51,26 @@ void worker()
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    double median_
+    variables_map& vm
+  , double median_
   , double mean_
   , double sum_
     )
 {
+    if (header)
+        std::cout << "Tasks,Delay (iterations),Total Walltime (seconds),"
+                     "Median Walltime (seconds),Average Walltime (seconds),\n"; 
+
+    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
     std::string const delay_str = boost::str(boost::format("%lu,") % delay);
 
-    std::cout << ( boost::format("%-21s %10.10s, %10.10s, %10.10s\n")
-                 % delay_str % median_ % mean_ % sum_);
+    std::cout << ( boost::format("%-21s %-21s %10.12s, %10.12s, %10.12s\n")
+                 % tasks_str % delay_str % sum_ % median_ % mean_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int app_main(
-    variables_map&
+    variables_map& vm
     )
 {
     if (0 == tasks)
@@ -82,7 +89,7 @@ int app_main(
     }
 
     // Print out the results.
-    print_results(median(results), mean(results), sum(results));
+    print_results(vm, median(results), mean(results), sum(results));
 
     return 0;
 }
@@ -110,6 +117,9 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
+
+        ( "no-header"
+        , "do not print out the csv header row")
         ;
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);
@@ -122,6 +132,9 @@ int main(
         std::cout << cmdline;
         return 0;
     }
+
+    if (vm.count("no-header"))
+        header = false;
 
     return app_main(vm);
 }

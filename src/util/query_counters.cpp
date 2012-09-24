@@ -46,7 +46,7 @@ namespace hpx { namespace util
             ids_.reserve(names_.size());
             BOOST_FOREACH(std::string const& name, names_)
             {
-                error_code ec;
+                error_code ec(lightweight);
                 naming::id_type id =
                     performance_counters::get_counter(name, ec);
                 if (HPX_UNLIKELY(!id))
@@ -89,7 +89,7 @@ namespace hpx { namespace util
     void query_counters::print_value(Stream& out, std::string const& name,
         performance_counters::counter_value const& value, std::string const& uom)
     {
-        error_code ec;        // do not throw
+        error_code ec(lightweight);        // do not throw
         double val = value.get_value<double>(ec);
 
         out << performance_counters::remove_counter_prefix(name) << ",";

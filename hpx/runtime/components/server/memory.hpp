@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 
 namespace hpx { namespace components { namespace server
 {

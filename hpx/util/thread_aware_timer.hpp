@@ -3,19 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM)
-#define HPX_UTIL_HIGH_RESOLUTION_TIMER_MAR_24_2008_1222PM
+#if !defined(HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM)
+#define HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/config.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/chrono/chrono.hpp>
-
-#include <stdexcept>
 
 namespace hpx { namespace util
 {
@@ -30,12 +27,12 @@ namespace hpx { namespace util
     {
     public:
         thread_aware_timer()
-          : start_time_(now())
+          : start_time_(take_time_stamp())
         {
         }
 
         thread_aware_timer(double t)
-          : start_time_(t * 1e9)
+          : start_time_(static_cast<boost::uint64_t>(t * 1e9))
         {}
 
         thread_aware_timer(thread_aware_timer const& rhs)
@@ -49,52 +46,50 @@ namespace hpx { namespace util
 
         void restart()
         {
-            start_time_ = now();
+            start_time_ = take_time_stamp();
         }
         double elapsed() const                  // return elapsed time in seconds
         {
-            return double(now() - start_time) * 1e-9;
+            return double(take_time_stamp() - start_time_) * 1e-9;
         }
 
         boost::int64_t elapsed_microseconds() const
         {
-            return boost::int64_t((now() - start_time) * 1e-3);
+            return boost::int64_t((take_time_stamp() - start_time_) * 1e-3);
         }
 
         boost::int64_t elapsed_nanoseconds() const
         {
-            return boost::int64_t(now() - start_time);
+            return boost::int64_t(take_time_stamp() - start_time_);
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
         {
-            return (boost::chrono::duration_values<boost::chrono::nanoseconds>::max)() * 1e-9;
+            return (util::high_resolution_clock::max)() * 1e-9;
         }
 
         double elapsed_min() const   // return minimum value for elapsed()
         {
-            return (boost::chrono::duration_values<boost::chrono::nanoseconds>::min)() * 1e-9;
+            return (util::high_resolution_clock::min)() * 1e-9;
         }
 
     protected:
-        static void sample_time(
-            boost::shared_ptr<hpx::lcos::local::promise<boost::uint64_t> > p)
+        static void sample_time(hpx::lcos::local::promise<boost::uint64_t>& p)
         {
-            p->set_value(util::high_resolution_clock::now());
+            p.set_value(util::high_resolution_clock::now());
         }
 
         static boost::uint64_t take_time_stamp()
         {
-            boost::shared_ptr<hpx::lcos::local::promise<boost::uint64_t> > p =
-                boost::make_shared<hpx::lcos::local::promise<boost::uint64_t> >();
+            hpx::lcos::local::promise<boost::uint64_t> p;
 
             // Get a reference to the Timer specific HPX io_service object ...
             hpx::util::io_service_pool* pool =
                 hpx::get_runtime().get_thread_pool("timer_pool");
 
             // ... and schedule the handler to run on the first of its OS-threads.
-            pool->get_io_service(0).post(hpx::util::bind(&sample_time, p));
-            return p->get_future().get();
+            pool->get_io_service(0).post(hpx::util::bind(&sample_time, boost::ref(p)));
+            return p.get_future().get();
         }
 
     private:

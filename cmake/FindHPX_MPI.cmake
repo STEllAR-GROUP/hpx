@@ -6,7 +6,7 @@
 # This is a wrapper for FindMPI.cmake avoiding to re-detect MPI during each
 # cmake configuration
 
-set(languages CXX Fortran)
+set(languages CXX C Fortran)
 
 if(MPI_DISABLE)
   hpx_info("find_package.mpi" "Library disabled by user.")

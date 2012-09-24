@@ -94,7 +94,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread_data*& thrd)
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             return queue_.get_next_thread(thrd, num_thread);
         }
@@ -113,9 +113,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd)
+        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
-            return queue_.destroy_thread(thrd);
+            return queue_.destroy_thread(thrd, busy_count);
         }
 
         /// This is a function which gets called periodically by the thread
@@ -123,7 +123,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count)
+            boost::int64_t& idle_loop_count)
         {
             std::size_t added = 0;
             return queue_.wait_or_add_new(num_thread, running, idle_loop_count, added);

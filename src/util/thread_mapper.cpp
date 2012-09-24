@@ -2,9 +2,11 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#include <cstring>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/format.hpp>
 
@@ -18,12 +20,13 @@ namespace hpx { namespace util
     // static members
     boost::uint32_t thread_mapper::invalid_index = static_cast<boost::uint32_t>(-1);
     long int thread_mapper::invalid_tid = -1;
+    std::string thread_mapper::invalid_label;
 
     ///////////////////////////////////////////////////////////////////////////
     // methods
     bool thread_mapper::null_cb(boost::uint32_t) {return true;}
 
-    long int thread_mapper::get_papi_thread_id()
+    long int thread_mapper::get_system_thread_id()
     {
 #if defined(__linux__)
         // this has been tested only on x86_*
@@ -61,12 +64,15 @@ namespace hpx { namespace util
             // unregistered correctly)
             unmap_thread(it);
         }
-        // increment category count and create mappings
+        // create mappings
         boost::uint32_t tix = thread_map_[id] =
             static_cast<boost::uint32_t>(thread_info_.size());
-        thread_info_.push_back(
-            thread_data(l, label_count_[l], get_papi_thread_id()));
-        label_map_[thread_id(l, label_count_[l]++)] = tix;
+        thread_info_.push_back(thread_data(get_system_thread_id()));
+        if (label_map_.left.find(l) != label_map_.left.end())
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::thread_mapper::register_thread",
+                "attempted to register thread with a duplicate label");
+        label_map_.left.insert(label_map_type::left_value_type(l, tix));
         return tix;
     }
 
@@ -80,7 +86,7 @@ namespace hpx { namespace util
     }
 
     bool thread_mapper::register_callback(boost::uint32_t tix,
-                                               callback_type cb)
+                                          callback_type cb)
     {
         mutex_type::scoped_lock m(mtx_);
 
@@ -105,28 +111,20 @@ namespace hpx { namespace util
         return (tix < thread_info_.size())? thread_info_[tix].tid_: invalid_tid;
     }
 
-    char const *thread_mapper::get_thread_label(boost::uint32_t tix) const
+    std::string const& thread_mapper::get_thread_label(boost::uint32_t tix) const
     {
         mutex_type::scoped_lock m(mtx_);
 
-        return (tix < thread_info_.size())? thread_info_[tix].label_: 0;
+        label_map_type::right_map::const_iterator it = label_map_.right.find(tix);
+        return (it == label_map_.right.end())? invalid_label: it->second;
     }
 
-    boost::uint32_t thread_mapper::get_thread_instance(boost::uint32_t tix) const
+    boost::uint32_t thread_mapper::get_thread_index(std::string const& label) const
     {
         mutex_type::scoped_lock m(mtx_);
 
-        return (tix < thread_info_.size())? thread_info_[tix].instance_: invalid_index;
-    }
-
-    boost::uint32_t thread_mapper::get_thread_index(char const *label,
-                                                       boost::uint32_t inst) const
-    {
-        mutex_type::scoped_lock m(mtx_);
-
-        thread_id tid(label, inst);
-        label_map_type::const_iterator it = label_map_.find(tid);
-        return (it == label_map_.end())? invalid_index: it->second;
+        label_map_type::left_map::const_iterator it = label_map_.left.find(label);
+        return (it == label_map_.left.end())? invalid_index: it->second;
     }
 
     boost::uint32_t thread_mapper::get_thread_count() const
@@ -134,14 +132,5 @@ namespace hpx { namespace util
         mutex_type::scoped_lock m(mtx_);
 
         return static_cast<boost::uint32_t>(thread_info_.size());
-    }
-
-    void thread_mapper::get_registered_labels(std::vector<char const *>& labels) const
-    {
-        mutex_type::scoped_lock m(mtx_);
-
-        label_count_type::const_iterator it;
-        for (it = label_count_.begin(); it != label_count_.end(); ++it)
-            labels.push_back(it->first);
     }
 }}

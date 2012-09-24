@@ -53,8 +53,7 @@ using hpx::util::high_resolution_timer;
 // Command-line variables.
 boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
-boost::uint64_t current_trial = 0;
-boost::uint64_t total_trials = 1; 
+bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -62,21 +61,17 @@ void print_results(
   , double walltime
     )
 {
-    if (current_trial == 0)
-    {
-        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-        std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    if (header)
+        std::cout << "OS-threads,Tasks,Delay (iterations),"
+                     "Total Walltime (seconds),Walltime per Task (seconds)\n";
 
-        std::cout << ( boost::format("%-21s %-21s %-21s %10.10s")
-                     % cores_str % tasks_str % delay_str % walltime);
-    }
+    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
 
-    else
-        std::cout << (boost::format(", %10.10s") % walltime);
-
-    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
-        std::cout << "\n";
+    std::cout << ( boost::format("%-21s %-21s %-21s %10.12s, %10.12s\n")
+                 % cores_str % tasks_str % delay_str
+                 % walltime % (walltime / tasks));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,14 +136,6 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
-
-        ( "current-trial"
-        , value<boost::uint64_t>(&current_trial)->default_value(0)
-        , "current trial")
-
-        ( "total-trials"
-        , value<boost::uint64_t>(&total_trials)->default_value(1)
-        , "total number of trial runs")
         ;
     ;
 
@@ -162,6 +149,9 @@ int main(
         std::cout << cmdline;
         return 0;
     }
+
+    if (vm.count("no-header"))
+        header = false;
 
     // Setup the OMP environment.
     omp_set_num_threads(vm["threads"].as<int>());

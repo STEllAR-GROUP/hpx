@@ -80,7 +80,7 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
   EXCLUDE ".*portable_binary_.*archive[.]cpp"
   APPEND)
 add_hpx_library_sources(hpx
@@ -111,11 +111,11 @@ endif()
 
 if(NOT MSVC)
   add_hpx_library_sources(hpx_external
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp"
+    GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/coroutine/swapcontext.cpp"
     APPEND)
 else()
   if(HPX_EMULATE_SWAP_CONTEXT)
-    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/switch_to_fiber.asm")
+    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(
@@ -180,126 +180,61 @@ add_hpx_library_headers(hpx_init
 
 ################################################################################
 # add headers to preprocessing
-hpx_partial_preprocess_header(
-    "hpx/util/detail/function_template.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/detail/get_table.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/detail/vtable.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/detail/vtable_ptr.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/detail/vtable_ptr_base.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/bind.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/bind_action.hpp"
-    LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/tuple.hpp"
-    LIMIT HPX_TUPLE_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/util/locking_helpers.hpp"
-    LIMIT HPX_LOCK_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/apply.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/async.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/async_fwd.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/wait_all.hpp"
-    LIMIT HPX_WAIT_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/wait_n.hpp"
-    LIMIT HPX_WAIT_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/wait_any.hpp"
-    LIMIT HPX_WAIT_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/future_wait.hpp"
-    LIMIT HPX_WAIT_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/packaged_action_constructors.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/packaged_action_constructors_direct.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/deferred_packaged_task_constructors.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/component_action_enum.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/component_action_implementations.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/construct_continuation_function_objects.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/construct_continuation_functions.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/define_function_operators.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/plain_action_enum.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/plain_action_implementations.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/actions/transfer_action_constructors.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/applier/apply_implementations.hpp"
-    LIMIT HPX_ACTION_ARGUMENT_LIMIT
-)
-hpx_partial_preprocess_header(
-    "hpx/runtime/components/memory_block.hpp"
-    LIMIT HPX_WAIT_ARGUMENT_LIMIT
-)
+set(function_argument_limit_preprocessing_files
+  "hpx/util/detail/function_template.hpp"
+  "hpx/util/detail/get_table.hpp"
+  "hpx/util/detail/vtable.hpp"
+  "hpx/util/detail/vtable_ptr.hpp"
+  "hpx/util/detail/vtable_ptr_base.hpp"
+  "hpx/util/bind.hpp"
+  "hpx/util/bind_action.hpp")
+foreach(file ${function_argument_limit_preprocessing_files})
+  hpx_partial_preprocess_header(${file} LIMIT HPX_FUNCTION_ARGUMENT_LIMIT)
+endforeach()
+
+set(tuple_argument_limit_preprocessing_files
+  "hpx/util/tuple.hpp")
+foreach(file ${tuple_argument_limit_preprocessing_files})
+  hpx_partial_preprocess_header(${file} LIMIT HPX_TUPLE_LIMIT)
+endforeach()
+
+set(lock_argument_limit_preprocessing_files
+  "hpx/util/locking_helpers.hpp")
+foreach(file ${tuple_argument_limit_preprocessing_files})
+  hpx_partial_preprocess_header(${file} LIMIT HPX_LOCK_LIMIT)
+endforeach()
+
+set(action_argument_limit_preprocessing_files
+  "hpx/apply.hpp"
+  "hpx/async.hpp"
+  "hpx/lcos/async_fwd.hpp"
+  "hpx/lcos/packaged_action_constructors.hpp"
+  "hpx/lcos/packaged_action_constructors_direct.hpp"
+  "hpx/lcos/deferred_packaged_task_constructors.hpp"
+  "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
+  "hpx/runtime/actions/component_action_enum.hpp"
+  "hpx/runtime/actions/component_action_implementations.hpp"
+  "hpx/runtime/actions/construct_continuation_function_objects.hpp"
+  "hpx/runtime/actions/construct_continuation_functions.hpp"
+  "hpx/runtime/actions/define_function_operators.hpp"
+  "hpx/runtime/actions/plain_action_enum.hpp"
+  "hpx/runtime/actions/plain_action_implementations.hpp"
+  "hpx/runtime/actions/transfer_action_constructors.hpp"
+  "hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp"
+  "hpx/runtime/applier/apply_implementations.hpp")
+foreach(file ${action_argument_limit_preprocessing_files})
+  hpx_partial_preprocess_header(${file} LIMIT HPX_ACTION_ARGUMENT_LIMIT)
+endforeach()
+
+set(wait_argument_limit_preprocessing_files
+  "hpx/lcos/wait_all.hpp"
+  "hpx/lcos/wait_n.hpp"
+  "hpx/lcos/wait_any.hpp"
+  "hpx/lcos/future_wait.hpp"
+  "hpx/runtime/components/memory_block.hpp")
+foreach(file ${wait_argument_limit_preprocessing_files})
+  hpx_partial_preprocess_header(${file} LIMIT HPX_WAIT_ARGUMENT_LIMIT)
+endforeach()
 
 ################################################################################
 
@@ -363,11 +298,27 @@ set_target_properties(hpx_serialization PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx_serialization
-  FOLDER "Core"
-  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
-  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
-  RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
-  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+  FOLDER "Core")
+
+if(MSVC)
+  set_target_properties(hpx_serialization PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELEASE}
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${HPX_ARCHIVE_OUTPUT_DIRECTORY_DEBUG}
+    ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL}
+    ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO}
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+    LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+    LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+else()
+  set_target_properties(hpx_serialization PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY}
+    LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
+endif()
 
 set(hpx_serialization_lib_dependencies
   ${hpx_MALLOC_LIBRARY})
@@ -388,7 +339,7 @@ set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY=\"${name}\""
   "HPX_EXPORTS"
-  "BOOST_COROUTINE_EXPORTS")
+  "HPX_COROUTINE_EXPORTS")
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx_serialization)
@@ -404,11 +355,27 @@ set_target_properties(hpx PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx
-  FOLDER "Core"
-  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
-  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
-  RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
-  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+  FOLDER "Core")
+
+if(MSVC)
+  set_target_properties(hpx PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELEASE}
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${HPX_ARCHIVE_OUTPUT_DIRECTORY_DEBUG}
+    ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL}
+    ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO}
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+    LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+    LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+else()
+  set_target_properties(hpx PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY}
+    LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
+endif()
 
 if(NOT MSVC)
   set_target_properties(hpx
@@ -437,7 +404,7 @@ set_property(TARGET hpx APPEND
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER"
-  "BOOST_COROUTINE_EXPORTS") # Do we still need this?
+  "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx)
@@ -454,6 +421,17 @@ set_property(TARGET hpx_init APPEND
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER")
+
+if(MSVC)
+  set_target_properties(hpx_init PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELEASE}
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${HPX_ARCHIVE_OUTPUT_DIRECTORY_DEBUG}
+    ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL}
+    ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+else()
+  set_target_properties(hpx_init PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY ${HPX_ARCHIVE_OUTPUT_DIRECTORY})
+endif()
 
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 

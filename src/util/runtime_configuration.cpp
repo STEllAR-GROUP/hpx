@@ -45,13 +45,18 @@ namespace hpx { namespace util
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
-            "default_stack_size = ${HPX_DEFAULT_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE) "}",
+            "small_stack_size = ${HPX_SMALL_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
+            "medium_stack_size = ${HPX_MEDIUM_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE) "}",
+            "large_stack_size = ${HPX_LARGE_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
+            "default_stack_size = $[hpx.small_stack_size]",
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
@@ -184,15 +189,21 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
       : default_stacksize(HPX_DEFAULT_STACK_SIZE),
+        small_stacksize(HPX_SMALL_STACK_SIZE),
+        medium_stacksize(HPX_MEDIUM_STACK_SIZE),
+        large_stacksize(HPX_LARGE_STACK_SIZE),
         need_to_call_pre_initialize(true)
     {
         pre_initialize_ini();
 
         // set global config options
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         default_stacksize = init_default_stack_size();
+        small_stacksize = init_small_stack_size();
+        medium_stacksize = init_medium_stack_size();
+        large_stacksize = init_large_stack_size();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -211,10 +222,13 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         default_stacksize = init_default_stack_size();
+        small_stacksize = init_small_stack_size();
+        medium_stacksize = init_medium_stack_size();
+        large_stacksize = init_large_stack_size();
     }
 
     void runtime_configuration::reconfigure(
@@ -232,10 +246,13 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         default_stacksize = init_default_stack_size();
+        small_stacksize = init_small_stack_size();
+        medium_stacksize = init_medium_stack_size();
+        large_stacksize = init_large_stack_size();
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -443,7 +460,7 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_itt_notify_mode() const
     {
-#if HPX_USE_ITT == 1
+#if HPX_USE_ITT != 0
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -492,14 +509,15 @@ namespace hpx { namespace util
     }
 
     // Will return the stack size to use for all HPX-threads.
-    std::ptrdiff_t runtime_configuration::init_default_stack_size() const
+    std::ptrdiff_t runtime_configuration::init_stack_size(
+        char const* entryname, char const* defaultvaluestr, 
+        std::ptrdiff_t defaultvalue) const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                std::string entry = sec->get_entry("default_stack_size",
-                    BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE));
-                std::ptrdiff_t val = HPX_DEFAULT_STACK_SIZE;
+                std::string entry = sec->get_entry(entryname, defaultvaluestr);
+                std::ptrdiff_t val = defaultvalue;
 
                 namespace qi = boost::spirit::qi;
                 qi::parse(entry.begin(), entry.end(),
@@ -507,7 +525,31 @@ namespace hpx { namespace util
                 return val;
             }
         }
-        return HPX_DEFAULT_STACK_SIZE;
+        return defaultvalue;
+    }
+
+    std::ptrdiff_t runtime_configuration::init_default_stack_size() const
+    {
+        return init_stack_size("default_stack_size", 
+            BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE), HPX_DEFAULT_STACK_SIZE);
+    }
+
+    std::ptrdiff_t runtime_configuration::init_small_stack_size() const
+    {
+        return init_stack_size("small_stack_size", 
+            BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
+    }
+
+    std::ptrdiff_t runtime_configuration::init_medium_stack_size() const
+    {
+        return init_stack_size("medium_stack_size", 
+            BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
+    }
+
+    std::ptrdiff_t runtime_configuration::init_large_stack_size() const
+    {
+        return init_stack_size("large_stack_size", 
+            BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -528,6 +570,27 @@ namespace hpx { namespace util
             return false;
         }
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::ptrdiff_t runtime_configuration::get_stack_size(
+        threads::thread_stacksize stacksize) const
+    {
+        switch (stacksize) {
+        case threads::thread_stacksize_small:
+            return small_stacksize;
+
+        case threads::thread_stacksize_medium:
+            return medium_stacksize;
+
+        case threads::thread_stacksize_large:
+            return large_stacksize;
+
+        default:
+        case threads::thread_stacksize_default:
+            break;
+        }
+        return default_stacksize;
     }
 }}
 

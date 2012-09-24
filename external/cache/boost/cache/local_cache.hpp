@@ -449,6 +449,63 @@ namespace boost { namespace cache
             return true;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        /// \brief Update an existing element in this cache
+        ///
+        /// \param k      [in] The key for the value which should be updated in
+        ///               the cache.
+        /// \param value  [in] The value which should be used as a replacement
+        ///               for the existing value in the cache. Any existing
+        ///               cache entry is not changed except for its value.
+        /// \param f      [in] A callable taking two arguments, \a k and the
+        ///               key found in the cache (in that order). If \a f
+        ///               returns true, then the update will continue. If \a f
+        ///               returns false, then the update will not succeed.
+        ///
+        /// \note         The function will call the entry's \a entry#touch
+        ///               function if the indexed value is found in the cache.
+        /// \note         The difference to the other overload of the \a insert
+        ///               function is that this overload replaces the cached
+        ///               value only, while the other overload replaces the
+        ///               whole cache entry, updating the cache entry
+        ///               properties.
+        ///
+        /// \returns      This function returns \a true if the entry has been
+        ///               successfully updated, otherwise it returns \a false.
+        ///               If the entry currently is not held by the cache it is
+        ///               added and the return value reflects the outcome of
+        ///               the corresponding insert operation.
+        template <
+            typename F
+        >
+        bool update_if(key_type const& k, value_type const& val, F f)
+        {
+            iterator it = store_.find(k);
+            if (it == store_.end()) {
+                // doesn't exist in this cache
+                statistics_.got_miss(); // update statistics
+                return insert(k, val);  // insert into cache
+            }
+
+            if (!f(k, (*it).first))
+                return false;
+
+            // update cache entry
+            (*it).second.get() = val;
+
+            // touch the entry
+            if ((*it).second.touch()) {
+                // reorder heap based on the changed entry attributes
+                std::make_heap(entry_heap_.begin(), entry_heap_.end(),
+                    update_policy_);
+            }
+
+            // update statistics
+            statistics_.got_hit();
+
+            return true;
+        }
+
         /// \brief Update an existing entry in this cache
         ///
         /// \param k      [in] The key for the entry which should be updated in
