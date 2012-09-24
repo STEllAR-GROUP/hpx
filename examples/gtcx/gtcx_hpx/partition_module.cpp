@@ -78,3 +78,15 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtcx_partition_type::wrapped_type::set_sndrecv_data_action,
     gtcx_partition_set_sndrecv_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_ntoroidal_gather_data_action,
+    gtcx_partition_set_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_ntoroidal_scatter_data_action,
+    gtcx_partition_set_ntoroidal_scatter_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_complex_ntoroidal_gather_data_action,
+    gtcx_partition_set_complex_ntoroidal_gather_data_action);
