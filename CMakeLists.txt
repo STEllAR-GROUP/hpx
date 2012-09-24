@@ -773,7 +773,7 @@ else()
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
-    hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX C)
+    hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
 
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
