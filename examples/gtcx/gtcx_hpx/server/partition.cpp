@@ -36,6 +36,11 @@ extern "C" {
                     ptr_to_class->set_toroidal_cmm(send,length);
                     return; };
             void FNAME(loop)(void* opaque_ptr_to_class, int *,int *);
+            void FNAME(sndrecv_toroidal_cmm) (void* pfoo,double *send, int *send_size,
+                                               double *receive,int *receive_size,int *dest) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
+                    return; };
             void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
                     // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
                     // derived from point, then the world will end.
@@ -218,36 +223,32 @@ namespace gtcx { namespace server
 
     void partition::partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1)
     {
-      if ( in_particle_ ) {
-        int vsize = (*mgrid)*(*mzetap1);
-        dnireceive_.resize(vsize);
+      int vsize = (*mgrid)*(*mzetap1);
+      dnireceive_.resize(vsize);
 
-        // synchronize with all operations to finish
-        std::size_t generation = 0;
-        hpx::future<void> f = allreduce_gate_.get_future(partd_comm_.size(),
-            &generation);
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      hpx::future<void> f = allreduce_gate_.get_future(p_comm_.size(),
+          &generation);
 
-        std::vector<double> dnisend;
-        dnisend.resize(vsize, 0.0);
+      std::vector<double> dnisend;
+      dnisend.resize(vsize, 0.0);
 
-        for (std::size_t i=0;i<dnisend.size();i++) {
-          dnisend[i] = dnitmp[i];
-        }
+      for (std::size_t i=0;i<dnisend.size();i++) {
+        dnisend[i] = dnitmp[i];
+      }
 
-        set_data_action set_data_;
-        for (std::size_t i=0;i<partd_comm_.size();i++) {
-          hpx::apply(set_data_, partd_comm_[i], item_, generation, dnisend);
-        }
+      set_data_action set_data_;
+      for (std::size_t i=0;i<p_comm_.size();i++) {
+        hpx::apply(set_data_, components_[p_comm_[i]], item_, generation, dnisend);
+      }
 
-        // possibly do other stuff while the allgather is going on...
-        f.get();
+      // possibly do other stuff while the allgather is going on...
+      f.get();
 
-        mutex_type::scoped_lock l(mtx_);
-        for (std::size_t i=0;i<dnireceive_.size();i++) {
-          densityi[i] = dnireceive_[i];
-        }
-      } else {
-        allreduce_gate_.next_generation();
+      mutex_type::scoped_lock l(mtx_);
+      for (std::size_t i=0;i<dnireceive_.size();i++) {
+        densityi[i] = dnireceive_[i];
       }
     }
 
@@ -264,6 +265,79 @@ namespace gtcx { namespace server
 
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
+
+  
+
+
+
+
+
+
+
+
+
+    void partition::toroidal_sndrecv(double *csend,int* csend_size,double *creceive,int *creceive_size,int* dest)
+    {
+      // create a new and-gate object
+      std::size_t generation = 0;
+      std::vector<double> send;
+
+      {
+        mutex_type::scoped_lock l(mtx_);
+
+        int vsize = *csend_size;
+        sndrecv_.resize(vsize);
+        sndrecv_future_ = sndrecv_gate_.get_future(&generation);
+
+        // The sender: send data to the left
+        // in a fire and forget fashion
+        send.resize(vsize);
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = csend[i];
+        }
+      }
+
+      set_sndrecv_data_action set_sndrecv_data_;
+      hpx::apply(set_sndrecv_data_, components_[t_comm_[*dest]], item_,
+          generation, send);
+      {  
+        // Now receive a message from the right
+        mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = sndrecv_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
+        if ( *creceive_size != sndrecv_.size() ){ 
+          std::cerr << " PROBLEM IN sndrecv!!! size mismatch " << std::endl;
+        }
+        for (std::size_t i=0;i<sndrecv_.size();i++) {
+          creceive[i] = sndrecv_[i];
+        }
+      }
+    }
+
+    void partition::set_sndrecv_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        sndrecv_gate_.synchronize(generation, l, "point::set_sndrecv_data");
+        sndrecv_ = send;
+        sndrecv_gate_.set();         // trigger corresponding and-gate input
+    }
+
+
+
+
+
+
+
+
+
 
     void partition::toroidal_sndleft(double *csend,int* mgrid)
     {
@@ -339,44 +413,40 @@ namespace gtcx { namespace server
 
     void partition::toroidal_allreduce(double *input,double *output, int* size)
     {
-      if ( in_toroidal_ ) {
-        int vsize = *size;
-        treceive_.resize(vsize);
+      int vsize = *size;
+      treceive_.resize(vsize);
 
-        // synchronize with all operations to finish
-        std::size_t generation = 0;
-        hpx::future<void> f = allreduce_gate_.get_future(toroidal_comm_.size(),
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      hpx::future<void> f = toroidal_allreduce_gate_.get_future(t_comm_.size(),
             &generation);
 
-        std::vector<double> send;
-        send.resize(vsize);
-        std::fill( treceive_.begin(),treceive_.end(),0.0);
+      std::vector<double> send;
+      send.resize(vsize);
+      std::fill( treceive_.begin(),treceive_.end(),0.0);
 
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = input[i];
-        }
+      for (std::size_t i=0;i<send.size();i++) {
+        send[i] = input[i];
+      }
 
-        set_tdata_action set_tdata_;
-        for (std::size_t i=0;i<toroidal_comm_.size();i++) {
-          hpx::apply(set_tdata_, toroidal_comm_[i], item_, generation, send);
-        }
+      set_tdata_action set_tdata_;
+      for (std::size_t i=0;i<t_comm_.size();i++) {
+        hpx::apply(set_tdata_, components_[t_comm_[i]], item_, generation, send);
+      }
 
-        // possibly do other stuff while the allgather is going on...
-        f.get();
+      // possibly do other stuff while the allgather is going on...
+      f.get();
 
-        mutex_type::scoped_lock l(mtx_);
-        for (std::size_t i=0;i<treceive_.size();i++) {
-          output[i] = treceive_[i];
-        }
-      } else {
-        allreduce_gate_.next_generation();
+      mutex_type::scoped_lock l(mtx_);
+      for (std::size_t i=0;i<treceive_.size();i++) {
+        output[i] = treceive_[i];
       }
     }
 
     void partition::set_tdata(std::size_t which,
                 std::size_t generation, std::vector<double> const& data)
     {
-        allreduce_gate_.synchronize(generation, "point::set_tdata");
+        toroidal_allreduce_gate_.synchronize(generation, "point::set_tdata");
 
         {
             mutex_type::scoped_lock l(mtx_);
@@ -384,7 +454,7 @@ namespace gtcx { namespace server
                 treceive_[i] += data[i];
         }
 
-        allreduce_gate_.set(which);         // trigger corresponding and-gate input
+        toroidal_allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
     void partition::toroidal_sndright(double *csend,int* mgrid)

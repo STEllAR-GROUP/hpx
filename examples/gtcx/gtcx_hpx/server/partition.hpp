@@ -97,6 +97,11 @@ namespace gtcx { namespace server
         void set_int_comm_allgather_data(std::size_t which,
                 std::size_t generation, std::vector<int> const& data);
         void int_comm_allgather(int *in,int *out, int* msize);
+        void toroidal_sndrecv(double *csend,int* csend_size,double *creceive,
+                                 int *creceive_size,int* dest);
+        void set_sndrecv_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -114,6 +119,7 @@ namespace gtcx { namespace server
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_comm_allgather_data, set_int_comm_allgather_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sendright_data, set_int_sendright_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sendleft_data, set_int_sendleft_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_sndrecv_data, set_sndrecv_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -135,6 +141,9 @@ namespace gtcx { namespace server
         hpx::lcos::local::trigger scatter_gate_;
         hpx::future<void> scatter_future_;
         and_gate_type broadcast_gate_;
+        hpx::future<void> sndrecv_future_;
+        hpx::lcos::local::trigger sndrecv_gate_;
+        and_gate_type toroidal_allreduce_gate_; 
 
         std::vector<hpx::naming::id_type> components_;
         mutable mutex_type mtx_;
@@ -152,6 +161,7 @@ namespace gtcx { namespace server
         std::vector<int> int_comm_allgather_receive_;
         std::vector<int> int_sendright_receive_;
         std::vector<int> int_sendleft_receive_;
+        std::vector<double> sndrecv_;
     };
 }}
 
@@ -204,6 +214,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx::server::partition::set_int_sendleft_data_action,
     gtcx_point_set_int_sendleft_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_sndrecv_data_action,
+    gtcx_point_set_sndrecv_data_action);
 
 #endif
 
