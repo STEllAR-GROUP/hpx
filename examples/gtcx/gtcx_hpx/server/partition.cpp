@@ -41,26 +41,6 @@ extern "C" {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
                     return; };
-            void FNAME(sndleft_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
-                    // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
-                    // derived from point, then the world will end.
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_sndleft(send,mgrid);
-                    return; };
-            void FNAME(rcvright_toroidal_cmm) (void* pfoo,double *receive) {
-                    // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
-                    // derived from point, then the world will end.
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_rcvright(receive);
-                    return; };
-            void FNAME(sndright_toroidal_cmm) (void* pfoo,double *send, int* mgrid) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_sndright(send,mgrid);
-                    return; };
-            void FNAME(rcvleft_toroidal_cmm) (void* pfoo,double *receive) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_rcvleft(receive);
-                    return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
                     // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
@@ -92,29 +72,9 @@ extern "C" {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->complex_ntoroidal_gather(input,size,output,dst);
                     return; };
-            void FNAME(toroidal_gather_cmm) (void* pfoo,double *input,
-                                             int* size,int* dst) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_gather(input,size,dst);
-                    return; };
-            void FNAME(toroidal_gather_receive_cmm) (void* pfoo,double *output,
-                                                     int* dst) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_gather_receive(output,dst);
-                    return; };
             void FNAME(ntoroidal_scatter_cmm) (void* pfoo,double *input,int *size,double *output,int * src){
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->ntoroidal_scatter(input,size,output,src);
-                    return; };
-            void FNAME(toroidal_scatter_cmm) (void* pfoo,double *input,
-                                             int* size,int* src) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_scatter(input,size,src);
-                    return; };
-            void FNAME(toroidal_scatter_receive_cmm) (void* pfoo,double *output,
-                                                     int* dst) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_scatter_receive(output,dst);
                     return; };
             void FNAME(comm_allreduce_cmm) (void* pfoo,double *in,double *out,
                                              int* msize) {
@@ -125,24 +85,6 @@ extern "C" {
                                              int* msize) {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->int_comm_allreduce(in,out,msize);
-                    return; };
-            void FNAME(int_sndright_toroidal_cmm) (void* pfoo,int *send, int* mgrid) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->int_toroidal_sndright(send,mgrid);
-                    return; };
-            void FNAME(int_rcvleft_toroidal_cmm) (void* pfoo,int *receive) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->int_toroidal_rcvleft(receive);
-                    return; };
-            void FNAME(int_sndleft_toroidal_cmm) (void* pfoo,int *send, int* mgrid) {
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->int_toroidal_sndleft(send,mgrid);
-                    return; };
-            void FNAME(int_rcvright_toroidal_cmm) (void* pfoo,int *receive) {
-                    // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
-                    // derived from point, then the world will end.
-                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
-                    ptr_to_class->int_toroidal_rcvright(receive);
                     return; };
 }
 
@@ -160,8 +102,6 @@ namespace gtcx { namespace server
     {
       item_ = mype;
       components_ = components;
-      in_toroidal_ = 0;
-      in_particle_ = 0;
 
       int t2 = static_cast<int>(numberpe);
       int t1 = static_cast<int>(mype);
@@ -345,86 +285,6 @@ namespace gtcx { namespace server
     }
 
 
-
-
-
-
-
-
-
-
-    void partition::toroidal_sndleft(double *csend,int* mgrid)
-    {
-//       std::cout << "toroidal_sndleft: " << item_ << " -> " << left_pe_
-//                 << " (g: " << sndleft_gate_.generation() << "), "
-//                 << in_toroidal_ << std::endl;
-
-      if ( in_toroidal_ ) {
-        // create a new and-gate object
-        std::size_t generation = 0;
-        std::vector<double> send;
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            int vsize = *mgrid;
-            sendleft_receive_.resize(vsize);
-            sndleft_future_ = sndleft_gate_.get_future(&generation);
-
-            // Send data to the left
-            // The sender: send data to the left
-            // in a fire and forget fashion
-            send.resize(vsize);
-
-            for (std::size_t i=0;i<send.size();i++) {
-              send[i] = csend[i];
-            }
-        }
-
-        set_sendleft_data_action set_sendleft_data_;
-        hpx::apply(set_sendleft_data_, toroidal_comm_[left_pe_], item_,
-            generation, send);
-      } else {
-        mutex_type::scoped_lock l(mtx_);
-        sndleft_gate_.next_generation();
-      }
-    }
-
-    void partition::toroidal_rcvright(double *creceive)
-    {
-      if ( in_toroidal_ ) {
-        // Now receive a message from the right
-        mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = sndleft_future_;
-
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
-
-        for (std::size_t i=0;i<sendleft_receive_.size();i++) {
-          creceive[i] = sendleft_receive_[i];
-        }
-//         std::cout << "toroidal_rcvright: " << item_
-//                   << " (g: " << sndleft_gate_.generation() << ")"
-//                   << std::endl;
-      }
-    }
-
-    void partition::set_sendleft_data(std::size_t which,
-                           std::size_t generation,
-                           std::vector<double> const& send)
-    {
-//         std::cout << "set_sendleft_data: " << item_ << " <- " << which
-//                 << " (g: " << sndleft_gate_.generation() << ", " << generation << ")"
-//                 << std::endl;
-
-        mutex_type::scoped_lock l(mtx_);
-        sndleft_gate_.synchronize(generation, l, "point::set_sendleft_data");
-        sendleft_receive_ = send;
-        sndleft_gate_.set();         // trigger corresponding and-gate input
-    }
-
     void partition::toroidal_allreduce(double *input,double *output, int* size)
     {
       int vsize = *size;
@@ -445,7 +305,7 @@ namespace gtcx { namespace server
 
       set_tdata_action set_tdata_;
       for (std::size_t i=0;i<t_comm_.size();i++) {
-        hpx::apply(set_tdata_, components_[t_comm_[i]], item_, generation, send);
+        hpx::apply(set_tdata_, components_[t_comm_[i]], myrank_toroidal_, generation, send);
       }
 
       // possibly do other stuff while the allgather is going on...
@@ -469,82 +329,6 @@ namespace gtcx { namespace server
         }
 
         toroidal_allreduce_gate_.set(which);         // trigger corresponding and-gate input
-    }
-
-    void partition::toroidal_sndright(double *csend,int* mgrid)
-    {
-//       std::cout << "toroidal_sndright: " << item_ << " -> " << right_pe_
-//                 << " (g: " << sndright_gate_.generation() << "), "
-//                 << in_toroidal_ << std::endl;
-
-      if ( in_toroidal_ ) {
-        std::size_t generation = 0;
-        std::vector<double> send;
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            int vsize = *mgrid;
-            sendright_receive_.resize(vsize);
-            sndright_future_ = sndright_gate_.get_future(&generation);
-
-            // Send data to the right
-            // The sender: send data to the left
-            // in a fire and forget fashion
-            send.resize(vsize);
-
-            for (std::size_t i=0;i<send.size();i++) {
-              send[i] = csend[i];
-            }
-        }
-
-        set_sendright_data_action set_sendright_data_;
-        hpx::apply(set_sendright_data_,
-             toroidal_comm_[right_pe_], item_, generation, send);
-      } else {
-        mutex_type::scoped_lock l(mtx_);
-        sndright_gate_.next_generation();
-      }
-    }
-
-    void partition::toroidal_rcvleft(double *creceive)
-    {
-//       std::cout << "toroidal_rcvleft: " << item_
-//                 << " (g: " << sndright_gate_.generation() << "), "
-//                 << in_toroidal_ << std::endl;
-
-      if ( in_toroidal_ ) {
-        // Now receive a message from the right
-        mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = sndright_future_;
-
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
-
-        for (std::size_t i=0;i<sendright_receive_.size();i++) {
-          creceive[i] = sendright_receive_[i];
-        }
-//         std::cout << "toroidal_rcvleft: " << item_
-//                   << " (g: " << sndright_gate_.generation() << ")"
-//                   << std::endl;
-      }
-    }
-
-    void partition::set_sendright_data(std::size_t which,
-                           std::size_t generation,
-                           std::vector<double> const& send)
-    {
-        mutex_type::scoped_lock l(mtx_);
-
-//         std::cout << "set_sendright_data: " << item_ << " <- " << which
-//                 << " (g: " << sndright_gate_.generation() << ", " << generation << ")"
-//                 << std::endl;
-
-        sndright_gate_.synchronize(generation, l, "point::set_sendright_data");
-        sendright_receive_ = send;
-        sndright_gate_.set();         // trigger corresponding and-gate input
     }
 
     void partition::ntoroidal_gather(double *csend, int *csize,double *creceive,int *tdst)
@@ -659,79 +443,6 @@ namespace gtcx { namespace server
         gather_gate_.set(which);         // trigger corresponding and-gate input
     }
 
-    void partition::toroidal_gather(double *csend, int *tsize,int *tdst)
-    {
-//       std::cout << "toroidal_gather: " << item_
-//                 << " (g: " << gather_gate_.generation() << "), "
-//                 << in_toroidal_ << std::endl;
-
-      if ( in_toroidal_ ) {
-        int vsize = *tsize;
-
-        // create a new and-gate object
-        std::size_t generation = 0;
-        if ( *tdst == item_ ) {
-          toroidal_gather_receive_.resize(toroidal_comm_.size()*vsize);
-          gather_future_ = gather_gate_.get_future(toroidal_comm_.size(),
-              &generation);
-        }
-        else {
-          generation = gather_gate_.next_generation();
-        }
-
-        // Send data to dst
-        // The sender: send data to the left
-        // in a fire and forget fashion
-        int dst = *tdst;
-        std::vector<double> send;
-        send.resize(vsize);
-
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
-        }
-
-        set_toroidal_gather_data_action set_toroidal_gather_data_;
-        hpx::apply(set_toroidal_gather_data_,
-             toroidal_comm_[dst], item_, generation, send);
-      } else {
-        gather_gate_.next_generation();
-      }
-
-    }
-
-    void partition::toroidal_gather_receive(double *creceive, int *cdst)
-    {
-      int dst = *cdst;
-      if ( dst == item_ ) {
-        // synchronize with all operations to finish
-        gather_future_.get();
-
-        mutex_type::scoped_lock l(mtx_);
-        for (std::size_t i=0;i<toroidal_gather_receive_.size();i++) {
-          creceive[i] = toroidal_gather_receive_[i];
-        }
-      }
-    }
-
-    void partition::set_toroidal_gather_data(std::size_t which,
-                           std::size_t generation,
-                           std::vector<double> const& send)
-    {
-//         std::cout << "set_toroidal_gather_data: " << item_ << " <- " << which
-//                 << " (g: " << gather_gate_.generation() << ", " << generation << ")"
-//                 << std::endl;
-
-        gather_gate_.synchronize(generation, "point::set_toroidal_gather_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            for (std::size_t i=0;i<send.size();i++)
-                toroidal_gather_receive_[which*send.size()+i] = send[i];
-        }
-
-        gather_gate_.set(which);         // trigger corresponding and-gate input
-    }
-
     void partition::ntoroidal_scatter(double *csend, int *csize,double *creceive,int *tsrc)
     {
       int src = *tsrc;
@@ -786,73 +497,6 @@ namespace gtcx { namespace server
         mutex_type::scoped_lock l(mtx_);
         scatter_gate_.synchronize(generation, l, "point::set_ntoroidal_scatter_data");
         ntoroidal_scatter_receive_ = send;
-        scatter_gate_.set();         // trigger corresponding and-gate input
-    }
-
-    void partition::toroidal_scatter(double *csend, int *tsize,int *tsrc)
-    {
-      int src = *tsrc;
-      if ( src == item_ ) {
-        // create a new and-gate object
-        std::size_t generation = 0;
-        std::vector<double> send;
-
-        {
-          mutex_type::scoped_lock l(mtx_);
-
-          int vsize = *tsize;
-          toroidal_scatter_receive_.resize(vsize);
-
-          scatter_future_ = scatter_gate_.get_future(&generation);
-
-          // Send data to everyone in toroidal
-          // The sender: send data to the left
-          // in a fire and forget fashion
-          send.resize(vsize);
-
-          for (std::size_t step=0;step<toroidal_comm_.size();step++) {
-            for (std::size_t i=0;i<send.size();i++) {
-              send[i] = csend[i+step*vsize];
-            }
-          }
-        }
-
-        set_toroidal_scatter_data_action set_toroidal_scatter_data_;
-        for (std::size_t i=0;i<toroidal_comm_.size();i++) {
-          hpx::apply(set_toroidal_scatter_data_,
-              toroidal_comm_[i], item_, generation, send);
-        }
-      } else {
-        scatter_gate_.next_generation();
-      }
-
-    }
-
-    void partition::toroidal_scatter_receive(double *creceive, int *cdst)
-    {
-      if ( in_toroidal_ ) {
-        // synchronize with all operations to finish
-        mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = scatter_future_;
-
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
-
-        for (std::size_t i=0;i<toroidal_scatter_receive_.size();i++) {
-          creceive[i] = toroidal_scatter_receive_[i];
-        }
-      }
-    }
-
-    void partition::set_toroidal_scatter_data(std::size_t which,
-                           std::size_t generation,
-                           std::vector<double> const& send)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        scatter_gate_.synchronize(generation, l, "point::set_toroidal_scatter_data");
-        toroidal_scatter_receive_ = send;
         scatter_gate_.set();         // trigger corresponding and-gate input
     }
 
@@ -946,129 +590,6 @@ namespace gtcx { namespace server
         }
 
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
-    }
-
-    void partition::int_toroidal_sndright(int *csend,int* mgrid)
-    {
-      if ( in_toroidal_ ) {
-
-        std::size_t generation = 0;
-        std::vector<int> send;
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            int vsize = *mgrid;
-            int_sendright_receive_.resize(vsize);
-            sndright_future_ = sndright_gate_.get_future(&generation);
-
-            // Send data to the right
-            // The sender: send data to the left
-            // in a fire and forget fashion
-            send.resize(vsize);
-
-            for (std::size_t i=0;i<send.size();i++) {
-              send[i] = csend[i];
-            }
-        }
-
-        set_int_sendright_data_action set_int_sendright_data_;
-        hpx::apply(set_int_sendright_data_,
-             toroidal_comm_[right_pe_], item_, generation, send);
-      } else {
-        mutex_type::scoped_lock l(mtx_);
-        sndright_gate_.next_generation();
-      }
-    }
-
-    void partition::int_toroidal_rcvleft(int *creceive)
-    {
-      if ( in_toroidal_ ) {
-        // Now receive a message from the right
-        mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = sndright_future_;
-
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
-
-        for (std::size_t i=0;i<int_sendright_receive_.size();i++) {
-          creceive[i] = int_sendright_receive_[i];
-        }
-      }
-    }
-
-    void partition::set_int_sendright_data(std::size_t which,
-                           std::size_t generation,
-                           std::vector<int> const& send)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        sndright_gate_.synchronize(generation, l, "point::set_int_sendright_data");
-        int_sendright_receive_ = send;
-        sndright_gate_.set();         // trigger corresponding and-gate input
-    }
-
-    void partition::int_toroidal_sndleft(int *csend,int* mgrid)
-    {
-      if ( in_toroidal_ ) {
-        std::size_t generation = 0;
-        std::vector<int> send;
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            int vsize = *mgrid;
-            int_sendleft_receive_.resize(vsize);
-
-            // create a new and-gate object
-            sndleft_future_ = sndleft_gate_.get_future(&generation);
-
-            // Send data to the left
-            // The sender: send data to the left
-            // in a fire and forget fashion
-            send.resize(vsize);
-
-            for (std::size_t i=0;i<send.size();i++) {
-              send[i] = csend[i];
-            }
-        }
-
-        set_int_sendleft_data_action set_int_sendleft_data_;
-        hpx::apply(set_int_sendleft_data_, toroidal_comm_[left_pe_], item_, 
-            generation, send);
-      } else {
-        mutex_type::scoped_lock l(mtx_);
-        sndleft_gate_.next_generation();
-      }
-    }
-
-    void partition::int_toroidal_rcvright(int *creceive)
-    {
-      if ( in_toroidal_ ) {
-        // Now receive a message from the right
-        mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = sndleft_future_;
-
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
-
-        for (std::size_t i=0;i<int_sendleft_receive_.size();i++) {
-          creceive[i] = int_sendleft_receive_[i];
-        }
-      }
-    }
-
-    void partition::set_int_sendleft_data(std::size_t which,
-                           std::size_t generation,
-                           std::vector<int> const& send)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        sndleft_gate_.synchronize(generation, l, "point::set_int_sendleft_data");
-        int_sendleft_receive_ = send;
-        sndleft_gate_.set();         // trigger corresponding and-gate input
     }
 
     void partition::set_toroidal_cmm(int *send,int*length,int *myrank_toroidal)
