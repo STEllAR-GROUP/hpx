@@ -141,67 +141,77 @@ protected:
 
     // default fall through for any types not specified here
     template <typename T>
-    void save(T const& val, unsigned int = 0u, 
-            typename boost::enable_if<boost::is_integral<T> >::type* = 0) 
+    void save(T const& val, typename boost::enable_if<boost::is_integral<T> >::type* = 0) 
     {
         boost::intmax_t t = static_cast<boost::intmax_t>(val);
         save_impl(t, sizeof(T));
     }
 
     template <typename T>
-    void save(T const& t, unsigned int version = 0u, 
-            typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
+    void save(T const& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
     {
-        this->detail_common_oarchive::save_override(t, version);
+        this->primitive_base_t::save(t);
     }
 
-    void save(const std::string& t, unsigned int = 0u) {
+    void save(const std::string& t) {
         this->primitive_base_t::save(t);
     }
 #if BOOST_VERSION >= 104400
-    void save(const boost::archive::class_id_type& t, unsigned int = 0u) {
-        /*boost::int16_t*/boost::intmax_t l = t;
+    void save(const boost::archive::class_id_reference_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
-    void save(const boost::archive::object_id_type& t, unsigned int = 0u) {
-        /*boost::uint32_t*/boost::intmax_t l = t;
+    void save(const boost::archive::class_id_optional_type& t) {
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::int16_t));
+    }
+    void save(const boost::archive::class_id_type& t) {
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::int16_t));
+    }
+    void save(const boost::archive::object_id_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::tracking_type& t, unsigned int = 0u) {
+    void save(const boost::archive::object_reference_type& t) {
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::uint32_t));
+    }
+    void save(const boost::archive::tracking_type& t) {
         bool l = t;
         this->primitive_base_t::save(l);
     }
-    void save(const boost::archive::version_type& t, unsigned int = 0u) {
-        /*boost::uint32_t*/boost::intmax_t l = t;
+    void save(const boost::archive::version_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::library_version_type& t, unsigned int = 0u) {
-        /*boost::uint16_t*/boost::intmax_t l = t;
+    void save(const boost::archive::library_version_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
-    void save(const boost::serialization::item_version_type& t, unsigned int = 0u) {
+    void save(const boost::serialization::item_version_type& t) {
         boost::intmax_t l = t;
         save_impl(l, sizeof(boost::intmax_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void save(const std::wstring& t, unsigned int = 0u) {
+    void save(const std::wstring& t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    void save(const float& t, unsigned int = 0u) {
+    void save(const float& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const double& t, unsigned int = 0u) {
+    void save(const double& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const char& t, unsigned int = 0u) {
+    void save(const char& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const unsigned char& t, unsigned int = 0u) {
+    void save(const unsigned char& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const signed char& t, unsigned int = 0u) {
+    void save(const signed char& t) {
         this->primitive_base_t::save(t);
     }
 
@@ -258,19 +268,19 @@ public:
 
     // default fall through for any types not specified here
     template <typename T>
-    void save_array(boost::serialization::array<T> const& a, unsigned int version)
+    void save_array(boost::serialization::array<T> const& a, unsigned int)
     {
         // If we need to potentially flip bytes we serialize each element 
         // separately.
 #ifdef BOOST_BIG_ENDIAN
         if (m_flags & endian_little) {
             for (std::size_t i = 0; i != a.count(); ++i)
-                save(a.address()[i], version);
+                save(a.address()[i]);
         }
 #else
         if (m_flags & endian_big) {
             for (std::size_t i = 0; i != a.count(); ++i)
-                save(a.address()[i], version);
+                save(a.address()[i]);
         }
 #endif
         else {

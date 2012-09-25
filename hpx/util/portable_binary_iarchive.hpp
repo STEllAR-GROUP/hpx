@@ -143,8 +143,7 @@ protected:
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
     template <typename T>
-    void load(T& t, unsigned int = 0u, 
-            typename boost::enable_if<boost::is_integral<T> >::type* = 0)
+    void load(T& t, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
     {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(T));
@@ -158,65 +157,82 @@ protected:
 #endif
 
     template <typename T>
-    void load(T& t, unsigned int version = 0u, 
-            typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
+    void load(T& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
     {
-        this->detail_common_iarchive::load_override(t, version);
+        this->primitive_base_t::load(t);
     }
 
-    void load(std::string& t, unsigned int = 0u) {
+    void load(std::string& t) {
         this->primitive_base_t::load(t);
     }
 #if BOOST_VERSION >= 104400
-    void load(boost::archive::class_id_type& t, unsigned int = 0u) {
+    void load(boost::archive::class_id_reference_type& t) {
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::int16_t));
+        t = boost::archive::class_id_reference_type(
+            boost::archive::class_id_type(std::size_t(l)));
+    }
+    void load(boost::archive::class_id_optional_type& t) {
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::int16_t));
+        t = boost::archive::class_id_optional_type(
+            boost::archive::class_id_type(std::size_t(l)));
+    }
+    void load(boost::archive::class_id_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_type(std::size_t(l));
     }
-    void load(boost::archive::object_id_type& t, unsigned int = 0u) {
+    void load(boost::archive::object_id_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::object_id_type(static_cast<unsigned int>(l));
     }
-    void load(boost::archive::tracking_type& t, unsigned int = 0u) {
+    void load(boost::archive::object_reference_type& t) {
+        boost::intmax_t l = 0;
+        load_impl(l, sizeof(boost::uint32_t));
+        t = boost::archive::object_reference_type(
+            boost::archive::object_id_type(std::size_t(l)));
+    }
+    void load(boost::archive::tracking_type& t) {
         bool l = false;
         this->primitive_base_t::load(l);
         t = boost::archive::tracking_type(l);
     }
-    void load(boost::archive::version_type& t, unsigned int = 0u) {
+    void load(boost::archive::version_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::version_type(static_cast<unsigned int>(l));
     }
-    void load(boost::archive::library_version_type& t, unsigned int = 0u) {
+    void load(boost::archive::library_version_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint16_t));
         t = boost::archive::library_version_type(static_cast<unsigned int>(l));
     }
-    void load(boost::serialization::item_version_type& t, unsigned int = 0u) {
+    void load(boost::serialization::item_version_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::intmax_t));
         t = boost::serialization::item_version_type(static_cast<unsigned int>(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void load(std::wstring& t, unsigned int = 0u) {
+    void load(std::wstring& t) {
         this->primitive_base_t::load(t);
     }
 #endif
-    void load(float& t, unsigned int = 0u) {
+    void load(float& t) {
         this->primitive_base_t::load(t);
     }
-    void load(double& t, unsigned int = 0u) {
+    void load(double& t) {
         this->primitive_base_t::load(t);
     }
-    void load(char& t, unsigned int = 0u) {
+    void load(char& t) {
         this->primitive_base_t::load(t);
     }
-    void load(unsigned char& t, unsigned int = 0u) {
+    void load(unsigned char& t) {
         this->primitive_base_t::load(t);
     }
-    void load(signed char& t, unsigned int = 0u) {
+    void load(signed char& t) {
         this->primitive_base_t::load(t);
     }
 
@@ -270,19 +286,19 @@ public:
 
     // the optimized load_array dispatches to load_binary 
     template <typename T>
-    void load_array(boost::serialization::array<T>& a, unsigned int version)
+    void load_array(boost::serialization::array<T>& a, unsigned int)
     {
         // If we need to potentially flip bytes we serialize each element 
         // separately.
 #ifdef BOOST_BIG_ENDIAN
         if (m_flags & endian_little) {
             for (std::size_t i = 0; i != a.count(); ++i)
-                load(a.address()[i], version);
+                load(a.address()[i]);
         }
 #else
         if (m_flags & endian_big) {
             for (std::size_t i = 0; i != a.count(); ++i)
-                load(a.address()[i], version);
+                load(a.address()[i]);
         }
 #endif
         else {
