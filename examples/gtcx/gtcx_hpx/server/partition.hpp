@@ -83,6 +83,23 @@ namespace gtcx { namespace server
         void toroidal_reduce(double *input,double *output, int* size,int *dest);
         void set_toroidal_reduce_data(std::size_t item, std::size_t generation,
                               std::vector<double> const& data);
+        void p2p_send(double *csend, int *csize,int *tdst);
+        void p2p_receive(double *creceive, int *csize,int *tdst);
+        void set_p2p_sendreceive_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send);
+        void broadcast_int_parameters(int *integer_params, int *n_integers);
+        void set_int_params(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& intparams);
+        void comm_reduce(double *input,double *output, int* size,int *tdest);
+        void set_comm_reduce_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data);
+
+        void int_toroidal_sndrecv(int *csend,int* csend_size,int *creceive,int *creceive_size,int* dest);
+        void set_int_sndrecv_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& send);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -99,6 +116,10 @@ namespace gtcx { namespace server
         HPX_DEFINE_COMPONENT_ACTION(partition, set_ntoroidal_scatter_data, set_ntoroidal_scatter_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_complex_ntoroidal_gather_data, set_complex_ntoroidal_gather_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_reduce_data, set_toroidal_reduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_p2p_sendreceive_data, set_p2p_sendreceive_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_params, set_int_params_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_comm_reduce_data, set_comm_reduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sndrecv_data, set_int_sndrecv_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -123,6 +144,11 @@ namespace gtcx { namespace server
         hpx::lcos::local::trigger sndrecv_gate_;
         and_gate_type toroidal_allreduce_gate_; 
         and_gate_type toroidal_reduce_gate_; 
+        and_gate_type comm_reduce_gate_; 
+        hpx::future<void> p2p_sendreceive_future_;
+        hpx::lcos::local::trigger p2p_sendreceive_gate_;
+        hpx::future<void> int_sndrecv_future_;
+        hpx::lcos::local::trigger int_sndrecv_gate_;
 
         std::vector<hpx::naming::id_type> components_;
         mutable mutex_type mtx_;
@@ -140,6 +166,9 @@ namespace gtcx { namespace server
         std::vector<std::complex<double> > complex_ntoroidal_gather_receive_;
         std::size_t myrank_toroidal_;
         std::size_t myrank_partd_;
+        std::vector<double> p2p_sendreceive_;
+        std::vector<double> comm_reduce_;
+        std::vector<int> int_sndrecv_;
     };
 }}
 
@@ -188,6 +217,22 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx::server::partition::set_toroidal_reduce_data_action,
     gtcx_point_set_toroidal_reduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_p2p_sendreceive_data_action,
+    gtcx_point_set_p2p_sendreceive_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_int_params_action,
+    gtcx_point_set_int_params_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_comm_reduce_data_action,
+    gtcx_point_set_comm_reduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_int_sndrecv_data_action,
+    gtcx_point_set_int_sndrecv_data_action);
 
 #endif
 

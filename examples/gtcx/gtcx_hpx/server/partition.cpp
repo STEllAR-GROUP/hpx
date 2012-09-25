@@ -24,10 +24,16 @@ extern "C" {
                     ptr_to_class->int_comm_allgather(in,out,length);
                     return; };
             void FNAME(set_partd_cmm) (void* pfoo,int *send, int* length,int *myrank_partd) {
-                    // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
-                    // derived from point, then the world will end.
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->set_partd_cmm(send,length,myrank_partd);
+                    return; };
+            void FNAME(send_cmm) (void* pfoo,double *send, int* length,int *dest) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->p2p_send(send,length,dest);
+                    return; };
+            void FNAME(receive_cmm) (void* pfoo,double *receive, int* length,int *dest) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->p2p_receive(receive,length,dest);
                     return; };
             void FNAME(set_toroidal_cmm) (void* pfoo,int *send, int* length,int *myrank_toroidal) {
                     // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
@@ -40,6 +46,11 @@ extern "C" {
                                                double *receive,int *receive_size,int *dest) {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
+                    return; };
+            void FNAME(int_sndrecv_toroidal_cmm) (void* pfoo,int *send, int *send_size,
+                                               int *receive,int *receive_size,int *dest) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->int_toroidal_sndrecv(send,send_size,receive,receive_size,dest);
                     return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
@@ -57,6 +68,16 @@ extern "C" {
                                              int* size,int *dest) {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->toroidal_reduce(input,output,size,dest);
+                    return; };
+            void FNAME(comm_reduce_cmm) (void* pfoo,double *input,double *output,
+                                             int* size,int *dest) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->comm_reduce(input,output,size,dest);
+                    return; };
+            void FNAME(broadcast_int_cmm) (void* pfoo,
+                     int *integer_params, int *n_integers) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->broadcast_int_parameters(integer_params, n_integers);
                     return; };
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
                      int *integer_params,double *real_params,
@@ -235,6 +256,78 @@ namespace gtcx { namespace server
 
 
 
+
+
+
+
+
+    void partition::broadcast_int_parameters(int *integer_params, int *n_integers)
+    {
+      int nint = *n_integers;
+
+      if ( item_ != 0 ) {
+        // synchronize with all operations to finish
+        hpx::future<void> f = broadcast_gate_.get_future(1);
+
+        f.get();
+
+        // Copy the parameters to the fortran arrays
+        for (std::size_t i=0;i<intparams_.size();i++) {
+          integer_params[i] = intparams_[i];
+        }
+      } else {
+        // The sender:  broadcast the parameters to the other components
+        // in a fire and forget fashion
+        std::size_t generation = broadcast_gate_.next_generation();
+
+        std::vector<int> intparams;
+        intparams.resize(nint);
+        for (int i=0;i<nint;i++) {
+          intparams[i] = integer_params[i];
+        }
+
+        // eliminate item 0's (the sender's) gid
+        std::vector<hpx::naming::id_type> all_but_root;
+        all_but_root.resize(components_.size()-1);
+        for (std::size_t i=0;i<all_but_root.size();i++) {
+          all_but_root[i] = components_[i+1];
+        }
+
+        set_int_params_action set_int_params_;
+        for (std::size_t i=0;i<all_but_root.size();i++) {
+          hpx::apply(set_int_params_, all_but_root[i], item_, generation,
+                     intparams);
+        }
+      }
+    }
+
+    void partition::set_int_params(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& intparams)
+    {
+        broadcast_gate_.synchronize(generation, "point::set_int_params");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            intparams_ = intparams;
+        }
+
+        broadcast_gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     void partition::toroidal_sndrecv(double *csend,int* csend_size,double *creceive,int *creceive_size,int* dest)
     {
       // create a new and-gate object
@@ -297,6 +390,133 @@ namespace gtcx { namespace server
 
 
 
+    void partition::int_toroidal_sndrecv(int *csend,int* csend_size,int *creceive,int *creceive_size,int* dest)
+    {
+      // create a new and-gate object
+      std::size_t generation = 0;
+      std::vector<int> send;
+
+      {
+        mutex_type::scoped_lock l(mtx_);
+
+        int vsize = *csend_size;
+        int_sndrecv_.resize(vsize);
+        int_sndrecv_future_ = int_sndrecv_gate_.get_future(&generation);
+
+        // The sender: send data to the left
+        // in a fire and forget fashion
+        send.resize(vsize);
+
+        for (std::size_t i=0;i<send.size();i++) {
+          send[i] = csend[i];
+        }
+      }
+
+      set_int_sndrecv_data_action set_int_sndrecv_data_;
+      hpx::apply(set_int_sndrecv_data_, components_[t_comm_[*dest]], item_,
+          generation, send);
+      {  
+        // Now receive a message from the right
+        mutex_type::scoped_lock l(mtx_);
+        hpx::future<void> f = int_sndrecv_future_;
+
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            f.get();
+        }
+
+        if ( *creceive_size != int_sndrecv_.size() ){ 
+          std::cerr << " PROBLEM IN sndrecv!!! size mismatch " << std::endl;
+        }
+        for (std::size_t i=0;i<int_sndrecv_.size();i++) {
+          creceive[i] = int_sndrecv_[i];
+        }
+      }
+    }
+
+    void partition::set_int_sndrecv_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& send)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        int_sndrecv_gate_.synchronize(generation, l, "point::set_int_sndrecv_data");
+        int_sndrecv_ = send;
+        int_sndrecv_gate_.set();         // trigger corresponding and-gate input
+    }
+
+
+
+
+
+
+
+
+
+
+
+    void partition::p2p_receive(double *creceive, int *csize,int *tdst)
+    {
+      int dst = *tdst;
+      int vsize = *csize;
+      if ( item_ != dst ) {
+        std::cout << " Problem:  p2p_receive needs to be called only by the receiver. " << item_ << " " << dst << std::endl;
+      }
+
+      p2p_sendreceive_future_.get();
+
+      if ( p2p_sendreceive_.size() != vsize ) {
+        std::cout << " Problem:  receive size doesn't match send size in p2p_receive " << std::endl;
+      }
+
+      mutex_type::scoped_lock l(mtx_);
+      for (std::size_t i=0;i<p2p_sendreceive_.size();i++) {
+        creceive[i] = p2p_sendreceive_[i];
+      }
+      
+    }
+
+    void partition::p2p_send(double *csend, int *csize,int *tdst)
+    {
+      int vsize = *csize;
+      int dst = *tdst;
+
+      // create a new and-gate object
+      std::size_t generation = 0;
+      p2p_sendreceive_.resize(vsize);
+      p2p_sendreceive_future_ = p2p_sendreceive_gate_.get_future(&generation);
+
+      // Send data to dst
+      // The sender: send data to the left
+      // in a fire and forget fashion
+      std::vector<double> send;
+      send.resize(vsize);
+
+      for (std::size_t i=0;i<send.size();i++) {
+        send[i] = csend[i];
+      }
+
+      set_p2p_sendreceive_data_action set_p2p_sendreceive_data_;
+      hpx::apply(set_p2p_sendreceive_data_,
+           components_[dst], item_, generation, send);
+    }
+
+
+    void partition::set_p2p_sendreceive_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        p2p_sendreceive_gate_.synchronize(generation, l, "point::set_p2p_sendreceive_data");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            p2p_sendreceive_ = send;
+        }
+
+        p2p_sendreceive_gate_.set();
+    }
+
+
 
 
 
@@ -347,6 +567,71 @@ namespace gtcx { namespace server
         }
 
         toroidal_reduce_gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void partition::comm_reduce(double *input,double *output, int* size,int *tdest)
+    {
+      int dest = *tdest;
+      int vsize = *size;
+      comm_reduce_.resize(vsize);
+
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      hpx::future<void> f = comm_reduce_gate_.get_future(components_.size(),
+            &generation);
+
+      std::vector<double> send;
+      send.resize(vsize);
+      std::fill( comm_reduce_.begin(),comm_reduce_.end(),0.0);
+
+      for (std::size_t i=0;i<send.size();i++) {
+        send[i] = input[i];
+      }
+
+      set_comm_reduce_data_action set_comm_reduce_data_;
+      hpx::apply(set_comm_reduce_data_, 
+             components_[dest], item_, generation, send);
+
+      if ( item_ == dest ) {
+        // possibly do other stuff while the allgather is going on...
+        f.get();
+
+        mutex_type::scoped_lock l(mtx_);
+        for (std::size_t i=0;i<comm_reduce_.size();i++) {
+          output[i] = comm_reduce_[i];
+        }
+      }
+    }
+
+    void partition::set_comm_reduce_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data)
+    {
+        comm_reduce_gate_.synchronize(generation, "point::set_comm_reduce_data");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<comm_reduce_.size();i++)
+                comm_reduce_[i] += data[i];
+        }
+
+        comm_reduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
 

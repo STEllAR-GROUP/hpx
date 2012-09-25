@@ -70,3 +70,19 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtcx_partition_type::wrapped_type::set_toroidal_reduce_data_action,
     gtcx_partition_set_toroidal_reduce_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_p2p_sendreceive_data_action,
+    gtcx_partition_set_p2p_sendreceive_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_int_params_action,
+    gtcx_partition_set_int_params_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_comm_reduce_data_action,
+    gtcx_partition_set_comm_reduce_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_int_sndrecv_data_action,
+    gtcx_partition_set_int_sndrecv_data_action);
