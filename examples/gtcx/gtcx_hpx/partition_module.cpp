@@ -66,3 +66,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtcx_partition_type::wrapped_type::set_complex_ntoroidal_gather_data_action,
     gtcx_partition_set_complex_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_toroidal_reduce_data_action,
+    gtcx_partition_set_toroidal_reduce_data_action);

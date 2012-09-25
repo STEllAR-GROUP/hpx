@@ -80,6 +80,9 @@ namespace gtcx { namespace server
         void set_complex_ntoroidal_gather_data(std::size_t which,
                            std::size_t generation,
                            std::vector<std::complex<double> > const& send);
+        void toroidal_reduce(double *input,double *output, int* size,int *dest);
+        void set_toroidal_reduce_data(std::size_t item, std::size_t generation,
+                              std::vector<double> const& data);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -95,6 +98,7 @@ namespace gtcx { namespace server
         HPX_DEFINE_COMPONENT_ACTION(partition, set_ntoroidal_gather_data, set_ntoroidal_gather_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_ntoroidal_scatter_data, set_ntoroidal_scatter_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_complex_ntoroidal_gather_data, set_complex_ntoroidal_gather_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_reduce_data, set_toroidal_reduce_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -118,6 +122,7 @@ namespace gtcx { namespace server
         hpx::future<void> sndrecv_future_;
         hpx::lcos::local::trigger sndrecv_gate_;
         and_gate_type toroidal_allreduce_gate_; 
+        and_gate_type toroidal_reduce_gate_; 
 
         std::vector<hpx::naming::id_type> components_;
         mutable mutex_type mtx_;
@@ -131,6 +136,7 @@ namespace gtcx { namespace server
         std::vector<double> sndrecv_;
         std::vector<double> ntoroidal_gather_receive_;
         std::vector<double> ntoroidal_scatter_receive_;
+        std::vector<double> toroidal_reduce_;
         std::vector<std::complex<double> > complex_ntoroidal_gather_receive_;
         std::size_t myrank_toroidal_;
         std::size_t myrank_partd_;
@@ -178,6 +184,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx::server::partition::set_complex_ntoroidal_gather_data_action,
     gtcx_point_set_complex_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_toroidal_reduce_data_action,
+    gtcx_point_set_toroidal_reduce_data_action);
 
 #endif
 

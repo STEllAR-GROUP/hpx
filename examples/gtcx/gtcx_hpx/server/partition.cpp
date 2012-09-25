@@ -53,6 +53,11 @@ extern "C" {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->toroidal_allreduce(input,output,size);
                     return; };
+            void FNAME(toroidal_reduce_cmm) (void* pfoo,double *input,double *output,
+                                             int* size,int *dest) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->toroidal_reduce(input,output,size,dest);
+                    return; };
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
                      int *integer_params,double *real_params,
                      int *n_integers,int *n_reals) {
@@ -283,6 +288,79 @@ namespace gtcx { namespace server
         sndrecv_ = send;
         sndrecv_gate_.set();         // trigger corresponding and-gate input
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void partition::toroidal_reduce(double *input,double *output, int* size,int *tdest)
+    {
+      int dest = *tdest;
+      int vsize = *size;
+      toroidal_reduce_.resize(vsize);
+
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      hpx::future<void> f = toroidal_reduce_gate_.get_future(t_comm_.size(),
+            &generation);
+
+      std::vector<double> send;
+      send.resize(vsize);
+      std::fill( toroidal_reduce_.begin(),toroidal_reduce_.end(),0.0);
+
+      for (std::size_t i=0;i<send.size();i++) {
+        send[i] = input[i];
+      }
+
+      set_toroidal_reduce_data_action set_toroidal_reduce_data_;
+      hpx::apply(set_toroidal_reduce_data_, 
+             components_[t_comm_[dest]], myrank_toroidal_, generation, send);
+
+      if ( myrank_toroidal_ == dest ) {
+        // possibly do other stuff while the allgather is going on...
+        f.get();
+
+        mutex_type::scoped_lock l(mtx_);
+        for (std::size_t i=0;i<toroidal_reduce_.size();i++) {
+          output[i] = toroidal_reduce_[i];
+        }
+      }
+    }
+
+    void partition::set_toroidal_reduce_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data)
+    {
+        toroidal_reduce_gate_.synchronize(generation, "point::set_toroidal_reduce_data");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<toroidal_reduce_.size();i++)
+                toroidal_reduce_[i] += data[i];
+        }
+
+        toroidal_reduce_gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     void partition::toroidal_allreduce(double *input,double *output, int* size)
