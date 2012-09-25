@@ -28,6 +28,8 @@ namespace hox { namespace util
 // portable_binary_iarchive.hpp
 
 // (C) Copyright 2002-7 Robert Ramey - http://www.rrsd.com .
+// Copyright (c) 2007-2012 Hartmut Kaiser
+//
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -35,6 +37,8 @@ namespace hox { namespace util
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <istream>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
@@ -91,7 +95,7 @@ public:
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // "Portable" input binary archive.  It addresses integer size and endianness so
 // that binary archives can be passed across systems. Note:floating point types
-// not addressed here
+// are passed through as is.
 #if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
 #define HPX_SERIALIZATION_EXPORT
 #else
@@ -138,8 +142,10 @@ protected:
 #endif
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
-    template<class T>
-    void load(T & t) {
+    template <typename T>
+    void load(T& t, unsigned int = 0u, 
+            typename boost::enable_if<boost::is_integral<T> >::type* = 0)
+    {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(T));
         // use cast to avoid compile time warning
@@ -150,63 +156,67 @@ protected:
 #pragma GCC diagnostic pop
 #endif
 #endif
-    void load(std::string & t) {
+
+    template <typename T>
+    void load(T& t, unsigned int version = 0u, 
+            typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
+    {
+        this->detail_common_iarchive::load_override(t, version);
+    }
+
+    void load(std::string& t, unsigned int = 0u) {
         this->primitive_base_t::load(t);
     }
 #if BOOST_VERSION >= 104400
-    void load(boost::archive::class_id_type & t) {
+    void load(boost::archive::class_id_type& t, unsigned int = 0u) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_type(std::size_t(l));
     }
-    void load(boost::archive::object_id_type & t) {
+    void load(boost::archive::object_id_type& t, unsigned int = 0u) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::object_id_type(static_cast<unsigned int>(l));
     }
-    void load(boost::archive::tracking_type & t) {
+    void load(boost::archive::tracking_type& t, unsigned int = 0u) {
         bool l = false;
         this->primitive_base_t::load(l);
         t = boost::archive::tracking_type(l);
     }
-    void load(boost::archive::version_type & t) {
+    void load(boost::archive::version_type& t, unsigned int = 0u) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::version_type(static_cast<unsigned int>(l));
     }
-    void load(boost::archive::library_version_type & t) {
+    void load(boost::archive::library_version_type& t, unsigned int = 0u) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint16_t));
         t = boost::archive::library_version_type(static_cast<unsigned int>(l));
     }
-    void load(boost::serialization::item_version_type & t) {
+    void load(boost::serialization::item_version_type& t, unsigned int = 0u) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::intmax_t));
         t = boost::serialization::item_version_type(static_cast<unsigned int>(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void load(std::wstring & t) {
+    void load(std::wstring& t, unsigned int = 0u) {
         this->primitive_base_t::load(t);
     }
 #endif
-    void load(float & t) {
-        this->primitive_base_t::load(t);
-        // floats not supported
-        //BOOST_STATIC_ASSERT(false);
-    }
-    void load(double & t) {
-        this->primitive_base_t::load(t);
-        // doubles not supported
-        //BOOST_STATIC_ASSERT(false);
-    }
-    void load(char & t) {
+    void load(float& t, unsigned int = 0u) {
         this->primitive_base_t::load(t);
     }
-    void load(unsigned char & t) {
+    void load(double& t, unsigned int = 0u) {
         this->primitive_base_t::load(t);
     }
-    void load(signed char & t) {
+    void load(char& t, unsigned int = 0u) {
+        this->primitive_base_t::load(t);
+    }
+    void load(unsigned char& t, unsigned int = 0u) {
+        this->primitive_base_t::load(t);
+    }
+    void load(signed char& t, unsigned int = 0u) {
         this->primitive_base_t::load(t);
     }
 
@@ -216,7 +226,7 @@ protected:
     typedef boost::archive::detail::common_iarchive<portable_binary_iarchive>
         detail_common_iarchive;
 
-    template <class T>
+    template <typename T>
     void load_override(T & t, BOOST_PFTO int) {
         this->detail_common_iarchive::load_override(t, 0);
     }
@@ -260,19 +270,19 @@ public:
 
     // the optimized load_array dispatches to load_binary 
     template <typename T>
-    void load_array(boost::serialization::array<T>& a, unsigned int)
+    void load_array(boost::serialization::array<T>& a, unsigned int version)
     {
         // If we need to potentially flip bytes we serialize each element 
         // separately.
 #ifdef BOOST_BIG_ENDIAN
         if (m_flags & endian_little) {
             for (std::size_t i = 0; i != a.count(); ++i)
-                load(a.address()[i]);
+                load(a.address()[i], version);
         }
 #else
         if (m_flags & endian_big) {
             for (std::size_t i = 0; i != a.count(); ++i)
-                load(a.address()[i]);
+                load(a.address()[i], version);
         }
 #endif
         else {
@@ -306,12 +316,8 @@ public:
 }}
 
 // required by export in boost version > 1.34
-#ifdef BOOST_SERIALIZATION_REGISTER_ARCHIVE
-    BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_iarchive)
-#endif
-#ifdef BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION
-    BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_iarchive)
-#endif
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_iarchive)
+BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_iarchive)
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
