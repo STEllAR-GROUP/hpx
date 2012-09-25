@@ -446,7 +446,6 @@ module. Here is a code snippet demonstrating this.
 
     # This adds the HPX cmake configuration directory to the search path.
     set(CMAKE_MODULE_PATH
-        ${CMAKE_MODULE_PATH}
         ${HPX_ROOT}/share/cmake-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}/Modules)
 
     # Instruct cmake to find the HPX settings
@@ -471,15 +470,10 @@ Now to actually build the application you should have a code snippet similar
 to this in your CMakeLists.txt file:
 
 ``
-    if(HPX_FOUND)
-        # build your application using HPX
-        add_hpx_executable(your_app
-            ESSENTIAL
-            SOURCES ${your_app_SRCS})
-    else()
-        # build your application with out using HPX
-        add_executable(your_app ${your_app_SRCS})
-    endif()
+    # build your application using HPX
+    add_hpx_executable(your_app
+        ESSENTIAL
+        SOURCES ${your_app_SRCS})
 ``
 
 [c++]
