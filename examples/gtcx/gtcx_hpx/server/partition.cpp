@@ -436,8 +436,9 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
-            for (std::size_t i=0;i<send.size();i++)
-                complex_ntoroidal_gather_receive_[which*send.size()+i] = send[i];
+            for (std::size_t i=0;i<send.size();i++) {
+              complex_ntoroidal_gather_receive_[which*send.size()+i] = send[i];
+            }
         }
 
         gather_gate_.set(which);         // trigger corresponding and-gate input

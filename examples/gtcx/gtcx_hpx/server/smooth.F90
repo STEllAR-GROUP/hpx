@@ -558,7 +558,7 @@ subroutine smooth(iflag, hpx4_bti, &
      !call MPI_GATHER(y_eigen,icount,mpi_Csize,yt,icount,&
      !     mpi_Csize,0,toroidal_comm,ierror)
      call complex_ntoroidal_gather_cmm(hpx4_bti,y_eigen, &
-                                        icount,yt,icount,0)
+                                        icount,yt,0)
      if(myrank_toroidal == 0)then
         do kz=1,num_mode
            
