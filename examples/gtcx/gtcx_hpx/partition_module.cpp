@@ -86,3 +86,11 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtcx_partition_type::wrapped_type::set_int_sndrecv_data_action,
     gtcx_partition_set_int_sndrecv_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_real_params_action,
+    gtcx_partition_set_real_params_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_partd_allgather_data_action,
+    gtcx_partition_set_partd_allgather_data_action);

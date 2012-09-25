@@ -54,10 +54,12 @@ extern "C" {
                     return; };
             void FNAME(partd_allreduce_cmm) (void* pfoo,double *dnitmp,double *densityi,
                                              int* mgrid, int *mzetap1) {
-                    // Cast to gtcx::server::point.  If the opaque pointer isn't a pointer to an object
-                    // derived from point, then the world will end.
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->partd_allreduce(dnitmp,densityi,mgrid,mzetap1);
+                    return; };
+            void FNAME(partd_allgather_cmm) (void* pfoo,double *in,double *out, int* size) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->partd_allgather(in,out,size);
                     return; };
             void FNAME(toroidal_allreduce_cmm) (void* pfoo,double *input,double *output,
                                              int* size) {
@@ -78,6 +80,10 @@ extern "C" {
                      int *integer_params, int *n_integers) {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->broadcast_int_parameters(integer_params, n_integers);
+                    return; };
+            void FNAME(broadcast_real_cmm) (void* pfoo, double *real_params,int *n_reals) {
+                    gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+                    ptr_to_class->broadcast_real_parameters(real_params, n_reals);
                     return; };
             void FNAME(broadcast_parameters_cmm) (void* pfoo,
                      int *integer_params,double *real_params,
@@ -246,6 +252,67 @@ namespace gtcx { namespace server
         allreduce_gate_.set(which);         // trigger corresponding and-gate input
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void partition::partd_allgather(double *in,double *out, int* size)
+    {
+      int vsize = *size;
+      partd_allgather_.resize(p_comm_.size()*vsize);
+
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      hpx::future<void> f = partd_allgather_gate_.get_future(p_comm_.size(),
+          &generation);
+
+      std::vector<double> send;
+      send.resize(vsize);
+
+      for (std::size_t i=0;i<send.size();i++) {
+        send[i] = in[i];
+      }
+
+      set_partd_allgather_data_action set_partd_allgather_data_;
+      for (std::size_t i=0;i<p_comm_.size();i++) {
+        hpx::apply(set_partd_allgather_data_, components_[p_comm_[i]], myrank_partd_, generation, send);
+      }
+
+      // possibly do other stuff while the allgather is going on...
+      f.get();
+
+      mutex_type::scoped_lock l(mtx_);
+      for (std::size_t i=0;i<partd_allgather_.size();i++) {
+        out[i] = partd_allgather_[i];
+      }
+    }
+
+    void partition::set_partd_allgather_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data)
+    {
+        partd_allgather_gate_.synchronize(generation, "point::set_partd_allgather_data");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            for (std::size_t i=0;i<partd_allgather_.size();i++)
+                partd_allgather_[which*partd_allgather_.size() + i] = data[i];
+        }
+
+        partd_allgather_gate_.set(which);         // trigger corresponding and-gate input
+    }
+
   
 
 
@@ -312,6 +379,78 @@ namespace gtcx { namespace server
             intparams_ = intparams;
         }
 
+        // which is always zero in this case
+        broadcast_gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void partition::broadcast_real_parameters(double *real_params,int *n_reals)
+    {
+      int nreal = *n_reals;
+
+      if ( item_ != 0 ) {
+        // synchronize with all operations to finish
+        hpx::future<void> f = broadcast_gate_.get_future(1);
+
+        f.get();
+
+        for (std::size_t i=0;i<realparams_.size();i++) {
+          real_params[i] = realparams_[i];
+        }
+      } else {
+        // The sender:  broadcast the parameters to the other components
+        // in a fire and forget fashion
+        std::size_t generation = broadcast_gate_.next_generation();
+
+        std::vector<double> realparams;
+        realparams.resize(nreal);
+        for (int i=0;i<nreal;i++) {
+          realparams[i] = real_params[i];
+        }
+
+        // eliminate item 0's (the sender's) gid
+        std::vector<hpx::naming::id_type> all_but_root;
+        all_but_root.resize(components_.size()-1);
+        for (std::size_t i=0;i<all_but_root.size();i++) {
+          all_but_root[i] = components_[i+1];
+        }
+
+        set_real_params_action set_real_params_;
+        for (std::size_t i=0;i<all_but_root.size();i++) {
+          hpx::apply(set_real_params_, all_but_root[i], item_, generation,
+                     realparams);
+        }
+      }
+    }
+
+    void partition::set_real_params(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& realparams)
+    {
+        broadcast_gate_.synchronize(generation, "point::set_real_params");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            realparams_ = realparams;
+        }
+
+        // which is always zero in this case
         broadcast_gate_.set(which);         // trigger corresponding and-gate input
     }
 
