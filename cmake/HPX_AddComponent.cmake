@@ -54,6 +54,7 @@ macro(add_hpx_component name)
     add_hpx_library_sources(${name}_component
       GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
 
+    set(${name}_SOURCES ${${name}_component_SOURCES})
     add_hpx_source_group(
       NAME ${name}
       CLASS "Source Files"
@@ -66,16 +67,15 @@ macro(add_hpx_component name)
     endif()
     hpx_debug("add_component.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
-    if(NOT ${name}_HEADER_GLOB)
-      add_hpx_library_headers(${name}_component
-        GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
+    add_hpx_library_headers(${name}_component
+      GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
 
-      add_hpx_source_group(
-        NAME ${name}
-        CLASS "Header Files"
-        ROOT ${${name}_HEADER_ROOT}
-        TARGETS ${${name}_component_HEADERS})
-    endif()
+    set(${name}_HEADERS ${${name}_component_HEADERS})
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_component_HEADERS})
   else()
     add_hpx_library_sources_noglob(${name}_component
         SOURCES "${${name}_SOURCES}")
