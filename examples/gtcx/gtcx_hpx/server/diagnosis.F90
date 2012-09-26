@@ -401,7 +401,7 @@ subroutine diagnosis(hpx4_bti,&
            enddo
         enddo
      enddo
-     call FLUSH(ihistory)
+     !call FLUSH(ihistory)
      write(stdout,*)istep,fdum(1),eradial,fdum(12),fdum(20),fdum(21)
      write(stdout,*)' Step ',istep,' thermal flux: ',fdum(10)
      write(stdout,*)istep,Total_field_energy(1:3),fdum(15),fdum(16),fdum(17),fdum(18),fdum(19)
