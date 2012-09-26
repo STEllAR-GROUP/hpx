@@ -442,18 +442,19 @@ namespace gtcx { namespace server
     void partition::toroidal_sndrecv(double *csend,int* csend_size,double *creceive,int *creceive_size,int* dest)
     {
       std::size_t generation = 0;
-      int vsize = *csend_size;
+      int send_size = *csend_size;
+      int receive_size = *creceive_size;
       hpx::future<void> f;
 
       {
         mutex_type::scoped_lock l(mtx_);
-        sndrecv_.resize(vsize);
+        sndrecv_.resize(receive_size);
         f = sndrecv_gate_.get_future(&generation);
       }
 
       // The sender: send data to the left
       // in a fire and forget fashion
-      std::vector<double> send(csend, csend+vsize);
+      std::vector<double> send(csend, csend+send_size);
 
       // send message to the left
       set_sndrecv_data_action set_sndrecv_data_;
@@ -464,9 +465,6 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
-      if ( *creceive_size != sndrecv_.size() ){ 
-        std::cerr << " PROBLEM IN sndrecv!!! size mismatch " << std::endl;
-      }
       for (std::size_t i=0;i<sndrecv_.size();i++) {
         creceive[i] = sndrecv_[i];
       }
@@ -494,18 +492,19 @@ namespace gtcx { namespace server
     void partition::int_toroidal_sndrecv(int *csend,int* csend_size,int *creceive,int *creceive_size,int* dest)
     {
       std::size_t generation = 0;
-      int vsize = *csend_size;
+      int send_size = *csend_size;
+      int receive_size = *creceive_size;
       hpx::future<void> f;
 
       {
         mutex_type::scoped_lock l(mtx_);
-        int_sndrecv_.resize(vsize);
+        int_sndrecv_.resize(receive_size);
         f = int_sndrecv_gate_.get_future(&generation);
       }
 
       // The sender: send data to the left
       // in a fire and forget fashion
-      std::vector<int> send(csend, csend+vsize);
+      std::vector<int> send(csend, csend+send_size);
 
       // send message to the left
       set_int_sndrecv_data_action set_int_sndrecv_data_;
@@ -517,9 +516,6 @@ namespace gtcx { namespace server
 
       {
         mutex_type::scoped_lock l(mtx_);
-        if ( *creceive_size != int_sndrecv_.size() ){ 
-          std::cerr << " PROBLEM IN sndrecv!!! size mismatch " << std::endl;
-        }
         for (std::size_t i=0;i<int_sndrecv_.size();i++) {
           creceive[i] = int_sndrecv_[i];
         }
