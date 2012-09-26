@@ -767,7 +767,9 @@ end subroutine setup
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
-  integer nmode(num_mode),mmode(num_mode)
+  ! Work around for windows
+  integer,parameter :: temp_num_mode=8
+  integer nmode(temp_num_mode),mmode(temp_num_mode)
   real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
