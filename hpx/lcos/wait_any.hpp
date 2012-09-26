@@ -5,8 +5,8 @@
 
 #if !BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_when_any_APR_17_2012_1143AM)
-#define HPX_LCOS_when_any_APR_17_2012_1143AM
+#if !defined(HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM)
+#define HPX_LCOS_WHEN_ANY_APR_17_2012_1143AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -181,7 +181,7 @@ namespace hpx
                     index_ = idx;
 
                     // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self().get_thread_id())
+                    if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
                 }
             }

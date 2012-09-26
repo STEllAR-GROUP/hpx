@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/unlock_lock.hpp>
+#include <boost/serialization/complex.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtcx { namespace server
@@ -32,49 +33,24 @@ namespace gtcx { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void set_toroidal_cmm(int *send,int*length);
-        void set_partd_cmm(int *send,int*length);
-        void loop(std::size_t numberpe,std::size_t mype,
+        void set_toroidal_cmm(int *send,int*length,int *myrank_toroidal);
+        void set_partd_cmm(int *send,int*length,int *myrank_partd);
+        void loop_wrapper(std::size_t numberpe,std::size_t mype,
                    std::vector<hpx::naming::id_type> const& point_components);
-        void partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1);
         void broadcast_parameters(int *integer_params,double *real_params,
                                   int *n_integers,int *n_reals);
-        void set_data(std::size_t item, std::size_t generation,
-                              std::vector<double> const& data);
-
-        void set_tdata(std::size_t item, std::size_t generation,
-                              std::vector<double> const& data);
-
         void set_params(std::size_t which,
                         std::size_t generation,
                         std::vector<int> const& intparams,
                         std::vector<double> const& realparams);
 
-        void toroidal_sndleft(double *csend, int* mgrid);
-        void toroidal_rcvright(double *creceive);
-        void toroidal_sndright(double *csend, int* mgrid);
-        void toroidal_rcvleft(double *creceive);
-
+        void partd_allreduce(double *dnitmp,double *densityi, int* mgrid, int *mzetap1);
         void toroidal_allreduce(double *input,double *output, int* size);
+        void set_data(std::size_t item, std::size_t generation,
+                              std::vector<double> const& data);
 
-        void set_sendleft_data(std::size_t which,
-                          std::size_t generation,
-                          std::vector<double> const& send);
-
-        void set_sendright_data(std::size_t which,
-                          std::size_t generation,
-                          std::vector<double> const& send);
-
-        void toroidal_gather(double *csend, int *size,int *dst);
-        void toroidal_gather_receive(double *creceive, int *dst);
-        void set_toroidal_gather_data(std::size_t which,
-                          std::size_t generation,
-                          std::vector<double> const& send);
-        void toroidal_scatter(double *csend, int *size,int *src);
-        void toroidal_scatter_receive(double *creceive, int *src);
-        void set_toroidal_scatter_data(std::size_t which,
-                          std::size_t generation,
-                          std::vector<double> const& send);
+        void set_tdata(std::size_t item, std::size_t generation,
+                              std::vector<double> const& data);
 
         void comm_allreduce(double *in,double *out, int* msize);
         void int_comm_allreduce(int *in,int *out, int* msize);
@@ -83,44 +59,83 @@ namespace gtcx { namespace server
         void set_int_comm_allreduce_data(std::size_t which,
                 std::size_t generation, std::vector<int> const& data);
 
-        void int_toroidal_sndright(int *csend, int* mgrid);
-        void int_toroidal_rcvleft(int *creceive);
-        void set_int_sendright_data(std::size_t which,
-                          std::size_t generation,
-                          std::vector<int> const& send);
-        void set_int_sendleft_data(std::size_t which,
-                          std::size_t generation,
-                          std::vector<int> const& send);
-        void int_toroidal_sndleft(int *csend, int* mgrid);
-        void int_toroidal_rcvright(int *creceive);
-
         void set_int_comm_allgather_data(std::size_t which,
                 std::size_t generation, std::vector<int> const& data);
         void int_comm_allgather(int *in,int *out, int* msize);
+        void toroidal_sndrecv(double *csend,int* csend_size,double *creceive,
+                                 int *creceive_size,int* dest);
+        void set_sndrecv_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send);
+
+        void ntoroidal_gather(double *csend, int *csize,double *creceive,int *tdst);
+        void set_ntoroidal_gather_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<double> const& send);
+        void ntoroidal_scatter(double *csend, int *csize,double *creceive,int *tsrc);
+        void set_ntoroidal_scatter_data(std::size_t which,
+                          std::size_t generation,
+                          std::vector<double> const& send);
+        void complex_ntoroidal_gather(std::complex<double> *csend, int *csize,std::complex<double> *creceive,int *tdst);
+        void set_complex_ntoroidal_gather_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<std::complex<double> > const& send);
+        void toroidal_reduce(double *input,double *output, int* size,int *dest);
+        void set_toroidal_reduce_data(std::size_t item, std::size_t generation,
+                              std::vector<double> const& data);
+        void p2p_send(double *csend, int *csize,int *tdst);
+        void p2p_receive(double *creceive, int *csize,int *tdst);
+        void set_p2p_sendreceive_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& send);
+        void broadcast_int_parameters(int *integer_params, int *n_integers);
+        void set_int_params(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& intparams);
+        void comm_reduce(double *input,double *output, int* size,int *tdest);
+        void set_comm_reduce_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data);
+
+        void int_toroidal_sndrecv(int *csend,int* csend_size,int *creceive,int *creceive_size,int* dest);
+        void set_int_sndrecv_data(std::size_t which,
+                           std::size_t generation,
+                           std::vector<int> const& send);
+
+        void set_real_params(std::size_t which,
+                           std::size_t generation,
+                           std::vector<double> const& realparams);
+        void broadcast_real_parameters(double *real_params,int *n_reals);
+        void partd_allgather(double *in,double *out, int* size);
+        void set_partd_allgather_data(std::size_t which,
+                std::size_t generation, std::vector<double> const& data);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(partition, loop, loop_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, loop_wrapper, loop_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_data, set_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_tdata, set_tdata_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_params, set_params_action);
-        HPX_DEFINE_COMPONENT_ACTION(partition, set_sendleft_data, set_sendleft_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(partition, set_sendright_data, set_sendright_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_gather_data, set_toroidal_gather_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_scatter_data, set_toroidal_scatter_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_comm_allreduce_data, set_comm_allreduce_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_comm_allreduce_data, set_int_comm_allreduce_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_comm_allgather_data, set_int_comm_allgather_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sendright_data, set_int_sendright_data_action);
-        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sendleft_data, set_int_sendleft_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_sndrecv_data, set_sndrecv_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_ntoroidal_gather_data, set_ntoroidal_gather_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_ntoroidal_scatter_data, set_ntoroidal_scatter_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_complex_ntoroidal_gather_data, set_complex_ntoroidal_gather_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_toroidal_reduce_data, set_toroidal_reduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_p2p_sendreceive_data, set_p2p_sendreceive_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_params, set_int_params_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_comm_reduce_data, set_comm_reduce_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sndrecv_data, set_int_sndrecv_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_real_params, set_real_params_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_partd_allgather_data, set_partd_allgather_data_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef hpx::lcos::local::base_and_gate<> and_gate_type;
 
         std::size_t item_;
-        std::vector<hpx::naming::id_type> toroidal_comm_,partd_comm_;
         std::vector<int> t_comm_,p_comm_;
         std::size_t left_pe_,right_pe_;
 
@@ -135,6 +150,16 @@ namespace gtcx { namespace server
         hpx::lcos::local::trigger scatter_gate_;
         hpx::future<void> scatter_future_;
         and_gate_type broadcast_gate_;
+        hpx::future<void> sndrecv_future_;
+        hpx::lcos::local::trigger sndrecv_gate_;
+        and_gate_type toroidal_allreduce_gate_; 
+        and_gate_type toroidal_reduce_gate_; 
+        and_gate_type comm_reduce_gate_; 
+        hpx::future<void> p2p_sendreceive_future_;
+        hpx::lcos::local::trigger p2p_sendreceive_gate_;
+        hpx::future<void> int_sndrecv_future_;
+        hpx::lcos::local::trigger int_sndrecv_gate_;
+        and_gate_type partd_allgather_gate_;
 
         std::vector<hpx::naming::id_type> components_;
         mutable mutex_type mtx_;
@@ -142,16 +167,20 @@ namespace gtcx { namespace server
         std::vector<double> realparams_;
         std::vector<double> dnireceive_;
         std::vector<double> treceive_;
-        std::size_t in_toroidal_,in_particle_;
-        std::vector<double> sendleft_receive_;
-        std::vector<double> sendright_receive_;
-        std::vector<double> toroidal_gather_receive_;
-        std::vector<double> toroidal_scatter_receive_;
         std::vector<double> comm_allreduce_receive_;
         std::vector<int> int_comm_allreduce_receive_;
         std::vector<int> int_comm_allgather_receive_;
-        std::vector<int> int_sendright_receive_;
-        std::vector<int> int_sendleft_receive_;
+        std::vector<double> sndrecv_;
+        std::vector<double> ntoroidal_gather_receive_;
+        std::vector<double> ntoroidal_scatter_receive_;
+        std::vector<double> toroidal_reduce_;
+        std::vector<std::complex<double> > complex_ntoroidal_gather_receive_;
+        std::size_t myrank_toroidal_;
+        std::size_t myrank_partd_;
+        std::vector<double> p2p_sendreceive_;
+        std::vector<double> comm_reduce_;
+        std::vector<int> int_sndrecv_;
+        std::vector<double> partd_allgather_;
     };
 }}
 
@@ -174,22 +203,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx_point_set_params_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtcx::server::partition::set_sendleft_data_action,
-    gtcx_point_set_sendleft_data_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtcx::server::partition::set_sendright_data_action,
-    gtcx_point_set_sendright_data_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtcx::server::partition::set_toroidal_gather_data_action,
-    gtcx_point_set_toroidal_gather_data_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtcx::server::partition::set_toroidal_scatter_data_action,
-    gtcx_point_set_toroidal_scatter_data_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx::server::partition::set_comm_allreduce_data_action,
     gtcx_point_set_comm_allreduce_data_action);
 
@@ -198,12 +211,48 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx_point_set_int_comm_allreduce_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtcx::server::partition::set_int_sendright_data_action,
-    gtcx_point_set_int_sendright_data_action);
+    gtcx::server::partition::set_sndrecv_data_action,
+    gtcx_point_set_sndrecv_data_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    gtcx::server::partition::set_int_sendleft_data_action,
-    gtcx_point_set_int_sendleft_data_action);
+    gtcx::server::partition::set_ntoroidal_gather_data_action,
+    gtcx_point_set_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_ntoroidal_scatter_data_action,
+    gtcx_point_set_ntoroidal_scatter_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_complex_ntoroidal_gather_data_action,
+    gtcx_point_set_complex_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_toroidal_reduce_data_action,
+    gtcx_point_set_toroidal_reduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_p2p_sendreceive_data_action,
+    gtcx_point_set_p2p_sendreceive_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_int_params_action,
+    gtcx_point_set_int_params_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_comm_reduce_data_action,
+    gtcx_point_set_comm_reduce_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_int_sndrecv_data_action,
+    gtcx_point_set_int_sndrecv_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_real_params_action,
+    gtcx_point_set_real_params_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    gtcx::server::partition::set_partd_allgather_data_action,
+    gtcx_point_set_partd_allgather_data_action);
 
 #endif
 

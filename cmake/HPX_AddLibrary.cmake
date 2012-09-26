@@ -22,17 +22,17 @@ macro(add_hpx_library name)
     set(${name}_LANGUAGE CXX)
   endif() 
 
+  if(NOT ${name}_SOURCE_ROOT)
+    set(${name}_SOURCE_ROOT ".")
+  endif()
+  hpx_debug("add_library.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
+
+  if(NOT ${name}_HEADER_ROOT)
+    set(${name}_HEADER_ROOT ".")
+  endif()
+  hpx_debug("add_library.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
+
   if(${${name}_AUTOGLOB})
-    if(NOT ${name}_SOURCE_ROOT)
-      set(${name}_SOURCE_ROOT ".")
-    endif()
-    hpx_debug("add_library.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
-
-    if(NOT ${name}_HEADER_ROOT)
-      set(${name}_HEADER_ROOT ".")
-    endif()
-    hpx_debug("add_library.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
-
     if(NOT ${name}_SOURCE_GLOB)
       set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp"
                               "${${name}_SOURCE_ROOT}/*.c"
@@ -63,18 +63,33 @@ macro(add_hpx_library name)
     endif()
     hpx_debug("add_library.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
-    if(NOT ${name}_HEADER_GLOB)
-      add_hpx_library_headers(${name}_lib
-        GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
-      hpx_debug("add_library.${name}" "${${name}_lib_HEADERS}: ${${${name}_lib_HEADERS}}")
+    add_hpx_library_headers(${name}_lib
+      GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
 
-      set(${name}_HEADERS ${${name}_lib_HEADERS})
-      add_hpx_source_group(
-        NAME ${name}
-        CLASS "Header Files"
-        ROOT ${${name}_HEADER_ROOT}
-        TARGETS ${${name}_HEADERS})
-    endif()
+    set(${name}_HEADERS ${${name}_lib_HEADERS})
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_HEADERS})
+  else()
+    add_hpx_library_sources_noglob(${name}_component
+        SOURCES "${${name}_SOURCES}")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Source Files"
+      ROOT ${${name}_SOURCE_ROOT}
+      TARGETS ${${name}_lib_SOURCES})
+
+    add_hpx_library_headers_noglob(${name}_component
+        HEADERS "${${name}_HEADERS}")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_lib_HEADERS})
   endif()
 
   hpx_print_list("DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES)

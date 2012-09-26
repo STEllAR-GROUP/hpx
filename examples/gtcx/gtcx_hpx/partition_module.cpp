@@ -44,22 +44,6 @@ HPX_REGISTER_ACTION_EX(
     gtcx_partition_set_params_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtcx_partition_type::wrapped_type::set_sendleft_data_action,
-    gtcx_partition_set_sendleft_data_action);
-
-HPX_REGISTER_ACTION_EX(
-    gtcx_partition_type::wrapped_type::set_sendright_data_action,
-    gtcx_partition_set_sendright_data_action);
-
-HPX_REGISTER_ACTION_EX(
-    gtcx_partition_type::wrapped_type::set_toroidal_scatter_data_action,
-    gtcx_partition_set_toroidal_scatter_data_action);
-
-HPX_REGISTER_ACTION_EX(
-    gtcx_partition_type::wrapped_type::set_toroidal_gather_data_action,
-    gtcx_partition_set_toroidal_gather_data_action);
-
-HPX_REGISTER_ACTION_EX(
     gtcx_partition_type::wrapped_type::set_comm_allreduce_data_action,
     gtcx_partition_set_comm_allreduce_data_action);
 
@@ -68,9 +52,45 @@ HPX_REGISTER_ACTION_EX(
     gtcx_partition_set_int_comm_allreduce_data_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtcx_partition_type::wrapped_type::set_int_sendright_data_action,
-    gtcx_partition_set_int_sendright_data_action);
+    gtcx_partition_type::wrapped_type::set_sndrecv_data_action,
+    gtcx_partition_set_sndrecv_data_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtcx_partition_type::wrapped_type::set_int_sendleft_data_action,
-    gtcx_partition_set_int_sendleft_data_action);
+    gtcx_partition_type::wrapped_type::set_ntoroidal_gather_data_action,
+    gtcx_partition_set_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_ntoroidal_scatter_data_action,
+    gtcx_partition_set_ntoroidal_scatter_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_complex_ntoroidal_gather_data_action,
+    gtcx_partition_set_complex_ntoroidal_gather_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_toroidal_reduce_data_action,
+    gtcx_partition_set_toroidal_reduce_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_p2p_sendreceive_data_action,
+    gtcx_partition_set_p2p_sendreceive_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_int_params_action,
+    gtcx_partition_set_int_params_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_comm_reduce_data_action,
+    gtcx_partition_set_comm_reduce_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_int_sndrecv_data_action,
+    gtcx_partition_set_int_sndrecv_data_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_real_params_action,
+    gtcx_partition_set_real_params_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtcx_partition_type::wrapped_type::set_partd_allgather_data_action,
+    gtcx_partition_set_partd_allgather_data_action);

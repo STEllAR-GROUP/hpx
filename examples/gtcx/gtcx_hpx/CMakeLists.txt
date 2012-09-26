@@ -34,7 +34,6 @@ if(MSVC AND ${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
 endif()
 
 add_hpx_component(gtcx_hpx
-  SOURCES ${sources}
   SOURCE_GLOB "*.cpp"
   HEADER_GLOB "*.hpp"
   DEPENDENCIES iostreams_component gtcx_hpx_fortran_lib

@@ -12,6 +12,7 @@ set(example_programs
     fibonacci_futures
     fractals
     #fractals_oclm
+    component_in_executable
     interest_calculator
     non_atomic_rma
     quicksort
@@ -26,6 +27,8 @@ if(HPX_CXX11_LAMBDAS)
       1d_wave_equation
      )
 endif()
+
+set(component_in_executable_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)

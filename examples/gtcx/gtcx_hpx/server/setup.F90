@@ -1316,7 +1316,7 @@ end subroutine broadcast_input_params
 
   count_t = 1
   count_p = 1
-  do i=1,numberpe
+  do i=0,numberpe-1
     p_rank=mod(i,npartdom)
     t_rank=i/npartdom
     if ( p_rank .eq. myrank_partd ) then
@@ -1341,8 +1341,8 @@ end subroutine broadcast_input_params
     end if
   enddo
 
-  call set_partd_cmm(hpx4_bti,p_gids,npartdom)
-  call set_toroidal_cmm(hpx4_bti,t_gids,ntoroidal)
+  call set_partd_cmm(hpx4_bti,p_gids,npartdom,myrank_partd)
+  call set_toroidal_cmm(hpx4_bti,t_gids,ntoroidal,myrank_toroidal)
 
 !  write(0,*)'mype=',mype,'  nproc_toroidal=',nproc_toroidal,&
 !       ' myrank_toroidal=',myrank_toroidal,'  nproc_partd=',nproc_partd,&

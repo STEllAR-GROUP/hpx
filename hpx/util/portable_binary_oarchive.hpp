@@ -28,6 +28,8 @@ namespace hox { namespace util
 // portable_binary_oarchive.hpp
 
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
+// Copyright (c) 2007-2012 Hartmut Kaiser
+//
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -35,6 +37,8 @@ namespace hox { namespace util
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <ostream>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
@@ -90,7 +94,7 @@ public:
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // "Portable" output binary archive.  This is a variation of the native binary
 // archive. it addresses integer size and endianness so that binary archives can
-// be passed across systems. Note:floating point types not addressed here
+// be passed across systems. Note:floating point types are passed through as is.
 
 #if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
 #define HPX_SERIALIZATION_EXPORT
@@ -136,62 +140,78 @@ protected:
     // using archive_base_t::save;
 
     // default fall through for any types not specified here
-    template<class T>
-    void save(const T & val) {
+    template <typename T>
+    void save(T const& val, typename boost::enable_if<boost::is_integral<T> >::type* = 0) 
+    {
         boost::intmax_t t = static_cast<boost::intmax_t>(val);
         save_impl(t, sizeof(T));
     }
-    void save(const std::string & t) {
+
+    template <typename T>
+    void save(T const& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
+    {
+        this->primitive_base_t::save(t);
+    }
+
+    void save(const std::string& t) {
         this->primitive_base_t::save(t);
     }
 #if BOOST_VERSION >= 104400
-    void save(const boost::archive::class_id_type & t) {
-        /*boost::int16_t*/boost::intmax_t l = t;
+    void save(const boost::archive::class_id_reference_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
-    void save(const boost::archive::object_id_type & t) {
-        /*boost::uint32_t*/boost::intmax_t l = t;
+    void save(const boost::archive::class_id_optional_type& t) {
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::int16_t));
+    }
+    void save(const boost::archive::class_id_type& t) {
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::int16_t));
+    }
+    void save(const boost::archive::object_id_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::tracking_type & t) {
+    void save(const boost::archive::object_reference_type& t) {
+        boost::intmax_t l = t;
+        save_impl(l, sizeof(boost::uint32_t));
+    }
+    void save(const boost::archive::tracking_type& t) {
         bool l = t;
         this->primitive_base_t::save(l);
     }
-    void save(const boost::archive::version_type & t) {
-        /*boost::uint32_t*/boost::intmax_t l = t;
+    void save(const boost::archive::version_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::library_version_type & t) {
-        /*boost::uint16_t*/boost::intmax_t l = t;
+    void save(const boost::archive::library_version_type& t) {
+        boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
-    void save(const boost::serialization::item_version_type & t) {
+    void save(const boost::serialization::item_version_type& t) {
         boost::intmax_t l = t;
         save_impl(l, sizeof(boost::intmax_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void save(const std::wstring & t) {
+    void save(const std::wstring& t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    void save(const float & t) {
-        this->primitive_base_t::save(t);
-        // floats not supported
-        //BOOST_STATIC_ASSERT(false);
-    }
-    void save(const double & t) {
-        this->primitive_base_t::save(t);
-        // doubles not supported
-        //BOOST_STATIC_ASSERT(false);
-    }
-    void save(const char & t) {
+    void save(const float& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const unsigned char & t) {
+    void save(const double& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const signed char & t) {
+    void save(const char& t) {
+        this->primitive_base_t::save(t);
+    }
+    void save(const unsigned char& t) {
+        this->primitive_base_t::save(t);
+    }
+    void save(const signed char& t) {
         this->primitive_base_t::save(t);
     }
 
@@ -201,7 +221,7 @@ protected:
     typedef boost::archive::detail::common_oarchive<portable_binary_oarchive>
         detail_common_oarchive;
 
-    template<class T>
+    template <typename T>
     void save_override(T & t, BOOST_PFTO int) {
         this->detail_common_oarchive::save_override(t, 0);
     }
@@ -291,22 +311,17 @@ public:
 };
 
 #undef HPX_SERIALIZATION_EXPORT
-
 }}
 
 // required by export in boost version > 1.34
-#ifdef BOOST_SERIALIZATION_REGISTER_ARCHIVE
-    BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_oarchive)
-#endif
-#ifdef BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION
-    BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_oarchive)
-#endif
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_oarchive)
+BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_oarchive)
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
 #endif
 
+#endif // HPX_USE_PORTABLE_ARCHIVES == 0
 #endif // PORTABLE_BINARY_OARCHIVE_HPP
 
-#endif // HPX_USE_PORTABLE_ARCHIVES == 0
 

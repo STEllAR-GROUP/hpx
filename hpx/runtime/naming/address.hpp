@@ -90,8 +90,10 @@ namespace hpx { namespace naming
         template<class Archive>
         void load(Archive & ar, const unsigned int version)
         {
-            if (version > HPX_ADDRESS_VERSION) {
-                throw exception(version_too_new,
+            if (version > HPX_ADDRESS_VERSION)
+            {
+                HPX_THROW_EXCEPTION(version_too_new,
+                    "address::load",
                     "trying to load address with unknown version");
             }
             ar >> locality_ >> type_ >> address_;
