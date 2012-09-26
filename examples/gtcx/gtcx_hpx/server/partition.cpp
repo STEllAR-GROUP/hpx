@@ -884,14 +884,14 @@ namespace gtcx { namespace server
       int src = *tsrc;
       hpx::future<void> f;
 
+      std::size_t generation = 0;
+      f = scatter_gate_.get_future(&generation);
+
       if ( t_comm_[src] == item_ ) {
         mutex_type::scoped_lock l(mtx_);
 
         int vsize = *csize;
         ntoroidal_scatter_receive_.resize(vsize);
-
-        std::size_t generation = 0;
-        f = scatter_gate_.get_future(&generation);
 
         // Send data to everyone in toroidal
         // The sender: send data to the left
@@ -906,12 +906,7 @@ namespace gtcx { namespace server
           hpx::apply(set_ntoroidal_scatter_data_,
               components_[t_comm_[i]], myrank_toroidal_, generation, send);
         }
-      } else {
-        scatter_gate_.next_generation();
       }
-
-      // FIXME: f.get() is called even if no future has been generated for 
-      //        this generation
 
       // synchronize with all operations to finish
       f.get();
@@ -1066,12 +1061,9 @@ namespace gtcx { namespace server
     {
         allgather_gate_.synchronize(generation, "point::set_int_comm_allgather_data");
 
-        // FIXME: Is the loop below correct? 
-        //        It looks like vsize should be initialized to data.size() instead.
-
         {
             mutex_type::scoped_lock l(mtx_);
-            std::size_t vsize = int_comm_allgather_receive_.size();
+            std::size_t vsize = data.size();
             for (std::size_t i=0;i<vsize;i++)
                 int_comm_allgather_receive_[which*vsize + i] = data[i];
         }
