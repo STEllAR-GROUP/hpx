@@ -285,13 +285,11 @@ namespace gtcx { namespace server
     {
         partd_allgather_gate_.synchronize(generation, "point::set_partd_allgather_data");
 
-        // FIXME: Is the loop below correct? 
-        //        It looks like the loop should go upto data.size() instead.
-
         {
             mutex_type::scoped_lock l(mtx_);
-            for (std::size_t i=0;i<partd_allgather_.size();i++)
-                partd_allgather_[which*partd_allgather_.size() + i] = data[i];
+            std::size_t vsize = data.size();
+            for (std::size_t i=0;i<vsize;i++)
+                partd_allgather_[which*vsize + i] = data[i];
         }
 
         partd_allgather_gate_.set(which);         // trigger corresponding and-gate input
@@ -614,12 +612,14 @@ namespace gtcx { namespace server
       toroidal_reduce_.resize(vsize);
       std::fill( toroidal_reduce_.begin(),toroidal_reduce_.end(),0.0);
 
-      // REVIEW: we create a new future always, but it's not always used 
-
       // synchronize with all operations to finish
       std::size_t generation = 0;
-      hpx::future<void> f = toroidal_reduce_gate_.get_future(t_comm_.size(),
-            &generation);
+      hpx::future<void> f;
+      if ( myrank_toroidal_ == dest ) {
+        f = toroidal_reduce_gate_.get_future(t_comm_.size(), &generation);
+      } else {
+        generation = toroidal_reduce_gate_.next_generation();
+      }
 
       std::vector<double> send(input, input+vsize);
 
@@ -676,12 +676,15 @@ namespace gtcx { namespace server
       comm_reduce_.resize(vsize);
       std::fill( comm_reduce_.begin(),comm_reduce_.end(),0.0);
 
-      // REVIEW: we create a new future always, but it's not always used 
-
       // synchronize with all operations to finish
       std::size_t generation = 0;
-      hpx::future<void> f = comm_reduce_gate_.get_future(components_.size(),
+      hpx::future<void> f;
+      if ( item_ == dest ) {
+        f = comm_reduce_gate_.get_future(components_.size(),
             &generation);
+      } else {
+        generation = comm_reduce_gate_.next_generation();
+      }
 
       std::vector<double> send(input, input+vsize);
 
@@ -884,14 +887,14 @@ namespace gtcx { namespace server
       int src = *tsrc;
       hpx::future<void> f;
 
+      int vsize = *csize;
+      ntoroidal_scatter_receive_.resize(vsize);
+
       std::size_t generation = 0;
       f = scatter_gate_.get_future(&generation);
 
       if ( t_comm_[src] == item_ ) {
         mutex_type::scoped_lock l(mtx_);
-
-        int vsize = *csize;
-        ntoroidal_scatter_receive_.resize(vsize);
 
         // Send data to everyone in toroidal
         // The sender: send data to the left
