@@ -108,6 +108,7 @@ namespace hpx { namespace util
         std::ptrdiff_t init_small_stack_size() const;
         std::ptrdiff_t init_medium_stack_size() const;
         std::ptrdiff_t init_large_stack_size() const;
+        std::ptrdiff_t init_huge_stack_size() const;
 
         void pre_initialize_ini();
         void post_initialize_ini(std::string const& hpx_ini_file,
@@ -118,6 +119,7 @@ namespace hpx { namespace util
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;
         std::ptrdiff_t large_stacksize;
+        std::ptrdiff_t huge_stacksize;
         bool need_to_call_pre_initialize;
     };
 }}
