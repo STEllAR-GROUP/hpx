@@ -185,7 +185,7 @@ namespace gtcx { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_ACTION_USES_LARGE_STACK(gtcx::server::partition::loop_action);
+HPX_ACTION_USES_HUGE_STACK(gtcx::server::partition::loop_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx::server::partition::loop_action,
     gtcx_point_loop_action);
