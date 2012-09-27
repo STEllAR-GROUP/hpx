@@ -50,7 +50,7 @@ subroutine set_random_zion(mi,rng_control,zion)
   implicit none
 
   integer mi,rng_control
-  real(wp),dimension(:,:),allocatable :: zion
+  real(kind=wp),dimension(:,:),allocatable :: zion
   integer,dimension(rng_s) :: seed
   type(rng_state) :: state
 
@@ -108,7 +108,7 @@ function get_random_number(rng_control)
   use precision
   use rng
   implicit none
-  real(wp) :: get_random_number
+  real(kind=wp) :: get_random_number
   integer rng_control
   integer,dimension(rng_s) :: seed
   type(rng_state) :: state

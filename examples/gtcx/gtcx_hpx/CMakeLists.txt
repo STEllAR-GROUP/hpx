@@ -4,9 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# We have to compile the Fortran sources into a separate static library as
+# cmake does not support generating mixed C++/Fortran modules for MSVC.
 if(MSVC)
-  # We have to compile the Fortran sources into a separate static library as
-  # cmake does not support generating mixed C++/Fortran modules for MSVC.
+  set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
   add_hpx_library(gtcx_hpx_fortran
     AUTOGLOB
     STATIC

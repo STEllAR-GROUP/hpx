@@ -58,34 +58,34 @@ subroutine smooth(iflag, hpx4_bti, &
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
   integer nmode(num_mode),mmode(num_mode)
-  real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
        amp_mode(2,num_mode,2)
-  real(wp),dimension(:),allocatable :: hfluxpsi
-  real(wp),dimension(:,:,:),allocatable :: eigenmode
-  real(wp) etracer,ptracer(4)
+  real(kind=wp),dimension(:),allocatable :: hfluxpsi
+  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+  real(kind=wp) etracer,ptracer(4)
 
 ! particle decomp
   integer  :: ntoroidal,npartdom
@@ -97,7 +97,7 @@ subroutine smooth(iflag, hpx4_bti, &
   integer iflag,i,j,k,ii,ij,ip,jt,kz,ismooth,mz,mzmax,mzbig,jpe,indp,indt,&
        indp1,indt1,meachtheta,jtp,icount,ierror,idest,isource,isendtag,&
        irecvtag
-  real(wp) sendl(mgrid),sendr(mgrid),recvl(mgrid),recvr(mgrid),phism(mgrid),&
+  real(kind=wp) sendl(mgrid),sendr(mgrid),recvl(mgrid),recvr(mgrid),phism(mgrid),&
        ptemp(mzeta),pleft(mthetamax),pright(mthetamax),phitmp(0:mzeta,mgrid),&
        filter(mtdiag/2+1),wt,r,dt,wz,zdum,tdum,pi2_inv,den00(0:mpsi),&
        phiflux(mtdiag/ntoroidal,mtdiag,idiag1:idiag2),&
@@ -108,8 +108,8 @@ subroutine smooth(iflag, hpx4_bti, &
 ! the dummy array size for thread-safe FFT assume data array size <16384
   real(doubleprec) :: aux1f(25000),aux1b(25000),aux2f(20000),aux2b(20000)
   real(doubleprec) :: aux3f(1),aux3b(1)
-  real(wp) :: scale
-  real(wp) energy_unit,energy_unit_sq
+  real(kind=wp) :: scale
+  real(kind=wp) energy_unit,energy_unit_sq
 
   scale=1.0_wp
   phitmp=0.

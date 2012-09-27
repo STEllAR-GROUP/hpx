@@ -39,23 +39,23 @@ subroutine tag_particles(&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-    real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+    real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
     integer,dimension(:),allocatable :: mtheta
-    real(wp),dimension(:),allocatable :: deltat
+    real(kind=wp),dimension(:),allocatable :: deltat
     logical  do_collision
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
 ! We tag each particle with a unique number that will be carried along
@@ -124,23 +124,23 @@ subroutine locate_tracked_particles(&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-    real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+    real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
     integer,dimension(:),allocatable :: mtheta
-    real(wp),dimension(:),allocatable :: deltat
+    real(kind=wp),dimension(:),allocatable :: deltat
     logical  do_collision
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
 ! Check if tracked particles are located on this processor. Particles that
@@ -192,15 +192,15 @@ subroutine write_tracked_particles(&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-    real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+    real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
     integer,dimension(:),allocatable :: mtheta
-    real(wp),dimension(:),allocatable :: deltat
+    real(kind=wp),dimension(:),allocatable :: deltat
     logical  do_collision
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
  
   integer :: i,j
@@ -275,23 +275,23 @@ subroutine hdf5out_tracked_particles(hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-    real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+    real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
     integer,dimension(:),allocatable :: mtheta
-    real(wp),dimension(:),allocatable :: deltat
+    real(kind=wp),dimension(:),allocatable :: deltat
     logical  do_collision
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
 ! HDF5 declarations
