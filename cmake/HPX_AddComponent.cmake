@@ -22,7 +22,7 @@ macro(add_hpx_component name)
 
   if(NOT ${name}_LANGUAGE)
     set(${name}_LANGUAGE CXX)
-  endif() 
+  endif()
 
   if(NOT ${name}_SOURCE_ROOT)
     set(${name}_SOURCE_ROOT ".")
