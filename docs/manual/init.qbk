@@ -121,7 +121,8 @@ by section basis below.
 ``
     [system]
     pid = <process-id>
-    prefix = <current prefix path>
+    prefix = <current prefix path of core HPX library>
+    executable = <current prefix path of executable>
 ``
 [c++]
 
@@ -134,6 +135,10 @@ by section basis below.
     [[`system.prefix`]
      [This is initialized to the base directory __hpx__ has been loaded from.]
      [dynamic information]]
+    [[`system.executable_prefix`]
+     [This is initialized to the base directory the current executable has been 
+      loaded from.]
+     [dynamic information]]
 ]
 
 ['[*The `hpx` Configuration Section]]
@@ -142,13 +147,14 @@ by section basis below.
 ``
     [hpx]
     location = ${HPX_LOCATION:$[system.prefix]}
-    component_path = $[hpx.location]/lib/hpx
+    component_path = $[hpx.location]/lib/hpx:$[system.executable_prefix]/lib/hpx
     master_ini_path = $[hpx.location]/share/hpx-<version>
     ini_path = $[hpx.master_ini_path]/ini
     default_stack_size = ${HPX_DEFAULT_STACK_SIZE:<hpx_default_stack_size>}
     small_stack_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
     medium_stack_size = ${HPX_MEDIUM_STACK_SIZE:<hpx_medium_stack_size>}
     large_stack_size = ${HPX_LARGE_STACK_SIZE:<hpx_large_stack_size>}
+    huge_stack_size = ${HPX_HUGE_STACK_SIZE:<hpx_huge_stack_size>}
     os_threads = 1
     localities = 1
     program_name =
@@ -163,8 +169,8 @@ by section basis below.
       is running on.]
      [dynamic information]]
     [[`hpx.component_path`]
-     [This is initialized to the default directory where the __hpx__ runtime
-      library will look for installed components.]
+     [This is initialized to the list of directories where the __hpx__ runtime
+      library will look for installed components. Duplicates are discarded.]
      [static information]]
     [[`hpx.master_ini_path`]
      [This is initialized to the default path of the main hpx.ini configuration
@@ -179,19 +185,23 @@ by section basis below.
     [[`hpx.default_stack_size`]
      [This is initialized to the default stack size to be used by __hpx__-threads]
      [static information, depends on the compile time preprocessor constant
-      `HPX_DEFAULT_STACK_SIZE` (`0x8000`)]]
+      `HPX_DEFAULT_STACK_SIZE` (defaults to `0x8000`)]]
     [[`hpx.small_stack_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads]
      [static information, depends on the compile time preprocessor constant
-      `HPX_SMALL_STACK_SIZE` (`0x2000`)]]
+      `HPX_SMALL_STACK_SIZE` (defaults to `0x8000`)]]
     [[`hpx.medium_stack_size`]
      [This is initialized to the medium stack size to be used by __hpx__-threads]
      [static information, depends on the compile time preprocessor constant
-      `HPX_MEDIUM_STACK_SIZE` (`0x30000`)]]
+      `HPX_MEDIUM_STACK_SIZE` (defaults to `0x20000`)]]
     [[`hpx.large_stack_size`]
      [This is initialized to the large stack size to be used by __hpx__-threads]
      [static information, depends on the compile time preprocessor constant
-      `HPX_LARGE_STACK_SIZE` (`0x800000`)]]
+      `HPX_LARGE_STACK_SIZE` (defaults to `0x200000`)]]
+    [[`hpx.large_stack_size`]
+     [This is initialized to the huge stack size to be used by __hpx__-threads]
+     [static information, depends on the compile time preprocessor constant
+      `HPX_HUGE_STACK_SIZE` (defaults to `0x2000000`)]]
     [[`hpx.os_threads`]
      [This setting reflects the number of OS-threads used for running
       __hpx__-threads.]

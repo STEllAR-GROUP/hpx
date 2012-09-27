@@ -40,13 +40,13 @@ namespace hpx { namespace util
             "[system]",
             "pid = " + boost::lexical_cast<std::string>(getpid()),
             "prefix = " + find_prefix(),
-            "executable = " + get_executable_prefix(),
+            "executable_prefix = " + get_executable_prefix(),
 
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx" 
-                HPX_INI_PATH_DELIMITER "$[system.executable]/lib/hpx",
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
 #if HPX_USE_ITT != 0
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
