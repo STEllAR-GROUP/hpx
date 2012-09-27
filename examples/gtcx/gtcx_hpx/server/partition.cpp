@@ -154,9 +154,11 @@ namespace gtcx { namespace server
         f.get();
 
         // Copy the parameters to the fortran arrays
+        BOOST_ASSERT(intparams_.size() == nint);
         for (std::size_t i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
         }
+        BOOST_ASSERT(realparams_.size() == nreal);
         for (std::size_t i=0;i<realparams_.size();i++) {
           real_params[i] = realparams_[i];
         }
@@ -219,6 +221,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(dnireceive_.size() == vsize);
       for (std::size_t i=0;i<dnireceive_.size();i++) {
         densityi[i] = dnireceive_[i];
       }
@@ -231,6 +234,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(dnireceive_.size() == data.size());
             for (std::size_t i=0;i<dnireceive_.size();i++)
                 dnireceive_[i] += data[i];
         }
@@ -275,6 +279,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(partd_allgather_.size() == p_comm_.size()*vsize);
       for (std::size_t i=0;i<partd_allgather_.size();i++) {
         out[i] = partd_allgather_[i];
       }
@@ -288,6 +293,7 @@ namespace gtcx { namespace server
         {
             mutex_type::scoped_lock l(mtx_);
             std::size_t vsize = data.size();
+            BOOST_ASSERT(partd_allgather_.size() == p_comm_.size()*vsize);
             for (std::size_t i=0;i<vsize;i++)
                 partd_allgather_[which*vsize + i] = data[i];
         }
@@ -321,6 +327,8 @@ namespace gtcx { namespace server
         f.get();
 
         // Copy the parameters to the fortran arrays
+        mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(intparams_.size() == nint);
         for (std::size_t i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
         }
@@ -353,6 +361,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(intparams_.size() == intparams.size());
             intparams_ = intparams;
         }
 
@@ -387,6 +396,8 @@ namespace gtcx { namespace server
 
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(realparams_.size() == nreal);
         for (std::size_t i=0;i<realparams_.size();i++) {
           real_params[i] = realparams_[i];
         }
@@ -419,6 +430,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(realparams_.size() == realparams.size());
             realparams_ = realparams;
         }
 
@@ -573,8 +585,11 @@ namespace gtcx { namespace server
 
       // create a new and-gate object
       std::size_t generation = 0;
-      p2p_sendreceive_.resize(vsize);
-      p2p_sendreceive_future_ = p2p_sendreceive_gate_.get_future(&generation);
+      {
+        mutex_type::scoped_lock l(mtx_);
+        p2p_sendreceive_.resize(vsize);
+        p2p_sendreceive_future_ = p2p_sendreceive_gate_.get_future(&generation);
+      }
 
       // Send data to dst
       // The sender: send data to the left
@@ -630,6 +645,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(toroidal_reduce_.size() == vsize);
         for (std::size_t i=0;i<toroidal_reduce_.size();i++) {
           output[i] = toroidal_reduce_[i];
         }
@@ -643,6 +659,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(toroidal_reduce_.size() == data.size());
             for (std::size_t i=0;i<toroidal_reduce_.size();i++)
                 toroidal_reduce_[i] += data[i];
         }
@@ -695,6 +712,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(comm_reduce_.size() == vsize);
         for (std::size_t i=0;i<comm_reduce_.size();i++) {
           output[i] = comm_reduce_[i];
         }
@@ -708,6 +726,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(comm_reduce_.size() == data.size());
             for (std::size_t i=0;i<comm_reduce_.size();i++)
                 comm_reduce_[i] += data[i];
         }
@@ -751,6 +770,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(treceive_.size() == vsize);
       for (std::size_t i=0;i<treceive_.size();i++) {
         output[i] = treceive_[i];
       }
@@ -802,6 +822,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(ntoroidal_gather_receive_.size() == vsize);
         for (std::size_t i=0;i<ntoroidal_gather_receive_.size();i++) {
           creceive[i] = ntoroidal_gather_receive_[i];
         }
@@ -856,6 +877,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(complex_ntoroidal_gather_receive_.size() == vsize);
         for (std::size_t i=0;i<complex_ntoroidal_gather_receive_.size();i++) {
           creceive[i] = complex_ntoroidal_gather_receive_[i];
         }
@@ -913,6 +935,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(ntoroidal_scatter_receive_.size() == vsize);
       for (std::size_t i=0;i<ntoroidal_scatter_receive_.size();i++) {
         creceive[i] = ntoroidal_scatter_receive_[i];
       }
@@ -951,6 +974,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(comm_allreduce_receive_.size() == vsize);
         for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
           out[i] = comm_allreduce_receive_[i];
         }
@@ -993,7 +1017,8 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
-        for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
+        BOOST_ASSERT(int_comm_allreduce_receive_.size() == vsize);
+        for (std::size_t i=0;i<int_comm_allreduce_receive_.size();i++) {
           out[i] = int_comm_allreduce_receive_[i];
         }
     }
@@ -1052,6 +1077,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(int_comm_allgather_receive_.size() == vsize);
         for (std::size_t i=0;i<int_comm_allgather_receive_.size();i++) {
           out[i] = int_comm_allgather_receive_[i];
         }
@@ -1065,6 +1091,8 @@ namespace gtcx { namespace server
         {
             mutex_type::scoped_lock l(mtx_);
             std::size_t vsize = data.size();
+            BOOST_ASSERT(int_comm_allgather_receive_.size() == data.size()*components_.size());
+            BOOST_ASSERT(which < components_.size());
             for (std::size_t i=0;i<vsize;i++)
                 int_comm_allgather_receive_[which*vsize + i] = data[i];
         }
