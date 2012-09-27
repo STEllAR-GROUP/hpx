@@ -121,8 +121,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         // construction and destruction
         promise()
-          : task_(new detail::future_object<Result>()),
-            future_obtained_(false)
+          : future_obtained_(false)
         {}
 
         ~promise()
@@ -252,8 +251,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         // construction and destruction
         promise()
-          : task_(new detail::future_object<void>()),
-            future_obtained_(false)
+          : future_obtained_(false)
         {}
 
         ~promise()
