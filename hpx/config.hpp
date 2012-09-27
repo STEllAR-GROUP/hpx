@@ -447,10 +447,13 @@
 #  define HPX_DEFAULT_STACK_SIZE  HPX_SMALL_STACK_SIZE
 #endif
 #if !defined(HPX_MEDIUM_STACK_SIZE)
-#  define HPX_MEDIUM_STACK_SIZE   0x030000        // 256kByte
+#  define HPX_MEDIUM_STACK_SIZE   0x0020000       // 128kByte
 #endif
 #if !defined(HPX_LARGE_STACK_SIZE)
-#  define HPX_LARGE_STACK_SIZE    0x800000        // 8MByte
+#  define HPX_LARGE_STACK_SIZE    0x0200000       // 2MByte
+#endif
+#if !defined(HPX_HUGE_STACK_SIZE)
+#  define HPX_HUGE_STACK_SIZE     0x2000000       // 32MByte
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

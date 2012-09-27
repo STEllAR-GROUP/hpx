@@ -66,43 +66,43 @@ subroutine chargei(hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
   integer nmode(num_mode),mmode(num_mode)
-  real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
        amp_mode(2,num_mode,2)
-  real(wp),dimension(:),allocatable :: hfluxpsi
-  real(wp),dimension(:,:,:),allocatable :: eigenmode
-  real(wp) etracer,ptracer(4)
+  real(kind=wp),dimension(:),allocatable :: hfluxpsi
+  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+  real(kind=wp) etracer,ptracer(4)
 
 ! particle decomp
   integer  :: ntoroidal,npartdom
@@ -113,11 +113,11 @@ subroutine chargei(hpx4_bti,&
 
   integer m,i,im,j,k,ip,jt,kk,ii,j11,j10,j01,j00,ierror,larmor,ij,ipjt,&
        icount,idest,isource,isendtag,irecvtag
-  real(wp) weight,wemark,rdum,tdum,delr,delt(0:mpsi),delz,smu_inv,r,wz1,wz0,&
+  real(kind=wp) weight,wemark,rdum,tdum,delr,delt(0:mpsi),delz,smu_inv,r,wz1,wz0,&
        wp1,wp0,wt11,wt10,wt01,wt00,adum(0:mpsi),tflr,damping,pi2_inv,&
        psitmp,thetatmp,zetatmp,rhoi,deltheta
-  real(wp) sendl(mgrid),recvr(mgrid)
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(kind=wp) sendl(mgrid),recvr(mgrid)
+  real(kind=wp) dnitmp(0:mzeta,mgrid)
 
   delr=1.0/deltar 
   delt=2.0*pi/deltat

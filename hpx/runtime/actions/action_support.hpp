@@ -959,6 +959,9 @@ namespace hpx { namespace actions
 #define HPX_ACTION_USES_LARGE_STACK(action)                                   \
     HPX_ACTION_USES_STACK(action, threads::thread_stacksize_large)            \
 /**/
+#define HPX_ACTION_USES_HUGE_STACK(action)                                    \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_huge)             \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_HAS_PRIORITY(action, priority)                             \

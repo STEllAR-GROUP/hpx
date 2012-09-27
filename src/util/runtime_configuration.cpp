@@ -56,6 +56,8 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE) "}",
             "large_stack_size = ${HPX_LARGE_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
+            "huge_stack_size = ${HPX_HUGE_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
             "default_stack_size = $[hpx.small_stack_size]",
 
             "[hpx.threadpools]",
@@ -192,6 +194,7 @@ namespace hpx { namespace util
         small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
         large_stacksize(HPX_LARGE_STACK_SIZE),
+        huge_stacksize(HPX_HUGE_STACK_SIZE),
         need_to_call_pre_initialize(true)
     {
         pre_initialize_ini();
@@ -204,6 +207,7 @@ namespace hpx { namespace util
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
+        huge_stacksize = init_huge_stack_size();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -229,6 +233,7 @@ namespace hpx { namespace util
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
+        huge_stacksize = init_huge_stack_size();
     }
 
     void runtime_configuration::reconfigure(
@@ -253,6 +258,7 @@ namespace hpx { namespace util
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
+        huge_stacksize = init_huge_stack_size();
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -552,6 +558,12 @@ namespace hpx { namespace util
             BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
     }
 
+    std::ptrdiff_t runtime_configuration::init_huge_stack_size() const
+    {
+        return init_stack_size("huge_stack_size", 
+            BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_configuration::load_application_configuration(
         char const* filename, error_code& ec)
@@ -585,6 +597,9 @@ namespace hpx { namespace util
 
         case threads::thread_stacksize_large:
             return large_stacksize;
+
+        case threads::thread_stacksize_huge:
+            return huge_stacksize;
 
         default:
         case threads::thread_stacksize_default:

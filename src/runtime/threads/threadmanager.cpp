@@ -1122,7 +1122,7 @@ namespace hpx { namespace threads
 //             if (!status_is_valid(status) || !f(i, ec) || ec)
 //                 return false;
 //
-//             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_HEAPS; ++t)
+//             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
 //             {
 //                 p.instancename_ = "allocator";
 //                 p.instanceindex_ = static_cast<boost::int32_t>(t);
@@ -1306,7 +1306,7 @@ namespace hpx { namespace threads
             { "count/objects",
               &coroutine_type::impl_type::get_allocation_count_all,
               HPX_STD_BIND(&coroutine_type::impl_type::get_allocation_count, paths.instanceindex_),
-              "allocator", HPX_COROUTINE_NUM_HEAPS
+              "allocator", HPX_COROUTINE_NUM_ALL_HEAPS
             },
         };
         std::size_t const data_size = sizeof(data)/sizeof(data[0]);

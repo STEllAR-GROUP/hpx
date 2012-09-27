@@ -57,34 +57,34 @@ subroutine field(hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
   integer nmode(num_mode),mmode(num_mode)
-  real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
        amp_mode(2,num_mode,2)
-  real(wp),dimension(:),allocatable :: hfluxpsi
-  real(wp),dimension(:,:,:),allocatable :: eigenmode
-  real(wp) etracer,ptracer(4)
+  real(kind=wp),dimension(:),allocatable :: hfluxpsi
+  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+  real(kind=wp) etracer,ptracer(4)
 
 ! particle decomp
   integer  :: ntoroidal,npartdom
@@ -94,7 +94,7 @@ subroutine field(hpx4_bti,&
   integer  :: toroidal_domain_location,particle_domain_location
 
   integer i,ii,ij,j,k,icount,idest,isource,isendtag,irecvtag,ierror,ip,jt
-  real(wp) diffr,difft(0:mpsi),diffz,r,drdp,pleft(mthetamax),pright(mthetamax),&
+  real(kind=wp) diffr,difft(0:mpsi),diffz,r,drdp,pleft(mthetamax),pright(mthetamax),&
        sendl(mgrid),recvr(mgrid),sendr(mgrid),recvl(mgrid),sendrs(3,mgrid),&
        recvls(3,mgrid),q,delq
 

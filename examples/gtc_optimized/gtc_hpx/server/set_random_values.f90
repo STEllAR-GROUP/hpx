@@ -101,7 +101,7 @@ function get_random_number()
   use global_parameters
   use rng_gtc
   implicit none
-  real(wp) :: get_random_number
+  real(kind=wp) :: get_random_number
 
   if(rng_control==0)then
    ! Use Fortran's intrinsic random number generator

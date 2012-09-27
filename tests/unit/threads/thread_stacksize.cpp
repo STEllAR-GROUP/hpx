@@ -86,6 +86,24 @@ HPX_PLAIN_ACTION(test_large_stacksize, test_large_stacksize_action)
 HPX_ACTION_USES_LARGE_STACK(test_large_stacksize_action)
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_huge_stacksize()
+{
+    HPX_TEST(hpx::threads::get_self_ptr()); 
+    // verify that sufficient stack has been allocated
+    HPX_TEST(hpx::threads::get_ctx_ptr()->get_stacksize() >= 
+        hpx::get_runtime().get_config().get_stack_size(
+            hpx::threads::thread_stacksize_huge));
+
+    // allocate HPX_LARGE_STACK_SIZE - management_space memory on the stack 
+    char array[HPX_HUGE_STACK_SIZE-management_space];
+
+    // do something to that array
+    std::memset(array, '\0', sizeof(array));
+}
+HPX_PLAIN_ACTION(test_huge_stacksize, test_huge_stacksize_action)
+HPX_ACTION_USES_HUGE_STACK(test_huge_stacksize_action)
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -96,19 +114,24 @@ int main()
             test_default_stacksize_action test_action;
             test_action(id);
         }
-    
+
         {
             test_small_stacksize_action test_action;
             test_action(id);
         }
-    
+
         {
             test_medium_stacksize_action test_action;
             test_action(id);
         }
-    
+
         {
             test_large_stacksize_action test_action;
+            test_action(id);
+        }
+
+        {
+            test_huge_stacksize_action test_action;
             test_action(id);
         }
     }

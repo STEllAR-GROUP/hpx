@@ -71,28 +71,28 @@ subroutine poisson(iflag,hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
   integer mring,mindex,ierr
   integer,dimension(mgrid,mzeta) :: nindex
   integer,dimension(mindex,mgrid,mzeta) :: indexp
-  real(wp),dimension(mindex,mgrid,mzeta) :: ring        
+  real(kind=wp),dimension(mindex,mgrid,mzeta) :: ring        
   end subroutine poisson_initial
   end interface ! }}}
 
@@ -105,23 +105,23 @@ subroutine poisson(iflag,hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
 ! particle decomp
   integer  :: ntoroidal,npartdom
@@ -133,12 +133,12 @@ subroutine poisson(iflag,hpx4_bti,&
   integer iflag,i,it,ij,j,k,n,iteration,mring,mindex,mtest,ierr
   integer,dimension(:,:),allocatable :: nindex
   integer,dimension(:,:,:),allocatable :: indexp
-  real(wp),dimension(:,:,:),allocatable :: ring
-  real(wp) gamma,tmp,prms,perr(mgrid)
-  real(wp) ptilde(mgrid),phitmp(mgrid),dentmp(mgrid)
+  real(kind=wp),dimension(:,:,:),allocatable :: ring
+  real(kind=wp) gamma,tmp,prms,perr(mgrid)
+  real(kind=wp) ptilde(mgrid),phitmp(mgrid),dentmp(mgrid)
 
   integer :: ipartd,nzeta,izeta1,izeta2
-  real(wp),dimension(:),allocatable :: sendbuf,recvbuf
+  real(kind=wp),dimension(:),allocatable :: sendbuf,recvbuf
 ! hjw
   integer :: nmem
 ! hjw
@@ -332,30 +332,30 @@ subroutine poisson_initial(mring,mindex,nindex,indexp,ring,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
   integer mring,mindex,ierr
   integer,dimension(mgrid,mzeta) :: nindex
   integer,dimension(mindex,mgrid,mzeta) :: indexp
-  real(wp),dimension(mindex,mgrid,mzeta) :: ring        
+  real(kind=wp),dimension(mindex,mgrid,mzeta) :: ring        
   integer i,ii,ij,ij0,ipjt,j,jt,j1,j0,jm,k,kr,kp,nt,np,minn,maxn
-  real(wp) vring(3),fring(3),rgrid,tgrid,ddelr,ddelt,wght,r,rr,t,rdum,wr,&
+  real(kind=wp) vring(3),fring(3),rgrid,tgrid,ddelr,ddelt,wght,r,rr,t,rdum,wr,&
        wt1,wt0,tdum,zdum,b,pi2_inv,delr,delt(0:mpsi)
   
   if(mring==1)then

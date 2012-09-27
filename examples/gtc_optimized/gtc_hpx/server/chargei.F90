@@ -9,11 +9,11 @@ subroutine chargei(ptr)
   TYPE(C_PTR), INTENT(IN), VALUE :: ptr
   integer m,i,im,j,k,ip,jt,kk,ii,j11,j10,j01,j00,ierror,larmor,ij,ipjt,&
        icount,idest,isource,isendtag,irecvtag !,istatus(MPI_STATUS_SIZE)
-  real(wp) weight,wemark,rdum,tdum,delr,delt(0:mpsi),delz,smu_inv,r,wz1,wz0,&
+  real(kind=wp) weight,wemark,rdum,tdum,delr,delt(0:mpsi),delz,smu_inv,r,wz1,wz0,&
        wp1,wp0,wt11,wt10,wt01,wt00,adum(0:mpsi),tflr,damping,pi2_inv,&
        psitmp,thetatmp,zetatmp,rhoi,deltheta
-  real(wp) sendl(mgrid),recvr(mgrid)
-  real(wp) dnitmp(0:mzeta,mgrid)
+  real(kind=wp) sendl(mgrid),recvr(mgrid)
+  real(kind=wp) dnitmp(0:mzeta,mgrid)
 
 #ifdef _OPENMP
 ! We need the following temporary array only when using OpenMP

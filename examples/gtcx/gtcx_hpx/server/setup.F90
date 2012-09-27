@@ -96,18 +96,18 @@
     use precision
     TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
     integer ierror,micell,mecell
-    real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+    real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
 !  global parameters
     integer :: ihistory,snapout,maxmpsi
    integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
         istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
         mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
         ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-   real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+   real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
         flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
         zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
    integer,dimension(:),allocatable :: mtheta
-   real(wp),dimension(:),allocatable :: deltat
+   real(kind=wp),dimension(:),allocatable :: deltat
    logical  do_collision
 
 ! particle decomp
@@ -119,19 +119,19 @@
 
 ! particle_tracking
    integer track_particles,nptrack,isnap
-   real(wp),dimension(:,:,:),allocatable :: ptracked
+   real(kind=wp),dimension(:,:,:),allocatable :: ptracked
    integer,dimension(:),allocatable :: ntrackp
  
 ! diagnosis array
    integer :: mflux,num_mode,m_poloidal
    integer nmode(num_mode),mmode(num_mode)
-   real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+   real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
         entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
         rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
         amp_mode(2,num_mode,2)
-   real(wp),dimension(:),allocatable :: hfluxpsi
-   real(wp),dimension(:,:,:),allocatable :: eigenmode
-   real(wp) etracer,ptracer(4)
+   real(kind=wp),dimension(:),allocatable :: hfluxpsi
+   real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+   real(kind=wp) etracer,ptracer(4)
    end subroutine read_input_params
    subroutine set_particle_decomp(hpx4_bti, &
              t_gids, p_gids,&
@@ -166,11 +166,11 @@
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-    real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+    real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
     integer,dimension(:),allocatable :: mtheta
-    real(wp),dimension(:),allocatable :: deltat
+    real(kind=wp),dimension(:),allocatable :: deltat
     logical  do_collision
 
 ! particle decomp
@@ -189,11 +189,11 @@
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle decomp
@@ -206,43 +206,43 @@
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 
 ! field array
   integer :: mmpsi
   integer,dimension(:),allocatable :: itran,igrid
   integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
+  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
        pmarki,pmarke,zonali,zonale,gradt
-  real(wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
+  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
        markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
-  real(wp) :: Total_field_energy(3)
+  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  real(kind=wp) :: Total_field_energy(3)
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
   integer nmode(num_mode),mmode(num_mode)
-  real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
        amp_mode(2,num_mode,2)
-  real(wp),dimension(:),allocatable :: hfluxpsi
-  real(wp),dimension(:,:,:),allocatable :: eigenmode
-  real(wp) etracer,ptracer(4)
+  real(kind=wp),dimension(:),allocatable :: hfluxpsi
+  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+  real(kind=wp) etracer,ptracer(4)
 
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
   TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
   integer mi_local,me_local
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(kind=wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   CHARACTER(LEN=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -696,18 +696,18 @@ end subroutine setup
     use precision
     TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
     integer ierror,micell,mecell
-    real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+    real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
 !  global parameters
     integer :: ihistory,snapout,maxmpsi
    integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
         istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
         mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
         ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-   real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+   real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
         flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
         zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
    integer,dimension(:),allocatable :: mtheta
-   real(wp),dimension(:),allocatable :: deltat
+   real(kind=wp),dimension(:),allocatable :: deltat
    logical  do_collision
 
 ! particle decomp
@@ -719,26 +719,26 @@ end subroutine setup
 
 ! particle_tracking
    integer track_particles,nptrack,isnap
-   real(wp),dimension(:,:,:),allocatable :: ptracked
+   real(kind=wp),dimension(:,:,:),allocatable :: ptracked
    integer,dimension(:),allocatable :: ntrackp
  
 ! diagnosis array
    integer :: mflux,num_mode,m_poloidal
    integer nmode(num_mode),mmode(num_mode)
-   real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+   real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
         entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
         rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
         amp_mode(2,num_mode,2)
-   real(wp),dimension(:),allocatable :: hfluxpsi
-   real(wp),dimension(:,:,:),allocatable :: eigenmode
-   real(wp) etracer,ptracer(4)
+   real(kind=wp),dimension(:),allocatable :: hfluxpsi
+   real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+   real(kind=wp) etracer,ptracer(4)
    end subroutine broadcast_input_params
   end interface
 
   TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+  real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
   CHARACTER(LEN=10) date, time
 !  global parameters
   integer :: ihistory,snapout,maxmpsi
@@ -746,11 +746,11 @@ end subroutine setup
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle decomp
@@ -762,19 +762,21 @@ end subroutine setup
 
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
-  integer nmode(num_mode),mmode(num_mode)
-  real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  ! Work around for windows
+  integer,parameter :: temp_num_mode=8
+  integer nmode(temp_num_mode),mmode(temp_num_mode)
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
        amp_mode(2,num_mode,2)
-  real(wp),dimension(:),allocatable :: hfluxpsi
-  real(wp),dimension(:,:,:),allocatable :: eigenmode
-  real(wp) etracer,ptracer(4)
+  real(kind=wp),dimension(:),allocatable :: hfluxpsi
+  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+  real(kind=wp) etracer,ptracer(4)
 
   namelist /input_parameters/ irun,mstep,msnap,ndiag,nhybrid,nonlinear,paranl,&
        mode00,tstep,micell,mecell,mpsi,mthetamax,mzetamax,npartdom,&
@@ -965,11 +967,11 @@ end Subroutine read_input_params
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle decomp
@@ -981,29 +983,29 @@ end Subroutine read_input_params
 
 ! particle_tracking
   integer track_particles,nptrack,isnap
-  real(wp),dimension(:,:,:),allocatable :: ptracked
+  real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
 ! diagnosis array
   integer :: mflux,num_mode,m_poloidal
   integer nmode(num_mode),mmode(num_mode)
-  real(wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
        rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
        amp_mode(2,num_mode,2)
-  real(wp),dimension(:),allocatable :: hfluxpsi
-  real(wp),dimension(:,:,:),allocatable :: eigenmode
-  real(wp) etracer,ptracer(4)
+  real(kind=wp),dimension(:),allocatable :: hfluxpsi
+  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+  real(kind=wp) etracer,ptracer(4)
 
 ! other variables
   TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
   integer,parameter :: temp_num_mode = 8
   integer,parameter :: n_integers=20+2*temp_num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  !real(wp) :: real_params(n_reals)
+  !real(kind=wp) :: real_params(n_reals)
   real*8 :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+  real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
 ! The master process, mype=0, holds all the input parameters. We need
 ! to broadcast their values to the other processes. Instead of issuing
 ! an expensive MPI_BCAST() for each parameter, it is better to pack
@@ -1181,11 +1183,11 @@ end subroutine broadcast_input_params
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle decomp

@@ -9,7 +9,7 @@ subroutine smooth(ptr,iflag)
   integer iflag,i,j,k,ii,ij,ip,jt,kz,ismooth,mz,mzmax,mzbig,jpe,indp,indt,&
        indp1,indt1,meachtheta,jtp,icount,ierror,idest,isource,isendtag,&
        irecvtag!,istatus(MPI_STATUS_SIZE)
-  real(wp) sendl(mgrid),sendr(mgrid),recvl(mgrid),recvr(mgrid),phism(mgrid),&
+  real(kind=wp) sendl(mgrid),sendr(mgrid),recvl(mgrid),recvr(mgrid),phism(mgrid),&
        ptemp(mzeta),pleft(mthetamax),pright(mthetamax),phitmp(0:mzeta,mgrid),&
        filter(mtdiag/2+1),wt,r,dt,wz,zdum,tdum,pi2_inv,den00(0:mpsi),&
        phiflux(mtdiag/ntoroidal,mtdiag,idiag1:idiag2),&
@@ -20,8 +20,8 @@ subroutine smooth(ptr,iflag)
 ! the dummy array size for thread-safe FFT assume data array size <16384
   real(doubleprec) :: aux1f(25000),aux1b(25000),aux2f(20000),aux2b(20000)
   real(doubleprec) :: aux3f(1),aux3b(1)
-  real(wp) :: scale
-  real(wp) energy_unit,energy_unit_sq
+  real(kind=wp) :: scale
+  real(kind=wp) energy_unit,energy_unit_sq
 
   scale=1.0_wp
   phitmp=0.

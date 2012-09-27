@@ -36,31 +36,31 @@ subroutine collision(hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 
   integer,parameter :: neop=32,neot=1,neoz=1
 
   integer m,mcell(mi),ip,jt,kz,ierror,k,icount
-  real(wp) delp,delt,delz,b,cost0,q,r,sint,v,xv,zv,vths,vth,vmin,freq,&
+  real(kind=wp) delp,delt,delz,b,cost0,q,r,sint,v,xv,zv,vths,vth,vmin,freq,&
            phix,dphi,f,g,h,sp,sn,dp,dn,dpn,delu,delv2,delm(neop*neot*neoz),&
            dele(neop*neot*neoz),marker(neop*neot*neoz),v3,v5,zeff,&
            ddum(neop*neot*neoz),den_electron,tem_ion,aspecie,psimin,psimax
-  real(wp) maxwell(100001)
-  real(wp) :: r2psi
+  real(kind=wp) maxwell(100001)
+  real(kind=wp) :: r2psi
   
   save maxwell
 

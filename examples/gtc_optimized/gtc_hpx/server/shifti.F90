@@ -11,8 +11,8 @@ subroutine shifti(ptr)
        iright(mimax),ileft(mimax),isendcount,irecvcount,&
        ierror,iteration,lasth
        !istatus(MPI_STATUS_SIZE)
-  real(wp),dimension(:,:),allocatable :: recvleft,recvright,sendleft,sendright
-  real(wp) zetaright,zetaleft,pi_inv
+  real(kind=wp),dimension(:,:),allocatable :: recvleft,recvright,sendleft,sendright
+  real(kind=wp) zetaright,zetaleft,pi_inv
   character(len=8) cdum
 #ifdef _OPENMP
   integer msleft(32,0:15),msright(32,0:15)
