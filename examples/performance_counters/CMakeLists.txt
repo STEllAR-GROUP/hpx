@@ -5,9 +5,16 @@
 
 add_subdirectory(sine)
 
-set(example_programs
-    simplest_performance_counter
-   )
+if(UNIX)
+    set(example_programs
+        simplest_performance_counter
+        mem_counter
+       )
+else()
+    set(example_programs
+        simplest_performance_counter
+       )
+endif()
 
 foreach(example_program ${example_programs})
   set(sources
