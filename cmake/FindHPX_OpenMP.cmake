@@ -39,7 +39,7 @@ else()
     hpx_include(AddConfigTest)
 
     foreach(flag_candidate ${flag_candidates}) 
-      hpx_info("find_package.openmp" "Trying flag '${flag_candidate}'.")
+      hpx_info("find_package.openmp" "Trying flag ${flag_candidate}.")
 
       add_hpx_config_test("openmp" OPENMP_FOUND LANGUAGE CXX
         SOURCE cmake/tests/openmp.cpp

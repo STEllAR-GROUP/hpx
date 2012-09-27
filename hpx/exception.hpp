@@ -69,7 +69,7 @@ namespace hpx
         null_thread_id = 26,
         invalid_data = 27,
         yield_aborted = 28,
-        component_load_failure = 29,
+        dynamic_link_failure = 29,
         commandline_option_error = 30,
         serialization_error = 31,
         unhandled_exception = 32,
@@ -126,7 +126,7 @@ namespace hpx
         "null_thread_id",
         "invalid_data",
         "yield_aborted",
-        "component_load_failure",
+        "dynamic_link_failure",
         "commandline_option_error",
         "serialization_error",
         "unhandled_exception",
@@ -168,6 +168,8 @@ namespace hpx
             }
         };
 
+        struct lightweight_hpx_category : hpx_category {};
+
         // this doesn't add any text to the exception what() message
         class hpx_category_rethrow : public boost::system::error_category
         {
@@ -183,6 +185,8 @@ namespace hpx
             }
         };
 
+        struct lightweight_hpx_category_rethrow : hpx_category_rethrow {};
+
         ///////////////////////////////////////////////////////////////////////
         boost::exception_ptr access_exception(error_code const&);
 
@@ -197,7 +201,7 @@ namespace hpx
         return instance;
     }
 
-    /// \brief Returns generic HPX error category used for errors rethrown
+    /// \brief Returns generic HPX error category used for errors re-thrown
     ///        after the exception has been de-serialized.
     inline boost::system::error_category const& get_hpx_rethrow_category()
     {
@@ -210,23 +214,52 @@ namespace hpx
     enum throwmode
     {
         plain = 0,
-        rethrow = 1
+        rethrow = 1,
+        lightweight = 0x80, // do not generate an exception for this error_code
+        /// \cond NODETAIL
+        lightweight_rethrow = lightweight | rethrow
+        /// \endcond
     };
 
     /// \cond NOINTERNAL
+    inline boost::system::error_category const& 
+    get_lightweight_hpx_category()
+    {
+        static detail::lightweight_hpx_category instance;
+        return instance;
+    }
+
+    inline boost::system::error_category const& get_hpx_category(throwmode mode)
+    {
+        switch(mode) {
+        case rethrow:
+            return get_hpx_rethrow_category();
+
+        case lightweight:
+        case lightweight_rethrow:
+            return get_lightweight_hpx_category();
+
+        case plain:
+        default:
+            break;
+        }
+        return get_hpx_category();
+    }
+
     inline boost::system::error_code
     make_system_error_code(error e, throwmode mode = plain)
     {
-        return boost::system::error_code(static_cast<int>(e),
-            mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
+        
+        return boost::system::error_code(
+            static_cast<int>(e), get_hpx_category(mode));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     inline boost::system::error_condition
     make_error_condition(error e, throwmode mode)
     {
-        return boost::system::error_condition(static_cast<int>(e),
-            mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
+        return boost::system::error_condition(
+            static_cast<int>(e), get_hpx_category(mode));
     }
     /// \endcond
 
@@ -297,8 +330,8 @@ namespace hpx
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        inline error_code(error e, std::string const& func,
-                std::string const& file, long line, throwmode mode = plain);
+        inline error_code(error e, char const* func, char const* file, 
+            long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
         ///
@@ -334,8 +367,8 @@ namespace hpx
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        inline error_code(error e, char const* msg, std::string const& func,
-                std::string const& file, long line, throwmode mode = plain);
+        inline error_code(error e, char const* msg, char const* func,
+                char const* file, long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
         ///
@@ -371,8 +404,8 @@ namespace hpx
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        inline error_code(error e, std::string const& msg, std::string const& func,
-                std::string const& file, long line, throwmode mode = plain);
+        inline error_code(error e, std::string const& msg, char const* func,
+                char const* file, long line, throwmode mode = plain);
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///
@@ -426,8 +459,8 @@ namespace hpx
         return error_code(e, mode);
     }
     inline error_code
-    make_error_code(error e, std::string const& func, std::string const& file,
-        long line, throwmode mode = plain)
+    make_error_code(error e, char const* func, char const* file, long line, 
+        throwmode mode = plain)
     {
         return error_code(e, func, file, line, mode);
     }
@@ -439,8 +472,8 @@ namespace hpx
         return error_code(e, msg, mode);
     }
     inline error_code
-    make_error_code(error e, char const* msg, std::string const& func,
-        std::string const& file, long line, throwmode mode = plain)
+    make_error_code(error e, char const* msg, char const* func,
+        char const* file, long line, throwmode mode = plain)
     {
         return error_code(e, msg, func, file, line, mode);
     }
@@ -452,8 +485,8 @@ namespace hpx
         return error_code(e, msg, mode);
     }
     inline error_code
-    make_error_code(error e, std::string const& msg, std::string const& func,
-        std::string const& file, long line, throwmode mode = plain)
+    make_error_code(error e, std::string const& msg, char const* func,
+        char const* file, long line, throwmode mode = plain)
     {
         return error_code(e, msg, func, file, line, mode);
     }
@@ -672,6 +705,7 @@ namespace hpx
         struct tag_throw_file {};
         struct tag_throw_function {};
         struct tag_throw_stacktrace {};
+        struct tag_throw_env {};
 
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
@@ -732,6 +766,12 @@ namespace hpx
         typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
             throw_stacktrace;
 
+        // Stores the full execution environment of the locality the exception
+        // has been raised in. This information will show up in error messages
+        // under the [env] tag.
+        typedef boost::error_info<detail::tag_throw_env, std::string>
+            throw_env;
+
         // construct an exception, internal helper
         template <typename Exception>
         HPX_EXPORT boost::exception_ptr
@@ -740,7 +780,8 @@ namespace hpx
                 std::string const& back_trace, boost::uint32_t node = 0,
                 std::string const& hostname = "", boost::int64_t pid = -1,
                 std::size_t shepherd = ~0, std::size_t thread_id = 0,
-                std::string const& thread_name = "");
+                std::string const& thread_name = "",
+                std::string const& env = "");
 
         // main function for throwing exceptions
         template <typename Exception>
@@ -1088,35 +1129,36 @@ namespace hpx
     inline error_code::error_code(error e, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success)
+        if (e != success && e != no_success && !(mode & lightweight))
             exception_ = detail::get_exception(hpx::exception(e, "", mode));
     }
 
-    inline error_code::error_code(error e, std::string const& func,
-            std::string const& file, long line, throwmode mode)
+    inline error_code::error_code(error e, char const* func,
+            char const* file, long line, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success) {
+        if (e != success && e != no_success && !(mode & lightweight)) {
+            boost::filesystem::path p(hpx::util::create_path(file));
             exception_ = detail::get_exception(hpx::exception(e, "", mode),
-                func, file, line);
+                func, p.string(), line);
         }
     }
 
     inline error_code::error_code(error e, char const* msg, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success)
+        if (e != success && e != no_success && !(mode & lightweight))
             exception_ = detail::get_exception(hpx::exception(e, msg, mode));
     }
 
     inline error_code::error_code(error e, char const* msg,
-            std::string const& func, std::string const& file, long line,
-            throwmode mode)
+            char const* func, char const* file, long line, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success) {
+        if (e != success && e != no_success && !(mode & lightweight)) {
+            boost::filesystem::path p(hpx::util::create_path(file));
             exception_ = detail::get_exception(hpx::exception(e, msg, mode),
-                func, file, line);
+                func, p.string(), line);
         }
     }
 
@@ -1124,18 +1166,18 @@ namespace hpx
             throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success)
+        if (e != success && e != no_success && !(mode & lightweight))
             exception_ = detail::get_exception(hpx::exception(e, msg, mode));
     }
 
     inline error_code::error_code(error e, std::string const& msg,
-            std::string const& func, std::string const& file, long line,
-            throwmode mode)
+            char const* func, char const* file, long line, throwmode mode)
       : boost::system::error_code(make_system_error_code(e, mode))
     {
-        if (e != success) {
+        if (e != success && e != no_success && !(mode & lightweight)) {
+            boost::filesystem::path p(hpx::util::create_path(file));
             exception_ = detail::get_exception(hpx::exception(e, msg, mode),
-                func, file, line);
+                func, p.string(), line);
         }
     }
 
@@ -1228,9 +1270,10 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
         } else {                                                              \
-            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
             ec = make_error_code(static_cast<hpx::error>(errcode), msg, f,    \
-                p__.string(), __LINE__, hpx::rethrow);                        \
+                __FILE__, __LINE__,                                           \
+                ec.category() == hpx::get_lightweight_hpx_category()) ?       \
+                    hpx::lightweight_rethrow : hpx::rethrow);                 \
         }                                                                     \
     }                                                                         \
     /**/
@@ -1250,9 +1293,10 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);        \
         } else {                                                              \
-            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
             ec = make_error_code(static_cast<hpx::error>(errcode), msg,       \
-                BOOST_CURRENT_FUNCTION, p__.string(), __LINE__);              \
+                BOOST_CURRENT_FUNCTION, __FILE__, __LINE__,                   \
+                (ec.category() == hpx::get_lightweight_hpx_category()) ?      \
+                    hpx::lightweight : hpx::plain);                           \
         }                                                                     \
     }                                                                         \
     /**/
@@ -1262,9 +1306,10 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);      \
         } else {                                                              \
-            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
             ec = make_error_code(static_cast<hpx::error>(errcode), msg,       \
-                BOOST_CURRENT_FUNCTION, p__.string(), __LINE__, hpx::rethrow);\
+                BOOST_CURRENT_FUNCTION, __FILE__, __LINE__,                   \
+                (ec.category() == hpx::get_lightweight_hpx_category()) ?      \
+                    (hpx::lightweight_rethrow) : hpx::rethrow);               \
         }                                                                     \
     }                                                                         \
     /**/
@@ -1322,9 +1367,10 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, f, msg);                             \
         } else {                                                              \
-            boost::filesystem::path p__(hpx::util::create_path(__FILE__));    \
             ec = make_error_code(static_cast<hpx::error>(errcode), msg, f,    \
-                p__.string(), __LINE__);                                      \
+                __FILE__, __LINE__,                                           \
+                (ec.category() == hpx::get_lightweight_hpx_category()) ?      \
+                    hpx::lightweight : hpx::plain);                           \
         }                                                                     \
     }                                                                         \
     /**/

@@ -16,7 +16,7 @@
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-#ifdef BOOST_HAS_DECLSPEC // defined by boost.config
+//#ifdef BOOST_HAS_DECLSPEC // defined by boost.config
 // we need to import/export our code only if the user has specifically
 // asked for it by defining either BOOST_ALL_DYN_LINK if they want all boost
 // libraries to be dynamically linked, or BOOST_BACKTRACE_DYN_LINK
@@ -24,12 +24,12 @@
 #if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_BACKTRACE_DYN_LINK)
 // export if this is our own source, otherwise import:
 #ifdef BOOST_BACKTRACE_SOURCE
-# define BOOST_BACKTRACE_DECL __declspec(dllexport)
+# define BOOST_BACKTRACE_DECL BOOST_SYMBOL_EXPORT
 #else
-# define BOOST_BACKTRACE_DECL __declspec(dllimport)
+# define BOOST_BACKTRACE_DECL BOOST_SYMBOL_IMPORT
 #endif  // BOOST_BACKTRACE_SOURCE
 #endif  // DYN_LINK
-#endif  // BOOST_HAS_DECLSPEC
+//#endif  // BOOST_HAS_DECLSPEC
 //
 // if BOOST_BACKTRACE_DECL isn't defined yet define it now:
 #ifndef BOOST_BACKTRACE_DECL

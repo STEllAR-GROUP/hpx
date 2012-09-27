@@ -16,16 +16,21 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;LANGUAGE"
+    "ESSENTIAL;NOLIBS;NOHPXINIT" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
+  if(NOT ${name}_LANGUAGE)
+    set(${name}_LANGUAGE CXX)
+  endif()
+
   # add the executable build target
   if(NOT MSVC)
-    if(${${name}_ESSENTIAL})
+      if("${${name}_ESSENTIAL}" STREQUAL "TRUE")
       add_executable(${name}_exe
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
@@ -42,6 +47,30 @@ macro(add_hpx_executable name)
     endif()
   endif()
 
+  if(HPX_INTERNAL_CMAKE AND NOT ${name}_OUTPUT_SUFFIX)
+    if(MSVC)
+      set_target_properties(${name}_exe PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELEASE}
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${HPX_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL}
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+    else()
+      set_target_properties(${name}_exe PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY})
+    endif()
+  elseif(${name}_OUTPUT_SUFFIX)
+    if(MSVC)
+      set_target_properties(${name}_exe PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/${${name}_OUTPUT_SUFFIX}
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/${${name}_OUTPUT_SUFFIX}
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/${${name}_OUTPUT_SUFFIX}
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/${${name}_OUTPUT_SUFFIX})
+    else()
+      set_target_properties(${name}_exe PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX})
+    endif()
+  endif()
+
   set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
 
   if(${name}_FOLDER)
@@ -54,10 +83,22 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
-  if(HPX_COMPILE_FLAGS)
-    set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
+  if(${name}_COMPILE_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+  endif()
+
+  if(${name}_LINK_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+  endif()
+
+  if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
+    set_property(TARGET ${name}_exe APPEND
+      PROPERTY COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
+      set_property(TARGET ${name}_exe APPEND
+        PROPERTY LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     endif()
   endif()
 
@@ -69,24 +110,22 @@ macro(add_hpx_executable name)
                                      INSTALL_RPATH ${HPX_RPATH})
   endif()
 
-#  set(libs "")
-
-#  if(NOT MSVC)
-#    set(libs ${BOOST_FOUND_LIBRARIES})
-#  endif()
-
   # linker instructions
   if(NOT ${${name}_NOLIBS})
-    if(HPX_FOUND AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
+    if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
       set(hpx_libs
         hpx${HPX_DEBUG_POSTFIX}
-        hpx_init${HPX_DEBUG_POSTFIX}
         hpx_serialization${HPX_DEBUG_POSTFIX})
+      if(NOT ${${name}_NOHPXINIT})
+        set(hpx_libs ${hpx_libs} hpx_init${HPX_DEBUG_POSTFIX})
+      endif()
     else()
       set(hpx_libs
         hpx
-        hpx_init
         hpx_serialization)
+      if(NOT ${${name}_NOHPXINIT})
+        set(hpx_libs ${hpx_libs} hpx_init)
+      endif()
     endif()
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)

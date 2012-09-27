@@ -18,11 +18,15 @@
 
 /// \cond NOINTERNAL
 
+#if !defined(HPX_MAIN_EXPORT)
+#define HPX_MAIN_EXPORT /**/
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // One of these functions must be implemented by the application for the
 // console locality.
 int hpx_main();
-int hpx_main(int argc, char* argv[]);
+HPX_MAIN_EXPORT int hpx_main(int argc, char* argv[]);
 int hpx_main(boost::program_options::variables_map& vm);
 
 // We support redefining the plain C-main provided by the user to be executed

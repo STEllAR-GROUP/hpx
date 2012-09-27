@@ -438,37 +438,48 @@ module. Here is a code snippet demonstrating this.
 
 [teletype]
 ``
+    # Require a recent version of cmake
+    cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+
+    # This project is C++ based.
+    project(your_app CXX)
+
     # This adds the HPX cmake configuration directory to the search path.
     set(CMAKE_MODULE_PATH
-        $(CMAKE_MODULE_PATH)
-        ${HPX_INSTALL_DIR}/share/cmake-2.8/Modules)
+        ${HPX_ROOT}/share/cmake-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}/Modules)
 
-    # Instruct cmake to find the HPX installation
+    # Instruct cmake to find the HPX settings
     find_package(HPX)
-    IF(HPX_FOUND)
-        # Add a special option to you compiler command line.
-        MESSAGE("HPX was found.")
-    ENDIF()
+
+    include_directories(${HPX_INCLUDE_DIR})
+    link_directories(${HPX_LIBRARY_DIR})
 ``
+
+This cmake script assumes that the location of the HPX installation is set 
+as the value of HPX_ROOT whic is best done by passing it on the command line 
+while invoking cmake:
+
+``
+    cmake -DHPX_ROOT=<HPX installations directory> ...
+``
+
+Alternatively, if you wish to require HPX for your project, replace the
+`find_package(HPX)` line with `find_package(HPX REQUIRED)`.
 
 Now to actually build the application you should have a code snippet similar
 to this in your CMakeLists.txt file:
 
 ``
-    IF(HPX_FOUND)
-        # build your application using HPX
-        add_hpx_executable(your_app
-            ESSENTIAL
-            SOURCES ${your_app_SRCS})
-    ELSE()
-        # build your application with out using HPX
-        add_executable(your_app ${your_app_SRCS})
-    ENDIF()
+    # build your application using HPX
+    add_hpx_executable(your_app
+        ESSENTIAL
+        SOURCES ${your_app_SRCS})
 ``
+
 [c++]
 
 When you configure your application, all you need to do is set the
-HPX_INSTALL_DIR variable to point to the installation of __hpx__! Now all you
+HPX_ROOT variable to point to the installation of __hpx__! Now all you
 have to do is type `make` and the application should build using the __hpx__
 installation you specified.
 

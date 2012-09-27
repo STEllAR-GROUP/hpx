@@ -13,7 +13,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
@@ -65,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_future };
+        enum { value = components::component_promise };
 
         promise()
           : back_ptr_(0)
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace detail
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
         // to associate this component with a given action.
-        enum { value = components::component_future };
+        enum { value = components::component_promise };
 
         promise()
           : back_ptr_(0)

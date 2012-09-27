@@ -13,7 +13,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/util/full_empty_memory.hpp>
+//#include <hpx/lcos/detail/full_empty_memory.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/applier/applier.hpp>

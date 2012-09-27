@@ -228,13 +228,53 @@
 /// This defines the default number of OS-threads created for the different
 /// internal thread pools
 #if !defined(HPX_NUM_IO_POOL_THREADS)
-#define HPX_NUM_IO_POOL_THREADS 2
+#  define HPX_NUM_IO_POOL_THREADS 2
 #endif
 #if !defined(HPX_NUM_PARCEL_POOL_THREADS)
-#define HPX_NUM_PARCEL_POOL_THREADS 2
+#  define HPX_NUM_PARCEL_POOL_THREADS 2
 #endif
 #if !defined(HPX_NUM_TIMER_POOL_THREADS)
-#define HPX_NUM_TIMER_POOL_THREADS 2
+#  define HPX_NUM_TIMER_POOL_THREADS 2
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable minimal thread deadlock detection in debug builds only.
+#if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the parent thread information in debug builds 
+/// only.
+#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the thread description in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_DESCRIPTION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the target address of the data the thread is 
+/// accessing in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default, enable guard pages. 
+#if !defined(HPX_THREAD_GUARD_PAGE)
+#  define HPX_THREAD_GUARD_PAGE 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -275,13 +315,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_WINDOWS)
-#  define HPX_MANGLE_COMPONENT_NAME_PREFIX  libhpx_component_
 #  if defined(HPX_DEBUG)
 #    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      BOOST_PP_CAT(BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n), d)      \
+      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
       /**/
 #    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n + "d"          \
+      "lib" + n + "d"                                                         \
       /**/
 #    define HPX_MANGLE_NAME(n)                                                \
       BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
@@ -291,10 +330,10 @@
       /**/
 #  else
 #    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      BOOST_PP_CAT(HPX_MANGLE_COMPONENT_NAME_PREFIX, n)                       \
+      BOOST_PP_CAT(lib, n)                                                    \
       /**/
 #    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME_PREFIX) + n                \
+      "lib" + n                                                               \
       /**/
 #    define HPX_MANGLE_NAME(n)                                                \
       BOOST_PP_CAT(lib, n)                                                    \
@@ -340,7 +379,7 @@
 #endif
 
 #if !defined(HPX_APPLICATION_NAME)
-#  define HPX_APPLICATION_NAME "unknown HPX application"
+#  define HPX_APPLICATION_NAME unknown_HPX_application
 #endif
 
 #if !defined(HPX_APPLICATION_STRING)
@@ -367,6 +406,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Count number of busy thread manager loop executions before forcefully 
+// cleaning up terminated thread objects
+#if !defined(HPX_BUSY_LOOP_COUNT_MAX)
+#  define HPX_BUSY_LOOP_COUNT_MAX 20000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WRAPPER_HEAP_STEP)
 #  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif
@@ -385,16 +431,29 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_DEFAULT_STACK_SIZE)
+#if !defined(HPX_SMALL_STACK_SIZE)
 #  if defined(BOOST_WINDOWS)
-#    define HPX_DEFAULT_STACK_SIZE 0x4000
+#    define HPX_SMALL_STACK_SIZE 0x4000           // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_DEFAULT_STACK_SIZE 0x10000
+#      define HPX_SMALL_STACK_SIZE 0x10000        // 64kByte
 #    else
-#      define HPX_DEFAULT_STACK_SIZE 0x8000
+#      define HPX_SMALL_STACK_SIZE 0x8000         // 32kByte
 #    endif
 #  endif
+#endif
+
+#if !defined(HPX_DEFAULT_STACK_SIZE)
+#  define HPX_DEFAULT_STACK_SIZE  HPX_SMALL_STACK_SIZE
+#endif
+#if !defined(HPX_MEDIUM_STACK_SIZE)
+#  define HPX_MEDIUM_STACK_SIZE   0x0020000       // 128kByte
+#endif
+#if !defined(HPX_LARGE_STACK_SIZE)
+#  define HPX_LARGE_STACK_SIZE    0x0200000       // 2MByte
+#endif
+#if !defined(HPX_HUGE_STACK_SIZE)
+#  define HPX_HUGE_STACK_SIZE     0x2000000       // 32MByte
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -220,6 +220,7 @@ namespace hpx { namespace components { namespace detail
                 {
                     return naming::invalid_gid;
                 }
+
             }
             return base_gid_ + static_cast<boost::uint64_t>((static_cast<value_type*>(p) - addr));
         }

@@ -75,4 +75,7 @@ hpx_find_package(HDF5_FORTRAN
   HEADER_PATHS include include/fortran ${hdf5_fortran_mod})
 
 # verify thread safety
-hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
+if(HDF5_FOUND)
+  hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
+endif()
+

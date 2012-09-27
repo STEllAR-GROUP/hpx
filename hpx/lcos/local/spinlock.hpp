@@ -54,7 +54,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 if(hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend();
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "spinlock::yield");
                 }
                 else
                 {
@@ -70,7 +71,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(boost::posix_time::microseconds(1));
+                    hpx::this_thread::suspend(
+                        boost::posix_time::microseconds(1), "spinlock::yield");
                 }
                 else
                 {
@@ -96,7 +98,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         spinlock() : v_(0)
         {
-            HPX_ITT_SYNC_CREATE(this, "test::spinlock", "");
+            HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");
         }
 
         spinlock(BOOST_RV_REF(spinlock) rhs)

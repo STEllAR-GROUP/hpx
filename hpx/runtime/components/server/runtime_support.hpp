@@ -135,7 +135,7 @@ namespace hpx { namespace components { namespace server
             runtime_support_load_components = 11,
             runtime_support_call_startup_functions = 12,
             runtime_support_call_shutdown_functions = 13,
-            runtime_support_update_agas_cache = 14,
+            runtime_support_insert_agas_cache_entry = 14,
             runtime_support_garbage_collect = 15,
             runtime_support_create_performance_counter = 16,
             runtime_support_get_instance_count = 17,
@@ -272,7 +272,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Insert the given name mapping into the AGAS cache of this
         ///        locality.
-        void update_agas_cache(naming::gid_type const&, naming::address const&);
+        void insert_agas_cache_entry(naming::gid_type const&, naming::address const&);
 
         /// \brief Load all components on this locality.
         bool load_components();
@@ -381,10 +381,10 @@ namespace hpx { namespace components { namespace server
         > get_config_action;
 
         typedef hpx::actions::action2<
-            runtime_support, runtime_support_update_agas_cache,
+            runtime_support, runtime_support_insert_agas_cache_entry,
             naming::gid_type const&, naming::address const&,
-            &runtime_support::update_agas_cache
-        > update_agas_cache_action;
+            &runtime_support::insert_agas_cache_entry
+        > insert_agas_cache_entry_action;
 
         typedef hpx::actions::action0<
             runtime_support, runtime_support_garbage_collect,
@@ -586,8 +586,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::components::server::runtime_support::update_agas_cache_action,
-    update_agas_cache_action)
+    hpx::components::server::runtime_support::insert_agas_cache_entry_action,
+    insert_agas_cache_entry_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action)

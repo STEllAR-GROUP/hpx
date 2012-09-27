@@ -18,10 +18,13 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/exception.hpp>
+
 namespace hpx { namespace threads
 {
 
-struct topology
+struct linux_topology : topology
 {
     std::size_t get_numa_node_number(
         std::size_t thread_num

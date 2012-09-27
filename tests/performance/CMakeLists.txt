@@ -3,14 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(subdirs statistical)
-
-foreach(subdir ${subdirs})
-    add_hpx_pseudo_target(tests.performance.${subdir})
-    add_subdirectory(${subdir})
-    add_hpx_pseudo_dependencies(tests tests.performance.${subdir})
-endforeach()
-
 set(benchmarks
     boost_tls_overhead
     native_tls_overhead
@@ -20,12 +12,13 @@ set(benchmarks
     hpx_heterogeneous_task_spawn
     print_heterogeneous_payloads
     sizeof
+    function_object_wrapper_overhead
    )
 
 if(MSVC)
   set(boost_library_dependencies)
 else()
-  set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY})
+    set(boost_library_dependencies ${BOOST_PROGRAM_OPTIONS_LIBRARY} ${BOOST_SYSTEM_LIBRARY} ${BOOST_CHRONO_LIBRARY})
 endif()
 
 if(OPENMP_FOUND)
@@ -118,12 +111,12 @@ set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
-      packaged_task_overhead
+      future_overhead
       spinlock_overhead1
       spinlock_overhead2
      )
 
-  set(packaged_task_overhead_FLAGS DEPENDENCIES iostreams_component)
+  set(future_overhead_FLAGS DEPENDENCIES iostreams_component)
 
   set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
 
@@ -160,17 +153,4 @@ if(OPENMP_FOUND)
   set_target_properties(openmp_homogeneous_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_homogeneous_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
-
-add_hpx_executable(util_function
-                   SOURCES util/function.cpp
-                   ${util_function_FLAGS}
-                   FOLDER "Benchmarks/util_function")
-
-add_hpx_pseudo_target(tests.performance.util.function)
-
-add_hpx_pseudo_dependencies(tests.performance
-                            tests.performance.util.function)
-
-add_hpx_pseudo_dependencies(tests.performance.util.function
-                            util.function_exe)
 

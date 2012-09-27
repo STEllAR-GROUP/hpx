@@ -183,7 +183,7 @@ namespace hpx { namespace lcos { namespace server
         void set_event() {}
 
     private:
-        util::full_empty<data_type> data;
+        hpx::lcos::detail::full_empty<data_type> data;
         // TODO: investigate if lockfree fifo would be better that std::vector + spinlock
         lcos::local::spinlock mtx;
         std::vector<naming::id_type> targets;

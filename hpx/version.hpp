@@ -37,8 +37,8 @@
 
 #define HPX_VERSION_TAG          "-trunk"
 
-#if !defined(HPX_SVN_REVISION)
-    #define HPX_SVN_REVISION     "$Revision$"
+#if !defined(HPX_GIT_COMMIT)
+    #define HPX_GIT_COMMIT       "unknown"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,6 +76,9 @@ namespace hpx
 
     // Returns the tag.
     HPX_EXPORT std::string tag();
+
+    // Returns the HPX full build information string.
+    HPX_EXPORT std::string full_build_string();
 
     // Returns the HPX version string.
     HPX_EXPORT std::string build_string();

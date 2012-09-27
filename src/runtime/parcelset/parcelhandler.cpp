@@ -214,7 +214,7 @@ namespace hpx { namespace parcelset
         components::component_type type) const
     {
         std::vector<naming::gid_type> allprefixes;
-        error_code ec;
+        error_code ec(lightweight);
         bool result = resolver_.get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
@@ -228,7 +228,7 @@ namespace hpx { namespace parcelset
         std::vector<naming::gid_type>& locality_ids,
         components::component_type type) const
     {
-        error_code ec;
+        error_code ec(lightweight);
         bool result = resolver_.get_localities(locality_ids, type, ec);
         if (ec || !result) return false;
 

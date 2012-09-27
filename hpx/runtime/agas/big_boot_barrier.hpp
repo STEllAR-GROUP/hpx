@@ -13,11 +13,11 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
-#include <boost/lockfree/fifo.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

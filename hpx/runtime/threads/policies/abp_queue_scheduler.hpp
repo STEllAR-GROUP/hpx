@@ -167,7 +167,7 @@ struct abp_queue_scheduler : boost::noncopyable
     // Return the next thread to be executed, return false if none is available
     // TODO: shouldn't we try to fill the queue before stealing?
     bool get_next_thread(std::size_t num_thread, bool running,
-                         std::size_t& idle_loop_count, threads::thread_data*& thrd)
+                         boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
     {
         BOOST_ASSERT(num_thread < queues_.size());
 
@@ -212,10 +212,10 @@ struct abp_queue_scheduler : boost::noncopyable
     }
 
     /// Destroy the passed thread as it has been terminated
-    bool destroy_thread(threads::thread_data* thrd)
+    bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
     {
         for (std::size_t i = 0; i < queues_.size(); ++i) {
-            if (queues_[i]->destroy_thread(thrd))
+            if (queues_[i]->destroy_thread(thrd, busy_count))
                 return true;
         }
         return false;
@@ -223,7 +223,7 @@ struct abp_queue_scheduler : boost::noncopyable
 
     // Note that this is more like terminate_or_add_new
     bool wait_or_add_new(std::size_t num_thread, bool running,
-                         std::size_t& idle_loop_count)
+                         boost::int64_t& idle_loop_count)
     {
         BOOST_ASSERT(num_thread < queues_.size());
 
@@ -261,6 +261,7 @@ struct abp_queue_scheduler : boost::noncopyable
             if (0 != added) return result;
         }
 
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         // no new work is available, are we deadlocked?
         if (/*0 == num_thread &&*/ LHPX_ENABLED(error)) {
             bool suspended_only = true;
@@ -283,6 +284,7 @@ struct abp_queue_scheduler : boost::noncopyable
                 }
             }
         }
+#endif
         return result;
     }
 

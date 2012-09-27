@@ -318,10 +318,10 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static void
-        update_agas_cache(naming::id_type const& targetgid,
+        insert_agas_cache_entry(naming::id_type const& targetgid,
             naming::gid_type const& gid, naming::address const& g)
         {
-            typedef server::runtime_support::update_agas_cache_action
+            typedef server::runtime_support::insert_agas_cache_entry_action
                 action_type;
             hpx::apply<action_type>(targetgid, gid, g);
         }

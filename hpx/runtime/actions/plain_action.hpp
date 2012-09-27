@@ -25,8 +25,6 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
 
-#include <boost/mpl/identity.hpp>
-
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,21 +38,18 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
 
     // zero argument version
-    template <typename Result, Result (*F)(), typename Derived,
-      threads::thread_priority Priority = threads::thread_priority_default>
+    template <typename Result, Result (*F)(), typename Derived>
     class plain_base_result_action0
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg0, Result, hpx::util::tuple0<>,
-            Derived, Priority>
+            function_result_action_arg0, Result, hpx::util::tuple0<>, Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple0<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg0, result_type, arguments_type,
-            Derived, Priority
+            function_result_action_arg0, result_type, arguments_type, Derived
         > base_type;
 
     protected:
@@ -126,16 +121,15 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, Result (*F)(),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct plain_result_action0
       : plain_base_result_action0<Result, F,
             typename detail::action_type<
-                plain_result_action0<Result, F, Priority>, Derived
-            >::type, Priority>
+                plain_result_action0<Result, F>, Derived
+            >::type>
     {
         typedef typename detail::action_type<
-            plain_result_action0<Result, F, Priority>, Derived
+            plain_result_action0, Derived
         >::type derived_type;
 
         typedef boost::mpl::false_ direct_execution;
@@ -143,9 +137,10 @@ namespace hpx { namespace actions
 
     template <typename Result, Result (*F)(), typename Derived>
     struct make_action<Result (*)(), F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<plain_result_action0<Result, F,
-            threads::thread_priority_default, Derived> >
-    {};
+      : plain_result_action0<Result, F, Derived> 
+    {
+        typedef plain_result_action0<Result, F, Derived> type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, Result (*F)(),
@@ -157,7 +152,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            plain_direct_result_action0<Result, F>, Derived
+            plain_direct_result_action0, Derived
         >::type derived_type;
 
         typedef boost::mpl::true_ direct_execution;
@@ -177,26 +172,27 @@ namespace hpx { namespace actions
 
     template <typename Result, Result (*F)(), typename Derived>
     struct make_action<Result (*)(), F, Derived, boost::mpl::true_>
-      : boost::mpl::identity<plain_direct_result_action0<Result, F, Derived> >
-    {};
+      : plain_direct_result_action0<Result, F, Derived>
+    {
+        typedef plain_direct_result_action0<Result, F, Derived> type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
-    template <void (*F)(), typename Derived,
-      threads::thread_priority Priority = threads::thread_priority_default>
+    template <void (*F)(), typename Derived>
     class plain_base_action0
       : public action<
             components::server::plain_function<Derived>,
             function_action_arg0, util::unused_type, hpx::util::tuple0<>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple0<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg0, result_type, arguments_type,
-            Derived, Priority> base_type;
+            function_action_arg0, result_type, arguments_type, Derived
+        > base_type;
 
     protected:
         /// The \a continuation_thread_function will be registered as the thread
@@ -266,16 +262,13 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)(),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct plain_action0
-      : plain_base_action0<F,
-            typename detail::action_type<
-                plain_action0<F, Priority>, Derived
-            >::type, Priority>
+      : plain_base_action0<
+            F, typename detail::action_type<plain_action0<F>, Derived>::type>
     {
         typedef typename detail::action_type<
-            plain_action0<F, Priority>, Derived
+            plain_action0, Derived
         >::type derived_type;
 
         typedef boost::mpl::false_ direct_execution;
@@ -283,9 +276,10 @@ namespace hpx { namespace actions
 
     template <void (*F)(), typename Derived>
     struct make_action<void (*)(), F, Derived, boost::mpl::false_>
-      : boost::mpl::identity<plain_action0<F, threads::thread_priority_default,
-            Derived> >
-    {};
+      : plain_action0<F, Derived> 
+    {
+        typedef plain_action0<F, Derived> type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)(), typename Derived = detail::this_type>
@@ -296,7 +290,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            plain_direct_action0<F>, Derived
+            plain_direct_action0, Derived
         >::type derived_type;
 
         typedef boost::mpl::true_ direct_execution;
@@ -324,16 +318,16 @@ namespace hpx { namespace actions
 
     template <void (*F)(), typename Derived>
     struct make_action<void(*)(), F, Derived, boost::mpl::true_>
-      : boost::mpl::identity<plain_direct_action0<F, Derived> >
-    {};
+      : plain_direct_action0<F, Derived>
+    {
+        typedef plain_direct_action0<F, Derived> type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // the specialization for void return type is just a template alias
-    template <void (*F)(),
-        threads::thread_priority Priority,
-        typename Derived>
-    struct plain_result_action0<void, F, Priority, Derived>
-        : plain_action0<F, Priority, Derived>
+    template <void (*F)(), typename Derived>
+    struct plain_result_action0<void, F, Derived>
+        : plain_action0<F, Derived>
     {};
 
     /// \endcond
@@ -344,11 +338,10 @@ namespace hpx { namespace actions
 namespace hpx { namespace traits
 {
     /// \cond NOINTERNAL
-    template <void (*F)(), hpx::threads::thread_priority Priority,
-        typename Enable>
+    template <void (*F)(), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_action0<F, Priority> > , Enable>
+                hpx::actions::plain_action0<F, Derived> > , Enable>
       : boost::mpl::false_
     {};
 
@@ -359,11 +352,10 @@ namespace hpx { namespace traits
       : boost::mpl::false_
     {};
 
-    template <typename R, R(*F)(), hpx::threads::thread_priority Priority,
-        typename Enable>
+    template <typename R, R(*F)(), typename Derived, typename Enable>
     struct needs_guid_initialization<
             hpx::actions::transfer_action<
-                hpx::actions::plain_result_action0<R, F, Priority> > , Enable>
+                hpx::actions::plain_result_action0<R, F, Derived> > , Enable>
       : boost::mpl::false_
     {};
 

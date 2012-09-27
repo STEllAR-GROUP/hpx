@@ -221,27 +221,47 @@ void notify_worker(notification_header const& header);
 typedef actions::plain_action1<
     registration_header const&
   , register_console
-  , threads::thread_priority_critical
 > register_console_action;
 
 typedef actions::plain_action1<
     notification_header const&
   , notify_console
-  , threads::thread_priority_critical
 > notify_console_action;
 
 typedef actions::plain_action1<
     registration_header const&
   , register_worker
-  , threads::thread_priority_critical
 > register_worker_action;
 
 typedef actions::plain_action1<
     notification_header const&
   , notify_worker
-  , threads::thread_priority_critical
 > notify_worker_action;
 // }}}
+
+}}
+
+using hpx::agas::register_console_action;
+using hpx::agas::notify_console_action;
+using hpx::agas::register_worker_action;
+using hpx::agas::notify_worker_action;
+
+HPX_ACTION_HAS_CRITICAL_PRIORITY(register_console_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_console_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_action);
+
+HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action,
+    register_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action,
+    notify_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action,
+    register_worker_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action,
+    notify_worker_action, hpx::components::factory_enabled)
+
+namespace hpx { namespace agas
+{
 
 // {{{ early action definitions
 // remote call to AGAS
@@ -548,25 +568,6 @@ void notify_worker(notification_header const& header)
 }
 // }}}
 
-}}
-
-using hpx::agas::register_console_action;
-using hpx::agas::notify_console_action;
-using hpx::agas::register_worker_action;
-using hpx::agas::notify_worker_action;
-
-HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action,
-    register_console_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action,
-    notify_console_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action,
-    register_worker_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action,
-    notify_worker_action, hpx::components::factory_enabled)
-
-namespace hpx { namespace agas
-{
-
 void big_boot_barrier::spin()
 {
     boost::mutex::scoped_lock lock(mtx);
@@ -592,6 +593,7 @@ big_boot_barrier::big_boot_barrier(
                ? (ini_.get_num_localities() - 1)
                : 0)
              : 1)
+  , thunks(16)
 {
     pp_.register_event_handler(boost::bind(&early_parcel_sink, _2));
 }

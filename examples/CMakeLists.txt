@@ -22,6 +22,7 @@ set(subdirs
     fortran_threadsafe
     gtc
     gtc_optimized
+    gtcx
     gravity
     heartbeat
     hplpx
@@ -31,9 +32,11 @@ set(subdirs
     nbody
     nqueen
     object_semaphore
+    oclm_integration
     performance_counters
     queue
     quickstart
+    qt
     random_mem_access
     sheneos
     spell_check

@@ -17,7 +17,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority_value))
+                >::call(priority_value)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1>
     transfer_action(threads::thread_priority priority,
@@ -29,7 +33,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority))
+                >::call(priority)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1 , typename Arg2>
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -40,7 +48,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority_value))
+                >::call(priority_value)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1 , typename Arg2>
     transfer_action(threads::thread_priority priority,
@@ -52,7 +64,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority))
+                >::call(priority)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -63,7 +79,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority_value))
+                >::call(priority_value)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     transfer_action(threads::thread_priority priority,
@@ -75,7 +95,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority))
+                >::call(priority)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -86,7 +110,11 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority_value))
+                >::call(priority_value)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     transfer_action(threads::thread_priority priority,
@@ -98,5 +126,9 @@
           priority_(
                 detail::thread_priority<
                     static_cast<threads::thread_priority>(priority_value)
-                >::call(priority))
+                >::call(priority)),
+          stacksize_(
+              detail::thread_stacksize<
+                  static_cast<threads::thread_stacksize>(stacksize_value)
+              >::call(threads::thread_stacksize_default))
     {}

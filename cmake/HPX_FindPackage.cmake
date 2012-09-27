@@ -33,6 +33,7 @@ macro(hpx_find_headers name)
     endforeach()
 
     if(${name}_ROOT)
+      string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
       find_path(${name}_INCLUDE_DIR
         NAMES ${${name}_HEADERS}
         PATHS ${rooted_header_paths}
@@ -41,7 +42,6 @@ macro(hpx_find_headers name)
       if(NOT ${name}_INCLUDE_DIR)
         hpx_warn("find_headers.${name}" "Header not found in ${${name}_ROOT}, trying system path.")
       else()
-        set(${name}_HEADER_SEARCHED ON CACHE INTERNAL "Searched for ${name} headers.")
         hpx_info("find_headers.${name}" "Header found in ${${name}_ROOT}.")
       endif()
     endif()
@@ -58,11 +58,11 @@ macro(hpx_find_headers name)
           hpx_warn("find_headers.${name}" "Header not found in system path.")
         endif()
       else()
-        set(${name}_HEADER_SEARCHED ON CACHE INTERNAL "Searched for ${name} headers.")
         hpx_info("find_headers.${name}" "Header found in system path.")
       endif()
     endif()
 
+    set(${name}_HEADER_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")
   endif()
 endmacro()
 
@@ -72,6 +72,8 @@ macro(hpx_find_package name)
 
     if(NOT ${name}_ROOT)
       set(${name}_ROOT ${name}_ROOT-NOTFOUND)
+    else()
+      string(REPLACE "\\" "/" ${name}_ROOT ${${name}_ROOT})
     endif()
 
     if(NOT ${name}_LIBRARY)
@@ -99,8 +101,9 @@ macro(hpx_find_package name)
       ${name}_LIBRARY_DIR
       ${name}_INCLUDE_DIR)
 
+    set(${name}_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")
+    set(${name}_HEADER_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")
   else()
-
     if(NOT ${name}_SEARCHED)
       hpx_info("find_package.${name}" "Searching for package ${name}.")
 
@@ -124,7 +127,6 @@ macro(hpx_find_package name)
         if(NOT ${name}_LIBRARY)
           hpx_warn("find_package.${name}" "Library not found in ${${name}_ROOT}, trying system path.")
         else()
-          set(${name}_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")
           hpx_info("find_package.${name}" "Library found in ${${name}_ROOT}.")
         endif()
       endif()
@@ -143,7 +145,6 @@ macro(hpx_find_package name)
             hpx_warn("find_package.${name}" "Library not found in system path.")
           endif()
         else()
-          set(${name}_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")
           hpx_info("find_package.${name}" "Library found in system path.")
         endif()
       endif()
@@ -157,7 +158,7 @@ macro(hpx_find_package name)
         get_filename_component(${name}_ROOT ${${name}_INCLUDE_DIR} PATH)
         get_filename_component(${name}_LIBRARY_DIR ${${name}_LIBRARY} PATH)
 
-        set(${name}_FOUND ${${name}_FOUND} CACHE BOOL "Found ${name}." FORCE)
+        set(${name}_FOUND ON CACHE BOOL "Found ${name}." FORCE)
       else()
         if(NOT ${name}_ROOT)
           set(${name}_ROOT ${name}_ROOT-NOTFOUND)
@@ -184,14 +185,13 @@ macro(hpx_find_package name)
       set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
 
       mark_as_advanced(FORCE
+        ${name}_FOUND
         ${name}_ROOT
         ${name}_LIBRARY
         ${name}_LIBRARY_DIR
         ${name}_INCLUDE_DIR)
-      if(NOT ${name}_FOUND)
-        mark_as_advanced(FORCE ${name}_FOUND)
-      endif()
 
+      set(${name}_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")
     endif()
   endif()
 endmacro()

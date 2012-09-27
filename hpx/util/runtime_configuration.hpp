@@ -88,17 +88,27 @@ namespace hpx { namespace util
         // Returns the command line that this locality was invoked with.
         std::string get_cmd_line() const;
 
-        // Will return the stack size to use for all HPX-threads.
+        // Will return the default stack size to use for all HPX-threads.
         std::ptrdiff_t get_default_stack_size() const
         {
             return default_stacksize;
         }
 
+        // Will return the requested stack size to use for an HPX-threads.
+        std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const;
+
         // Return the configured sizes of any of the know thread pools
         std::size_t get_thread_pool_size(char const* poolname) const;
 
     private:
+        std::ptrdiff_t init_stack_size(char const* entryname, 
+            char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const;
+
         std::ptrdiff_t init_default_stack_size() const;
+        std::ptrdiff_t init_small_stack_size() const;
+        std::ptrdiff_t init_medium_stack_size() const;
+        std::ptrdiff_t init_large_stack_size() const;
+        std::ptrdiff_t init_huge_stack_size() const;
 
         void pre_initialize_ini();
         void post_initialize_ini(std::string const& hpx_ini_file,
@@ -106,6 +116,10 @@ namespace hpx { namespace util
 
     private:
         std::ptrdiff_t default_stacksize;
+        std::ptrdiff_t small_stacksize;
+        std::ptrdiff_t medium_stacksize;
+        std::ptrdiff_t large_stacksize;
+        std::ptrdiff_t huge_stacksize;
         bool need_to_call_pre_initialize;
     };
 }}

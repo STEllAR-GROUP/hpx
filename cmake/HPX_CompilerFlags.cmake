@@ -15,6 +15,8 @@ hpx_include(Message
 macro(hpx_language_suffix var language)
   if(${language} STREQUAL "CXX")
     set(${var} .cpp)
+  elseif(${language} STREQUAL "C")
+    set(${var} .c)
   elseif(${language} STREQUAL "Fortran")
     set(${var} .fpp)
   else()
@@ -83,7 +85,7 @@ macro(hpx_use_flag_if_available flag)
       if(HPX_ROOT)
         set(source_dir "${HPX_ROOT}")
         add_hpx_config_test(${lowercase_name}
-          HPX_${uppercase_language}_FLAG_${uppercase_name}
+          HPX_${language}_FLAG_${uppercase_name}
           DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
           LANGUAGE ${language}
           ROOT ${source_dir}
@@ -92,7 +94,7 @@ macro(hpx_use_flag_if_available flag)
       elseif($ENV{HPX_ROOT})
         set(source_dir "$ENV{HPX_ROOT}")
         add_hpx_config_test(${lowercase_name}
-          HPX_${uppercase_language}_FLAG_${uppercase_name}
+          HPX_${language}_FLAG_${uppercase_name}
           DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
           LANGUAGE ${language}
           ROOT ${source_dir}
@@ -100,17 +102,17 @@ macro(hpx_use_flag_if_available flag)
           FLAGS "${flag}" FILE)
       else()
         add_hpx_config_test(${lowercase_name}
-          HPX_${uppercase_language}_FLAG_${uppercase_name}
+          HPX_${language}_FLAG_${uppercase_name}
           DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
           LANGUAGE ${language}
           SOURCE cmake/tests/flag${language_suffix}
           FLAGS "${flag}" FILE)
       endif()
 
-      if(HPX_${uppercase_language}_FLAG_${uppercase_name})
+      if(HPX_${language}_FLAG_${uppercase_name})
         hpx_append_flag("${flag}" LANGUAGES ${language})
-      else()
-        hpx_warn("use_flag_if_available" "${flag} is unavailable for ${language}")
+      #else()
+      #  hpx_warn("use_flag_if_available" "${flag} is unavailable for ${language}")
       endif()
     endif()
   endforeach()

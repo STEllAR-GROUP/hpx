@@ -15,20 +15,18 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action,
         typename T0,
-        Result (Component::*F)(T0), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        Result (Component::*F)(T0), typename Derived>
     class base_result_action1
       : public action<
             Component, Action, Result,
             hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple1<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority>
+        typedef action<Component, Action, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -108,7 +106,6 @@ namespace hpx { namespace actions
         typename Component, typename Result, int Action,
         typename T0,
         Result (Component::*F)(T0),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct result_action1
       : base_result_action1<
@@ -116,16 +113,12 @@ namespace hpx { namespace actions
             T0, F,
             typename detail::action_type<
                 result_action1<
-                    Component, Result, Action, T0, F,
-                        Priority>,
+                    Component, Result, Action, T0, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            result_action1<
-                Component, Result, Action, T0, F,
-                    Priority>,
-            Derived
+            result_action1, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -134,22 +127,31 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0), typename Derived>
     struct make_action<Result (Component::*)(T0),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action1<
+      : result_action1<
             Component, Result, component_result_action_arg1,
-            T0, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef result_action1<
+            Component, Result, component_result_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0,
         Result (Component::*F)(T0) const, typename Derived>
     struct make_action<Result (Component::*)(T0) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action1<
+      : result_action1<
             Component const, Result,
             component_result_action_arg1,
-            T0, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef result_action1<
+            Component const, Result,
+            component_result_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     
     
     template <
@@ -168,9 +170,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_result_action1<
-                Component, Result, Action, T0, F>,
-                Derived
+            direct_result_action1, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -199,38 +199,48 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0), typename Derived>
     struct make_action<Result (Component::*)(T0),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action1<
+      : direct_result_action1<
             Component, Result, component_result_action_arg1,
-            T0, F, Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef direct_result_action1<
+            Component, Result, component_result_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0,
         Result (Component::*F)(T0) const, typename Derived>
     struct make_action<Result (Component::*)(T0) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action1<
+      : direct_result_action1<
             Component const, Result,
             component_result_action_arg1,
-            T0, F, Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef direct_result_action1<
+            Component const, Result,
+            component_result_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action, typename T0,
-        void (Component::*F)(T0), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        void (Component::*F)(T0), typename Derived>
     class base_action1
       : public action<
             Component, Action, util::unused_type,
             hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple1<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority> base_type;
+        typedef action<Component, Action, result_type, arguments_type, Derived> 
+            base_type;
     protected:
         
         
@@ -308,21 +318,18 @@ namespace hpx { namespace actions
     template <
         typename Component, int Action, typename T0,
         void (Component::*F)(T0),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct action1
       : base_action1<
             Component, Action, T0, F,
             typename detail::action_type<
                 action1<
-                    Component, Action, T0, F, Priority>,
+                    Component, Action, T0, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            action1<
-                Component, Action, T0, F, Priority>,
-            Derived
+            action1, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -330,20 +337,28 @@ namespace hpx { namespace actions
         void (Component::*F)(T0), typename Derived>
     struct make_action<void (Component::*)(T0),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action1<
+      : action1<
             Component, component_action_arg1,
-            T0, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef action1<
+            Component, component_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     template <typename Component, typename T0,
         void (Component::*F)(T0) const, typename Derived>
     struct make_action<void (Component::*)(T0) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action1<
+      : action1<
             Component const, component_action_arg1,
-            T0, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef action1<
+            Component const, component_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     
     template <
         typename Component, int Action, typename T0,
@@ -359,9 +374,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_action1<
-                Component, Action, T0, F>,
-                Derived
+            direct_action1, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -390,30 +403,39 @@ namespace hpx { namespace actions
         void (Component::*F)(T0), typename Derived>
     struct make_action<void (Component::*)(T0),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action1<
+      : direct_action1<
             Component, component_action_arg1,
-            T0, F, Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef direct_action1<
+            Component, component_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     template <typename Component, typename T0,
         void (Component::*F)(T0) const, typename Derived>
     struct make_action<void (Component::*)(T0) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action1<
+      : direct_action1<
             Component const, component_action_arg1,
-            T0, F, Derived> >
-    {};
+            T0, F, Derived>
+    {
+        typedef direct_action1<
+            Component const, component_action_arg1,
+            T0, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action,
         typename T0,
         void (Component::*F)(T0),
-        threads::thread_priority Priority,
         typename Derived>
     struct result_action1<Component, void, Action,
-            T0, F, Priority, Derived>
+            T0, F, Derived>
       : action1<Component, Action,
-            T0, F, Priority, Derived>
+            T0, F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -423,20 +445,18 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action,
         typename T0 , typename T1,
-        Result (Component::*F)(T0 , T1), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        Result (Component::*F)(T0 , T1), typename Derived>
     class base_result_action2
       : public action<
             Component, Action, Result,
             hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple2<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority>
+        typedef action<Component, Action, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -516,7 +536,6 @@ namespace hpx { namespace actions
         typename Component, typename Result, int Action,
         typename T0 , typename T1,
         Result (Component::*F)(T0 , T1),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct result_action2
       : base_result_action2<
@@ -524,16 +543,12 @@ namespace hpx { namespace actions
             T0 , T1, F,
             typename detail::action_type<
                 result_action2<
-                    Component, Result, Action, T0 , T1, F,
-                        Priority>,
+                    Component, Result, Action, T0 , T1, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            result_action2<
-                Component, Result, Action, T0 , T1, F,
-                    Priority>,
-            Derived
+            result_action2, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -542,22 +557,31 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action2<
+      : result_action2<
             Component, Result, component_result_action_arg2,
-            T0 , T1, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef result_action2<
+            Component, Result, component_result_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1,
         Result (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action2<
+      : result_action2<
             Component const, Result,
             component_result_action_arg2,
-            T0 , T1, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef result_action2<
+            Component const, Result,
+            component_result_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     
     
     template <
@@ -576,9 +600,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_result_action2<
-                Component, Result, Action, T0 , T1, F>,
-                Derived
+            direct_result_action2, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -607,38 +629,48 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action2<
+      : direct_result_action2<
             Component, Result, component_result_action_arg2,
-            T0 , T1, F, Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef direct_result_action2<
+            Component, Result, component_result_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1,
         Result (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action2<
+      : direct_result_action2<
             Component const, Result,
             component_result_action_arg2,
-            T0 , T1, F, Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef direct_result_action2<
+            Component const, Result,
+            component_result_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action, typename T0 , typename T1,
-        void (Component::*F)(T0 , T1), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        void (Component::*F)(T0 , T1), typename Derived>
     class base_action2
       : public action<
             Component, Action, util::unused_type,
             hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple2<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority> base_type;
+        typedef action<Component, Action, result_type, arguments_type, Derived> 
+            base_type;
     protected:
         
         
@@ -716,21 +748,18 @@ namespace hpx { namespace actions
     template <
         typename Component, int Action, typename T0 , typename T1,
         void (Component::*F)(T0 , T1),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct action2
       : base_action2<
             Component, Action, T0 , T1, F,
             typename detail::action_type<
                 action2<
-                    Component, Action, T0 , T1, F, Priority>,
+                    Component, Action, T0 , T1, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            action2<
-                Component, Action, T0 , T1, F, Priority>,
-            Derived
+            action2, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -738,20 +767,28 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1), typename Derived>
     struct make_action<void (Component::*)(T0 , T1),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action2<
+      : action2<
             Component, component_action_arg2,
-            T0 , T1, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef action2<
+            Component, component_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action2<
+      : action2<
             Component const, component_action_arg2,
-            T0 , T1, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef action2<
+            Component const, component_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     
     template <
         typename Component, int Action, typename T0 , typename T1,
@@ -767,9 +804,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_action2<
-                Component, Action, T0 , T1, F>,
-                Derived
+            direct_action2, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -798,30 +833,39 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1), typename Derived>
     struct make_action<void (Component::*)(T0 , T1),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action2<
+      : direct_action2<
             Component, component_action_arg2,
-            T0 , T1, F, Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef direct_action2<
+            Component, component_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action2<
+      : direct_action2<
             Component const, component_action_arg2,
-            T0 , T1, F, Derived> >
-    {};
+            T0 , T1, F, Derived>
+    {
+        typedef direct_action2<
+            Component const, component_action_arg2,
+            T0 , T1, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action,
         typename T0 , typename T1,
         void (Component::*F)(T0 , T1),
-        threads::thread_priority Priority,
         typename Derived>
     struct result_action2<Component, void, Action,
-            T0 , T1, F, Priority, Derived>
+            T0 , T1, F, Derived>
       : action2<Component, Action,
-            T0 , T1, F, Priority, Derived>
+            T0 , T1, F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -831,20 +875,18 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action,
         typename T0 , typename T1 , typename T2,
-        Result (Component::*F)(T0 , T1 , T2), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        Result (Component::*F)(T0 , T1 , T2), typename Derived>
     class base_result_action3
       : public action<
             Component, Action, Result,
             hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple3<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority>
+        typedef action<Component, Action, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -924,7 +966,6 @@ namespace hpx { namespace actions
         typename Component, typename Result, int Action,
         typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct result_action3
       : base_result_action3<
@@ -932,16 +973,12 @@ namespace hpx { namespace actions
             T0 , T1 , T2, F,
             typename detail::action_type<
                 result_action3<
-                    Component, Result, Action, T0 , T1 , T2, F,
-                        Priority>,
+                    Component, Result, Action, T0 , T1 , T2, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            result_action3<
-                Component, Result, Action, T0 , T1 , T2, F,
-                    Priority>,
-            Derived
+            result_action3, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -950,22 +987,31 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action3<
+      : result_action3<
             Component, Result, component_result_action_arg3,
-            T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef result_action3<
+            Component, Result, component_result_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action3<
+      : result_action3<
             Component const, Result,
             component_result_action_arg3,
-            T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef result_action3<
+            Component const, Result,
+            component_result_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     
     
     template <
@@ -984,9 +1030,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_result_action3<
-                Component, Result, Action, T0 , T1 , T2, F>,
-                Derived
+            direct_result_action3, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -1015,38 +1059,48 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action3<
+      : direct_result_action3<
             Component, Result, component_result_action_arg3,
-            T0 , T1 , T2, F, Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef direct_result_action3<
+            Component, Result, component_result_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action3<
+      : direct_result_action3<
             Component const, Result,
             component_result_action_arg3,
-            T0 , T1 , T2, F, Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef direct_result_action3<
+            Component const, Result,
+            component_result_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2,
-        void (Component::*F)(T0 , T1 , T2), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        void (Component::*F)(T0 , T1 , T2), typename Derived>
     class base_action3
       : public action<
             Component, Action, util::unused_type,
             hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple3<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority> base_type;
+        typedef action<Component, Action, result_type, arguments_type, Derived> 
+            base_type;
     protected:
         
         
@@ -1124,21 +1178,18 @@ namespace hpx { namespace actions
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct action3
       : base_action3<
             Component, Action, T0 , T1 , T2, F,
             typename detail::action_type<
                 action3<
-                    Component, Action, T0 , T1 , T2, F, Priority>,
+                    Component, Action, T0 , T1 , T2, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            action3<
-                Component, Action, T0 , T1 , T2, F, Priority>,
-            Derived
+            action3, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -1146,20 +1197,28 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action3<
+      : action3<
             Component, component_action_arg3,
-            T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef action3<
+            Component, component_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action3<
+      : action3<
             Component const, component_action_arg3,
-            T0 , T1 , T2, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef action3<
+            Component const, component_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2,
@@ -1175,9 +1234,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_action3<
-                Component, Action, T0 , T1 , T2, F>,
-                Derived
+            direct_action3, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -1206,30 +1263,39 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action3<
+      : direct_action3<
             Component, component_action_arg3,
-            T0 , T1 , T2, F, Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef direct_action3<
+            Component, component_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action3<
+      : direct_action3<
             Component const, component_action_arg3,
-            T0 , T1 , T2, F, Derived> >
-    {};
+            T0 , T1 , T2, F, Derived>
+    {
+        typedef direct_action3<
+            Component const, component_action_arg3,
+            T0 , T1 , T2, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action,
         typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2),
-        threads::thread_priority Priority,
         typename Derived>
     struct result_action3<Component, void, Action,
-            T0 , T1 , T2, F, Priority, Derived>
+            T0 , T1 , T2, F, Derived>
       : action3<Component, Action,
-            T0 , T1 , T2, F, Priority, Derived>
+            T0 , T1 , T2, F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -1239,20 +1305,18 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action,
         typename T0 , typename T1 , typename T2 , typename T3,
-        Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     class base_result_action4
       : public action<
             Component, Action, Result,
             hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple4<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority>
+        typedef action<Component, Action, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1332,7 +1396,6 @@ namespace hpx { namespace actions
         typename Component, typename Result, int Action,
         typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct result_action4
       : base_result_action4<
@@ -1340,16 +1403,12 @@ namespace hpx { namespace actions
             T0 , T1 , T2 , T3, F,
             typename detail::action_type<
                 result_action4<
-                    Component, Result, Action, T0 , T1 , T2 , T3, F,
-                        Priority>,
+                    Component, Result, Action, T0 , T1 , T2 , T3, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            result_action4<
-                Component, Result, Action, T0 , T1 , T2 , T3, F,
-                    Priority>,
-            Derived
+            result_action4, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -1358,22 +1417,31 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action4<
+      : result_action4<
             Component, Result, component_result_action_arg4,
-            T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef result_action4<
+            Component, Result, component_result_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action4<
+      : result_action4<
             Component const, Result,
             component_result_action_arg4,
-            T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef result_action4<
+            Component const, Result,
+            component_result_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     
     
     template <
@@ -1392,9 +1460,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_result_action4<
-                Component, Result, Action, T0 , T1 , T2 , T3, F>,
-                Derived
+            direct_result_action4, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -1423,38 +1489,48 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action4<
+      : direct_result_action4<
             Component, Result, component_result_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef direct_result_action4<
+            Component, Result, component_result_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action4<
+      : direct_result_action4<
             Component const, Result,
             component_result_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef direct_result_action4<
+            Component const, Result,
+            component_result_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2 , typename T3,
-        void (Component::*F)(T0 , T1 , T2 , T3), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     class base_action4
       : public action<
             Component, Action, util::unused_type,
             hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple4<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority> base_type;
+        typedef action<Component, Action, result_type, arguments_type, Derived> 
+            base_type;
     protected:
         
         
@@ -1532,21 +1608,18 @@ namespace hpx { namespace actions
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct action4
       : base_action4<
             Component, Action, T0 , T1 , T2 , T3, F,
             typename detail::action_type<
                 action4<
-                    Component, Action, T0 , T1 , T2 , T3, F, Priority>,
+                    Component, Action, T0 , T1 , T2 , T3, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            action4<
-                Component, Action, T0 , T1 , T2 , T3, F, Priority>,
-            Derived
+            action4, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -1554,20 +1627,28 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action4<
+      : action4<
             Component, component_action_arg4,
-            T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef action4<
+            Component, component_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action4<
+      : action4<
             Component const, component_action_arg4,
-            T0 , T1 , T2 , T3, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef action4<
+            Component const, component_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2 , typename T3,
@@ -1583,9 +1664,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_action4<
-                Component, Action, T0 , T1 , T2 , T3, F>,
-                Derived
+            direct_action4, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -1614,30 +1693,39 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action4<
+      : direct_action4<
             Component, component_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef direct_action4<
+            Component, component_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action4<
+      : direct_action4<
             Component const, component_action_arg4,
-            T0 , T1 , T2 , T3, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3, F, Derived>
+    {
+        typedef direct_action4<
+            Component const, component_action_arg4,
+            T0 , T1 , T2 , T3, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action,
         typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3),
-        threads::thread_priority Priority,
         typename Derived>
     struct result_action4<Component, void, Action,
-            T0 , T1 , T2 , T3, F, Priority, Derived>
+            T0 , T1 , T2 , T3, F, Derived>
       : action4<Component, Action,
-            T0 , T1 , T2 , T3, F, Priority, Derived>
+            T0 , T1 , T2 , T3, F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -1647,20 +1735,18 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     class base_result_action5
       : public action<
             Component, Action, Result,
             hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple5<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority>
+        typedef action<Component, Action, result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1740,7 +1826,6 @@ namespace hpx { namespace actions
         typename Component, typename Result, int Action,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct result_action5
       : base_result_action5<
@@ -1748,16 +1833,12 @@ namespace hpx { namespace actions
             T0 , T1 , T2 , T3 , T4, F,
             typename detail::action_type<
                 result_action5<
-                    Component, Result, Action, T0 , T1 , T2 , T3 , T4, F,
-                        Priority>,
+                    Component, Result, Action, T0 , T1 , T2 , T3 , T4, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            result_action5<
-                Component, Result, Action, T0 , T1 , T2 , T3 , T4, F,
-                    Priority>,
-            Derived
+            result_action5, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -1766,22 +1847,31 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action5<
+      : result_action5<
             Component, Result, component_result_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef result_action5<
+            Component, Result, component_result_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<result_action5<
+      : result_action5<
             Component const, Result,
             component_result_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef result_action5<
+            Component const, Result,
+            component_result_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     
     
     template <
@@ -1800,9 +1890,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_result_action5<
-                Component, Result, Action, T0 , T1 , T2 , T3 , T4, F>,
-                Derived
+            direct_result_action5, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -1831,38 +1919,48 @@ namespace hpx { namespace actions
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action5<
+      : direct_result_action5<
             Component, Result, component_result_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef direct_result_action5<
+            Component, Result, component_result_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     template <typename Component, typename Result,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_result_action5<
+      : direct_result_action5<
             Component const, Result,
             component_result_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef direct_result_action5<
+            Component const, Result,
+            component_result_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived,
-        threads::thread_priority Priority = threads::thread_priority_default>
+        void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     class base_action5
       : public action<
             Component, Action, util::unused_type,
             hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
-            Derived, Priority>
+            Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple5<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority> base_type;
+        typedef action<Component, Action, result_type, arguments_type, Derived> 
+            base_type;
     protected:
         
         
@@ -1940,21 +2038,18 @@ namespace hpx { namespace actions
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4),
-        threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     struct action5
       : base_action5<
             Component, Action, T0 , T1 , T2 , T3 , T4, F,
             typename detail::action_type<
                 action5<
-                    Component, Action, T0 , T1 , T2 , T3 , T4, F, Priority>,
+                    Component, Action, T0 , T1 , T2 , T3 , T4, F>,
                 Derived
-            >::type, Priority>
+            >::type>
     {
         typedef typename detail::action_type<
-            action5<
-                Component, Action, T0 , T1 , T2 , T3 , T4, F, Priority>,
-            Derived
+            action5, Derived
         >::type derived_type;
         typedef boost::mpl::false_ direct_execution;
     };
@@ -1962,20 +2057,28 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action5<
+      : action5<
             Component, component_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef action5<
+            Component, component_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::false_>
-      : detail::make_base_action<action5<
+      : action5<
             Component const, component_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, threads::thread_priority_default,
-            Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef action5<
+            Component const, component_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     
     template <
         typename Component, int Action, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
@@ -1991,9 +2094,7 @@ namespace hpx { namespace actions
             >::type>
     {
         typedef typename detail::action_type<
-            direct_action5<
-                Component, Action, T0 , T1 , T2 , T3 , T4, F>,
-                Derived
+            direct_action5, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
@@ -2022,29 +2123,38 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action5<
+      : direct_action5<
             Component, component_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef direct_action5<
+            Component, component_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4) const,
             F, Derived, boost::mpl::true_>
-      : detail::make_base_action<direct_action5<
+      : direct_action5<
             Component const, component_action_arg5,
-            T0 , T1 , T2 , T3 , T4, F, Derived> >
-    {};
+            T0 , T1 , T2 , T3 , T4, F, Derived>
+    {
+        typedef direct_action5<
+            Component const, component_action_arg5,
+            T0 , T1 , T2 , T3 , T4, F, Derived
+        > type;
+    };
     
     
     template <
         typename Component, int Action,
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4),
-        threads::thread_priority Priority,
         typename Derived>
     struct result_action5<Component, void, Action,
-            T0 , T1 , T2 , T3 , T4, F, Priority, Derived>
+            T0 , T1 , T2 , T3 , T4, F, Derived>
       : action5<Component, Action,
-            T0 , T1 , T2 , T3 , T4, F, Priority, Derived>
+            T0 , T1 , T2 , T3 , T4, F, Derived>
     {};
 }}

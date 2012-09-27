@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/full_empty_memory.hpp>
+#include <hpx/lcos/detail/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
 #include <hpx/util/unlock_lock.hpp>
@@ -315,8 +315,8 @@ namespace hpx { namespace lcos { namespace detail
                             boost::forward<T>(result))));
 
                         // invoke the callback (continuation) function
-                        on_completed_(f);
                         set_on_completed_ = false;
+                        on_completed_(f);
                         on_completed_.reset();
                         return;
                     }
@@ -344,8 +344,8 @@ namespace hpx { namespace lcos { namespace detail
                     data_.set(e);
 
                     // invoke the callback (continuation) function
-                    on_completed_(f);
                     set_on_completed_ = false;
+                    on_completed_(f);
                     on_completed_.reset();
                     return;
                 }
@@ -440,7 +440,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
-        util::full_empty<data_type> data_;
+        detail::full_empty<data_type> data_;
         completed_callback_type on_completed_;
         bool set_on_completed_;
     };

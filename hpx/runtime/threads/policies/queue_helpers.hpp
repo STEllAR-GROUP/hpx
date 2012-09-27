@@ -19,20 +19,26 @@ namespace hpx { namespace threads { namespace policies
 
 struct add_new_tag {};
 
-///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // debug helper function, logs all suspended threads
     // this returns true if all threads in the map are currently suspended
     template <typename Map>
     bool dump_suspended_threads(std::size_t num_thread,
-        Map& tm, std::size_t& idle_loop_count, bool running) HPX_COLD;
+        Map& tm, boost::int64_t& idle_loop_count, bool running) HPX_COLD;
 
     template <typename Map>
     bool dump_suspended_threads(std::size_t num_thread,
-        Map& tm, std::size_t& idle_loop_count, bool running)
+        Map& tm, boost::int64_t& idle_loop_count, bool running)
     {
+#if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+        (void)tm;
+        (void)idle_loop_count;
+        (void)running;
+        return false;
+#else
         if (HPX_LIKELY(idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX))
             return false;
 
@@ -75,8 +81,11 @@ namespace detail
                                     << std::setfill('0') << thrd->get_thread_phase()
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
-                                << ") P" << std::hex << std::setw(8)
+                                << ")"
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+                                << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
+#endif
                                 << ": " << thrd->get_description()
                                 << ": " << thrd->get_lco_description();
                 }
@@ -90,8 +99,11 @@ namespace detail
                                     << std::setfill('0') << thrd->get_thread_phase()
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
-                                << ") P" << std::hex << std::setw(8)
+                                << ")"
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+                                << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
+#endif
                                 << ": " << thrd->get_description()
                                 << ": " << thrd->get_lco_description() << "\n";
                 }
@@ -119,6 +131,7 @@ namespace detail
             }
         }
         return result;
+#endif
     }
 }
 

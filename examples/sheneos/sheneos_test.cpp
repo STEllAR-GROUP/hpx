@@ -415,17 +415,23 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
-        std::vector<hpx::lcos::future<void> > bulk_tests;
+        std::vector<hpx::future<void> > bulk_tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
-            using hpx::async;
-            for (std::size_t i = 0; i < num_workers; ++i)
-                bulk_tests.push_back(async<test_bulk_action>(id,
+            for (std::size_t i = 0; i < num_workers; ++i) 
+            {
+                bulk_tests.push_back(hpx::async<test_bulk_action>(id,
                     num_ye_points, num_temp_points, num_rho_points, seed));
+            }
         }
 
-        hpx::lcos::wait(bulk_tests,
-            boost::bind(wait_for_bulk_task, ::_1, boost::ref(t)));
+        std::size_t i = 0;
+        while (!bulk_tests.empty()) 
+        {
+            HPX_STD_TUPLE<int, hpx::future<void> > r = hpx::wait_any(bulk_tests);
+            bulk_tests.erase(bulk_tests.begin() + HPX_STD_GET(0, r));
+            wait_for_bulk_task(i++, t);
+        }
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
             << std::endl;

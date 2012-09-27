@@ -6,6 +6,7 @@
 add_subdirectory(components)
 
 set(tests
+    local_address_rebind
     scoped_ref_to_local_object
     scoped_ref_to_remote_object
     local_embedded_ref_to_local_object
@@ -20,6 +21,11 @@ set(tests
     credit_exhaustion
     split_credit
    )
+
+set(local_address_rebind_FLAGS
+    DEPENDENCIES simple_mobile_object_component)
+set(local_address_rebind_PARAMETERS
+    THREADS_PER_LOCALITY 4)
 
 set(scoped_ref_to_local_object_FLAGS
     DEPENDENCIES simple_refcnt_checker_component

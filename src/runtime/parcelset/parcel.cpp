@@ -25,7 +25,7 @@ namespace hpx { namespace parcelset
     {
         static boost::atomic<boost::uint64_t> id(0);
 
-        error_code ec;        // ignore all errors
+        error_code ec(lightweight);        // ignore all errors
         boost::uint32_t locality_id = hpx::get_locality_id(ec);
         naming::gid_type result = naming::get_gid_from_locality_id(locality_id);
         result.set_lsb(++id);

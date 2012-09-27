@@ -41,7 +41,7 @@ namespace hpx { namespace naming
 
                     if (get_runtime_ptr())
                     {
-                        error_code ec;
+                        error_code ec(lightweight);
                         // Fire-and-forget semantics.
                         naming::get_agas_client().decref(*p, credits, ec);
                     }

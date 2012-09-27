@@ -60,12 +60,15 @@ namespace hpx {
 
         futures_type futures(boost::size(range));
 
-        if(futures.size() < 2)
+        std::size_t granularity = hpx::get_os_thread_count() == 1 ? 2 : hpx::get_os_thread_count();
+
+        if(futures.size() < granularity)
         {
             std::size_t i = 0;
             BOOST_FOREACH(value_type const & v, range)
             {
                 futures[i] = hpx::async(HPX_STD_BIND(hpx::util::protect(f), v));
+                ++i;
             }
 
             return futures;

@@ -40,8 +40,8 @@
 namespace hpx { namespace util
 {
 
-HPX_ALWAYS_EXPORT void
-portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
+void portable_binary_oarchive::save_impl(
+    const boost::intmax_t l, const char maxsize)
 {
     char size = 0;
     if (l == 0) {
@@ -86,7 +86,7 @@ portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
 #   endif
 #   pragma GCC diagnostic ignored "-Wconversion"
 #endif
-HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
+void portable_binary_oarchive::init(unsigned int flags)
 {
     if (m_flags == (endian_big | endian_little)) {
         BOOST_THROW_EXCEPTION(
@@ -138,6 +138,7 @@ template class HPX_ALWAYS_EXPORT
 
 } // namespace archive
 } // namespace boost
+
 #endif
 
 // explicitly instantiate for this type of stream

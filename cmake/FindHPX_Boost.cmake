@@ -6,6 +6,7 @@
 ################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT BOOST_SEARCHED)
+set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
 
 include(HPX_Utils)
 
@@ -196,7 +197,6 @@ macro(find_boost_library target_lib)
       set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
         CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
       mark_as_advanced(FORCE BOOST_${target_lib_uc}_LIBRARY)
-      set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${target_lib_uc}_LIBRARY})
@@ -227,7 +227,6 @@ macro(find_boost_library target_lib)
       set(BOOST_${target_lib_uc}_LIBRARY ${BOOST_${target_lib_uc}_LIBRARY}
         CACHE FILEPATH "Boost ${target_lib} shared library." FORCE)
       mark_as_advanced(FORCE BOOST_${target_lib_uc}_LIBRARY)
-      set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${target_lib_uc}_LIBRARY})

@@ -60,7 +60,7 @@ namespace hpx { namespace util
             is_started_ = false;
 
             if (id_) {
-                error_code ec;       // avoid throwing on error
+                error_code ec(lightweight);       // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
                     threads::wait_abort, threads::thread_priority_critical, ec);
                 id_ = 0;
