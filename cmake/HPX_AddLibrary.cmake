@@ -20,7 +20,7 @@ macro(add_hpx_library name)
 
   if(NOT ${name}_LANGUAGE)
     set(${name}_LANGUAGE CXX)
-  endif() 
+  endif()
 
   if(NOT ${name}_SOURCE_ROOT)
     set(${name}_SOURCE_ROOT ".")
@@ -157,7 +157,7 @@ macro(add_hpx_library name)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME ${name})
 
-  if(HPX_INTERNAL_CMAKE AND NOT ${name}_OUTPUT_SUFFIX)
+  if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties(${name}_lib PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
