@@ -154,9 +154,11 @@ namespace gtcx { namespace server
         f.get();
 
         // Copy the parameters to the fortran arrays
+        BOOST_ASSERT(intparams_.size() == nint);
         for (std::size_t i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
         }
+        BOOST_ASSERT(realparams_.size() == nreal);
         for (std::size_t i=0;i<realparams_.size();i++) {
           real_params[i] = realparams_[i];
         }
@@ -165,20 +167,11 @@ namespace gtcx { namespace server
         // in a fire and forget fashion
         std::size_t generation = broadcast_gate_.next_generation();
 
-        std::vector<int> intparams;
-        std::vector<double> realparams;
-        intparams.resize(nint);
-        for (int i=0;i<nint;i++) {
-          intparams[i] = integer_params[i];
-        }
-        realparams.resize(nreal);
-        for (int i=0;i<nreal;i++) {
-          realparams[i] = real_params[i];
-        }
+        std::vector<int> intparams(integer_params, integer_params+nint);
+        std::vector<double> realparams(real_params, real_params+nreal);
 
         // eliminate item 0's (the sender's) gid
-        std::vector<hpx::naming::id_type> all_but_root;
-        all_but_root.resize(components_.size()-1);
+        std::vector<hpx::naming::id_type> all_but_root(components_.size()-1);
         for (std::size_t i=0;i<all_but_root.size();i++) {
           all_but_root[i] = components_[i+1];
         }
@@ -217,12 +210,7 @@ namespace gtcx { namespace server
       hpx::future<void> f = allreduce_gate_.get_future(p_comm_.size(),
           &generation);
 
-      std::vector<double> dnisend;
-      dnisend.resize(vsize, 0.0);
-
-      for (std::size_t i=0;i<dnisend.size();i++) {
-        dnisend[i] = dnitmp[i];
-      }
+      std::vector<double> dnisend(dnitmp, dnitmp+vsize);
 
       set_data_action set_data_;
       for (std::size_t i=0;i<p_comm_.size();i++) {
@@ -233,6 +221,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(dnireceive_.size() == vsize);
       for (std::size_t i=0;i<dnireceive_.size();i++) {
         densityi[i] = dnireceive_[i];
       }
@@ -245,6 +234,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(dnireceive_.size() == data.size());
             for (std::size_t i=0;i<dnireceive_.size();i++)
                 dnireceive_[i] += data[i];
         }
@@ -278,12 +268,7 @@ namespace gtcx { namespace server
       hpx::future<void> f = partd_allgather_gate_.get_future(p_comm_.size(),
           &generation);
 
-      std::vector<double> send;
-      send.resize(vsize);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = in[i];
-      }
+      std::vector<double> send(in, in+vsize);
 
       set_partd_allgather_data_action set_partd_allgather_data_;
       for (std::size_t i=0;i<p_comm_.size();i++) {
@@ -294,6 +279,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(partd_allgather_.size() == p_comm_.size()*vsize);
       for (std::size_t i=0;i<partd_allgather_.size();i++) {
         out[i] = partd_allgather_[i];
       }
@@ -306,8 +292,10 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
-            for (std::size_t i=0;i<partd_allgather_.size();i++)
-                partd_allgather_[which*partd_allgather_.size() + i] = data[i];
+            std::size_t vsize = data.size();
+            BOOST_ASSERT(partd_allgather_.size() == p_comm_.size()*vsize);
+            for (std::size_t i=0;i<vsize;i++)
+                partd_allgather_[which*vsize + i] = data[i];
         }
 
         partd_allgather_gate_.set(which);         // trigger corresponding and-gate input
@@ -339,6 +327,8 @@ namespace gtcx { namespace server
         f.get();
 
         // Copy the parameters to the fortran arrays
+        mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(intparams_.size() == nint);
         for (std::size_t i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
         }
@@ -347,15 +337,10 @@ namespace gtcx { namespace server
         // in a fire and forget fashion
         std::size_t generation = broadcast_gate_.next_generation();
 
-        std::vector<int> intparams;
-        intparams.resize(nint);
-        for (int i=0;i<nint;i++) {
-          intparams[i] = integer_params[i];
-        }
+        std::vector<int> intparams(integer_params, integer_params+nint);
 
         // eliminate item 0's (the sender's) gid
-        std::vector<hpx::naming::id_type> all_but_root;
-        all_but_root.resize(components_.size()-1);
+        std::vector<hpx::naming::id_type> all_but_root(components_.size()-1);
         for (std::size_t i=0;i<all_but_root.size();i++) {
           all_but_root[i] = components_[i+1];
         }
@@ -376,6 +361,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(intparams_.size() == intparams.size());
             intparams_ = intparams;
         }
 
@@ -410,6 +396,8 @@ namespace gtcx { namespace server
 
         f.get();
 
+        mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(realparams_.size() == nreal);
         for (std::size_t i=0;i<realparams_.size();i++) {
           real_params[i] = realparams_[i];
         }
@@ -418,15 +406,10 @@ namespace gtcx { namespace server
         // in a fire and forget fashion
         std::size_t generation = broadcast_gate_.next_generation();
 
-        std::vector<double> realparams;
-        realparams.resize(nreal);
-        for (int i=0;i<nreal;i++) {
-          realparams[i] = real_params[i];
-        }
+        std::vector<double> realparams(real_params, real_params+nreal);
 
         // eliminate item 0's (the sender's) gid
-        std::vector<hpx::naming::id_type> all_but_root;
-        all_but_root.resize(components_.size()-1);
+        std::vector<hpx::naming::id_type> all_but_root(components_.size()-1);
         for (std::size_t i=0;i<all_but_root.size();i++) {
           all_but_root[i] = components_[i+1];
         }
@@ -447,6 +430,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(realparams_.size() == realparams.size());
             realparams_ = realparams;
         }
 
@@ -469,45 +453,33 @@ namespace gtcx { namespace server
 
     void partition::toroidal_sndrecv(double *csend,int* csend_size,double *creceive,int *creceive_size,int* dest)
     {
-      // create a new and-gate object
       std::size_t generation = 0;
-      std::vector<double> send;
+      int send_size = *csend_size;
+      int receive_size = *creceive_size;
+      hpx::future<void> f;
 
       {
         mutex_type::scoped_lock l(mtx_);
-
-        int vsize = *csend_size;
-        sndrecv_.resize(vsize);
-        sndrecv_future_ = sndrecv_gate_.get_future(&generation);
-
-        // The sender: send data to the left
-        // in a fire and forget fashion
-        send.resize(vsize);
-
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
-        }
+        sndrecv_.resize(receive_size);
+        f = sndrecv_gate_.get_future(&generation);
       }
 
+      // The sender: send data to the left
+      // in a fire and forget fashion
+      std::vector<double> send(csend, csend+send_size);
+
+      // send message to the left
       set_sndrecv_data_action set_sndrecv_data_;
       hpx::apply(set_sndrecv_data_, components_[t_comm_[*dest]], item_,
           generation, send);
-      {  
-        // Now receive a message from the right
-        mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = sndrecv_future_;
 
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
+      // Now receive a message from the right
+      f.get();
 
-        if ( *creceive_size != sndrecv_.size() ){ 
-          std::cerr << " PROBLEM IN sndrecv!!! size mismatch " << std::endl;
-        }
-        for (std::size_t i=0;i<sndrecv_.size();i++) {
-          creceive[i] = sndrecv_[i];
-        }
+      mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(sndrecv_.size() == receive_size);
+      for (std::size_t i=0;i<sndrecv_.size();i++) {
+        creceive[i] = sndrecv_[i];
       }
     }
 
@@ -517,6 +489,7 @@ namespace gtcx { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         sndrecv_gate_.synchronize(generation, l, "point::set_sndrecv_data");
+        BOOST_ASSERT(sndrecv_.size() == send.size());
         sndrecv_ = send;
         sndrecv_gate_.set();         // trigger corresponding and-gate input
     }
@@ -531,42 +504,32 @@ namespace gtcx { namespace server
 
     void partition::int_toroidal_sndrecv(int *csend,int* csend_size,int *creceive,int *creceive_size,int* dest)
     {
-      // create a new and-gate object
       std::size_t generation = 0;
-      std::vector<int> send;
+      int send_size = *csend_size;
+      int receive_size = *creceive_size;
+      hpx::future<void> f;
 
       {
         mutex_type::scoped_lock l(mtx_);
-
-        int vsize = *csend_size;
-        int_sndrecv_.resize(vsize);
-        int_sndrecv_future_ = int_sndrecv_gate_.get_future(&generation);
-
-        // The sender: send data to the left
-        // in a fire and forget fashion
-        send.resize(vsize);
-
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = csend[i];
-        }
+        int_sndrecv_.resize(receive_size);
+        f = int_sndrecv_gate_.get_future(&generation);
       }
 
+      // The sender: send data to the left
+      // in a fire and forget fashion
+      std::vector<int> send(csend, csend+send_size);
+
+      // send message to the left
       set_int_sndrecv_data_action set_int_sndrecv_data_;
       hpx::apply(set_int_sndrecv_data_, components_[t_comm_[*dest]], item_,
           generation, send);
-      {  
-        // Now receive a message from the right
+
+      // Now receive a message from the right
+      f.get();
+
+      {
         mutex_type::scoped_lock l(mtx_);
-        hpx::future<void> f = int_sndrecv_future_;
-
-        {
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            f.get();
-        }
-
-        if ( *creceive_size != int_sndrecv_.size() ){ 
-          std::cerr << " PROBLEM IN sndrecv!!! size mismatch " << std::endl;
-        }
+        BOOST_ASSERT(int_sndrecv_.size() == receive_size);
         for (std::size_t i=0;i<int_sndrecv_.size();i++) {
           creceive[i] = int_sndrecv_[i];
         }
@@ -579,6 +542,7 @@ namespace gtcx { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         int_sndrecv_gate_.synchronize(generation, l, "point::set_int_sndrecv_data");
+        BOOST_ASSERT(int_sndrecv_.size() == send.size());
         int_sndrecv_ = send;
         int_sndrecv_gate_.set();         // trigger corresponding and-gate input
     }
@@ -603,11 +567,11 @@ namespace gtcx { namespace server
 
       p2p_sendreceive_future_.get();
 
+      mutex_type::scoped_lock l(mtx_);
       if ( p2p_sendreceive_.size() != vsize ) {
         std::cout << " Problem:  receive size doesn't match send size in p2p_receive " << std::endl;
       }
 
-      mutex_type::scoped_lock l(mtx_);
       for (std::size_t i=0;i<p2p_sendreceive_.size();i++) {
         creceive[i] = p2p_sendreceive_[i];
       }
@@ -621,18 +585,16 @@ namespace gtcx { namespace server
 
       // create a new and-gate object
       std::size_t generation = 0;
-      p2p_sendreceive_.resize(vsize);
-      p2p_sendreceive_future_ = p2p_sendreceive_gate_.get_future(&generation);
+      {
+        mutex_type::scoped_lock l(mtx_);
+        p2p_sendreceive_.resize(vsize);
+        p2p_sendreceive_future_ = p2p_sendreceive_gate_.get_future(&generation);
+      }
 
       // Send data to dst
       // The sender: send data to the left
       // in a fire and forget fashion
-      std::vector<double> send;
-      send.resize(vsize);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = csend[i];
-      }
+      std::vector<double> send(csend, csend+vsize);
 
       set_p2p_sendreceive_data_action set_p2p_sendreceive_data_;
       hpx::apply(set_p2p_sendreceive_data_,
@@ -646,12 +608,8 @@ namespace gtcx { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         p2p_sendreceive_gate_.synchronize(generation, l, "point::set_p2p_sendreceive_data");
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            p2p_sendreceive_ = send;
-        }
-
+        BOOST_ASSERT(p2p_sendreceive_.size() == send.size());
+        p2p_sendreceive_ = send;
         p2p_sendreceive_gate_.set();
     }
 
@@ -665,19 +623,18 @@ namespace gtcx { namespace server
       int dest = *tdest;
       int vsize = *size;
       toroidal_reduce_.resize(vsize);
+      std::fill( toroidal_reduce_.begin(),toroidal_reduce_.end(),0.0);
 
       // synchronize with all operations to finish
       std::size_t generation = 0;
-      hpx::future<void> f = toroidal_reduce_gate_.get_future(t_comm_.size(),
-            &generation);
-
-      std::vector<double> send;
-      send.resize(vsize);
-      std::fill( toroidal_reduce_.begin(),toroidal_reduce_.end(),0.0);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = input[i];
+      hpx::future<void> f;
+      if ( myrank_toroidal_ == dest ) {
+        f = toroidal_reduce_gate_.get_future(t_comm_.size(), &generation);
+      } else {
+        generation = toroidal_reduce_gate_.next_generation();
       }
+
+      std::vector<double> send(input, input+vsize);
 
       set_toroidal_reduce_data_action set_toroidal_reduce_data_;
       hpx::apply(set_toroidal_reduce_data_, 
@@ -688,6 +645,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(toroidal_reduce_.size() == vsize);
         for (std::size_t i=0;i<toroidal_reduce_.size();i++) {
           output[i] = toroidal_reduce_[i];
         }
@@ -701,6 +659,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(toroidal_reduce_.size() == data.size());
             for (std::size_t i=0;i<toroidal_reduce_.size();i++)
                 toroidal_reduce_[i] += data[i];
         }
@@ -730,19 +689,19 @@ namespace gtcx { namespace server
       int dest = *tdest;
       int vsize = *size;
       comm_reduce_.resize(vsize);
+      std::fill( comm_reduce_.begin(),comm_reduce_.end(),0.0);
 
       // synchronize with all operations to finish
       std::size_t generation = 0;
-      hpx::future<void> f = comm_reduce_gate_.get_future(components_.size(),
+      hpx::future<void> f;
+      if ( item_ == dest ) {
+        f = comm_reduce_gate_.get_future(components_.size(),
             &generation);
-
-      std::vector<double> send;
-      send.resize(vsize);
-      std::fill( comm_reduce_.begin(),comm_reduce_.end(),0.0);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = input[i];
+      } else {
+        generation = comm_reduce_gate_.next_generation();
       }
+
+      std::vector<double> send(input, input+vsize);
 
       set_comm_reduce_data_action set_comm_reduce_data_;
       hpx::apply(set_comm_reduce_data_, 
@@ -753,6 +712,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(comm_reduce_.size() == vsize);
         for (std::size_t i=0;i<comm_reduce_.size();i++) {
           output[i] = comm_reduce_[i];
         }
@@ -766,6 +726,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(comm_reduce_.size() == data.size());
             for (std::size_t i=0;i<comm_reduce_.size();i++)
                 comm_reduce_[i] += data[i];
         }
@@ -791,19 +752,14 @@ namespace gtcx { namespace server
     {
       int vsize = *size;
       treceive_.resize(vsize);
+      std::fill( treceive_.begin(),treceive_.end(),0.0);
 
       // synchronize with all operations to finish
       std::size_t generation = 0;
       hpx::future<void> f = toroidal_allreduce_gate_.get_future(t_comm_.size(),
             &generation);
 
-      std::vector<double> send;
-      send.resize(vsize);
-      std::fill( treceive_.begin(),treceive_.end(),0.0);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = input[i];
-      }
+      std::vector<double> send(input, input+vsize);
 
       set_tdata_action set_tdata_;
       for (std::size_t i=0;i<t_comm_.size();i++) {
@@ -814,6 +770,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(treceive_.size() == vsize);
       for (std::size_t i=0;i<treceive_.size();i++) {
         output[i] = treceive_[i];
       }
@@ -826,6 +783,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(treceive_.size() == data.size());
             for (std::size_t i=0;i<treceive_.size();i++)
                 treceive_[i] += data[i];
         }
@@ -838,12 +796,13 @@ namespace gtcx { namespace server
       int vsize = *csize;
       int dst = *tdst;
 
+      hpx::future<void> f;
+
       // create a new and-gate object
       std::size_t generation = 0;
       if ( myrank_toroidal_ == dst ) {
         ntoroidal_gather_receive_.resize(t_comm_.size()*vsize);
-        gather_future_ = gather_gate_.get_future(t_comm_.size(),
-            &generation);
+        f = gather_gate_.get_future(t_comm_.size(), &generation);
       }
       else {
         generation = gather_gate_.next_generation();
@@ -852,12 +811,7 @@ namespace gtcx { namespace server
       // Send data to dst
       // The sender: send data to the left
       // in a fire and forget fashion
-      std::vector<double> send;
-      send.resize(vsize);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = csend[i];
-      }
+      std::vector<double> send(csend, csend+vsize);
 
       set_ntoroidal_gather_data_action set_ntoroidal_gather_data_;
       hpx::apply(set_ntoroidal_gather_data_,
@@ -865,9 +819,10 @@ namespace gtcx { namespace server
 
       if ( myrank_toroidal_ == dst ) {
         // synchronize with all operations to finish
-        gather_future_.get();
+        f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(ntoroidal_gather_receive_.size() == vsize);
         for (std::size_t i=0;i<ntoroidal_gather_receive_.size();i++) {
           creceive[i] = ntoroidal_gather_receive_[i];
         }
@@ -882,6 +837,8 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(ntoroidal_gather_receive_.size() == send.size()*t_comm_.size());
+            BOOST_ASSERT(which < t_comm_.size());
             for (std::size_t i=0;i<send.size();i++)
                 ntoroidal_gather_receive_[which*send.size()+i] = send[i];
         }
@@ -894,12 +851,13 @@ namespace gtcx { namespace server
       int vsize = *csize;
       int dst = *tdst;
 
+      hpx::future<void> f;
+
       // create a new and-gate object
       std::size_t generation = 0;
       if ( myrank_toroidal_ == dst ) {
         complex_ntoroidal_gather_receive_.resize(t_comm_.size()*vsize);
-        gather_future_ = gather_gate_.get_future(t_comm_.size(),
-            &generation);
+        f = gather_gate_.get_future(t_comm_.size(), &generation);
       }
       else {
         generation = gather_gate_.next_generation();
@@ -908,12 +866,7 @@ namespace gtcx { namespace server
       // Send data to dst
       // The sender: send data to the left
       // in a fire and forget fashion
-      std::vector<std::complex<double> > send;
-      send.resize(vsize);
-
-      for (std::size_t i=0;i<send.size();i++) {
-        send[i] = csend[i];
-      }
+      std::vector<std::complex<double> > send(csend, csend+vsize);
 
       set_complex_ntoroidal_gather_data_action set_complex_ntoroidal_gather_data_;
       hpx::apply(set_complex_ntoroidal_gather_data_,
@@ -921,9 +874,10 @@ namespace gtcx { namespace server
 
       if ( myrank_toroidal_ == dst ) {
         // synchronize with all operations to finish
-        gather_future_.get();
+        f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(complex_ntoroidal_gather_receive_.size() == vsize);
         for (std::size_t i=0;i<complex_ntoroidal_gather_receive_.size();i++) {
           creceive[i] = complex_ntoroidal_gather_receive_[i];
         }
@@ -938,6 +892,8 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(complex_ntoroidal_gather_receive_.size() == send.size()*t_comm_.size());
+            BOOST_ASSERT(which < t_comm_.size());
             for (std::size_t i=0;i<send.size();i++) {
               complex_ntoroidal_gather_receive_[which*send.size()+i] = send[i];
             }
@@ -949,22 +905,21 @@ namespace gtcx { namespace server
     void partition::ntoroidal_scatter(double *csend, int *csize,double *creceive,int *tsrc)
     {
       int src = *tsrc;
+      hpx::future<void> f;
+
+      int vsize = *csize;
+      ntoroidal_scatter_receive_.resize(vsize);
+
+      std::size_t generation = 0;
+      f = scatter_gate_.get_future(&generation);
+
       if ( t_comm_[src] == item_ ) {
-        // create a new and-gate object
-        std::size_t generation = 0;
-        std::vector<double> send;
-
         mutex_type::scoped_lock l(mtx_);
-
-        int vsize = *csize;
-        ntoroidal_scatter_receive_.resize(vsize);
-
-        scatter_future_ = scatter_gate_.get_future(&generation);
 
         // Send data to everyone in toroidal
         // The sender: send data to the left
         // in a fire and forget fashion
-        send.resize(vsize);
+        std::vector<double> send(vsize);
 
         set_ntoroidal_scatter_data_action set_ntoroidal_scatter_data_;
         for (std::size_t i=0;i<t_comm_.size();i++) {
@@ -974,23 +929,16 @@ namespace gtcx { namespace server
           hpx::apply(set_ntoroidal_scatter_data_,
               components_[t_comm_[i]], myrank_toroidal_, generation, send);
         }
-      } else {
-        scatter_gate_.next_generation();
       }
-        
+
       // synchronize with all operations to finish
+      f.get();
+
       mutex_type::scoped_lock l(mtx_);
-      hpx::future<void> f = scatter_future_;
-
-      {
-          hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-          f.get();
-      }
-
+      BOOST_ASSERT(ntoroidal_scatter_receive_.size() == vsize);
       for (std::size_t i=0;i<ntoroidal_scatter_receive_.size();i++) {
         creceive[i] = ntoroidal_scatter_receive_[i];
       }
-
     }
 
     void partition::set_ntoroidal_scatter_data(std::size_t which,
@@ -999,6 +947,7 @@ namespace gtcx { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
         scatter_gate_.synchronize(generation, l, "point::set_ntoroidal_scatter_data");
+        BOOST_ASSERT(ntoroidal_scatter_receive_.size() == send.size());
         ntoroidal_scatter_receive_ = send;
         scatter_gate_.set();         // trigger corresponding and-gate input
     }
@@ -1008,18 +957,13 @@ namespace gtcx { namespace server
         // synchronize with all operations to finish
         int vsize = *msize;
         comm_allreduce_receive_.resize(vsize);
+        std::fill( comm_allreduce_receive_.begin(),comm_allreduce_receive_.end(),0.0);
 
         std::size_t generation = 0;
         hpx::future<void> f = allreduce_gate_.get_future(components_.size(),
             &generation);
 
-        std::vector<double> send;
-        send.resize(vsize);
-        std::fill( comm_allreduce_receive_.begin(),comm_allreduce_receive_.end(),0.0);
-
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = in[i];
-        }
+        std::vector<double> send(in, in+vsize);
 
         set_comm_allreduce_data_action set_data_;
         for (std::size_t i=0;i<components_.size();i++) {
@@ -1030,6 +974,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(comm_allreduce_receive_.size() == vsize);
         for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
           out[i] = comm_allreduce_receive_[i];
         }
@@ -1042,6 +987,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(comm_allreduce_receive_.size() == data.size());
             for (std::size_t i=0;i<comm_allreduce_receive_.size();i++)
                 comm_allreduce_receive_[i] += data[i];
         }
@@ -1054,18 +1000,13 @@ namespace gtcx { namespace server
         // synchronize with all operations to finish
         int vsize = *msize;
         int_comm_allreduce_receive_.resize(vsize);
+        std::fill( int_comm_allreduce_receive_.begin(),int_comm_allreduce_receive_.end(),0);
 
         std::size_t generation = 0;
         hpx::future<void> f = allreduce_gate_.get_future(components_.size(),
             &generation);
 
-        std::vector<int> send;
-        send.resize(vsize);
-        std::fill( int_comm_allreduce_receive_.begin(),int_comm_allreduce_receive_.end(),0);
-
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = in[i];
-        }
+        std::vector<int> send(in, in+vsize);
 
         set_int_comm_allreduce_data_action set_data_;
         for (std::size_t i=0;i<components_.size();i++) {
@@ -1076,7 +1017,8 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
-        for (std::size_t i=0;i<comm_allreduce_receive_.size();i++) {
+        BOOST_ASSERT(int_comm_allreduce_receive_.size() == vsize);
+        for (std::size_t i=0;i<int_comm_allreduce_receive_.size();i++) {
           out[i] = int_comm_allreduce_receive_[i];
         }
     }
@@ -1088,6 +1030,7 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
+            BOOST_ASSERT(int_comm_allreduce_receive_.size() == data.size());
             for (std::size_t i=0;i<int_comm_allreduce_receive_.size();i++)
                 int_comm_allreduce_receive_[i] += data[i];
         }
@@ -1123,12 +1066,7 @@ namespace gtcx { namespace server
         hpx::future<void> f = allreduce_gate_.get_future(components_.size(),
             &generation);
 
-        std::vector<int> send;
-        send.resize(vsize);
-
-        for (std::size_t i=0;i<send.size();i++) {
-          send[i] = in[i];
-        }
+        std::vector<int> send(in, in+vsize);
 
         set_int_comm_allgather_data_action set_allgather;
         for (std::size_t i=0;i<components_.size();i++) {
@@ -1139,6 +1077,7 @@ namespace gtcx { namespace server
         f.get();
 
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(int_comm_allgather_receive_.size() == vsize);
         for (std::size_t i=0;i<int_comm_allgather_receive_.size();i++) {
           out[i] = int_comm_allgather_receive_[i];
         }
@@ -1151,7 +1090,9 @@ namespace gtcx { namespace server
 
         {
             mutex_type::scoped_lock l(mtx_);
-            std::size_t vsize = int_comm_allgather_receive_.size();
+            std::size_t vsize = data.size();
+            BOOST_ASSERT(int_comm_allgather_receive_.size() == data.size()*components_.size());
+            BOOST_ASSERT(which < components_.size());
             for (std::size_t i=0;i<vsize;i++)
                 int_comm_allgather_receive_[which*vsize + i] = data[i];
         }

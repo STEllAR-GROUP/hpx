@@ -51,6 +51,12 @@
 #include <hpx/util/coroutine/detail/noreturn.hpp>
 #include <boost/assert.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_COROUTINE_NUM_ALL_HEAPS (HPX_COROUTINE_NUM_HEAPS +                \
+    HPX_COROUTINE_NUM_HEAPS/2 + HPX_COROUTINE_NUM_HEAPS/4 +                   \
+    HPX_COROUTINE_NUM_HEAPS/4)                                                \
+/**/
+
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   /////////////////////////////////////////////////////////////////////////////
@@ -59,16 +65,16 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   {
       allocation_counters()
       {
-          for(std::size_t i = 0; i < HPX_COROUTINE_NUM_HEAPS; ++i)
+          for(std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i)
               m_allocation_counter[i].store(0);
       }
 
       boost::atomic_uint64_t& get(std::size_t i)
       {
-          return m_allocation_counter[i % HPX_COROUTINE_NUM_HEAPS];
+          return m_allocation_counter[i % HPX_COROUTINE_NUM_ALL_HEAPS];
       }
 
-      boost::atomic_uint64_t m_allocation_counter[HPX_COROUTINE_NUM_HEAPS];
+      boost::atomic_uint64_t m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -376,7 +382,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static boost::uint64_t get_allocation_count_all()
     {
         boost::uint64_t count = 0;
-        for (std::size_t i = 0; i < HPX_COROUTINE_NUM_HEAPS; ++i)
+        for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i)
             count += m_allocation_counters.get(i).load();
         return count;
     }
@@ -384,6 +390,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
         return m_allocation_counters.get(heap_num).load();
     }
+
     static boost::uint64_t increment_allocation_count(std::size_t heap_num)
     {
         return ++m_allocation_counters.get(heap_num);

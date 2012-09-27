@@ -8,7 +8,7 @@ subroutine restart_write
   character(len=18) cdum
   character(len=10) restart_dir
   character(len=60) file_name
-  real(wp) dum
+  real(kind=wp) dum
   integer i,j,mquantity,mflx,n_mode,mstepfinal,noutputs
   integer save_restart_files,ierr
 

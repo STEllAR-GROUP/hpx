@@ -44,20 +44,20 @@ subroutine shifti(hpx4_bti,&
        istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
        mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
        ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
+  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
        flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
        zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(wp),dimension(:),allocatable :: deltat
+  real(kind=wp),dimension(:),allocatable :: deltat
   logical  do_collision
 
 ! particle array
   integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
   integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
+  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
        wtelectron0,wtelectron1
-  real(wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
-  real(wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 
 ! particle decomp
@@ -71,8 +71,8 @@ subroutine shifti(hpx4_bti,&
        kzi(mimax),m0,msend,mrecv,idest,isource,isendtag,irecvtag,nzion,&
        iright(mimax),ileft(mimax),isendcount,irecvcount,&
        ierror,iteration,lasth
-  real(wp),dimension(:,:),allocatable :: recvleft,recvright,sendleft,sendright
-  real(wp) zetaright,zetaleft,pi_inv
+  real(kind=wp),dimension(:,:),allocatable :: recvleft,recvright,sendleft,sendright
+  real(kind=wp) zetaright,zetaleft,pi_inv
   character(len=8) cdum
 
   if(numberpe==1)return

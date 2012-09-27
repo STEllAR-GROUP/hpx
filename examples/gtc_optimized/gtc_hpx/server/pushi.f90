@@ -10,7 +10,7 @@ subroutine pushi(ptr)
 
   integer i,im,ip,j,jt,k,kz,kk,m,ii,j11,j10,j01,j00,jtheta,num,ierror,&
        larmor,ij,ipjt
-  real(wp) cost0,sint0,cost,sint,rdum,tdum,dtime,q,r,b,g,gp,ri,rip,dbdp,dbdt,&
+  real(kind=wp) cost0,sint0,cost,sint,rdum,tdum,dtime,q,r,b,g,gp,ri,rip,dbdp,dbdt,&
        dedb,deni,upara,energy,kappa,dptdp,dptdt,dptdz,vdr,pdot,tdot,zdot,rdot,&
        wdot,wdrift,vdrenergy,delr,pi2,pi2_inv,uleft,uright,adum(0:mpsi),&
        dmark(mflux),pstat,xdum,ydum,xdot,ydot,tem_inv,wz1,wz0,wp1,wp0,wt11,&
@@ -19,8 +19,8 @@ subroutine pushi(ptr)
        ainv,rinv,qinv,psitmp,thetatmp,zetatmp,rhoi,e1,e2,e3,cmratio,cinv,&
        wpi(3,mi),rdel,vthi,dtem(mflux),dden(mflux),ddentmp(mflux),&
        dtemtmp(mflux),vdrtmp(mflux),dmarktmp(mflux),hfluxpsitmp(0:mpsi)
-  real(wp) Epsi,Etheta,Ezeta,En_field(3),zdum,drdp,grad_zeta,jacobian,dphi_square(3)
-  real(wp) sum_of_weights,total_sum_of_weights,residual_weight
+  real(kind=wp) Epsi,Etheta,Ezeta,En_field(3),zdum,drdp,grad_zeta,jacobian,dphi_square(3)
+  real(kind=wp) sum_of_weights,total_sum_of_weights,residual_weight
   integer  mi_total,conserve_particles
 
   limit_vpara=0   ! limit_vpara=1 :  parallel velocity kept <= abs(umax)

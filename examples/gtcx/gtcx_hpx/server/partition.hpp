@@ -140,24 +140,24 @@ namespace gtcx { namespace server
         std::size_t left_pe_,right_pe_;
 
         and_gate_type allreduce_gate_;     // synchronization gates
-        and_gate_type allgather_gate_;  
-        hpx::lcos::local::trigger sndleft_gate_;
-        hpx::future<void> sndleft_future_;
-        hpx::lcos::local::trigger sndright_gate_;
-        hpx::future<void> sndright_future_;
+        and_gate_type allgather_gate_;
+//        hpx::lcos::local::trigger sndleft_gate_;
+//        hpx::future<void> sndleft_future_;
+//        hpx::lcos::local::trigger sndright_gate_;
+//        hpx::future<void> sndright_future_;
         and_gate_type gather_gate_;
-        hpx::future<void> gather_future_;
+//        hpx::future<void> gather_future_;
         hpx::lcos::local::trigger scatter_gate_;
-        hpx::future<void> scatter_future_;
+//        hpx::future<void> scatter_future_;
         and_gate_type broadcast_gate_;
-        hpx::future<void> sndrecv_future_;
+//        hpx::future<void> sndrecv_future_;
         hpx::lcos::local::trigger sndrecv_gate_;
         and_gate_type toroidal_allreduce_gate_; 
         and_gate_type toroidal_reduce_gate_; 
         and_gate_type comm_reduce_gate_; 
         hpx::future<void> p2p_sendreceive_future_;
         hpx::lcos::local::trigger p2p_sendreceive_gate_;
-        hpx::future<void> int_sndrecv_future_;
+//        hpx::future<void> int_sndrecv_future_;
         hpx::lcos::local::trigger int_sndrecv_gate_;
         and_gate_type partd_allgather_gate_;
 
@@ -185,7 +185,7 @@ namespace gtcx { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_ACTION_USES_LARGE_STACK(gtcx::server::partition::loop_action);
+HPX_ACTION_USES_HUGE_STACK(gtcx::server::partition::loop_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     gtcx::server::partition::loop_action,
     gtcx_point_loop_action);

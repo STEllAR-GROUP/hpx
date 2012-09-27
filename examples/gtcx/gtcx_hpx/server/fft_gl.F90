@@ -2,8 +2,8 @@ subroutine fftr1d(isign,irank,scale,x,y,icount)
   use precision
   implicit none
   integer, intent(in) :: isign,irank,icount
-  real(wp), intent(in) :: scale
-  real(wp), intent(inout), dimension(0:irank-1) :: x
+  real(kind=wp), intent(in) :: scale
+  real(kind=wp), intent(inout), dimension(0:irank-1) :: x
   complex(wp), intent(inout), dimension(0:irank/2) :: y
 
   if (icount.gt.0.and.icount.le.3) then
@@ -21,7 +21,7 @@ subroutine fftc1d(isign,irank,scale,x)
   use precision
   implicit none
   integer, intent(in) :: isign,irank
-  real(wp), intent(in) :: scale
+  real(kind=wp), intent(in) :: scale
   complex(wp), intent(inout), dimension(0:irank-1) :: x
   complex(wp),  dimension(0:irank-1) :: y
 
@@ -39,8 +39,8 @@ Subroutine r2cfftgl(isign,n,scale,rin,cout)
   use precision
   implicit none
   integer,intent(in) :: n,isign
-  real(wp),intent(in) :: rin(n)
-  real(wp),intent(in) :: scale
+  real(kind=wp),intent(in) :: rin(n)
+  real(kind=wp),intent(in) :: scale
   complex(wp),intent(out) :: cout(n/2+1)  
   integer i
   complex(wp),dimension(n) :: fdata,dwork
@@ -66,9 +66,9 @@ Subroutine c2rfftgl(isign,n,scale,cin,rout)
   use precision
   implicit none
   integer,intent(in) :: isign,n
-  real(wp),intent(in) :: scale
+  real(kind=wp),intent(in) :: scale
   complex(wp),intent(in) :: cin(n/2+1)
-  real(wp),intent(out) :: rout(n)  
+  real(kind=wp),intent(out) :: rout(n)  
   integer i
   complex(wp),dimension(n) :: fdata,dwork
   
@@ -102,7 +102,7 @@ Subroutine c2cfftgl(isign,n,scale,cin,cout)
   complex(wp),intent(in),dimension(n) :: cin
   complex(wp),intent(out),dimension(n) :: cout
   complex(wp),dimension(n) :: dwork
-  real(wp) :: cfac,scale
+  real(kind=wp) :: cfac,scale
   integer i
   
   cout=cin
@@ -159,7 +159,7 @@ SUBROUTINE SPCFFT(U,N,ISIGN,WORK,INTERP)
     I,        &  ! DO loop index.
     ISIGN        ! sign of transform
 
-  REAL(wp)    &
+  real(kind=wp)    &
     INTERP       ! interpolation factor
 
   COMPLEX(wp) &

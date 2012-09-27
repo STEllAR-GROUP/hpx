@@ -227,7 +227,8 @@ namespace hpx
             thread_stacksize_minimal = 1,       ///< use minimally possible stack size (default)
             thread_stacksize_small = thread_stacksize_minimal,  ///< use small stack size 
             thread_stacksize_medium = 2,        ///< use medium sized stack size
-            thread_stacksize_large = 3          ///< use large stack size
+            thread_stacksize_large = 3,         ///< use large stack size
+            thread_stacksize_huge = 4           ///< use very large stack size
         };
 
         ///////////////////////////////////////////////////////////////////////

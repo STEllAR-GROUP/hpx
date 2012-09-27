@@ -390,25 +390,31 @@ private:
     typedef coroutine_heap<coroutine_impl_wrapper, Heap> heap_type;
 
   private:
-    struct heap_tag {};
+    struct heap_tag_small {};
+    struct heap_tag_medium {};
+    struct heap_tag_large {};
+    struct heap_tag_huge {};
 
-    template <std::size_t NumHeaps>
+    template <std::size_t NumHeaps, typename Tag>
     static heap_type& get_heap(std::size_t i)
     {
         // ensure thread-safe initialization
-        static_<heap_type, heap_tag, NumHeaps> heap;
+        static_<heap_type, Tag, NumHeaps> heap;
         return heap.get(i);
     }
 
     static heap_type& get_heap(std::size_t i, ptrdiff_t stacksize)
     {
-        if (stacksize > HPX_MEDIUM_STACK_SIZE)
-            return get_heap<HPX_COROUTINE_NUM_HEAPS/4>(i % (HPX_COROUTINE_NUM_HEAPS/4));
+        if (stacksize > HPX_MEDIUM_STACK_SIZE) {
+            if (stacksize > HPX_LARGE_STACK_SIZE)
+                return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS/4));
 
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS/4));
+        }
         if (stacksize > HPX_SMALL_STACK_SIZE)
-            return get_heap<HPX_COROUTINE_NUM_HEAPS/2>(i % (HPX_COROUTINE_NUM_HEAPS/2));
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/2, heap_tag_medium>(i % (HPX_COROUTINE_NUM_HEAPS/2));
 
-        return get_heap<HPX_COROUTINE_NUM_HEAPS>(i % HPX_COROUTINE_NUM_HEAPS);
+        return get_heap<HPX_COROUTINE_NUM_HEAPS, heap_tag_small>(i % HPX_COROUTINE_NUM_HEAPS);
     }
 
   public:
