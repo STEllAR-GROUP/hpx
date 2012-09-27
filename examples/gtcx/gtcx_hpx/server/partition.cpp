@@ -465,6 +465,7 @@ namespace gtcx { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
+      BOOST_ASSERT(sndrecv_.size() == receive_size);
       for (std::size_t i=0;i<sndrecv_.size();i++) {
         creceive[i] = sndrecv_[i];
       }
@@ -516,6 +517,7 @@ namespace gtcx { namespace server
 
       {
         mutex_type::scoped_lock l(mtx_);
+        BOOST_ASSERT(int_sndrecv_.size() == receive_size);
         for (std::size_t i=0;i<int_sndrecv_.size();i++) {
           creceive[i] = int_sndrecv_[i];
         }
