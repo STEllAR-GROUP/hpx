@@ -32,7 +32,7 @@ end module particle_decomp
   integer i,j,k,ierror,ij,mid_theta,ip,jt,indp,indt,mtest,micell,mecell
   integer mi_local,me_local,hpx_left_pe, hpx_right_pe, hpx_mstep
   integer hpx_numberpe,hpx_mype,hpx_npartdom,hpx_ntoroidal
-  real(wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
+  real(kind=wp) r0,b0,temperature,tdum,r,q,sint,dtheta_dx,rhoi,b,zdum,&
        edensity0,delr,delt,rmax,rmin,wt,tau_vth,zeff
   CHARACTER(LEN=10) date, time
   namelist /run_parameters/ numberpe,mi,mgrid,mid_theta,mtdiag,delr,delt,&
@@ -51,7 +51,7 @@ end module particle_decomp
     use diagnosis_array
     TYPE(C_PTR), INTENT(IN), VALUE :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+    real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
     end subroutine read_input_params
   end interface
 
@@ -393,7 +393,7 @@ end subroutine setup
   TYPE(C_PTR), INTENT(IN), VALUE :: ptr
   logical file_exist
   integer ierror,micell,mecell
-  real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+  real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
   CHARACTER(LEN=10) date, time
 
 #ifdef _OPENMP
@@ -417,7 +417,7 @@ end subroutine setup
     use diagnosis_array
     TYPE(C_PTR), INTENT(IN), VALUE :: ptr
     integer ierror,micell,mecell
-    real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+    real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
     end subroutine broadcast_input_params
   end interface
 !
@@ -555,9 +555,9 @@ end Subroutine read_input_params
   TYPE(C_PTR), INTENT(IN), VALUE :: ptr
   integer,parameter :: n_integers=20+2*num_mode,n_reals=28
   integer  :: integer_params(n_integers)
-  real(wp) :: real_params(n_reals)
+  real(kind=wp) :: real_params(n_reals)
   integer ierror,micell,mecell
-  real(wp),intent(INOUT) :: r0,b0,temperature,edensity0
+  real(kind=wp),intent(INOUT) :: r0,b0,temperature,edensity0
 
 ! The master process, mype=0, holds all the input parameters. We need
 ! to broadcast their values to the other processes. Instead of issuing

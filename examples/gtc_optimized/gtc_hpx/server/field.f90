@@ -9,7 +9,7 @@ subroutine fieldr(ptr)
 
   integer i,ii,ij,j,k,icount,idest,isource,isendtag,irecvtag,ierror,ip,jt !,&
        !istatus(MPI_STATUS_SIZE)
-  real(wp) diffr,difft(0:mpsi),diffz,r,drdp,pleft(mthetamax),pright(mthetamax),&
+  real(kind=wp) diffr,difft(0:mpsi),diffz,r,drdp,pleft(mthetamax),pright(mthetamax),&
        sendl(mgrid),recvr(mgrid),sendr(mgrid),recvl(mgrid),sendrs(3,mgrid),&
        recvls(3,mgrid),q,delq
 

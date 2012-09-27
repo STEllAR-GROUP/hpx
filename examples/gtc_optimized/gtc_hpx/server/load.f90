@@ -7,9 +7,9 @@ subroutine load
   implicit none
 
   integer i,m,ierr
-  real(wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
+  real(kind=wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
-  real(wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
+  real(kind=wp) :: w_initial,energy,momentum,r,rmi,pi2_inv,delr,ainv,vthe,tsqrt,&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! Initialize random number generator
