@@ -907,7 +907,7 @@ namespace hpx { namespace actions
         HPX_REGISTER_ACTION_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
     )(__VA_ARGS__))                                                           \
 /**/
-#define HPX_REGISTER_ACTION_DECLARATION_1(action, actionname)                 \
+#define HPX_REGISTER_ACTION_DECLARATION_1(action)                             \
     HPX_REGISTER_ACTION_DECLARATION_2(action, action)                         \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_2(action, actionname)                 \
