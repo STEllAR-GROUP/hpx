@@ -27,82 +27,82 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(gtc_point_type, gtc_point);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::init_action,
     gtc_point_init_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::load_action,
     gtc_point_load_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::chargei_action,
     gtc_point_chargei_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_densityi_action,
     gtc_point_get_densityi_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_zonali_action,
     gtc_point_get_zonali_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::smooth_action,
     gtc_point_smooth_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_phi_action,
     gtc_point_get_phi_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_eachzeta_action,
     gtc_point_get_eachzeta_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::field_action,
     gtc_point_field_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_evector_action,
     gtc_point_get_evector_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::pushi_action,
     gtc_point_pushi_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_dden_action,
     gtc_point_get_dden_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_dtem_action,
     gtc_point_get_dtem_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::shifti_action,
     gtc_point_shifti_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_msend_action,
     gtc_point_get_msend_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_msendright_action,
     gtc_point_get_msendright_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_sendright_action,
     gtc_point_get_sendright_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_msendleft_action,
     gtc_point_get_msendleft_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::get_sendleft_action,
     gtc_point_get_sendleft_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_point_type::wrapped_type::poisson_action,
     gtc_point_poisson_action);

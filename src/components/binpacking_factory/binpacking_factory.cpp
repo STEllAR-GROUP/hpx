@@ -27,10 +27,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE(binpacking_factory_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the binpacking_factory actions
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     binpacking_factory_type::create_components_action,
     binpacking_factory_create_components_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     binpacking_factory_type::create_components_counterbased_action,
     binpacking_factory_create_components_counterbased_action)
 

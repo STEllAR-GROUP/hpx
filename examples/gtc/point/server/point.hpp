@@ -455,83 +455,83 @@ namespace gtc { namespace server
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::init_action,
               gtc_point_init_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::load_action,
               gtc_point_load_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::chargei_action,
               gtc_point_chargei_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_densityi_action,
               gtc_point_get_densityi_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_zonali_action,
               gtc_point_get_zonali_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::smooth_action,
               gtc_point_smooth_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_phi_action,
               gtc_point_get_phi_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_eachzeta_action,
               gtc_point_get_eachzeta_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::field_action,
               gtc_point_field_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_evector_action,
               gtc_point_get_evector_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::pushi_action,
               gtc_point_pushi_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_dden_action,
               gtc_point_get_dden_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_dtem_action,
               gtc_point_get_dtem_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::shifti_action,
               gtc_point_shifti_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_msend_action,
               gtc_point_get_msend_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_msendright_action,
               gtc_point_get_msendright_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_sendright_action,
               gtc_point_get_sendright_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_msendleft_action,
               gtc_point_get_msendleft_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::get_sendleft_action,
               gtc_point_get_sendleft_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::point::poisson_action,
               gtc_point_poisson_action)
 

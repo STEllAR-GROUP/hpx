@@ -199,7 +199,7 @@ namespace hpx { namespace components
         state)                                                                \
     BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<plain_action>,      \
         BOOST_PP_STRINGIZE(plain_action_name))                                \
-    HPX_REGISTER_ACTION_EX(plain_action, plain_action_name)                   \
+    HPX_REGISTER_ACTION(plain_action, plain_action_name)                   \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \
         plain_action_name)                                                    \

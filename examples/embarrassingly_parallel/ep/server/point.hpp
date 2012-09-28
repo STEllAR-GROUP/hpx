@@ -58,7 +58,7 @@ namespace ep { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ep::server::point::bfs_action,
     ep_point_bfs_action);
 #endif

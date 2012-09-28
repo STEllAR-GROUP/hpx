@@ -274,55 +274,55 @@ namespace graph500 { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::init_action,
     graph500_point_init_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::root_action,
     graph500_point_root_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::ppedge_action,
     graph500_point_ppedge_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::findwhohasthisedge_action,
     graph500_point_findwhohasthisedge_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::receive_duplicates_action,
     graph500_point_receive_duplicates_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::get_parent_action,
     graph500_point_get_parent_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::bfs_action,
     graph500_point_bfs_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::resolve_conflict_action,
     graph500_point_resolve_conflict_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::get_numedges_action,
     graph500_point_get_numedges_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::distributed_validate_action,
     graph500_point_distributed_validate_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     graph500::server::point::has_edge_action,
     graph500_point_has_edge_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,
     get_value_action_vector_size_t);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_value_action,
     set_value_action_vector_size_t);
 

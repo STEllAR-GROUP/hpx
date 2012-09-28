@@ -140,13 +140,13 @@ namespace hpx { namespace lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the base LCO actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::set_event_action, base_set_event_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, base_set_exception_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::connect_action, base_connect_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::disconnect_action, base_disconnect_action)
 
 #endif

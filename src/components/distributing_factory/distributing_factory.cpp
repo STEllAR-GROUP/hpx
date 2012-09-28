@@ -23,10 +23,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE(distributing_factory_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the distributing_factory actions
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     distributing_factory_type::create_components_action,
     distributing_factory_create_components_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     distributing_factory_type::create_partitioned_action,
     distributing_factory_create_partitioned_action)
 

@@ -26,7 +26,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_EX(
     hpx::components::factory_disabled)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     simple_refcnt_checker::take_reference_action,
     simple_refcnt_checker_take_reference_action);
 

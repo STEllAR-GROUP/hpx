@@ -66,7 +66,7 @@ struct HPX_COMPONENT_EXPORT simple_refcnt_checker
 
 }}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_refcnt_checker::take_reference_action,
     simple_refcnt_checker_take_reference_action);
 

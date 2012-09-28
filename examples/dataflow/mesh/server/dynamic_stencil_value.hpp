@@ -164,19 +164,19 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 }}}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::dynamic_stencil_value::call_action,
     dataflow_dynamic_stencil_value_double_call_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::dynamic_stencil_value::get_output_ports_action,
     dataflow_dynamic_stencil_value_double_get_output_ports_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::dynamic_stencil_value::connect_input_ports_action,
     dataflow_dynamic_stencil_value_double_connect_input_ports_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::dynamic_stencil_value::set_functional_component_action,
     dataflow_dynamic_stencil_value_double_set_functional_component_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::dynamic_stencil_value::start_action,
     dataflow_dynamic_stencil_value_double_start_action);
 

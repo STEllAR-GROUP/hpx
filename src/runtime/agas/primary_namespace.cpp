@@ -25,14 +25,14 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     primary_namespace, component_agas_primary_namespace)
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     primary_namespace::service_action,
     primary_namespace_service_action)
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     primary_namespace::route_action,
     primary_namespace_route_action)

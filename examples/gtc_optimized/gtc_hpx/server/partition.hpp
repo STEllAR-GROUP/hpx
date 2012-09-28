@@ -150,63 +150,63 @@ namespace gtc { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::setup_action,
     gtc_point_setup_action);
 
 // ensure sufficient stack space for chargei_action
 HPX_ACTION_USES_LARGE_STACK(gtc::server::partition::timeloop_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::timeloop_action,
     gtc_point_timeloop_action);
 
 // ensure sufficient stack space for timeloop_action
 HPX_ACTION_USES_LARGE_STACK(gtc::server::partition::chargei_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::chargei_action,
     gtc_point_chargei_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_data_action,
     gtc_point_set_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_tdata_action,
     gtc_point_set_tdata_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_params_action,
     gtc_point_set_params_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_sendleft_data_action,
     gtc_point_set_sendleft_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_sendright_data_action,
     gtc_point_set_sendright_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_toroidal_gather_data_action,
     gtc_point_set_toroidal_gather_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_toroidal_scatter_data_action,
     gtc_point_set_toroidal_scatter_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_comm_allreduce_data_action,
     gtc_point_set_comm_allreduce_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_int_comm_allreduce_data_action,
     gtc_point_set_int_comm_allreduce_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_int_sendright_data_action,
     gtc_point_set_int_sendright_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtc::server::partition::set_int_sendleft_data_action,
     gtc_point_set_int_sendleft_data_action);
 

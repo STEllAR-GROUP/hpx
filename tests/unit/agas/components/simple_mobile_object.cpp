@@ -26,7 +26,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::factory_disabled)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     simple_mobile_object::get_lva_action,
     simple_mobile_object_get_lva_action);
 

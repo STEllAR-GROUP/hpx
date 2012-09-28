@@ -26,23 +26,23 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(gtc_particle_type, gtc_particle);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_particle_type::wrapped_type::init_action,
     gtc_particle_init_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_particle_type::wrapped_type::chargei_action,
     gtc_particle_chargei_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_particle_type::wrapped_type::distance_action,
     gtc_particle_distance_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_particle_type::wrapped_type::get_index_action,
     gtc_particle_get_index_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtc_particle_type::wrapped_type::get_densityi_action,
     gtc_particle_get_densityi_action);
 

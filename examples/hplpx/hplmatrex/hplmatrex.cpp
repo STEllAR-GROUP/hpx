@@ -22,18 +22,18 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hplmatrex);
 
 //Register the actions
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::construct_action,HPLconstruct_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::assign_action,HPLassign_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::solve_action,HPLsolve_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::search_action,HPLsearch_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::swap_action,HPLswap_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::partbsub_action,HPLpartbsub_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::hplmatrex::check_action,HPLcheck_action);
 

@@ -48,16 +48,16 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(nbody_global_solve_type, global_solve_t);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for global_solve actions.
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     nbody_global_solve_type::wrapped_type::init_action,
     global_solve_init_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     nbody_global_solve_type::wrapped_type::run_action,
     global_solve_run_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     nbody_global_solve_type::wrapped_type::report_action,
     global_solve_report_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     nbody_global_solve_type::wrapped_type::calc_action,
     global_solve_calculate_action);
 //HPX_DEFINE_GET_COMPONENT_TYPE(nbody_global_solve_type::wrapped_type);

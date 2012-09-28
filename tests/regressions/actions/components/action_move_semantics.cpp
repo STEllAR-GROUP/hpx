@@ -26,29 +26,29 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::factory_disabled)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::test_movable_action,
     action_move_semantics_test_movable_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::test_non_movable_action,
     action_move_semantics_test_non_movable_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::test_movable_direct_action,
     action_move_semantics_test_movable_direct_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::test_non_movable_direct_action,
     action_move_semantics_test_non_movable_direct_action)
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::return_test_movable_action,
     action_move_semantics_return_test_movable_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::return_test_non_movable_action,
     action_move_semantics_return_test_non_movable_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::return_test_movable_direct_action,
     action_move_semantics_return_test_movable_direct_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::test::server::action_move_semantics::return_test_non_movable_direct_action,
     action_move_semantics_return_test_non_movable_direct_action)
 

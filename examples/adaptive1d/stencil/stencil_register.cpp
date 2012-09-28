@@ -46,4 +46,4 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<adaptive1d_logging_type>, adaptive1d_logging);
 
-HPX_REGISTER_ACTION_EX(adaptive1d_logging_type::logentry_action, adaptive1d_logentry_action);
+HPX_REGISTER_ACTION(adaptive1d_logging_type::logentry_action, adaptive1d_logentry_action);

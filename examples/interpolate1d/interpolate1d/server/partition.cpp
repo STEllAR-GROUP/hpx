@@ -68,9 +68,9 @@ typedef interpolate1d::server::partition partition_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(partition_type::init_action,
+HPX_REGISTER_ACTION(partition_type::init_action,
     partition_init_action);
-HPX_REGISTER_ACTION_EX(partition_type::interpolate_action,
+HPX_REGISTER_ACTION(partition_type::interpolate_action,
     partition_interpolate_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(

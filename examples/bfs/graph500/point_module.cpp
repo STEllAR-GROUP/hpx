@@ -27,47 +27,47 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(graph500_point_type, graph500_point);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::init_action,
     graph500_point_init_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::root_action,
     graph500_point_root_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::ppedge_action,
     graph500_point_ppedge_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::findwhohasthisedge_action,
     graph500_point_findwhohasthisedge_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::receive_duplicates_action,
     graph500_point_receive_duplicates_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::get_parent_action,
     graph500_point_get_parent_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::bfs_action,
     graph500_point_bfs_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::resolve_conflict_action,
     graph500_point_resolve_conflict_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::distributed_validate_action,
     graph500_point_distributed_validate_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::get_numedges_action,
     graph500_point_get_numedges_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     graph500_point_type::wrapped_type::has_edge_action,
     graph500_point_has_edge_action);
 
@@ -75,10 +75,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >,
     hpx::components::component_base_lco_with_value);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,
     get_value_action_vector_size_t);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_value_action,
     set_value_action_vector_size_t);

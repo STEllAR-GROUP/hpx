@@ -138,11 +138,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
 }}}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::adaptive1d::server::functional_component::alloc_data_action,
+HPX_REGISTER_ACTION_DECLARATION(hpx::components::adaptive1d::server::functional_component::alloc_data_action,
     adaptive1d_dataflow_functional_component_alloc_data_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::adaptive1d::server::functional_component::eval_action,
+HPX_REGISTER_ACTION_DECLARATION(hpx::components::adaptive1d::server::functional_component::eval_action,
     adaptive1d_dataflow_functional_component_eval_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::adaptive1d::server::functional_component::init_action,
+HPX_REGISTER_ACTION_DECLARATION(hpx::components::adaptive1d::server::functional_component::init_action,
     adaptive1d_dataflow_functional_component_init_action);
 
 #endif

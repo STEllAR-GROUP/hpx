@@ -38,7 +38,7 @@ typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_trigger_type, dataflow_trigger,
     "hpx::lcos::server::dataflow")
 
-// HPX_REGISTER_ACTION_EX(
+// HPX_REGISTER_ACTION(
 //     hpx::lcos::server::dataflow_trigger::init_action
 //   , dataflow_trigger_type_init_action
 // )

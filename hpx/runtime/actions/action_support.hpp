@@ -40,6 +40,7 @@
 #  include <boost/typeof/typeof.hpp>
 #endif
 #include <boost/utility/enable_if.hpp>
+#include <boost/preprocessor/cat.hpp>
 
 #include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/runtime/get_lva.hpp>
@@ -52,6 +53,7 @@
 #include <hpx/util/base_object.hpp>
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
@@ -854,7 +856,15 @@ namespace hpx { namespace actions
     }}}                                                                       \
 /**/
 
-#define HPX_REGISTER_ACTION_EX(action, actionname)                            \
+#define HPX_REGISTER_ACTION_(...)                                             \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_ACTION_1(action)                                         \
+    HPX_REGISTER_ACTION_2(action, action)                                     \
+/**/
+#define HPX_REGISTER_ACTION_2(action, actionname)                             \
     BOOST_CLASS_EXPORT_IMPLEMENT(hpx::actions::transfer_action<action>)       \
     HPX_REGISTER_BASE_HELPER(hpx::actions::transfer_action<action>, actionname) \
     HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                         \
@@ -891,7 +901,16 @@ namespace hpx { namespace actions
         }                                                                     \
     }}}                                                                       \
 /**/
-#define HPX_REGISTER_ACTION_DECLARATION_EX(action, actionname)                \
+
+#define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_ACTION_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_1(action, actionname)                 \
+    HPX_REGISTER_ACTION_DECLARATION_2(action, action)                         \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_2(action, actionname)                 \
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)                  \
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(                         \
         hpx::actions::transfer_action<action>)                                \
@@ -997,6 +1016,13 @@ namespace hpx { namespace actions
 ///
 /// The parameter \a action is the type of the action to declare the
 /// boilerplate for.
+/// 
+/// This macro can be invoked with an optional second parameter. This parameter
+/// specifies a unique name of the action to be used for serialization purposes. 
+/// The second parameter has to be specified if the first parameter is not 
+/// usable as a plain (non-qualified) C++ identifier, i.e. the first parameter
+/// contains special characters which cannot be part of a C++ identifier, such 
+/// as '<', '>', or ':'. 
 ///
 /// \par Example:
 ///
@@ -1026,8 +1052,8 @@ namespace hpx { namespace actions
 /// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
 /// be visible in all translation units using the action, thus it is
 /// recommended to place it into the header file defining the component.
-#define HPX_REGISTER_ACTION_DECLARATION(action)                               \
-    HPX_REGISTER_ACTION_DECLARATION_EX(action, action)                        \
+#define HPX_REGISTER_ACTION_DECLARATION(...)                                  \
+    HPX_REGISTER_ACTION_DECLARATION_(__VA_ARGS__)                             \
 /**/
 
 /// \def HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(template, action)
@@ -1101,6 +1127,13 @@ namespace hpx { namespace actions
 ///
 /// The parameter \a action is the type of the action to define the
 /// boilerplate for.
+/// 
+/// This macro can be invoked with an optional second parameter. This parameter
+/// specifies a unique name of the action to be used for serialization purposes. 
+/// The second parameter has to be specified if the first parameter is not 
+/// usable as a plain (non-qualified) C++ identifier, i.e. the first parameter
+/// contains special characters which cannot be part of a C++ identifier, such 
+/// as '<', '>', or ':'. 
 ///
 /// \note This macro has to be used once for each of the component actions
 /// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
@@ -1108,8 +1141,8 @@ namespace hpx { namespace actions
 /// place it into the source file defining the component. There is no need
 /// to use this macro for actions which have template type arguments (see
 /// \a HPX_REGISTER_ACTION_DECLARATION_TEMPLATE)
-#define HPX_REGISTER_ACTION(action)                                           \
-    HPX_REGISTER_ACTION_EX(action, action)                                    \
+#define HPX_REGISTER_ACTION(...)                                              \
+    HPX_REGISTER_ACTION_(__VA_ARGS__)                                         \
 /**/
 
 #endif

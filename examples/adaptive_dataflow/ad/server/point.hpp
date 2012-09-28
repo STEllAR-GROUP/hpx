@@ -104,19 +104,19 @@ namespace ad { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ad::server::point::init_action,
     ad_point_init_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ad::server::point::compute_action,
     ad_point_compute_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ad::server::point::get_item_action,
     ad_point_get_item_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ad::server::point::remove_item_action,
     ad_point_remove_item_action);
 #endif

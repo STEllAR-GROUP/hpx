@@ -153,7 +153,7 @@ namespace jacobi
     }
 }
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::solver::run_action
   , jacobi_server_solver_run_action
 )

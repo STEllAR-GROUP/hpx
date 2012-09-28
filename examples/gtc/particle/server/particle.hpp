@@ -164,23 +164,23 @@ namespace gtc { namespace server
 #pragma warning(pop)
 #endif
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::particle::init_action,
               gtc_particle_init_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::particle::chargei_action,
               gtc_particle_chargei_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::particle::distance_action,
               gtc_particle_distance_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::particle::get_index_action,
               gtc_particle_get_index_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
               gtc::server::particle::get_densityi_action,
               gtc_particle_get_densityi_action)
 

@@ -29,11 +29,11 @@ HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type)
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the remote_object actions
 /*
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::remote_object_apply_action<void>,
     remote_object_apply_action_void);
 */
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     remote_object_type::set_dtor_action,
     remote_object_set_dtor_action)
 

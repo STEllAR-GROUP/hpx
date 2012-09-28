@@ -77,12 +77,12 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the binpacking_factory actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::binpacking_factory::create_components_action
   , binpacking_factory_create_components_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::binpacking_factory::create_components_counterbased_action
   , binpacking_factory_create_components_counterbased_action
 )
