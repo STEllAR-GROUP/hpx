@@ -87,6 +87,7 @@ namespace hpx
         thread_interrupted = 45,
         thread_not_interruptable = 46,
         duplicate_component_id = 47,
+        unknown_error = 48,
 
         /// \cond NOINTERNAL
         last_error,
@@ -144,6 +145,7 @@ namespace hpx
         "thread_interrupted",
         "thread_not_interruptable",
         "duplicate_component_id",
+        "unknown_error"
         ""
     };
     /// \endcond
@@ -424,8 +426,11 @@ namespace hpx
     private:
         friend boost::exception_ptr detail::access_exception(error_code const&);
         friend class exception;
+        friend error_code make_error_code(boost::exception_ptr);
 
         inline error_code(int err, hpx::exception const& e);
+        inline explicit error_code(boost::exception_ptr e);
+
         boost::exception_ptr exception_;
     };
 
@@ -489,6 +494,11 @@ namespace hpx
         char const* file, long line, throwmode mode = plain)
     {
         return error_code(e, msg, func, file, line, mode);
+    }
+    inline error_code 
+    make_error_code(boost::exception_ptr e)
+    {
+        return error_code(e);
     }
     ///@}
 
@@ -824,8 +834,8 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
-    ///             \a boost::exception, or \a boost::exception_ptr
+    ///             of the following types: \a hpx::exception or 
+    ///             \a hpx::error_code.
     ///
     /// \returns    The formatted string holding all of the available
     ///             diagnostic information stored in the given exception
@@ -863,7 +873,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \returns    The locality id of the locality where the exception was
@@ -889,6 +899,40 @@ namespace hpx
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception_ptr const& e);
     /// \endcond
 
+    /// \brief Return the locality id where the exception was thrown.
+    ///
+    /// The function \a hpx::get_error can be used to extract the
+    /// diagnostic information element representing the error value code as 
+    /// stored in the given exception instance.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
+    ///             \a boost::exception, or \a boost::exception_ptr
+    ///
+    /// \returns    The error value code of the locality where the exception was
+    ///             thrown. If the exception instance does not hold
+    ///             this information, the function will return
+    ///             \a hpx::naming#invalid_locality_id.
+    ///
+    /// \throws     nothing
+    ///
+    /// \see        \a hpx::diagnostic_information(), \a hpx::get_host_name(),
+    ///             \a hpx::get_process_id(), \a hpx::get_function_name(),
+    ///             \a hpx::get_file_name(), \a hpx::get_line_number(),
+    ///             \a hpx::get_os_thread(), \a hpx::get_thread_id(),
+    ///             \a hpx::get_thread_description()
+    ///
+    HPX_EXPORT error get_error(hpx::exception const& e);
+
+    /// \copydoc get_error(hpx::exception const& e)
+    HPX_EXPORT error get_error(hpx::error_code const& e);
+
+    /// \cond NOINTERNAL
+    HPX_EXPORT error get_error(boost::exception_ptr const& e);
+    /// \endcond
+
     /// \brief Return the hostname of the locality where the exception was
     ///        thrown.
     ///
@@ -899,7 +943,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \returns    The hostname of the locality where the exception was
@@ -932,7 +976,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
@@ -960,7 +1004,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
@@ -990,7 +1034,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
@@ -1019,7 +1063,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
@@ -1049,7 +1093,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
@@ -1079,7 +1123,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     nothing
@@ -1109,7 +1153,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception, \a hox::error_code,
+    ///             of the following types: \a hpx::exception, \a hpx::error_code,
     ///             \a boost::exception, or \a boost::exception_ptr
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
@@ -1191,6 +1235,11 @@ namespace hpx
             exception_ = boost::current_exception();
         }
     }
+
+    inline error_code::error_code(boost::exception_ptr e) 
+      : boost::system::error_code(make_system_error_code(get_error(e), rethrow)),
+        exception_(e) 
+    {}
 
     ///////////////////////////////////////////////////////////////////////////
     inline std::string error_code::get_message() const

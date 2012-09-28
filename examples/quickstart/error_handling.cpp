@@ -23,7 +23,7 @@ int hpx_main()
         ///////////////////////////////////////////////////////////////////////
         // Error reporting using exceptions
         //[exception_diagnostic_information
-        hpx::cout << "Error reporting using exceptions";
+        hpx::cout << "Error reporting using exceptions\n";
         try {
             // invoke raise_exception() which throws an exception
             raise_exception_action do_it;
@@ -43,7 +43,7 @@ int hpx_main()
 
         // Detailed error reporting using exceptions
         //[exception_diagnostic_elements
-        hpx::cout << "Detailed error reporting using exceptions";
+        hpx::cout << "Detailed error reporting using exceptions\n";
         try {
             // invoke raise_exception() which throws an exception
             raise_exception_action do_it;
@@ -69,7 +69,7 @@ int hpx_main()
         // Error reporting using error code
         {
             //[error_handling_diagnostic_information
-            hpx::cout << "Error reporting using error code";
+            hpx::cout << "Error reporting using error code\n";
 
             // Create a new error_code instance.
             hpx::error_code ec;
@@ -97,7 +97,7 @@ int hpx_main()
         // Detailed error reporting using error code
         {
             //[error_handling_diagnostic_elements
-            hpx::cout << "Detailed error reporting using error code";
+            hpx::cout << "Detailed error reporting using error code\n";
 
             // Create a new error_code instance.
             hpx::error_code ec;
@@ -119,7 +119,34 @@ int hpx_main()
                 hpx::cout << "[os-thread]: "   << hpx::get_os_thread(ec) << "\n";
                 hpx::cout << "[thread-id]: "   << std::hex << hpx::get_thread_id(ec) << "\n";
                 hpx::cout << "[thread-description]: "
-                    << hpx::get_thread_description(ec) << "\n";
+                    << hpx::get_thread_description(ec) << "\n\n";
+            }
+
+            hpx::cout << hpx::flush;
+            //]
+        }
+
+        // Error reporting using lightweight error code
+        {
+            //[lightweight_error_handling_diagnostic_information
+            hpx::cout << "Error reporting using an lightweight error code\n";
+
+            // Create a new error_code instance.
+            hpx::error_code ec(hpx::lightweight);
+
+            // If an instance of an error_code is passed as the last argument while
+            // invoking the action, the function will not throw in case of an error
+            // but store the error information in this error_code instance instead.
+            raise_exception_action do_it;
+            do_it(hpx::find_here(), ec);
+
+            // Print just the essential error information.
+            if (ec) {
+                hpx::cout << "returned error: " << ec.get_message() << "\n";
+
+                // Print all of the available diagnostic information as stored with
+                // the exception.
+                hpx::cout << "error code:" << ec.value() << "\n";
             }
 
             hpx::cout << hpx::flush;

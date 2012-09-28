@@ -220,13 +220,7 @@ namespace hpx { namespace lcos { namespace detail
                 // never reached
             }
             else {
-                try {
-                    boost::rethrow_exception(d.get_error());
-                }
-                catch (hpx::exception const& he) {
-                    ec = make_error_code(he.get_error(), he.what(),
-                        hpx::rethrow);
-                }
+                ec = make_error_code(d.get_error());
             }
             return result_type();
         }
