@@ -136,7 +136,7 @@ __hpx__ implements `hpx::async`, which semantically works similar to the
 way `std::async` works for plain C++ function.
 
 [note The similarity of applying an action to conventional function invocations
-      extend even further. __hpx__ implements `hpx::bind` and `hpx::function`:
+      extends even further. __hpx__ implements `hpx::bind` and `hpx::function`:
       two facilities which are semantically equivalent to the `std::bind` and
       `std::function` types as defined by the C++11 Standard. While `hpx::async`
       extends beyond the conventional semantics by supporting actions and
@@ -157,7 +157,7 @@ on the local locality (the locality this code runs on):
     some_global_action act;     // define an instance of some_global_action
     hpx::apply(act, hpx::find_here(), 2.0);
 
-(the function `hpx::find_here()` returns the id of the local locality (the
+(the function `hpx::find_here()` returns the id of the local locality, i.e. the
 locality this code executes on).
 
 Any component member function can be invoked using the same syntactic
@@ -177,10 +177,10 @@ This method will make sure the action is scheduled to run on the target locality
 Applying the action itself does not wait for the function to start running or
 to complete, instead this is a fully asynchronous operation similar to using
 `hpx::apply` as described above. The difference is that this method will return
-an instance of a `future<>` encapsulating the (possibly remote) execution. The
-future can be used to synchronize with the asynchronous operation. The
-following example shows how to apply the action from above on the local
-locality:
+an instance of a `hpx::future<>` encapsulating the result of the (possibly 
+remote) execution. The future can be used to synchronize with the asynchronous 
+operation. The following example shows how to apply the action from above on 
+the local locality:
 
     some_global_action act;     // define an instance of some_global_action
     hpx::future<void> f = hpx::async(act, hpx::find_here(), 2.0);
@@ -244,10 +244,10 @@ This result will be returned from the synchronous action invocation.
 
 It is very important to understand that this 'synchronous' invocation syntax
 in fact conceals an asynchronous function call. This is beneficial as the
-calling thread is blocked while waiting for the outcome of a potentially remote
+calling thread is suspended while waiting for the outcome of a potentially remote
 operation. The __hpx__ thread scheduler will schedule other work in the mean
 time, allowing the application to make further progress while the remote result
-is computed. This helps overlapping computation with communication and hides
+is computed. This helps overlapping computation with communication and hiding
 communication latencies.
 
 [note The syntax of applying an action is always the same, regardless whether
@@ -275,7 +275,7 @@ arbitrary result type.
 
 [table Comparing C++ Functions and __hpx__ Actions
     [[Invocation] [C++ Function] [__hpx__ Action]]
-    [[Apply (fire&forget)]
+    [[Apply (fire & forget)]
      [`hpx::apply(func, ...);`]
      [`hpx::apply(act, id, ...);`]
     ]

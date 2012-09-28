@@ -103,5 +103,18 @@ For more information please refer to the documentation of
 [funcref hpx::get_thread_description `hpx::get_thread_description()`]
 for more details.
 
+[heading:lightweight_error_code Lightweight error Codes]
+
+Sometimes it is not desireable to collect all the ambient information about the 
+error at the point where it happened as this might impose too much overhead for 
+simple scenarious. In this case, __hpx__ provides a lightweight error code 
+facility which will hold the error code only. The following snippet demonstrates 
+its use:
+
+[lightweight_error_handling_diagnostic_information]
+
+All functions which retrieve other diagnostic elements from the error_code will
+fail if called with a lightweight error_code instance.
+
 [endsect] [/ Working with Exceptions]
 

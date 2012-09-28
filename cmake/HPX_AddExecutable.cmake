@@ -47,7 +47,7 @@ macro(add_hpx_executable name)
     endif()
   endif()
 
-  if(HPX_INTERNAL_CMAKE AND NOT ${name}_OUTPUT_SUFFIX)
+  if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties(${name}_exe PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_RUNTIME_OUTPUT_DIRECTORY_RELEASE}
