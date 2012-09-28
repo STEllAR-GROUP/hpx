@@ -421,6 +421,34 @@ namespace hpx
         return get_locality_id(detail::access_exception(e));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    error get_error(hpx::exception const& e)
+    {
+        return static_cast<hpx::error>(e.get_error());
+    }
+
+    error get_error(hpx::error_code const& e)
+    {
+        return static_cast<hpx::error>(e.value());
+    }
+
+    error get_error(boost::exception_ptr const& e)
+    {
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (hpx::exception const& he) {
+            return he.get_error();
+        }
+        catch (boost::system::system_error const& e) {
+            return static_cast<hpx::error>(e.code().value());
+        }
+        catch (...) {
+            return unknown_error;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Return the host-name of the locality where the exception was thrown.
     std::string get_host_name(boost::exception const& e)
     {
