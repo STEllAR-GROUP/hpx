@@ -115,6 +115,9 @@ As a first step the internal configuration database is filled with a set of
 default configuration properties. Those settings are described on a section
 by section basis below.
 
+[note You can print the default configuration settings used for an executable
+      by specifying the command line option [hpx_cmdline `--hpx:dump-config`].]
+
 ['[*The `system` Configuration Section]]
 
 [teletype]
