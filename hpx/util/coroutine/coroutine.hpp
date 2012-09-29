@@ -39,6 +39,8 @@
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/call_traits.hpp>
+#include <boost/move/move.hpp>
+
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/util/coroutine/detail/is_callable.hpp>
@@ -48,7 +50,6 @@
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/coroutine_traits.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
-#include <hpx/util/coroutine/move.hpp>
 #include <hpx/util/coroutine/detail/fix_result.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
 
@@ -62,18 +63,18 @@ namespace hpx { namespace util { namespace coroutines
                       boost::optional<T> > { };
 
     template<typename T>
-    BOOST_DEDUCED_TYPENAME
+    typename
     boost::enable_if<boost::is_same<T, void> >::type
     optional_result() {}
 
     template<typename T>
-    BOOST_DEDUCED_TYPENAME
+    typename
     boost::disable_if<boost::is_same<T, void>,
-                      BOOST_DEDUCED_TYPENAME
+                      typename
                       optional_result_type<T>::type
                       >::type
     optional_result() {
-      return BOOST_DEDUCED_TYPENAME
+      return typename
         optional_result_type<T>::type();
     }
   }
@@ -81,18 +82,12 @@ namespace hpx { namespace util { namespace coroutines
   template<typename Signature, template <typename> class Heap, typename Context>
   class coroutine;
 
-//   template<typename Signature, typename Functor, typename Context>
-//   class static_coroutine;
-
   template<typename T>
   struct is_coroutine : boost::mpl::false_{};
 
   template<typename Signature, template <typename> class Heap, typename Context>
   struct is_coroutine<coroutine<Signature, Heap, Context> >
     : boost::mpl::true_ {};
-
-//   template<typename Sig, typename F, typename Con>
-//   struct is_coroutine<static_coroutine<Sig, F, Con> > : boost::mpl::true_{};
 
   /////////////////////////////////////////////////////////////////////////////
   namespace detail
@@ -117,8 +112,10 @@ namespace hpx { namespace util { namespace coroutines
            template <typename> class Heap = detail::coroutine_allocator,
            typename ContextImpl = detail::default_context_impl>
   class coroutine
-    : public movable<coroutine<Signature, Heap, ContextImpl> >
   {
+  private:
+    BOOST_MOVABLE_BUT_NOT_COPYABLE(coroutine);
+
   public:
     typedef coroutine<Signature, Heap, ContextImpl> type;
     typedef ContextImpl context_impl;
@@ -127,21 +124,21 @@ namespace hpx { namespace util { namespace coroutines
 
     friend struct detail::coroutine_accessor;
 
-    typedef BOOST_DEDUCED_TYPENAME traits_type::result_type result_type;
-    typedef BOOST_DEDUCED_TYPENAME traits_type::result_slot_type result_slot_type;
-    typedef BOOST_DEDUCED_TYPENAME traits_type::yield_result_type yield_result_type;
-    typedef BOOST_DEDUCED_TYPENAME traits_type::result_slot_traits result_slot_traits;
-    typedef BOOST_DEDUCED_TYPENAME traits_type::arg_slot_type arg_slot_type;
-    typedef BOOST_DEDUCED_TYPENAME traits_type::arg_slot_traits arg_slot_traits;
+    typedef typename traits_type::result_type result_type;
+    typedef typename traits_type::result_slot_type result_slot_type;
+    typedef typename traits_type::yield_result_type yield_result_type;
+    typedef typename traits_type::result_slot_traits result_slot_traits;
+    typedef typename traits_type::arg_slot_type arg_slot_type;
+    typedef typename traits_type::arg_slot_traits arg_slot_traits;
 
     typedef detail::coroutine_impl<type, context_impl, Heap> impl_type;
-    typedef BOOST_DEDUCED_TYPENAME impl_type::pointer impl_ptr;
-    typedef BOOST_DEDUCED_TYPENAME impl_type::thread_id_type thread_id_type;
+    typedef typename impl_type::pointer impl_ptr;
+    typedef typename impl_type::thread_id_type thread_id_type;
 
     typedef detail::coroutine_self<type> self;
     coroutine() : m_pimpl(0) {}
 
-    template<typename Functor>
+    template <typename Functor>
     coroutine (BOOST_FWD_REF(Functor) f, thread_id_type id = 0,
             std::ptrdiff_t stack_size = detail::default_stack_size)
       : m_pimpl(impl_type::create(boost::forward<Functor>(f), id, stack_size))
@@ -151,13 +148,13 @@ namespace hpx { namespace util { namespace coroutines
       : m_pimpl(p)
     {}
 
-    coroutine(move_from<coroutine> src)
+    coroutine(BOOST_RV_REF(coroutine) src)
       : m_pimpl(src->m_pimpl)
     {
       src->m_pimpl = 0;
     }
 
-    coroutine& operator=(move_from<coroutine> src) {
+    coroutine& operator=(BOOST_RV_REF(coroutine) src) {
       coroutine(src).swap(*this);
       return *this;
     }
@@ -195,60 +192,47 @@ namespace hpx { namespace util { namespace coroutines
         m_pimpl->reset();
     }
 
-#   define HPX_COROUTINE_generate_argument_n_type(z, n, traits_type) \
-    typedef BOOST_DEDUCED_TYPENAME traits_type ::template at<n>::type  \
-    BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                         \
-    /**/
+#define HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE(z, n, traits_type)             \
+    typedef typename traits_type::template at<n>::type                        \
+    BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                                \
+/**/
 
     BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-                    HPX_COROUTINE_generate_argument_n_type,
+                    HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE,
                     arg_slot_traits)
 
     static const int arity = arg_slot_traits::length;
 
     struct yield_traits {
       BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-                      HPX_COROUTINE_generate_argument_n_type,
+                      HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE,
                       result_slot_traits)
       static const int arity = result_slot_traits::length;
     };
 
-#   undef HPX_COROUTINE_generate_argument_n_type
+#undef HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE
 
-#   define HPX_COROUTINE_param_with_default(z, n, type_prefix)    \
-    BOOST_DEDUCED_TYPENAME boost::call_traits                              \
-    <BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type \
-    BOOST_PP_CAT(arg, n) =                                          \
-    BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()             \
-    /**/
+#define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
+    typename boost::call_traits<                                              \
+        BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type        \
+            BOOST_PP_CAT(arg, n) =                                            \
+                BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
+/**/
 
-    result_type operator()
-      (BOOST_PP_ENUM
-       (HPX_COROUTINE_ARG_MAX,
-        HPX_COROUTINE_param_with_default,
-        arg)) {
-      return call_impl
-        (arg_slot_type(BOOST_PP_ENUM_PARAMS
-          (HPX_COROUTINE_ARG_MAX,
-           arg)));
+    result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX, 
+        HPX_COROUTINE_PARAM_WITH_DEFAULT, arg)) 
+    {
+      return call_impl(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
     }
 
-    BOOST_DEDUCED_TYPENAME
-    detail::optional_result_type<result_type>::type
-    operator()
-      (const std::nothrow_t&
-       BOOST_PP_ENUM_TRAILING
-       (HPX_COROUTINE_ARG_MAX,
-        HPX_COROUTINE_param_with_default,
-        arg)) {
-      return call_impl_nothrow
-        (arg_slot_type(BOOST_PP_ENUM_PARAMS
-          (HPX_COROUTINE_ARG_MAX,
-           arg)));
+    typename detail::optional_result_type<result_type>::type
+    operator()(const std::nothrow_t& 
+        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_PARAM_WITH_DEFAULT, arg)) 
+    {
+      return call_impl_nothrow(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
     }
 
-#   undef HPX_COROUTINE_param_typedef
-#   undef HPX_COROUTINE_param_with_default
+#undef HPX_COROUTINE_PARAM_WITH_DEFAULT
 
     typedef void(coroutine::*bool_type)();
     operator bool_type() const {
@@ -282,12 +266,13 @@ namespace hpx { namespace util { namespace coroutines
     bool empty() const {
       return m_pimpl == 0;
     }
-  protected:
 
+  protected:
     // The second parameter is used to avoid calling this constructor
     // by mistake from other member functions (specifically operator=).
-    coroutine(impl_type * pimpl, detail::init_from_impl_tag) :
-      m_pimpl(pimpl) {}
+    coroutine(impl_type * pimpl, detail::init_from_impl_tag) 
+      : m_pimpl(pimpl) 
+    {}
 
     void bool_type_f() {}
 
@@ -305,8 +290,7 @@ namespace hpx { namespace util { namespace coroutines
       return detail::fix_result<result_slot_traits>(*m_pimpl->result());
     }
 
-    BOOST_DEDUCED_TYPENAME
-    detail::optional_result_type<result_type>::type
+    typename detail::optional_result_type<result_type>::type
     call_impl_nothrow(arg_slot_type args) {
       BOOST_ASSERT(m_pimpl);
       m_pimpl->bind_args(&args);
@@ -337,182 +321,6 @@ namespace hpx { namespace util { namespace coroutines
       return m_pimpl;
     }
   };
-
-  /////////////////////////////////////////////////////////////////////////////
-  // essentially this is the same as above except it doesn't allocate the
-  // coroutine implementation but includes it as a member
-//   template<
-//       typename Signature, typename Functor,
-//       typename ContextImpl = detail::default_context_impl
-//   >
-//   class static_coroutine
-//   {
-//   public:
-//     typedef static_coroutine type;
-//     typedef ContextImpl context_impl;
-//     typedef Signature signature_type;
-//     friend struct detail::coroutine_accessor;
-//
-//     typedef BOOST_DEDUCED_TYPENAME
-//         detail::coroutine_traits<signature_type>::result_type
-//     result_type;
-//
-//     typedef BOOST_DEDUCED_TYPENAME
-//         detail::coroutine_traits<signature_type>::result_slot_type
-//     result_slot_type;
-//
-//     typedef BOOST_DEDUCED_TYPENAME
-//         detail::coroutine_traits<signature_type>::yield_result_type
-//     yield_result_type;
-//
-//     typedef BOOST_DEDUCED_TYPENAME
-//         detail::coroutine_traits<signature_type>::result_slot_traits
-//     result_slot_traits;
-//
-//     typedef BOOST_DEDUCED_TYPENAME
-//         detail::coroutine_traits<signature_type>::arg_slot_type
-//     arg_slot_type;
-//
-//     typedef BOOST_DEDUCED_TYPENAME
-//         detail::coroutine_traits<signature_type>::arg_slot_traits
-//     arg_slot_traits;
-//
-//     typedef detail::coroutine_impl_wrapper<Functor, type, context_impl> impl_type;
-//     typedef typename impl_type::thread_id_type thread_id_type;
-//     typedef detail::coroutine_self<type> self;
-//
-//     static_coroutine (Functor f, thread_id_type id = 0,
-//             std::ptrdiff_t stack_size = detail::default_stack_size)
-//       : impl_(f, id, stack_size)
-//     {
-//         impl_.acquire();    // make sure refcount is not zero
-//     }
-//
-//     thread_id_type get_thread_id() const
-//     {
-//         return impl_.get_thread_id();
-//     }
-//
-//     std::size_t get_thread_phase() const
-//     {
-//         return impl_.get_thread_phase();
-//     }
-//
-//     void rebind(Functor f, thread_id_type id = 0)
-//     {
-//         BOOST_ASSERT(exited());
-//         impl_type::rebind(f, id);
-//     }
-//
-#if 0
- #define HPX_COROUTINE_generate_argument_n_type(z, n, traits_type)           \
-     typedef BOOST_DEDUCED_TYPENAME traits_type ::template at<n>::type         \
-     BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                                \
-     /**/
-#endif
-//
-//     BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-//                     HPX_COROUTINE_generate_argument_n_type,
-//                     arg_slot_traits);
-//
-//     static const int arity = arg_slot_traits::length;
-//
-//     struct yield_traits {
-//       BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-//                       HPX_COROUTINE_generate_argument_n_type,
-//                       result_slot_traits);
-//       static const int arity = result_slot_traits::length;
-//     };
-// #undef HPX_COROUTINE_generate_argument_n_type
-#if 0
- #define HPX_COROUTINE_param_with_default(z, n, type_prefix)                 \
-     BOOST_DEDUCED_TYPENAME                                                    \
-     boost::call_traits<BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type\
-     BOOST_PP_CAT(arg, n) =                                                    \
-         BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()                   \
-     /**/
-#endif
-//     result_type operator()(
-//         BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_param_with_default, arg))
-//     {
-//       return call_impl(arg_slot_type(
-//               BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)
-//           ));
-//     }
-//
-//     BOOST_DEDUCED_TYPENAME
-//     detail::optional_result_type<result_type>::type
-//     operator() (std::nothrow_t const&
-//         BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_param_with_default, arg))
-//     {
-//       return call_impl_nothrow(arg_slot_type(
-//               BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)
-//           ));
-//     }
-// #undef HPX_COROUTINE_param_with_default
-//
-//     typedef void(static_coroutine::*bool_type)();
-//     operator bool_type() const {
-//         return good()? &static_coroutine::bool_type_f: 0;
-//     }
-//
-//     void exit() {
-//         impl_.exit();
-//     }
-//
-//     bool waiting() const {
-//         return impl_.waiting();
-//     }
-//
-//     bool pending() const {
-//         return impl_.pending();
-//     }
-//
-//     bool exited() const {
-//         return impl_.exited();
-//     }
-//
-//     bool empty() const {
-//       return false;
-//     }
-//
-//   protected:
-//     void bool_type_f() {}
-//
-//     bool good() const  {
-//         return !empty() && !exited() && !waiting();
-//     }
-//
-//     result_type call_impl(arg_slot_type args)
-//     {
-//         impl_.bind_args(&args);
-//         result_slot_type* ptr;
-//         impl_.bind_result_pointer(&ptr);
-//
-//         impl_.invoke();
-//
-//         return detail::fix_result<result_slot_traits>(*impl_.result());
-//     }
-//
-//     BOOST_DEDUCED_TYPENAME detail::optional_result_type<result_type>::type
-//     call_impl_nothrow(arg_slot_type args)
-//     {
-//         impl_.bind_args(&args);
-//         result_slot_type * ptr;
-//         impl_.bind_result_pointer(&ptr);
-//         if(!impl_.wake_up())
-//             return detail::optional_result<result_type>();
-//
-//         return detail::fix_result<result_slot_traits>(*impl_.result());
-//     }
-//
-//     impl_type impl_;      // coroutine implementation type
-//
-//     std::size_t
-//     count() const {
-//         return impl_.count();
-//     }
-//   };
 
 }}}
 #endif

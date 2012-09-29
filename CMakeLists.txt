@@ -183,7 +183,7 @@ hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DHPX_COROUTINE_ARG_MAX=2)
+add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
 if(NOT MSVC)
   add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()

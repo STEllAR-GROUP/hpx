@@ -290,7 +290,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 private:
     struct reset_self_on_exit
     {
-        typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
+        typedef typename coroutine_type::self self_type;
 
         reset_self_on_exit(self_type* val)
         {
@@ -306,6 +306,7 @@ private:
 
     //GCC workaround as per enable_if docs
     template <int> struct dummy { dummy(int) {} };
+
     /*
      * Implementation for operator()
      * This is for void result types.
@@ -317,12 +318,11 @@ private:
     {
       BOOST_ASSERT(this->count() > 0);
 
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
+      typedef typename coroutine_type::self self_type;
 
       // In this particular case result_slot_type is guaranteed to be
       // default constructible.
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type
-        result_slot_type;
+      typedef typename coroutine_type::result_slot_type result_slot_type;
 
       {
 //           boost::optional<self_type> self (coroutine_accessor::in_place(this));
@@ -343,10 +343,9 @@ private:
     {
       BOOST_ASSERT(this->count() > 0);
 
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits;
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type
-        result_slot_type;
+      typedef typename coroutine_type::self self_type;
+      typedef typename coroutine_type::arg_slot_traits traits;
+      typedef typename coroutine_type::result_slot_type result_slot_type;
 
       {
 //           boost::optional<self_type> self (coroutine_accessor::in_place(this));

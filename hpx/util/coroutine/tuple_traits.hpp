@@ -28,6 +28,7 @@
 
 #ifndef HPX_COROUTINE_TUPLE_TRAITS_HPP_20060613
 #define HPX_COROUTINE_TUPLE_TRAITS_HPP_20060613
+
 #include <boost/tuple/tuple.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>

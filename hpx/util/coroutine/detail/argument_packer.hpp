@@ -28,6 +28,7 @@
 
 #ifndef HPX_COROUTINE_ARGUMENT_PACKER_HPP_20060601
 #define HPX_COROUTINE_ARGUMENT_PACKER_HPP_20060601
+
 #include <boost/preprocessor/control/if.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition.hpp>
