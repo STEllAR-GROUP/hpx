@@ -244,7 +244,7 @@ namespace hpx { namespace components
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
 /**/
 
-#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_ONE_2(                        \
+#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_ONE(                          \
         ComponentType, componentname)                                         \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_3(                             \
         ComponentType, componentname, ::hpx::components::factory_disabled)    \

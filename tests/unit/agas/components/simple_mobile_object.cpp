@@ -20,16 +20,13 @@ typedef hpx::components::simple_component<simple_mobile_object>
 // We use a special component registry for this component as it has to be
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_DISABLED_COMPONENT_FACTORY(
     hpx::components::simple_component<simple_mobile_object>,
-    simple_mobile_object,
-    hpx::components::factory_disabled)
+    simple_mobile_object)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
     simple_mobile_object::get_lva_action,
     simple_mobile_object_get_lva_action);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(simple_mobile_object);
 
 

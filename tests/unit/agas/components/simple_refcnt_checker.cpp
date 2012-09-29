@@ -20,16 +20,13 @@ typedef hpx::components::simple_component<simple_refcnt_checker>
 // We use a special component registry for this component as it has to be
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(
+HPX_REGISTER_DISABLED_COMPONENT_FACTORY_ONE(
     hpx::components::simple_component<simple_refcnt_checker>,
-    simple_refcnt_checker,
-    hpx::components::factory_disabled)
+    simple_refcnt_checker)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
     simple_refcnt_checker::take_reference_action,
     simple_refcnt_checker_take_reference_action);
-
-HPX_DEFINE_GET_COMPONENT_TYPE(simple_refcnt_checker);
 
 
