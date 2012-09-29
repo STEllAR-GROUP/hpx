@@ -11,6 +11,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
+#include <boost/move/move.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -18,6 +20,9 @@ namespace hpx { namespace components
     template <typename Derived, typename Stub>
     class client_base : public Stub
     {
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(client_base);
+
     protected:
         typedef Stub stub_type;
 
@@ -26,14 +31,46 @@ namespace hpx { namespace components
           : gid_(naming::invalid_id)
         {}
 
-        client_base(naming::id_type const& gid)
+        explicit client_base(naming::id_type const& gid)
           : gid_(gid)
         {}
 
-        client_base& operator=(naming::id_type const& gid)
+        explicit client_base(BOOST_RV_REF(naming::id_type) gid)
+          : gid_(boost::move(gid))
+        {}
+
+        explicit client_base(client_base const& rhs)
+          : gid_(rhs.gid_)
+        {}
+
+        explicit client_base(BOOST_RV_REF(client_base) rhs)
+          : gid_(boost::move(rhs.gid_))
+        {}
+
+        // copy assignment and move assignment
+        client_base& operator=(BOOST_COPY_ASSIGN_REF(naming::id_type) gid)
         {
-            if (gid_ != gid)
-                gid_ = gid;
+            gid_ = gid;
+            return *this;
+        }
+
+        client_base& operator=(BOOST_RV_REF(naming::id_type) gid)
+        {
+            gid_ = boost::move(gid);
+            return *this;
+        }
+
+        client_base& operator=(BOOST_COPY_ASSIGN_REF(client_base) rhs)
+        {
+            if (this != &rhs)
+                gid_ = rhs.gid_;
+            return *this;
+        }
+
+        client_base& operator=(BOOST_RV_REF(client_base) rhs)
+        {
+            if (this != &rhs)
+                gid_ = boost::move(rhs.gid_);
             return *this;
         }
 
