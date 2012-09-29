@@ -181,11 +181,8 @@ namespace tsf { namespace server
       int nreal = *n_reals;
 
       if ( item_ != 0 ) {
-        // create a new and-gate object
-        gate_.init(1);
-
         // synchronize with all operations to finish
-        hpx::future<void> f = gate_.get_future();
+        hpx::future<void> f = gate_.get_future(1);
 
         {
           mutex_type::scoped_lock l(mtx_);
