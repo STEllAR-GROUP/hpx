@@ -16,7 +16,9 @@
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/detail/atomic_count.hpp>

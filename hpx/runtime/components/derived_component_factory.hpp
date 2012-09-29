@@ -16,7 +16,9 @@
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -260,7 +262,7 @@ namespace hpx { namespace components
 /**/
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_3(ComponentType, componentname,\
         basecomponentname)                                                    \
-    HPX_REGISTER_DERIVED_COMPONENT_FACTORY_3(                                 \
+    HPX_REGISTER_DERIVED_COMPONENT_FACTORY_4(                                 \
         ComponentType, componentname, basecomponentname,                      \
         ::hpx::components::factory_check)                                     \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
