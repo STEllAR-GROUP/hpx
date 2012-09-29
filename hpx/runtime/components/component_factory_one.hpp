@@ -234,7 +234,7 @@ namespace hpx { namespace components
 /// \a HPX_REGISTER_COMPONENT_MODULE macros should be used instead.
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(...)                       \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(__VA_ARGS__)                   \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_(__VA_ARGS__)                  \
 /**/
 
 #define HPX_REGISTER_ENABLED_COMPONENT_FACTORY_ONE(                           \
