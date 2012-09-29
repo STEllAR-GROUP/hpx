@@ -16,7 +16,7 @@ HPX_REGISTER_COMPONENT_MODULE()
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::distributing_factory distributing_factory_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<distributing_factory_type>,
     distributing_factory, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(distributing_factory_type)

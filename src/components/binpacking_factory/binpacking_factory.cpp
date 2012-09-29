@@ -20,7 +20,7 @@ HPX_REGISTER_COMPONENT_MODULE()
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::binpacking_factory binpacking_factory_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<binpacking_factory_type>,
     binpacking_factory, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(binpacking_factory_type)

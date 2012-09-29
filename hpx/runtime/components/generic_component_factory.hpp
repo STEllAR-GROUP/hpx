@@ -233,24 +233,34 @@ namespace hpx { namespace components
 /// the only factory to be exposed from a particular module. If more than one
 /// factory needs to be exposed the \a HPX_REGISTER_COMPONENT_FACTORY and
 /// \a HPX_REGISTER_COMPONENT_MODULE macros should be used instead.
-#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
-            ComponentType, componentname, state)                              \
-        HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::generic_component_factory<ComponentType>,        \
-            componentname);                                                   \
-        HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::generic_component_factory<ComponentType>,        \
-            componentname)                                                    \
-        template struct hpx::components::generic_component_factory<ComponentType>;\
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, state)                              \
-    /**/
+#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(...)                   \
+    HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_(__VA_ARGS__)              \
+/**/
 
-#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(ComponentType, componentname) \
-        HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
-            ComponentType, componentname, ::hpx::components::factory_check)   \
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
-    /**/
+#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_(...)                  \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_,                      \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_2(                     \
+        ComponentType, componentname)                                         \
+    HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_3(                         \
+        ComponentType, componentname, ::hpx::components::factory_check)       \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
+#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_3(                     \
+        ComponentType, componentname, state)                                  \
+    HPX_REGISTER_COMPONENT_FACTORY(                                           \
+        hpx::components::generic_component_factory<ComponentType>,            \
+        componentname);                                                       \
+    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
+        hpx::components::generic_component_factory<ComponentType>,            \
+        componentname)                                                        \
+    template struct hpx::components::generic_component_factory<ComponentType>;\
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(                                \
+        ComponentType, componentname, state)                                  \
+/**/
 
 #endif
 

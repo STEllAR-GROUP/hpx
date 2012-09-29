@@ -248,7 +248,24 @@ namespace hpx { namespace components
 /// the only factory to be exposed from a particular module. If more than one
 /// factory needs to be exposed the \a HPX_REGISTER_COMPONENT_FACTORY and
 /// \a HPX_REGISTER_COMPONENT_MODULE macros should be used instead.
-#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_EX(ComponentType,          \
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(...)                       \
+    HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_(__VA_ARGS__)                  \
+/**/
+
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_(...)                      \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_,                          \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_3(ComponentType,           \
+    componentname, basecomponentname)                                         \
+        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_3(                         \
+            ComponentType, componentname, basecomponentname,                  \
+            ::hpx::components::factory_check)                                 \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
+/**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_4(ComponentType,           \
     componentname, basecomponentname, state)                                  \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::derived_component_factory_one<ComponentType>,    \
@@ -258,17 +275,9 @@ namespace hpx { namespace components
             componentname, basecomponentname)                                 \
         template struct                                                       \
             hpx::components::derived_component_factory_one<ComponentType>;    \
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(ComponentType,             \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(ComponentType,              \
             componentname, state)                                             \
-    /**/
-
-#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(ComponentType,             \
-    componentname, basecomponentname)                                         \
-        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_EX(                        \
-            ComponentType, componentname, basecomponentname,                  \
-            ::hpx::components::factory_check)                                 \
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
-    /**/
+/**/
 
 #endif
 

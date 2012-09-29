@@ -17,7 +17,7 @@ typedef hpx::components::managed_component<
     hpx::performance_counters::server::raw_counter
 > raw_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     raw_counter_type, raw_counter, "base_performance_counter",
     hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(
