@@ -78,6 +78,7 @@ void test_store_value_from_thread()
     HPX_TEST(fi2.has_value());
     HPX_TEST(!fi2.has_exception());
     HPX_TEST(fi2.get_state() == hpx::lcos::future_status::ready);
+    t.join();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,6 +99,7 @@ void test_store_exception()
     HPX_TEST(!fi3.has_value());
     HPX_TEST(fi3.has_exception());
     HPX_TEST(fi3.get_state() ==  hpx::lcos::future_status::ready);
+    t.join();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
