@@ -7,8 +7,10 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/lcos/local/event_semaphore.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
+
+#include <boost/ref.hpp>
 
 struct data
 {
@@ -29,25 +31,26 @@ struct data
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void worker(data* d)
+void worker(std::size_t i, data& d, hpx::lcos::local::counting_semaphore& sem)
 {
-    hpx::cout << d->msg << hpx::flush;
+    d.init.wait();
+    hpx::cout << d.msg << ": " << i << "\n" << hpx::flush;
+    sem.signal();                   // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     data d;
+    hpx::lcos::local::counting_semaphore sem;
 
     for (std::size_t i = 0; i < 10; ++i)
-        hpx::apply(&worker, &d);
+        hpx::apply(&worker, i, boost::ref(d), boost::ref(sem));
 
-    d.initialize("initialized");
+    d.initialize("initialized");    // signal the event
 
     // Wait for all threads to finish executing.
-    do {
-        hpx::this_thread::suspend();
-    } while (hpx::threads::get_thread_count() > 1);
+    sem.wait(10);
 
     return 0;
 }
