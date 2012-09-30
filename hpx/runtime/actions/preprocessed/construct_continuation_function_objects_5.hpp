@@ -22,7 +22,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
            >
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
            ) const
         {
             try {
@@ -68,7 +69,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
            >
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
            ) const
         {
             try {
@@ -120,7 +122,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0) const
         {
             try {
@@ -166,7 +169,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0) const
         {
             try {
@@ -218,7 +222,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
         {
             try {
@@ -264,7 +269,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
         {
             try {
@@ -316,7 +322,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
         {
             try {
@@ -362,7 +369,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
         {
             try {
@@ -414,7 +422,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
         {
             try {
@@ -460,7 +469,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
         {
             try {
@@ -512,7 +522,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
         {
             try {
@@ -558,7 +569,8 @@ namespace detail
         typedef threads::thread_state_enum result_type;
         template <typename Func
           , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
         {
             try {

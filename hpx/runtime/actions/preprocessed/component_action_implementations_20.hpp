@@ -36,7 +36,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0) const
             {
@@ -174,7 +174,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -249,7 +249,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0) const
             {
@@ -378,7 +378,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -466,7 +466,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
             {
@@ -604,7 +604,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -679,7 +679,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
             {
@@ -808,7 +808,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -896,7 +896,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
             {
@@ -1034,7 +1034,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -1109,7 +1109,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
             {
@@ -1238,7 +1238,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -1326,7 +1326,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
             {
@@ -1464,7 +1464,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -1539,7 +1539,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
             {
@@ -1668,7 +1668,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -1756,7 +1756,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
             {
@@ -1894,7 +1894,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -1969,7 +1969,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
             {
@@ -2098,7 +2098,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -2186,7 +2186,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) const
             {
@@ -2324,7 +2324,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -2399,7 +2399,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) const
             {
@@ -2528,7 +2528,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -2616,7 +2616,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) const
             {
@@ -2754,7 +2754,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -2829,7 +2829,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) const
             {
@@ -2958,7 +2958,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -3046,7 +3046,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) const
             {
@@ -3184,7 +3184,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -3259,7 +3259,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) const
             {
@@ -3388,7 +3388,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -3476,7 +3476,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) const
             {
@@ -3614,7 +3614,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -3689,7 +3689,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) const
             {
@@ -3818,7 +3818,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -3906,7 +3906,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) const
             {
@@ -4044,7 +4044,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -4119,7 +4119,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) const
             {
@@ -4248,7 +4248,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -4336,7 +4336,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) const
             {
@@ -4474,7 +4474,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -4549,7 +4549,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) const
             {
@@ -4678,7 +4678,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -4766,7 +4766,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) const
             {
@@ -4904,7 +4904,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -4979,7 +4979,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) const
             {
@@ -5108,7 +5108,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -5196,7 +5196,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) const
             {
@@ -5334,7 +5334,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -5409,7 +5409,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) const
             {
@@ -5538,7 +5538,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -5626,7 +5626,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13) const
             {
@@ -5764,7 +5764,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -5839,7 +5839,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13) const
             {
@@ -5968,7 +5968,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -6056,7 +6056,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14) const
             {
@@ -6194,7 +6194,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -6269,7 +6269,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14) const
             {
@@ -6398,7 +6398,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -6486,7 +6486,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15) const
             {
@@ -6624,7 +6624,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -6699,7 +6699,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15) const
             {
@@ -6828,7 +6828,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -6916,7 +6916,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16) const
             {
@@ -7054,7 +7054,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -7129,7 +7129,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16) const
             {
@@ -7258,7 +7258,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -7346,7 +7346,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17) const
             {
@@ -7484,7 +7484,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -7559,7 +7559,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17) const
             {
@@ -7688,7 +7688,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -7776,7 +7776,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18) const
             {
@@ -7914,7 +7914,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -7989,7 +7989,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18) const
             {
@@ -8118,7 +8118,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -8206,7 +8206,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19) const
             {
@@ -8344,7 +8344,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -8419,7 +8419,7 @@ namespace hpx { namespace actions
         {
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19) const
             {
@@ -8548,7 +8548,7 @@ namespace hpx { namespace actions
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {

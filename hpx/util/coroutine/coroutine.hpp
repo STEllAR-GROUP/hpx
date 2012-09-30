@@ -223,13 +223,13 @@ namespace hpx { namespace util { namespace coroutines
                 BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
 /**/
 
-    result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX, 
+    BOOST_FORCEINLINE result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX, 
         HPX_COROUTINE_PARAM_WITH_DEFAULT, arg)) 
     {
       return call_impl(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
     }
 
-    typename detail::optional_result_type<result_type>::type
+    BOOST_FORCEINLINE typename detail::optional_result_type<result_type>::type
     operator()(const std::nothrow_t& 
         BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_PARAM_WITH_DEFAULT, arg)) 
     {
@@ -240,7 +240,7 @@ namespace hpx { namespace util { namespace coroutines
 
 #else
 
-    result_type operator()(arg0_type arg0 = arg0_type()) 
+    BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type()) 
     {
       BOOST_ASSERT(m_pimpl);
 

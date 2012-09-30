@@ -55,7 +55,7 @@ namespace hpx { namespace actions
         /// original function (given by \a func), while ignoring the return
         /// value.
         template <typename Address>   // dummy template parameter
-        static threads::thread_state_enum
+        BOOST_FORCEINLINE static threads::thread_state_enum
         thread_function(Address lva)
         {
             try {
@@ -193,7 +193,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments))
         {
@@ -255,7 +255,7 @@ namespace hpx { namespace actions
         /// original function (given by \a func), while ignoring the return
         /// value.
         template <typename Address>   // dummy template parameter
-        static threads::thread_state_enum
+        BOOST_FORCEINLINE static threads::thread_state_enum
         thread_function(Address lva)
         {
             try {
@@ -367,7 +367,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments))
         {

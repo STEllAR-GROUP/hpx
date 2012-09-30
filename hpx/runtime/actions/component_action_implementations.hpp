@@ -126,7 +126,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
             {
@@ -276,7 +276,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -358,7 +358,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
                 HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
             {
@@ -498,7 +498,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {

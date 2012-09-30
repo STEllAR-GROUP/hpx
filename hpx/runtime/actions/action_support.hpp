@@ -643,7 +643,7 @@ namespace hpx { namespace actions
 
         // bring in the definition for all overloads for operator()
         template <typename IdType>
-        typename boost::enable_if<
+        BOOST_FORCEINLINE typename boost::enable_if<
             boost::mpl::and_<
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
