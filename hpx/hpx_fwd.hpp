@@ -28,14 +28,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/util/unused.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx
 ///
