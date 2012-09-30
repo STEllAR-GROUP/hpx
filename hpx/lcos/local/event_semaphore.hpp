@@ -32,7 +32,7 @@ namespace hpx { namespace lcos { namespace local
     namespace detail
     {
         template <typename Mutex = lcos::local::spinlock>
-        class HPX_EXPORT event_semaphore
+        class event_semaphore
         {
         private:
             typedef Mutex mutex_type;
