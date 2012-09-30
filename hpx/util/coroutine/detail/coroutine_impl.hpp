@@ -207,10 +207,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
   protected:
     result_type m_result_last;
-
-  private:
-    arg0_type * m_arg;
-    result_type ** m_result;
+    arg0_type* m_arg;
+    result_type** m_result;
 #endif
 
     thread_id_type m_thread_id;
@@ -301,7 +299,33 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         boost::exception_ptr tinfo;
         try {
           this->check_exit_state();
+
+#if defined(HPX_GENERIC_COROUTINES)
           do_call<result_type>();
+#else
+          BOOST_ASSERT(this->count() > 0);
+
+          typedef typename coroutine_type::self self_type;
+          typedef typename coroutine_type::arg_slot_traits traits;
+          typedef typename coroutine_type::result_slot_type result_slot_type;
+
+          {
+              self_type self(this);
+              reset_self_on_exit on_exit(&self);
+              this->m_result_last = m_fun(*this->args());
+
+              // if this thread returned 'terminated' we need to reset the functor
+              // and the bound arguments
+              //
+              // Note: threads::terminated == 5
+              //
+              if (this->m_result_last == 5)
+                  this->reset();
+          }
+
+          // return value to other side of the fence
+          this->bind_result(&this->m_result_last);
+#endif
         } 
         catch (exit_exception const&) {
           status = super_type::ctx_exited_exit;
@@ -325,13 +349,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
 
         this->do_return(status, tinfo);
+
       } while (this->m_state == super_type::ctx_running);
 
       // should not get here, never
       BOOST_ASSERT(this->m_state == super_type::ctx_running);
     }
 
-private:
+  protected:
     struct reset_self_on_exit
     {
         typedef typename coroutine_type::self self_type;
@@ -411,33 +436,6 @@ private:
 
       // return value to other side of the fence
       this->bind_result(&*this->m_result_last);
-    }
-#else
-    template <typename ResultType>
-    void do_call()
-    {
-      BOOST_ASSERT(this->count() > 0);
-
-      typedef typename coroutine_type::self self_type;
-      typedef typename coroutine_type::arg_slot_traits traits;
-      typedef typename coroutine_type::result_slot_type result_slot_type;
-
-      {
-          self_type self(this);
-          reset_self_on_exit on_exit(&self);
-          this->m_result_last = m_fun(*this->args());
-
-          // if this thread returned 'terminated' we need to reset the functor
-          // and the bound arguments
-          //
-          // Note: threads::terminated == 5
-          //
-          if (this->m_result_last == 5)
-              this->reset();
-      }
-
-      // return value to other side of the fence
-      this->bind_result(&this->m_result_last);
     }
 #endif
 
