@@ -70,6 +70,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef coroutine_impl<coroutine_type, context_impl, Heap> type;
     typedef context_base<context_impl> context_base_;
     typedef typename coroutine_type::arg_slot_type arg_slot_type;
+    typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
     typedef typename coroutine_type::result_type result_type;
     typedef typename coroutine_type::result_slot_type result_slot_type;
     typedef void* thread_id_type;
@@ -85,20 +86,21 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         m_thread_id(id)
     {}
 
-    arg_slot_type * args() {
-      BOOST_ASSERT(m_arg);
-      return m_arg;
-    };
+    template <typename Functor>
+    static inline pointer create(BOOST_FWD_REF(Functor), thread_id_type = 0,
+        std::ptrdiff_t = default_stack_size);
 
+#if HPX_COROUTINE_ARG_MAX > 1
     result_slot_type * result() {
       BOOST_ASSERT(m_result);
       BOOST_ASSERT(*m_result);
       return *this->m_result;
     }
 
-    template <typename Functor>
-    static inline pointer create(BOOST_FWD_REF(Functor), thread_id_type = 0,
-        std::ptrdiff_t = default_stack_size);
+    arg_slot_type * args() {
+      BOOST_ASSERT(m_arg);
+      return m_arg;
+    };
 
     void bind_args(arg_slot_type* arg) {
       m_arg = arg;
@@ -117,6 +119,36 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     result_slot_type** result_pointer() {
       return m_result;
     }
+#else
+    result_type * result() {
+      BOOST_ASSERT(m_result);
+      return *this->m_result;
+    }
+
+    typedef typename arg_slot_traits::template at<0>::type arg0_type;
+    arg0_type * args() {
+      BOOST_ASSERT(m_arg);
+      return m_arg;
+    };
+
+    void bind_args(arg0_type* arg) {
+      m_arg = arg;
+    }
+
+    void bind_result(result_type* res) {
+      *m_result = res;
+    }
+
+    // Another level of indirection is needed to handle
+    // yield_to correctly.
+    void bind_result_pointer(result_type** resp) {
+      m_result = resp;
+    }
+
+    result_type** result_pointer() {
+      return m_result;
+    }
+#endif
 
     // This function must be called only for void
     // coroutines. It wakes up the coroutine.
@@ -139,10 +171,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         return m_thread_id;
     }
 
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t get_thread_phase() const
     {
         return this->phase();
     }
+#endif
 
     struct tls_tag {};
 
@@ -163,12 +197,22 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         this->context_base_::rebind();
     }
 
+#if defined(HPX_GENERIC_COROUTINES)
   protected:
-    boost::optional<result_slot_type>  m_result_last;
+    boost::optional<result_slot_type> m_result_last;
 
   private:
     arg_slot_type * m_arg;
     result_slot_type ** m_result;
+#else
+  protected:
+    result_type m_result_last;
+
+  private:
+    arg0_type * m_arg;
+    result_type ** m_result;
+#endif
+
     thread_id_type m_thread_id;
   };
 
@@ -304,6 +348,7 @@ private:
 
   public:
 
+#if defined(HPX_GENERIC_COROUTINES)
     //GCC workaround as per enable_if docs
     template <int> struct dummy { dummy(int) {} };
 
@@ -367,6 +412,34 @@ private:
       // return value to other side of the fence
       this->bind_result(&*this->m_result_last);
     }
+#else
+    template <typename ResultType>
+    void do_call()
+    {
+      BOOST_ASSERT(this->count() > 0);
+
+      typedef typename coroutine_type::self self_type;
+      typedef typename coroutine_type::arg_slot_traits traits;
+      typedef typename coroutine_type::result_slot_type result_slot_type;
+
+      {
+          self_type self(this);
+          reset_self_on_exit on_exit(&self);
+          this->m_result_last = m_fun(*this->args());
+
+          // if this thread returned 'terminated' we need to reset the functor
+          // and the bound arguments
+          //
+          // Note: threads::terminated == 5
+          //
+          if (this->m_result_last == 5)
+              this->reset();
+      }
+
+      // return value to other side of the fence
+      this->bind_result(&this->m_result_last);
+    }
+#endif
 
     static inline void destroy(type* p);
     static inline void reset(type* p);

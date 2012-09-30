@@ -39,6 +39,22 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   template <typename Coroutine>
   class coroutine_self : boost::noncopyable 
   {
+    // store the current this and write it to the TSS on exit
+    struct reset_self_on_exit
+    {
+        reset_self_on_exit(coroutine_self* self)
+          : self_(self)
+        {
+            impl_type::set_self(NULL);
+        }
+        ~reset_self_on_exit()
+        {
+            impl_type::set_self(self_);
+        }
+
+        coroutine_self* self_;
+    };
+
   public:
     typedef Coroutine coroutine_type;
     typedef coroutine_self<coroutine_type> type;
@@ -57,6 +73,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
     typedef typename coroutine_type::yield_traits yield_traits;
     typedef typename coroutine_type::thread_id_type thread_id_type;
+
+#if defined(HPX_GENERIC_COROUTINES)
 
 #define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
     typename boost::call_traits<                                              \
@@ -84,6 +102,24 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #undef  HPX_COROUTINE_PARAM_WITH_DEFAULT
 
+#else
+
+    yield_result_type yield(typename yield_traits::arg0_type arg0 =
+        typename yield_traits::arg0_type())
+    {
+      BOOST_ASSERT(m_pimpl);
+
+      this->m_pimpl->bind_result(&arg0);
+      {
+        reset_self_on_exit on_exit(this);
+        this->m_pimpl->yield();
+      }
+
+      return *m_pimpl->args();
+    }
+
+#endif
+
     BOOST_ATTRIBUTE_NORETURN void exit() {
       m_pimpl -> exit_self();
       std::terminate(); // FIXME: replace with hpx::terminate();
@@ -105,8 +141,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     std::size_t get_thread_phase() const {
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->get_thread_phase();
+#else
+      return 0;
+#endif
     }
 
     explicit coroutine_self(impl_type * pimpl)
@@ -118,27 +158,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       : m_pimpl(pimpl) 
     {}
 
-    // store the current this and write it to the TSS on exit
-    struct reset_self_on_exit
-    {
-        reset_self_on_exit(coroutine_self* self)
-          : self_(self)
-        {
-            impl_type::set_self(NULL);
-        }
-        ~reset_self_on_exit()
-        {
-            impl_type::set_self(self_);
-        }
-
-        coroutine_self* self_;
-    };
-
+#if defined(HPX_GENERIC_COROUTINES)
     yield_result_type yield_impl(
         typename coroutine_type::result_slot_type result_)
     {
-      typedef typename coroutine_type::result_slot_type slot_type;
-
       BOOST_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&result_);
@@ -168,6 +191,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::arg_slot_traits traits_type;
       return detail::fix_result<traits_type>(*m_pimpl->args());
     }
+#endif
 
     impl_ptr get_impl() {
       return m_pimpl;

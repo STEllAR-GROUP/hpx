@@ -108,7 +108,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_exit_status(ctx_not_exited),
       m_wait_counter(0),
       m_operation_counter(0),
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       m_phase(0),
+#endif
       m_type_info() {}
 
     friend
@@ -160,9 +162,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return m_operation_counter;
     }
 
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t phase() const {
         return m_phase;
     }
+#endif
 
     /*
      * A signal may occur only when a context is
@@ -463,7 +467,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     void do_invoke() throw (){
       BOOST_ASSERT(ready() || waiting());
-      ++m_phase;
       m_state = ctx_running;
       swap_context(m_caller, *this, detail::invoke_hint());
     }
@@ -490,7 +493,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     context_exit_status m_exit_status;
     int m_wait_counter;
     int m_operation_counter;
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t m_phase;
+#endif
 
     // This is used to generate a meaningful exception trace.
     boost::exception_ptr m_type_info;

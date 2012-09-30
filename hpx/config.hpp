@@ -255,6 +255,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the thread phase in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the thread description in debug builds only.
 #if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
 #  if defined(HPX_DEBUG)

@@ -174,10 +174,12 @@ namespace hpx { namespace util { namespace coroutines
         return m_pimpl->get_thread_id();
     }
 
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t get_thread_phase() const
     {
         return m_pimpl->get_thread_phase();
     }
+#endif
 
     template <typename Functor>
     void rebind(Functor f, thread_id_type id = 0)
@@ -212,6 +214,8 @@ namespace hpx { namespace util { namespace coroutines
 
 #undef HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE
 
+#if defined(HPX_GENERIC_COROUTINES)
+
 #define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
     typename boost::call_traits<                                              \
         BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type        \
@@ -233,6 +237,23 @@ namespace hpx { namespace util { namespace coroutines
     }
 
 #undef HPX_COROUTINE_PARAM_WITH_DEFAULT
+
+#else
+
+    result_type operator()(arg0_type arg0 = arg0_type()) 
+    {
+      BOOST_ASSERT(m_pimpl);
+
+      result_type* ptr;
+      m_pimpl->bind_args(&arg0);
+      m_pimpl->bind_result_pointer(&ptr);
+
+      m_pimpl->invoke();
+
+      return *m_pimpl->result();
+    }
+
+#endif
 
     typedef void(coroutine::*bool_type)();
     operator bool_type() const {
@@ -280,6 +301,7 @@ namespace hpx { namespace util { namespace coroutines
       return !empty() && !exited() && !waiting();
     }
 
+#if defined(HPX_GENERIC_COROUTINES)
     result_type call_impl(arg_slot_type args) {
       BOOST_ASSERT(m_pimpl);
       m_pimpl->bind_args(&args);
@@ -301,6 +323,7 @@ namespace hpx { namespace util { namespace coroutines
 
       return detail::fix_result<result_slot_traits>(*m_pimpl->result());
     }
+#endif
 
     impl_ptr m_pimpl;
 

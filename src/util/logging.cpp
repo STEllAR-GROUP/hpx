@@ -210,15 +210,18 @@ namespace hpx { namespace util
             threads::thread_self* self = threads::get_self_ptr();
             if (0 != self) {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(2) << std::setfill('0')
-                    << self->get_thread_phase();
-                str.prepend_string(out.str());
+                std::size_t phase = self->get_thread_phase();
+                if (0 != phase) {
+                    std::stringstream out;
+                    out << std::hex << std::setw(2) << std::setfill('0')
+                        << self->get_thread_phase();
+                    str.prepend_string(out.str());
+                    return;
+                }
             }
-            else {
-                // called from outside a HPX thread
-                str.prepend_string("--");
-            }
+
+            // called from outside a HPX thread or no phase given
+            str.prepend_string("--");
         }
     };
 

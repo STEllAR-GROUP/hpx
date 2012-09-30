@@ -263,15 +263,15 @@ namespace hpx
         HPX_API_EXPORT thread_self::impl_type* get_ctx_ptr();
 
         /// The function \a get_self_ptr_checked returns a pointer to the (OS
-        /// thread specific) self reference to the current PX thread.
+        /// thread specific) self reference to the current HPX thread.
         HPX_API_EXPORT thread_self* get_self_ptr_checked(error_code& ec = throws);
 
-        /// The function \a get_self_id returns the PX thread id of the current
+        /// The function \a get_self_id returns the HPX thread id of the current
         /// thread (or zero if the current thread is not a PX thread).
         HPX_API_EXPORT thread_id_type get_self_id();
 
-        /// The function \a get_parent_id returns the PX thread id of the
-        /// currents thread parent (or zero if the current thread is not a
+        /// The function \a get_parent_id returns the HPX thread id of the
+        /// current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the  
@@ -279,8 +279,8 @@ namespace hpx
         ///       being defined.
         HPX_API_EXPORT thread_id_type get_parent_id();
 
-        /// The function \a get_parent_phase returns the PX phase of the
-        /// currents thread parent (or zero if the current thread is not a
+        /// The function \a get_parent_phase returns the HPX phase of the
+        /// current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the  
@@ -289,7 +289,7 @@ namespace hpx
         HPX_API_EXPORT std::size_t get_parent_phase();
 
         /// The function \a get_parent_locality_id returns the id of the locality of
-        /// the currents thread parent (or zero if the current thread is not a
+        /// the current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the  
