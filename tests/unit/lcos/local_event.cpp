@@ -6,8 +6,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/inlude/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/lcos/local/event_semaphore.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -17,7 +17,7 @@ using boost::program_options::value;
 
 using hpx::applier::register_work;
 
-using hpx::lcos::local::event_semaphore;
+using hpx::lcos::local::event;
 
 using hpx::init;
 using hpx::finalize;
@@ -25,7 +25,7 @@ using hpx::finalize;
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-void local_event_test(event_semaphore& b, boost::atomic<std::size_t>& c)
+void local_event_test(event& b, boost::atomic<std::size_t>& c)
 {
     ++c;
     // Wait for the event to occur.
@@ -52,7 +52,7 @@ int hpx_main(variables_map& vm)
 
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        event_semaphore e; 
+        event e; 
 
         boost::atomic<std::size_t> c(0);
 

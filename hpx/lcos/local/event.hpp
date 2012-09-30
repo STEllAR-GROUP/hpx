@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_EVENT_SEMAPHORE_SEP_29_2012_1918AM)
-#define HPX_LCOS_EVENT_SEMAPHORE_SEP_29_2012_1918AM
+#if !defined(HPX_LCOS_EVENT_SEP_29_2012_1918AM)
+#define HPX_LCOS_EVENT_SEP_29_2012_1918AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -32,7 +32,7 @@ namespace hpx { namespace lcos { namespace local
     namespace detail
     {
         template <typename Mutex = lcos::local::spinlock>
-        class event_semaphore
+        class event
         {
         private:
             typedef Mutex mutex_type;
@@ -83,17 +83,17 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             /// \brief Construct a new event semaphore
-            event_semaphore()
+            event()
               : event_(false) {}
 
-            ~event_semaphore()
+            ~event()
             {
                 typename mutex_type::scoped_lock l(mtx_);
 
                 if (!queue_.empty())
                 {
                     LERR_(fatal)
-                        << "lcos::event_semaphore::~event_semaphore:"
+                        << "lcos::event::~event:"
                            " queue is not empty, aborting threads";
 
                     while (!queue_.empty())
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace local
 
                         // we know that the id is actually the pointer to the thread
                         LERR_(fatal)
-                                << "lcos::event_semaphore::~event_semaphore:"
+                                << "lcos::event::~event:"
                                 << " pending thread: "
                                 << get_thread_state_name(threads::get_thread_state(id))
                                 << "(" << id << "): " << threads::get_thread_description(id);
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace local
                         if (ec)
                         {
                             LERR_(fatal)
-                                << "lcos::event_semaphore::~event_semaphore:"
+                                << "lcos::event::~event:"
                                 << " could not abort thread: "
                                 << get_thread_state_name(threads::get_thread_state(id))
                                 << "(" << id << "): " << threads::get_thread_description(id);
@@ -169,7 +169,7 @@ namespace hpx { namespace lcos { namespace local
                     {
                         util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                         this_thread::suspend(threads::suspended,
-                            "lcos::event_semaphore::wait");
+                            "lcos::event::wait");
                     }
                 }
             }
@@ -186,7 +186,7 @@ namespace hpx { namespace lcos { namespace local
                     if (HPX_UNLIKELY(!id))
                     {
                         HPX_THROW_EXCEPTION(null_thread_id,
-                            "lcos::event_semaphore::set_locked",
+                            "lcos::event::set_locked",
                             "NULL thread id encountered");
                     }
                     queue_.front().id_ = 0;
@@ -207,7 +207,7 @@ namespace hpx { namespace lcos { namespace local
                     if (HPX_UNLIKELY(!id))
                     {
                         HPX_THROW_EXCEPTION(null_thread_id,
-                            "lcos::event_semaphore::set_locked",
+                            "lcos::event::set_locked",
                             "NULL thread id encountered");
                     }
                     queue.front().id_ = 0;
@@ -225,7 +225,7 @@ namespace hpx { namespace lcos { namespace local
         };
     }
 
-    typedef detail::event_semaphore<> event_semaphore;
+    typedef detail::event<> event;
 }}}
 
 #if defined(BOOST_MSVC)

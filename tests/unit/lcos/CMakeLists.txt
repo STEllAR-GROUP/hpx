@@ -12,7 +12,7 @@ set(tests
     future
     future_wait
     local_barrier
-    local_event_semaphore
+    local_event
     local_mutex
     packaged_action
     promise
@@ -31,7 +31,7 @@ set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(local_event_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
+set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 

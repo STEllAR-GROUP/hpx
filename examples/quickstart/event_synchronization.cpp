@@ -15,7 +15,7 @@
 struct data
 {
     ///< For synchronizing two-phase initialization.
-    hpx::lcos::local::event_semaphore init;
+    hpx::lcos::local::event init;
 
     char const* msg;
 
