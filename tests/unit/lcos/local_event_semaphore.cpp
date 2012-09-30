@@ -59,14 +59,14 @@ int hpx_main(variables_map& vm)
         // Create the threads which will wait on the event
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work(boost::bind
-                (&local_event_test, boost::ref(b), boost::ref(c)));
+                (&local_event_test, boost::ref(e), boost::ref(c)));
 
         // Release all the threads.
-        b.set(); 
+        e.set(); 
         HPX_TEST_EQ(pxthreads, c);
 
         // Make sure that waiting on a set event works.
-        b.wait();
+        e.wait();
     }
 
     // Initiate shutdown of the runtime system.
