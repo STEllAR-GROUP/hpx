@@ -7,6 +7,7 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
