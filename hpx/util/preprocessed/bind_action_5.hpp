@@ -94,7 +94,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) ); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -103,7 +103,7 @@ namespace hpx { namespace util
                   
                         ).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -113,7 +113,7 @@ namespace hpx { namespace util
                         ).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -127,7 +127,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -141,7 +141,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -155,7 +155,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -169,7 +169,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -183,7 +183,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -197,7 +197,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -211,7 +211,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -225,7 +225,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -239,7 +239,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -253,7 +253,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -267,7 +267,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -281,7 +281,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -295,7 +295,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -309,7 +309,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -323,7 +323,7 @@ namespace hpx { namespace util
                 ).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -526,7 +526,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -535,7 +535,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -545,7 +545,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -559,7 +559,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -573,7 +573,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -587,7 +587,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -601,7 +601,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -615,7 +615,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -629,7 +629,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -643,7 +643,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -657,7 +657,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -671,7 +671,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -685,7 +685,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -699,7 +699,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -713,7 +713,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -727,7 +727,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -741,7 +741,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -755,7 +755,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -958,7 +958,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -967,7 +967,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -977,7 +977,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -991,7 +991,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -1005,7 +1005,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -1019,7 +1019,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -1033,7 +1033,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -1047,7 +1047,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -1061,7 +1061,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -1075,7 +1075,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -1089,7 +1089,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -1103,7 +1103,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -1117,7 +1117,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -1131,7 +1131,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -1145,7 +1145,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -1159,7 +1159,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -1173,7 +1173,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -1187,7 +1187,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -1390,7 +1390,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -1399,7 +1399,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -1409,7 +1409,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -1423,7 +1423,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -1437,7 +1437,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -1451,7 +1451,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -1465,7 +1465,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -1479,7 +1479,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -1493,7 +1493,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -1507,7 +1507,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -1521,7 +1521,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -1535,7 +1535,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -1549,7 +1549,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -1563,7 +1563,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -1577,7 +1577,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -1591,7 +1591,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -1605,7 +1605,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -1619,7 +1619,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -1822,7 +1822,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -1831,7 +1831,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -1841,7 +1841,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -1855,7 +1855,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -1869,7 +1869,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -1883,7 +1883,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -1897,7 +1897,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -1911,7 +1911,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -1925,7 +1925,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -1939,7 +1939,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -1953,7 +1953,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -1967,7 +1967,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -1981,7 +1981,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -1995,7 +1995,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -2009,7 +2009,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -2023,7 +2023,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -2037,7 +2037,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -2051,7 +2051,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -2254,7 +2254,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -2263,7 +2263,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -2273,7 +2273,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -2287,7 +2287,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -2301,7 +2301,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -2315,7 +2315,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -2329,7 +2329,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -2343,7 +2343,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -2357,7 +2357,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -2371,7 +2371,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -2385,7 +2385,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -2399,7 +2399,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -2413,7 +2413,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -2427,7 +2427,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -2441,7 +2441,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -2455,7 +2455,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -2469,7 +2469,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -2483,7 +2483,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -2686,7 +2686,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -2695,7 +2695,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -2705,7 +2705,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -2719,7 +2719,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -2733,7 +2733,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -2747,7 +2747,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -2761,7 +2761,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -2775,7 +2775,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -2789,7 +2789,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -2803,7 +2803,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -2817,7 +2817,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -2831,7 +2831,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -2845,7 +2845,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -2859,7 +2859,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -2873,7 +2873,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -2887,7 +2887,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -2901,7 +2901,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -2915,7 +2915,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<
@@ -3118,7 +3118,7 @@ namespace hpx { namespace util
             }
             template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple1< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type > env_type; env_type env(boost::forward<A0>( a0 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple2< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple3< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple4< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple5< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple6< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> hpx::lcos::future<result_type> async(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple7< typename detail::env_value_type<BOOST_FWD_REF(A0)>::type , typename detail::env_value_type<BOOST_FWD_REF(A1)>::type , typename detail::env_value_type<BOOST_FWD_REF(A2)>::type , typename detail::env_value_type<BOOST_FWD_REF(A3)>::type , typename detail::env_value_type<BOOST_FWD_REF(A4)>::type , typename detail::env_value_type<BOOST_FWD_REF(A5)>::type , typename detail::env_value_type<BOOST_FWD_REF(A6)>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return hpx::async<Action>( hpx::util::detail::eval(env, arg0) , hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)); }
             
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -3127,7 +3127,7 @@ namespace hpx { namespace util
                   ,
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
             }
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -3137,7 +3137,7 @@ namespace hpx { namespace util
                         hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
             }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
     {
         typedef
             hpx::util::tuple1<
@@ -3151,7 +3151,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0>
-    result_type operator()(BOOST_FWD_REF(A0) a0) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
     {
         typedef
             hpx::util::tuple1<
@@ -3165,7 +3165,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef
             hpx::util::tuple2<
@@ -3179,7 +3179,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
     {
         typedef
             hpx::util::tuple2<
@@ -3193,7 +3193,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef
             hpx::util::tuple3<
@@ -3207,7 +3207,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
     {
         typedef
             hpx::util::tuple3<
@@ -3221,7 +3221,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef
             hpx::util::tuple4<
@@ -3235,7 +3235,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
     {
         typedef
             hpx::util::tuple4<
@@ -3249,7 +3249,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef
             hpx::util::tuple5<
@@ -3263,7 +3263,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
     {
         typedef
             hpx::util::tuple5<
@@ -3277,7 +3277,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef
             hpx::util::tuple6<
@@ -3291,7 +3291,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
     {
         typedef
             hpx::util::tuple6<
@@ -3305,7 +3305,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef
             hpx::util::tuple7<
@@ -3319,7 +3319,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
     {
         typedef
             hpx::util::tuple7<
@@ -3333,7 +3333,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef
             hpx::util::tuple8<
@@ -3347,7 +3347,7 @@ namespace hpx { namespace util
                 hpx::util::detail::eval(env, arg1) , hpx::util::detail::eval(env, arg2) , hpx::util::detail::eval(env, arg3) , hpx::util::detail::eval(env, arg4) , hpx::util::detail::eval(env, arg5) , hpx::util::detail::eval(env, arg6) , hpx::util::detail::eval(env, arg7)).get();
     }
     template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
+    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
     {
         typedef
             hpx::util::tuple8<

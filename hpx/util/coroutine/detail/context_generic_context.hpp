@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace coroutines
         // Generic implementation for the context_impl_base class based on 
         // Boost.Context.
         template <typename T>
-        inline void trampoline(intptr_t pv) 
+        BOOST_FORCEINLINE void trampoline(intptr_t pv) 
         {
             T* fun = reinterpret_cast<T*>(pv);
             BOOST_ASSERT(fun);

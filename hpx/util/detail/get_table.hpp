@@ -57,7 +57,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        static vtable_ptr_base<
+        BOOST_FORCEINLINE static vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive
           , OArchive

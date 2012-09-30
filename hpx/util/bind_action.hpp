@@ -279,7 +279,7 @@ namespace hpx { namespace util
 #undef HPX_UTIL_BIND_ACTION_ASYNC
 
             // The operator()() invokes the embedded action synchronously.
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -289,7 +289,7 @@ namespace hpx { namespace util
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();
             }
 
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -304,7 +304,7 @@ namespace hpx { namespace util
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
           , <hpx/util/detail/bind_action_functor_operator.hpp>                  \
         )                                                                       \
     )                                                                           \

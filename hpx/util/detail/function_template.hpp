@@ -519,7 +519,6 @@ namespace hpx { namespace util {
             return *this;
         }
 
-
         function_base &swap(function_base& f)
         {
             std::swap(vptr, f.vptr);
@@ -552,13 +551,13 @@ namespace hpx { namespace util {
             }
         }
 
-        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
+        BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 
-        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));

@@ -72,7 +72,7 @@ namespace hpx { namespace util { namespace coroutines
     void trampoline(T* fun);
 
     template<typename T>
-    inline void
+    BOOST_FORCEINLINE void
     trampoline(T* fun)
     {
       (*fun)();

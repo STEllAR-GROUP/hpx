@@ -169,9 +169,8 @@ namespace hpx { namespace util { namespace coroutines
       fiber_ptr m_ctx;
     };
 
-    template<typename T>
-    inline
-    VOID CALLBACK
+    template <typename T>
+    BOOST_FORCEINLINE VOID CALLBACK
     trampoline(LPVOID pv) {
       T* fun = static_cast<T*>(pv);
       BOOST_ASSERT(fun);
