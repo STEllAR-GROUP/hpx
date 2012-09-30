@@ -460,13 +460,23 @@ int hpx_main(variables_map&)
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 5u : 7u);
+        ), 
+#if defined(__GNUC__) && HPX_GCC_VERSION < 40500
+        is_local ? 6u : 8u);      // gcc V4.4 is special
+#else
+        is_local ? 5u : 7u);
+#endif
 
         HPX_TEST_EQ((
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
+        ), 
+#if defined(__GNUC__) && HPX_GCC_VERSION < 40500
+        is_local ? 3u : 8u);      // gcc V4.4 is special
+#else
+        is_local ? 2u : 7u);
+#endif
     }
 
     finalize();
