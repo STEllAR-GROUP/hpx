@@ -193,7 +193,7 @@ namespace hpx { namespace components
             }
 
             HPX_THROW_EXCEPTION(bad_request,
-                "generic_component_factory::create_one",
+                "generic_component_factory::create_one_functor",
                 "this factory instance is disabled for this locality (" +
                 get_component_name() + ")");
             return naming::invalid_gid;

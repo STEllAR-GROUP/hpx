@@ -188,11 +188,19 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const&)
+        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const& ctor)
         {
+            if (isenabled_) {
+                naming::gid_type id = server::create_one<Component>(ctor);
+                if (id)
+                    ++refcnt_;
+                return id;
+            }
+
             HPX_THROW_EXCEPTION(bad_request,
-                "component_factory_one::create_one",
-                "create_one is not supported by this factory instance");
+                "component_factory_one::create_one_functor",
+                "this factory instance is disabled for this locality (" +
+                get_component_name() + ")");
             return naming::invalid_gid;
         }
 
