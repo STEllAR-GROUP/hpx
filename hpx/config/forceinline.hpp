@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +14,7 @@
 #   elif defined(__GNUC__) && __GNUC__ > 3
 #       define BOOST_FORCEIINLINE inline __attribute__ ((always_inline))
 #   else
-#   define BOOST_FORCEINLINE inline
+#       define BOOST_FORCEINLINE inline
 #   endif
 #endif
 
