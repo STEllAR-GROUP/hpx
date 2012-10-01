@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/inlude/lcos.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
