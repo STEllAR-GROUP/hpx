@@ -43,7 +43,6 @@ else()
             endif()
         endforeach()
 
-
         if(NOT FILE_ADDED_ALREADY)
             set(HPX_PREPROCESS_HEADERS ${HPX_PREPROCESS_HEADERS} ${file} CACHE INTERNAL "")
             hpx_parse_arguments(HPX_PREPROCESS_HEADERS_${file} "GUARD;LIMIT" "" ${ARGN})

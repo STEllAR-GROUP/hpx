@@ -361,7 +361,12 @@ endif()
 ################################################################################
 hpx_include(Documentation)
 
-hpx_include(Preprocessing)
+################################################################################
+# Creating the partially preprocessed header requires a recent version of Wave
+################################################################################
+if(${BOOST_MINOR_VERSION} GREATER 50) 
+  hpx_include(Preprocessing)
+endif()
 
 ################################################################################
 # Warning configuration
@@ -1059,7 +1064,7 @@ if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
-if(HPX_AUTOMATIC_PREPROCESSING)
+if(HPX_AUTOMATIC_PREPROCESSING AND ${BOOST_MINOR_VERSION} GREATER 50)
   add_subdirectory(preprocess)
 endif()
 
