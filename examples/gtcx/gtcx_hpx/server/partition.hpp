@@ -158,7 +158,7 @@ namespace gtcx { namespace server
         hpx::future<void> p2p_sendreceive_future_;
         hpx::lcos::local::trigger p2p_sendreceive_gate_;
 //        hpx::future<void> int_sndrecv_future_;
-        hpx::lcos::local::trigger int_sndrecv_gate_;
+//        hpx::lcos::local::trigger int_sndrecv_gate_;
         and_gate_type partd_allgather_gate_;
 
         std::vector<hpx::naming::id_type> components_;

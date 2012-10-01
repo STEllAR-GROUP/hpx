@@ -523,7 +523,7 @@ namespace gtcx { namespace server
       {
         mutex_type::scoped_lock l(mtx_);
         int_sndrecv_.resize(receive_size);
-        f = int_sndrecv_gate_.get_future(&generation);
+        f = sndrecv_gate_.get_future(&generation);
       }
 
       // The sender: send data to the left
@@ -534,6 +534,11 @@ namespace gtcx { namespace server
       set_int_sndrecv_data_action set_int_sndrecv_data_;
       hpx::apply(set_int_sndrecv_data_, components_[t_comm_[*dest]], item_,
           generation, send);
+
+      std::cerr << "int_toroidal_sndrecv(" << item_ << "): " 
+                << "g(" << generation << "), " 
+                << "s(" << send_size << "), r(" << receive_size << ")" 
+                << std::endl;
 
       // Now receive a message from the right
       f.get();
@@ -552,10 +557,16 @@ namespace gtcx { namespace server
                            std::vector<int> const& send)
     {
         mutex_type::scoped_lock l(mtx_);
-        int_sndrecv_gate_.synchronize(generation, l, "point::set_int_sndrecv_data");
+        sndrecv_gate_.synchronize(generation, l, "point::set_int_sndrecv_data");
+
+        std::cerr << "set_int_sndrecv_data(" << item_ << "," << which << "): " 
+                << "g(" << generation << "), " 
+                << "s(" << send.size() << "), r(" << int_sndrecv_.size() << ")"
+                << std::endl;
+
         BOOST_ASSERT(int_sndrecv_.size() == send.size());
         int_sndrecv_ = send;
-        int_sndrecv_gate_.set();         // trigger corresponding and-gate input
+        sndrecv_gate_.set();         // trigger corresponding and-gate input
     }
 
 
