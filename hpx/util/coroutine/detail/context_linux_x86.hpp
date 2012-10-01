@@ -23,6 +23,7 @@
 #include <boost/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>

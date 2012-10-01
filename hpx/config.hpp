@@ -11,6 +11,7 @@
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/config/preprocessor/add3.hpp>
 #include <hpx/config/preprocessor/round_up.hpp>
 #include <hpx/config/preprocessor/round_up_add3.hpp>

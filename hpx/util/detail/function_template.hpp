@@ -9,6 +9,8 @@
 #ifndef HPX_UTIL_FUNCTION_TEMPLATE_HPP
 #define HPX_UTIL_FUNCTION_TEMPLATE_HPP
 
+#include <hpx/config/forceinline.hpp>
+
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>

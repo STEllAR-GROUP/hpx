@@ -8,6 +8,7 @@
 #ifndef HPX_FUNCTION_DETAIL_GET_TABLE_HPP
 #define HPX_FUNCTION_DETAIL_GET_TABLE_HPP
 
+#include <hpx/config/forceinline.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>

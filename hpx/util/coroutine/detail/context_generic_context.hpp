@@ -20,6 +20,7 @@
 #include <boost/context/all.hpp>
 #include <boost/noncopyable.hpp>
 
+#include <hpx/config/forecinline.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 

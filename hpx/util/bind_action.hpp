@@ -10,6 +10,7 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/remove_reference.hpp>

@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
 
         void reset()
         {
-            cond_.reset();
+            cond_.clear();
         }
 
         /// \brief Trigger this object.

@@ -8,6 +8,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM)
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/move.hpp>
 #include <boost/fusion/include/size.hpp>
 #include <boost/type_traits/remove_reference.hpp>

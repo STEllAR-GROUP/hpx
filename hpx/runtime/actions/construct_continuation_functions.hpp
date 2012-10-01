@@ -8,6 +8,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM)
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/preprocessor/cat.hpp>

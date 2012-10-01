@@ -506,7 +506,7 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_ACTION_TPL(component, func, name)                \
-    typedef HPX_MAKE_COMPONENT_ACTION_TPL(component, func)::type name         \
+    typedef typename HPX_MAKE_COMPONENT_ACTION_TPL(component, func)::type name\
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_TPL(component, func, name)          \
     typedef HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, func)::type name   \
