@@ -32,7 +32,7 @@ namespace hpx { namespace components
         create_async(naming::id_type const& gid)
         {
             return stubs::runtime_support::create_component_async<ServerComponent>
-                (gid, get_component_type());
+                (gid);
         }
 
         static naming::id_type create(naming::id_type const& gid)
