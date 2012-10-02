@@ -19,6 +19,9 @@
 
 namespace hpx { namespace components
 {
+    template <typename Component>
+    class simple_component;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     class simple_component_base : public detail::simple_component_tag
@@ -32,6 +35,7 @@ namespace hpx { namespace components
     public:
         typedef this_component_type wrapped_type;
         typedef this_component_type base_type_holder;
+        typedef simple_component<this_component_type> wrapping_type;
 
         /// \brief Construct an empty simple_component
         simple_component_base()
@@ -120,11 +124,14 @@ namespace hpx { namespace components
         {
             static Component* alloc(std::size_t count)
             {
-                return Component::create(count);
+                BOOST_ASSERT(1 == count);
+                return static_cast<Component*>
+                    (::operator new(sizeof(Component)));
             }
             static void free(void* p, std::size_t count)
             {
-                Component::destroy(reinterpret_cast<Component *>(p), count);
+                BOOST_ASSERT(1 == count);
+                ::operator delete(p);
             }
         };
     }
@@ -136,6 +143,7 @@ namespace hpx { namespace components
     public:
         typedef Component type_holder;
         typedef simple_component<Component> component_type;
+        typedef component_type derived_type;
         typedef detail::simple_heap_factory<component_type> heap_type;
 
         /// \brief  The function \a create is used for allocation and

@@ -117,7 +117,7 @@ namespace hpx { namespace components { namespace server
 
             result_type operator()(void* p)
             {
-                new (p) Component(HPX_ENUM_MOVE_ARGS(N, a));
+                new (p) typename Component::derived_type(HPX_ENUM_MOVE_ARGS(N, a));
             }
             BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CTOR_M1, _)
 

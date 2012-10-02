@@ -360,13 +360,12 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component : boost::noncopyable
     {
-    private:
+    public:
         typedef typename boost::mpl::if_<
                 boost::is_same<Derived, detail::this_type>,
                 managed_component, Derived
             >::type derived_type;
 
-    public:
         typedef Component wrapped_type;
         typedef Component type_holder;
         typedef typename Component::base_type_holder base_type_holder;
