@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace server
             return gid;
         }
 
-        //Component::heap_type::free(c, 1);
+        Component::heap_type::free(c, 1);
 
         hpx::util::osstream strm;
         strm << "global id " << gid << " is already bound to a different "
