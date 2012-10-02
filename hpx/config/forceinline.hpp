@@ -12,7 +12,7 @@
 #   if defined(_MSC_VER)
 #       define BOOST_FORCEINLINE __forceinline
 #   elif defined(__GNUC__) && __GNUC__ > 3
-#       define BOOST_FORCEIINLINE inline __attribute__ ((always_inline))
+#       define BOOST_FORCEINLINE inline __attribute__ ((always_inline))
 #   else
 #       define BOOST_FORCEINLINE inline
 #   endif
