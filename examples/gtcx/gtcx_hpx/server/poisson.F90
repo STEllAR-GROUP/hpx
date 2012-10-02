@@ -164,7 +164,8 @@ subroutine poisson(iflag,hpx4_bti,&
 ! hjw
      nmem = (2*(mindex*mgrid*mzeta))+(mgrid*mzeta)
 !     write(0,*)mype,'*** Cannot allocate indexp: mtest=',mtest
-      write(0,*)mype,'*** indexp: Allocate Error: ',nmem, ' words mtest= ',mtest
+      ! FIXME MATT -- looks like it is already allocated but something is fishy
+      !write(0,*)mype,'*** indexp: Allocate Error: ',nmem, ' words mtest= ',mtest
 ! hjw
         !call MPI_ABORT(MPI_COMM_WORLD,1,ierr)
      endif
