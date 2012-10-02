@@ -55,6 +55,8 @@ int main()
     std::string msg = "hello world\n";
     ms.create(hpx::find_here(), msg);
 
+    ms.print();
+
     return 0; 
 }
 
