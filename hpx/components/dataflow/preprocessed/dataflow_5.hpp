@@ -16,7 +16,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action3<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
@@ -39,7 +39,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action3<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &

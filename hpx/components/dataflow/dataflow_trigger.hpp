@@ -34,7 +34,7 @@ namespace hpx { namespace lcos
             typedef
                 hpx::components::server::runtime_support::
                     create_component_action1<
-                        components::managed_component<server::dataflow_trigger>
+                        server::dataflow_trigger
                       , std::vector<dataflow_base<void> > const &
                     >::type
                 create_component_action;
@@ -54,7 +54,7 @@ namespace hpx { namespace lcos
         {
             typedef
                 hpx::components::server::create_component_action1<
-                    components::managed_component<server::dataflow_trigger>
+                    server::dataflow_trigger
                   , std::vector<dataflow_base<void> >
                 >::type
                 create_component_action;
