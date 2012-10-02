@@ -67,7 +67,7 @@ find_barrier(char const* symname)
 // Symbolic names of global boot barrier objects
 const char* second_barrier = "/barrier(agas#0)/second_stage";
 const char* third_barrier = "/barrier(agas#0)/third_stage";
-const char* forth_barrier = "/barrier(agas#0)/forth_stage";
+const char* fourth_barrier = "/barrier(agas#0)/fourth_stage";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
@@ -156,7 +156,7 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_requested ? ", application exit has been requested" : "");
 
-        lcos::barrier second_stage, third_stage, forth_stage;
+        lcos::barrier second_stage, third_stage, fourth_stage;
 
         // {{{ Second and third stage barrier creation.
         if (agas_client.is_bootstrap())
@@ -173,7 +173,7 @@ bool pre_main(runtime_mode mode)
             std::size_t const num_localities = cfg.get_num_localities();
             second_stage = create_barrier(num_localities, second_barrier);
             third_stage = create_barrier(num_localities, third_barrier);
-            forth_stage = create_barrier(num_localities, forth_barrier);
+            fourth_stage = create_barrier(num_localities, fourth_barrier);
 
             LBT_(info) << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
         }
@@ -183,7 +183,7 @@ bool pre_main(runtime_mode mode)
             // Initialize the barrier clients (find them in AGAS)
             second_stage = find_barrier(second_barrier);
             third_stage = find_barrier(third_barrier);
-            forth_stage = find_barrier(forth_barrier);
+            fourth_stage = find_barrier(fourth_barrier);
 
             LBT_(info) << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
@@ -218,7 +218,7 @@ bool pre_main(runtime_mode mode)
         // localities. This is done after component loading to guarantee that
         // all user code, including startup functions, are only run after the
         // component tables are populated.
-        forth_stage.wait();
+        fourth_stage.wait();
         LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
 
         // Tear down the second stage barrier.
