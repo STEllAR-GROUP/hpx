@@ -21,7 +21,7 @@ hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header prepro
 set(HPX_PREPROCESS_HEADERS CACHE INTERNAL "" FORCE)
 set(HPX_PREPROCESS_INCLUDE_DIRS CACHE INTERNAL "" FORCE)
 
-if(NOT HPX_AUTOMATIC_PREPROCESSING)
+if(NOT (HPX_AUTOMATIC_PREPROCESSING AND ${BOOST_MINOR_VERSION} GREATER 50))
     macro(hpx_partial_preprocess_header file)
     endmacro()
     macro(hpx_setup_partial_preprocess_headers)

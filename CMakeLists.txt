@@ -364,9 +364,7 @@ hpx_include(Documentation)
 ################################################################################
 # Creating the partially preprocessed header requires a recent version of Wave
 ################################################################################
-if(${BOOST_MINOR_VERSION} GREATER 50) 
-  hpx_include(Preprocessing)
-endif()
+hpx_include(Preprocessing)
 
 ################################################################################
 # Warning configuration
