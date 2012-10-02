@@ -60,7 +60,7 @@ namespace hpx { namespace lcos
         {
             typedef
                 typename hpx::components::server::runtime_support::create_component_action2<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action>
                   , naming::id_type
                 >::type
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos
                     components::server::runtime_support::create_component_action
                   , BOOST_PP_ADD(N, 2)
                 )<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , BOOST_PP_REPEAT(N, HPX_A, _)
@@ -169,7 +169,7 @@ namespace hpx { namespace lcos
                     components::server::runtime_support::create_component_direct_action
                   , BOOST_PP_ADD(N, 2)
                 )<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , BOOST_PP_REPEAT(N, HPX_A, _)

@@ -16,7 +16,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action3<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
@@ -39,7 +39,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action3<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
@@ -74,7 +74,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action4<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
@@ -97,7 +97,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action4<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
@@ -132,7 +132,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action5<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
@@ -155,7 +155,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action5<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
@@ -190,7 +190,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action6<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
@@ -213,7 +213,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action6<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
@@ -248,7 +248,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action7<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
@@ -271,7 +271,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action7<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
@@ -306,7 +306,7 @@
         )
         {
             typedef typename components::server::runtime_support::create_component_action8<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
@@ -329,7 +329,7 @@
         {
             typedef
                 typename components::server::runtime_support::create_component_direct_action8<
-                    components::managed_component<server::dataflow>
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
