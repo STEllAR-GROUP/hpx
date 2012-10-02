@@ -59,7 +59,7 @@ namespace hpx { namespace lcos
         create_component(naming::id_type const & target)
         {
             typedef
-                typename hpx::components::server::create_one_component_action2<
+                typename hpx::components::server::runtime_support::create_component_action2<
                     components::managed_component<server::dataflow>
                   , detail::action_wrapper<Action>
                   , naming::id_type
@@ -68,7 +68,6 @@ namespace hpx { namespace lcos
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                 );
@@ -139,9 +138,8 @@ namespace hpx { namespace lcos
           , boost::mpl::false_
         )
         {
-            typedef
-                typename BOOST_PP_CAT(
-                    hpx::components::server::create_one_component_action
+            typedef typename BOOST_PP_CAT(
+                    components::server::runtime_support::create_component_action
                   , BOOST_PP_ADD(N, 2)
                 )<
                     components::managed_component<server::dataflow>
@@ -153,7 +151,6 @@ namespace hpx { namespace lcos
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , HPX_ENUM_FORWARD_ARGS(N, A, a)
@@ -169,7 +166,7 @@ namespace hpx { namespace lcos
         {
             typedef
                 typename BOOST_PP_CAT(
-                    hpx::components::server::create_one_component_direct_action
+                    components::server::runtime_support::create_component_direct_action
                   , BOOST_PP_ADD(N, 2)
                 )<
                     components::managed_component<server::dataflow>
@@ -181,7 +178,6 @@ namespace hpx { namespace lcos
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , HPX_ENUM_FORWARD_ARGS(N, A, a)

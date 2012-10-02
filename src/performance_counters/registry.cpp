@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/create_component_with_args.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
@@ -241,7 +241,7 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             typedef components::managed_component<server::raw_counter> counter_t;
-            id = components::server::create_one<counter_t>(complemented_info, f);
+            id = components::server::create_with_args<counter_t>(complemented_info, f);
 
             std::string name(complemented_info.fullname_);
             ensure_counter_prefix(name);      // pre-pend prefix, if necessary
@@ -292,7 +292,7 @@ namespace hpx { namespace performance_counters
             case counter_elapsed_time:
                 {
                     typedef components::managed_component<server::elapsed_time_counter> counter_t;
-                    id = components::server::create_one<counter_t>(complemented_info);
+                    id = components::server::create_with_args<counter_t>(complemented_info);
                 }
                 break;
 
@@ -371,7 +371,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::aggregating_counter<
                         boost::accumulators::tag::mean>
                 > counter_t;
-                gid = components::server::create_one<counter_t>(
+                gid = components::server::create_with_args<counter_t>(
                     complemented_info, base_counter_name, base_time_interval);
             }
             else if (p.countername_ == "max") {
@@ -379,7 +379,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::aggregating_counter<
                         boost::accumulators::tag::max>
                 > counter_t;
-                gid = components::server::create_one<counter_t>(
+                gid = components::server::create_with_args<counter_t>(
                     complemented_info, base_counter_name, base_time_interval);
             }
             else if (p.countername_ == "min") {
@@ -387,7 +387,7 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::aggregating_counter<
                         boost::accumulators::tag::min>
                 > counter_t;
-                gid = components::server::create_one<counter_t>(
+                gid = components::server::create_with_args<counter_t>(
                     complemented_info, base_counter_name, base_time_interval);
             }
             else {

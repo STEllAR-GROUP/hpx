@@ -22,8 +22,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/constructor_argument.hpp>
-#include <hpx/runtime/components/server/create_one_component_functor.hpp>
+#include <hpx/runtime/components/server/create_component_with_args.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -31,62 +30,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#define HPX_TO_MOVE_OR_NOT_ARGS(z, n, _)                                      \
-    detail::to_move_or_not<BOOST_PP_CAT(A, n)>::call(BOOST_PP_CAT(a, n))      \
-    /**/
-
 namespace hpx { namespace components { namespace server
 {
-    namespace detail
-    {
-#if !defined(BOOST_NO_RVALUE_REFERENCES)
-        template <typename T, bool IsRvalueRef =
-            std::is_rvalue_reference<T>::type::value>
-#else
-        template <typename T, bool IsRvalueRef = false>
-#endif
-        struct to_move_or_not
-        {
-            template <typename A>
-            static T call(BOOST_FWD_REF(A) t)
-            {
-                return boost::move(t);
-            }
-        };
-
-        template <typename T>
-        struct to_move_or_not<T &, false>
-        {
-            template <typename A>
-            static T & call(BOOST_FWD_REF(A) t)
-            {
-                return t;
-            }
-        };
-
-        template <typename T>
-        struct to_move_or_not<T const &, false>
-        {
-            template <typename A>
-            static T const & call(BOOST_FWD_REF(A) t)
-            {
-                return t;
-            }
-        };
-
-        template <typename T>
-        struct to_move_or_not<T, true>
-        {
-            template <typename A>
-            static BOOST_RV_REF(
-                typename hpx::util::detail::remove_reference<T>::type)
-            call(BOOST_FWD_REF(A) t)
-            {
-                return boost::move(t);
-            }
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
     {
@@ -122,7 +67,6 @@ namespace hpx { namespace components { namespace server
                                                     ///< one instance of a component
                                                     ///< can be created at once
             runtime_support_create_component = 1,   ///< create new default constructed components
-            runtime_support_create_one_component = 2,   ///< create new component with one constructor argument
             runtime_support_bulk_create_components = 3, ///< create N new default constructed components
             runtime_support_free_component = 4,     ///< delete existing components
             runtime_support_shutdown = 5,           ///< shut down this runtime instance
@@ -177,24 +121,64 @@ namespace hpx { namespace components { namespace server
         ///        instance at once
         int factory_properties(components::component_type type);
 
-        /// \brief Action to create new default constructed components
-        naming::gid_type create_component(components::component_type type,
-            std::size_t count);
-
         /// \brief Action to create N new default constructed components
         std::vector<naming::gid_type> bulk_create_components(
             components::component_type type, std::size_t count);
 
-        /// \brief Action to create new component while passing one constructor
-        ///        parameter
-        naming::gid_type create_one_component(components::component_type type,
-            constructor_argument const& arg0);
+        template <typename Component>
+        naming::gid_type create_component0()
+        {
+            components::component_type const type
+                = components::get_component_type<
+                    typename Component::wrapped_type
+                >();
+            component_map_mutex_type::scoped_lock l(cm_mtx_);
+            component_map_type::const_iterator it = components_.find(type);
+            if (it == components_.end()) {
+                hpx::util::osstream strm;
+                strm << "attempt to create component instance of "
+                     << "invalid/unknown type: "
+                     << components::get_component_type_name(type)
+                     << " (component not found in map)";
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                    "runtime_support::create_component",
+                    hpx::util::osstream_get_string(strm));
+                return naming::invalid_gid;
+            }
+            if (!(*it).second.first) {
+                hpx::util::osstream strm;
+                strm << "attempt to create component instance of "
+                     << "invalid/unknown type: "
+                     << components::get_component_type_name(type)
+                     << " (map entry is NULL)";
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                    "runtime_support::create_component",
+                    hpx::util::osstream_get_string(strm));
+                return naming::invalid_gid;
+            }
 
-#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_(Z, N, D)                      \
+            naming::gid_type id;
+            boost::shared_ptr<component_factory_base> factory((*it).second.first);
+            {
+                util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+                id = factory->create();
+            }
+            LRT_(info) << "successfully created component " << id
+                       << " of type: "
+                       << components::get_component_type_name(type);
+
+            return id;
+        }
+
+#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT(Z, N, D)                           \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
-        naming::gid_type BOOST_PP_CAT(create_one_component_, N)(                \
-            components::component_type type, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
+        naming::gid_type BOOST_PP_CAT(create_component, N)(                     \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                               \
         {                                                                       \
+            components::component_type const type                               \
+                = components::get_component_type<                               \
+                    typename Component::wrapped_type                            \
+                  >();                                                          \
             component_map_mutex_type::scoped_lock l(cm_mtx_);                   \
             component_map_type::const_iterator it = components_.find(type);     \
             if (it == components_.end()) {                                      \
@@ -224,9 +208,10 @@ namespace hpx { namespace components { namespace server
             boost::shared_ptr<component_factory_base> factory((*it).second.first);\
             {                                                                   \
                 util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);\
-                id = server::create_one_functor<Component>(                     \
-                    factory.get(),                                              \
-                    BOOST_PP_ENUM(N, HPX_TO_MOVE_OR_NOT_ARGS, _));              \
+                id = factory->create_with_args(                                 \
+                    BOOST_PP_CAT(component_constructor_functor, N)<             \
+                        Component, BOOST_PP_ENUM_PARAMS(N, A)>(                 \
+                        HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)));                \
             }                                                                   \
             LRT_(info) << "successfully created component " << id               \
                        << " of type: "                                          \
@@ -235,13 +220,15 @@ namespace hpx { namespace components { namespace server
             return id;                                                          \
         }                                                                       \
     /**/
+
         BOOST_PP_REPEAT_FROM_TO(
             1
           , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_
+          , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT
           , _
         )
-#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_
+
+#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT
 
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
@@ -303,19 +290,6 @@ namespace hpx { namespace components { namespace server
             runtime_support_factory_properties, components::component_type,
             &runtime_support::factory_properties
         > factory_properties_action;
-
-        typedef hpx::actions::result_action2<
-            runtime_support, naming::gid_type, runtime_support_create_component,
-            components::component_type, std::size_t,
-            &runtime_support::create_component
-        > create_component_action;
-
-        typedef hpx::actions::result_action2<
-            runtime_support, naming::gid_type,
-            runtime_support_create_one_component,
-            components::component_type, constructor_argument const&,
-            &runtime_support::create_one_component
-        > create_one_component_action;
 
         typedef hpx::actions::result_action2<
             runtime_support, std::vector<naming::gid_type>,
@@ -492,52 +466,55 @@ namespace hpx { namespace components { namespace server
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
-    };
 
-#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION(Z, N, D)              \
-    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
-    struct BOOST_PP_CAT(create_one_component_action, N)                       \
-    {                                                                         \
-        typedef                                                               \
-            BOOST_PP_CAT( ::hpx::actions::result_action, BOOST_PP_INC(N))<    \
-                runtime_support                                               \
-              , naming::gid_type                                              \
-              , runtime_support::runtime_support_create_one_component         \
-              , components::component_type                                    \
-              , BOOST_PP_ENUM_PARAMS(N, A)                                    \
-              , &runtime_support::BOOST_PP_CAT(create_one_component_, N)<     \
-                    Component                                                 \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
+    public:
+
+#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION(Z, N, D)                  \
+        template <typename Component                                          \
+                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>   \
+        struct BOOST_PP_CAT(create_component_action, N)                       \
+        {                                                                     \
+            typedef                                                           \
+                BOOST_PP_CAT( ::hpx::actions::result_action, N)<              \
+                    runtime_support                                           \
+                  , naming::gid_type                                          \
+                  , runtime_support::runtime_support_create_component         \
+                    BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)           \
+                  , &runtime_support::BOOST_PP_CAT(create_component, N)<      \
+                        Component                                             \
+                        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)       \
+                    >                                                         \
                 >                                                             \
-            >                                                                 \
-            type;                                                             \
-    };                                                                        \
+                type;                                                         \
+        };                                                                    \
                                                                               \
-    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
-    struct BOOST_PP_CAT(create_one_component_direct_action, N)                \
-    {                                                                         \
-        typedef                                                               \
-            BOOST_PP_CAT( ::hpx::actions::direct_result_action, BOOST_PP_INC(N))<\
-                runtime_support                                               \
-              , naming::gid_type                                              \
-              , runtime_support::runtime_support_create_one_component         \
-              , components::component_type                                    \
-              , BOOST_PP_ENUM_PARAMS(N, A)                                    \
-              , &runtime_support::BOOST_PP_CAT(create_one_component_, N)<     \
-                    Component                                                 \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
+        template <typename Component                                          \
+                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>   \
+        struct BOOST_PP_CAT(create_component_direct_action, N)                \
+        {                                                                     \
+            typedef                                                           \
+                BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<       \
+                    runtime_support                                           \
+                  , naming::gid_type                                          \
+                  , runtime_support::runtime_support_create_component         \
+                    BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)           \
+                  , &runtime_support::BOOST_PP_CAT(create_component, N)<      \
+                        Component                                             \
+                        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)       \
+                    >                                                         \
                 >                                                             \
-            >                                                                 \
-            type;                                                             \
-    };                                                                        \
-    /**/
-    BOOST_PP_REPEAT_FROM_TO(
-        1
-      , BOOST_PP_DEC(HPX_ACTION_ARGUMENT_LIMIT)
-      , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION
-      , _
-    )
-#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION
+                type;                                                         \
+        };                                                                    \
+        /**/
+        BOOST_PP_REPEAT_FROM_TO(
+            0
+          , HPX_ACTION_ARGUMENT_LIMIT
+          , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION
+          , _
+        )
+#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION
+
+    };
 
 }}}
 
@@ -546,12 +523,6 @@ namespace hpx { namespace components { namespace server
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::factory_properties_action,
     factory_properties_action)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::create_component_action,
-    create_component_action)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::create_one_component_action,
-    create_one_component_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::bulk_create_components_action,
     bulk_create_components_action)
@@ -603,6 +574,5 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#undef HPX_TO_MOVE_OR_NOT_ARGS
-
 #endif
+

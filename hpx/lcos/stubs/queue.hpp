@@ -18,7 +18,7 @@ namespace hpx { namespace lcos { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     template <typename ValueType, typename RemoteType = ValueType>
     struct queue
-      : public components::stubs::stub_base<
+      : public components::stub_base<
             lcos::server::queue<ValueType, RemoteType> >
     {
         ///////////////////////////////////////////////////////////////////////

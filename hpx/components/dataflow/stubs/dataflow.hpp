@@ -15,7 +15,7 @@ namespace hpx { namespace lcos {
     namespace stubs
     {
         struct dataflow
-            : components::stubs::stub_base<
+            : components::stub_base<
                 hpx::lcos::server::dataflow
             >
         {

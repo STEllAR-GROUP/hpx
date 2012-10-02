@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/derived_component_factory_one.hpp>
+#include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/server/barrier.hpp>
 #include <hpx/util/serialize_exception.hpp>
@@ -23,6 +23,6 @@ typedef hpx::components::managed_component<hpx::lcos::server::barrier> barrier_t
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::server::barrier, hpx::components::component_barrier)
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(barrier_type, barrier,
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(barrier_type, barrier,
     "hpx::lcos::base_lco", hpx::components::factory_enabled)
 

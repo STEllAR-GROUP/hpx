@@ -32,15 +32,15 @@ namespace hpx { namespace lcos
         )
         {
             typedef
-                hpx::components::server::create_one_component_action1<
-                    components::managed_component<server::dataflow_trigger>
-                  , std::vector<dataflow_base<void> > const &
-                >::type
+                hpx::components::server::runtime_support::
+                    create_component_action1<
+                        components::managed_component<server::dataflow_trigger>
+                      , std::vector<dataflow_base<void> > const &
+                    >::type
                 create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(id)
-                  , stub_type::get_component_type()
                   , trigger
                 );
         }
@@ -53,7 +53,7 @@ namespace hpx { namespace lcos
         )
         {
             typedef
-                hpx::components::server::create_one_component_action1<
+                hpx::components::server::create_component_action1<
                     components::managed_component<server::dataflow_trigger>
                   , std::vector<dataflow_base<void> >
                 >::type
@@ -61,7 +61,6 @@ namespace hpx { namespace lcos
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(id)
-                  , stub_type::get_component_type()
                   , boost::move(trigger)
                 );
         }

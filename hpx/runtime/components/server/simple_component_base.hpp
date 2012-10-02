@@ -151,23 +151,6 @@ namespace hpx { namespace components
             return static_cast<component_type* >(new Component());
         }
 
-        /// \brief  The function \a create is used for allocation and
-        //          initialization of a single instance.
-#define HPX_SIMPLE_COMPONENT_CREATE_ONE(Z, N, _)                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        static component_type*                                                \
-        create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
-        {                                                                     \
-            return static_cast<component_type* >(                             \
-                new Component(BOOST_PP_ENUM_PARAMS(N, t)));                   \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-            HPX_SIMPLE_COMPONENT_CREATE_ONE, _)
-
-#undef HPX_SIMPLE_COMPONENT_CREATE_ONE
-
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
 #if defined(NDEBUG) && defined(BOOST_DISABLE_ASSERTS)
