@@ -19,6 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
 {
+/*
     //
     lcos::future<naming::id_type, naming::gid_type>
     create_async(naming::id_type const& targetgid,
@@ -39,6 +40,7 @@ namespace hpx { namespace applier
     {
         return create_async(targetgid, type, count).get();
     }
+*/
 
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state_enum thread_function(

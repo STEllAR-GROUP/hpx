@@ -35,7 +35,7 @@ inline lcos::barrier
 create_barrier(std::size_t num_localities, char const* symname)
 {
     lcos::barrier b;
-    b.create_one(find_here(), num_localities);
+    b.create(find_here(), num_localities);
 
     agas::register_name(symname, b.get_gid());
     return b;

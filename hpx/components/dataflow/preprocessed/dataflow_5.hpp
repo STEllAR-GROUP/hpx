@@ -15,8 +15,7 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action3<
+            typedef typename components::server::runtime_support::create_component_action3<
                     components::managed_component<server::dataflow>
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -26,7 +25,6 @@
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 )
@@ -40,7 +38,7 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action3<
+                typename components::server::runtime_support::create_component_direct_action3<
                     components::managed_component<server::dataflow>
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
@@ -50,7 +48,6 @@
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 )

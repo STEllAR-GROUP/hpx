@@ -143,22 +143,6 @@ struct fixed_component : Component
         return new Component();
     }
 
-        /// \brief  The function \a create is used for allocation and
-        //          initialization of a single instance.
-#define HPX_FIXED_COMPONENT_CREATE_ONE(Z, N, _)                               \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        static Component*                                                     \
-        create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
-        {                                                                     \
-            return new Component(BOOST_PP_ENUM_PARAMS(N, t));                 \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-            HPX_FIXED_COMPONENT_CREATE_ONE, _)
-
-#undef HPX_FIXED_COMPONENT_CREATE_ONE
-
     /// \brief  The function \a destroy is used for destruction and
     ///         de-allocation of instances of the derived components.
     static void destroy(Component* p, std::size_t count = 1)

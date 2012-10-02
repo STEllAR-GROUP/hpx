@@ -16,7 +16,7 @@ namespace hpx { namespace performance_counters { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT performance_counter
-      : components::stubs::stub_base<server::base_performance_counter>
+      : components::stub_base<server::base_performance_counter>
     {
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<counter_info> get_info_async(

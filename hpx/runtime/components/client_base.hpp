@@ -10,6 +10,7 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/move/move.hpp>
 
@@ -77,44 +78,33 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an object on the locality as
         /// given by the parameter \a targetgid
-        Derived& create(naming::id_type const& targetgid, component_type type,
-            std::size_t count = 1)
+        Derived& create(naming::id_type const& targetgid)
         {
             free();
-            gid_ = stub_type::create_sync(targetgid, type, count);
+            gid_ = stub_type::create(targetgid);
             return static_cast<Derived&>(*this);
         }
 
-        Derived& create(naming::id_type const& targetgid, std::size_t count = 1)
-        {
-            free();
-            gid_ = stub_type::create_sync(targetgid, count);
-            return static_cast<Derived&>(*this);
-        }
+#define HPX_CLIENT_BASE_CREATE(Z, N, D)                                      \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                       \
+        Derived& create(naming::id_type const& targetgid,                    \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                            \
+        {                                                                    \
+            free();                                                          \
+            gid_ = stub_type::create(targetgid,                              \
+                HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                      \
+            return static_cast<Derived&>(*this);                             \
+        }                                                                    \
+    /**/
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Arg0>
-        Derived& create_one(naming::id_type const& gid, component_type type,
-            BOOST_FWD_REF(Arg0) arg0)
-        {
-            free();
-            gid_ = stub_type::create_one_sync(gid, type, boost::forward<Arg0>(arg0));
-            return static_cast<Derived&>(*this);
-        }
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , HPX_ACTION_ARGUMENT_LIMIT
+          , HPX_CLIENT_BASE_CREATE
+          , _
+        )
 
-        template <typename Arg0>
-        Derived& create_one(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
-        {
-            free();
-            gid_ = stub_type::create_one_sync(gid, boost::forward<Arg0>(arg0));
-            return static_cast<Derived&>(*this);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void free(component_type)
-        {
-            stub_type::free(gid_);
-        }
+#undef HPX_CLIENT_BASE_CREATE
 
         void free()
         {

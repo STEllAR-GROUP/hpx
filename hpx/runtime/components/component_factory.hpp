@@ -13,7 +13,8 @@
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
-#include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
@@ -136,9 +137,10 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::gid_type create (std::size_t count)
+        naming::gid_type create(std::size_t count = 1)
         {
-            if (isenabled_) {
+            if (isenabled_)
+            {
                 naming::gid_type id = server::create<Component>(count);
                 if (id)
                     ++refcnt_;
@@ -152,38 +154,28 @@ namespace hpx { namespace components
             return naming::invalid_gid;
         }
 
-        /// \brief Create one new component instance using the given constructor
-        ///        argument.
-        ///
-        /// \param Arg0  [in] The type specific constructor argument
-        ///
-        /// \return Returns the GID of the first newly created component
-        ///         instance. If more than one component instance has been
-        ///         created (\a count > 1) the GID's of all new instances are
-        ///         sequential in a row.
-        naming::gid_type create_one (components::constructor_argument const&)
-        {
-            HPX_THROW_EXCEPTION(bad_request,
-                "component_factory::create_one",
-                "create_one is not supported by this factory instance");
-            return naming::invalid_gid;
-        }
-
         /// \brief Create one new component instance and initialize it using
         ///        the using the given constructor function.
         ///
         /// \param f  [in] The constructor function to call in order to
-        ///         initialize the newly allocated object.
+        ///           initialize the newly allocated object.
         ///
-        /// \return Returns the GID of the first newly created component
-        ///         instance. If more than one component instance has been
-        ///         created (\a count > 1) the GID's of all new instances are
-        ///         sequential in a row.
-        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const& ctor)
+        /// \return   Returns the GID of the first newly created component
+        ///           instance. 
+        naming::gid_type create_with_args(HPX_STD_FUNCTION<void(void*)> const& ctor)
         {
+            if (isenabled_)
+            {
+                naming::gid_type id = server::create<Component>(ctor);
+                if (id)
+                    ++refcnt_;
+                return id;
+            }
+
             HPX_THROW_EXCEPTION(bad_request,
-                "component_factory::create_one_functor",
-                "create_one is not supported by this factory instance");
+                "component_factory::create_with_args",
+                "this factory instance is disabled for this locality (" +
+                get_component_name() + ")");
             return naming::invalid_gid;
         }
 

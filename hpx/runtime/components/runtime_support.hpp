@@ -51,28 +51,47 @@ namespace hpx { namespace components
         }
 
         /// Create a new component type using the runtime_support
-        naming::id_type create_component(
-            components::component_type type, std::size_t count = 1)
+        template <typename Component>
+        naming::id_type create_component()
         {
-            return this->base_type::create_component(gid_, type, count);
+            return this->base_type::template create_component<Component>(gid_);
         }
 
         /// Asynchronously create a new component using the runtime_support
-        lcos::future<naming::id_type, naming::gid_type>
-        create_component_async(components::component_type type,
-            std::size_t count = 1)
+        template <typename Component>
+        lcos::future<naming::id_type, naming::gid_type> create_component_async()
         {
-            return this->base_type::create_component_async(gid_, type, count);
+            return this->base_type::template create_component_async<Component>
+                (gid_);
         }
 
-        /// Create a new component type using the runtime_support. Pass one
-        /// generic argument to the constructor.
-        template <typename Arg0>
-        naming::id_type create_one_component(
-            components::component_type type, Arg0 const& arg0)
-        {
-            return this->base_type::create_one_component(gid_, type, arg0);
-        }
+#define HPX_RUNTIME_SUPPORT_CLIENT_CREATE(Z, N, D)                           \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
+        lcos::future<naming::id_type, naming::gid_type>                      \
+        create_component_async(naming::id_type const& gid,                   \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                            \
+        {                                                                    \
+            return this->base_type::template create_component_async<Component>\
+                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                \
+        }                                                                    \
+                                                                             \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
+        naming::id_type create_component(naming::id_type const& gid,         \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                            \
+        {                                                                    \
+            return this->base_type::template create_component<Component>     \
+                (gid, HPX_ENUM_FORWARD_ARGS(N, A, a));                       \
+        }                                                                    \
+    /**/
+
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , HPX_ACTION_ARGUMENT_LIMIT
+          , HPX_RUNTIME_SUPPORT_CLIENT_CREATE
+          , _
+        )
+
+#undef HPX_RUNTIME_SUPPORT_CLIENT_CREATE
 
         /// Asynchronously create N new default constructed components using
         /// the runtime_support
@@ -88,16 +107,6 @@ namespace hpx { namespace components
             std::size_t count = 1)
         {
             return this->base_type::bulk_create_components_async(gid_, type, count);
-        }
-
-        /// Asynchronously create a new component using the runtime_support.
-        /// Pass one generic argument to the constructor.
-        template <typename Arg0>
-        lcos::future<naming::id_type, naming::gid_type>
-        create_component_async(components::component_type type,
-            Arg0 const& arg0)
-        {
-            return this->base_type::create_one_component_async(gid_, type, arg0);
         }
 
         ///////////////////////////////////////////////////////////////////////

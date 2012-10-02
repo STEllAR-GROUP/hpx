@@ -14,7 +14,7 @@
 namespace hpx { namespace lcos { namespace stubs
 {
     struct barrier
-      : public components::stubs::stub_base<lcos::server::barrier>
+      : public components::stub_base<lcos::server::barrier>
     {
         static lcos::future<void>
         wait_async(naming::id_type const& gid)

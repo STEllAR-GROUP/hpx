@@ -57,28 +57,63 @@ namespace hpx { namespace components { namespace stubs
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
+        template <typename Component>
         static lcos::future<naming::id_type, naming::gid_type>
-        create_component_async(
-            naming::id_type const& gid, components::component_type type,
-            std::size_t count = 1)
+        create_component_async(naming::id_type const& gid)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
-            typedef server::runtime_support::create_component_action action_type;
-            return hpx::async<action_type>(gid, type, count);
+            typedef typename
+                server::runtime_support::template
+                    create_component_action0<Component>::type
+                action_type;
+            return hpx::async<action_type>(gid);
         }
 
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. Block for the creation to finish.
-        static naming::id_type create_component(
-            naming::id_type const& gid, components::component_type type,
-            std::size_t count = 1)
+        template <typename Component>
+        static naming::id_type create_component(naming::id_type const& gid)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future
-            return create_component_async(gid, type, count).get();
+            return create_component_async<Component>(gid).get();
         }
+
+#define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                             \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
+        static lcos::future<naming::id_type, naming::gid_type>               \
+        create_component_async(                                              \
+            naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))\
+        {                                                                    \
+            typedef typename                                                 \
+                server::runtime_support::template                            \
+                    BOOST_PP_CAT(create_component_action, N)<                \
+                        Component, BOOST_PP_ENUM_PARAMS(N, A)                \
+                    >::type                                                  \
+                action_type;                                                 \
+            return hpx::async<action_type>(gid,                              \
+                HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                      \
+        }                                                                    \
+                                                                             \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
+        static naming::id_type create_component(                             \
+            naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))\
+        {                                                                    \
+            return create_component_async<Component>                         \
+                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)).get();          \
+        }                                                                    \
+    /**/
+
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , HPX_ACTION_ARGUMENT_LIMIT
+          , HPX_RUNTIME_SUPPORT_STUB_CREATE
+          , _
+        )
+
+#undef HPX_RUNTIME_SUPPORT_STUB_CREATE
 
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<std::vector<naming::id_type>, std::vector<naming::gid_type> >
@@ -102,40 +137,6 @@ namespace hpx { namespace components { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future
             return bulk_create_components_async(gid, type, count).get();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. This is a non-blocking call. The caller needs
-        /// to call \a future#get on the result of this function
-        /// to obtain the global id of the newly created object. Pass one
-        /// generic argument to the constructor.
-        template <typename Arg0>
-        static lcos::future<naming::id_type, naming::gid_type>
-        create_one_component_async(
-            naming::id_type const& gid, components::component_type type,
-            BOOST_FWD_REF(Arg0) arg0)
-        {
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::runtime_support::create_one_component_action
-                action_type;
-            return hpx::async<action_type>(gid, type,
-                components::constructor_argument(boost::forward<Arg0>(arg0)));
-        }
-
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. Block for the creation to finish. Pass one
-        /// generic argument to the constructor.
-        template <typename Arg0>
-        static naming::id_type create_one_component(
-            naming::id_type const& targetgid, components::component_type type,
-            BOOST_FWD_REF(Arg0) arg0)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the future
-            return create_one_component_async(targetgid, type, boost::forward<Arg0>(arg0)).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
