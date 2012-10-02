@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
@@ -32,9 +31,9 @@ struct HPX_COMPONENT_EXPORT managed_refcnt_checker
     {}
 
     managed_refcnt_checker(
-        components::constructor_argument const& target_
+        naming::id_type const& target
         )
-      : target_(boost::get<naming::id_type>(target_))
+      : target_(target)
       , references_()
     {}
 

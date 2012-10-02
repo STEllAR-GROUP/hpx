@@ -25,7 +25,7 @@ namespace jacobi
                 solver_type = hpx::components::get_component_type<
                     server::solver
                 >();
-            
+   
             // get list of locality prefixes
             std::vector<hpx::naming::id_type> localities =
                 hpx::find_all_localities(solver_type);
@@ -33,7 +33,7 @@ namespace jacobi
             BOOST_ASSERT(localities.size() > 0);
 
             typedef
-                hpx::components::server::create_one_component_action3<
+                hpx::components::server::runtime_support::create_component_action3<
                     hpx::components::managed_component<server::solver>
                   , grid
                   , std::size_t
@@ -44,7 +44,6 @@ namespace jacobi
             id
                 = hpx::async<create_component_action>(
                     localities[0]
-                  , solver_type
                   , g
                   , nx
                   , line_block

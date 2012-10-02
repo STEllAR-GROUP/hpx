@@ -45,11 +45,7 @@ int hpx_main(variables_map& vm)
             if (!localities.empty()) {
                 // use AGAS client to get the component type as we do not
                 // register any factories
-                hpx::components::component_type type =
-                    get_agas_client().get_component_id("throttle_throttle_type");
-                std::cout << "throttle component type: " << (int)type << std::endl;
-
-                t.create(localities[0], type);
+                t.create(localities[0]);
                 hpx::agas::register_name(throttle_component_name, t.get_gid());
             }
             else {

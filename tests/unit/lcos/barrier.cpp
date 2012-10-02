@@ -62,7 +62,7 @@ int hpx_main(variables_map& vm)
 
         // create a barrier waiting on 'count' threads
         barrier b;
-        b.create_one(prefix, pxthreads + 1);
+        b.create(prefix, pxthreads + 1);
 
         boost::atomic<std::size_t> c(0);
 

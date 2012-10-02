@@ -16,7 +16,7 @@ namespace interpolate3d { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct configuration
-      : hpx::components::stubs::stub_base<interpolate3d::server::configuration>
+      : hpx::components::stub_base<interpolate3d::server::configuration>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<void>

@@ -25,7 +25,7 @@ namespace throttle
     public:
         // create a new partition instance and initialize it synchronously
         throttle()
-          : base_type(stubs::throttle::create_sync(hpx::find_here()))
+          : base_type(stubs::throttle::create(hpx::find_here()))
         {}
 
         throttle(hpx::naming::id_type gid)

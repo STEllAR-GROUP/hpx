@@ -54,14 +54,10 @@ namespace jacobi
                 y = y_;
                 rows[0] = r;
                 jacobi::row tmp;
-                hpx::components::component_type
-                    type = hpx::components::get_component_type<
-                        server::row
-                    >();
-                tmp.id = hpx::async<hpx::components::server::runtime_support::create_component_action>(
+                typedef hpx::components::server::runtime_support::
+                    create_component_action0<server::row>::type create_action;
+                tmp.id = hpx::async<create_action>(
                     hpx::naming::get_locality_from_id(r.id)
-                  , type
-                  , 1
                   ).get();
                 tmp.init(nx_).get();
                 rows[1] = tmp;

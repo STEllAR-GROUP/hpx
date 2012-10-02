@@ -27,13 +27,13 @@ namespace interpolate3d
         // create a new partition instance and initialize it synchronously
         configuration(std::string const& datafilename,
                 std::string const& symbolic_name, std::size_t num_instances)
-          : base_type(interpolate3d::stubs::configuration::create_sync(hpx::find_here()))
+          : base_type(interpolate3d::stubs::configuration::create(hpx::find_here()))
         {
             init(datafilename, symbolic_name, num_instances);
         }
         configuration(hpx::naming::id_type gid, std::string const& datafilename,
                 std::string const& symbolic_name, std::size_t num_instances)
-          : base_type(interpolate3d::stubs::configuration::create_sync(gid))
+          : base_type(interpolate3d::stubs::configuration::create(gid))
         {
             init(datafilename, symbolic_name, num_instances);
         }

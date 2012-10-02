@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct functional_component
-      : components::stubs::stub_base<amr::server::functional_component>
+      : components::stub_base<amr::server::functional_component>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

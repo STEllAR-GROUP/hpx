@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     inline void
     free_helper_sync(naming::id_type& gid)
     {
-        components::stubs::memory_block::free_sync(gid);
+        components::stubs::memory_block::free(gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -289,7 +289,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             sem_in_[i].reset(new lcos::local::counting_semaphore(1));
             sem_out_[i].reset(new lcos::local::counting_semaphore());
             out_[i] = naming::id_type(
-                components::server::create_one<out_adaptor_type>(
+                components::server::create_with_args<out_adaptor_type>(
                     boost::bind(&dynamic_stencil_value::get_value, this, i)),
                     naming::id_type::managed);
         }

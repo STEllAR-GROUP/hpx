@@ -62,7 +62,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 namespace hpx { namespace components { namespace adaptive1d { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct logging : public components::stubs::stub_base<adaptive1d::server::logging>
+    struct logging : public components::stub_base<adaptive1d::server::logging>
     {
         ///////////////////////////////////////////////////////////////////////
         static void logentry(naming::id_type const& gid,

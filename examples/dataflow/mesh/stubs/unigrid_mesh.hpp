@@ -20,7 +20,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct unigrid_mesh
-      : components::stubs::stub_base<amr::server::unigrid_mesh>
+      : components::stub_base<amr::server::unigrid_mesh>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

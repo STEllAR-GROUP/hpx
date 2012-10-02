@@ -29,7 +29,7 @@ namespace distributed
         datastructure(std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality, std::size_t initial_length
             , std::size_t initial_value)
-            : base_type(distributed::stubs::datastructure::create_sync(hpx::find_here()))
+            : base_type(distributed::stubs::datastructure::create(hpx::find_here()))
         {
             data_init(symbolic_name, num_instances, my_cardinality
                 , initial_length, initial_value);    
@@ -37,7 +37,7 @@ namespace distributed
         datastructure(hpx::naming::id_type gid, std::string const& symbolic_name
                 , std::size_t num_instances, std::size_t my_cardinality
                 , std::size_t initial_length, std::size_t initial_value)
-            : base_type(distributed::stubs::datastructure::create_sync(gid))
+            : base_type(distributed::stubs::datastructure::create(gid))
         {
             data_init(symbolic_name, num_instances, my_cardinality
                 , initial_length, initial_value);

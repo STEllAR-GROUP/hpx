@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 {
     /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/adaptive1d/server/dynamic_stencil_value.hpp
     class HPX_COMPONENT_EXPORT dynamic_stencil_value
-      : public components::detail::managed_component_base<dynamic_stencil_value >
+      : public components::managed_component_base<dynamic_stencil_value >
     {
     protected:
         // the in_adaptors_type is the concrete dynamic_stencil_value_in_adaptor

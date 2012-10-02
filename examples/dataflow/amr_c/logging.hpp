@@ -62,7 +62,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 namespace hpx { namespace components { namespace amr { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct logging : public components::stubs::stub_base<amr::server::logging>
+    struct logging : public components::stub_base<amr::server::logging>
     {
         ///////////////////////////////////////////////////////////////////////
         static void logentry(naming::id_type const& gid,

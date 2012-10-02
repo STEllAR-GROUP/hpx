@@ -51,8 +51,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 {
     {
         // create a new object semaphore
-        object_semaphore_type os
-            (object_semaphore_type::create_sync(hpx::find_here()));
+        object_semaphore_type os;
+        os.create(hpx::find_here());
 
         // create some threads waiting to pull elements from the queue
         for (std::size_t i = 0; i < 5; ++i)
