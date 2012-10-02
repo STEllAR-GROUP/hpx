@@ -452,9 +452,6 @@
 #  endif
 #endif
 
-#if !defined(HPX_DEFAULT_STACK_SIZE)
-#  define HPX_DEFAULT_STACK_SIZE  HPX_SMALL_STACK_SIZE
-#endif
 #if !defined(HPX_MEDIUM_STACK_SIZE)
 #  define HPX_MEDIUM_STACK_SIZE   0x0020000       // 128kByte
 #endif
