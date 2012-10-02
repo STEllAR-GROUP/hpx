@@ -16,7 +16,7 @@
 namespace interpolate1d { namespace stubs
 {
     struct partition
-      : hpx::components::stubs::stub_base<interpolate1d::server::partition>
+      : hpx::components::stub_base<interpolate1d::server::partition>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<void>

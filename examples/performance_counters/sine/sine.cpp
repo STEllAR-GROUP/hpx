@@ -147,7 +147,7 @@ namespace performance_counters { namespace sine
             try {
                 // create the 'sine' performance counter component locally, we
                 // only get here if this instance does not exist yet
-                id = hpx::components::server::create_one<sine_counter_type>(
+                id = hpx::components::server::create_with_args<sine_counter_type>(
                         complemented_info);
             }
             catch (hpx::exception const& e) {

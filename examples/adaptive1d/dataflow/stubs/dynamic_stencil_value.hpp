@@ -19,7 +19,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
 {
     /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/adaptive1d/stubs/dynamic_stencil_value.hpp
     struct dynamic_stencil_value
-      : components::stubs::stub_base<adaptive1d::server::dynamic_stencil_value >
+      : components::stub_base<adaptive1d::server::dynamic_stencil_value >
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

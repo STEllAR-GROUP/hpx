@@ -16,7 +16,7 @@
 namespace interpolate3d { namespace stubs
 {
     struct partition3d
-      : hpx::components::stubs::stub_base<interpolate3d::server::partition3d>
+      : hpx::components::stub_base<interpolate3d::server::partition3d>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<void>

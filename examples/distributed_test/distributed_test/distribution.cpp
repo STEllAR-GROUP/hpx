@@ -35,8 +35,9 @@ namespace distributed
 
         typedef hpx::components::distributing_factory distributing_factory;
 
-        distributing_factory factory(
-            distributing_factory::create_sync(hpx::find_here()));
+        distributing_factory factory;
+        factory.create(hpx::find_here());
+
         //asyncronously create comonents, which will be distributed across
         //all available localities
         distributing_factory::async_create_result_type result =

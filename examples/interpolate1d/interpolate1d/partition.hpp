@@ -27,13 +27,13 @@ namespace interpolate1d
         // create a new partition instance and initialize it synchronously
         partition(std::string datafilename, dimension const& dim,
                 std::size_t num_nodes)
-          : base_type(interpolate1d::stubs::partition::create_sync(hpx::find_here()))
+          : base_type(interpolate1d::stubs::partition::create(hpx::find_here()))
         {
             init(datafilename, dim, num_nodes);
         }
         partition(hpx::naming::id_type gid, std::string datafilename,
                 dimension const& dim, std::size_t num_nodes)
-          : base_type(interpolate1d::stubs::partition::create_sync(gid))
+          : base_type(interpolate1d::stubs::partition::create(gid))
         {
             init(datafilename, dim, num_nodes);
         }

@@ -18,7 +18,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 {
     /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/amr/stubs/dynamic_stencil_value.hpp
     struct dynamic_stencil_value
-      : components::stubs::stub_base<amr::server::dynamic_stencil_value >
+      : components::stub_base<amr::server::dynamic_stencil_value>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

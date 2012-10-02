@@ -17,7 +17,7 @@ namespace sheneos { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct configuration
-      : hpx::components::stubs::stub_base<sheneos::server::configuration>
+      : hpx::components::stub_base<sheneos::server::configuration>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<void>

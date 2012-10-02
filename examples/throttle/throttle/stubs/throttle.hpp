@@ -15,7 +15,7 @@
 namespace throttle { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct throttle : hpx::components::stubs::stub_base<server::throttle>
+    struct throttle : hpx::components::stub_base<server::throttle>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<void>

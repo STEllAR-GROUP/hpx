@@ -33,7 +33,7 @@ namespace examples
         /// Create a client side representation of an object which is newly
         /// created on the given locality
         cancelable_action(hpx::naming::id_type const& target_gid)
-          : base_type(base_type::stub_type::create_sync(target_gid))
+          : base_type(base_type::stub_type::create(target_gid))
         {}
 
         ///////////////////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@
 namespace distributed { namespace stubs
 {
     struct datastructure
-        : hpx::components::stubs::stub_base<distributed::server::datastructure>
+        : hpx::components::stub_base<distributed::server::datastructure>
     {
         typedef std::vector<std::size_t> client_data_type;
         /////////////////////////////////////////////////////////////////////

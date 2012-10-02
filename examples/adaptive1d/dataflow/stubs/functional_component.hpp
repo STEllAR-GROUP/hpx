@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct functional_component
-      : components::stubs::stub_base<adaptive1d::server::functional_component>
+      : components::stub_base<adaptive1d::server::functional_component>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
