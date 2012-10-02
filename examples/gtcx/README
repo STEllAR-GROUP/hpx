@@ -1,3 +1,5 @@
+Prerequisites:  threadsafe HDF5 with fortran and c++ bindings and a fortran compiler.
+
 This is a port of the fortran-90 GTC to HPX by Matt Anderson (anderson.matthew.w@gmail.com)
 assisted by Hartmut Kaiser (hartmut.kaiser@gmail.com).
 Every effort will be made to keep this code functional as HPX continues to evolve.
