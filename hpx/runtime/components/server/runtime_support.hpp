@@ -210,7 +210,7 @@ namespace hpx { namespace components { namespace server
                 util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);\
                 id = factory->create_with_args(                                 \
                     BOOST_PP_CAT(component_constructor_functor, N)<             \
-                        Component, BOOST_PP_ENUM_PARAMS(N, A)>(                 \
+                        typename Component::wrapping_type, BOOST_PP_ENUM_PARAMS(N, A)>(                 \
                         HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)));                \
             }                                                                   \
             LRT_(info) << "successfully created component " << id               \

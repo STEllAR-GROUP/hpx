@@ -24,6 +24,9 @@ namespace hpx { namespace components
 template <boost::uint64_t MSB, boost::uint64_t LSB>
 struct gid_tag;
 
+template <typename Component>
+struct fixed_component;
+
 ///////////////////////////////////////////////////////////////////////////
 template <boost::uint64_t MSB, boost::uint64_t LSB, typename Component>
 struct fixed_component_base : detail::fixed_component_tag
@@ -37,6 +40,7 @@ struct fixed_component_base : detail::fixed_component_tag
   public:
     typedef this_component_type wrapped_type;
     typedef this_component_type base_type_holder;
+    typedef fixed_component<this_component_type> wrapping_type;
 
     /// \brief Construct an empty fixed_component
     fixed_component_base()
@@ -127,12 +131,34 @@ struct fixed_component_base : detail::fixed_component_tag
     mutable naming::gid_type gid_;
 };
 
+namespace detail
+{
+    ///////////////////////////////////////////////////////////////////////
+    template <typename Component>
+    struct fixed_heap_factory
+    {
+        static Component* alloc(std::size_t count)
+        {
+            BOOST_ASSERT(1 == count);
+            return static_cast<Component*>
+                (::operator new(sizeof(Component)));
+        }
+        static void free(void* p, std::size_t count)
+        {
+            BOOST_ASSERT(1 == count);
+            ::operator delete(p);
+        }
+    };
+}
 
 ///////////////////////////////////////////////////////////////////////////
 template <typename Component>
 struct fixed_component : Component
 {
     typedef Component type_holder;
+    typedef fixed_component<Component> component_type;
+    typedef component_type derived_type;
+    typedef detail::fixed_heap_factory<component_type> heap_type;
 
     /// \brief  The function \a create is used for allocation and
     ///         initialization of instances of the derived components.

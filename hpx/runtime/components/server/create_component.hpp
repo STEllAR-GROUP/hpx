@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace server
     naming::gid_type create(HPX_STD_FUNCTION<void(void*)> const& ctor,
         error_code& ec = throws)
     {
-        Component* c = static_cast<Component*>(Component::create(1));
+        Component* c = Component::heap_type::alloc(1);
         ctor(c);
 
         naming::gid_type gid = c->get_base_gid();
@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace server
             return gid;
         }
 
-        Component::destroy(c, 1);
+        //Component::heap_type::free(c, 1);
 
         hpx::util::osstream strm;
         strm << "global id " << gid << " is already bound to a different "
