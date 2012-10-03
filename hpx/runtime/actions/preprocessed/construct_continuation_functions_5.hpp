@@ -16,7 +16,7 @@
         template <typename Object
              
              >
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(),
             Object* obj
            ) const
@@ -41,7 +41,7 @@
         template <typename Object
              
              >
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 ) const,
             Component* obj
@@ -100,7 +100,7 @@
         template <typename Object
              
              >
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(),
             Component* obj
            ) const
@@ -126,7 +126,7 @@
         template <typename Object
              
              >
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 ) const,
             Component* obj
@@ -187,7 +187,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0),
             Object* obj
           , BOOST_FWD_REF(Arg0) arg0) const
@@ -212,7 +212,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
@@ -271,7 +271,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0),
             Component* obj
           , BOOST_FWD_REF(Arg0) arg0) const
@@ -297,7 +297,7 @@
         template <typename Object
             , typename Arg0
             , typename FArg0>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
@@ -358,7 +358,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Object* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
@@ -383,7 +383,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
@@ -442,7 +442,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Component* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
@@ -468,7 +468,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1
             , typename FArg0 , typename FArg1>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
@@ -529,7 +529,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Object* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
@@ -554,7 +554,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
@@ -613,7 +613,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Component* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
@@ -639,7 +639,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2
             , typename FArg0 , typename FArg1 , typename FArg2>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
@@ -700,7 +700,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Object* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
@@ -725,7 +725,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
@@ -784,7 +784,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Component* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
@@ -810,7 +810,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
@@ -871,7 +871,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Object* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
@@ -896,7 +896,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj
@@ -955,7 +955,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Component* obj
           , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
@@ -981,7 +981,7 @@
         template <typename Object
             , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
             , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj

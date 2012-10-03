@@ -45,12 +45,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     };
 
     template<typename T>
-    struct yield_result_type <boost::mpl::vector1<T> >{
+    struct yield_result_type<boost::mpl::vector1<T> > {
       typedef T type;
     };
 
     template<>
-    struct yield_result_type <boost::mpl::vector0<> >{
+    struct yield_result_type<boost::mpl::vector0<> > {
       typedef void type;
     };
 }}}}

@@ -61,7 +61,6 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
             "huge_stack_size = ${HPX_HUGE_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
-            "default_stack_size = $[hpx.small_stack_size]",
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
@@ -219,8 +218,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
-      : default_stacksize(HPX_DEFAULT_STACK_SIZE),
-        small_stacksize(HPX_SMALL_STACK_SIZE),
+      : small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
         large_stacksize(HPX_LARGE_STACK_SIZE),
         huge_stacksize(HPX_HUGE_STACK_SIZE),
@@ -232,7 +230,6 @@ namespace hpx { namespace util
 #if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        default_stacksize = init_default_stack_size();
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
@@ -258,7 +255,6 @@ namespace hpx { namespace util
 #if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        default_stacksize = init_default_stack_size();
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
@@ -283,7 +279,6 @@ namespace hpx { namespace util
 #if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        default_stacksize = init_default_stack_size();
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
@@ -563,12 +558,6 @@ namespace hpx { namespace util
         return defaultvalue;
     }
 
-    std::ptrdiff_t runtime_configuration::init_default_stack_size() const
-    {
-        return init_stack_size("default_stack_size", 
-            BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE), HPX_DEFAULT_STACK_SIZE);
-    }
-
     std::ptrdiff_t runtime_configuration::init_small_stack_size() const
     {
         return init_stack_size("small_stack_size", 
@@ -618,9 +607,6 @@ namespace hpx { namespace util
         threads::thread_stacksize stacksize) const
     {
         switch (stacksize) {
-        case threads::thread_stacksize_small:
-            return small_stacksize;
-
         case threads::thread_stacksize_medium:
             return medium_stacksize;
 
@@ -631,10 +617,10 @@ namespace hpx { namespace util
             return huge_stacksize;
 
         default:
-        case threads::thread_stacksize_default:
+        case threads::thread_stacksize_small:
             break;
         }
-        return default_stacksize;
+        return small_stacksize;
     }
 }}
 

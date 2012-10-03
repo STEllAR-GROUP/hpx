@@ -178,44 +178,44 @@ namespace hpx { namespace performance_counters { namespace server
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
     performance_counter_get_counter_info_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
     performance_counter_get_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter::set_counter_value_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
     performance_counter_set_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter::reset_counter_value_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
     performance_counter_reset_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter::start_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::start_action,
     performance_counter_start_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
     hpx::performance_counters::server::base_performance_counter::stop_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::stop_action,
     performance_counter_stop_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_value_action,
     set_value_action_counter_info)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_value_action,
     set_value_action_counter_value)
 

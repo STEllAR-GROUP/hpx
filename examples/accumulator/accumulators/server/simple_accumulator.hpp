@@ -115,15 +115,15 @@ namespace examples { namespace server
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::simple_accumulator::reset_action,
     simple_accumulator_reset_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::simple_accumulator::add_action,
     simple_accumulator_add_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::simple_accumulator::query_action,
     simple_accumulator_query_action);
 

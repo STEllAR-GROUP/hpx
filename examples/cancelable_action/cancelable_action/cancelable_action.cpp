@@ -23,10 +23,10 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for simple_accumulator actions.
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     examples::server::cancelable_action::do_it_action,
     cancelable_action_do_it_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     examples::server::cancelable_action::cancel_it_action,
     cancelable_action_cancel_it_action);
 

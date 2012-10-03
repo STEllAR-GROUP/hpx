@@ -46,4 +46,4 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<dataflow_logging_type>, dataflow_logging);
 
-HPX_REGISTER_ACTION_EX(dataflow_logging_type::logentry_action, dataflow_logentry_action);
+HPX_REGISTER_ACTION(dataflow_logging_type::logentry_action, dataflow_logentry_action);

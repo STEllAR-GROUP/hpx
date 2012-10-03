@@ -1294,7 +1294,7 @@ namespace boost
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro allowing to prepend file name and line number to a generated
 // exception
-#define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
+#define HPX_THROW_EXCEPTION_(except, errcode, func, msg, mode)                \
     {                                                                         \
         boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
         hpx::detail::throw_exception(                                         \
@@ -1311,7 +1311,7 @@ namespace boost
     /**/
 
 #define HPX_RETHROW_EXCEPTION(errcode, f, msg)                                \
-    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::rethrow)     \
+    HPX_THROW_EXCEPTION_(hpx::exception, errcode, f, msg, hpx::rethrow)       \
     /**/
 
 #define HPX_RETHROWS_IF(ec, errcode, f, msg)                                  \
@@ -1393,7 +1393,7 @@ namespace boost
 /// \endcode
 ///
 #define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
-    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::plain)       \
+    HPX_THROW_EXCEPTION_(hpx::exception, errcode, f, msg, hpx::plain)         \
     /**/
 
 /// \def HPX_THROWS_IF(ec, errcode, f, msg)

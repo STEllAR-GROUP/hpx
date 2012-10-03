@@ -135,20 +135,20 @@ namespace boost { namespace serialization
     void serialize(Archive&, distributed::config_comp&, unsigned int const);
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::init_action,
+HPX_REGISTER_ACTION_DECLARATION(distributed::server::datastructure::init_action,
     distributed_datastructure_init_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::write_action,
+HPX_REGISTER_ACTION_DECLARATION(distributed::server::datastructure::write_action,
     distributed_datastructure_write_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_config_action,
+HPX_REGISTER_ACTION_DECLARATION(distributed::server::datastructure::get_config_action,
     distributed_datastructure_get_config_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_data_action,
+HPX_REGISTER_ACTION_DECLARATION(distributed::server::datastructure::get_data_action,
     distributed_datastructure_get_data_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_data_at_action,
+HPX_REGISTER_ACTION_DECLARATION(distributed::server::datastructure::get_data_at_action,
     distributed_datastructure_get_data_at_action);
 
-//HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::
+//HPX_REGISTER_ACTION_DECLARATION(distributed::server::datastructure::
     //get_config_action, distributed_datastructure_get_config_action);
-//HPX_REGISTER_ACTION_DECLARATION_EX(
+//HPX_REGISTER_ACTION_DECLARATION(
 //    hpx::lcos::base_lco_with_value<distributed::config_comp>::set_value_action,
 //    set_value_action_distributed_config_comp);
 

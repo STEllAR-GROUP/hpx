@@ -407,15 +407,15 @@ struct HPX_EXPORT primary_namespace :
 
 }}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::service_action,
     primary_namespace_service_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::route_action,
     primary_namespace_route_action)
 

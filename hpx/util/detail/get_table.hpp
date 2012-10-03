@@ -8,6 +8,7 @@
 #ifndef HPX_FUNCTION_DETAIL_GET_TABLE_HPP
 #define HPX_FUNCTION_DETAIL_GET_TABLE_HPP
 
+#include <hpx/config/forceinline.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -57,7 +58,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        static vtable_ptr_base<
+        BOOST_FORCEINLINE static vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive
           , OArchive

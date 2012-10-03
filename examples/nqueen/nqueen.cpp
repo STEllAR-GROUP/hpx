@@ -27,35 +27,35 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(board_type, board);
 
 // Serialization support for the board actions
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     board_type::wrapped_type::init_action,
     board_init_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     board_type::wrapped_type::check_action,
     board_check_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     board_type::wrapped_type::access_action,
     board_access_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     board_type::wrapped_type::update_action,
     board_update_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     board_type::wrapped_type::solve_action,
     board_solve_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     board_type::wrapped_type::clear_action,
     board_clear_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<nqueen::list_type>::set_value_action,
     set_value_action_vector_std_size_t);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<nqueen::list_type>::get_value_action,
     get_value_action_vector_std_size_t);
 

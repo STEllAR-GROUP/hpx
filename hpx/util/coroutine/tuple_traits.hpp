@@ -28,6 +28,7 @@
 
 #ifndef HPX_COROUTINE_TUPLE_TRAITS_HPP_20060613
 #define HPX_COROUTINE_TUPLE_TRAITS_HPP_20060613
+
 #include <boost/tuple/tuple.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
@@ -151,7 +152,7 @@ namespace hpx { namespace util { namespace coroutines
     // FIXME: Currently coroutine code does not use this typedef in all cases
     // and expect it to be equal to boost::tuples::null_type
     typedef boost::tuples::null_type null_type;
-    enum {length = boost::tuples::length<internal_tuple_type>::value};
+    enum { length = boost::tuples::length<internal_tuple_type>::value };
 
     // Return the element at the Indext'th position in the typelist.
     // If the index is not less than the tuple length, it returns

@@ -202,7 +202,7 @@ namespace hpx { namespace traits
 
 #include <hpx/config/warnings_suffix.hpp>
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<
         std::vector<hpx::util::remote_locality_result>
     >::set_value_action

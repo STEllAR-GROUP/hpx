@@ -23,9 +23,9 @@ using hpx::flush;
 
 struct hello_world_server : managed_component_base<hello_world_server>
 {
-    void print() { cout << "hello world\n" << flush; } 
+    void print() const { cout << "hello world\n" << flush; } 
 
-    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
+    HPX_DEFINE_COMPONENT_CONST_ACTION(hello_world_server, print, print_action);
 };
 
 typedef managed_component<hello_world_server> server_type;

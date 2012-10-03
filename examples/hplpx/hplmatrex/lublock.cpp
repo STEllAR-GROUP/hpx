@@ -26,28 +26,28 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >,
     hpx::components::component_base_lco_with_value);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<
         std::vector<std::vector<double> >
     >::set_value_action,
     base_lco_with_value_set_value_vector_vector_double);
 
 //Register the actions
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::constructBlock_action,HPLconstructBlock_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::gcorner_action,HPLgcorner_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::gtop_action,HPLgtop_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::gleft_action,HPLgleft_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::gtrail_action,HPLgtrail_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::getRows_action,HPLgetRows_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::getColumns_action,HPLgetColumns_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::getData_action,HPLgetData_action);
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::lublock::getFuture_action,HPLgetFuture_action);

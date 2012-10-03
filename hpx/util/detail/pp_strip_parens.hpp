@@ -53,8 +53,8 @@
  * \endcode
  */
 //==============================================================================
-#define HPX_UTIL_STRIP(X)                                              \
-HPX_UTIL_DETAILS_EVAL((HPX_UTIL_DETAILS_STRIP_PARENS_I X), X) \
+#define HPX_UTIL_STRIP(X)                                                     \
+    HPX_UTIL_DETAILS_EVAL((HPX_UTIL_DETAILS_STRIP_PARENS_I X), X)             \
 /**/
 
 #endif

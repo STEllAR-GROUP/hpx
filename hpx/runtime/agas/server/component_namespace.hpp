@@ -253,11 +253,11 @@ struct HPX_EXPORT component_namespace :
 
 }}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::component_namespace::service_action,
     component_namespace_service_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::component_namespace::bulk_service_action,
     component_namespace_bulk_service_action)
 

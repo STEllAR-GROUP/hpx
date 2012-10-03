@@ -5,14 +5,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+    component_ctors
+    component_in_executable
     error_handling
+    event_synchronization 
     factorial
     fibonacci
     fibonacci_one
     fibonacci_futures
     fractals
     #fractals_oclm
-    component_in_executable
     interest_calculator
     non_atomic_rma
     quicksort
@@ -29,6 +31,8 @@ if(HPX_CXX11_LAMBDAS)
 endif()
 
 set(component_in_executable_FLAGS DEPENDENCIES iostreams_component)
+set(component_ctors_FLAGS DEPENDENCIES iostreams_component)
+set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)

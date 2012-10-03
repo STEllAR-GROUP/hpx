@@ -151,12 +151,12 @@ struct HPX_COMPONENT_EXPORT output_stream
 
 }}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::iostreams::server::output_stream::write_async_action
   , output_stream_write_async_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::iostreams::server::output_stream::write_sync_action
   , output_stream_write_sync_action
 )

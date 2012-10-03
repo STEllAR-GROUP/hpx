@@ -574,7 +574,7 @@ BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
 #endif
 #endif
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::agas::response>::set_value_action,
     set_value_action_agas_response_type)
 
@@ -589,15 +589,15 @@ namespace hpx { namespace agas { namespace create_result_ns {
         hpx::lcos::base_lco_with_value<std::vector<hpx::agas::response> >
         base_lco_vector_response_type;
 }}}
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::create_result_ns::base_lco_bool_response_type::set_value_action,
     set_value_action_agas_bool_response_type)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::create_result_ns::base_lco_id_type_response_type::set_value_action,
     set_value_action_agas_id_type_response_type)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::create_result_ns::base_lco_vector_response_type::set_value_action,
     set_value_action_agas_vector_response_type)
 

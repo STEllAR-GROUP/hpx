@@ -176,35 +176,35 @@ namespace bfs { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::point::init_action,
     bfs_point_init_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::point::traverse_action,
     bfs_point_traverse_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::point::depth_traverse_action,
     bfs_point_depth_traverse_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::point::get_parent_action,
     bfs_point_get_parent_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::point::get_level_action,
     bfs_point_get_level_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::point::reset_visited_action,
     bfs_point_reset_visited_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,
     get_value_action_vector_size_t);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_value_action,
     set_value_action_vector_size_t);
 

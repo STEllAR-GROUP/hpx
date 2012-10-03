@@ -371,66 +371,66 @@ namespace bright_future {
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::init_action
   , remote_lse_init_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::init_u_action
   , remote_lse_init_u_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::init_u_blocked_action
   , remote_lse_init_u_blocked_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::init_rhs_action
   , remote_lse_init_rhs_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::init_rhs_blocked_action
   , remote_lse_init_rhs_blocked_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::apply_action
   , remote_lse_apply_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::apply_region_action
   , remote_lse_apply_region_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::apply_region_df_action
   , remote_lse_apply_region_df_action
 )
 /*
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::get_col_action
   , remote_lse_get_col_action
 )
 */
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action
   , remote_lse_base_lco_set_value_action
 )
 /*
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::get_row_action
   , remote_lse_get_row_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::update_top_boundary_action
   , remote_lse_update_top_boundary_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::update_bottom_boundary_action
   , remote_lse_update_bottom_boundary_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::update_left_boundary_action
   , remote_lse_update_left_boundary_action
 )
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bright_future::server::remote_lse<double>::update_right_boundary_action
   , remote_lse_update_right_boundary_action
 )

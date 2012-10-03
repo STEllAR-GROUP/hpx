@@ -72,7 +72,7 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Component>
-    naming::gid_type create_one (HPX_STD_FUNCTION<void(void*)> const& ctor,
+    naming::gid_type create_one(HPX_STD_FUNCTION<void(void*)> const& ctor,
         error_code& ec = throws)
     {
         Component* c = Component::heap_type::alloc(1);

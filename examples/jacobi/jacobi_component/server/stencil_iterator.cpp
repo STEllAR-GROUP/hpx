@@ -111,22 +111,22 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(stencil_iterator_type, stencil_iterator);
 
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::stencil_iterator::init_action
   , jacobi_server_stencil_iterator_init_action
 )
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::stencil_iterator::setup_boundary_action
   , jacobi_server_stencil_iterator_setup_boundary_action
 )
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::stencil_iterator::step_action
   , jacobi_server_stencil_iterator_step_action
 )
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::stencil_iterator::get_action
   , jacobi_server_stencil_iterator_get_action
 )

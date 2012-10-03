@@ -22,8 +22,6 @@
 
 #include <memory>   // for placement new
 
-#include <hpx/exception.hpp>
-
 namespace hpx { namespace util
 {
     //
@@ -40,8 +38,6 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T, std::size_t N = 1>
     struct static_ : boost::noncopyable
     {
-        BOOST_STATIC_ASSERT(N > 0 && N <= HPX_RUNTIME_INSTANCE_LIMIT);
-
     public:
         typedef T value_type;
 
@@ -133,7 +129,6 @@ namespace hpx { namespace util
 
     template <typename T, typename Tag, std::size_t N>
     boost::once_flag static_<T, Tag, N>::constructed_ = BOOST_ONCE_INIT;
-
 }}
 
 #endif // include guard

@@ -66,11 +66,11 @@ namespace tsf { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     tsf::server::point::setup_action,
     tsf_point_setup_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     tsf::server::point::set_params_action,
     tsf_point_set_params_action);
 

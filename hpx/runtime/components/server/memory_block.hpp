@@ -706,22 +706,22 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the memory_block actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::get_action,
     memory_block_get_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::get_config_action,
     memory_block_get_config_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::checkout_action,
     memory_block_checkout_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::checkin_action,
     memory_block_checkin_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::components::memory_block_data>::set_value_action,
     set_value_action_memory_data_type)
 

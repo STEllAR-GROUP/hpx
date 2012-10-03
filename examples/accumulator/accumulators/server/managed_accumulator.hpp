@@ -91,15 +91,15 @@ namespace examples { namespace server
 }}
 
 //[managed_accumulator_registration_declarations
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::managed_accumulator::reset_action,
     managed_accumulator_reset_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::managed_accumulator::add_action,
     managed_accumulator_add_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::managed_accumulator::query_action,
     managed_accumulator_query_action);
 //]

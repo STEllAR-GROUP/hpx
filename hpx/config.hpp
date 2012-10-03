@@ -11,6 +11,7 @@
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/config/preprocessor/add3.hpp>
 #include <hpx/config/preprocessor/round_up.hpp>
 #include <hpx/config/preprocessor/round_up_add3.hpp>
@@ -255,6 +256,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// By default, enable storing the thread phase in debug builds only.
+#if !defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#  if defined(HPX_DEBUG)
+#    define HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the thread description in debug builds only.
 #if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
 #  if defined(HPX_DEBUG)
@@ -443,9 +452,6 @@
 #  endif
 #endif
 
-#if !defined(HPX_DEFAULT_STACK_SIZE)
-#  define HPX_DEFAULT_STACK_SIZE  HPX_SMALL_STACK_SIZE
-#endif
 #if !defined(HPX_MEDIUM_STACK_SIZE)
 #  define HPX_MEDIUM_STACK_SIZE   0x0020000       // 128kByte
 #endif

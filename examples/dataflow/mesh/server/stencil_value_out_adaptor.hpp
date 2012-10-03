@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 }}}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::stencil_value_out_adaptor::get_value_action,
     dataflow_stencil_value_out_get_value_action);
 

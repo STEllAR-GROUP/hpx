@@ -27,70 +27,70 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(gtcx_partition_type, gtcx_partition);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::loop_action,
     gtcx_partition_loop_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_data_action,
     gtcx_partition_set_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_tdata_action,
     gtcx_partition_set_tdata_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_params_action,
     gtcx_partition_set_params_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_comm_allreduce_data_action,
     gtcx_partition_set_comm_allreduce_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_int_comm_allreduce_data_action,
     gtcx_partition_set_int_comm_allreduce_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_sndrecv_data_action,
     gtcx_partition_set_sndrecv_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_ntoroidal_gather_data_action,
     gtcx_partition_set_ntoroidal_gather_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_ntoroidal_scatter_data_action,
     gtcx_partition_set_ntoroidal_scatter_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_complex_ntoroidal_gather_data_action,
     gtcx_partition_set_complex_ntoroidal_gather_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_toroidal_reduce_data_action,
     gtcx_partition_set_toroidal_reduce_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_p2p_sendreceive_data_action,
     gtcx_partition_set_p2p_sendreceive_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_int_params_action,
     gtcx_partition_set_int_params_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_comm_reduce_data_action,
     gtcx_partition_set_comm_reduce_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_int_sndrecv_data_action,
     gtcx_partition_set_int_sndrecv_data_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_real_params_action,
     gtcx_partition_set_real_params_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_partd_allgather_data_action,
     gtcx_partition_set_partd_allgather_data_action);

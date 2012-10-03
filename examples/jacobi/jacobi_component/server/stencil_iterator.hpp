@@ -114,22 +114,22 @@ namespace jacobi
     }
 }
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::stencil_iterator::init_action
   , jacobi_server_stencil_iterator_init_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::stencil_iterator::setup_boundary_action
   , jacobi_server_stencil_iterator_setup_boundary_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::stencil_iterator::step_action
   , jacobi_server_stencil_iterator_step_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::stencil_iterator::get_action
   , jacobi_server_stencil_iterator_get_action
 )

@@ -41,6 +41,7 @@
 #include <boost/system/error_code.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/detail/atomic_count.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
@@ -169,9 +170,8 @@ namespace hpx { namespace util { namespace coroutines
       fiber_ptr m_ctx;
     };
 
-    template<typename T>
-    inline
-    VOID CALLBACK
+    template <typename T>
+    BOOST_FORCEINLINE VOID CALLBACK
     trampoline(LPVOID pv) {
       T* fun = static_cast<T*>(pv);
       BOOST_ASSERT(fun);
