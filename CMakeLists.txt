@@ -499,6 +499,12 @@ if(HPX_UTIL_FUNCTION)
   add_definitions(-DHPX_UTIL_FUNCTION)
 endif()
 
+hpx_option(HPX_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
+
+if(HPX_UTIL_TUPLE)
+  add_definitions(-DHPX_UTIL_TUPLE)
+endif()
+
 ################################################################################
 # Scheduler configuration
 ################################################################################
@@ -609,8 +615,11 @@ if(MSVC)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_TUPLE BOOL "Compiler supports C++11 (movable) std::tuple (default: ON)." ON ADVANCED)
-    if(HPX_HAVE_CXX11_STD_TUPLE)
+    if(NOT HPX_UTIL_TUPLE AND HPX_HAVE_CXX11_STD_TUPLE)
       add_definitions(-DHPX_HAVE_CXX11_STD_TUPLE)
+    else()
+      set(HPX_HAVE_CXX11_STD_TUPLE OFF CACHE BOOL "Compiler supports C++11 (movable) std::tuple." FORCE)
+      hpx_info("C++11" "HPX_UTIL_TUPLE is enabled: even while std::tuple is available it will not be used.")
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_BIND  BOOL "Compiler supports C++11 (movable) std::bind (default: OFF)." OFF ADVANCED)
@@ -622,7 +631,7 @@ if(MSVC)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_FUNCTION BOOL "Compiler supports C++11 (movable) std::function (default: OFF)." OFF ADVANCED)
-    if(NOT HPX_UTIL_FUNCTION)
+    if(NOT HPX_UTIL_FUNCTION AND HPX_HAVE_CXX11_STD_FUNCTION)
       add_definitions(-DHPX_HAVE_CXX11_STD_FUNCTION)
     else()
       set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 (movable) std::function." FORCE)
@@ -752,8 +761,12 @@ else()
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
                   BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
 
-    hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
-      DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
+    if(NOT HPX_UTIL_TUPLE)
+      hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
+        DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
+    else()
+      hpx_info("C++11" "HPX_UTIL_TUPLE is enabled: even if std::tuple is available it will not be used.")
+    endif()
 
     if(NOT HPX_UTIL_BIND)
       hpx_check_for_cxx11_std_bind(HPX_CXX11_STD_BIND

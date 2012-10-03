@@ -512,6 +512,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::tuple if it's available and movable
+#if defined(HPX_UTIL_TUPLE)
+#  define HPX_STD_TUPLE         ::hpx::util::tuple
+#  define HPX_STD_MAKE_TUPLE    ::hpx::util::make_tuple
+#  define HPX_STD_GET(N, c)     ::hpx::util::get<N>(c)
+#else
 #if !defined(HPX_HAVE_CXX11_STD_TUPLE)
 #  define HPX_STD_TUPLE         ::boost::tuple
 #  define HPX_STD_MAKE_TUPLE    ::boost::make_tuple
@@ -520,6 +525,7 @@
 #  define HPX_STD_TUPLE         ::std::tuple
 #  define HPX_STD_MAKE_TUPLE    ::std::make_tuple
 #  define HPX_STD_GET(N, c)     ::std::get<N>(c)
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
