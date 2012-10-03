@@ -454,16 +454,17 @@ namespace hpx { namespace util
 #if !defined(BOOST_NO_RVALUE_REFERENCES)
 #define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
     typename detail::env_value_type<BOOST_PP_CAT(D, N)>::type                 \
-    /**/
+/**/
 #else
 #define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
     BOOST_FWD_REF(BOOST_PP_CAT(D, N))                                         \
-    /**/
+/**/
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    inline HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>
+    BOOST_FORCEINLINE 
+    HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>
     forward_as_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return HPX_UTIL_TUPLE_NAME<
@@ -471,7 +472,6 @@ namespace hpx { namespace util
             HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
     }
 
-#undef HPX_UTIL_ARGUMENT_PACK_ARGS
 #undef HPX_UTIL_MAKE_ARGUMENT_PACK
 
     ///////////////////////////////////////////////////////////////////////////
@@ -554,6 +554,21 @@ namespace hpx { namespace util
           : base_tuple(other)
         {}
     };
+
+#define HPX_UTIL_MAKE_TUPLE_ARG(Z, N, D)                                      \
+    typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type               \
+/**/
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_TUPLE_ARG, Arg)>
+    make_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_TUPLE_ARG, Arg)>(
+            HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
+    }
+
+#undef HPX_UTIL_MAKE_TUPLE_ARG
 }}
 
 BOOST_FUSION_ADAPT_TPL_STRUCT(
