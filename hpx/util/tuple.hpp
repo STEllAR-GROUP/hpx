@@ -486,14 +486,14 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(HPX_UTIL_TUPLE_NAME const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
 
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(HPX_UTIL_TUPLE_NAME) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
 

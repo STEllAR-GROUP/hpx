@@ -92,13 +92,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple1 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple1) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -237,13 +237,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple2 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple2) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -382,13 +382,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple3 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple3) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -527,13 +527,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple4 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple4) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -672,13 +672,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple5 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple5) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -817,13 +817,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple6 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple6) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -962,13 +962,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple7 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple7) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1107,13 +1107,13 @@ namespace hpx { namespace util
         tuple(tuple const& other)
           : base_tuple(other)
         {}
-        tuple(tuple8 const& other)
+        tuple(base_tuple const& other)
           : base_tuple(other)
         {}
         tuple(BOOST_RV_REF(tuple) other)
           : base_tuple(other)
         {}
-        tuple(BOOST_RV_REF(tuple8) other)
+        tuple(BOOST_RV_REF(base_tuple) other)
           : base_tuple(other)
         {}
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
