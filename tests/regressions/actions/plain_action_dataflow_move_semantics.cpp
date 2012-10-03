@@ -333,11 +333,19 @@ int hpx_main(variables_map&)
         ), is_local ? 2u : 7u);
         */
             
+#if defined(__GNUC__) && (HPX_GCC_VERSION < 40500)
+        HPX_TEST_EQ((
+            return_move_object<
+                return_movable_object_action, movable_object
+            >(id)
+        ), is_local ? 2u : 2u);
+#else
         HPX_TEST_EQ((
             return_move_object<
                 return_movable_object_action, movable_object
             >(id)
         ), is_local ? 0u : 2u);
+#endif
 
         /* TODO: Make this compile
         HPX_TEST_EQ((
