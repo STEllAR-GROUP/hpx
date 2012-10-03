@@ -24,19 +24,19 @@ HPX_REGISTER_COMPONENT_MODULE()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::detail::memory_block::get_action,
     memory_block_get_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::detail::memory_block::get_config_action,
     memory_block_get_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::detail::memory_block::checkout_action,
     memory_block_checkout_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::detail::memory_block::checkin_action,
     memory_block_checkin_action)
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action)
 
@@ -51,7 +51,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::component_memory_block)
 
 typedef hpx::components::memory_block_data memory_data_type;
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<memory_data_type>::set_value_action,
     set_value_action_memory_data_type)
 

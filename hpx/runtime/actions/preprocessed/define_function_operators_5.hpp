@@ -10,7 +10,7 @@
 
     
     template <typename IdType, typename Arg0>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 1>,
@@ -25,7 +25,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 2>,
@@ -40,7 +40,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 3>,
@@ -55,7 +55,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 4>,
@@ -70,7 +70,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 5>,

@@ -275,12 +275,24 @@ void test_creation_through_reference_wrapper()
 //     timed_test(&do_test_timed_join, 10);
 // }
 
+void simple_sync_thread(hpx::lcos::local::barrier& b1, hpx::lcos::local::barrier& b2)
+{
+    b1.wait();   // wait for both threads to be started
+    // ... do nothing
+    b2.wait();   // wait for the tests to be completed
+}
+
 void test_swap()
 {
     set_description("test_swap");
 
-    hpx::thread t1(&simple_thread);
-    hpx::thread t2(&simple_thread);
+    hpx::lcos::local::barrier b1(3);
+    hpx::lcos::local::barrier b2(3);
+    hpx::thread t1(hpx::util::bind(&simple_sync_thread, boost::ref(b1), boost::ref(b2)));
+    hpx::thread t2(hpx::util::bind(&simple_sync_thread, boost::ref(b1), boost::ref(b2)));
+
+    b1.wait();   // wait for both threads to be started
+
     hpx::thread::id id1 = t1.get_id();
     hpx::thread::id id2 = t2.get_id();
 
@@ -291,6 +303,8 @@ void test_swap()
     swap(t1, t2);
     HPX_TEST(t1.get_id() == id1);
     HPX_TEST(t2.get_id() == id2);
+
+    b2.wait();   // wait for the tests to be completed
 
     t1.join();
     t2.join();

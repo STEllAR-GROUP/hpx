@@ -28,14 +28,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/util/unused.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx
 ///
@@ -223,12 +223,14 @@ namespace hpx
         /// \enum thread_stacksize
         enum thread_stacksize
         {
-            thread_stacksize_default = 0,       ///< use default stack size
-            thread_stacksize_minimal = 1,       ///< use minimally possible stack size (default)
-            thread_stacksize_small = thread_stacksize_minimal,  ///< use small stack size 
+            thread_stacksize_small = 1,         ///< use small stack size 
             thread_stacksize_medium = 2,        ///< use medium sized stack size
             thread_stacksize_large = 3,         ///< use large stack size
-            thread_stacksize_huge = 4           ///< use very large stack size
+            thread_stacksize_huge = 4,          ///< use very large stack size
+
+            thread_stacksize_default = thread_stacksize_small,  ///< use default stack size
+            thread_stacksize_minimal = thread_stacksize_small,  ///< use minimally possible stack size
+            thread_stacksize_maximal = thread_stacksize_huge    ///< use maximally possible stack size
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -263,15 +265,15 @@ namespace hpx
         HPX_API_EXPORT thread_self::impl_type* get_ctx_ptr();
 
         /// The function \a get_self_ptr_checked returns a pointer to the (OS
-        /// thread specific) self reference to the current PX thread.
+        /// thread specific) self reference to the current HPX thread.
         HPX_API_EXPORT thread_self* get_self_ptr_checked(error_code& ec = throws);
 
-        /// The function \a get_self_id returns the PX thread id of the current
+        /// The function \a get_self_id returns the HPX thread id of the current
         /// thread (or zero if the current thread is not a PX thread).
         HPX_API_EXPORT thread_id_type get_self_id();
 
-        /// The function \a get_parent_id returns the PX thread id of the
-        /// currents thread parent (or zero if the current thread is not a
+        /// The function \a get_parent_id returns the HPX thread id of the
+        /// current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the  
@@ -279,8 +281,8 @@ namespace hpx
         ///       being defined.
         HPX_API_EXPORT thread_id_type get_parent_id();
 
-        /// The function \a get_parent_phase returns the PX phase of the
-        /// currents thread parent (or zero if the current thread is not a
+        /// The function \a get_parent_phase returns the HPX phase of the
+        /// current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the  
@@ -289,7 +291,7 @@ namespace hpx
         HPX_API_EXPORT std::size_t get_parent_phase();
 
         /// The function \a get_parent_locality_id returns the id of the locality of
-        /// the currents thread parent (or zero if the current thread is not a
+        /// the current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the  

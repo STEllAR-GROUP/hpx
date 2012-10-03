@@ -8,6 +8,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_FUNCTION_OPERATORS_MAY_09_2012_0420PM)
 #define HPX_RUNTIME_ACTIONS_FUNCTION_OPERATORS_MAY_09_2012_0420PM
 
+#include <hpx/config/forceinline.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
@@ -44,7 +45,7 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename IdType, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == N>,

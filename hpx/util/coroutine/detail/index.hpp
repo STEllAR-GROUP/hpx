@@ -28,8 +28,10 @@
 
 #ifndef HPX_COROUTINE_DETAIL_INDEX_HPP_20060613
 #define HPX_COROUTINE_DETAIL_INDEX_HPP_20060613
+
 #include <boost/preprocessor/repetition.hpp>
 #include <hpx/util/coroutine/detail/arg_max.hpp>
+
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   /*
@@ -38,7 +40,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
    * NOTE: we are really abusing BOOST_PP_ENUM_BINARY_PARAMS,
    * Should simply use BOOST_PP_ENUM.
    */
-  enum {BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, index_)};
+  enum { BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, index_) };
 }}}}
 
 #endif

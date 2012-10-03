@@ -232,6 +232,12 @@ namespace hpx { namespace lcos { namespace local
                     while (!queue_.empty())
                     {
                         threads::thread_id_type id = queue_.front().id_;
+                        if (HPX_UNLIKELY(!id))
+                        {
+                            HPX_THROW_EXCEPTION(null_thread_id,
+                                "lcos::counting_semaphore::signal_locked",
+                                "NULL thread id encountered");
+                        }
                         queue_.front().id_ = 0;
                         queue_.pop_front();
                         threads::set_thread_lco_description(id);
@@ -247,9 +253,10 @@ namespace hpx { namespace lcos { namespace local
                     while (!queue.empty())
                     {
                         threads::thread_id_type id = queue.front().id_;
-                        if (HPX_UNLIKELY(!id)) {
+                        if (HPX_UNLIKELY(!id))
+                        {
                             HPX_THROW_EXCEPTION(null_thread_id,
-                                "counting_semaphore::signal_locked",
+                                "lcos::counting_semaphore::signal_locked",
                                 "NULL thread id encountered");
                         }
                         queue.front().id_ = 0;

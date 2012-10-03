@@ -338,7 +338,11 @@ namespace hpx { namespace threads
 
         std::size_t get_thread_phase() const
         {
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
             return coroutine_.get_thread_phase();
+#else
+            return 0;
+#endif
         }
 
         /// Return the id of the component this thread is running in

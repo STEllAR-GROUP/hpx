@@ -26,15 +26,15 @@ typedef hpx::components::adaptive1d::server::dataflow_stencil dataflow_dataflow_
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(dataflow_dataflow_stencil_type::init_execute_action,
+HPX_REGISTER_ACTION(dataflow_dataflow_stencil_type::init_execute_action,
     adaptive1d_dataflow_dataflow_stencil_init_execute_action);
-HPX_REGISTER_ACTION_EX(dataflow_dataflow_stencil_type::execute_action,
+HPX_REGISTER_ACTION(dataflow_dataflow_stencil_type::execute_action,
     adaptive1d_dataflow_dataflow_stencil_execute_action);
 
 typedef hpx::lcos::base_lco_with_value<
     boost::shared_ptr<std::vector<hpx::naming::id_type> > > dataflow_lco_gid_vector_ptr;
 
-HPX_REGISTER_ACTION_EX(dataflow_lco_gid_vector_ptr::set_value_action,
+HPX_REGISTER_ACTION(dataflow_lco_gid_vector_ptr::set_value_action,
     adaptive1d_dataflow_set_value_action_gid_vector_ptr);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(dataflow_lco_gid_vector_ptr,
                                 hpx::components::component_base_lco_with_value);

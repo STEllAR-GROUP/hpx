@@ -10,7 +10,7 @@
 
     
     template <typename IdType, typename Arg0>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 1>,
@@ -25,7 +25,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 2>,
@@ -40,7 +40,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 3>,
@@ -55,7 +55,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 4>,
@@ -70,7 +70,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 5>,
@@ -85,7 +85,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 6>,
@@ -100,7 +100,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 7>,
@@ -115,7 +115,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 8>,
@@ -130,7 +130,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 9>,
@@ -145,7 +145,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 10>,
@@ -160,7 +160,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 11>,
@@ -175,7 +175,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 12>,
@@ -190,7 +190,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 13>,
@@ -205,7 +205,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 14>,
@@ -220,7 +220,7 @@
     }
     
     template <typename IdType, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
-    typename boost::enable_if<
+    BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 15>,

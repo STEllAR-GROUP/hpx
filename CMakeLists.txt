@@ -183,7 +183,7 @@ hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DHPX_COROUTINE_ARG_MAX=2)
+add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
 if(NOT MSVC)
   add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
@@ -361,6 +361,9 @@ endif()
 ################################################################################
 hpx_include(Documentation)
 
+################################################################################
+# Creating the partially preprocessed header requires a recent version of Wave
+################################################################################
 hpx_include(Preprocessing)
 
 ################################################################################
@@ -1059,7 +1062,7 @@ if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
-if(HPX_AUTOMATIC_PREPROCESSING)
+if(HPX_AUTOMATIC_PREPROCESSING AND ${BOOST_MINOR_VERSION} GREATER 50)
   add_subdirectory(preprocess)
 endif()
 

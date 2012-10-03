@@ -214,7 +214,8 @@ namespace hpx
             static lcos::future<T, RT> const&
             get_element(Tuple const& t, std::size_t idx)
             {
-                BOOST_ASSERT(idx < boost::fusion::result_of::size<Tuple>::value);
+                BOOST_ASSERT(idx < 
+                    static_cast<std::size_t>(boost::fusion::result_of::size<Tuple>::value));
                 return get_element(
                     boost::fusion::begin(t), boost::fusion::end(t), idx,
                     boost::fusion::result_of::equal_to<

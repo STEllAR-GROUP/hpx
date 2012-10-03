@@ -105,9 +105,9 @@ typedef interpolate3d::server::partition3d partition3d_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(partition3d_type::init_action,
+HPX_REGISTER_ACTION(partition3d_type::init_action,
     interpolate3d_partition3d_init_action);
-HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_action,
+HPX_REGISTER_ACTION(partition3d_type::interpolate_action,
     interpolate3d_partition3d_interpolate_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(

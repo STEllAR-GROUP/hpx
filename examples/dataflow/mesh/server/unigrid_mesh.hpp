@@ -140,13 +140,13 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 }}}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::unigrid_mesh::init_execute_action,
     dataflow_unigrid_mesh_init_execute_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::unigrid_mesh::execute_action,
     dataflow_unigrid_mesh_execute_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<boost::shared_ptr<std::vector<hpx::naming::id_type> > >::set_value_action,
     dataflow_set_value_action_gid_vector_ptr);
 

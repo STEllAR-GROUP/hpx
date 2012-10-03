@@ -36,20 +36,21 @@
  * we will play it safe and use an atomic count. The overhead shouldn't
  * be big.
  */
-#include <boost/atomic.hpp>
 #include <cstddef>
 #include <algorithm> //for swap
+
+#include <boost/atomic.hpp>
+#include <boost/assert.hpp>
 #include <boost/version.hpp>
-#include <hpx/util/coroutine/detail/swap_context.hpp> //for swap hints
 #include <boost/intrusive_ptr.hpp>
 #if BOOST_VERSION < 104200
 #include <boost/exception.hpp>
 #else
 #include <boost/exception/all.hpp>
 #endif
+
+#include <hpx/util/coroutine/detail/swap_context.hpp> //for swap hints
 #include <hpx/util/coroutine/exception.hpp>
-#include <hpx/util/coroutine/detail/noreturn.hpp>
-#include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_COROUTINE_NUM_ALL_HEAPS (HPX_COROUTINE_NUM_HEAPS +                \
@@ -107,7 +108,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_exit_status(ctx_not_exited),
       m_wait_counter(0),
       m_operation_counter(0),
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       m_phase(0),
+#endif
       m_type_info() {}
 
     friend
@@ -159,9 +162,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return m_operation_counter;
     }
 
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t phase() const {
         return m_phase;
     }
+#endif
 
     /*
      * A signal may occur only when a context is
@@ -362,7 +367,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     // Always throw exit_exception.
     // Never returns from standard control flow.
-    HPX_COROUTINE_NORETURN(void exit_self()) {
+    BOOST_ATTRIBUTE_NORETURN void exit_self() {
       BOOST_ASSERT(!pending());
       BOOST_ASSERT(running());
       m_exit_state = ctx_exit_pending;
@@ -462,7 +467,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     void do_invoke() throw (){
       BOOST_ASSERT(ready() || waiting());
-      ++m_phase;
       m_state = ctx_running;
       swap_context(m_caller, *this, detail::invoke_hint());
     }
@@ -489,7 +493,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     context_exit_status m_exit_status;
     int m_wait_counter;
     int m_operation_counter;
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t m_phase;
+#endif
 
     // This is used to generate a meaningful exception trace.
     boost::exception_ptr m_type_info;

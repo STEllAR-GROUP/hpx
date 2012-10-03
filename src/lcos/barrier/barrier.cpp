@@ -23,6 +23,6 @@ typedef hpx::components::managed_component<hpx::lcos::server::barrier> barrier_t
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::server::barrier, hpx::components::component_barrier)
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_EX(barrier_type, barrier,
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE(barrier_type, barrier,
     "hpx::lcos::base_lco", hpx::components::factory_enabled)
 

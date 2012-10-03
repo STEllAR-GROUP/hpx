@@ -256,19 +256,19 @@ namespace boost { namespace serialization {
 }}
 
 //[global_solve_registration_declarations
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::global_solve::init_action,
     global_solve_init_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::global_solve::run_action,
     global_solve_run_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::global_solve::report_action,
     global_solve_report_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::global_solve::calc_action,
     global_solve_calculate_action);
 

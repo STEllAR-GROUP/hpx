@@ -218,11 +218,11 @@ struct HPX_EXPORT symbol_namespace :
 
 }}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::symbol_namespace::bulk_service_action,
     symbol_namespace_bulk_service_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::symbol_namespace::service_action,
     symbol_namespace_service_action)
 

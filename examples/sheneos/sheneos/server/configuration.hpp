@@ -91,11 +91,11 @@ namespace boost { namespace serialization
     void serialize(Archive&, sheneos::config_data&, unsigned int const);
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(sheneos::server::configuration::init_action,
+HPX_REGISTER_ACTION_DECLARATION(sheneos::server::configuration::init_action,
     sheneos_configuration_init_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(sheneos::server::configuration::get_action,
+HPX_REGISTER_ACTION_DECLARATION(sheneos::server::configuration::get_action,
     sheneos_configuration_get_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<sheneos::config_data>::set_value_action,
     set_value_action_sheneos_config_data);
 

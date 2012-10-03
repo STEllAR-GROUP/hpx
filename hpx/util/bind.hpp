@@ -138,7 +138,7 @@ namespace hpx { namespace util {
 
 #define HPX_UTIL_BIND_FUNCTOR_OPERATOR(Z, N, D)                                 \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const                    \
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const  \
     {                                                                           \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
@@ -150,7 +150,7 @@ namespace hpx { namespace util {
     }                                                                           \
                                                                                 \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a))                          \
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a))        \
     {                                                                           \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
@@ -176,7 +176,7 @@ namespace hpx { namespace util {
                 : f(f_)
             {}
 
-            R operator()() const
+            BOOST_FORCEINLINE R operator()() const
             {
                 return f();
             }
@@ -242,12 +242,12 @@ namespace hpx { namespace util {
                 : f(f_)
             {}
 
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 return f();
             }
 
-            result_type operator()()
+            BOOST_FORCEINLINE result_type operator()()
             {
                 return f();
             }
@@ -394,14 +394,14 @@ namespace hpx { namespace util {
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MEMBER, _)
             {}
 
-            R operator()() const
+            BOOST_FORCEINLINE R operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
                 return f(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-            R operator()()
+            BOOST_FORCEINLINE R operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -525,7 +525,7 @@ namespace hpx { namespace util {
                 return *this;
             }
 
-            R operator()() const
+            BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
@@ -535,7 +535,7 @@ namespace hpx { namespace util {
                         (BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-            R operator()()
+            BOOST_FORCEINLINE R operator()()
             {
                 using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
@@ -614,7 +614,7 @@ namespace hpx { namespace util {
                 return *this;
             }
 
-            R operator()() const
+            BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
@@ -624,7 +624,7 @@ namespace hpx { namespace util {
                         (BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-            R operator()()
+            BOOST_FORCEINLINE R operator()()
             {
                 using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
@@ -636,7 +636,7 @@ namespace hpx { namespace util {
 
 #define HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR(Z, N, D)                          \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a))                           \
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a))        \
     {                                                                           \
         using detail::get_pointer;                                              \
         typedef                                                                 \
@@ -644,13 +644,13 @@ namespace hpx { namespace util {
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
             >                                                                   \
             env_type;                                                           \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                           \
         return                                                                  \
             (get_pointer(detail::eval(env, a0))->*f)                            \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
     }                                                                           \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const                     \
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const  \
     {                                                                           \
         using detail::get_pointer;                                              \
         typedef                                                                 \
@@ -658,7 +658,7 @@ namespace hpx { namespace util {
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
             >                                                                   \
             env_type;                                                           \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                           \
         return                                                                  \
             (get_pointer(detail::eval(env, a0))->*f)                            \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
@@ -817,7 +817,7 @@ namespace hpx { namespace util {
                 return *this;
             }
 
-            result_type operator()() const
+            BOOST_FORCEINLINE result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;

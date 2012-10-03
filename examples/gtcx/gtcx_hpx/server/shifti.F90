@@ -205,7 +205,7 @@ subroutine shifti(hpx4_bti,&
   !call MPI_SENDRECV(sendright,isendcount,mpi_Rsize,idest,isendtag,recvleft,&
   !     irecvcount,mpi_Rsize,isource,irecvtag,toroidal_comm,istatus,ierror)
   call sndrecv_toroidal_cmm(hpx4_bti,sendright,isendcount,&
-                             mrecvleft,irecvcount,idest)
+                             recvleft,irecvcount,idest)
   
 ! send # of particle to move left
   mrecvright=0

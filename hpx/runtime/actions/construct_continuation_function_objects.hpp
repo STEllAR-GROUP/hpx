@@ -8,6 +8,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM)
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_OBJECTS_MAY_08_2012_0610PM
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/move.hpp>
 #include <boost/fusion/include/size.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -84,7 +85,8 @@ namespace detail
 
         template <typename Func
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {
@@ -134,7 +136,8 @@ namespace detail
 
         template <typename Func
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        result_type operator()(continuation_type cont, Func const& func
+        BOOST_FORCEINLINE result_type operator()(
+            continuation_type cont, Func const& func
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
         {
             try {

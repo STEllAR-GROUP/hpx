@@ -81,19 +81,19 @@ namespace bfs { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::bgl_graph::init_action,
     bfs_bgl_graph_init_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::bgl_graph::bfs_action,
     bfs_bgl_graph_bfs_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::bgl_graph::get_parents_action,
     bfs_bgl_graph_get_parents_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     bfs::server::bgl_graph::reset_action,
     bfs_bgl_graph_reset_action);
 

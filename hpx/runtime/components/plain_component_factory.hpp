@@ -18,8 +18,10 @@
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/serialization/export.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -195,11 +197,26 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 // This macro is used to create and to register a minimal factory for plain
 // actions with Boost.Plugin.
-#define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
-        state)                                                                \
+#define HPX_REGISTER_PLAIN_ACTION_(...)                                       \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)             \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_PLAIN_ACTION_1(action_type)                              \
+    HPX_REGISTER_PLAIN_ACTION_3(action_type, action_type,                     \
+        ::hpx::components::factory_check)                                     \
+/**/
+
+#define HPX_REGISTER_PLAIN_ACTION_2(plain_action, plain_action_name)          \
+    HPX_REGISTER_PLAIN_ACTION_3(plain_action, plain_action_name,              \
+        ::hpx::components::factory_check)                                     \
+/**/
+
+#define HPX_REGISTER_PLAIN_ACTION_3(plain_action, plain_action_name, state)   \
     BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<plain_action>,      \
         BOOST_PP_STRINGIZE(plain_action_name))                                \
-    HPX_REGISTER_ACTION_EX(plain_action, plain_action_name)                   \
+    HPX_REGISTER_ACTION_2(plain_action, plain_action_name)                    \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \
         plain_action_name)                                                    \
@@ -207,17 +224,12 @@ namespace hpx { namespace components
         hpx::components::plain_component_factory<plain_action>,               \
         plain_action_name)                                                    \
     template struct hpx::components::plain_component_factory<plain_action>;   \
-    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                               \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(                                \
         hpx::components::server::plain_function<plain_action>,                \
         plain_action_name, state)                                             \
     HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
         hpx::components::server::plain_function<plain_action>)                \
-    /**/
-
-#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,            \
-        ::hpx::components::factory_check)                                     \
-    /**/
+/**/
 
 /// \endcond
 

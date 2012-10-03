@@ -74,12 +74,12 @@ namespace interpolate3d { namespace server
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(interpolate3d::server::configuration::init_action,
+HPX_REGISTER_ACTION_DECLARATION(interpolate3d::server::configuration::init_action,
     interpolate3d_configuration_init_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(interpolate3d::server::configuration::get_action,
+HPX_REGISTER_ACTION_DECLARATION(interpolate3d::server::configuration::get_action,
     interpolate3d_configuration_get_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<interpolate3d::config_data>::set_value_action,
     set_value_action_interpolate3d_config_data);
 

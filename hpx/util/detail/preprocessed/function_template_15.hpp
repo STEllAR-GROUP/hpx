@@ -215,12 +215,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()() const
+        BOOST_FORCEINLINE R operator()() const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object );
         }
-        R operator()()
+        BOOST_FORCEINLINE R operator()()
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object );
@@ -439,12 +439,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0) const
+        BOOST_FORCEINLINE R operator()(A0 a0) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0);
         }
-        R operator()(A0 a0)
+        BOOST_FORCEINLINE R operator()(A0 a0)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0);
@@ -663,12 +663,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1);
         }
-        R operator()(A0 a0 , A1 a1)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1);
@@ -887,12 +887,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2);
@@ -1111,12 +1111,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
@@ -1335,12 +1335,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
@@ -1559,12 +1559,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
@@ -1783,12 +1783,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
@@ -2007,12 +2007,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
@@ -2231,12 +2231,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
@@ -2455,12 +2455,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
@@ -2679,12 +2679,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
@@ -2903,12 +2903,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
@@ -3127,12 +3127,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
@@ -3351,12 +3351,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
@@ -3575,12 +3575,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
@@ -3799,12 +3799,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
@@ -4023,12 +4023,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
@@ -4247,12 +4247,12 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17) const
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
         }
-        R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
+        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);

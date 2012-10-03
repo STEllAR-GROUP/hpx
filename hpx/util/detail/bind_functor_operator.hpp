@@ -7,7 +7,7 @@
 #define NNN BOOST_PP_FRAME_ITERATION(2)
 
     template <BOOST_PP_ENUM_PARAMS(NNN, typename A)>
-    result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a))
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a))
     {
         using detail::get_pointer;
         typedef
@@ -22,7 +22,7 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(NNN, typename A)>
-    result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a)) const
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a)) const
     {
         using detail::get_pointer;
         typedef

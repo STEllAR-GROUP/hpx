@@ -403,29 +403,29 @@ typedef sheneos::server::partition3d partition3d_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions.
-HPX_REGISTER_ACTION_EX(partition3d_type::init_action,
+HPX_REGISTER_ACTION(partition3d_type::init_action,
     sheneos_partition3d_init_action);
-HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_action,
+HPX_REGISTER_ACTION(partition3d_type::interpolate_action,
     sheneos_partition3d_interpolate_action);
-HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_action,
+HPX_REGISTER_ACTION(partition3d_type::interpolate_one_action,
     sheneos_partition3d_interpolate_one_action);
-HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_bulk_action,
+HPX_REGISTER_ACTION(partition3d_type::interpolate_bulk_action,
     sheneos_partition3d_interpolate_bulk_action);
-HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_bulk_action,
+HPX_REGISTER_ACTION(partition3d_type::interpolate_one_bulk_action,
     sheneos_partition3d_interpolate_one_bulk_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<partition3d_type>,
     sheneos_partition_type);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_value_action,
     set_value_action_vector_vector_double);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >,
     hpx::components::component_base_lco_with_value);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action,
     set_value_action_vector_double);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

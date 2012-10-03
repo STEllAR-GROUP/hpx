@@ -25,7 +25,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     dataflow_stencil_value_out_adaptor_type, adaptive1d_dataflow_stencil_value_out_adaptor);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     dataflow_stencil_value_out_adaptor_type::wrapped_type::get_value_action,
     adaptive1d_dataflow_stencil_value_out_get_value_action);
 

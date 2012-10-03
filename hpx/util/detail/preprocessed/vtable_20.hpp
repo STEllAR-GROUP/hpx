@@ -69,17 +69,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f )
             {
                 return invoke_(f , typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()();
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))();
@@ -146,19 +146,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f )
             {
                 invoke_(f , typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()();
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))();
@@ -225,17 +225,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0)
             {
                 return invoke_(f , a0, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0);
@@ -302,19 +302,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0)
             {
                 invoke_(f , a0, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0);
@@ -381,17 +381,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1)
             {
                 return invoke_(f , a0 , a1, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1);
@@ -458,19 +458,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1)
             {
                 invoke_(f , a0 , a1, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1);
@@ -537,17 +537,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
             {
                 return invoke_(f , a0 , a1 , a2, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2);
@@ -614,19 +614,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
             {
                 invoke_(f , a0 , a1 , a2, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2);
@@ -693,17 +693,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
             {
                 return invoke_(f , a0 , a1 , a2 , a3, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3);
@@ -770,19 +770,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
             {
                 invoke_(f , a0 , a1 , a2 , a3, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3);
@@ -849,17 +849,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4);
@@ -926,19 +926,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4);
@@ -1005,17 +1005,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5);
@@ -1082,19 +1082,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5);
@@ -1161,17 +1161,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6);
@@ -1238,19 +1238,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6);
@@ -1317,17 +1317,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
@@ -1394,19 +1394,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
@@ -1473,17 +1473,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
@@ -1550,19 +1550,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
@@ -1629,17 +1629,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
@@ -1706,19 +1706,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
@@ -1785,17 +1785,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
@@ -1862,19 +1862,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
@@ -1941,17 +1941,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
@@ -2018,19 +2018,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
@@ -2097,17 +2097,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
@@ -2174,19 +2174,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
@@ -2253,17 +2253,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
@@ -2330,19 +2330,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
@@ -2409,17 +2409,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
@@ -2486,19 +2486,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
@@ -2565,17 +2565,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
@@ -2642,19 +2642,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
@@ -2721,17 +2721,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
@@ -2798,19 +2798,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
@@ -2877,17 +2877,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
@@ -2954,19 +2954,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
@@ -3033,17 +3033,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
@@ -3110,19 +3110,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
@@ -3189,17 +3189,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
@@ -3266,19 +3266,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
@@ -3345,17 +3345,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20);
@@ -3422,19 +3422,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20);
@@ -3501,17 +3501,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21);
@@ -3578,19 +3578,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21);
@@ -3657,17 +3657,17 @@
                 *reinterpret_cast<Functor*>(dest) =
                     *reinterpret_cast<Functor const *>(f);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22)
             {
                 return invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22, typename boost::is_reference_wrapper<Functor>::type());
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22, boost::mpl::true_)
             {
                 return (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22);
             }
-            static R
+            BOOST_FORCEINLINE static R
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22, boost::mpl::false_)
             {
                 return (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22);
@@ -3734,19 +3734,19 @@
                     *reinterpret_cast<Functor const *>(f);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22)
             {
                 invoke_(f , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22, typename boost::is_reference_wrapper<Functor>::type());
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22, boost::mpl::true_)
             {
                 (*reinterpret_cast<Functor*>(f)).get()(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22);
             }
             static
-            void
+            BOOST_FORCEINLINE void
             invoke_(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19 , A20 a20 , A21 a21 , A22 a22, boost::mpl::false_)
             {
                 (*reinterpret_cast<Functor*>(f))(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a20 , a21 , a22);

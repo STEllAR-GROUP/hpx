@@ -27,18 +27,18 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ad_point_type, ad_point);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     ad_point_type::wrapped_type::init_action,
     ad_point_init_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     ad_point_type::wrapped_type::compute_action,
     ad_point_compute_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     ad_point_type::wrapped_type::get_item_action,
     ad_point_get_item_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     ad_point_type::wrapped_type::remove_item_action,
     ad_point_remove_item_action);

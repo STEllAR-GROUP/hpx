@@ -23,7 +23,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the simple_accumulator actions
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     startup_shutdown::server::startup_shutdown_component::init_action,
     startup_shutdown_component_init_action);
 

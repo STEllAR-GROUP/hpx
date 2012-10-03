@@ -27,10 +27,10 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(tsf_point_type, tsf_point);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     tsf_point_type::wrapped_type::setup_action,
     tsf_point_setup_action);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     tsf_point_type::wrapped_type::set_params_action,
     tsf_point_set_params_action);

@@ -71,17 +71,17 @@ namespace throttle { namespace server
 }}
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::suspend_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     throttle::server::throttle::suspend_action
   , throttle_suspend_action);
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::resume_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     throttle::server::throttle::resume_action
   , throttle_resume_action);
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::is_suspended_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     throttle::server::throttle::is_suspended_action
   , throttle_is_suspended_action);
 

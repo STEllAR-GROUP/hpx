@@ -91,7 +91,7 @@ namespace hpx { namespace util
         // Will return the default stack size to use for all HPX-threads.
         std::ptrdiff_t get_default_stack_size() const
         {
-            return default_stacksize;
+            return small_stacksize;
         }
 
         // Will return the requested stack size to use for an HPX-threads.
@@ -104,7 +104,6 @@ namespace hpx { namespace util
         std::ptrdiff_t init_stack_size(char const* entryname, 
             char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const;
 
-        std::ptrdiff_t init_default_stack_size() const;
         std::ptrdiff_t init_small_stack_size() const;
         std::ptrdiff_t init_medium_stack_size() const;
         std::ptrdiff_t init_large_stack_size() const;
@@ -115,7 +114,6 @@ namespace hpx { namespace util
             std::vector<std::string> const& cmdline_ini_defs);
 
     private:
-        std::ptrdiff_t default_stacksize;
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;
         std::ptrdiff_t large_stacksize;

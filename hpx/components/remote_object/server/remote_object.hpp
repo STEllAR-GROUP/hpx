@@ -114,7 +114,7 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
   , (hpx::components::server::remote_object_apply_action2<F, A>)
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::remote_object::set_dtor_action
   , remote_object_set_dtor_action
 )

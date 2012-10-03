@@ -229,7 +229,7 @@ template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter
 template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::min>;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     average_count_counter_type, average_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
@@ -241,7 +241,7 @@ typedef hpx::components::managed_component<
         boost::accumulators::tag::max>
 > max_count_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     max_count_counter_type, max_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type)
@@ -253,7 +253,7 @@ typedef hpx::components::managed_component<
         boost::accumulators::tag::min>
 > min_count_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     min_count_counter_type, min_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type)

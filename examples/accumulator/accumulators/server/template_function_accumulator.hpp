@@ -96,11 +96,11 @@ namespace examples { namespace server
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::reset_action,
     managed_accumulator_reset_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::query_action,
     managed_accumulator_query_action);
 
