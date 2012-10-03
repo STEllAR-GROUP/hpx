@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace server
         // distribute the number of components to create in a way, so that the
         // overall number of component instances on all localities is
         // approximately the same
-        BOOST_ASSERT(maxcount * counts.size() >= existing);
+        BOOST_ASSERT(maxcount * counts.size() >= std::size_t(existing));
         std::size_t missing = maxcount * counts.size() - existing;
         if (missing == 0) missing = 1;
 
@@ -205,7 +205,7 @@ namespace hpx { namespace components { namespace server
         // distribute the number of components to create in a way, so that the
         // overall number of component instances on all localities is
         // approximately the same
-        BOOST_ASSERT(maxcount * counts.size() >= existing);
+        BOOST_ASSERT(maxcount * counts.size() >= std::size_t(existing));
         std::size_t missing = maxcount * counts.size() - existing;
         if (missing == 0) missing = 1;
 
