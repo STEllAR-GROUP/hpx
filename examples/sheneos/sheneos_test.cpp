@@ -8,6 +8,10 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <hpx/include/performance_counters.hpp>
+//#include <hpx/components/memory/mem_counter.hpp>
+#include <examples/performance_counters/mem_counter.hpp>
+
 #include <boost/dynamic_bitset.hpp>
 #include <boost/bind.hpp>
 
@@ -17,6 +21,24 @@
 #include "sheneos/interpolator.hpp"
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
+
+//namespace read_mem = hpx::performance_counters::memory;
+namespace read_mem = hpx::performance_counters::server;
+void register_counter_type()
+{
+    namespace pc = hpx::performance_counters;
+    pc::install_counter_type(
+        "/memory/count/vm",
+        &read_mem::read_psm_vm,
+        "returns the virtual memory for the pid value of process which calls this counter"
+    );
+    pc::install_counter_type(
+        "/memory/count/resident",
+        &read_mem::read_psm_resident,
+        "returns the virtual memory for the pid value of process which calls this counter"
+    );
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -111,6 +133,8 @@ typedef hpx::actions::plain_action4<
 > test_action;
 
 HPX_REGISTER_PLAIN_ACTION(test_action);
+
+HPX_ACTION_USES_MEDIUM_STACK(test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -213,6 +237,8 @@ typedef hpx::actions::plain_action4<
 
 HPX_REGISTER_PLAIN_ACTION(test_one_bulk_action);
 
+HPX_ACTION_USES_MEDIUM_STACK(test_one_bulk_action);
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function for interpolate_bulk. It will be invoked on all
 /// localities that the benchmark is being run on.
@@ -313,6 +339,8 @@ typedef hpx::actions::plain_action4<
 > test_bulk_action;
 
 HPX_REGISTER_PLAIN_ACTION(test_bulk_action);
+
+HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_task(std::size_t i, hpx::util::high_resolution_timer& t)
@@ -445,6 +473,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+
+    // register memory counters
+    hpx::register_startup_function(&register_counter_type);    
+
     using boost::program_options::options_description;
     using boost::program_options::value;
 

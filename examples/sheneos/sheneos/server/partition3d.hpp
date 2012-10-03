@@ -249,6 +249,9 @@ namespace boost { namespace serialization
 HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::init_action,
     sheneos_partition3d_init_action);
+ 
+HPX_ACTION_USES_LARGE_STACK(sheneos::server::partition3d::init_action);
+
 HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_action,
     sheneos_partition3d_interpolate_action);
