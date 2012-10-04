@@ -140,6 +140,12 @@ namespace hpx
         void register_counter_types();
 
         ///////////////////////////////////////////////////////////////////////
+        virtual int run(HPX_STD_FUNCTION<hpx_main_function_type> func =
+                HPX_STD_FUNCTION<hpx_main_function_type>(),
+            std::size_t num_threads = 1, std::size_t num_localities = 1) = 0;
+
+        virtual int run(std::size_t num_threads, std::size_t num_localities = 1) = 0;
+
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
