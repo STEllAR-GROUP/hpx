@@ -183,7 +183,7 @@ hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DHPX_COROUTINE_ARG_MAX=2)
+add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
 if(NOT MSVC)
   add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
@@ -361,6 +361,9 @@ endif()
 ################################################################################
 hpx_include(Documentation)
 
+################################################################################
+# Creating the partially preprocessed header requires a recent version of Wave
+################################################################################
 hpx_include(Preprocessing)
 
 ################################################################################
@@ -496,6 +499,12 @@ if(HPX_UTIL_FUNCTION)
   add_definitions(-DHPX_UTIL_FUNCTION)
 endif()
 
+hpx_option(HPX_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
+
+if(HPX_UTIL_TUPLE)
+  add_definitions(-DHPX_UTIL_TUPLE)
+endif()
+
 ################################################################################
 # Scheduler configuration
 ################################################################################
@@ -606,8 +615,11 @@ if(MSVC)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_TUPLE BOOL "Compiler supports C++11 (movable) std::tuple (default: ON)." ON ADVANCED)
-    if(HPX_HAVE_CXX11_STD_TUPLE)
+    if(NOT HPX_UTIL_TUPLE AND HPX_HAVE_CXX11_STD_TUPLE)
       add_definitions(-DHPX_HAVE_CXX11_STD_TUPLE)
+    else()
+      set(HPX_HAVE_CXX11_STD_TUPLE OFF CACHE BOOL "Compiler supports C++11 (movable) std::tuple." FORCE)
+      hpx_info("C++11" "HPX_UTIL_TUPLE is enabled: even while std::tuple is available it will not be used.")
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_BIND  BOOL "Compiler supports C++11 (movable) std::bind (default: OFF)." OFF ADVANCED)
@@ -619,7 +631,7 @@ if(MSVC)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_FUNCTION BOOL "Compiler supports C++11 (movable) std::function (default: OFF)." OFF ADVANCED)
-    if(NOT HPX_UTIL_FUNCTION)
+    if(NOT HPX_UTIL_FUNCTION AND HPX_HAVE_CXX11_STD_FUNCTION)
       add_definitions(-DHPX_HAVE_CXX11_STD_FUNCTION)
     else()
       set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 (movable) std::function." FORCE)
@@ -749,8 +761,12 @@ else()
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
                   BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
 
-    hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
-      DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
+    if(NOT HPX_UTIL_TUPLE)
+      hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
+        DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
+    else()
+      hpx_info("C++11" "HPX_UTIL_TUPLE is enabled: even if std::tuple is available it will not be used.")
+    endif()
 
     if(NOT HPX_UTIL_BIND)
       hpx_check_for_cxx11_std_bind(HPX_CXX11_STD_BIND
@@ -1059,7 +1075,7 @@ if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
-if(HPX_AUTOMATIC_PREPROCESSING)
+if(HPX_AUTOMATIC_PREPROCESSING AND ${BOOST_MINOR_VERSION} GREATER 50)
   add_subdirectory(preprocess)
 endif()
 

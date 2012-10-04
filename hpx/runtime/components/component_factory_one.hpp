@@ -15,7 +15,9 @@
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/manage_component.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -186,11 +188,19 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const&)
+        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const& ctor)
         {
+            if (isenabled_) {
+                naming::gid_type id = server::create_one<Component>(ctor);
+                if (id)
+                    ++refcnt_;
+                return id;
+            }
+
             HPX_THROW_EXCEPTION(bad_request,
-                "component_factory_one::create_one",
-                "create_one is not supported by this factory instance");
+                "component_factory_one::create_one_functor",
+                "this factory instance is disabled for this locality (" +
+                get_component_name() + ")");
             return naming::invalid_gid;
         }
 
@@ -230,36 +240,49 @@ namespace hpx { namespace components
 /// the only factory to be exposed from a particular module. If more than one
 /// factory needs to be exposed the \a HPX_REGISTER_COMPONENT_FACTORY and
 /// \a HPX_REGISTER_COMPONENT_MODULE macros should be used instead.
-#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_EX(                        \
-            ComponentType, componentname, state)                              \
-        HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::component_factory_one<ComponentType>,            \
-            componentname);                                                   \
-        HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::component_factory_one<ComponentType>,            \
-            componentname)                                                    \
-        template struct hpx::components::component_factory_one<ComponentType>;\
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, state)                              \
-    /**/
 
-#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(ComponentType, componentname) \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_EX(                        \
-            ComponentType, componentname, ::hpx::components::factory_check)   \
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
-    /**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(...)                       \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_(__VA_ARGS__)                  \
+/**/
 
-#define HPX_REGISTER_ENABLED_COMPONENT_FACTORY_ONE(ComponentType, componentname) \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_EX(                        \
-            ComponentType, componentname, ::hpx::components::factory_enabled) \
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
-    /**/
+#define HPX_REGISTER_ENABLED_COMPONENT_FACTORY_ONE(                           \
+        ComponentType, componentname)                                         \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_3(                             \
+        ComponentType, componentname, ::hpx::components::factory_enabled)     \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
 
-#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_ONE(ComponentType, componentname) \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_EX(                        \
-            ComponentType, componentname, ::hpx::components::factory_disabled)\
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
-    /**/
+#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_ONE(                          \
+        ComponentType, componentname)                                         \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_3(                             \
+        ComponentType, componentname, ::hpx::components::factory_disabled)    \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_(...)                      \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_,                          \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_2(                         \
+        ComponentType, componentname)                                         \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_3(                             \
+        ComponentType, componentname, ::hpx::components::factory_check)       \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_3(                         \
+        ComponentType, componentname, state)                                  \
+    HPX_REGISTER_COMPONENT_FACTORY(                                           \
+        hpx::components::component_factory_one<ComponentType>,                \
+        componentname);                                                       \
+    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
+        hpx::components::component_factory_one<ComponentType>,                \
+        componentname)                                                        \
+    template struct hpx::components::component_factory_one<ComponentType>;    \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(                                \
+        ComponentType, componentname, state)                                  \
+/**/
 
 #endif
 

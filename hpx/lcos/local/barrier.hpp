@@ -132,8 +132,15 @@ namespace hpx { namespace lcos { namespace local
             // slist::swap has a bug in Boost 1.35.0
 #if BOOST_VERSION < 103600
                 // release the threads
-                while (!queue_.empty()) {
+                while (!queue_.empty())
+                {
                     threads::thread_id_type id = queue_.front().id_;
+                    if (HPX_UNLIKELY(!id))
+                    {
+                        HPX_THROW_EXCEPTION(null_thread_id,
+                            "barrier::wait",
+                            "NULL thread id encountered");
+                    }
                     queue_.front().id_ = 0;
                     queue_.pop_front();
                     threads::set_thread_lco_description(id);
@@ -146,8 +153,15 @@ namespace hpx { namespace lcos { namespace local
                 l.unlock();
 
                 // release the threads
-                while (!queue.empty()) {
+                while (!queue.empty())
+                {
                     threads::thread_id_type id = queue.front().id_;
+                    if (HPX_UNLIKELY(!id))
+                    {
+                        HPX_THROW_EXCEPTION(null_thread_id,
+                            "barrier::wait",
+                            "NULL thread id encountered");
+                    }
                     queue.front().id_ = 0;
                     queue.pop_front();
                     threads::set_thread_lco_description(id);

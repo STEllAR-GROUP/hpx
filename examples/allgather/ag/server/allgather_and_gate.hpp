@@ -59,15 +59,15 @@ namespace ag { namespace server
 }}
 
 // Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ag::server::allgather_and_gate::compute_action,
     allgather_compute_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ag::server::allgather_and_gate::print_action,
     allgather_print_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     ag::server::allgather_and_gate::set_data_action,
     allgather_set_data_action);
 

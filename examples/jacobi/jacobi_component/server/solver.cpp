@@ -14,7 +14,7 @@ typedef hpx::components::managed_component<
 HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(solver_type, solver);
 
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::solver::run_action
   , jacobi_server_solver_run_action
 )

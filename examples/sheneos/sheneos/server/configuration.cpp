@@ -56,16 +56,16 @@ typedef sheneos::server::configuration configuration_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions.
-HPX_REGISTER_ACTION_EX(configuration_type::init_action,
+HPX_REGISTER_ACTION(configuration_type::init_action,
     sheneos_configuration_init_action);
-HPX_REGISTER_ACTION_EX(configuration_type::get_action,
+HPX_REGISTER_ACTION(configuration_type::get_action,
     sheneos_configuration_get_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<configuration_type>,
     sheneos_configuration_type);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<sheneos::config_data>::set_value_action,
     set_value_action_sheneos_config_data);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

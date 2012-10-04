@@ -111,6 +111,7 @@ typedef hpx::actions::plain_action4<
 > test_action;
 
 HPX_REGISTER_PLAIN_ACTION(test_action);
+HPX_ACTION_USES_MEDIUM_STACK(test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -212,6 +213,7 @@ typedef hpx::actions::plain_action4<
 > test_one_bulk_action;
 
 HPX_REGISTER_PLAIN_ACTION(test_one_bulk_action);
+HPX_ACTION_USES_MEDIUM_STACK(test_one_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function for interpolate_bulk. It will be invoked on all
@@ -313,6 +315,7 @@ typedef hpx::actions::plain_action4<
 > test_bulk_action;
 
 HPX_REGISTER_PLAIN_ACTION(test_bulk_action);
+HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_task(std::size_t i, hpx::util::high_resolution_timer& t)

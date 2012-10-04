@@ -29,15 +29,15 @@ typedef hpx::components::amr::server::unigrid_mesh dataflow_unigrid_mesh_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(dataflow_unigrid_mesh_type::init_execute_action,
+HPX_REGISTER_ACTION(dataflow_unigrid_mesh_type::init_execute_action,
     dataflow_unigrid_mesh_init_execute_action);
-HPX_REGISTER_ACTION_EX(dataflow_unigrid_mesh_type::execute_action,
+HPX_REGISTER_ACTION(dataflow_unigrid_mesh_type::execute_action,
     dataflow_unigrid_mesh_execute_action);
 
 typedef hpx::lcos::base_lco_with_value<
     boost::shared_ptr<std::vector<hpx::naming::id_type> > > dataflow_lco_gid_vector_ptr;
 
-HPX_REGISTER_ACTION_EX(dataflow_lco_gid_vector_ptr::set_value_action,
+HPX_REGISTER_ACTION(dataflow_lco_gid_vector_ptr::set_value_action,
     dataflow_set_value_action_gid_vector_ptr);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(dataflow_lco_gid_vector_ptr,
                              hpx::components::component_base_lco_with_value);

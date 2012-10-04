@@ -9,6 +9,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_PLAIN_ACTION_IMPLEMENTATIONS_NOV_14_2008_0811PM)
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_IMPLEMENTATIONS_NOV_14_2008_0811PM
 
+#include <hpx/config/forceinline.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -90,7 +91,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
             {
                 try {
@@ -208,7 +209,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -271,7 +272,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            result_type operator()(
+            BOOST_FORCEINLINE result_type operator()(
                 HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
             {
                 try {
@@ -387,7 +388,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
@@ -477,7 +478,6 @@ namespace hpx { namespace traits
 ///////////////////////////////////////////////////////////////////////////////
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_DIRECT_ARGUMENT
-// #undef HPX_ACTION_ARGUMENT
 #undef N
 
 #endif

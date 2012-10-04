@@ -28,7 +28,9 @@
 
 #ifndef HPX_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP_20060609
 #define HPX_COROUTINE_DETAIL_MAKE_TUPLE_TRAITS_HPP_20060609
+
 #include <boost/preprocessor/repetition.hpp>
+#include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/mpl/vector.hpp>
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 #include <hpx/util/coroutine/tuple_traits.hpp>
@@ -47,7 +49,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   template<typename TypeList>
   struct make_tuple_traits;
 
-#define HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR(z, n, unused)             \
+#define HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR(z, n, unused)               \
     template<BOOST_PP_ENUM_PARAMS(n, class A)>                                \
     struct make_tuple_traits<BOOST_PP_CAT(boost::mpl::vector, n)              \
         <BOOST_PP_ENUM_PARAMS(n, A)> >{                                       \
@@ -60,8 +62,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
    * @note This could be done more elegantly with a recursive metafunction,
    * but this is simpler and works well anyway.
    */
-BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-          HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~)
+  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_COROUTINE_ARG_MAX),
+      HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~)
 
 #undef HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR
 

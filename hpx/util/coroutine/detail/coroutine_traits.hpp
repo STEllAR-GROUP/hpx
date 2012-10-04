@@ -33,11 +33,12 @@
 #include <boost/type_traits.hpp>
 
 #include <hpx/util/coroutine/tuple_traits.hpp>
+#include <hpx/util/coroutine/detail/signature.hpp>
 #include <hpx/util/coroutine/detail/yield_result_type.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail 
 {
-  template<typename T>
+  template <typename T>
   struct as_tuple {
     typedef typename T::as_tuple type;
   };
@@ -45,38 +46,38 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   // This trait class is used to compute
   // all nested typedefs of coroutines given
   // a signature in the form 'result_type(parm1, ... parmn)'.
-  template<typename Signature>
+  template <typename Signature>
   struct coroutine_traits {
   private:
+    typedef typename boost::function_traits<Signature>::result_type
+      signature_result_type;
 
-    typedef BOOST_DEDUCED_TYPENAME boost::function_traits<Signature>::result_type
-    signature_result_type;
   public:
-    typedef BOOST_DEDUCED_TYPENAME
-    boost::mpl::eval_if<is_tuple_traits<signature_result_type>,
-                        as_tuple<signature_result_type>,
-                        boost::mpl::identity<signature_result_type> >
-    ::type result_type;
+    typedef typename boost::mpl::eval_if<
+        is_tuple_traits<signature_result_type>,
+        as_tuple<signature_result_type>,
+        boost::mpl::identity<signature_result_type> 
+    >::type result_type;
 
-    typedef BOOST_DEDUCED_TYPENAME
-    boost::mpl::eval_if<is_tuple_traits<signature_result_type>,
-                        boost::mpl::identity<signature_result_type>,
-                        boost::mpl::if_
-                        <boost::is_same<signature_result_type, void>,
-                         tuple_traits<>,
-                         tuple_traits<signature_result_type> > >
-    ::type result_slot_traits;
+    typedef typename boost::mpl::eval_if<
+        is_tuple_traits<signature_result_type>,
+        boost::mpl::identity<signature_result_type>,
+        boost::mpl::if_<
+            boost::is_same<signature_result_type, void>,
+            tuple_traits<>,
+            tuple_traits<signature_result_type> 
+        > 
+    >::type result_slot_traits;
 
-    typedef BOOST_DEDUCED_TYPENAME result_slot_traits
-    ::as_tuple result_slot_type;
+    typedef typename result_slot_traits::as_tuple result_slot_type;
 
-    typedef BOOST_DEDUCED_TYPENAME detail::make_tuple_traits<
-        BOOST_DEDUCED_TYPENAME detail::signature<Signature>::type
+    typedef typename detail::make_tuple_traits<
+        typename detail::signature<Signature>::type
     >::type arg_slot_traits;
 
-    typedef BOOST_DEDUCED_TYPENAME arg_slot_traits::as_tuple arg_slot_type;
+    typedef typename arg_slot_traits::as_tuple arg_slot_type;
 
-    typedef BOOST_DEDUCED_TYPENAME arg_slot_traits::as_result yield_result_type;
+    typedef typename arg_slot_traits::as_result yield_result_type;
   };
 }}}}
 

@@ -64,10 +64,10 @@ namespace interpolate1d { namespace server
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     interpolate1d::server::partition::init_action,
     partition_init_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     interpolate1d::server::partition::interpolate_action,
     partition_interpolate_action);
 

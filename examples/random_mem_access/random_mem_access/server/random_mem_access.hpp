@@ -146,16 +146,16 @@ namespace hpx { namespace components { namespace server
 
 }}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::init_action,
     random_mem_access_init_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::add_action,
     random_mem_access_add_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::query_action,
     random_mem_access_query_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::print_action,
     random_mem_access_print_action);
 

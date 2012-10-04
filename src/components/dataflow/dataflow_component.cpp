@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/components/generic_component_factory.hpp>
+#include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/base_lco.hpp>
@@ -38,7 +38,7 @@ typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_trigger_type, dataflow_trigger,
     "hpx::lcos::server::dataflow")
 
-// HPX_REGISTER_ACTION_EX(
+// HPX_REGISTER_ACTION(
 //     hpx::lcos::server::dataflow_trigger::init_action
 //   , dataflow_trigger_type_init_action
 // )

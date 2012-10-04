@@ -47,7 +47,7 @@ namespace startup_shutdown { namespace server
     };
 }}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     startup_shutdown::server::startup_shutdown_component::init_action,
     startup_shutdown_component_init_action);
 

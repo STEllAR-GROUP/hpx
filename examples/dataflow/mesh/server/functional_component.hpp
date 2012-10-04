@@ -144,13 +144,13 @@ namespace hpx { namespace components { namespace amr { namespace server
 
 }}}}
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::functional_component::alloc_data_action,
     dataflow_functional_component_alloc_data_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::functional_component::eval_action,
     dataflow_functional_component_eval_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::amr::server::functional_component::init_action,
     dataflow_functional_component_init_action);
 

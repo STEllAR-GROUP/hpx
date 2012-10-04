@@ -7,6 +7,7 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
@@ -220,13 +221,7 @@ namespace hpx { namespace lcos { namespace detail
                 // never reached
             }
             else {
-                try {
-                    boost::rethrow_exception(d.get_error());
-                }
-                catch (hpx::exception const& he) {
-                    ec = make_error_code(he.get_error(), he.what(),
-                        hpx::rethrow);
-                }
+                ec = make_error_code(d.get_error());
             }
             return result_type();
         }
@@ -317,7 +312,7 @@ namespace hpx { namespace lcos { namespace detail
                         // invoke the callback (continuation) function
                         set_on_completed_ = false;
                         on_completed_(f);
-                        on_completed_.reset();
+                        on_completed_.clear();
                         return;
                     }
                 }
@@ -346,7 +341,7 @@ namespace hpx { namespace lcos { namespace detail
                     // invoke the callback (continuation) function
                     set_on_completed_ = false;
                     on_completed_(f);
-                    on_completed_.reset();
+                    on_completed_.clear();
                     return;
                 }
             }
@@ -424,7 +419,7 @@ namespace hpx { namespace lcos { namespace detail
                 // invoke the callback (continuation) function
                 on_completed_(f);
                 set_on_completed_ = false;
-                on_completed_.reset();
+                on_completed_.clear();
             }
             return retval;
         }

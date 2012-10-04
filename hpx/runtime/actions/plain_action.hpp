@@ -24,6 +24,9 @@
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
+
+#include <boost/preprocessor/cat.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -58,7 +61,7 @@ namespace hpx { namespace actions
         /// original function (given by \a func), while ignoring the return
         /// value.
         template <typename State>   // dummy template parameter
-        static threads::thread_state_enum
+        BOOST_FORCEINLINE static threads::thread_state_enum
         thread_function(State)
         {
             try {
@@ -158,7 +161,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static Result
+        BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type,
             BOOST_FWD_REF(Arguments) /*args*/)
         {
@@ -200,7 +203,7 @@ namespace hpx { namespace actions
         /// original function (given by \a func), while ignoring the return
         /// value.
         template <typename State>   // dummy template parameter
-        static threads::thread_state_enum
+        BOOST_FORCEINLINE static threads::thread_state_enum
         thread_function(State)
         {
             try {
@@ -296,7 +299,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         template <typename Arguments>
-        static util::unused_type
+        BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) /*args*/)
         {
@@ -403,10 +406,9 @@ namespace hpx { namespace traits
 /// to avoid defining the action_type in global namespace. Normally, the use of
 /// the macro \a HPX_PLAIN_ACTION is recommend.
 ///
-#define HPX_REGISTER_PLAIN_ACTION(action_type)                                \
-    HPX_REGISTER_PLAIN_ACTION_EX2(action_type, action_type,                   \
-        ::hpx::components::factory_check)                                     \
-    /**/
+#define HPX_REGISTER_PLAIN_ACTION(...)                                        \
+    HPX_REGISTER_PLAIN_ACTION_(__VA_ARGS__)                                   \
+/**/
 
 /// \def HPX_DEFINE_PLAIN_ACTION(func, name)
 /// \brief Defines a plain action type
@@ -472,20 +474,28 @@ namespace hpx { namespace traits
 /// if the wrapped function is located in some other namespace. The newly
 /// defined action type is placed into the global namespace as well.
 ///
-#define HPX_PLAIN_ACTION(func, name)                                          \
-    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
-    HPX_REGISTER_PLAIN_ACTION(name)                                           \
-    /**/
+#define HPX_PLAIN_ACTION(...)                                                 \
+    HPX_PLAIN_ACTION_(__VA_ARGS__)                                            \
+/**/
 
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/plain_action_implementations.hpp>
 
 /// \cond NOINTERNAL
 
-#define HPX_PLAIN_ACTION_EX(func, name, state)                                \
+#define HPX_PLAIN_ACTION_(...)                                                \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                      \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_PLAIN_ACTION_2(func, name)                                        \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
-    HPX_REGISTER_PLAIN_ACTION_EX2(name, name, state)                          \
-    /**/
+    HPX_REGISTER_PLAIN_ACTION_1(name)                                         \
+/**/
+#define HPX_PLAIN_ACTION_3(func, name, state)                                 \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_PLAIN_ACTION_3(name, name, state)                            \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_PLAIN_ACTION_DECLARATION is used create the

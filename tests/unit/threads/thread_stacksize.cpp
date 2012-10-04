@@ -16,22 +16,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_default_stacksize()
-{
-    HPX_TEST(hpx::threads::get_self_ptr()); 
-    // verify that sufficient stack has been allocated
-    HPX_TEST_EQ(hpx::threads::get_ctx_ptr()->get_stacksize(), 
-        hpx::get_runtime().get_config().get_default_stack_size());
-
-    // allocate HPX_DEFAULT_STACK_SIZE - management_space memory on the stack 
-    char array[HPX_DEFAULT_STACK_SIZE-management_space];
-
-    // do something to that array
-    std::memset(array, '\0', sizeof(array));
-}
-HPX_PLAIN_ACTION(test_default_stacksize, test_default_stacksize_action)
-
-///////////////////////////////////////////////////////////////////////////////
 void test_small_stacksize()
 {
     HPX_TEST(hpx::threads::get_self_ptr()); 
@@ -110,11 +94,6 @@ int main()
 
     BOOST_FOREACH(hpx::id_type id, localities)
     {
-        {
-            test_default_stacksize_action test_action;
-            test_action(id);
-        }
-
         {
             test_small_stacksize_action test_action;
             test_action(id);

@@ -246,27 +246,29 @@ namespace boost { namespace serialization
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::init_action,
     sheneos_partition3d_init_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_ACTION_USES_LARGE_STACK(sheneos::server::partition3d::init_action);
+
+HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_action,
     sheneos_partition3d_interpolate_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_one_action,
     sheneos_partition3d_interpolate_one_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_bulk_action,
     sheneos_partition3d_interpolate_bulk_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_value_action,
     set_value_action_vector_vector_double);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_one_bulk_action,
     sheneos_partition3d_interpolate_one_bulk_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action,
     set_value_action_vector_double);
 

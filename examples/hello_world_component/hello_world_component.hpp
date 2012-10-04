@@ -55,7 +55,7 @@ struct hello_world
 
 }
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     examples::server::hello_world::invoke_action, hello_world_invoke_action);
 
 #endif // HELLO_WORLD_COMPONENT_HPP 

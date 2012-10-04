@@ -23,10 +23,10 @@
 #include <boost/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
-#include <hpx/util/coroutine/detail/static.hpp>
 
 /*
  * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
@@ -73,7 +73,7 @@ namespace hpx { namespace util { namespace coroutines
     void trampoline(T* fun);
 
     template<typename T>
-    inline void
+    BOOST_FORCEINLINE void
     trampoline(T* fun)
     {
       (*fun)();

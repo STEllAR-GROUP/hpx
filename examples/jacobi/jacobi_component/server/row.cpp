@@ -24,12 +24,12 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(row_type, row);
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::row::init_action
   , jacobi_server_row_init_action
 )
 
-HPX_REGISTER_ACTION_EX(
+HPX_REGISTER_ACTION(
     jacobi::server::row::get_action
   , jacobi_server_row_get_action
 )

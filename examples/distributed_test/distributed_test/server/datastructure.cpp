@@ -135,15 +135,15 @@ typedef distributed::server::datastructure datastructure_type;
 
 //////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(datastructure_type::init_action,
+HPX_REGISTER_ACTION(datastructure_type::init_action,
     distributed_datastructure_init_action);
-HPX_REGISTER_ACTION_EX(datastructure_type::write_action,
+HPX_REGISTER_ACTION(datastructure_type::write_action,
     distributed_datastructure_write_action);
-HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_config_action,
+HPX_REGISTER_ACTION(distributed::server::datastructure::get_config_action,
     distributed_datastructure_get_config_action);
-HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_action,
+HPX_REGISTER_ACTION(distributed::server::datastructure::get_data_action,
     distributed_datastructure_get_data_action);
-HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_at_action,
+HPX_REGISTER_ACTION(distributed::server::datastructure::get_data_at_action,
     distributed_datastructure_get_data_at_action);
     
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
@@ -151,7 +151,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     distributed_datastructure_type);
 
 
-/*HPX_REGISTER_ACTION_EX(
+/*HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<distributed::config_comp>::set_value_action, 
     set_value_action_distributed_config_comp);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

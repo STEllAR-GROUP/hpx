@@ -8,6 +8,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM)
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -63,7 +64,7 @@
         template <typename Object
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Object* obj
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
@@ -90,7 +91,7 @@
         template <typename Object
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* const func)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)) const,
             Component* obj
@@ -154,7 +155,7 @@
         template <typename Object
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Component* obj
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)) const
@@ -182,7 +183,7 @@
         template <typename Object
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
-        result_type operator()(continuation_type cont,
+        BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* const func)(
                 BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)) const,
             Component* obj

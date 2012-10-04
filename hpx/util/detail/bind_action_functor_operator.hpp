@@ -7,7 +7,7 @@
 #define NNN BOOST_PP_FRAME_ITERATION(2)
 
     template <BOOST_PP_ENUM_PARAMS(NNN, typename A)>
-    result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a))
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a))
     {
         typedef
             BOOST_PP_CAT(hpx::util::tuple, NNN)<
@@ -21,7 +21,7 @@
                 BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();
     }
     template <BOOST_PP_ENUM_PARAMS(NNN, typename A)>
-    result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a)) const
+    BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a)) const
     {
         typedef
             BOOST_PP_CAT(hpx::util::tuple, NNN)<

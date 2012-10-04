@@ -158,7 +158,7 @@ namespace gtcx { namespace server
         hpx::future<void> p2p_sendreceive_future_;
         hpx::lcos::local::trigger p2p_sendreceive_gate_;
 //        hpx::future<void> int_sndrecv_future_;
-        hpx::lcos::local::trigger int_sndrecv_gate_;
+//        hpx::lcos::local::trigger int_sndrecv_gate_;
         and_gate_type partd_allgather_gate_;
 
         std::vector<hpx::naming::id_type> components_;
@@ -186,71 +186,71 @@ namespace gtcx { namespace server
 
 // Declaration of serialization support for the actions
 HPX_ACTION_USES_HUGE_STACK(gtcx::server::partition::loop_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::loop_action,
     gtcx_point_loop_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_data_action,
     gtcx_point_set_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_tdata_action,
     gtcx_point_set_tdata_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_params_action,
     gtcx_point_set_params_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_comm_allreduce_data_action,
     gtcx_point_set_comm_allreduce_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_int_comm_allreduce_data_action,
     gtcx_point_set_int_comm_allreduce_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_sndrecv_data_action,
     gtcx_point_set_sndrecv_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_ntoroidal_gather_data_action,
     gtcx_point_set_ntoroidal_gather_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_ntoroidal_scatter_data_action,
     gtcx_point_set_ntoroidal_scatter_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_complex_ntoroidal_gather_data_action,
     gtcx_point_set_complex_ntoroidal_gather_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_toroidal_reduce_data_action,
     gtcx_point_set_toroidal_reduce_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_p2p_sendreceive_data_action,
     gtcx_point_set_p2p_sendreceive_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_int_params_action,
     gtcx_point_set_int_params_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_comm_reduce_data_action,
     gtcx_point_set_comm_reduce_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_int_sndrecv_data_action,
     gtcx_point_set_int_sndrecv_data_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_real_params_action,
     gtcx_point_set_real_params_action);
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_partd_allgather_data_action,
     gtcx_point_set_partd_allgather_data_action);
 

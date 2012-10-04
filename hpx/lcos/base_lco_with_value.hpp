@@ -156,58 +156,58 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::set_value_action,
     set_value_action_gid_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::get_value_action,
     get_value_action_gid_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::set_value_action,
     set_value_action_vector_gid_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::get_value_action,
     get_value_action_vector_gid_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_value_action,
     set_value_action_id_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::naming::id_type>::get_value_action,
     get_value_action_id_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_value_action,
     set_value_action_vector_id_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::get_value_action,
     get_value_action_vector_id_type)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<double>::set_value_action,
     set_value_action_double)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<double>::get_value_action,
     get_value_action_double)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<int>::set_value_action,
     set_value_action_int)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<int>::get_value_action,
     get_value_action_int)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<bool>::set_value_action,
     set_value_action_bool)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<bool>::get_value_action,
     get_value_action_bool)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::util::section>::set_value_action,
     set_value_action_section)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::util::section>::get_value_action,
     get_value_action_section)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::util::unused_type>::set_value_action,
     set_value_action_void)
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<hpx::util::unused_type>::get_value_action,
     get_value_action_void)
 

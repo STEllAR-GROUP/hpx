@@ -28,8 +28,10 @@
 
 #ifndef HPX_COROUTINE_ARGUMENT_UNPACKER_HPP_20060601
 #define HPX_COROUTINE_ARGUMENT_UNPACKER_HPP_20060601
+
 #include <boost/preprocessor/control/if.hpp>
 #include <boost/preprocessor/repetition.hpp>
+#include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/utility/result_of.hpp>
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/arg_max.hpp>
@@ -44,62 +46,53 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 
 #define HPX_COROUTINE_ARGUMENT_UNPACKER(z, len, unused)                       \
-    template<typename Traits>                                                 \
+    template <typename Traits>                                                \
     struct unpacker_n<Traits, len> {                                          \
-        template<typename Functor, typename Tuple>                            \
+      template<typename Functor, typename Tuple>                              \
       struct result {/*for result_of compatibility*/                          \
-          typedef typename  boost::result_of                                  \
-             <Functor(BOOST_PP_ENUM_BINARY_PARAMS                             \
-                      (len, typename Traits::template at<index_ , >           \
-                       ::type BOOST_PP_INTERCEPT))>::type type;               \
+          typedef typename boost::result_of<                                  \
+              Functor(BOOST_PP_ENUM_BINARY_PARAMS(len,                        \
+                  typename Traits::template at<index_ , >::type               \
+                      BOOST_PP_INTERCEPT))>::type type;                       \
       };                                                                      \
       template<typename Functor, typename Tuple>                              \
-      typename result<Functor, Tuple>::type operator()                        \
-       (Functor& f, Tuple& parms){                                            \
-           using boost::get; /*tuples::get cannot be found via ADL*/          \
-           return f(BOOST_PP_ENUM_BINARY_PARAMS                               \
-                    (len,                                                     \
-                     get<index_, >                                            \
-                     (parms) BOOST_PP_INTERCEPT));                            \
+      typename result<Functor, Tuple>::type operator()(                       \
+          Functor& f, Tuple& parms)                                           \
+      {                                                                       \
+              using boost::get; /*tuples::get cannot be found via ADL*/       \
+              return f(BOOST_PP_ENUM_BINARY_PARAMS(len, get<index_, >(parms)  \
+                  BOOST_PP_INTERCEPT));                                       \
       }                                                                       \
     };                                                                        \
 /**/
 
 #define HPX_COROUTINE_ARGUMENT_UNPACKER_EX(z, len, unused)                    \
     template<typename Traits>                                                 \
-    struct unpacker_ex_n<Traits, len >           {                            \
-    template<typename Functor,                                                \
-             typename First,                                                  \
-             typename Tuple>                                                  \
+    struct unpacker_ex_n<Traits, len > {                                      \
+      template <typename Functor, typename First, typename Tuple>             \
       struct result {                                                         \
-          typedef typename  boost::result_of                                  \
-             <Functor(First BOOST_PP_COMMA_IF(len)                            \
-                      BOOST_PP_ENUM_BINARY_PARAMS                             \
-                      (len, typename Traits                                   \
-                       ::template at<index_ , >::type BOOST_PP_INTERCEPT))>   \
-          ::type type;                                                        \
-        };                                                                    \
-                                                                              \
-      template<typename Functor,                                              \
-               typename First,                                                \
-               typename Tuple>                                                \
+          typedef typename  boost::result_of<                                 \
+              Functor(First BOOST_PP_COMMA_IF(len)                            \
+                 BOOST_PP_ENUM_BINARY_PARAMS(len,                             \
+                      typename Traits::template at<index_ , >::type           \
+                          BOOST_PP_INTERCEPT))>::type type;                   \
+      };                                                                      \
+      template <typename Functor, typename First, typename Tuple>             \
       typename result<Functor, First, Tuple>::type                            \
-      operator()(Functor& f, First& arg0, Tuple& parms){                      \
+      operator()(Functor& f, First& arg0, Tuple& parms)                       \
+      {                                                                       \
            using boost::get; /*tuples::get cannot be found via ADL*/          \
-           return f(arg0                                                      \
-                    BOOST_PP_COMMA_IF(len)                                    \
-                    BOOST_PP_ENUM_BINARY_PARAMS                               \
-                    (len,                                                     \
-                     get<index_, >                                            \
-                     (parms) BOOST_PP_INTERCEPT) );                           \
+           return f(arg0 BOOST_PP_COMMA_IF(len)                               \
+                BOOST_PP_ENUM_BINARY_PARAMS(len, get<index_, >(parms)         \
+                    BOOST_PP_INTERCEPT) );                                    \
       }                                                                       \
     };                                                                        \
 /**/
 
-BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-                HPX_COROUTINE_ARGUMENT_UNPACKER, ~)
-BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-                HPX_COROUTINE_ARGUMENT_UNPACKER_EX, ~)
+  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_COROUTINE_ARG_MAX),
+    HPX_COROUTINE_ARGUMENT_UNPACKER, ~)
+  BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
+    HPX_COROUTINE_ARGUMENT_UNPACKER_EX, ~)
 
   // Somehow VCPP 8.0 chokes if the Trait for unpack[_ex]
   // is explicitly specified. We use an empty dispatch

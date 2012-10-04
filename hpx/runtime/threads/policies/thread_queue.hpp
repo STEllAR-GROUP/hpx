@@ -278,7 +278,8 @@ namespace hpx { namespace threads { namespace policies
             else {
                 // delete only this many threads
                 boost::int64_t delete_count = 
-                    (std::max)(terminated_items_count_ / 10, 
+                    (std::max)(
+                        static_cast<boost::int64_t>(terminated_items_count_ / 10), 
                         static_cast<boost::int64_t>(max_delete_count));
 
                 thread_id_type todelete;

@@ -57,12 +57,12 @@ namespace jacobi {
     }
 }
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::row::get_action
   , jacobi_server_row_get_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
+HPX_REGISTER_ACTION_DECLARATION(
     jacobi::server::row::init_action
   , jacobi_server_row_init_action
 )

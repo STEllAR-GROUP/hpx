@@ -218,7 +218,7 @@ int hpx_main(variables_map&)
                 pass_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ), 4u);
+            ), 5u);
 
             /* TODO: Make this compile
             HPX_TEST_EQ((
@@ -246,7 +246,7 @@ int hpx_main(variables_map&)
                 move_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ), 4u);
+            ), 5u);
             
             /* TODO: Make this compile
             HPX_TEST_EQ((
@@ -272,7 +272,7 @@ int hpx_main(variables_map&)
         // test for a non-movable object ('normal' actions)
         HPX_TEST_EQ((
             pass_object<pass_non_movable_object_action, non_movable_object>(id)
-        ), is_local ? 4u : 4u);
+        ), is_local ? 5u : 5u);
 
         /* TODO: Make this compile
         // test for a non-movable object (direct actions)
@@ -296,7 +296,7 @@ int hpx_main(variables_map&)
         // test for a non-movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<pass_non_movable_object_action, non_movable_object>(id)
-        ), is_local ? 4u : 4u);
+        ), is_local ? 5u : 5u);
 
         /* TODO: Make this compile
         // test for a non-movable object (direct actions)
@@ -309,7 +309,7 @@ int hpx_main(variables_map&)
             return_object<
                 return_movable_object_action, movable_object
             >(id)
-        ), is_local ? 1u : 2u);
+        ), is_local ? 1u : 3u);
 
         /* TODO: Make this compile
         HPX_TEST_EQ((
@@ -323,7 +323,7 @@ int hpx_main(variables_map&)
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
+        ), is_local ? 2u : 9u);
 
         /* TODO: Make this compile
         HPX_TEST_EQ((
@@ -337,7 +337,7 @@ int hpx_main(variables_map&)
             return_move_object<
                 return_movable_object_action, movable_object
             >(id)
-        ), is_local ? 0u : 0u);
+        ), is_local ? 0u : 2u);
 
         /* TODO: Make this compile
         HPX_TEST_EQ((
@@ -347,11 +347,21 @@ int hpx_main(variables_map&)
         ), is_local ? 0u : 0u);
         */
 
+#if defined(__GNUC__) && (HPX_GCC_VERSION < 40500)
         HPX_TEST_EQ((
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 2u);
+        ), 
+        is_local ? 3u : 10u);      // gcc V4.4 is special
+#else
+        HPX_TEST_EQ((
+            return_move_object<
+                return_non_movable_object_action, non_movable_object
+            >(id)
+        ), 
+        is_local ? 2u : 9u);
+#endif
 
         /* TODO: Make this compile
         HPX_TEST_EQ((

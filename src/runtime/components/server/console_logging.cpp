@@ -53,7 +53,7 @@ namespace boost { namespace serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_PLAIN_ACTION_EX2(
+HPX_REGISTER_PLAIN_ACTION(
     hpx::components::server::console_logging_action<>,
     console_logging_action, hpx::components::factory_enabled)
 
