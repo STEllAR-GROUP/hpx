@@ -183,11 +183,11 @@ namespace hpx
                                      garbage collected */
         };
 
-        /// \cond NODETAIL
+        /// \ cond NODETAIL
         ///   Please note that if you change the value of threads::terminated 
         ///   above, you will need to adjust do_call(dummy<1> = 1) in 
         ///   util/coroutine /detail/coroutine_impl.hpp as well.
-        /// \endcond
+        /// \ endcond
 
         /// \enum thread_priority
         enum thread_priority
@@ -234,12 +234,12 @@ namespace hpx
         };
 
         ///////////////////////////////////////////////////////////////////////
-        /// \cond NODETAIL
+        /// \ cond NODETAIL
         namespace detail
         {
             template <typename CoroutineImpl> struct coroutine_allocator;
         }
-        /// \endcond
+        /// \ endcond
 
         typedef util::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
@@ -247,10 +247,10 @@ namespace hpx
         typedef coroutine_type::self thread_self;
 
         ///////////////////////////////////////////////////////////////////////
-        /// \cond NODETAIL
+        /// \ cond NODETAIL
         thread_id_type const invalid_thread_id =
             reinterpret_cast<thread_id_type>(-1);
-        /// \endcond
+        /// \ endcond
 
         /// The function \a get_self returns a reference to the (OS thread
         /// specific) self reference to the current PX thread.
@@ -411,7 +411,7 @@ namespace hpx
             factory_check    = 2
         };
 
-        /// \cond NODETAIL
+        /// \ cond NODETAIL
         namespace detail
         {
             struct this_type {};
@@ -419,7 +419,7 @@ namespace hpx
             struct simple_component_tag {};
             struct managed_component_tag {};
         }
-        /// \endcond
+        /// \ endcond
 
         ///////////////////////////////////////////////////////////////////////
         typedef boost::int32_t component_type;
@@ -599,12 +599,12 @@ namespace hpx
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type);
 
-    /// \cond NODETAIL
+    /// \ cond NODETAIL
     namespace detail
     {
         HPX_API_EXPORT naming::gid_type get_next_id();
     }
-    /// \endcond
+    /// \ endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance

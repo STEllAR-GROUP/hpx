@@ -153,7 +153,7 @@ else()
           "-D__hpx_binary_dir__=${CMAKE_BINARY_DIR}"
           "-D__hpx_docs_dir__=${CMAKE_CURRENT_BINARY_DIR}"
           ${${name}_QUICKBOOK_ARGS}
-          ${input_path}
+          "${input_path}"
       COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
       DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
   endmacro()

@@ -16,8 +16,8 @@ in 3 different ways:
   point.
 * Balanced use case: Supply your own main __hpx__ entry point while blocking 
   the main thread.
-* Most flexibility: Supply your own main __hpx__ entry point avoiding to block
-  the main thread.
+* Most flexibility: Supply your own main __hpx__ entry point while avoiding to 
+  block the main thread.
 
 [heading:minimal Re-use the `main()` function as the main __hpx__ entry point]
 
@@ -33,12 +33,74 @@ this technique looks like:
         return 0;
     }
 
-The only change to your code you have to make is to include the file `hpx/hpx_main.hpp'.
-In this case the function `main()` will be invoked as the sfirst __hpx__ thread 
-of the application.
+The only change to your code you have to make is to include the file `hpx/hpx_main.hpp`.
+In this case the function `main()` will be invoked as the first __hpx__ thread 
+of the application. The runtime system will be initialized behind the scenes
+before the function `main()` is executed and will automatically stopped after 
+`main()` has returned. All __hpx__ API functions can be used from within this
+function now.
+
+[note The function `main()` does not need to expect receiving `argc`/`argv`
+      as shown above, but could expose the signature `int main()`. This 
+      is consistent with the usually allowed prototypes for the function 
+      `main()` in C++ applications.]
+
+All commandline arguments specific to __hpx__ will still be processed by the 
+__hpx__ runtime system as usual. However, those command line options will be 
+removed from the list of values passed to `argc`/`argv` of the function 
+`main()`. The list of values passed to `main()` will hold only the commandline 
+options which are not recognized by the __hpx__ runtime system (see the section
+__commandline__ for more details on what options are recognized by __hpx__).
+
+The value returned from the function `main()` as shown above will be returned 
+to the operating system as usual.
 
 [heading:medium Supply your own main __hpx__ entry point while blocking the main thread]
 
-[heading:flexible Supply your own main __hpx__ entry point avoiding to block the main thread]
+With this method you need to provide an explicit main thread function name 
+`hpx_main`. This function will be invoked as the main entry point of your 
+__hpx__ application on the console locality only (this function will be invoked 
+as the first __hpx__ thread of your application). All __hpx__ API functions 
+can be used from within this function.
+
+The thread executing the function `hpx::init` will block waiting for the 
+runtime system to exit. The value returned from `hpx_main` will be returned 
+from `hpx::init` after the runtime system has stopped.
+
+This method has the advantage of you being able to decide which version of 
+[funcref `hpx::init`] to call. This allows to pass additional configuration 
+parameters while initializing the __hpx__ runtime system. 
+
+    #include <hpx/hpx_init.hpp>
+
+    int hpx_main(int argc, char* argv[])
+    {
+        return hpx::finalize();
+    }
+
+    int main(int argc, char* argv[])
+    {
+        // Initialize HPX, run hpx_main as the first HPX thread, and 
+        // wait for hpx::finalize being called.
+        return hpx::init(argc, argv);
+    }
+
+
+[heading:flexible Supply your own main __hpx__ entry point while avoiding to block the main thread]
+
+
+    int hpx_main(int argc, char* argv[])
+    {
+        return hpx::finalize();
+    }
+
+    int main(int argc, char* argv[])
+    {
+        // Initialize HPX, run hpx_main.
+        hpx::start(argc, argv);
+
+        // Wait for hpx::finalize being called.
+        return hpx::stop();
+    }
 
 [endsect]

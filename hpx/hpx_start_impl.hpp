@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// \file hpx_init_impl.hpp
-
 #if !defined(HPX_START_IMPL_OCT_04_2012_0252PM)
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
