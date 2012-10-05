@@ -1,0 +1,28 @@
+[/=============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:applications Writing __hpx__ applications]
+
+In order to write an application which uses services from the __hpx__ runtime 
+system you need to initialize the __hpx__ library by inserting certain calls 
+into the code of your application. Depending on your use case, this can be done
+in 3 different ways:
+
+ * Minimally invasive: Re-use the `main()` function as the main __hpx__ entry 
+   point.
+ * Balanced use case: Supply your own main __hpx__ entry point while blocking 
+   the main thread.
+ * Most flexibility: Supply your own main __hpx__ entry point avoiding to block
+   the main thread.
+
+[heading:minimal Re-use the `main()` function as the main __hpx__ entry point]
+
+[headin:medium Supply your own main __hpx__ entry point while blocking the main thread]
+
+[heading:flexible Supply your own main __hpx__ entry point avoiding to block the main thread]
+
+[endsect]
