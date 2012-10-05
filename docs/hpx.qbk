@@ -10,7 +10,7 @@
     [quickbook 1.6]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 1.0.0]
+    [version 0.9.5]
     [copyright 2011 2012 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -29,9 +29,10 @@
 [def __0_8_0__                  [link hpx.whats_new.hpx_0_8_0 V0.8.0]]
 [def __0_8_1__                  [link hpx.whats_new.hpx_0_8_1 V0.8.1]]
 [def __0_9_0__                  [link hpx.whats_new.hpx_0_9_0 V0.9.0]]
+[def __0_9_5__                  [link hpx.whats_new.hpx_0_9_5 V0.9.5]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __1_0_0__]
+[def __version__                __0_9_5__]
 
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
@@ -197,6 +198,7 @@ QuickBook can be found in the collection of __boost_tools__.
 [section:manual Manual]
 
 [include manual/init.qbk]
+[include manual/applications.qbk]
 [include manual/names.qbk]
 [include manual/applying_actions.qbk]
 [include manual/plain_actions.qbk]
