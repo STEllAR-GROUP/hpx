@@ -53,6 +53,17 @@ addressing_service::addressing_service(
         launch_hosted(pp, ini_);
 } // }}}
 
+naming::locality const& addressing_service::get_here() const
+{
+    if (!here_) {
+        BOOST_ASSERT(get_runtime_ptr() && 
+            get_runtime().get_state() >= runtime::state_initialized && 
+            get_runtime().get_state() < runtime::state_stopped);
+        here_ = get_runtime().here();
+    }
+    return here_;
+}
+
 void addressing_service::launch_bootstrap(
     parcelset::parcelport& pp
   , util::runtime_configuration const& ini_
@@ -837,9 +848,7 @@ bool addressing_service::is_local_address(
     if (ec)
         return false;
 
-    if (!here_)
-        here_ = get_runtime().here();
-    return addr.locality_ == here_;
+    return addr.locality_ == get_here();
 }
 
 bool addressing_service::is_local_address(
@@ -860,9 +869,7 @@ bool addressing_service::is_local_address(
     if (ec)
         return false;
 
-    if (!here_)
-        here_ = get_runtime().here();
-    return addr.locality_ == here_;
+    return addr.locality_ == get_here();
 }
 
 // Return true if at least one address is local.
@@ -902,9 +909,7 @@ bool addressing_service::is_local_address_cached(
     if (!resolve_cached(id, addr, ec) || ec)
         return false;
 
-    if (!here_)
-        here_ = get_runtime().here();
-    return addr.locality_ == here_;
+    return addr.locality_ == get_here();
 }
 
 bool addressing_service::is_local_address_cached(
@@ -919,9 +924,7 @@ bool addressing_service::is_local_address_cached(
     if (!resolve_cached(id, addr, ec) || ec)
         return false;
 
-    if (!here_)
-        here_ = get_runtime().here();
-    return addr.locality_ == here_;
+    return addr.locality_ == get_here();
 }
 
 bool addressing_service::is_local_lva_encoded_address(
@@ -942,9 +945,7 @@ bool addressing_service::resolve_locally_known_addresses(
     // LVA-encoded GIDs (located on this machine)
     if (is_local_lva_encoded_address(id))
     {
-        if (!here_)
-            here_ = get_runtime().here();
-        addr.locality_ = here_;
+        addr.locality_ = get_here();
 
         // An LSB of 0 references the runtime support component
         if (!rts_lva_)
@@ -1249,9 +1250,6 @@ bool addressing_service::resolve_cached(
     addrs.resize(count);
     locals.resize(count);
 
-    if (!here_)
-        here_ = get_runtime().here();
-
     std::size_t resolved = 0;
     for (std::size_t i = 0; i < count; ++i)
     {
@@ -1263,11 +1261,11 @@ bool addressing_service::resolve_cached(
             if (was_resolved)
                 ++resolved;
 
-            if (addrs[i].locality_ == here_)
+            if (addrs[i].locality_ == get_here())
                 locals.set(i, true);
         }
 
-        else if (addrs[i].locality_ == here_)
+        else if (addrs[i].locality_ == get_here())
             locals.set(i, true);
     }
 
