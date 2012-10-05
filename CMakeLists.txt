@@ -241,7 +241,11 @@ include(HPX_GitCommit)
 ################################################################################
 # FIXME: Three separate doc strings are used for the *_PREFIX macros.
 
-hpx_option(HPX_NO_INSTALL BOOL "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_DEFAULT_BUILD_TARGETS BOOL
+  "Associate the core HPX library with the default build target (default: ON)." ON ADVANCED)
+
+hpx_option(HPX_NO_INSTALL BOOL
+  "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
 
 if(NOT HPX_NO_INSTALL)
   # for backwards compatibility
