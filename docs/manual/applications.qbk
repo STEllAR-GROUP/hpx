@@ -12,16 +12,32 @@ system you need to initialize the __hpx__ library by inserting certain calls
 into the code of your application. Depending on your use case, this can be done
 in 3 different ways:
 
- * Minimally invasive: Re-use the `main()` function as the main __hpx__ entry 
-   point.
- * Balanced use case: Supply your own main __hpx__ entry point while blocking 
-   the main thread.
- * Most flexibility: Supply your own main __hpx__ entry point avoiding to block
-   the main thread.
+* Minimally invasive: Re-use the `main()` function as the main __hpx__ entry 
+  point.
+* Balanced use case: Supply your own main __hpx__ entry point while blocking 
+  the main thread.
+* Most flexibility: Supply your own main __hpx__ entry point avoiding to block
+  the main thread.
 
 [heading:minimal Re-use the `main()` function as the main __hpx__ entry point]
 
-[headin:medium Supply your own main __hpx__ entry point while blocking the main thread]
+This method is the least intrusive to your code. It however provides you with 
+the smallest flexibility in terms of initializing the __hpx__ runtime system 
+only. The following code snippet shows what a minimal __hpx__ application using
+this technique looks like:
+
+    #include <hpx/hpx_main.hpp>
+
+    int main(int argc, char* argv[])
+    {
+        return 0;
+    }
+
+The only change to your code you have to make is to include the file `hpx/hpx_main.hpp'.
+In this case the function `main()` will be invoked as the sfirst __hpx__ thread 
+of the application.
+
+[heading:medium Supply your own main __hpx__ entry point while blocking the main thread]
 
 [heading:flexible Supply your own main __hpx__ entry point avoiding to block the main thread]
 
