@@ -3,8 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 2.8)
-
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
 file(GLOB base_files ${hpx_SOURCE_DIR}/docs/*.qbk)
@@ -82,6 +80,9 @@ if(HPX_DOCUMENTATION_DEVELOPMENT)
   set(quickbook_fixme_mode "-D__hpx_enable_fixme__")
 endif()
 
+set(image
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
+
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
   DEPENDENCIES ${documentation_dependencies}
@@ -91,7 +92,7 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.section.depth 4
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
-                --stringparam boost.image.src images/hpx_0_9_5.png
+                --stringparam boost.image.src ${image}
                 --stringparam boost.image.w 458 
                 --stringparam boost.image.h 110
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
