@@ -12,6 +12,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <vector>
