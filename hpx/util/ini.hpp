@@ -61,6 +61,8 @@ namespace hpx { namespace util
         void line_msg(std::string const& msg, std::string const& file,
             int lnum = 0);
 
+        section& clone_from(section const& rhs, section* root = 0);
+
     public:
         section();
         explicit section(std::string const& filename, section* root = NULL);

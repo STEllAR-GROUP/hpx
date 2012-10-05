@@ -115,13 +115,13 @@ section::section (const section & in)
     section_map s = in.get_sections();
     section_map::iterator send = s.end();
     for (section_map::iterator si = s.begin(); si != send; ++si)
-        add_section (si->first, si->second, get_root());
+        add_section(si->first, si->second, get_root());
 }
 
 section& section::operator=(section const& rhs)
 {
     if (this != &rhs) {
-        root_ = rhs.get_root();
+        root_ = this;
         parent_name_ = rhs.get_parent_name();
         name_ = rhs.get_name();
 
@@ -133,7 +133,27 @@ section& section::operator=(section const& rhs)
         section_map s = rhs.get_sections();
         section_map::iterator send = s.end();
         for (section_map::iterator si = s.begin(); si != send; ++si)
-            add_section (si->first, si->second, get_root());
+            add_section(si->first, si->second, get_root());
+    }
+    return *this;
+}
+
+section& section::clone_from(section const& rhs, section* root)
+{
+    if (this != &rhs) {
+        root_ = root ? root : this;
+        parent_name_ = rhs.get_parent_name();
+        name_ = rhs.get_name();
+
+        entry_map const& e = rhs.get_entries();
+        entry_map::const_iterator end = e.end();
+        for (entry_map::const_iterator i = e.begin (); i != end; ++i)
+            add_entry(i->first, i->second);
+
+        section_map s = rhs.get_sections();
+        section_map::iterator send = s.end();
+        for (section_map::iterator si = s.begin(); si != send; ++si)
+            add_section(si->first, si->second, get_root());
     }
     return *this;
 }
@@ -292,8 +312,7 @@ void section::add_section (std::string const& sec_name, section& sec, section* r
     sec.parent_name_ = get_full_name();
 
     section& newsec = sections_[sec_name];
-    newsec = sec;
-    newsec.set_root((NULL != root) ? root : get_root());
+    newsec.clone_from(sec, (NULL != root) ? root : get_root());
 }
 
 bool section::has_section (std::string const& sec_name) const
