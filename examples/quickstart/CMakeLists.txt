@@ -20,6 +20,7 @@ set(example_programs
     quicksort
     simplest_hello_world
     timed_wake
+    use_main_thread
     wait_composition
    )
 

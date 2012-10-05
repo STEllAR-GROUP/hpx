@@ -151,7 +151,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration& rtcfg)
+            util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         topology_(

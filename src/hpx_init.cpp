@@ -8,6 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/hpx_start.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/bind_action.hpp>
 
@@ -312,22 +313,6 @@ namespace hpx
                 rt.add_startup_function(dump_config(rt));
         }
 
-        int run(hpx::runtime& rt, hpx_main_type f,
-            boost::program_options::variables_map& vm, runtime_mode mode,
-            startup_function_type const& startup,
-            shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
-        {
-            add_startup_functions(rt, vm, mode, startup, shutdown);
-
-            // Run this runtime instance using the given function f.
-            if (0 != f)
-                return rt.run(boost::bind(f, vm), num_threads, num_localities);
-
-            // Run this runtime instance without an hpx_main
-            return rt.run(num_threads, num_localities);
-        }
-
         // helper function testing option compatibility
         void ensure_queuing_option_compatibility(
             boost::program_options::variables_map const& vm)
@@ -363,6 +348,40 @@ namespace hpx
 #endif
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        int run(hpx::runtime& rt, hpx_main_type f,
+            boost::program_options::variables_map& vm, runtime_mode mode,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, std::size_t num_threads,
+            std::size_t num_localities)
+        {
+            add_startup_functions(rt, vm, mode, startup, shutdown);
+
+            // Run this runtime instance using the given function f.
+            if (0 != f)
+                return rt.run(boost::bind(f, vm), num_threads, num_localities);
+
+            // Run this runtime instance without an hpx_main
+            return rt.run(num_threads, num_localities);
+        }
+
+        int start(hpx::runtime& rt, hpx_main_type f,
+            boost::program_options::variables_map& vm, runtime_mode mode,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, std::size_t num_threads,
+            std::size_t num_localities)
+        {
+            add_startup_functions(rt, vm, mode, startup, shutdown);
+
+            if (0 != f) {
+                // Run this runtime instance using the given function f.
+                return rt.start(boost::bind(f, vm), num_threads, num_localities);
+            }
+
+            // Run this runtime instance without an hpx_main
+            return rt.start(num_threads, num_localities);
+        }
+
 #if defined(HPX_GLOBAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // global scheduler (one queue for all OS threads)
@@ -370,7 +389,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             ensure_queuing_option_compatibility(vm);
             ensure_hwloc_compatibility(vm);
@@ -383,10 +402,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<global_queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.release();          // pointer to runtime is stored in TLS
+            return 0;
         }
 #endif
 
@@ -397,7 +424,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             ensure_queuing_option_compatibility(vm);
 
@@ -408,10 +435,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.release();          // pointer to runtime is stored in TLS
+            return 0;
         }
 #endif
 
@@ -422,7 +457,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             std::size_t num_high_priority_queues = num_threads;
             if (vm.count("hpx:high-priority-threads")) {
@@ -468,10 +503,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.release();          // pointer to runtime is stored in TLS
+            return 0;
         }
 
 #if defined(HPX_ABP_SCHEDULER)
@@ -482,7 +525,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             ensure_queuing_option_compatibility(vm);
             ensure_hwloc_compatibility(vm);
@@ -494,10 +537,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.release();          // pointer to runtime is stored in TLS
+            return 0;
         }
 #endif
 
@@ -509,7 +560,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             std::size_t num_high_priority_queues = num_threads;
             if (vm.count("hpx:high-priority-threads")) {
@@ -534,10 +585,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.release();          // pointer to runtime is stored in TLS
+            return 0;
         }
 #endif
 
@@ -549,7 +608,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             if (vm.count("hpx:high-priority-threads")) {
                 throw std::logic_error("Invalid command line option "
@@ -573,10 +632,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.detach();          // pointer to runtime is stored in TLS
+            return 0;
         }
 #endif
 
@@ -588,7 +655,7 @@ namespace hpx
             hpx_main_type f, boost::program_options::variables_map& vm,
             runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            std::size_t num_localities, bool blocking)
         {
             std::size_t num_high_priority_queues = num_threads;
             if (vm.count("hpx:high-priority-threads")) {
@@ -613,10 +680,18 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            runtime_type rt(rtcfg, mode, init);
+            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(new runtime_type(rtcfg, mode, init));
 
-            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+            if (blocking) {
+                return run(*rt, f, vm, mode, startup, shutdown, num_threads,
+                    num_localities);
+            }
+
+            // non-blocking version
+            start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
+            rt.release();          // pointer to runtime is stored in TLS
+            return 0;
         }
 #endif
 
@@ -646,11 +721,12 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int init(hpx_main_type f,
+    int run_or_start(hpx_main_type f,
         boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& ini_config,
         startup_function_type const& startup, 
-        shutdown_function_type const& shutdown, hpx::runtime_mode mode)
+        shutdown_function_type const& shutdown, hpx::runtime_mode mode,
+        bool blocking)
     {
         int result = 0;
         detail::set_error_handlers();
@@ -675,7 +751,7 @@ namespace hpx
             if (0 == std::string("global").find(queuing)) {
 #if defined(HPX_GLOBAL_SCHEDULER)
                 result = detail::run_global(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
 #else
                 throw std::logic_error("Command line option --hpx:queuing=global "
                     "is not configured in this build. Please rebuild with "
@@ -685,7 +761,7 @@ namespace hpx
             else if (0 == std::string("local").find(queuing)) {
 #if defined(HPX_LOCAL_SCHEDULER)
                 result = detail::run_local(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
 #else
                 throw std::logic_error("Command line option --hpx:queuing=local "
                     "is not configured in this build. Please rebuild with "
@@ -696,14 +772,14 @@ namespace hpx
                 // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
                 result = detail::run_priority_local(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
             }
             else if (0 == std::string("abp").find(queuing)) {
                 // abp scheduler: local dequeues for each OS thread, with work
                 // stealing from the "bottom" of each.
 #if defined(HPX_ABP_SCHEDULER)
                 result = detail::run_abp(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
 #else
                 throw std::logic_error("Command line option --hpx:queuing=abp "
                     "is not configured in this build. Please rebuild with "
@@ -715,7 +791,7 @@ namespace hpx
                 // OS thread, with work stealing from the "bottom" of each.
 #if defined(HPX_ABP_PRIORITY_SCHEDULER)
                 result = detail::run_priority_abp(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
 #else
                 throw std::logic_error("Command line option --hpx:queuing=priority_abp "
                     "is not configured in this build. Please rebuild with "
@@ -727,7 +803,7 @@ namespace hpx
                 // hierarchy scheduler: tree of queues, with work
                 // stealing from the parent queue in that tree.
                 result = detail::run_hierarchy(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
 #else
                 throw std::logic_error("Command line option --hpx:queuing=hierarchy "
                     "is not configured in this build. Please rebuild with "
@@ -737,7 +813,7 @@ namespace hpx
             else if (0 == std::string("periodic").find(queuing)) {
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
                 result = detail::run_periodic(rtcfg, f, vm, mode,
-                    startup, shutdown, num_threads, num_localities);
+                    startup, shutdown, num_threads, num_localities, blocking);
 #else
                 throw std::logic_error("Command line option --hpx:queuing=periodic "
                     "is not configured in this build. Please rebuild with "
@@ -759,6 +835,27 @@ namespace hpx
             return -1;
         }
         return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    int init(hpx_main_type f,
+        boost::program_options::options_description& desc_cmdline,
+        int argc, char* argv[], std::vector<std::string> const& ini_config,
+        startup_function_type const& startup, 
+        shutdown_function_type const& shutdown, hpx::runtime_mode mode)
+    {
+        return run_or_start(f, desc_cmdline, argc, argv, ini_config,
+            startup, shutdown, mode, true);
+    }
+
+    int start(hpx_main_type f,
+        boost::program_options::options_description& desc_cmdline,
+        int argc, char* argv[], std::vector<std::string> const& ini_config,
+        startup_function_type const& startup, 
+        shutdown_function_type const& shutdown, hpx::runtime_mode mode)
+    {
+        return run_or_start(f, desc_cmdline, argc, argv, ini_config,
+            startup, shutdown, mode, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -840,6 +937,17 @@ namespace hpx
     {
         components::stubs::runtime_support::terminate_all(
             naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    int stop()
+    {
+        HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
+
+        int result = rt->wait();
+        rt->stop();
+
+        return result;
     }
 }
 

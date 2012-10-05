@@ -7,6 +7,7 @@
 #define HPX_THREAD_APR_17_2012_1003AM
 
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #endif
 
