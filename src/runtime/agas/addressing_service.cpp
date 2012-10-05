@@ -34,8 +34,8 @@ addressing_service::addressing_service(
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , action_priority_(ini_.get_agas_dedicated_server() ?
         threads::thread_priority_normal : threads::thread_priority_critical)
-  , here_(get_runtime().here())
-  , rts_lva_(get_runtime().get_runtime_support_lva())
+  , here_()         // defer initializing this
+  , rts_lva_(0)
   , state_(starting)
   , locality_()
 { // {{{
@@ -837,6 +837,8 @@ bool addressing_service::is_local_address(
     if (ec)
         return false;
 
+    if (!here_)
+        here_ = get_runtime().here();
     return addr.locality_ == here_;
 }
 
@@ -858,6 +860,8 @@ bool addressing_service::is_local_address(
     if (ec)
         return false;
 
+    if (!here_)
+        here_ = get_runtime().here();
     return addr.locality_ == here_;
 }
 
@@ -898,6 +902,8 @@ bool addressing_service::is_local_address_cached(
     if (!resolve_cached(id, addr, ec) || ec)
         return false;
 
+    if (!here_)
+        here_ = get_runtime().here();
     return addr.locality_ == here_;
 }
 
@@ -913,6 +919,8 @@ bool addressing_service::is_local_address_cached(
     if (!resolve_cached(id, addr, ec) || ec)
         return false;
 
+    if (!here_)
+        here_ = get_runtime().here();
     return addr.locality_ == here_;
 }
 
@@ -934,9 +942,13 @@ bool addressing_service::resolve_locally_known_addresses(
     // LVA-encoded GIDs (located on this machine)
     if (is_local_lva_encoded_address(id))
     {
+        if (!here_)
+            here_ = get_runtime().here();
         addr.locality_ = here_;
 
         // An LSB of 0 references the runtime support component
+        if (!rts_lva_)
+            rts_lva_ = get_runtime().get_runtime_support_lva();
         if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
         {
             addr.type_ = components::component_runtime_support;
@@ -1236,6 +1248,9 @@ bool addressing_service::resolve_cached(
 
     addrs.resize(count);
     locals.resize(count);
+
+    if (!here_)
+        here_ = get_runtime().here();
 
     std::size_t resolved = 0;
     for (std::size_t i = 0; i < count; ++i)
