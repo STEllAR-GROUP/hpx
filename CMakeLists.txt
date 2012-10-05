@@ -1169,7 +1169,7 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   if(${BOOST_MINOR_VERSION} LESS 52)
-    # install Boost.Atomic library for older Boost versions only
+    # install Boost.Lockfree library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
       DESTINATION include/hpx/external
