@@ -133,7 +133,9 @@ namespace hpx { namespace detail
         std::string back_trace(backtrace());
 
         std::string hostname_ = "";
-        if (get_runtime_ptr())
+        hpx::runtime* rt = get_runtime_ptr();
+        if (rt && rt->get_state() >= runtime::state_initialized && 
+                  rt->get_state() < runtime::state_stopped)
         {
             util::osstream strm;
             strm << get_runtime().here();
