@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/for_each.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -21,8 +22,8 @@ boost::uint64_t delay = 0;
 int twice(int i)
 {
     double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1. / (2. * i + 1.);
+    for (boost::uint64_t ui = 0; ui < delay; ++ui)
+        d += 1. / (2. * ui + 1.);
     return i * 2;
 }
 
@@ -86,7 +87,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv/*, cfg*/);
