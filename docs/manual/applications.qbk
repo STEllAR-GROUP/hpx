@@ -33,7 +33,8 @@ this technique looks like:
         return 0;
     }
 
-The only change to your code you have to make is to include the file `hpx/hpx_main.hpp`.
+The only change to your code you have to make is to include the file 
+[headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`].
 In this case the function `main()` will be invoked as the first __hpx__ thread 
 of the application. The runtime system will be initialized behind the scenes
 before the function `main()` is executed and will automatically stopped after 
@@ -63,13 +64,14 @@ __hpx__ application on the console locality only (this function will be invoked
 as the first __hpx__ thread of your application). All __hpx__ API functions 
 can be used from within this function.
 
-The thread executing the function `hpx::init` will block waiting for the 
-runtime system to exit. The value returned from `hpx_main` will be returned 
-from `hpx::init` after the runtime system has stopped.
+The thread executing the function [funcref hpx::init `hpx::init`] will block 
+waiting for the runtime system to exit. The value returned from 
+[funcref hpx_main `hpx_main`] will be returned from [funcref hpx::init `hpx::init`] 
+after the runtime system has stopped.
 
 This method has the advantage of you being able to decide which version of 
-[funcref `hpx::init`] to call. This allows to pass additional configuration 
-parameters while initializing the __hpx__ runtime system. 
+[funcref hpx::init `hpx::init`] to call. This allows to pass additional 
+configuration parameters while initializing the __hpx__ runtime system. 
 
     #include <hpx/hpx_init.hpp>
 
