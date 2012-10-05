@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 // Define the amount of stack space that we need to reserve for management

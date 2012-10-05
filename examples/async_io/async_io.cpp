@@ -8,6 +8,7 @@
 // and how to synchronize the result of this IO task with a waiting HPX thread.
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/iostreams.hpp>
 
 // this function will be executed by a dedicated OS thread
