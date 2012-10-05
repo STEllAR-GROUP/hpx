@@ -49,7 +49,7 @@ namespace hpx
 
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration& rtcfg);
+            util::runtime_configuration const& rtcfg);
 
         virtual ~runtime()
         {
@@ -66,13 +66,13 @@ namespace hpx
         }
 
         /// \brief Manage runtime 'stopped' state
-        void start()
+        void starting()
         {
             state_ = state_pre_main;
         }
 
         /// \brief Call all registered on_exit functions
-        void stop()
+        void stopping()
         {
             state_ = state_stopped;
 
@@ -140,11 +140,23 @@ namespace hpx
         void register_counter_types();
 
         ///////////////////////////////////////////////////////////////////////
-        virtual int run(HPX_STD_FUNCTION<hpx_main_function_type> func =
+        virtual int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
                 HPX_STD_FUNCTION<hpx_main_function_type>(),
             std::size_t num_threads = 1, std::size_t num_localities = 1) = 0;
 
         virtual int run(std::size_t num_threads, std::size_t num_localities = 1) = 0;
+
+        virtual int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
+                HPX_STD_FUNCTION<hpx_main_function_type>(),
+            std::size_t num_threads = 1, std::size_t num_localities = 1,
+            bool blocking = false) = 0;
+
+        virtual int start(std::size_t num_threads, std::size_t num_localities = 1,
+            bool blocking = false) = 0;
+
+        virtual int wait() = 0;
+
+        virtual void stop(bool blocking = true) = 0;
 
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
@@ -203,7 +215,7 @@ namespace hpx
         on_exit_type on_exit_functions_;
         boost::mutex on_exit_functions_mtx_;
 
-        util::runtime_configuration& ini_;
+        util::runtime_configuration ini_;
         boost::shared_ptr<performance_counters::registry> counters_;
 
         long instance_number_;

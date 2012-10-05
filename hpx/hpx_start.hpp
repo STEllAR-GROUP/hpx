@@ -1,14 +1,12 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
-//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// \file hpx_init.hpp
+// \file hpx_start.hpp
 
-#if !defined(HPX_INIT_OCT_04_2012_0132PM)
-#define HPX_INIT_OCT_04_2012_0132PM
+#if !defined(HPX_START_OCT_04_2012_048PM)
+#define HPX_START_OCT_04_2012_048PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_finalize.hpp>
@@ -18,23 +16,12 @@
 
 /// \cond NOINTERNAL
 
-#if !defined(HPX_MAIN_EXPORT)
-#define HPX_MAIN_EXPORT /**/
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 // One of these functions must be implemented by the application for the
 // console locality.
 int hpx_main();
-HPX_MAIN_EXPORT int hpx_main(int argc, char* argv[]);
+int hpx_main(int argc, char* argv[]);
 int hpx_main(boost::program_options::variables_map& vm);
-
-// We support redefining the plain C-main provided by the user to be executed
-// as the first HPX-thread (equivalent to hpx_main()). This is implemented by
-// a macro redefining main, so we disable it by default.
-#if defined(HPX_MAIN_IS_MAIN)
-#  define main hpx::user_main
-#endif
 
 /// \endcond
 
@@ -53,12 +40,14 @@ namespace hpx
 
     /// \endcond
 
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is the main entry point for any HPX application. This function
-    /// (or one of its overloads below) should be called from the users `main()`
-    /// function. It will set up the HPX runtime environment and schedule the
-    /// function given by \p f as a HPX thread.
+    /// This is the main, non-blocking entry point for any HPX application.
+    /// This function (or one of its overloads below) should be called from
+    /// the users `main()` function. It will set up the HPX runtime environment
+    /// and schedule the function given by \p f as a HPX thread. It will return
+    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -105,19 +94,21 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    HPX_EXPORT int init(int (*f)(boost::program_options::variables_map& vm),
+    HPX_EXPORT int start(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is the main entry point for any HPX application. This function
-    /// (or one of its overloads below) should be called from the users `main()`
-    /// function. It will set up the HPX runtime environment and schedule the
-    /// function given by \p f as a HPX thread.
+    /// This is the main, non-blocking entry point for any HPX application.
+    /// This function (or one of its overloads below) should be called from the
+    /// users `main()` function. It will set up the HPX runtime environment and
+    /// schedule the function given by \p f as a HPX thread. It will return
+    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -158,19 +149,21 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int
-    init(int (*f)(boost::program_options::variables_map& vm),
+    inline void
+    start(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[],
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will be
+    /// set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
@@ -212,18 +205,20 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int
-    init(boost::program_options::options_description& desc_cmdline,
+    inline void
+    start(boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[],
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
@@ -271,18 +266,20 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int
-    init(boost::program_options::options_description& desc_cmdline,
+    inline void
+    start(boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
@@ -317,17 +314,19 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline int
-    init(boost::program_options::options_description& desc_cmdline, int argc,
+    inline void
+    start(boost::program_options::options_description& desc_cmdline, int argc,
         char* argv[], hpx::runtime_mode mode);
 
-    /// \fn int init(std::string const& app_name, int argc = 0, char* argv[] = 0)
+    /// \fn int start(std::string const& app_name, int argc = 0, char* argv[] = 0)
     ///
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param app_name     [in] The name of the application.
     /// \param argc         [in] The number of command line arguments passed
@@ -344,14 +343,16 @@ namespace hpx
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline int
-    init(std::string const& app_name, int argc = 0, char* argv[] = 0);
+    inline void
+    start(std::string const& app_name, int argc = 0, char* argv[] = 0);
 
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
@@ -374,15 +375,16 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline int init(int argc = 0, char* argv[] = 0);
+    inline void start(int argc = 0, char* argv[] = 0);
 
-    /// \fn int init(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char* argv[])
+    /// \fn int start(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char* argv[])
     ///
-    /// \brief Main entry point for launching the HPX runtime system.
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -401,15 +403,15 @@ namespace hpx
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline int init(int (*f)(boost::program_options::variables_map& vm),
+    inline void start(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char* argv[]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Pull in the implementation of the inlined hpx::init functions if we're not 
+// Pull in the implementation of the inlined hpx::init functions if we're not
 // compiling the core HPX library.
 #if !defined(HPX_EXPORTS)
-#  include <hpx/hpx_init_impl.hpp>
+#  include <hpx/hpx_start_impl.hpp>
 #endif
 
 #endif

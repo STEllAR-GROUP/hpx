@@ -94,7 +94,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            util::runtime_configuration& rtcfg,
+            util::runtime_configuration const& rtcfg,
             runtime_mode locality_mode, init_scheduler_type const& init)
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
@@ -201,7 +201,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        HPX_STD_FUNCTION<hpx_main_function_type> func,
+        HPX_STD_FUNCTION<hpx_main_function_type> const& func,
         std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
@@ -249,7 +249,7 @@ namespace hpx {
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
         thread_manager_->register_thread(data);
-        this->runtime::start();
+        this->runtime::starting();
         // }}}
 
         // block if required
@@ -327,7 +327,7 @@ namespace hpx {
         LRT_(warning) << "runtime_impl: about to stop services";
 
         // execute all on_exit functions whenever the first thread calls this
-        this->runtime::stop();
+        this->runtime::stopping();
 
         // stop runtime_impl services (threads)
         thread_manager_->stop(false);    // just initiate shutdown
@@ -417,7 +417,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        HPX_STD_FUNCTION<hpx_main_function_type> func,
+        HPX_STD_FUNCTION<hpx_main_function_type> const& func,
         std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function

@@ -64,7 +64,7 @@ namespace hpx { namespace util
     int command_line_handling(
         boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> ini_config,
-        hpx::runtime_mode mode, hpx_main_type& f,
+        hpx::runtime_mode& mode, hpx_main_type& f,
         boost::program_options::variables_map& vm,
         util::runtime_configuration& rtcfg, std::size_t& num_threads,
         std::size_t& num_localities, std::string& queuing)

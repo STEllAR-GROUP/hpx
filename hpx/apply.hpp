@@ -9,10 +9,12 @@
 #define HPX_APPLY_APR_16_20012_0943AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/async.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_action.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 

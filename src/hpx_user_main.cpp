@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx::user_main, if necessary. This has to be in a separate
