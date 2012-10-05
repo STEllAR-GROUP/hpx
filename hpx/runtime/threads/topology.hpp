@@ -67,8 +67,6 @@ HPX_EXPORT topology const& get_topology();
 
 }
 
-using threads::hardware_concurrency;
-
 }
 
 #endif // HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798

@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
@@ -82,7 +83,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
         if (0 == sched_getaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))
 #  endif
         {
-            std::size_t num_cores = hpx::hardware_concurrency();
+            std::size_t num_cores = hpx::threads::hardware_concurrency();
             for (std::size_t i = 0; i < num_cores; ++i)
             {
                 // only the bit for the current core should be set
@@ -163,8 +164,8 @@ HPX_PLAIN_ACTION(thread_affinity_foreman, thread_affinity_foreman_action)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& /*vm*/)
 {
-    HPX_TEST_LTE(hpx::hardware_concurrency(), sizeof(std::size_t) * CHAR_BIT);
-    HPX_TEST_LTE(hpx::hardware_concurrency(), sizeof(unsigned long) * CHAR_BIT);
+    HPX_TEST_LTE(hpx::threads::hardware_concurrency(), sizeof(std::size_t) * CHAR_BIT);
+    HPX_TEST_LTE(hpx::threads::hardware_concurrency(), sizeof(unsigned long) * CHAR_BIT);
     {
         // Get a list of all available localities.
         std::vector<hpx::naming::id_type> localities =

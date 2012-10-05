@@ -6,6 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

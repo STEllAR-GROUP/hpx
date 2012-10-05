@@ -5,7 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-//#include <hpx/include/iostreams.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #if HPX_ACTION_ARGUMENT_LIMIT < 10
@@ -227,7 +227,7 @@ int main(int argc, char ** argv)
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
