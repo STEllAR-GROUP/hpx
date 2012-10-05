@@ -141,10 +141,10 @@ namespace hpx { namespace lcos
     }
 
     template <typename T1, typename T2, typename TR1, typename TR2>
-    inline boost::tuple<T1, T2>
+    inline HPX_STD_TUPLE<T1, T2>
     wait (lcos::future<T1, TR1> const& f1, lcos::future<T2, TR2> const& f2)
     {
-        return boost::make_tuple(f1.get(), f2.get());
+        return HPX_STD_MAKE_TUPLE(f1.get(), f2.get());
     }
 
     inline void
@@ -239,10 +239,10 @@ namespace hpx { namespace lcos
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
         BOOST_PP_ENUM_PARAMS(N, typename TR)>
-    inline boost::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
+    inline HPX_STD_TUPLE<BOOST_PP_ENUM_PARAMS(N, T)>
     wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_ARGUMENT, _))
     {
-        return boost::make_tuple(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
+        return HPX_STD_MAKE_TUPLE(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
     }
 
     inline void
