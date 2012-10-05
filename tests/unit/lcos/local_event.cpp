@@ -18,6 +18,10 @@ using boost::program_options::value;
 
 using hpx::applier::register_work;
 
+using hpx::threads::get_thread_count;
+
+using hpx::this_thread::suspend;
+
 using hpx::lcos::local::event;
 
 using hpx::init;
@@ -64,6 +68,10 @@ int hpx_main(variables_map& vm)
 
         // Release all the threads.
         e.set(); 
+
+        // Wait for all the our threads to finish executing. 
+        do { suspend(); } while (get_thread_count() > 1);
+
         HPX_TEST_EQ(pxthreads, c);
 
         // Make sure that waiting on a set event works.
