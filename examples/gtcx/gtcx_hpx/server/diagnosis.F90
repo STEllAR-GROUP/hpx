@@ -54,6 +54,11 @@ subroutine diagnosis(hpx4_bti,&
   !use diagnosis_array
   use, intrinsic :: iso_c_binding, only : c_ptr
   use precision
+#ifdef __INTEL_COMPILER
+  ! The Intel compiler has FLUSH in a special module
+  use IFPORT
+#endif
+
   implicit none
   interface ! {{{
     subroutine err_check(f1,f2,numpe,&
