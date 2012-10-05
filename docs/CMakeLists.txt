@@ -38,6 +38,14 @@ set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp
     ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
 
+foreach(doxygen_input ${doxygen_dependencies})
+  set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
+endforeach()
+hpx_info("doxygen" "${doxygen_inputs}")
+
+set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
+set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
+
 set(doxygen_definition_list
     "DOXYGEN:=1"
     "BOOST_SCOPED_ENUM_START(x):=enum x"

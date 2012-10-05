@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// \file hpx_init.hpp
+/// \file hpx_init.hpp
 
 #if !defined(HPX_INIT_OCT_04_2012_0132PM)
 #define HPX_INIT_OCT_04_2012_0132PM
@@ -16,8 +16,7 @@
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 
-/// \cond NOINTERNAL
-
+#ifndef DOXYGEN
 #if !defined(HPX_MAIN_EXPORT)
 #define HPX_MAIN_EXPORT /**/
 #endif
@@ -35,14 +34,13 @@ int hpx_main(boost::program_options::variables_map& vm);
 #if defined(HPX_MAIN_IS_MAIN)
 #  define main hpx::user_main
 #endif
-
-/// \endcond
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \namespace hpx
 namespace hpx
 {
-    /// \cond NOINTERNAL
-
+#ifndef DOXYGEN
     ///////////////////////////////////////////////////////////////////////////
     // As an alternative, the user can provide a function hpx::user_main, which
     // is semantically equivalent to the plain old C-main.
@@ -50,8 +48,7 @@ namespace hpx
     int user_main(int argc, char* argv[]);
 
     typedef int (*hpx_main_type)(boost::program_options::variables_map&);
-
-    /// \endcond
+#endif
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///
@@ -405,11 +402,13 @@ namespace hpx
         std::string const& app_name, int argc, char* argv[]);
 }
 
+#ifndef DOXYGEN
 ///////////////////////////////////////////////////////////////////////////////
 // Pull in the implementation of the inlined hpx::init functions if we're not 
 // compiling the core HPX library.
 #if !defined(HPX_EXPORTS)
 #  include <hpx/hpx_init_impl.hpp>
+#endif
 #endif
 
 #endif

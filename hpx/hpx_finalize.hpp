@@ -3,13 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// \file hpx_finalize.hpp
+/// \file hpx_finalize.hpp
 
 #if !defined(HPX_FINALIZE_OCT_04_2012_0809PM)
 #define HPX_FINALIZE_OCT_04_2012_0809PM
 
 #include <hpx/hpx_fwd.hpp>
 
+/// \namespace hpx
 namespace hpx
 {
     /// \brief Main function to gracefully terminate the the HPX runtime system.
