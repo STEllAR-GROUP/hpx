@@ -10,6 +10,93 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_5 __hpx__ V0.9.5]
 
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release:
+
+* #563 - Add hpx::start/hpx::stop to avoid blocking main thread
+* #561 - Boost.Tuple is not move aware
+* #556 - Creation of partially preprocessed headers should be enabled for Boost 
+         newer than V1.50
+* #555 - BOOST_FORCEINLINE does not name a type
+* #554 - Possible race condition in thread get_id()
+* #552 - Move enable client_base
+* #550 - Add stack size category 'huge'
+* #549 - ShenEOS run seg-faults on single or distributed runs
+* #545 - AUTOGLOB broken for add_hpx_component
+* #542 - FindHPX_HDF5 still searches multiple times
+* #541 - Quotes around application name in hpx::init
+* #539 - Race conditition occuring with new lightweight threads
+* #535 - hpx_run_tests.py exits with no error code when tests are missing
+* #530 - Thread description(<unknown>) in logs
+* #521 - hpx::error_code is not usable for lightweight error handling
+* #520 - Add full user environment to HPX logs
+* #519 - Build succeeds, running fails
+* #517 - Add a guard page to linux coroutine stacks
+* #516 - hpx::thread::detach suspends while holding locks, leads to hang in debug
+* #514 - Preprocessed headers for <hpx/apply.hpp> don't compile
+* #513 - Buildbot configuration problem
+* #512 - Implement action based stack size customization
+* #511 - Move action priority into a separate type trait
+* #510 - trunk broken
+* #507 - no matching function for call to 
+         boost::scoped_ptr<hpx::threads::topology>::scoped_ptr(hpx::threads::linux_topology*)
+* #505 - undefined_symbol regression test currently failing
+* #502 - Adding OpenCL and OCLM support to HPX for Windows and Linux
+* #501 - find_package(HPX) sets cmake output variables
+* #499 - Add support for disabling pbs support in pbs runs
+* #498 - Error during no-cache runs
+* #496 - Add partial preprocessing support to cmake
+* #495 - Support HPX modules exporting startup/shutdown functions only
+* #494 - Allow modules to specify when to run startup/shutdown functions
+* #493 - Avoid constructing a string in make_success_code
+* #492 - Performance counter creation is no longer synchronized at startup
+* #491 - Performance counter creation is no longer synchronized at startup
+* #490 - Sheneos on_completed_bulk seg fault in distributed
+* #489 - compiling issue with g++44
+* #488 - Adding OpenCL and OCLM support to HPX for the MSVC platform
+* #487 - FindHPX.cmake problems
+* #485 - Change distributing_factory and binpacking_factory to use bulk creation
+* #484 - Change HPX_DONT_USE_PREPROCESSED_FILES to HPX_USE_PREPROCESSED_FILES
+* #483 - Memory counter for Windows
+* #479 - strange errors appear when requesting performance counters on multiple 
+         nodes
+* #477 - Create (global) timer for multi-threaded measurements
+* #472 - Add partial preprocessing using Wave
+* #471 - Segfault stack traces don't show up in release
+* #468 - External projects need to link with internal components
+* #462 - Startup/shutdown functions are called more than once
+* #458 - Consolidate hpx::util::high_resolution_timer and 
+         hpx::util::high_resolution_clock
+* #457 - index out of bounds in allgather_and_gate on 4 cores or more
+* #447 - 'make tests' should execute tests on local installation
+* #446 - Remove SVN-related code from the codebase
+* #444 - race condition in smp
+* #441 - Patched Boost.Serialization headers should only be installed if needed
+* #439 - Components using HPX_REGISTER_STARTUP_MODULE fail to compile with MSVC
+* #436 - Verify that no locks are being held while threads are suspended
+* #435 - Installing HPX should not clobber existing Boost installation
+* #434 - Logging external component failed (Boost 1.50)
+* #433 - Runtime crash when building all examples
+* #432 - Dataflow hangs on 512 cores/64 nodes
+* #430 - Problem with distributing factory
+* #424 - File paths referring to XSL-files need to be properly escaped
+* #417 - Make dataflow LCOs work out of the box by using partial preprocessing
+* #413 - hpx_svnversion.py fails on Windows
+* #412 - Make hpx::error_code equivalent to hpx::exception
+* #398 - HPX clobbers out-of-tree application specific CMake variables 
+         (specifically CMAKE_BUILD_TYPE)
+* #394 - Remove code generating random port numbers for network
+* #378 - ShenEOS scaling issues
+* #354 - Create a coroutines wrapper for Boost.Context
+* #349 - Commandline option --localities=N/-lN should be necessary only on AGAS 
+         locality
+* #317 - Implement network performance counters
+* #230 - Add compile time option to disable thread debugging info
+* #103 - Better diagnostics for multiple component/action registerations under 
+         the same name
+* #21  - Build fails with GCC 4.6
+
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
