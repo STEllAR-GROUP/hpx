@@ -197,28 +197,28 @@ namespace parcelset
         /// completion handler (nanoseconds)
         boost::int64_t get_sending_time() const
         {
-            return parcels_sent_.total_time() * 1000;
+            return parcels_sent_.total_time();
         }
 
         /// the total time it took for all receives, from async_read to the
         /// completion handler (nanoseconds)
         boost::int64_t get_receiving_time() const
         {
-            return parcels_received_.total_time() * 1000;
+            return parcels_received_.total_time();
         }
 
         /// the total time it took for all sender-side serialization operations
         /// (nanoseconds)
         boost::int64_t get_sending_serialization_time() const
         {
-            return parcels_sent_.total_serialization_time() * 1000;
+            return parcels_sent_.total_serialization_time();
         }
 
         /// the total time it took for all receiver-side serialization
         /// operations (nanoseconds)
         boost::int64_t get_receiving_serialization_time() const
         {
-            return parcels_received_.total_serialization_time() * 1000;
+            return parcels_received_.total_serialization_time();
         }
 
         /// total data received (bytes)
