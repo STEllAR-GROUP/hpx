@@ -31,9 +31,9 @@
 
 #if !defined(HPX_BUILD_TYPE)
 #  if defined(HPX_DEBUG)
-#    define HPX_BUILD_TYPE "debug"
+#    define HPX_BUILD_TYPE debug
 #  else
-#    define HPX_BUILD_TYPE "release"
+#    define HPX_BUILD_TYPE release
 #  endif
 #endif
 
@@ -337,10 +337,10 @@
 
 #if defined(HPX_DEBUG)
 #  define HPX_MANGLE_NAME(n)     BOOST_PP_CAT(n, d)
-#  define HPX_MANGLE_NAME_STR(n) n + "d"
+#  define HPX_MANGLE_STRING(n)   n + "d"
 #else
 #  define HPX_MANGLE_NAME(n)     n 
-#  define HPX_MANGLE_NAME_STR(n) n
+#  define HPX_MANGLE_STRING(n)   n
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

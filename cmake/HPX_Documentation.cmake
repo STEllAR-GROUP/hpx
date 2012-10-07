@@ -135,8 +135,8 @@ else()
     endif()
 
     set(git_commit_option "")
-    if(GIT_COMMIT AND NOT ${GIT_COMMIT} STREQUAL "")
-      set(git_commit_option "-D__hpx_git_commit__=${GIT_COMMIT}")
+    if(HPX_GIT_COMMIT AND NOT ${HPX_GIT_COMMIT} STREQUAL "")
+      set(git_commit_option "-D__hpx_git_commit__=${HPX_GIT_COMMIT}")
     endif()
 
     set(doxygen_option "")

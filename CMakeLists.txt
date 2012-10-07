@@ -292,7 +292,7 @@ else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
 endif()
 
-add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
+#add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 
 # Make sure the specified build type is valid.
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR

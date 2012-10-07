@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_library name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;LANGUAGE"
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
     "ESSENTIAL;NOLIBS;AUTOGLOB;STATIC" ${ARGN})
 
   if(NOT ${name}_LANGUAGE)
@@ -225,10 +225,17 @@ macro(add_hpx_library name)
   endif()
 
   set_property(TARGET ${name}_lib APPEND
-               PROPERTY COMPILE_DEFINITIONS "HPX_LIBRARY_EXPORTS")
+               PROPERTY COMPILE_DEFINITIONS
+                 "HPX_PREFIX=\"${HPX_PREFIX}\""
+                 "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
+                 "HPX_LIBRARY_EXPORTS")
 
   if(NOT HPX_NO_INSTALL)
-    hpx_library_install(${name}_lib)
+    if(${name}_INSTALL_SUFFIX)
+      hpx_library_install(${name}_lib ${${name}_INSTALL_SUFFIX})
+    else()
+      hpx_library_install(${name}_lib lib/hpx)
+    endif()
   endif()
 endmacro()
 
