@@ -11,6 +11,7 @@ hpx_include(Message)
 
 execute_process(
   COMMAND "git" "log" "--pretty=%H" "-1" "${hpx_SOURCE_DIR}"
+  WORKING_DIRECTORY ${hpx_SOURCE_DIR}
   OUTPUT_VARIABLE GIT_COMMIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(NOT GIT_COMMIT OR "${GIT_COMMIT}" STREQUAL "None")
