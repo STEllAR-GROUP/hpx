@@ -25,11 +25,11 @@ template <boost::uint64_t MSB, boost::uint64_t LSB>
 struct gid_tag;
 
 template <typename Component>
-struct fixed_component;
+class fixed_component;
 
 ///////////////////////////////////////////////////////////////////////////
 template <boost::uint64_t MSB, boost::uint64_t LSB, typename Component>
-struct fixed_component_base : detail::fixed_component_tag
+class fixed_component_base : public detail::fixed_component_tag
 {
   private:
     typedef typename boost::mpl::if_<
@@ -153,8 +153,9 @@ namespace detail
 
 ///////////////////////////////////////////////////////////////////////////
 template <typename Component>
-struct fixed_component : Component
+class fixed_component : public Component
 {
+  public:
     typedef Component type_holder;
     typedef fixed_component<Component> component_type;
     typedef component_type derived_type;
