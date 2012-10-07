@@ -13,6 +13,8 @@
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/lcos/local/packaged_continuation.hpp>
 
 #include <boost/format.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -568,12 +570,23 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type get_counter(counter_info const& info, error_code& ec)
+    void register_with_agas(lcos::future<naming::id_type, naming::gid_type> f,
+        std::string const& fullname)
     {
+        // register the canonical name with AGAS
+        agas::register_name(fullname, f.get());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    lcos::future<naming::id_type, naming::gid_type> get_counter_async(
+        counter_info const& info, error_code& ec)
+    {
+        typedef lcos::future<naming::id_type, naming::gid_type> result_type;
+
         // complement counter info data
         counter_info complemented_info = info;
         complement_counter_info(complemented_info, ec);
-        if (ec) return naming::invalid_id;
+        if (ec) result_type();
 
         ensure_counter_prefix(complemented_info.fullname_);      // pre-pend prefix, if necessary
 
@@ -585,14 +598,14 @@ namespace hpx { namespace performance_counters
                 // figure out target locality
                 counter_path_elements p;
                 get_counter_path_elements(complemented_info.fullname_, p, ec);
-                if (ec) return naming::invalid_id;
+                if (ec) return result_type();
 
                 // Take target locality from base counter if if this is an
                 // aggregating counter (the instance name is a base counter).
                 if (p.parentinstance_is_basename_)
                 {
                     get_counter_path_elements(p.parentinstancename_, p, ec);
-                    if (ec) return naming::invalid_id;
+                    if (ec) return result_type();
                 }
 
                 if (p.parentinstancename_ == "locality" &&
@@ -603,25 +616,29 @@ namespace hpx { namespace performance_counters
                 {
                     HPX_THROWS_IF(ec, bad_parameter, "get_counter",
                         "attempt to create counter on non-existing locality");
-                    return naming::invalid_id;
+                    return result_type();
                 }
 
                 // use the runtime_support component of the target locality to
                 // create the new performance counter
                 using namespace components::stubs;
-                naming::gid_type gid;
+                lcos::future<naming::id_type, naming::gid_type> f;
                 if (p.parentinstanceindex_ >= 0) {
-                    gid = runtime_support::create_performance_counter(
-                        naming::get_id_from_locality_id(static_cast<boost::uint32_t>(p.parentinstanceindex_)),
-                        complemented_info, ec);
+                    f = runtime_support::create_performance_counter_async(
+                        naming::get_id_from_locality_id(
+                            static_cast<boost::uint32_t>(p.parentinstanceindex_)),
+                        complemented_info);
                 }
                 else {
-                    gid = runtime_support::create_performance_counter(
-                        find_here(), complemented_info, ec);
+                    f = runtime_support::create_performance_counter_async(
+                        find_here(), complemented_info);
                 }
-                if (ec) return naming::invalid_id;
 
-                id = naming::id_type(gid, naming::id_type::managed);
+                // attach the function which registers the id_type with AGAS
+                f.when(util::bind(&register_with_agas, util::placeholders::_1, 
+                    complemented_info.fullname_));
+
+                return f;
             }
             catch (hpx::exception const& e) {
                 if (&ec == &throws)
@@ -629,27 +646,21 @@ namespace hpx { namespace performance_counters
                 ec = make_error_code(e.get_error(), e.what());
                 LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
                     % complemented_info.fullname_ % e.what());
-                return naming::invalid_id;
+                return lcos::future<naming::id_type, naming::gid_type>();
             }
-
-            // register the canonical name with AGAS
-            agas::register_name(complemented_info.fullname_, id, ec);
         }
-        if (ec)
-            return naming::invalid_id;
+        if (ec) return result_type();
 
-        return id;
+        return result_type(id);
     }
 
-    naming::id_type get_counter(std::string name, error_code& ec)
+    lcos::future<naming::id_type, naming::gid_type> get_counter_async(
+        std::string const& name, error_code& ec)
     {
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
 
-//         get_counter_type(name, info, ec);
-//         if (ec) return naming::invalid_id;
-
         counter_info info(name);          // set full counter name
-        return get_counter(info, ec);
+        return get_counter_async(info, ec);
     }
 }}
 

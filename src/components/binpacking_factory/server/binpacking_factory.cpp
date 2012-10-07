@@ -175,7 +175,7 @@ namespace hpx { namespace components { namespace server
         performance_counters::get_counter_type_path_elements(countername, p);
 
         // FIXME: make loop asynchronous
-        typedef lcos::future<naming::id_type, naming::id_type> future_type;
+        typedef lcos::future<naming::id_type, naming::gid_type> future_type;
 
         std::vector<future_type> lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)
@@ -183,7 +183,7 @@ namespace hpx { namespace components { namespace server
             std::string name;
             p.parentinstanceindex_ = naming::get_locality_id_from_id(id);
             performance_counters::get_counter_name(p, name);
-            lazy_counts.push_back(performance_counters::get_counter(name));
+            lazy_counts.push_back(performance_counters::get_counter_async(name));
         }
 
         // wait for counts to get back, collect statistics
