@@ -7,6 +7,7 @@
 set(example_programs
     component_ctors
     component_in_executable
+    component_inheritance
     error_handling
     event_synchronization 
     factorial
@@ -39,6 +40,7 @@ set(error_handling_FLAGS DEPENDENCIES iostreams_component)
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
+set(component_inheritance_FLAGS DEPENDENCIES iostreams_component)
 set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 
 foreach(example_program ${example_programs})

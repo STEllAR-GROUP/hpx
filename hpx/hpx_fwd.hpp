@@ -468,16 +468,22 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         template <boost::uint64_t MSB, boost::uint64_t LSB,
             typename Component = detail::this_type>
-        struct fixed_component_base;
+        class fixed_component_base;
 
         template <typename Component>
-        struct fixed_component;
+        class fixed_component;
+
+        template <typename Component = detail::this_type>
+        class abstract_simple_component_base;
 
         template <typename Component = detail::this_type>
         class simple_component_base;
 
         template <typename Component>
         class simple_component;
+
+        template <typename Component, typename Derived = detail::this_type>
+        class abstract_managed_component_base;
 
         template <typename Component, typename Wrapper = detail::this_type,
             typename CtorPolicy = traits::construct_without_back_ptr,
