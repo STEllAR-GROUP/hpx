@@ -19,29 +19,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
 {
-/*
-    //
-    lcos::future<naming::id_type, naming::gid_type>
-    create_async(naming::id_type const& targetgid,
-        components::component_type type, std::size_t count)
-    {
-        // Create a future, execute the required action,
-        // we simply return the initialized future, the caller needs
-        // to call get() on the return value to obtain the result
-        typedef
-            components::server::runtime_support::create_component_action
-        action_type;
-        return hpx::async<action_type>(targetgid, type, count);
-    }
-
-    //
-    naming::id_type create(naming::id_type const& targetgid,
-        components::component_type type, std::size_t count)
-    {
-        return create_async(targetgid, type, count).get();
-    }
-*/
-
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state_enum thread_function(
         HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> const& func)
