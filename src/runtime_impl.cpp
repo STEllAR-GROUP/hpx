@@ -116,7 +116,8 @@ namespace hpx {
         notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
-        thread_manager_(new hpx::threads::threadmanager_impl<SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
+        thread_manager_(new hpx::threads::threadmanager_impl<
+            SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
