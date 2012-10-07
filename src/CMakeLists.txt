@@ -290,10 +290,12 @@ set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_DLL_STRING=\"${name}\""
   "HPX_EXPORTS"
+  "HPX_PREFIX=\"${HPX_PREFIX}\""
+  "HPX_GIT_COMMIT=\"${GIT_COMMIT}\""
   "HPX_COROUTINE_EXPORTS")
 
 if(NOT HPX_NO_INSTALL)
-  hpx_library_install(hpx_serialization)
+  hpx_library_install(hpx_serialization lib/hpx)
 endif()
 
 ################################################################################
@@ -357,13 +359,15 @@ set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_DLL_STRING=\"${name}\""
   "HPX_EXPORTS"
+  "HPX_PREFIX=\"${HPX_PREFIX}\""
+  "HPX_GIT_COMMIT=\"${GIT_COMMIT}\""
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
 if(NOT HPX_NO_INSTALL)
-  hpx_library_install(hpx)
+  hpx_library_install(hpx lib/hpx)
 endif()
 
 ################################################################################
@@ -378,6 +382,8 @@ endif()
 
 set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS
+  "HPX_PREFIX=\"${HPX_PREFIX}\""
+  "HPX_GIT_COMMIT=\"${GIT_COMMIT}\""
   "HPX_APPLICATION_EXPORTS"
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
@@ -397,6 +403,6 @@ endif()
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
 if(NOT HPX_NO_INSTALL)
-  hpx_archive_install(hpx_init)
+  hpx_archive_install(hpx_init lib/hpx)
 endif()
 

@@ -977,7 +977,7 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
-            boost::plugin::dll d(lib.string(), HPX_MANGLE_NAME_STR(component));
+            boost::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
 
             // initialize the factory instance using the preferences from the
             // ini files

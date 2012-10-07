@@ -12,13 +12,12 @@ hpx_include(Message)
 execute_process(
   COMMAND "git" "log" "--pretty=%H" "-1" "${hpx_SOURCE_DIR}"
   WORKING_DIRECTORY ${hpx_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_COMMIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+  OUTPUT_VARIABLE HPX_GIT_COMMIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(NOT GIT_COMMIT OR "${GIT_COMMIT}" STREQUAL "None")
+if(NOT HPX_GIT_COMMIT OR "${HPX_GIT_COMMIT}" STREQUAL "None")
   hpx_warn("git.commit" "GIT commit not found (set to 'unknown').")
-  set(GIT_COMMIT "unknown")
+  set(HPX_GIT_COMMIT "unknown")
 else()
-  hpx_info("git.commit" "GIT commit is ${GIT_COMMIT}.")
-  add_definitions("-DHPX_GIT_COMMIT=\"${GIT_COMMIT}\"")
+  hpx_info("git.commit" "GIT commit is ${HPX_GIT_COMMIT}.")
 endif()
 

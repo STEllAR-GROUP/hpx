@@ -22,11 +22,11 @@ macro(hpx_symlink source destination)
   endif()
 endmacro()
 
-macro(hpx_executable_install name)
+macro(hpx_executable_install name suffix)
   if(NOT HPX_NO_INSTALL)
     hpx_get_target_location(location ${name})
 
-    set(target_directory "${CMAKE_INSTALL_PREFIX}/bin")
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
 
     set(install_code
         "file(INSTALL FILES \"${location}\"
@@ -46,7 +46,7 @@ macro(hpx_executable_install name)
   endif()
 endmacro()
 
-macro(hpx_library_install name)
+macro(hpx_library_install name suffix)
   if(NOT HPX_NO_INSTALL)
     hpx_get_target_file(lib ${name})
     hpx_get_target_path(output_dir ${name})
@@ -57,7 +57,7 @@ macro(hpx_library_install name)
       set(targets ${lib})
     endif()
 
-    set(target_directory "${CMAKE_INSTALL_PREFIX}/lib/hpx")
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
 
     foreach(target ${targets})
       set(install_code
@@ -79,11 +79,11 @@ macro(hpx_library_install name)
   endif()
 endmacro()
 
-macro(hpx_archive_install name)
+macro(hpx_archive_install name suffix)
   if(NOT HPX_NO_INSTALL)
     hpx_get_target_location(location ${name})
 
-    set(target_directory "${CMAKE_INSTALL_PREFIX}/lib/hpx")
+    set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
 
     set(install_code
       "file(INSTALL FILES \"${location}\"
