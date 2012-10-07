@@ -776,12 +776,10 @@ namespace hpx { namespace components { namespace server
             std::string instance (i->second.get_name());
             std::string component;
 
-            if (i->second.has_entry("mangledname"))
-                component = i->second.get_entry("mangledname");
-            else if (i->second.has_entry("name"))
-                component = HPX_MANGLE_COMPONENT_NAME_STR(i->second.get_entry("name"));
+            if (i->second.has_entry("name"))
+                component = i->second.get_entry("name");
             else
-                component = HPX_MANGLE_COMPONENT_NAME_STR(instance);
+                component = instance;
 
             bool isenabled = true;
             if (i->second.has_entry("enabled")) {
@@ -815,7 +813,7 @@ namespace hpx { namespace components { namespace server
                         startup_handled))
                 {
                     // build path to component to load
-                    std::string libname(component + HPX_SHARED_LIB_EXTENSION);
+                    std::string libname(HPX_MAKE_DLL_STRING(component));
                     lib /= hpx::util::create_path(libname);
                     if (!load_component(ini, instance, component, lib, prefix,
                             agas_client, isdefault, isenabled, options,
@@ -889,7 +887,7 @@ namespace hpx { namespace components { namespace server
         try {
             // get the factory, may fail
             boost::plugin::plugin_factory<component_startup_shutdown_base> pf (d,
-                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(startup_shutdown)));
+                "startup_shutdown");
 
             // create the startup_shutdown object
             boost::shared_ptr<component_startup_shutdown_base>
@@ -938,7 +936,7 @@ namespace hpx { namespace components { namespace server
         try {
             // get the factory, may fail
             boost::plugin::plugin_factory<component_commandline_base> pf (d,
-                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(commandline_options)));
+                "commandline_options");
 
             // create the startup_shutdown object
             boost::shared_ptr<component_commandline_base>
@@ -979,7 +977,7 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
-            boost::plugin::dll d (lib.string(), component);
+            boost::plugin::dll d(lib.string(), HPX_MANGLE_NAME_STR(component));
 
             // initialize the factory instance using the preferences from the
             // ini files
@@ -995,7 +993,7 @@ namespace hpx { namespace components { namespace server
             if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0")) {
                 // get the factory
                 boost::plugin::plugin_factory<component_factory_base> pf (d,
-                    BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(factory)));
+                    "factory");
 
                 // create the component factory object, if not disabled
                 boost::shared_ptr<component_factory_base> factory (

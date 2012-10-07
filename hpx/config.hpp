@@ -325,74 +325,49 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_WINDOWS)
 #  if defined(HPX_DEBUG)
-#    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
-      /**/
-#    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      "lib" + n + "d"                                                         \
-      /**/
-#    define HPX_MANGLE_NAME(n)                                                \
-      BOOST_PP_CAT(BOOST_PP_CAT(lib, n), d)                                   \
-      /**/
-#    define HPX_MANGLE_NAME_STR(n)                                            \
-      "lib" + n + "d"                                                         \
-      /**/
+#    define HPX_MAKE_DLL_STRING(n) "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION 
 #  else
-#    define HPX_MANGLE_COMPONENT_NAME(n)                                      \
-      BOOST_PP_CAT(lib, n)                                                    \
-      /**/
-#    define HPX_MANGLE_COMPONENT_NAME_STR(n)                                  \
-      "lib" + n                                                               \
-      /**/
-#    define HPX_MANGLE_NAME(n)                                                \
-      BOOST_PP_CAT(lib, n)                                                    \
-      /**/
-#    define HPX_MANGLE_NAME_STR(n)                                            \
-      "lib" + n                                                               \
-      /**/
+#    define HPX_MAKE_DLL_STRING(n) "lib" + n + HPX_SHARED_LIB_EXTENSION 
 #  endif
 #elif defined(HPX_DEBUG)
-#  define HPX_MANGLE_COMPONENT_NAME(n)      BOOST_PP_CAT(n, d)
-#  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n + "d"
-#  define HPX_MANGLE_NAME(n)                BOOST_PP_CAT(n, d)
-#  define HPX_MANGLE_NAME_STR(n)            n + "d"
+#  define HPX_MAKE_DLL_STRING(n)   n + "d" + HPX_SHARED_LIB_EXTENSION 
 #else
-#  define HPX_MANGLE_COMPONENT_NAME(n)      n
-#  define HPX_MANGLE_COMPONENT_NAME_STR(n)  n
-#  define HPX_MANGLE_NAME(n)                n
-#  define HPX_MANGLE_NAME_STR(n)            n
+#  define HPX_MAKE_DLL_STRING(n)   n + HPX_SHARED_LIB_EXTENSION 
+#endif
+
+#if defined(HPX_DEBUG)
+#  define HPX_MANGLE_NAME(n)     BOOST_PP_CAT(n, d)
+#  define HPX_MANGLE_NAME_STR(n) n + "d"
+#else
+#  define HPX_MANGLE_NAME(n)     n 
+#  define HPX_MANGLE_NAME_STR(n) n
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_COMPONENT_NAME)
-# define HPX_COMPONENT_NAME hpx
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_LIBRARY)
-#  if defined(HPX_COMPONENT_EXPORTS)
-#    define HPX_LIBRARY                                                       \
-        BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME))     \
-        HPX_SHARED_LIB_EXTENSION                                              \
-    /**/
-#  else
-#    define HPX_LIBRARY                                                       \
-        BOOST_PP_STRINGIZE(HPX_MANGLE_NAME(HPX_COMPONENT_NAME))               \
-        HPX_SHARED_LIB_EXTENSION                                              \
-    /**/
-#  endif
+#  define HPX_COMPONENT_NAME hpx
 #endif
 
 #if !defined(HPX_COMPONENT_STRING)
 #  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
 
-#if !defined(HPX_APPLICATION_NAME)
-#  define HPX_APPLICATION_NAME unknown_HPX_application
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_PLUGIN_PREFIX)
+#  define HPX_PLUGIN_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_DLL_STRING)
+#  define HPX_DLL_STRING HPX_MAKE_DLL_STRING(HPX_COMPONENT_NAME) 
 #endif
 
 #if !defined(HPX_APPLICATION_STRING)
-#  define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
+#  if defined(HPX_APPLICATION_NAME)
+#    define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
+#  else
+#    define HPX_APPLICATION_STRING "unknown HPX application"
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
