@@ -18,23 +18,26 @@
 namespace hpx { namespace components { namespace server
 {
 
-#define HPX_RUNTIME_SUPPORT_CTOR_M0(Z, N, D)                            \
-        BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(T, N)>(BOOST_PP_CAT(t, N)))                   \
+#define HPX_RUNTIME_SUPPORT_CTOR_M0(Z, N, D)                                  \
+        BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(T, N)>                 \
+            (BOOST_PP_CAT(t, N)))                                             \
     /**/
-#define HPX_RUNTIME_SUPPORT_CTOR_M1(Z, N, D)                            \
-        typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, N)>::type>::type\
+#define HPX_RUNTIME_SUPPORT_CTOR_M1(Z, N, D)                                  \
+        typename boost::remove_const<typename                                 \
+            hpx::util::detail::remove_reference<BOOST_PP_CAT(A, N)>::type     \
+        >::type                                                               \
             BOOST_PP_CAT(a, N);                                               \
     /**/
-#define HPX_RUNTIME_SUPPORT_CTOR_M2(Z, N, D)                            \
+#define HPX_RUNTIME_SUPPORT_CTOR_M2(Z, N, D)                                  \
         BOOST_PP_CAT(a, N)(other. BOOST_PP_CAT(a, N))                         \
     /**/
-#define HPX_RUNTIME_SUPPORT_CTOR_M3(Z, N, D)                            \
+#define HPX_RUNTIME_SUPPORT_CTOR_M3(Z, N, D)                                  \
         BOOST_PP_CAT(a, N)(boost::move(other. BOOST_PP_CAT(a, N)))            \
     /**/
-#define HPX_RUNTIME_SUPPORT_CTOR_M4(Z, N, D)                            \
+#define HPX_RUNTIME_SUPPORT_CTOR_M4(Z, N, D)                                  \
         BOOST_PP_CAT(a, N) = other. BOOST_PP_CAT(a, N);                       \
     /**/
-#define HPX_RUNTIME_SUPPORT_CTOR_M5(Z, N, D)                            \
+#define HPX_RUNTIME_SUPPORT_CTOR_M5(Z, N, D)                                  \
         BOOST_PP_CAT(a, N) = boost::move(other. BOOST_PP_CAT(a, N));          \
     /**/
 
