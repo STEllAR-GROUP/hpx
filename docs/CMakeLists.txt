@@ -41,7 +41,7 @@ set(doxygen_dependencies
 foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
 endforeach()
-hpx_info("doxygen" "${doxygen_inputs}")
+#hpx_info("doxygen" "${doxygen_inputs}")
 
 set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
 set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
