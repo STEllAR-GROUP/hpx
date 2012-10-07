@@ -15,13 +15,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action3<
+            typedef components::server::create_component_action3<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -38,13 +37,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action3<
+                components::server::create_component_direct_action3<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)

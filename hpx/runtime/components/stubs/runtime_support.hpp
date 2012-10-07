@@ -64,9 +64,7 @@ namespace hpx { namespace components { namespace stubs
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
-            typedef typename
-                server::runtime_support::template
-                    create_component_action0<Component>::type
+            typedef typename server::create_component_action0<Component>
                 action_type;
             return hpx::async<action_type>(gid);
         }
@@ -81,29 +79,27 @@ namespace hpx { namespace components { namespace stubs
             return create_component_async<Component>(gid).get();
         }
 
-#define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                             \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        static lcos::future<naming::id_type, naming::gid_type>               \
-        create_component_async(                                              \
-            naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))\
-        {                                                                    \
-            typedef typename                                                 \
-                server::runtime_support::template                            \
-                    BOOST_PP_CAT(create_component_action, N)<                \
-                        Component, BOOST_PP_ENUM_PARAMS(N, A)                \
-                    >::type                                                  \
-                action_type;                                                 \
-            return hpx::async<action_type>(gid,                              \
-                HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                      \
-        }                                                                    \
-                                                                             \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        static naming::id_type create_component(                             \
-            naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))\
-        {                                                                    \
-            return create_component_async<Component>                         \
-                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)).get();          \
-        }                                                                    \
+#define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        static lcos::future<naming::id_type, naming::gid_type>                \
+        create_component_async(                                               \
+            naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
+        {                                                                     \
+            typedef typename                                                  \
+                server::BOOST_PP_CAT(create_component_action, N)<             \
+                        Component, BOOST_PP_ENUM_PARAMS(N, A)>                \
+                    action_type;                                              \
+            return hpx::async<action_type>(gid,                               \
+                HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                       \
+        }                                                                     \
+                                                                              \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        static naming::id_type create_component(                              \
+            naming::id_type const& gid, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
+        {                                                                     \
+            return create_component_async<Component>                          \
+                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)).get();           \
+        }                                                                     \
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(
@@ -353,19 +349,16 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<naming::gid_type>
+        static lcos::future<naming::id_type, naming::gid_type>
         create_performance_counter_async(naming::id_type targetgid,
             performance_counters::counter_info const& info)
         {
             typedef server::runtime_support::create_performance_counter_action
                 action_type;
-
-            lcos::packaged_action<action_type, naming::gid_type> p;
-            p.apply(targetgid, info);
-            return p.get_future();
+            return hpx::async<action_type>(targetgid, info);
         }
 
-        static naming::gid_type
+        static naming::id_type
         create_performance_counter(naming::id_type targetgid,
             performance_counters::counter_info const& info,
             error_code& ec = throws)

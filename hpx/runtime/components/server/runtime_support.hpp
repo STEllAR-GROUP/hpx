@@ -125,110 +125,24 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::gid_type> bulk_create_components(
             components::component_type type, std::size_t count);
 
+        /// \brief Actions to create new objects
         template <typename Component>
-        naming::gid_type create_component0()
-        {
-            components::component_type const type
-                = components::get_component_type<
-                    typename Component::wrapped_type
-                >();
-            component_map_mutex_type::scoped_lock l(cm_mtx_);
-            component_map_type::const_iterator it = components_.find(type);
-            if (it == components_.end()) {
-                hpx::util::osstream strm;
-                strm << "attempt to create component instance of "
-                     << "invalid/unknown type: "
-                     << components::get_component_type_name(type)
-                     << " (component not found in map)";
-                HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                    "runtime_support::create_component",
-                    hpx::util::osstream_get_string(strm));
-                return naming::invalid_gid;
-            }
-            if (!(*it).second.first) {
-                hpx::util::osstream strm;
-                strm << "attempt to create component instance of "
-                     << "invalid/unknown type: "
-                     << components::get_component_type_name(type)
-                     << " (map entry is NULL)";
-                HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                    "runtime_support::create_component",
-                    hpx::util::osstream_get_string(strm));
-                return naming::invalid_gid;
-            }
+        naming::gid_type create_component0();
 
-            naming::gid_type id;
-            boost::shared_ptr<component_factory_base> factory((*it).second.first);
-            {
-                util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
-                id = factory->create();
-            }
-            LRT_(info) << "successfully created component " << id
-                       << " of type: "
-                       << components::get_component_type_name(type);
-
-            return id;
-        }
-
-#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT(Z, N, D)                           \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
-        naming::gid_type BOOST_PP_CAT(create_component, N)(                     \
-            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                               \
-        {                                                                       \
-            components::component_type const type                               \
-                = components::get_component_type<                               \
-                    typename Component::wrapped_type                            \
-                  >();                                                          \
-            component_map_mutex_type::scoped_lock l(cm_mtx_);                   \
-            component_map_type::const_iterator it = components_.find(type);     \
-            if (it == components_.end()) {                                      \
-                hpx::util::osstream strm;                                       \
-                strm << "attempt to create component instance of "              \
-                     << "invalid/unknown type: "                                \
-                     << components::get_component_type_name(type)               \
-                     << " (component not found in map)";                        \
-                HPX_THROW_EXCEPTION(hpx::bad_component_type,                    \
-                    "runtime_support::create_component",                        \
-                    hpx::util::osstream_get_string(strm));                      \
-                return naming::invalid_gid;                                     \
-            }                                                                   \
-            if (!(*it).second.first) {                                          \
-                hpx::util::osstream strm;                                       \
-                strm << "attempt to create component instance of "              \
-                     << "invalid/unknown type: "                                \
-                     << components::get_component_type_name(type)               \
-                     << " (map entry is NULL)";                                 \
-                HPX_THROW_EXCEPTION(hpx::bad_component_type,                    \
-                    "runtime_support::create_component",                        \
-                    hpx::util::osstream_get_string(strm));                      \
-                return naming::invalid_gid;                                     \
-            }                                                                   \
-                                                                                \
-            naming::gid_type id;                                                \
-            boost::shared_ptr<component_factory_base> factory((*it).second.first);\
-            {                                                                   \
-                util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);\
-                id = factory->create_with_args(                                 \
-                    BOOST_PP_CAT(component_constructor_functor, N)<             \
-                        typename Component::wrapping_type, BOOST_PP_ENUM_PARAMS(N, A)>(\
-                        HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)));                \
-            }                                                                   \
-            LRT_(info) << "successfully created component " << id               \
-                       << " of type: "                                          \
-                       << components::get_component_type_name(type);            \
-                                                                                \
-            return id;                                                          \
-        }                                                                       \
+#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_DECL(Z, N, D)                    \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        naming::gid_type BOOST_PP_CAT(create_component, N)(                   \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));                            \
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(
             1
           , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT
+          , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_DECL
           , _
         )
 
-#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT
+#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_DECL
 
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
@@ -466,60 +380,185 @@ namespace hpx { namespace components { namespace server
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
-
-    public:
-
-#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION(Z, N, D)                  \
-        template <typename Component                                          \
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        struct BOOST_PP_CAT(create_component_action, N)                       \
-        {                                                                     \
-            typedef                                                           \
-                BOOST_PP_CAT( ::hpx::actions::result_action, N)<              \
-                    runtime_support                                           \
-                  , naming::gid_type                                          \
-                  , runtime_support::runtime_support_create_component         \
-                    BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)           \
-                  , &runtime_support::BOOST_PP_CAT(create_component, N)<      \
-                        Component                                             \
-                        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)       \
-                    >                                                         \
-                >                                                             \
-                type;                                                         \
-        };                                                                    \
-                                                                              \
-        template <typename Component                                          \
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        struct BOOST_PP_CAT(create_component_direct_action, N)                \
-        {                                                                     \
-            typedef                                                           \
-                BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<       \
-                    runtime_support                                           \
-                  , naming::gid_type                                          \
-                  , runtime_support::runtime_support_create_component         \
-                    BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)           \
-                  , &runtime_support::BOOST_PP_CAT(create_component, N)<      \
-                        Component                                             \
-                        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)       \
-                    >                                                         \
-                >                                                             \
-                type;                                                         \
-        };                                                                    \
-        /**/
-        BOOST_PP_REPEAT_FROM_TO(
-            0
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION
-          , _
-        )
-#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION
-
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Functions wrapped by creat_component actions below
+    template <typename Component>
+    naming::gid_type runtime_support::create_component0()
+    {
+        components::component_type const type =
+            components::get_component_type<
+                typename Component::wrapped_type>();
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        naming::gid_type id;
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            id = factory->create();
+        }
+        LRT_(info) << "successfully created component " << id
+            << " of type: " << components::get_component_type_name(type);
+
+        return id;
+    }
+
+#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT(Z, N, D)                         \
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
+    naming::gid_type runtime_support::BOOST_PP_CAT(create_component, N)(      \
+        BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                                 \
+    {                                                                         \
+        components::component_type const type =                               \
+            components::get_component_type<                                   \
+                typename Component::wrapped_type>();                          \
+                                                                              \
+        component_map_mutex_type::scoped_lock l(cm_mtx_);                     \
+        component_map_type::const_iterator it = components_.find(type);       \
+        if (it == components_.end()) {                                        \
+            hpx::util::osstream strm;                                         \
+            strm << "attempt to create component instance of "                \
+                << "invalid/unknown type: "                                   \
+                << components::get_component_type_name(type)                  \
+                << " (component not found in map)";                           \
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,                      \
+                "runtime_support::create_component",                          \
+                hpx::util::osstream_get_string(strm));                        \
+            return naming::invalid_gid;                                       \
+        }                                                                     \
+                                                                              \
+        if (!(*it).second.first) {                                            \
+            hpx::util::osstream strm;                                         \
+            strm << "attempt to create component instance of "                \
+                << "invalid/unknown type: "                                   \
+                << components::get_component_type_name(type)                  \
+                << " (map entry is NULL)";                                    \
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,                      \
+                "runtime_support::create_component",                          \
+                hpx::util::osstream_get_string(strm));                        \
+            return naming::invalid_gid;                                       \
+        }                                                                     \
+                                                                              \
+        naming::gid_type id;                                                  \
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);\
+        {                                                                     \
+            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);\
+            id = factory->create_with_args(                                   \
+                BOOST_PP_CAT(component_constructor_functor, N)<               \
+                    typename Component::wrapping_type,                        \
+                    BOOST_PP_ENUM_PARAMS(N, A)>(                              \
+                        HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)));              \
+        }                                                                     \
+        LRT_(info) << "successfully created component " << id                 \
+            << " of type: " << components::get_component_type_name(type);     \
+                                                                              \
+        return id;                                                            \
+    }                                                                         \
+/**/
+
+    BOOST_PP_REPEAT_FROM_TO(
+        1
+      , HPX_ACTION_ARGUMENT_LIMIT
+      , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT
+      , _
+    )
+
+#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT
+
+///////////////////////////////////////////////////////////////////////////////
+// Actions used to create components with constructors of various arities.
+#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION(Z, N, D)                  \
+    template <typename Component                                              \
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>               \
+    struct BOOST_PP_CAT(create_component_action, N)                           \
+      : BOOST_PP_CAT( ::hpx::actions::result_action, N)<                      \
+            runtime_support                                                   \
+          , naming::gid_type                                                  \
+          , runtime_support::runtime_support_create_component                 \
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)                     \
+          , &runtime_support::BOOST_PP_CAT(create_component, N)<              \
+                Component                                                     \
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)                 \
+            >                                                                 \
+          , BOOST_PP_CAT(create_component_action, N)<                         \
+                Component                                                     \
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>                \
+        >                                                                     \
+    {};                                                                       \
+                                                                              \
+    template <typename Component                                              \
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>               \
+    struct BOOST_PP_CAT(create_component_direct_action, N)                    \
+      : BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<               \
+            runtime_support                                                   \
+          , naming::gid_type                                                  \
+          , runtime_support::runtime_support_create_component                 \
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)                     \
+          , &runtime_support::BOOST_PP_CAT(create_component, N)<              \
+                Component                                                     \
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)                 \
+            >                                                                 \
+          , BOOST_PP_CAT(create_component_direct_action, N)<                  \
+                Component                                                     \
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>                \
+        >                                                                     \
+    {};                                                                       \
+/**/
+
+    BOOST_PP_REPEAT_FROM_TO(
+        0
+      , HPX_ACTION_ARGUMENT_LIMIT
+      , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION
+      , _
+    )
+
+#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the runtime_support actions
+#define HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION_REGISTRATION(Z, N, D)     \
+    HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(                               \
+        (template <typename Component                                         \
+            BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>)        \
+      , (hpx::components::server::BOOST_PP_CAT(create_component_action, N)<   \
+            Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>))      \
+/**/
+
+    BOOST_PP_REPEAT_FROM_TO(
+        0
+      , HPX_ACTION_ARGUMENT_LIMIT
+      , HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION_REGISTRATION
+      , _
+    )
+
+#undef HPX_RUNTIME_SUPPORT_CREATE_COMPONENT_ACTION_REGISTRATION
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::factory_properties_action,
     factory_properties_action)
