@@ -288,7 +288,7 @@ hpx_get_target_file(name hpx_serialization)
 
 set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
-  "HPX_LIBRARY=\"${name}\""
+  "HPX_DLL_STRING=\"${name}\""
   "HPX_EXPORTS"
   "HPX_COROUTINE_EXPORTS")
 
@@ -355,7 +355,7 @@ hpx_get_target_file(name hpx)
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
-  "HPX_LIBRARY=\"${name}\""
+  "HPX_DLL_STRING=\"${name}\""
   "HPX_EXPORTS"
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"

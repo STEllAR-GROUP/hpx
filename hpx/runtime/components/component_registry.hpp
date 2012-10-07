@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -52,7 +53,8 @@ namespace hpx { namespace components
             fillini += std::string("[hpx.components.") +
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
-            fillini += "path = $[hpx.location]/lib/hpx/";
+            fillini += std::string("path = ") +
+                util::find_prefix(HPX_COMPONENT_STRING) + "/lib/hpx";
             switch (state)
             {
                 case factory_enabled:

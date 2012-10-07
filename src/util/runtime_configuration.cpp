@@ -126,22 +126,22 @@ namespace hpx { namespace util
 
             "[hpx.components.barrier]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1",
 
             "[hpx.components.raw_counter]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1",
 
             "[hpx.components.average_count_counter]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1",
 
             "[hpx.components.elapsed_time_counter]",
             "name = hpx",
-            "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY,
+            "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1"
         ;
         // don't overload user overrides
