@@ -15,13 +15,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action3<
+            typedef components::server::create_component_action3<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -38,13 +37,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action3<
+                components::server::create_component_direct_action3<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -73,13 +71,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action4<
+            typedef components::server::create_component_action4<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -96,13 +93,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action4<
+                components::server::create_component_direct_action4<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -131,13 +127,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action5<
+            typedef components::server::create_component_action5<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -154,13 +149,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action5<
+                components::server::create_component_direct_action5<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -189,13 +183,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action6<
+            typedef components::server::create_component_action6<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -212,13 +205,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action6<
+                components::server::create_component_direct_action6<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -247,13 +239,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action7<
+            typedef components::server::create_component_action7<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -270,13 +261,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action7<
+                components::server::create_component_direct_action7<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -305,13 +295,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action8<
+            typedef components::server::create_component_action8<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -328,13 +317,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action8<
+                components::server::create_component_direct_action8<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -363,13 +351,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action9<
+            typedef components::server::create_component_action9<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -386,13 +373,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action9<
+                components::server::create_component_direct_action9<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -421,13 +407,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action10<
+            typedef components::server::create_component_action10<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -444,13 +429,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action10<
+                components::server::create_component_direct_action10<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -479,13 +463,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action11<
+            typedef components::server::create_component_action11<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -502,13 +485,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action11<
+                components::server::create_component_direct_action11<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -537,13 +519,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action12<
+            typedef components::server::create_component_action12<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -560,13 +541,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action12<
+                components::server::create_component_direct_action12<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -595,13 +575,12 @@
           , boost::mpl::false_
         )
         {
-            typedef typename components::server::runtime_support::create_component_action13<
+            typedef components::server::create_component_action13<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A10>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -618,13 +597,12 @@
         )
         {
             typedef
-                typename components::server::runtime_support::create_component_direct_action13<
+                components::server::create_component_direct_action13<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A10>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)

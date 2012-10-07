@@ -59,12 +59,11 @@ namespace hpx { namespace lcos
         create_component(naming::id_type const & target)
         {
             typedef
-                typename hpx::components::server::runtime_support::create_component_action2<
+                hpx::components::server::create_component_action2<
                     server::dataflow
                   , detail::action_wrapper<Action>
                   , naming::id_type
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -138,16 +137,16 @@ namespace hpx { namespace lcos
           , boost::mpl::false_
         )
         {
-            typedef typename BOOST_PP_CAT(
-                    components::server::runtime_support::create_component_action
+            typedef BOOST_PP_CAT(
+                    components::server::create_component_action
                   , BOOST_PP_ADD(N, 2)
                 )<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , BOOST_PP_REPEAT(N, HPX_A, _)
-                >::type
-                create_component_action;
+                > create_component_action;
+
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
@@ -165,16 +164,16 @@ namespace hpx { namespace lcos
         )
         {
             typedef
-                typename BOOST_PP_CAT(
-                    components::server::runtime_support::create_component_direct_action
+                BOOST_PP_CAT(
+                    components::server::create_component_direct_action
                   , BOOST_PP_ADD(N, 2)
                 )<
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , BOOST_PP_REPEAT(N, HPX_A, _)
-                >::type
-                create_component_action;
+                > create_component_action;
+
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)

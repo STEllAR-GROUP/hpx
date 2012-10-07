@@ -33,16 +33,14 @@ namespace jacobi
             BOOST_ASSERT(localities.size() > 0);
 
             typedef
-                hpx::components::server::runtime_support::create_component_action3<
+                hpx::components::server::create_component_action3<
                     hpx::components::managed_component<server::solver>
                   , grid
                   , std::size_t
                   , std::size_t
-                >::type
-                create_component_action;
+                > create_component_action;
 
-            id
-                = hpx::async<create_component_action>(
+            id = hpx::async<create_component_action>(
                     localities[0]
                   , g
                   , nx

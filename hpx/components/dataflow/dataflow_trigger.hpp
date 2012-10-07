@@ -32,11 +32,11 @@ namespace hpx { namespace lcos
         )
         {
             typedef
-                hpx::components::server::runtime_support::
+                hpx::components::server::
                     create_component_action1<
                         server::dataflow_trigger
                       , std::vector<dataflow_base<void> > const &
-                    >::type
+                    >
                 create_component_action;
             return
                 async<create_component_action>(
