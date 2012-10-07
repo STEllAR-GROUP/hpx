@@ -809,6 +809,7 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
+                // first, try using the path as the full path to the library
                 if (!load_component(ini, instance, component, lib, prefix,
                         agas_client, isdefault, isenabled, options,
                         startup_handled))
@@ -972,7 +973,7 @@ namespace hpx { namespace components { namespace server
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
         {
-            LRT_(info) << lib.string() << " is not a shared object: " << instance;
+            //LRT_(info) << lib.string() << " is not a shared object: " << instance;
             return false;
         }
 
