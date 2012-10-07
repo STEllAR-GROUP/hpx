@@ -7,3 +7,5 @@ add_hpx_component(startup_shutdown
   FOLDER "Examples/StartupShutdown"
   AUTOGLOB)
 
+# make pseudo-targets depend on master pseudo-target
+add_hpx_pseudo_dependencies(examples.startup_shutdown startup_shutdown_component)
