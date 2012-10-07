@@ -133,8 +133,8 @@ macro(add_hpx_component name)
   target_link_libraries(${name}_component
     ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_libs})
 
-  if(HPX_EXTERNAL_CMAKE AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(lib_name ${name}${CMAKE_DEBUG_POSTFIX})
+  if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
+    set(lib_name ${name}${HPX_DEBUG_POSTFIX})
   else()
     set(lib_name ${name})
   endif()
