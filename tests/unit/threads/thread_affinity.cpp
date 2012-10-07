@@ -59,7 +59,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
             // sadly get_cpubind is not implemented for Windows based systems
             hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
             hwloc_bitmap_zero(cpuset_cmp);
-            hwloc_bitmap_only(cpuset_cmp, idx);
+            hwloc_bitmap_only(cpuset_cmp, unsigned(idx));
             HPX_TEST(hwloc_bitmap_compare(cpuset, cpuset_cmp) == 0);
             hwloc_bitmap_free(cpuset_cmp);
         }
