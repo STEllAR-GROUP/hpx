@@ -7,6 +7,7 @@
 #define HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
@@ -80,11 +81,11 @@ namespace hpx { namespace lcos { namespace detail
             return boost::move(this->move_data(ec));
         }
 
-        template <typename Result>
-        void run_impl(lcos::future<Result> const& f);
+        template <typename Result, typename RemoteResult>
+        void run_impl(lcos::future<Result, RemoteResult> const& f);
 
-        template <typename Result>
-        void run (lcos::future<Result> const& f, error_code& ec)
+        template <typename Result, typename RemoteResult>
+        void run (lcos::future<Result, RemoteResult> const& f, error_code& ec)
         {
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
@@ -97,18 +98,18 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            run_impl<Result>(f);
+            run_impl<Result, RemoteResult>(f);
 
             if (&ec != &throws)
                 ec = make_success_code();
         }
 
-        template <typename Result>
+        template <typename Result, typename RemoteResult>
         threads::thread_state_enum
-        async_impl(lcos::future<Result> const& f);
+        async_impl(lcos::future<Result, RemoteResult> const& f);
 
-        template <typename Result>
-        void async (lcos::future<Result> const& f, error_code& ec)
+        template <typename Result, typename RemoteResult>
+        void async (lcos::future<Result, RemoteResult> const& f, error_code& ec)
         {
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
@@ -123,7 +124,8 @@ namespace hpx { namespace lcos { namespace detail
 
             future_base_type this_(this);
             applier::register_thread_plain(
-                HPX_STD_BIND(&continuation_base::async_impl<Result>, this_, f),
+                HPX_STD_BIND(&continuation_base::async_impl<Result, RemoteResult>, 
+                    this_, f),
                 "continuation_base::async");
 
             if (&ec != &throws)
@@ -192,31 +194,32 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult, typename Result>
+    template <typename ContResult, typename Result, typename RemoteResult>
     struct continuation : continuation_base<ContResult>
     {
         typedef typename lcos::detail::continuation_base<
             ContResult
         >::result_type result_type;
 
-        virtual void do_run(lcos::future<Result> const& f) = 0;
+        virtual void do_run(lcos::future<Result, RemoteResult> const& f) = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult>
-    template <typename Result>
-    void continuation_base<ContResult>::run_impl(lcos::future<Result> const& f)
+    template <typename Result, typename RemoteResult>
+    void continuation_base<ContResult>::run_impl(
+        lcos::future<Result, RemoteResult> const& f)
     {
-        typedef continuation<ContResult, Result> derived_type;
+        typedef continuation<ContResult, Result, RemoteResult> derived_type;
         static_cast<derived_type*>(this)->do_run(f);
     }
 
     template <typename ContResult>
-    template <typename Result>
+    template <typename Result, typename RemoteResult>
     threads::thread_state_enum continuation_base<ContResult>::async_impl(
-        lcos::future<Result> const& f)
+        lcos::future<Result, RemoteResult> const& f)
     {
-        typedef continuation<ContResult, Result> derived_type;
+        typedef continuation<ContResult, Result, RemoteResult> derived_type;
         reset_id r(*this);
         static_cast<derived_type*>(this)->do_run(f);
         return threads::terminated;
@@ -227,12 +230,13 @@ namespace hpx { namespace lcos { namespace local
 {
     namespace detail
     {
-        template <typename ContResult, typename Result, typename F>
+        template <typename ContResult, typename Result, typename RemoteResult, 
+            typename F>
         struct continuation_object
-          : lcos::detail::continuation<ContResult, Result>
+          : lcos::detail::continuation<ContResult, Result, RemoteResult>
         {
             typedef typename lcos::detail::continuation<
-                ContResult, Result
+                ContResult, Result, RemoteResult
             >::result_type result_type;
 
             F f_;
@@ -246,7 +250,7 @@ namespace hpx { namespace lcos { namespace local
               : f_(boost::forward<Func>(f))
             {}
 
-            void do_run(lcos::future<Result> const& f)
+            void do_run(lcos::future<Result, RemoteResult> const& f)
             {
                 try {
                     this->set_data(f_(f));
@@ -258,13 +262,12 @@ namespace hpx { namespace lcos { namespace local
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result, typename F>
-        struct continuation_object<void, Result, F>
-          : lcos::detail::continuation<void, Result>
+        template <typename Result, typename RemoteResult, typename F>
+        struct continuation_object<void, Result, RemoteResult, F>
+          : lcos::detail::continuation<void, Result, RemoteResult>
         {
-            typedef
-                typename lcos::detail::continuation<void, Result>::result_type
-            result_type;
+            typedef typename lcos::detail::continuation<
+                void, Result, RemoteResult>::result_type result_type;
 
             F f_;
 
@@ -277,7 +280,7 @@ namespace hpx { namespace lcos { namespace local
               : f_(boost::forward<Func>(f))
             {}
 
-            void do_run(lcos::future<Result> const& f)
+            void do_run(lcos::future<Result, RemoteResult> const& f)
             {
                 try {
                     f_(f);
@@ -291,7 +294,7 @@ namespace hpx { namespace lcos { namespace local
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult, typename Result>
+    template <typename ContResult, typename Result, typename RemoteResult>
     class packaged_continuation
     {
     protected:
@@ -306,8 +309,9 @@ namespace hpx { namespace lcos { namespace local
 
         template <typename F>
         explicit packaged_continuation(BOOST_FWD_REF(F) f)
-          : cont_(new detail::continuation_object<ContResult, Result, F>(
-                boost::forward<F>(f))),
+          : cont_(new detail::continuation_object<
+                      ContResult, Result, RemoteResult, F>(
+                          boost::forward<F>(f))),
             future_obtained_(false)
         {}
 
@@ -362,7 +366,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // synchronous execution
-        void operator()(lcos::future<Result> f, error_code& ec = throws)
+        void operator()(lcos::future<Result, RemoteResult> f, 
+            error_code& ec = throws)
         {
             if (!cont_) {
                 HPX_THROWS_IF(ec, task_moved,
@@ -374,7 +379,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // asynchronous execution
-        void async(lcos::future<Result> f, error_code& ec = throws)
+        void async(lcos::future<Result, RemoteResult> f, 
+            error_code& ec = throws)
         {
             if (!cont_) {
                 HPX_THROWS_IF(ec, task_moved,
@@ -402,7 +408,7 @@ namespace hpx { namespace lcos { namespace local
             cont_->set_exception(e);
         }
 
-        void on_value_ready(lcos::future<Result> const& f)
+        void on_value_ready(lcos::future<Result, RemoteResult> const& f)
         {
             (*this)(f);   // pass this future on to the continuation
         }
@@ -428,7 +434,9 @@ namespace hpx { namespace lcos
         typedef typename boost::result_of<F(future)>::type result_type;
 
         // create continuation
-        typedef local::packaged_continuation<result_type, Result> cont_type;
+        typedef local::packaged_continuation<
+            result_type, Result, RemoteResult> cont_type;
+
         boost::shared_ptr<cont_type> p(
             boost::make_shared<cont_type>(
                 util::bind(boost::forward<F>(f), util::placeholders::_1)
@@ -453,7 +461,9 @@ namespace hpx { namespace lcos
         typedef typename boost::result_of<F(future)>::type result_type;
 
         // create continuation
-        typedef local::packaged_continuation<result_type, void> cont_type;
+        typedef local::packaged_continuation<
+            result_type, void, util::unused_type> cont_type;
+
         boost::shared_ptr<cont_type> p(
             boost::make_shared<cont_type>(
                 util::bind(boost::forward<F>(f), util::placeholders::_1)
