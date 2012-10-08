@@ -3,20 +3,20 @@
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-***
+*****
  HPX on Android
-***
+*****
 
 This folder contains Makefile definitions in order to get HPX build for an
 Android device. Once hpx is included in your applications Android.mk, it takes
 care of building the required boost dependencies.
 
-**NOTE:*** This has only been tested with boost trunk and a Samsung Galaxy Note
+**NOTE:** This has only been tested with boost trunk and a Samsung Galaxy Note
 10.1 (Running Android 4.0.4) and the latest Android NDK (r8b)
 
-***
+*****
  Build Instructions
-***
+*****
 
 1) Get the Android NDK
 (`Download NDK <http://developer.android.com/tools/sdk/ndk/index.html>`_)
