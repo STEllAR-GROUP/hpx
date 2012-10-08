@@ -54,7 +54,9 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/actions/transfer_action_constructors.hpp"
   "hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp"
   "hpx/runtime/applier/apply_implementations.hpp"
-  "hpx/runtime/components/server/runtime_support.hpp")
+  "hpx/runtime/components/server/runtime_support.hpp"
+  "hpx/runtime/components/server/create_component_with_args.hpp"
+  "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
 foreach(file ${action_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_ACTION_ARGUMENT_LIMIT)
 endforeach()
