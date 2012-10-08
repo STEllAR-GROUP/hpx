@@ -904,6 +904,14 @@ namespace hpx
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
     HPX_API_EXPORT bool is_running();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the name of the calling thread.
+    /// 
+    /// This function returns the name of the calling thread. This name uniquely
+    /// identifies the thread in the context of HPX. If the function is called 
+    /// while no HPX runtime system is active, it will return zero.
+    HPX_API_EXPORT std::string const* get_thread_name();
 }
 
 #include <hpx/lcos/async_fwd.hpp>
