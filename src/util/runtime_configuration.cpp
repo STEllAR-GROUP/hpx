@@ -230,9 +230,11 @@ namespace hpx { namespace util
 #if HPX_USE_ITT != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
+        BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
+        BOOST_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
         huge_stacksize = init_huge_stack_size();
     }
 

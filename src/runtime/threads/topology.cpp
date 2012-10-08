@@ -9,12 +9,21 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime.hpp>
 
+#if defined(__ANDROID__) && defined(ANDROID)
+#include <cpu-features.h>
+#endif
+
 namespace hpx { namespace threads
 {
 
 std::size_t hardware_concurrency()
 {
+#if defined(__ANDROID__) && defined(ANDROID)
+    static std::size_t num_of_cores = ::android_getCpuCount();
+#else
     static std::size_t num_of_cores = boost::thread::hardware_concurrency();
+#endif
+
     if (0 == num_of_cores)
         return 1; // Assume one core.
     else
