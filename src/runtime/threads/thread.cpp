@@ -13,6 +13,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>
 
+#if defined(__ANDROID__) && defined(ANDROID)
+#include <cpu-features.h>
+#endif
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -115,6 +119,15 @@ namespace hpx
     thread::id thread::get_id() const BOOST_NOEXCEPT
     {
         return id(native_handle());
+    }
+
+    unsigned thread::hardware_concurrency() BOOST_NOEXCEPT
+    {
+#if defined(__ANDROID__) && defined(ANDROID)
+        return ::android_getCpuCount();
+#else
+        return boost::thread::hardware_concurrency();
+#endif
     }
 
     void thread::start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func)
