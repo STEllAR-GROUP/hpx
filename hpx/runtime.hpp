@@ -111,7 +111,7 @@ namespace hpx
         }
 
         /// \brief Return the name of the calling thread.
-        static std::string const* runtime::get_thread_name();
+        static std::string const* get_thread_name();
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
