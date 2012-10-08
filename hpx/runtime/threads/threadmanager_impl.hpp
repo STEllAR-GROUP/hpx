@@ -23,7 +23,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
