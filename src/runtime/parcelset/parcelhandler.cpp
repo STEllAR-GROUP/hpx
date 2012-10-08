@@ -112,7 +112,7 @@ namespace hpx { namespace parcelset
                 boost::iostreams::stream<io_device_type> io(*parcel_data);
 
                 // mark start of serialization
-                receive_data.serialization_time_ = timer_.elapsed_nanoseconds();
+                util::high_resolution_timer timer;
                 boost::int64_t overall_add_parcel_time = 0;
 
                 {
@@ -131,10 +131,10 @@ namespace hpx { namespace parcelset
                         BOOST_ASSERT(p.get_destination_locality() == here());
 
                         // be sure not to measure add_parcel as serialization time
-                        boost::int64_t add_parcel_time = timer_.elapsed_nanoseconds();
+                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
                         parcels_->add_parcel(p);
-                        overall_add_parcel_time +=
-                            timer_.elapsed_nanoseconds() - add_parcel_time;
+                        overall_add_parcel_time += timer.elapsed_nanoseconds() - 
+                            add_parcel_time;
                     }
 
                     // complete received data with parcel count
@@ -142,8 +142,7 @@ namespace hpx { namespace parcelset
                 }
 
                 // store the time required for serialization
-                receive_data.serialization_time_ =
-                    timer_.elapsed_nanoseconds() - receive_data.serialization_time_ -
+                receive_data.serialization_time_ = timer.elapsed_nanoseconds() - 
                     overall_add_parcel_time;
 
                 pp_.add_received_data(receive_data);

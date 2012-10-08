@@ -97,7 +97,7 @@ namespace hpx { namespace parcelset
             try {
                 server::parcelport_connection_ptr conn(
                     new server::parcelport_connection(
-                        io_service_pool_.get_io_service(), parcels_, timer_));
+                        io_service_pool_.get_io_service(), parcels_));
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -155,7 +155,7 @@ namespace hpx { namespace parcelset
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
-                io_service_pool_.get_io_service(), parcels_, timer_));
+                io_service_pool_.get_io_service(), parcels_));
 
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
@@ -206,7 +206,7 @@ namespace hpx { namespace parcelset
         {
             client_connection.reset(new parcelport_connection(
                 io_service_pool_.get_io_service(), locality_id,
-                connection_cache_, timer_, parcels_sent_));
+                connection_cache_, parcels_sent_));
 
             // Connect to the target locality, retry if needed.
             boost::system::error_code error = boost::asio::error::try_again;
@@ -300,15 +300,9 @@ namespace hpx { namespace parcelset
     }
 
     void parcelport::send_pending_parcels_trampoline(
-        naming::locality const& locality_id)
+        naming::locality const& locality_id, 
+        parcelport_connection_ptr client_connection)
     {
-        parcelport_connection_ptr client_connection(
-            connection_cache_.get(locality_id));
-
-        // If another thread was faster ... try again
-        if (!client_connection)
-            return;
-
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
 
@@ -325,7 +319,8 @@ namespace hpx { namespace parcelset
 
         if (!parcels.empty() && !handlers.empty())
         {
-            // create a new thread which sends parcels that might still be pending
+            // Create a new thread which sends parcels that might still be 
+            // pending.
             hpx::applier::register_thread_nullary(
                 HPX_STD_BIND(&parcelport::send_pending_parcels, this,
                     client_connection, boost::move(parcels),
@@ -333,6 +328,8 @@ namespace hpx { namespace parcelset
         }
         else
         {
+            // Give this connection back to the cache as it's not needed 
+            // anymore.
             BOOST_ASSERT(locality_id == client_connection->destination());
             connection_cache_.reclaim(locality_id, client_connection);
         }
@@ -363,7 +360,7 @@ namespace hpx { namespace parcelset
         // ... start an asynchronous write operation now.
         client_connection->async_write(
             detail::call_for_each(handlers),
-            boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1)
-        );
+            boost::bind(&parcelport::send_pending_parcels_trampoline, this, 
+                ::_1, ::_2));
     }
 }}
