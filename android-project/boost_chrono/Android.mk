@@ -17,6 +17,9 @@ LOCAL_SRC_FILES:=libs/chrono/src/chrono.cpp
 LOCAL_SRC_FILES+=libs/chrono/src/thread_clock.cpp
 LOCAL_SRC_FILES+=libs/chrono/src/process_cpu_clocks.cpp
 LOCAL_CPPFLAGS:=-DBOOST_CHRONO_DYN_LINK=1
+LOCAL_CPPFLAGS+=-std=gnu++0x
+LOCAL_CPPFLAGS+=-DBOOST_SYSTEM_NO_DEPRECATED
+LOCAL_CPPFLAGS+=-Wno-psabi
 LOCAL_SHARED_LIBRARIES:=boost_system
 NDK_TOOLCHAIN_VERSION:=4.6
 LOCAL_ARM_NEON:=true

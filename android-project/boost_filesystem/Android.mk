@@ -21,6 +21,9 @@ LOCAL_SRC_FILES+=libs/filesystem/src/portability.cpp
 LOCAL_SRC_FILES+=libs/filesystem/src/unique_path.cpp
 LOCAL_SRC_FILES+=libs/filesystem/src/utf8_codecvt_facet.cpp
 LOCAL_CPPFLAGS:=-DBOOST_FILESYSTEM_DYN_LINK=1
+LOCAL_CPPFLAGS+=-std=gnu++0x
+LOCAL_CPPFLAGS+=-DBOOST_SYSTEM_NO_DEPRECATED
+LOCAL_CPPFLAGS+=-Wno-psabi
 LOCAL_SHARED_LIBRARIES:=boost_system
 NDK_TOOLCHAIN_VERSION:=4.6
 LOCAL_ARM_NEON:=true

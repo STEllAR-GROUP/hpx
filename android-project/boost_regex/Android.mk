@@ -29,6 +29,9 @@ LOCAL_SRC_FILES+=libs/regex/src/wide_posix_api.cpp
 LOCAL_SRC_FILES+=libs/regex/src/winstances.cpp
 LOCAL_SRC_FILES+=libs/regex/src/usinstances.cpp
 LOCAL_CPPFLAGS:=-DBOOST_REGEX_DYN_LINK=1
+LOCAL_CPPFLAGS+=-std=gnu++0x
+LOCAL_CPPFLAGS+=-DBOOST_SYSTEM_NO_DEPRECATED
+LOCAL_CPPFLAGS+=-Wno-psabi
 NDK_TOOLCHAIN_VERSION:=4.6
 LOCAL_ARM_NEON:=true
 LOCAL_LDLIBS := -fuse-ld=gold

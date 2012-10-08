@@ -42,7 +42,6 @@ LOCAL_SRC_FILES:=$(filter-out $(HPX_SRC_ROOT)/src/hpx_user_main.cpp, $(LOCAL_SRC
 LOCAL_SRC_FILES:=$(filter-out $(HPX_SRC_ROOT)/src/util/portable_binary_iarchive.cpp, $(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES:=$(filter-out $(HPX_SRC_ROOT)/src/util/portable_binary_oarchive.cpp, $(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES:=$(patsubst $(HPX_SRC_ROOT)/%, %, $(LOCAL_SRC_FILES))
-LOCAL_SRC_FILES+=src/util/coroutine/swapcontext.cpp
 LOCAL_CPPFLAGS:=$(HPX_CPPFLAGS)
 LOCAL_CPPFLAGS+=-DHPX_LIBRARY=\"hpx\"
 LOCAL_CPPFLAGS+=-DHPX_EXPORTS
