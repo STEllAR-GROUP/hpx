@@ -19,8 +19,8 @@ care of building the required boost dependencies.
 *****
 
 1) Get the Android NDK
-(`Download NDK <http://developer.android.com/tools/sdk/ndk/index.html>`_)
-and follow the instruction on this site on how to install it.
+   (`Download NDK <http://developer.android.com/tools/sdk/ndk/index.html>`_)
+   and follow the instruction on this site on how to install it.
 
 2) Clone the master HPX git repository::
     $ git clone https://github.com/STEllAR-GROUP/hpx.git
@@ -49,8 +49,8 @@ and follow the instruction on this site on how to install it.
     LOCAL_CPP_FEATURES:= exceptions rtti
 
 6) In order for the Android NDK to find hpx, you need to set the NDK_MODULE_PATH 
-environment variable to point to HPX_ROOT/android-project and set the
-BOOST_SRC_ROOT to point to your patched source code version of boost.
+   environment variable to point to HPX_ROOT/android-project and set the
+   BOOST_SRC_ROOT to point to your patched source code version of boost.
 
 7) Run ndk-build in your applications root directory
 
