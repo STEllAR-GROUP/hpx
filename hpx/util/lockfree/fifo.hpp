@@ -17,7 +17,8 @@ namespace boost { namespace lockfree
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Alloc = std::allocator<T> >
-    class caching_freelist : public lockfree::detail::freelist_stack<T, Alloc>
+    class caching_freelist
+        : public lockfree::detail::freelist_stack<T, Alloc>
     {
         typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
 
@@ -28,18 +29,21 @@ namespace boost { namespace lockfree
 
         T* allocate()
         {
-            return this->base_type::allocate<true, false>();
+            return this->base_type::template allocate<true, false>();
         }
 
         void deallocate(T* n)
         {
-            this->base_type::deallocate<true>(n);
+            this->base_type::template deallocate<true>(n);
         }
     };
 
     template <typename T, typename Alloc = std::allocator<T> >
-    class static_freelist : public lockfree::detail::freelist_stack<T, Alloc>
+    class static_freelist
+        : public lockfree::detail::freelist_stack<T, Alloc>
     {
+        typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
+
     public:
         static_freelist (std::size_t n = 0) 
           : lockfree::detail::freelist_stack<T, Alloc>(Alloc(), n)
@@ -47,12 +51,12 @@ namespace boost { namespace lockfree
 
         T* allocate()
         {
-            return this->base_type::allocate<true, true>();
+            return this->base_type::template allocate<true, true>();
         }
 
         void deallocate(T* n)
         {
-            this->base_type::deallocate<true>(n);
+            this->base_type::template deallocate<true>(n);
         }
     };
 

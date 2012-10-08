@@ -245,6 +245,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         parcelset::parcelport& pp
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
+      , std::size_t runtime_support_lva
         );
 
     ~addressing_service()
