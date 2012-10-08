@@ -552,15 +552,15 @@ namespace hpx {
     runtime_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_pool(char const* name)
     {
-        std::string service_name(name);
+        BOOST_ASSERT(name != 0);
 
-        if (service_name == "io_pool")
+        if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
-        if (service_name == "parcel_pool")
+        if (0 == std::strncmp(name, "parcel", 6))
             return &parcel_pool_;
-        if (service_name == "timer_pool")
+        if (0 == std::strncmp(name, "timer", 5))
             return &timer_pool_;
-        if (service_name == "main_pool")
+        if (0 == std::strncmp(name, "main", 4))
             return &main_pool_;
 
         return 0;

@@ -202,6 +202,11 @@ namespace hpx
         runtime::runtime_.reset();
     }
 
+    std::string const* runtime::get_thread_name()
+    {
+        return runtime::thread_name_.get();
+    }
+
     /// \brief Register all performance counter types related to this runtime
     ///        instance
     void runtime::register_counter_types()
@@ -543,6 +548,11 @@ namespace hpx
     boost::uint32_t get_locality_id(error_code& ec)
     {
         return agas::get_locality_id(ec);
+    }
+
+    std::string const* get_thread_name()
+    {
+        return runtime::get_thread_name();
     }
 }
 

@@ -110,6 +110,9 @@ namespace hpx
             return static_cast<std::size_t>(instance_number_);
         }
 
+        /// \brief Return the name of the calling thread.
+        static std::string const* runtime::get_thread_name();
+
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry()
