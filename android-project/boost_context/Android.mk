@@ -19,7 +19,9 @@ LOCAL_SRC_FILES+=libs/context/src/fcontext.cpp
 LOCAL_SRC_FILES+=libs/context/src/guarded_stack_allocator_posix.cpp
 LOCAL_SRC_FILES+=libs/context/src/utils_posix.cpp
 LOCAL_CPPFLAGS:=-DBOOST_CONTEXT_DYN_LINK=1
-LOCAL_CPPFLAGS+=
+LOCAL_CPPFLAGS+=-std=gnu++0x
+LOCAL_CPPFLAGS+=-DBOOST_SYSTEM_NO_DEPRECATED
+LOCAL_CPPFLAGS+=-Wno-psabi
 NDK_TOOLCHAIN_VERSION:=4.6
 LOCAL_ARM_NEON:=true
 LOCAL_LDLIBS := -fuse-ld=gold
