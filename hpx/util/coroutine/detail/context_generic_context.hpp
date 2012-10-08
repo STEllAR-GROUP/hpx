@@ -20,7 +20,7 @@
 #include <boost/context/all.hpp>
 #include <boost/noncopyable.hpp>
 
-#include <hpx/config/forecinline.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
@@ -64,7 +64,10 @@ namespace hpx { namespace util { namespace coroutines
                 ctx_.fc_stack.size = (stack_size == -1) ? 
                     alloc_.minimum_stacksize() : std::size_t(stack_size);
                 ctx_.fc_stack.sp = alloc_.allocate(ctx_.fc_stack.size);
-                boost::ctx::make_fcontext(&ctx_, &trampoline<Functor>);
+
+                void (*fn)(intptr_t) = &trampoline<Functor>;
+
+                boost::context::make_fcontext(&ctx_, stack_size, fn);
             }
 
             ~fcontext_context_impl()
@@ -115,12 +118,12 @@ namespace hpx { namespace util { namespace coroutines
             friend void swap_context(fcontext_context_impl& from, 
                 fcontext_context_impl const& to, detail::default_hint)
             {
-                boost::ctx::jump_fcontext(&from.ctx_, &to.ctx_, to.cb_, false);
+                boost::context::jump_fcontext(&from.ctx_, &to.ctx_, to.cb_, false);
             }
 
         private:
-            boost::ctx::fcontext_t ctx_;
-            boost::ctx::stack_allocator alloc_;
+            boost::context::fcontext_t ctx_;
+            boost::context::simple_stack_allocator<256 * 1024, 64 * 1024, 8 * 1024> alloc_;
             intptr_t cb_;
         };
 

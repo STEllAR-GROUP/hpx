@@ -21,9 +21,11 @@
 #if defined(BOOST_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock_w32.hpp>
 #else
-#  include <boost/smart_ptr/detail/spinlock_sync.hpp>
-#  if defined( __ia64__ ) && defined( __INTEL_COMPILER )
-#    include <ia64intrin.h>
+#  if !defined(__ANDROID__) && !defined(ANDROID)
+#    include <boost/smart_ptr/detail/spinlock_sync.hpp>
+#    if defined( __ia64__ ) && defined( __INTEL_COMPILER )
+#      include <ia64intrin.h>
+#    endif
 #  endif
 #endif
 
@@ -34,7 +36,11 @@ namespace hpx { namespace lcos { namespace local
     struct spinlock
     {
     private:
+#if defined(__ANDROID__) && defined(ANDROID)
+        int v_;
+#else
         boost::uint64_t v_;
+#endif
 
         BOOST_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 

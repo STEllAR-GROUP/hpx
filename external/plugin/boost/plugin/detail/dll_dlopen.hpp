@@ -24,7 +24,9 @@
 
 #include <boost/plugin/config.hpp>
 
+#if !defined(__ANDROID__) && !defined(ANDROID)
 #include <link.h>
+#endif
 #include <dlfcn.h>
 #include <limits.h>
 
@@ -255,6 +257,7 @@ namespace boost { namespace plugin {
         }
 
     public:
+#if !defined(__ANDROID__) && !defined(ANDROID)
         std::string get_directory() const
         {
             // now find the full path of the loaded library
@@ -270,6 +273,7 @@ namespace boost { namespace plugin {
             ::dlerror();                // Clear the error state.
             return directory;
         }
+#endif
 
     protected:
         void FreeLibrary()
