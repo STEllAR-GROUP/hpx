@@ -96,7 +96,8 @@ void early_write_handler(
     // no-op
 }
 
-void early_pending_parcel_handler(naming::locality const&)
+void early_pending_parcel_handler(naming::locality const&, 
+    parcelset::parcelport_connection_ptr const&)
 {
     // no-op
 }
@@ -639,7 +640,7 @@ void big_boot_barrier::apply(
         // need to keep the original parcel alive after this call returned.
         client_connection.reset(new parcelset::parcelport_connection(
             io_service_pool_.get_io_service(), addr.locality_,
-            connection_cache_, pp.timer_, pp.parcels_sent_));
+            connection_cache_, pp.parcels_sent_));
         client_connection->set_parcel(p);
 
         // Connect to the target locality, retry if needed

@@ -20,7 +20,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 
@@ -253,7 +252,8 @@ namespace parcelset
             server::parcelport_connection_ptr);
 
         /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(naming::locality const& prefix);
+        void send_pending_parcels_trampoline(naming::locality const& prefix,
+            parcelport_connection_ptr client_connection);
         void send_pending_parcels(parcelport_connection_ptr client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
@@ -291,8 +291,6 @@ namespace parcelset
         naming::locality here_;
 
         /// Parcel timers and their data containers.
-        util::high_resolution_timer timer_;
-
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
     };

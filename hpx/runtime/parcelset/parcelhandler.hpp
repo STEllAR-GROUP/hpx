@@ -294,7 +294,7 @@ namespace hpx { namespace parcelset
 
         double get_current_time() const
         {
-            return startup_time_ + timer_.elapsed();
+            return util::high_resolution_timer::now();
         }
 
         /// \brief Allow access to the locality of the parcelport this
@@ -338,10 +338,6 @@ namespace hpx { namespace parcelset
 
         ///
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
-
-        /// This is the timer instance for this parcelhandler
-        double startup_time_;
-        util::high_resolution_timer timer_;
     };
 
 }}
