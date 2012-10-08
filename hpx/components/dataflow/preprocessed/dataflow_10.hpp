@@ -15,18 +15,15 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action3<
-                    components::managed_component<server::dataflow>
+            typedef components::server::create_component_action3<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 )
@@ -40,17 +37,15 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action3<
-                    components::managed_component<server::dataflow>
+                components::server::create_component_direct_action3<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 )
@@ -76,18 +71,15 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action4<
-                    components::managed_component<server::dataflow>
+            typedef components::server::create_component_action4<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
@@ -101,17 +93,15 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action4<
-                    components::managed_component<server::dataflow>
+                components::server::create_component_direct_action4<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
@@ -137,18 +127,15 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action5<
-                    components::managed_component<server::dataflow>
+            typedef components::server::create_component_action5<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
@@ -162,17 +149,15 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action5<
-                    components::managed_component<server::dataflow>
+                components::server::create_component_direct_action5<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
@@ -198,18 +183,15 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action6<
-                    components::managed_component<server::dataflow>
+            typedef components::server::create_component_action6<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
@@ -223,17 +205,15 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action6<
-                    components::managed_component<server::dataflow>
+                components::server::create_component_direct_action6<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
@@ -259,18 +239,15 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action7<
-                    components::managed_component<server::dataflow>
+            typedef components::server::create_component_action7<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
@@ -284,17 +261,15 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action7<
-                    components::managed_component<server::dataflow>
+                components::server::create_component_direct_action7<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
@@ -320,18 +295,15 @@
           , boost::mpl::false_
         )
         {
-            typedef
-                typename hpx::components::server::create_one_component_action8<
-                    components::managed_component<server::dataflow>
+            typedef components::server::create_component_action8<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
@@ -345,17 +317,15 @@
         )
         {
             typedef
-                typename hpx::components::server::create_one_component_direct_action8<
-                    components::managed_component<server::dataflow>
+                components::server::create_component_direct_action8<
+                    server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
                   , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
-                >::type
-                create_component_action;
+                > create_component_action;
             return
                 async<create_component_action>(
                     naming::get_locality_from_id(target)
-                  , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
                   , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )

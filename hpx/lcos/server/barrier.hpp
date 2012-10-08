@@ -17,7 +17,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,8 +92,8 @@ namespace hpx { namespace lcos { namespace server
           : number_of_threads_(1)
         {}
 
-        barrier(components::constructor_argument const& number_of_threads)
-          : number_of_threads_(boost::get<std::size_t>(number_of_threads))
+        barrier(std::size_t number_of_threads)
+          : number_of_threads_(number_of_threads)
         {}
 
         ~barrier()

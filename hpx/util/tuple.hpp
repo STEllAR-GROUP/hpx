@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -96,33 +95,6 @@ namespace hpx { namespace util
             typedef T & type;
         };
 #endif
-
-        template <typename A>
-        struct move_if_no_ref
-        {
-            static A call(A & a)
-            {
-                return boost::move(a);
-            }
-        };
-
-        template <typename A>
-        struct move_if_no_ref<A &>
-        {
-            static A & call(A & a)
-            {
-                return a;
-            }
-        };
-
-        template <typename A>
-        struct move_if_no_ref<A const &>
-        {
-            static A const & call(A const & a)
-            {
-                return a;
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////

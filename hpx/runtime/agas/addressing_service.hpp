@@ -228,7 +228,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     bool const range_caching_;
     threads::thread_priority const action_priority_;
 
-    naming::locality here_;
+    mutable naming::locality here_;
     boost::uint64_t rts_lva_;
 
     boost::shared_ptr<bootstrap_data_type> bootstrap;
@@ -332,10 +332,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         error_code& ec = throws
         );
 
-    naming::locality get_here() const
-    {
-        return here_;
-    }
+    naming::locality const& get_here() const;
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.

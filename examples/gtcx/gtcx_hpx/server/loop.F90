@@ -1614,7 +1614,7 @@
            etracer,ptracer &
               ) ! }}}
 
-        if(idiag==0)then
+        if(idiag==-1)then
            call diagnosis(hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters

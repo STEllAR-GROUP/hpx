@@ -200,7 +200,15 @@ namespace hpx { namespace components
     class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
     {
+    private:
+        typedef typename boost::mpl::if_<
+            boost::is_same<Component, detail::this_type>,
+            managed_component_base, Component
+        >::type this_component_type;
+
     public:
+        typedef this_component_type wrapped_type;
+
         typedef void has_managed_component_base;
         typedef CtorPolicy ctor_policy;
         typedef DtorPolicy dtor_policy;
@@ -272,9 +280,6 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // for backwards compatibility only
-        using components::managed_component_base;
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Component, typename Derived>
         struct heap_factory
@@ -355,13 +360,12 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component : boost::noncopyable
     {
-    private:
+    public:
         typedef typename boost::mpl::if_<
                 boost::is_same<Derived, detail::this_type>,
                 managed_component, Derived
             >::type derived_type;
 
-    public:
         typedef Component wrapped_type;
         typedef Component type_holder;
         typedef typename Component::base_type_holder base_type_holder;
@@ -552,27 +556,6 @@ namespace hpx { namespace components
             }
             return p;
         }
-
-        /// \brief  The function \a create is used for allocation and
-        //          initialization of a single instance.
-#define HPX_MANAGED_COMPONENT_CREATE_ONE(Z, N, _)                             \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        static derived_type*                                                  \
-        create_one(HPX_ENUM_FWD_ARGS(N, T, t))                                \
-        {                                                                     \
-            derived_type* p = heap_type::alloc();                             \
-            if (NULL == p) {                                                  \
-                HPX_THROW_STD_EXCEPTION(std::bad_alloc(),                     \
-                    "managed_component::create_one");                         \
-            }                                                                 \
-            return new (p) derived_type(HPX_ENUM_FORWARD_ARGS(N, T, t));      \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-            HPX_MANAGED_COMPONENT_CREATE_ONE, _)
-
-#undef HPX_MANAGED_COMPONENT_CREATE_ONE
 
         /// \brief  The function \a destroy is used for deletion and
         //          de-allocation of arrays of wrappers

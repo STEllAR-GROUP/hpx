@@ -8,6 +8,7 @@
 #define HPX_WAIT_ARGUMENT_LIMIT 5
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -1495,7 +1496,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

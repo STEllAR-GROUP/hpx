@@ -99,10 +99,7 @@ namespace hpx
             return id_;
         }
 
-        static unsigned hardware_concurrency() BOOST_NOEXCEPT
-        {
-            return boost::thread::hardware_concurrency();
-        }
+        static unsigned hardware_concurrency() BOOST_NOEXCEPT;
 
         // extensions
         void interrupt();

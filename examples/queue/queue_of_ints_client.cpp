@@ -34,7 +34,8 @@ void break_queue(queue_type queue)
 int hpx_main(boost::program_options::variables_map &vm)
 {
     // create a new queue of integers
-    queue_type queue(queue_type::create_sync(hpx::find_here()));
+    queue_type queue;
+    queue.create(hpx::find_here());
 
     // create some threads waiting to pull elements from the queue
     for (int i = 0; i < 5; ++i)

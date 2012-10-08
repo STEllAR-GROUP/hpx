@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct dataflow_stencil
-      : components::stubs::stub_base<adaptive1d::server::dataflow_stencil>
+      : components::stub_base<adaptive1d::server::dataflow_stencil>
     {
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component

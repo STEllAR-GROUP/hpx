@@ -47,7 +47,7 @@ namespace hpx { namespace geometry { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
-      : public components::detail::managed_component_base<point>
+      : public components::managed_component_base<point>
     {
     public:
         // parcel action code: the action to be performed on the destination

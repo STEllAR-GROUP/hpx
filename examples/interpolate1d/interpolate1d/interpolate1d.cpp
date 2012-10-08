@@ -39,8 +39,9 @@ namespace interpolate1d
         // of 'partition' objects
         typedef hpx::components::distributing_factory distributing_factory;
 
-        distributing_factory factory(
-            distributing_factory::create_sync(hpx::find_here()));
+        distributing_factory factory;
+        factory.create(hpx::find_here());
+
         distributing_factory::async_create_result_type result =
             factory.create_components_async(type, num_instances);
 

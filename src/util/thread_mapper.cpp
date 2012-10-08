@@ -28,7 +28,7 @@ namespace hpx { namespace util
 
     long int thread_mapper::get_system_thread_id()
     {
-#if defined(__linux__)
+#if defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
         // this has been tested only on x86_*
         return syscall(SYS_gettid);
 #else

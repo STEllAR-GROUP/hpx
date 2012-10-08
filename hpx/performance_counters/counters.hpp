@@ -8,6 +8,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -465,20 +468,26 @@ namespace hpx { namespace performance_counters
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter name.
-//     HPX_API_EXPORT lcos::future<naming::id_type> get_counter_async(
-//         std::string name);
+    HPX_API_EXPORT lcos::future<naming::id_type, naming::gid_type>
+        get_counter_async(std::string const& name, error_code& ec = throws);
 
-    HPX_API_EXPORT naming::id_type get_counter(std::string name,
-        error_code& ec = throws);
+    inline naming::id_type get_counter(std::string const& name, 
+        error_code& ec = throws)
+    {
+        return get_counter_async(name, ec).get();
+    }
 
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter info.
-//     HPX_API_EXPORT lcos::future<naming::id_type> get_counter_async(
-//         counter_info const& info);
+    HPX_API_EXPORT lcos::future<naming::id_type, naming::gid_type>
+        get_counter_async(counter_info const& info, error_code& ec = throws);
 
-    HPX_API_EXPORT naming::id_type get_counter(
-        counter_info const& info, error_code& ec = throws);
+    inline naming::id_type get_counter(counter_info const& info, 
+        error_code& ec = throws)
+    {
+        return get_counter_async(info, ec).get();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Retrieve the meta data specific for the given counter instance

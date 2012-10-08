@@ -257,10 +257,8 @@ void gs(
 
         std::vector<id_type> prefixes = find_all_localities(type);
 
-        distributing_factory
-            factory(
-                distributing_factory::create_sync(hpx::find_here())
-            );
+        distributing_factory factory;
+        factory.create(hpx::find_here());
 
         double num_blocks_sqrt = std::floor(std::sqrt(static_cast<double>(prefixes.size())));
 

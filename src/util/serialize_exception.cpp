@@ -323,8 +323,14 @@ namespace boost { namespace serialization
         case hpx::util::boost_system_error:
             e = hpx::detail::construct_exception(
                     boost::system::system_error(err_value,
-                        boost::system::get_system_category(), err_message),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+#ifndef BOOST_SYSTEM_NO_DEPRECATED
+                        boost::system::get_system_category()
+#else
+                        boost::system::system_category()
+#endif
+                      , err_message
+                    )
+                  , throw_function_, throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
                     throw_env_);

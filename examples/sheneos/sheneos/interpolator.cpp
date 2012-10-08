@@ -101,8 +101,8 @@ namespace sheneos
 
         // Create distributing factory and let it create num_instances
         // objects.
-        distributing_factory factory(
-            distributing_factory::create_sync(hpx::find_here()));
+        distributing_factory factory;
+        factory.create(hpx::find_here());
 
         // Asynchronously create the components. They will be distributed
         // fairly across all available localities.

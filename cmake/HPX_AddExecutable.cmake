@@ -29,22 +29,12 @@ macro(add_hpx_executable name)
   endif()
 
   # add the executable build target
-  if(NOT MSVC)
-      if("${${name}_ESSENTIAL}" STREQUAL "TRUE")
-      add_executable(${name}_exe
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    else()
-      add_executable(${name}_exe EXCLUDE_FROM_ALL
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    endif()
+  if(${${name}_ESSENTIAL})
+    add_executable(${name}_exe
+      ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    if(${${name}_ESSENTIAL})
-      add_executable(${name}_exe
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    else()
-      add_executable(${name}_exe EXCLUDE_FROM_ALL
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    endif()
+    add_executable(${name}_exe EXCLUDE_FROM_ALL
+      ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
   if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)

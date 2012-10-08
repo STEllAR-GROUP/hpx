@@ -3,8 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 2.8)
-
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
 file(GLOB base_files ${hpx_SOURCE_DIR}/docs/*.qbk)
@@ -32,6 +30,8 @@ set(documentation_dependencies
 set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
+    ${hpx_SOURCE_DIR}/hpx/hpx_start.hpp
+    ${hpx_SOURCE_DIR}/hpx/hpx_finalize.hpp
     ${hpx_SOURCE_DIR}/hpx/exception.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
@@ -39,12 +39,12 @@ set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
 
 foreach(doxygen_input ${doxygen_dependencies})
-set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
+  set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
 endforeach()
 #hpx_info("doxygen" "${doxygen_inputs}")
 
-set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
-set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
+set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
+set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
 
 set(doxygen_definition_list
     "DOXYGEN:=1"
@@ -56,14 +56,22 @@ set(doxygen_definition_list
     "HPX_STD_FUNCTION=std::function"
     "extern=")
 
-foreach(doxygen_predef ${doxygen_definition_list})
-set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
-endforeach()
-#hpx_info("doxygen" "${doxygen_definitions}")
+#############################################################################
+# Definitions for autodoc.doxy.in
+set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
+set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
 
-hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
+foreach(doxygen_predef ${doxygen_definition_list})
+  set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
+endforeach()
+
+foreach(doxygen_input ${doxygen_dependencies})
+  set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
+endforeach()
+
+hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy")
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
-                ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
+                ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy
                 @ONLY)
 
 #############################################################################
@@ -72,13 +80,16 @@ set(documentation_dependencies ${documentation_dependencies}
 
 # Generate Doxygen from the source code.
 hpx_source_to_boostbook(hpx_autodoc
-CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
-DEPENDENCIES ${doxygen_dependencies})
+    CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
+    DEPENDENCIES ${doxygen_dependencies})
 
 set(quickbook_fixme_mode "-D__hpx_disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)
   set(quickbook_fixme_mode "-D__hpx_enable_fixme__")
 endif()
+
+set(image
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
 
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
@@ -89,9 +100,9 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.section.depth 4
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
-                --stringparam boost.image.src images/hpx_1_0.png
-                --stringparam boost.image.w 322
-                --stringparam boost.image.h 101
+                --stringparam boost.image.src ${image}
+                --stringparam boost.image.w 458 
+                --stringparam boost.image.h 110
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
   QUICKBOOK_ARGS ${quickbook_fixme_mode})
 

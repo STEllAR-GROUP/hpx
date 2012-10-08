@@ -63,7 +63,7 @@ namespace hpx {
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        explicit runtime_impl(util::runtime_configuration& rtcfg,
+        explicit runtime_impl(util::runtime_configuration const& rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
             init_scheduler_type const& init = init_scheduler_type());
 
@@ -92,7 +92,7 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(HPX_STD_FUNCTION<hpx_main_function_type> func =
+        int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
                 HPX_STD_FUNCTION<hpx_main_function_type>(),
             std::size_t num_threads = 1, std::size_t num_localities = 1,
             bool blocking = false);
@@ -193,7 +193,7 @@ namespace hpx {
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(HPX_STD_FUNCTION<hpx_main_function_type> func =
+        int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
                     HPX_STD_FUNCTION<hpx_main_function_type>(),
                 std::size_t num_threads = 1, std::size_t num_localities = 1);
 

@@ -7,8 +7,6 @@
 #define HPX_PERFORMANCE_COUNTERS_STUBS_COUNTER_MAR_03_2009_0745M
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,7 +14,6 @@ namespace hpx { namespace performance_counters { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT performance_counter
-      : components::stubs::stub_base<server::base_performance_counter>
     {
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<counter_info> get_info_async(

@@ -42,9 +42,9 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuratio
 ################################################################################
 project(hpx CXX C)
 
-set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
-set(HPX_PATCH_LEVEL   0)
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 9)
+set(HPX_PATCH_LEVEL   5)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
@@ -241,7 +241,11 @@ include(HPX_GitCommit)
 ################################################################################
 # FIXME: Three separate doc strings are used for the *_PREFIX macros.
 
-hpx_option(HPX_NO_INSTALL BOOL "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_DEFAULT_BUILD_TARGETS BOOL
+  "Associate the core HPX library with the default build target (default: ON)." ON ADVANCED)
+
+hpx_option(HPX_NO_INSTALL BOOL
+  "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
 
 if(NOT HPX_NO_INSTALL)
   # for backwards compatibility
@@ -1169,7 +1173,7 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   if(${BOOST_MINOR_VERSION} LESS 52)
-    # install Boost.Atomic library for older Boost versions only
+    # install Boost.Lockfree library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
       DESTINATION include/hpx/external

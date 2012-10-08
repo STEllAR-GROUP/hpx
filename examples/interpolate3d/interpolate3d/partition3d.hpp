@@ -27,13 +27,13 @@ namespace interpolate3d
         // create a new partition instance and initialize it synchronously
         partition3d(std::string const& datafilename, dimension const& dimx,
                 dimension const& dimy, dimension const& dimz)
-          : base_type(interpolate3d::stubs::partition3d::create_sync(hpx::find_here()))
+          : base_type(interpolate3d::stubs::partition3d::create(hpx::find_here()))
         {
             init(datafilename, dimx, dimy, dimz);
         }
         partition3d(hpx::naming::id_type gid, std::string const& datafilename,
                 dimension const& dimx, dimension const& dimy, dimension const& dimz)
-          : base_type(interpolate3d::stubs::partition3d::create_sync(gid))
+          : base_type(interpolate3d::stubs::partition3d::create(gid))
         {
             init(datafilename, dimx, dimy, dimz);
         }

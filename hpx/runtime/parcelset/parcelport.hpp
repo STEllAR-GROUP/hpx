@@ -20,7 +20,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 
@@ -197,28 +196,28 @@ namespace parcelset
         /// completion handler (nanoseconds)
         boost::int64_t get_sending_time() const
         {
-            return parcels_sent_.total_time() * 1000;
+            return parcels_sent_.total_time();
         }
 
         /// the total time it took for all receives, from async_read to the
         /// completion handler (nanoseconds)
         boost::int64_t get_receiving_time() const
         {
-            return parcels_received_.total_time() * 1000;
+            return parcels_received_.total_time();
         }
 
         /// the total time it took for all sender-side serialization operations
         /// (nanoseconds)
         boost::int64_t get_sending_serialization_time() const
         {
-            return parcels_sent_.total_serialization_time() * 1000;
+            return parcels_sent_.total_serialization_time();
         }
 
         /// the total time it took for all receiver-side serialization
         /// operations (nanoseconds)
         boost::int64_t get_receiving_serialization_time() const
         {
-            return parcels_received_.total_serialization_time() * 1000;
+            return parcels_received_.total_serialization_time();
         }
 
         /// total data received (bytes)
@@ -253,7 +252,8 @@ namespace parcelset
             server::parcelport_connection_ptr);
 
         /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(naming::locality const& prefix);
+        void send_pending_parcels_trampoline(naming::locality const& prefix,
+            parcelport_connection_ptr client_connection);
         void send_pending_parcels(parcelport_connection_ptr client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
@@ -291,8 +291,6 @@ namespace parcelset
         naming::locality here_;
 
         /// Parcel timers and their data containers.
-        util::high_resolution_timer timer_;
-
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
     };

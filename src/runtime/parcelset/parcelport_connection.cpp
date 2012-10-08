@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset
             out_buffer_.clear();
 
             // mark start of serialization
-            send_data_.serialization_time_ = timer_.elapsed_microseconds();
+            util::high_resolution_timer timer;
 
             {
                 typedef util::container_device<std::vector<char> > io_device_type;
@@ -58,8 +58,7 @@ namespace hpx { namespace parcelset
             }
 
             // store the time required for serialization
-            send_data_.serialization_time_ =
-                timer_.elapsed_microseconds() - send_data_.serialization_time_;
+            send_data_.serialization_time_ = timer.elapsed_nanoseconds();
         }
         catch (boost::archive::archive_exception const& e) {
             // We have to repackage all exceptions thrown by the

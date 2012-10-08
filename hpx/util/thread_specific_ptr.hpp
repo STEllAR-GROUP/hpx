@@ -13,6 +13,8 @@
 // native implementation
 #if defined(HPX_HAVE_NATIVE_TLS)
 
+#if !defined(__ANDROID__) && !defined(ANDROID)
+
 #if defined(_GLIBCXX_HAVE_TLS)
 #  define HPX_NATIVE_TLS __thread
 #elif defined(BOOST_WINDOWS)
@@ -65,6 +67,101 @@ template <typename T, typename Tag>
 HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = 0;
 
 }}
+
+#else
+
+#include <pthread.h>
+#include <boost/assert.hpp>
+
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        struct thread_specific_ptr_key
+        {
+            /*
+            static void make_key()
+            {
+                pthread_key_create(&key, NULL);
+            }
+            */
+
+            thread_specific_ptr_key()
+                //: key_once(PTHREAD_ONCE_INIT)
+            {
+                //pthread_once(&key_once, &thread_specific_ptr_key::make_key);
+                pthread_key_create(&key, NULL);
+            }
+
+            pthread_key_t key;
+            //pthread_once_t key_once;
+        };
+    }
+
+template <typename T, typename Tag>
+struct thread_specific_ptr
+{
+    typedef T element_type;
+
+    static pthread_key_t get_key()
+    {
+        static_<detail::thread_specific_ptr_key, thread_specific_ptr<T, Tag> > key_holder;
+
+        return key_holder.get().key;
+    }
+
+    T* get() const
+    {
+        T* ptr = 0;
+
+        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+
+        return ptr;
+    }
+
+    T* operator->() const
+    {
+        T* ptr = 0;
+
+        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+
+        return ptr;
+    }
+
+    T& operator*() const
+    {
+        T* ptr = 0;
+
+        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+        BOOST_ASSERT(0 != ptr);
+        return *ptr;
+    }
+
+    void reset(
+        T* new_value = 0
+        )
+    {
+        T* ptr = 0;
+
+        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+        if (0 != ptr)
+            delete ptr;
+
+        ptr = new_value;
+        pthread_setspecific(thread_specific_ptr<T, Tag>::get_key(), ptr);
+    }
+
+  private:
+};
+
+/*
+template <typename T, typename Tag>
+static_<detail::thread_specific_ptr_key> thread_specific_ptr<T, Tag>::key_holder = detail::thread_specific_ptr_key();
+*/
+
+}}
+
+#endif
 
 // fallback implementation
 #else

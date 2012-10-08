@@ -94,7 +94,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            util::runtime_configuration& rtcfg,
+            util::runtime_configuration const& rtcfg,
             runtime_mode locality_mode, init_scheduler_type const& init)
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
@@ -116,7 +116,8 @@ namespace hpx {
         notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
-        thread_manager_(new hpx::threads::threadmanager_impl<SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
+        thread_manager_(new hpx::threads::threadmanager_impl<
+            SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
@@ -201,7 +202,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        HPX_STD_FUNCTION<hpx_main_function_type> func,
+        HPX_STD_FUNCTION<hpx_main_function_type> const& func,
         std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
@@ -249,7 +250,7 @@ namespace hpx {
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
         thread_manager_->register_thread(data);
-        this->runtime::start();
+        this->runtime::starting();
         // }}}
 
         // block if required
@@ -327,7 +328,7 @@ namespace hpx {
         LRT_(warning) << "runtime_impl: about to stop services";
 
         // execute all on_exit functions whenever the first thread calls this
-        this->runtime::stop();
+        this->runtime::stopping();
 
         // stop runtime_impl services (threads)
         thread_manager_->stop(false);    // just initiate shutdown
@@ -417,7 +418,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        HPX_STD_FUNCTION<hpx_main_function_type> func,
+        HPX_STD_FUNCTION<hpx_main_function_type> const& func,
         std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function
@@ -551,15 +552,15 @@ namespace hpx {
     runtime_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_pool(char const* name)
     {
-        std::string service_name(name);
+        BOOST_ASSERT(name != 0);
 
-        if (service_name == "io_pool")
+        if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
-        if (service_name == "parcel_pool")
+        if (0 == std::strncmp(name, "parcel", 6))
             return &parcel_pool_;
-        if (service_name == "timer_pool")
+        if (0 == std::strncmp(name, "timer", 5))
             return &timer_pool_;
-        if (service_name == "main_pool")
+        if (0 == std::strncmp(name, "main", 4))
             return &main_pool_;
 
         return 0;

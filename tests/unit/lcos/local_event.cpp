@@ -6,6 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -16,6 +17,10 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::applier::register_work;
+
+using hpx::threads::get_thread_count;
+
+using hpx::this_thread::suspend;
 
 using hpx::lcos::local::event;
 
@@ -63,6 +68,10 @@ int hpx_main(variables_map& vm)
 
         // Release all the threads.
         e.set(); 
+
+        // Wait for all the our threads to finish executing. 
+        do { suspend(); } while (get_thread_count() > 1);
+
         HPX_TEST_EQ(pxthreads, c);
 
         // Make sure that waiting on a set event works.
@@ -91,7 +100,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

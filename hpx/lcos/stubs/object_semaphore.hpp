@@ -16,7 +16,7 @@ namespace hpx { namespace lcos { namespace stubs
 {
 
 template <typename ValueType>
-struct object_semaphore : components::stubs::stub_base<
+struct object_semaphore : components::stub_base<
     lcos::server::object_semaphore<ValueType> >
 {
     typedef lcos::server::object_semaphore<ValueType> server_type;

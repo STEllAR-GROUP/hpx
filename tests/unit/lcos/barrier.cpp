@@ -6,8 +6,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -61,7 +62,7 @@ int hpx_main(variables_map& vm)
 
         // create a barrier waiting on 'count' threads
         barrier b;
-        b.create_one(prefix, pxthreads + 1);
+        b.create(prefix, pxthreads + 1);
 
         boost::atomic<std::size_t> c(0);
 
@@ -96,7 +97,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

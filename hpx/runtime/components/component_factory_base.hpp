@@ -14,7 +14,6 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,31 +65,17 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        virtual naming::gid_type create (std::size_t) = 0;
-
-        /// \brief Create one new component instance using the given constructor
-        ///        argument.
-        ///
-        /// \param Arg0  [in] The type specific constructor argument
-        ///
-        /// \return Returns the GID of the first newly created component
-        ///         instance. If more than one component instance has been
-        ///         created (\a count > 1) the GID's of all new instances are
-        ///         sequential in a row.
-        virtual naming::gid_type create_one (
-            components::constructor_argument const&) = 0;
+        virtual naming::gid_type create (std::size_t size = 1) = 0;
 
         /// \brief Create one new component instance and initialize it using
         ///        the using the given constructor function.
         ///
         /// \param f  [in] The constructor function to call in order to
-        ///         initialize the newly allocated object.
+        ///           initialize the newly allocated object.
         ///
-        /// \return Returns the GID of the first newly created component
-        ///         instance. If more than one component instance has been
-        ///         created (\a count > 1) the GID's of all new instances are
-        ///         sequential in a row.
-        virtual naming::gid_type create_one_functor(
+        /// \return   Returns the GID of the first newly created component
+        ///           instance. 
+        virtual naming::gid_type create_with_args(
             HPX_STD_FUNCTION<void(void*)> const&) = 0;
 
         /// \brief Destroy one or more component instances

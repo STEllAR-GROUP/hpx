@@ -14,10 +14,6 @@ using hpx::components::stub_base;
 using hpx::components::client_base;
 using hpx::components::managed_component;
 using hpx::components::managed_component_base;
-using hpx::components::server::create_one_component_action1;
-using hpx::components::component_type;
-using hpx::components::get_component_type;
-using hpx::components::constructor_argument;
 
 using hpx::id_type;
 using hpx::find_here;
@@ -32,12 +28,6 @@ struct message_server : managed_component_base<message_server>
 
     message_server() : msg("uninitialized\n") {}
 
-    message_server(constructor_argument const&)
-    {
-        // Should never be called.
-        BOOST_ASSERT(false);
-    }
-
     message_server(std::string const& msg_) : msg(msg_) {}
 
     void print() const { cout << msg << flush; } 
@@ -46,25 +36,26 @@ struct message_server : managed_component_base<message_server>
 };
 
 typedef managed_component<message_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE(server_type, message_server);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, message_server);
 
 typedef message_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
 HPX_REGISTER_ACTION(print_action);
 
-typedef create_one_component_action1<server_type, std::string const&>::type
-    create_action;
+struct message : client_base<message, stub_base<message_server> >
+{
+    void print() { async<print_action>(this->gid_).get(); } 
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
+    message ms;
+
     std::string msg = "hello world\n";
+    ms.create(hpx::find_here(), msg);
 
-    component_type t = get_component_type<message_server>();    
-
-    id_type id = async<create_action>(find_here(), t, msg).get();
-
-    async<print_action>(id).get();
+    ms.print();
 
     return 0; 
 }

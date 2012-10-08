@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/for_each.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -18,11 +19,11 @@
 
 boost::uint64_t delay = 0;
 
-int twice(int i)
+std::size_t twice(std::size_t i)
 {
     double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1. / (2. * i + 1.);
+    for (boost::uint64_t ui = 0; ui < delay; ++ui)
+        d += 1. / (2. * ui + 1.);
     return i * 2;
 }
 
@@ -37,8 +38,8 @@ int hpx_main(variables_map & vm)
 {
     {
         std::size_t n = vm["n"].as<std::size_t>();
-        std::vector<int> v(n);
-        std::vector<int> w;
+        std::vector<std::size_t> v(n);
+        std::vector<std::size_t> w;
         boost::copy(boost::irange(std::size_t(0), n), v.begin());
 
         high_resolution_timer t;
@@ -54,12 +55,12 @@ int hpx_main(variables_map & vm)
         std::cout << t.elapsed() << "\n";
 
         int ref = 0;
-        BOOST_FOREACH(int i, v)
+        BOOST_FOREACH(std::size_t i, v)
         {
             HPX_TEST_EQ(i, ref++);
         }
         ref = 0;
-        BOOST_FOREACH(int i, w)
+        BOOST_FOREACH(std::size_t i, w)
         {
             HPX_TEST_EQ(i, (ref++)*2);
 
@@ -86,7 +87,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv/*, cfg*/);

@@ -38,7 +38,7 @@ namespace hpx { namespace geometry
         /// Create client side representation from a newly create component
         /// instance.
         point(naming::id_type where, double x, double y)
-          : base_type(base_type::create_sync(where))    // create component
+          : base_type(base_type::create(where))    // create component
         {
             //init(x, y);   // initialize coordinates
         }

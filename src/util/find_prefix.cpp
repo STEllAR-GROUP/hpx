@@ -28,6 +28,7 @@ namespace hpx { namespace util
         std::string library
         )
     {
+#if !defined(__ANDROID__) && !defined(ANDROID)
         try {
             boost::plugin::dll dll(
                 HPX_MANGLE_NAME_STR(library) + HPX_SHARED_LIB_EXTENSION);
@@ -45,6 +46,7 @@ namespace hpx { namespace util
         catch (std::logic_error const&) {
             ;   // just ignore loader problems
         }
+#endif
         return HPX_PREFIX;
     }
 

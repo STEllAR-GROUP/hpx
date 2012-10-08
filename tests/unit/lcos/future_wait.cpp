@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/thread.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>

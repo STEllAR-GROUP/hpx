@@ -29,7 +29,6 @@ struct simple_mobile_object
 
   private:
     using base_type::create;
-    using base_type::create_one;
 
   public:
     typedef server::simple_mobile_object server_type;

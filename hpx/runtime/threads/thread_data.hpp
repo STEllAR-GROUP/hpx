@@ -30,7 +30,6 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 

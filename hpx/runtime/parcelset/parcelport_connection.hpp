@@ -46,10 +46,9 @@ namespace hpx { namespace parcelset
         parcelport_connection(boost::asio::io_service& io_service,
                 naming::locality const& locality_id,
                 util::connection_cache<parcelport_connection, naming::locality>& cache,
-                util::high_resolution_timer& timer,
                 performance_counters::parcels::gatherer& parcels_sent)
           : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-            connection_cache_(cache), timer_(timer), parcels_sent_(parcels_sent)
+            connection_cache_(cache), parcels_sent_(parcels_sent)
         {}
 
         ~parcelport_connection()
@@ -75,7 +74,7 @@ namespace hpx { namespace parcelset
         void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
             /// Increment sends and begin timer.
-            send_data_.time_ = timer_.elapsed_microseconds();
+            send_data_.time_ = timer_.elapsed_nanoseconds();
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
@@ -108,21 +107,11 @@ namespace hpx { namespace parcelset
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
-            // if there is an error sending a parcel it's likely logging will not
-            // work anyways, so don't log the error
-//             if (e) {
-//                 LPT_(error) << "parcelhandler: put parcel failed: "
-//                             << e.message();
-//             }
-//             else {
-//                 LPT_(info) << "parcelhandler: put parcel succeeded";
-//             }
-
             // just call initial handler
             boost::get<0>(handler)(e, bytes);
 
             // complete data point and push back onto gatherer
-            send_data_.time_ = timer_.elapsed_microseconds() - send_data_.time_;
+            send_data_.time_ = timer_.elapsed_nanoseconds() - send_data_.time_;
             parcels_sent_.add_data(send_data_);
 
             // now we can give this connection back to the cache
@@ -135,15 +124,10 @@ namespace hpx { namespace parcelset
             send_data_.serialization_time_ = 0;
             send_data_.num_parcels_ = 0;
 
-            // FIXME: This seems a bit silly, don't some of our handlers try
-            // to get a connection from the cache? Why not pass the this pointer
-            // to the handler and /then/ return the connection to the cache.
-
-            // Return the connection to the cache.
-            connection_cache_.reclaim(there_, shared_from_this());
-
-            // Call post-processing handler, which will send remaining pending parcels
-            boost::get<1>(handler)(there_);
+            // Call post-processing handler, which will send remaining pending 
+            // parcels. Pass along the connection so it can be reused if more 
+            // parcels have to be sent.
+            boost::get<1>(handler)(there_, shared_from_this());
         }
 
     private:
@@ -162,7 +146,7 @@ namespace hpx { namespace parcelset
         util::connection_cache<parcelport_connection, naming::locality>& connection_cache_;
 
         /// Counters and their data containers.
-        util::high_resolution_timer& timer_;
+        util::high_resolution_timer timer_;
         performance_counters::parcels::data_point send_data_;
         performance_counters::parcels::gatherer& parcels_sent_;
     };

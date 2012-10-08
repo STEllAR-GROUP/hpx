@@ -11,7 +11,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/components/iostreams/lazy_ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
@@ -68,7 +68,7 @@ namespace hpx { namespace iostreams
             if (agas_client.is_console())
             {
                 naming::id_type cout_id(
-                    components::server::create_one<ostream_type>(
+                    components::server::create_with_args<ostream_type>(
                         boost::ref(detail::get_outstream(Tag()))),
                     naming::id_type::managed);
                 client.reset(new lazy_ostream(cout_id));

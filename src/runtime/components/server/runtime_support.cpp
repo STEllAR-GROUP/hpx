@@ -17,7 +17,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
@@ -49,12 +49,6 @@
 HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::factory_properties_action,
     factory_properties_action)
-HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::create_component_action,
-    create_component_action)
-HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::create_one_component_action,
-    create_one_component_action)
 HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::bulk_create_components_action,
     bulk_create_components_action)
@@ -145,53 +139,6 @@ namespace hpx { namespace components { namespace server
         return (*it).second.first->get_factory_properties();
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // create a new instance of a component
-    naming::gid_type runtime_support::create_component(
-        components::component_type type, std::size_t count)
-    {
-        // locate the factory for the requested component type
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
-
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end() || !(*it).second.first) {
-            // we don't know anything about this component
-            hpx::util::osstream strm;
-            strm << "attempt to create component instance of invalid/unknown type: "
-                 << components::get_component_type_name(type);
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
-            return naming::invalid_gid;
-        }
-
-    // create new component instance
-        naming::gid_type id;
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
-            id = factory->create(count);
-        }
-
-    // log result if requested
-        if (LHPX_ENABLED(info))
-        {
-            if ((*it).second.first->get_factory_properties() & factory_instance_count_is_size)
-            {
-                LRT_(info) << "successfully created component " << id
-                           << " of type: "
-                           << components::get_component_type_name(type)
-                           << " (size: " << count << ")";
-            }
-            else {
-                LRT_(info) << "successfully created " << count
-                           << " component(s) " << id << " of type: "
-                           << components::get_component_type_name(type);
-            }
-        }
-        return id;
-    }
-
     /// \brief Action to create N new default constructed components
     std::vector<naming::gid_type> runtime_support::bulk_create_components(
         components::component_type type, std::size_t count)
@@ -219,7 +166,7 @@ namespace hpx { namespace components { namespace server
             util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
             ids.reserve(count);
             for (std::size_t i = 0; i < count; ++i)
-                ids.push_back(factory->create(1));
+                ids.push_back(factory->create());
         }
 
     // log result if requested
@@ -230,54 +177,6 @@ namespace hpx { namespace components { namespace server
                         << components::get_component_type_name(type);
         }
         return ids;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // create a new instance of a component
-    naming::gid_type runtime_support::create_one_component(
-        components::component_type type, constructor_argument const& arg0)
-    {
-        // locate the factory for the requested component type
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
-
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
-            // we don't know anything about this component
-            hpx::util::osstream strm;
-            strm << "attempt to create component instance of invalid/unknown type: "
-                 << components::get_component_type_name(type)
-                 << " (component not found in map)";
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
-            return naming::invalid_gid;
-        }
-        else if (!(*it).second.first) {
-            // we don't know anything about this component
-            hpx::util::osstream strm;
-            strm << "attempt to create component instance of invalid/unknown type: "
-                 << components::get_component_type_name(type)
-                 << " (map entry is NULL)";
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::create_component",
-                hpx::util::osstream_get_string(strm));
-            return naming::invalid_gid;
-        }
-
-    // create new component instance
-        naming::gid_type id;
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
-            id = factory->create_one(arg0);
-        }
-
-    // set result if requested
-        LRT_(info) << "successfully created component " << id
-                   << " of type: "
-                   << components::get_component_type_name(type);
-
-        return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -910,6 +809,7 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
+                // first, try using the path as the full path to the library
                 if (!load_component(ini, instance, component, lib, prefix,
                         agas_client, isdefault, isenabled, options,
                         startup_handled))
@@ -1073,7 +973,7 @@ namespace hpx { namespace components { namespace server
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
         {
-            LRT_(info) << lib.string() << " is not a shared object: " << instance;
+            //LRT_(info) << lib.string() << " is not a shared object: " << instance;
             return false;
         }
 

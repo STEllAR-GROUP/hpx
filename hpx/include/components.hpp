@@ -11,30 +11,27 @@
 #include <hpx/runtime/components/component_registry.hpp>
 
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/component_factory_one.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
-#include <hpx/runtime/components/derived_component_factory_one.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/runtime/components/generic_component_factory.hpp>
 
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/component_commandline.hpp>
 
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/constructor_argument.hpp>
 
 #include <hpx/runtime/components/memory_block.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 
 #include <hpx/runtime/components/server/memory.hpp>
 
-#include <hpx/runtime/components/server/manage_component.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
 
 #include <hpx/runtime/components/client_base.hpp>
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/server/abstract_component_base.hpp>
 
 #endif
 

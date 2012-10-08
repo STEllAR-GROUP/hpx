@@ -75,7 +75,7 @@ add_hpx_library_sources(hpx_serialization
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE "(.*(hpx_main|hpx_init|hpx_user).*[.]cpp)|main.cpp")
+  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp")
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/pre_main.cpp"
   APPEND)
@@ -95,7 +95,8 @@ add_hpx_library_sources(hpx
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp")
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp"
+  EXCLUDE "hpx_init[.]cpp")
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/main.cpp" APPEND)
 
@@ -150,7 +151,7 @@ add_hpx_library_headers(hpx_serialization
 # libhpx headers
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
-  EXCLUDE ".*(hpx_main|hpx_init).hpp")
+  EXCLUDE ".*hpx_main.hpp")
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/preprocessed/*.hpp"
   APPEND)
@@ -178,11 +179,10 @@ add_hpx_library_headers(hpx
   APPEND)
 
 # libhpx_init headers
+#add_hpx_library_headers(hpx_init
+#  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
 add_hpx_library_headers(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
-add_hpx_library_headers(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_main.hpp"
-  APPEND)
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_main.hpp")
 
 ################################################################################
 # make source groups
@@ -228,8 +228,13 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-add_library(hpx_serialization SHARED
-  ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
+if(HPX_DEFAULT_BUILD_TARGETS)
+  add_library(hpx_serialization SHARED
+    ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
+else()
+  add_library(hpx_serialization SHARED EXCLUDE_FROM_ALL
+    ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
+endif()
 
 if(NOT MSVC)
   set_target_properties(hpx_serialization
@@ -293,8 +298,13 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED
-  ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+if(HPX_DEFAULT_BUILD_TARGETS)
+  add_library(hpx SHARED
+    ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+else()
+  add_library(hpx SHARED EXCLUDE_FROM_ALL
+    ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+endif()
 
 set_target_properties(hpx PROPERTIES
   VERSION ${HPX_VERSION}
@@ -358,8 +368,13 @@ endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC
-  ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+if(HPX_DEFAULT_BUILD_TARGETS)
+  add_library(hpx_init STATIC 
+    ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+else()
+  add_library(hpx_init STATIC EXCLUDE_FROM_ALL
+    ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+endif()
 
 set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS

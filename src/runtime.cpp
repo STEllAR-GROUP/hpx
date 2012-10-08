@@ -23,7 +23,7 @@
     #include <hpx/runtime/threads/policies/windows_topology.hpp>
 #elif defined(__APPLE__)
     #include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
     #include <hpx/runtime/threads/policies/linux_topology.hpp>
 #else
     #include <hpx/runtime/threads/policies/noop_topology.hpp>
@@ -151,7 +151,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration& rtcfg)
+            util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         topology_(
@@ -161,7 +161,7 @@ namespace hpx
             new threads::windows_topology
 #elif defined(__APPLE__)
             new threads::macosx_topology
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
             new threads::linux_topology
 #else
             new threads::noop_topology
@@ -200,6 +200,11 @@ namespace hpx
         // reset our TSS
         threads::coroutine_type::impl_type::reset_self();
         runtime::runtime_.reset();
+    }
+
+    std::string const* runtime::get_thread_name()
+    {
+        return runtime::thread_name_.get();
     }
 
     /// \brief Register all performance counter types related to this runtime
@@ -543,6 +548,11 @@ namespace hpx
     boost::uint32_t get_locality_id(error_code& ec)
     {
         return agas::get_locality_id(ec);
+    }
+
+    std::string const* get_thread_name()
+    {
+        return runtime::get_thread_name();
     }
 }
 

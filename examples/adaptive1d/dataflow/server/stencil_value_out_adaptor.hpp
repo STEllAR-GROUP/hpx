@@ -19,13 +19,13 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT stencil_value_out_adaptor
-      : public components::detail::managed_component_base<
+      : public components::managed_component_base<
             stencil_value_out_adaptor
         >
     {
     private:
         typedef HPX_STD_FUNCTION<naming::id_type()> callback_function_type;
-        typedef components::detail::managed_component_base<
+        typedef components::managed_component_base<
             stencil_value_out_adaptor
         > base_type;
 

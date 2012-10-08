@@ -103,20 +103,12 @@ macro(add_hpx_library name)
     set(${name}_lib_linktype SHARED)
   endif()
 
-  if(NOT MSVC)
-    if(${${name}_ESSENTIAL})
-      add_library(${name}_lib ${${name}_lib_linktype}
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    else()
-      add_library(${name}_lib ${${name}_lib_linktype} EXCLUDE_FROM_ALL
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    endif()
+  if(${${name}_ESSENTIAL})
+    add_library(${name}_lib ${${name}_lib_linktype}
+      ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    if(${${name}_ESSENTIAL})
-      add_library(${name}_lib ${${name}_lib_linktype} ${${name}_SOURCES})
-    else()
-      add_library(${name}_lib ${${name}_lib_linktype} EXCLUDE_FROM_ALL ${${name}_SOURCES})
-    endif()
+    add_library(${name}_lib ${${name}_lib_linktype} EXCLUDE_FROM_ALL
+      ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
   hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)

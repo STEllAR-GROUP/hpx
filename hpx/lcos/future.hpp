@@ -26,7 +26,8 @@ namespace hpx { namespace lcos
         template <typename Func> class packaged_task;
         template <typename Func> class futures_factory;
 
-        template <typename ContResult, typename Result>
+        template <typename ContResult, typename Result, typename RemoteResult =
+            typename traits::promise_remote_result<Result>::type>
         class packaged_continuation;
 
         namespace detail
@@ -72,18 +73,19 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data_base<Result, RemoteResult>
             future_data_type;
 
-        future(future_data_type* p)
+        explicit future(future_data_type* p)
           : future_data_(p)
         {}
 
-        future(boost::intrusive_ptr<future_data_type> p)
+        explicit future(boost::intrusive_ptr<future_data_type> p)
           : future_data_(p)
         {}
 
         friend class local::promise<Result>;
         friend class local::packaged_task<Result()>;
         friend class local::futures_factory<Result()>;
-        template <typename ContResult, typename Result_>
+
+        template <typename ContResult, typename Result_, typename RemoteResult_>
         friend class local::packaged_continuation;
         template <typename ContResult>
         friend struct local::detail::continuation_base;
@@ -113,11 +115,19 @@ namespace hpx { namespace lcos
         }
 
         // extension: init from given value, set future to ready right away
-        future(Result const& init)
+        explicit future(Result const& init)
         {
-            boost::intrusive_ptr<future_data_type> p =
-                new lcos::detail::future_data<Result, RemoteResult>();
-            static_cast<lcos::detail::future_data<Result, RemoteResult> *>(p.get())->set_data(boost::move(init));
+            typedef lcos::detail::future_data<Result, RemoteResult> impl_type;
+            boost::intrusive_ptr<future_data_type> p = new impl_type();
+            static_cast<impl_type*>(p.get())->set_data(init);
+            future_data_ = p;
+        }
+
+        explicit future(BOOST_RV_REF(Result) init)
+        {
+            typedef lcos::detail::future_data<Result, RemoteResult> impl_type;
+            boost::intrusive_ptr<future_data_type> p = new impl_type();
+            static_cast<impl_type*>(p.get())->set_data(boost::move(init));
             future_data_ = p;
         }
 
@@ -259,18 +269,18 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data_base<void, util::unused_type>
             future_data_type;
 
-        future(future_data_type* p)
+        explicit future(future_data_type* p)
           : future_data_(p)
         {}
 
-        future(boost::intrusive_ptr<future_data_type> p)
+        explicit future(boost::intrusive_ptr<future_data_type> p)
           : future_data_(p)
         {}
 
         friend class local::promise<void>;
         friend class local::packaged_task<void()>;
         friend class local::futures_factory<void()>;
-        template <typename ContResult, typename Result_>
+        template <typename ContResult, typename Result_, typename RemoteResult_>
         friend class local::packaged_continuation;
         template <typename ContResult>
         friend struct local::detail::continuation_base;
@@ -282,7 +292,7 @@ namespace hpx { namespace lcos
         // create_void uses the dummy argument constructor below
         friend future<void> create_void();
 
-        future(int)
+        explicit future(int)
         {
             boost::intrusive_ptr<future_data_type> p =
                 new lcos::detail::future_data<void, util::unused_type>();

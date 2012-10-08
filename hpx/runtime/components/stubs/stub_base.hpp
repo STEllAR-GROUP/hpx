@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_STUBS_STUB_BASE_CLIENT_OCT_31_2008_0441PM)
-#define HPX_COMPONENTS_STUBS_STUB_BASE_CLIENT_OCT_31_2008_0441PM
+#if !defined(HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM)
+#define HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -29,66 +29,46 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a component
         static lcos::future<naming::id_type, naming::gid_type>
-        create_async(naming::id_type const& gid,
-            component_type type, std::size_t count = 1)
+        create_async(naming::id_type const& gid)
         {
-            return stubs::runtime_support::create_component_async(
-                gid, type, count);
+            return stubs::runtime_support::create_component_async<ServerComponent>
+                (gid);
         }
 
-        static lcos::future<naming::id_type, naming::gid_type>
-        create_async(naming::id_type const& gid, std::size_t count = 1)
+        static naming::id_type create(naming::id_type const& gid)
         {
-            return create_async(gid, get_component_type(), count);
-        }
-
-        /// Create a new instance of an simple_accumulator
-        static naming::id_type
-        create_sync(naming::id_type const& gid, component_type type,
-            std::size_t count = 1)
-        {
-            return stubs::runtime_support::create_component(gid, type, count);
-        }
-
-        static naming::id_type
-        create_sync(naming::id_type const& gid, std::size_t count = 1)
-        {
-            return create_sync(gid, get_component_type(), count);
+            return stubs::runtime_support::create_component<ServerComponent>(gid);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Asynchronously create a new instance of a component while passing
-        /// one argument to it's constructor
-        template <typename Arg0>
-        static lcos::future<naming::id_type, naming::gid_type>
-        create_one_async(naming::id_type const& gid, component_type type,
-            BOOST_FWD_REF(Arg0) arg0)
-        {
-            return stubs::runtime_support::create_one_component_async(
-                gid, type, boost::forward<Arg0>(arg0));
-        }
+#define HPX_STUB_BASE_CREATE(Z, N, D)                                        \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                       \
+        static lcos::future<naming::id_type, naming::gid_type>               \
+        create_async(naming::id_type const& gid,                             \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                            \
+        {                                                                    \
+            return stubs::runtime_support::create_component_async<ServerComponent>\
+                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                \
+        }                                                                    \
+                                                                             \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                       \
+        static naming::id_type create(                                       \
+            naming::id_type const& gid,                                      \
+                BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                        \
+        {                                                                    \
+            return stubs::runtime_support::create_component<ServerComponent> \
+                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                \
+        }                                                                    \
+    /**/
 
-        template <typename Arg0>
-        static lcos::future<naming::id_type, naming::gid_type>
-        create_one_async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
-        {
-            return create_one_async(gid, get_component_type(), boost::forward<Arg0>(arg0));
-        }
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , HPX_ACTION_ARGUMENT_LIMIT
+          , HPX_STUB_BASE_CREATE
+          , _
+        )
 
-        template <typename Arg0>
-        static naming::id_type
-        create_one_sync(naming::id_type const& gid, component_type type, BOOST_FWD_REF(Arg0) arg0)
-        {
-            return stubs::runtime_support::create_one_component(
-                gid, type, boost::forward<Arg0>(arg0));
-        }
-
-        template <typename Arg0>
-        static naming::id_type
-        create_one_sync(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
-        {
-            return create_one_sync(gid, get_component_type(), boost::forward<Arg0>(arg0));
-        }
+#undef HPX_STUB_BASE_CREATE
 
         /// Delete an existing component
         static void
@@ -102,26 +82,7 @@ namespace hpx { namespace components
         {
             gid = naming::invalid_id;
         }
-
-        static void
-        free_sync(component_type type, naming::id_type& gid)
-        {
-            gid = naming::invalid_id;
-        }
-
-        static void
-        free_sync(naming::id_type& gid)
-        {
-            gid = naming::invalid_id;
-        }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace stubs
-    {
-          // for backwards compatibility only
-          using components::stub_base;
-    }
 }}
 
 #endif
