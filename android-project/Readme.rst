@@ -23,16 +23,20 @@ care of building the required boost dependencies.
    and follow the instruction on this site on how to install it.
 
 2) Clone the master HPX git repository::
+
     $ git clone https://github.com/STEllAR-GROUP/hpx.git
 
 3) Checkt out Boost trunk::
+
     $ svn co http://svn.boost.org/svn/boost/trunk boost-trunk
 
 4) Patch boost::
+
     $ cd BOOST_SRC_ROOT
     $ patch -p0 HPX_ROOT/android-project/boost-android-ndk.patch
 
 5) In Your Applications Android.mk add the following::
+
     MY_PATH := $(call my-dir)
     $(call import-module,hpx)
     LOCAL_PATH := $(MY_PATH)
