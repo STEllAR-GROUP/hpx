@@ -53,7 +53,8 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/actions/plain_action_implementations.hpp"
   "hpx/runtime/actions/transfer_action_constructors.hpp"
   "hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp"
-  "hpx/runtime/applier/apply_implementations.hpp")
+  "hpx/runtime/applier/apply_implementations.hpp"
+  "hpx/runtime/components/server/runtime_support.hpp")
 foreach(file ${action_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_ACTION_ARGUMENT_LIMIT)
 endforeach()
