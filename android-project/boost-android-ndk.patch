@@ -1,0 +1,171 @@
+Index: boost/config/compiler/intel.hpp
+===================================================================
+--- boost/config/compiler/intel.hpp	(revision 80904)
++++ boost/config/compiler/intel.hpp	(working copy)
+@@ -27,7 +27,7 @@
+ #endif
+ 
+ // Flags determined by comparing output of 'icpc -dM -E' with and without '-std=c++0x'
+-#if (!(defined(_WIN32) || defined(_WIN64)) && defined(__STDC_HOSTED__) && (__STDC_HOSTED__ && (BOOST_INTEL_CXX_VERSION <= 1200))) || defined(__GXX_EXPERIMENTAL_CPP0X__)
++#if (!(defined(_WIN32) || defined(_WIN64)) && defined(__STDC_HOSTED__) && (__STDC_HOSTED__ && (BOOST_INTEL_CXX_VERSION <= 1200))) || defined(__GXX_EXPERIMENTAL_CPP0X__) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+ #  define BOOST_INTEL_STDCXX0X
+ #endif
+ #if defined(_MSC_VER) && (_MSC_VER >= 1600)
+@@ -224,7 +224,7 @@
+ #endif
+ 
+ // icl Version 12.1.0.233 Build 20110811 and possibly some other builds
+-// had an incorrect __INTEL_COMPILER value of 9999. Intel say this has been fixed. 
++// had an incorrect __INTEL_COMPILER value of 9999. Intel say this has been fixed.
+ #if defined(BOOST_INTEL_STDCXX0X) && (BOOST_INTEL_CXX_VERSION > 1200)
+ #  undef  BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
+ #  undef  BOOST_NO_CXX11_NULLPTR
+Index: boost/lockfree/detail/freelist.hpp
+===================================================================
+--- boost/lockfree/detail/freelist.hpp	(revision 80904)
++++ boost/lockfree/detail/freelist.hpp	(working copy)
+@@ -159,6 +159,15 @@
+             return allocate_impl_unsafe<Bounded>();
+     }
+ 
++    template <bool ThreadSafe>
++    void deallocate (T * n)
++    {
++        if (ThreadSafe)
++            deallocate_impl(n);
++        else
++            deallocate_impl_unsafe(n);
++    }
++
+ private:
+     template <bool Bounded>
+     T * allocate_impl (void)
+@@ -203,15 +212,6 @@
+         return reinterpret_cast<T*>(ptr);
+     }
+ 
+-    template <bool ThreadSafe>
+-    void deallocate (T * n)
+-    {
+-        if (ThreadSafe)
+-            deallocate_impl(n);
+-        else
+-            deallocate_impl_unsafe(n);
+-    }
+-
+     void deallocate_impl (T * n)
+     {
+         void * node = n;
+Index: boost/functional/hash/detail/hash_float.hpp
+===================================================================
+--- boost/functional/hash/detail/hash_float.hpp	(revision 80904)
++++ boost/functional/hash/detail/hash_float.hpp	(working copy)
+@@ -211,7 +211,7 @@
+         inline std::size_t float_hash_value(T v)
+         {
+             using namespace std;
+-            switch (fpclassify(v)) {
++            switch (std::fpclassify(v)) {
+             case FP_ZERO:
+                 return 0;
+             case FP_INFINITE:
+Index: boost/functional/hash/extensions.hpp
+===================================================================
+--- boost/functional/hash/extensions.hpp	(revision 80904)
++++ boost/functional/hash/extensions.hpp	(working copy)
+@@ -254,6 +254,7 @@
+ #if !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
+         std::size_t operator()(T const& val) const
+         {
++            using boost::hash_value;
+             return hash_value(val);
+         }
+ #else
+Index: libs/filesystem/src/operations.cpp
+===================================================================
+--- libs/filesystem/src/operations.cpp	(revision 80904)
++++ libs/filesystem/src/operations.cpp	(working copy)
+@@ -73,13 +73,15 @@
+     const fs::path dot_dot_path("..");
+ #   include <sys/types.h>
+ #   include <sys/stat.h>
+-#   if !defined(__APPLE__) && !defined(__OpenBSD__)
++#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) && !defined(ANDROID)
+ #     include <sys/statvfs.h>
+ #     define BOOST_STATVFS statvfs
+ #     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize
+ #   else
+ #     ifdef __OpenBSD__
+ #     include <sys/param.h>
++#     elif defined(__ANDROID__) || defined(ANDROID)
++#     include <sys/vfs.h>
+ #     endif
+ #     include <sys/mount.h>
+ #     define BOOST_STATVFS statfs
+@@ -819,6 +821,7 @@
+ 
+         if (is_sym)
+         {
++          path tmp;
+           path link(detail::read_symlink(result, ec));
+           if (ec && *ec)
+             return path();
+@@ -827,8 +830,11 @@
+           if (link.is_absolute())
+           {
+             for (++itr; itr != source.end(); ++itr)
++            {
+               link /= *itr;
+-            source = link;
++            }
++
++            tmp = link;
+           }
+           else // link is relative
+           {
+@@ -836,8 +842,9 @@
+             new_source /= link;
+             for (++itr; itr != source.end(); ++itr)
+               new_source /= *itr;
+-            source = new_source;
++            tmp = new_source;
+           }
++          source = tmp;
+           scan = true;  // symlink causes scan to be restarted
+           break;
+         }
+Index: tools/build/v2/tools/gcc.jam
+===================================================================
+--- tools/build/v2/tools/gcc.jam	(revision 80904)
++++ tools/build/v2/tools/gcc.jam	(working copy)
+@@ -1032,6 +1032,7 @@
+             case *bsd    : option = -pthread ;  # There is no -lrt on BSD.
+             case sgi     : # gcc on IRIX does not support multi-threading.
+             case darwin  : # No threading options.
++            case android : option = -pthread ;
+             case *       : option = -pthread ; libs = rt ;
+         }
+ 
+Index: tools/build/v2/tools/builtin.jam
+===================================================================
+--- tools/build/v2/tools/builtin.jam	(revision 80904)
++++ tools/build/v2/tools/builtin.jam	(working copy)
+@@ -41,7 +41,7 @@
+ 
+ 
+ .os-names = aix bsd cygwin darwin freebsd hpux iphone linux netbsd openbsd osf
+-    qnx qnxnto sgi solaris unix unixware windows
++    qnx qnxnto sgi solaris unix unixware windows android
+     elf  # Not actually an OS -- used for targeting bare metal where object
+          # format is ELF.  This catches both -elf and -eabi gcc targets and well
+          # as other compilers targeting ELF. It is not clear how often we need
+@@ -79,7 +79,8 @@
+             case MACOSX       : host-os = darwin  ;
+             case KFREEBSD     : host-os = freebsd ;
+             case LINUX        : host-os = linux   ;
+-            case SUNOS        :
++            case ANDROID      : host-os = android ;
++            case SUNOS        : 
+               ECHO "SunOS is not a supported operating system." ;
+               ECHO "We believe last version of SunOS was released in 1992, " ;
+               ECHO "so if you get this message, something is very wrong with configuration logic. " ;
