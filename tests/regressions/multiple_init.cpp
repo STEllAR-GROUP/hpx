@@ -19,4 +19,6 @@ int main()
     hpx::init();
     // Segfault on the call
     hpx::init();
+
+    return 0;
 }
