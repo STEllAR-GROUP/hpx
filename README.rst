@@ -7,6 +7,11 @@
  HPX 
 *****
 
+HPX is a a general purpose C++ runtime system for parallel and distributed 
+applications of any scale. Even if that's quite a mouthful, we mean every 
+word of it!
+
+
 The goal of HPX is to create a high quality, freely available, open source 
 implementation of the ParalleX model for conventional systems, such as 
 classic Linux based Beowulf clusters or multi-socket highly parallel SMP 
