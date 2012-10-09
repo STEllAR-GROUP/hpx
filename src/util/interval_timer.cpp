@@ -32,14 +32,17 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
         if (!is_started_) {
             is_started_ = true;
-            l.unlock();
 
             if (first_start_) {
                 first_start_ = false;
+                l.unlock();
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
                     register_shutdown_function(boost::bind(&interval_timer::terminate, this));
+            }
+            else {
+                l.unlock();
             }
 
             evaluate(threads::wait_signaled);
