@@ -24,7 +24,9 @@ smooth migration path for developers. The API exposed by HPX is modelled
 after the interfaces defined by the C++11 ISO standard and adheres to the 
 programming guidelines used by the Boost collection of C++ libraries. 
 
+****************************
 What’s so special about HPX?
+****************************
 
 * HPX exposes an uniform, standards-oriented API for ease of programming 
   parallel and distributed applications.
