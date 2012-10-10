@@ -20,7 +20,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::cout << "ever.\n" << hpx::flush;
 
     hpx::util::high_resolution_timer t;
-    while (runfor < 0 || t.elapsed() < runfor)
+    while (runfor <= 0 || t.elapsed() < runfor)
     {
         hpx::this_thread::suspend(1000);
         hpx::cout << "." << hpx::flush;
