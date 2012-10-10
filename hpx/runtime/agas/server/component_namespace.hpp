@@ -28,7 +28,6 @@
 
 #include <boost/format.hpp>
 #include <boost/bimap.hpp>
-#include <boost/typeof/typeof.hpp>
 
 namespace hpx { namespace agas
 {
