@@ -166,6 +166,13 @@ namespace hpx { namespace parcelset { namespace server
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
 
+    // this makes sure we can store our connections in a set
+    inline bool operator<(server::parcelport_connection_ptr const& lhs, 
+        server::parcelport_connection_ptr const& rhs)
+    {
+        return lhs.get() < rhs.get();
+    }
+
 ///////////////////////////////////////////////////////////////////////////////
 }}}
 

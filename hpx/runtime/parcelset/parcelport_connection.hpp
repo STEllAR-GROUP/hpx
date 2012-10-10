@@ -90,6 +90,11 @@ namespace hpx { namespace parcelset
                     boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
 
+            // make sure the Nagle algorithm is disabled for this socket,
+            // disable lingering on close
+            socket_.set_option(boost::asio::ip::tcp::no_delay(true));
+            socket_.set_option(boost::asio::socket_base::linger(true, 0));
+
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, _2,

@@ -273,7 +273,11 @@ namespace parcelset
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
-        /// mutex for pending parcels
+        /// The list of accepted connections
+        typedef std::set<server::parcelport_connection_ptr> accepted_connections_set;
+        accepted_connections_set accepted_connections_;
+
+        /// mutex for all of the member data
         mutable util::spinlock mtx_;
 
         /// The cache for pending parcels
