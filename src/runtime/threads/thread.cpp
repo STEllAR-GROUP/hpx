@@ -13,7 +13,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>
 
-#if defined(__ANDROID__) && defined(ANDROID)
+#if defined(__ANDROID__) || defined(ANDROID)
 #include <cpu-features.h>
 #endif
 
@@ -123,7 +123,7 @@ namespace hpx
 
     unsigned thread::hardware_concurrency() BOOST_NOEXCEPT
     {
-#if defined(__ANDROID__) && defined(ANDROID)
+#if defined(__ANDROID__) || defined(ANDROID)
         return ::android_getCpuCount();
 #else
         return boost::thread::hardware_concurrency();
