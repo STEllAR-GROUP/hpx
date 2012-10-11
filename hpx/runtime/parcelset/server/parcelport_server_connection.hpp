@@ -83,6 +83,12 @@ namespace hpx { namespace parcelset { namespace server
             buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
             buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
 
+#if defined(__linux) || defined(linux) || defined(__linux__)
+            boost::asio::detail::socket_option::boolean<
+                IPPROTO_TCP, TCP_QUICKACK> quickack;
+            socket_.set_option(boost::asio::ip::tcp::quickack(true));
+#endif
+
             boost::asio::async_read(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
@@ -112,6 +118,12 @@ namespace hpx { namespace parcelset { namespace server
                 void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;
+
+#if defined(__linux) || defined(linux) || defined(__linux__)
+                boost::asio::detail::socket_option::boolean<
+                    IPPROTO_TCP, TCP_QUICKACK> quickack;
+                socket_.set_option(boost::asio::ip::tcp::quickack(true));
+#endif
 
                 boost::asio::async_read(socket_,
                     boost::asio::buffer(*in_buffer_.get()),
