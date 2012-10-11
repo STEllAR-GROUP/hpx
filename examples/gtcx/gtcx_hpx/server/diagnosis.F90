@@ -156,6 +156,7 @@ subroutine diagnosis(hpx4_bti,&
   integer,parameter :: mquantity=20
   integer i,j,k,ij,m,ierror
   real(kind=wp) r,b,g,q,kappa,fdum(21),adum(21),ddum(mpsi),ddumtmp(mpsi),tracer(6),&
+       tmptracer(6), &
        tmarker,xnormal(mflux),rfac,dum,epotential,vthi,vthe,tem_inv
   real(kind=wp),external :: boozer2x,boozer2z,bfield,psi2r
   character(len=11) cdum
@@ -179,16 +180,18 @@ subroutine diagnosis(hpx4_bti,&
         tracer(1:5)=zelectron0(1:5,ntracer)
         tracer(6)=zelectron(6,ntracer)
      endif
-     if(mype/=0) then
-       !call MPI_SEND(tracer,6,mpi_Rsize,0,1,MPI_COMM_WORLD,ierror)
-       call send_cmm(hpx4_bti,tracer,6,0)
-     endif
+     !if(mype/=0) then
+     !  !call MPI_SEND(tracer,6,mpi_Rsize,0,1,MPI_COMM_WORLD,ierror)
+     !  call send_cmm(hpx4_bti,tracer,6,0)
+     !endif
   endif
-  if(mype==0 .and. ntracer==0) then 
+  !if(mype==0 .and. ntracer==0) then 
     !call MPI_RECV(tracer,6,mpi_Rsize,MPI_ANY_SOURCE,&
     !              1,MPI_COMM_WORLD,istatus,ierror)
-    call receive_cmm(hpx4_bti,tracer,6,0)
-  endif
+  !  call receive_cmm(hpx4_bti,tracer,6,0)
+  !endif
+  call comm_reduce_cmm(hpx4_bti,tracer,tmptracer,6,0)
+  tracer = tmptracer
 
 ! initialize output file
   if(istep==ndiag)then
