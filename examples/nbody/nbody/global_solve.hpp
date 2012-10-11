@@ -8,7 +8,7 @@
 #if !defined(HPX_NBODY_GLOBAL_SOLVE_HPP)
 #define HPX_NBODY_GLOBAL_SOLVE_HPP
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/global_solve.hpp"
 
@@ -34,27 +34,27 @@ namespace examples{
 
         //initialize the particle history space
         int init(std::string filename){
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::solve_init(this->gid_, filename);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::solve_init(this->get_gid(), filename);
         }
 
         //run the entire series of simulations
         void run(int iters, int bch, int tch){
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::solve_run(this->gid_, iters, bch, tch);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::solve_run(this->get_gid(), iters, bch, tch);
         }
 
         //output the results to a series of files with a specified directory
         void report(std::string directory){
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::solve_report(this->gid_, directory);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::solve_report(this->get_gid(), directory);
         }
 
         //output the results to a series of files with a specified directory
         void calculate(bool cont, bool odd, vector<int> const& cargs){
-            BOOST_ASSERT(this->gid_);
+            BOOST_ASSERT(this->get_gid());
             return this->base_type::solve_calculate(
-                this->gid_, cont, odd, cargs);
+                this->get_gid(), cont, odd, cargs);
         }
     };
 }

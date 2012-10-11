@@ -18,6 +18,7 @@ namespace hpx { namespace agas { namespace stubs
 struct HPX_EXPORT primary_namespace
 {
     typedef server::primary_namespace server_type;
+    typedef server::primary_namespace server_component_type;
 
     ///////////////////////////////////////////////////////////////////////////
     template <

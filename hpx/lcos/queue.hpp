@@ -7,7 +7,7 @@
 #define HPX_LCOS_QUEUE_FEB_10_2011_1232PM
 
 #include <hpx/exception.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/lcos/stubs/queue.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,59 +38,59 @@ namespace hpx { namespace lcos
         lcos::future<ValueType, RemoteType>
         get_value_async()
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::get_value_async(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::get_value_async(this->get_gid());
         }
 
         lcos::future<void>
         set_value_async(RemoteType const& val)
         {
-            BOOST_ASSERT(this->gid_);
+            BOOST_ASSERT(this->get_gid());
             RemoteType tmp(val);
-            return this->base_type::set_value_async(this->gid_, boost::move(tmp));
+            return this->base_type::set_value_async(this->get_gid(), boost::move(tmp));
         }
 
         lcos::future<void>
         abort_pending_async(boost::exception_ptr const& e)
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::abort_pending_async(this->gid_, e);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::abort_pending_async(this->get_gid(), e);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ValueType get_value_sync()
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::get_value_sync(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::get_value_sync(this->get_gid());
         }
 
         void set_value_sync(RemoteType const& val)
         {
-            BOOST_ASSERT(this->gid_);
+            BOOST_ASSERT(this->get_gid());
             RemoteType tmp(val);
-            this->base_type::set_value_sync(this->gid_, boost::move(tmp));
+            this->base_type::set_value_sync(this->get_gid(), boost::move(tmp));
         }
 
         void set_value_sync(BOOST_RV_REF(RemoteType) val)
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::set_value_sync(this->gid_, val);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::set_value_sync(this->get_gid(), val);
         }
 
         void abort_pending_sync(boost::exception_ptr const& e)
         {
-            this->base_type::abort_pending_sync(this->gid_, e);
+            this->base_type::abort_pending_sync(this->get_gid(), e);
         }
 
         ///////////////////////////////////////////////////////////////////////
         void set_value(RemoteType const& val)
         {
             RemoteType tmp(val);
-            this->base_type::set_value(this->gid_, boost::move(tmp));
+            this->base_type::set_value(this->get_gid(), boost::move(tmp));
         }
         void set_value(BOOST_RV_REF(RemoteType) val)
         {
-            this->base_type::set_value(this->gid_, val);
+            this->base_type::set_value(this->get_gid(), val);
         }
 
         void abort_pending()
@@ -100,7 +100,7 @@ namespace hpx { namespace lcos
                     "interrupt all pending requests");
             }
             catch (...) {
-                this->base_type::abort_pending(this->gid_, boost::current_exception());
+                this->base_type::abort_pending(this->get_gid(), boost::current_exception());
             }
         }
     };

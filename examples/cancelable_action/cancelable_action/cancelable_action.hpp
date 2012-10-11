@@ -39,14 +39,14 @@ namespace examples
         ///////////////////////////////////////////////////////////////////////
         void do_it(hpx::error_code& ec = hpx::throws)
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::do_it(this->gid_, ec);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::do_it(this->get_gid(), ec);
         }
 
         void cancel_it()
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::cancel_it(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::cancel_it(this->get_gid());
         }
     };
 }

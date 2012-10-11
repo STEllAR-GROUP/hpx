@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/components/remote_object/new_impl.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 

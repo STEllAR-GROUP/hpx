@@ -9,8 +9,8 @@
 #define HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/lcos/async.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
@@ -18,6 +18,7 @@ namespace hpx { namespace agas { namespace stubs
 struct HPX_EXPORT component_namespace
 {
     typedef server::component_namespace server_type;
+    typedef server::component_namespace server_component_type;
 
     typedef server_type::component_id_type component_id_type;
     typedef server_type::prefixes_type prefixes_type;

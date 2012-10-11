@@ -13,6 +13,8 @@
 #include <boost/preprocessor/tuple/rem.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 
+#include <boost/move/move.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_FWD_ARGS(z, n, d)                                                 \
     BOOST_FWD_REF(BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n))              \
@@ -27,7 +29,7 @@
     boost::move(BOOST_PP_CAT(d, n))                                           \
     /**/
 #define HPX_MOVE_IF_NO_REF_ARGS(z, n, d)                                      \
-    hpx::util::detail::move_if_no_ref<                                       \
+    hpx::util::detail::move_if_no_ref<                                        \
         BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n)>                        \
             ::call(BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 1, d), n))             \
     /**/

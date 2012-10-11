@@ -7,7 +7,7 @@
 #define HPX_LCOS_BARRIER_MAR_10_2010_0307PM
 
 #include <hpx/exception.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/lcos/stubs/barrier.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,32 +27,31 @@ namespace hpx { namespace lcos
         barrier(naming::id_type gid)
           : base_type(gid)
         {}
+        barrier(lcos::future<naming::id_type, naming::gid_type> gid)
+          : base_type(gid)
+        {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         lcos::future<void> wait_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::wait_async(gid_);
+            return this->base_type::wait_async(get_gid());
         }
 
         void wait()
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::wait(gid_);
+            this->base_type::wait(get_gid());
         }
 
         lcos::future<void> set_exception_async(boost::exception_ptr const& e)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::set_exception_async(gid_, e);
+            return this->base_type::set_exception_async(get_gid(), e);
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::set_exception(gid_, e);
+            this->base_type::set_exception(get_gid(), e);
         }
     };
 }}

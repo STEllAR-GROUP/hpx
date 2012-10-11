@@ -582,6 +582,11 @@ namespace hpx
         HPX_API_EXPORT void expand(std::string& expand);
     }
 
+    namespace performance_counters
+    {
+        struct counter_info;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Launch policy for \a hpx::async
     BOOST_SCOPED_ENUM_START(launch)

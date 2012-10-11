@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_BINPACKING_FACTORY_MAY_23_2012_1122AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/components/binpacking_factory/stubs/binpacking_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

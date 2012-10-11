@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/partition.hpp"
 
@@ -46,14 +46,14 @@ namespace interpolate1d
         init_async(std::string datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
-            return stubs::partition::init_async(this->gid_, datafilename,
+            return stubs::partition::init_async(this->get_gid(), datafilename,
                 dim, num_nodes);
         }
 
         void init(std::string datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
-            stubs::partition::init(this->gid_, datafilename, dim, num_nodes);
+            stubs::partition::init(this->get_gid(), datafilename, dim, num_nodes);
         }
 
         // ask this partition to interpolate, note that value must be in the
@@ -61,12 +61,12 @@ namespace interpolate1d
         hpx::lcos::future<double>
         interpolate_async(double value)
         {
-            return stubs::partition::interpolate_async(this->gid_, value);
+            return stubs::partition::interpolate_async(this->get_gid(), value);
         }
 
         double interpolate(double value)
         {
-            return stubs::partition::interpolate(this->gid_, value);
+            return stubs::partition::interpolate(this->get_gid(), value);
         }
     };
 }

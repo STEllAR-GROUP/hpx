@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/configuration.hpp"
 
@@ -48,26 +48,26 @@ namespace sheneos
         init_async(std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
-            return stubs::configuration::init_async(this->gid_, datafile,
+            return stubs::configuration::init_async(this->get_gid(), datafile,
                 symbolic_name, num_instances);
         }
 
         void init(std::string const& datafile, std::string const& symbolic_name,
             std::size_t num_instances)
         {
-            stubs::configuration::init(this->gid_, datafile, symbolic_name,
+            stubs::configuration::init(this->get_gid(), datafile, symbolic_name,
                 num_instances);
         }
 
         ///////////////////////////////////////////////////////////////////////
         hpx::lcos::future<config_data> get_async() const
         {
-            return stubs::configuration::get_async(this->gid_);
+            return stubs::configuration::get_async(this->get_gid());
         }
 
         config_data get() const
         {
-            return stubs::configuration::get(this->gid_);
+            return stubs::configuration::get(this->get_gid());
         }
     };
 }

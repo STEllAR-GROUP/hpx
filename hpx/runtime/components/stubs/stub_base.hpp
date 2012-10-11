@@ -9,6 +9,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/util/move.hpp>
+
+#include <boost/preprocessor/enum_params.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -31,34 +34,38 @@ namespace hpx { namespace components
         static lcos::future<naming::id_type, naming::gid_type>
         create_async(naming::id_type const& gid)
         {
-            return stubs::runtime_support::create_component_async<ServerComponent>
+            using stubs::runtime_support;
+            return runtime_support::create_component_async<ServerComponent>
                 (gid);
         }
 
         static naming::id_type create(naming::id_type const& gid)
         {
-            return stubs::runtime_support::create_component<ServerComponent>(gid);
+            using stubs::runtime_support;
+            return runtime_support::create_component<ServerComponent>(gid);
         }
 
         ///////////////////////////////////////////////////////////////////////
-#define HPX_STUB_BASE_CREATE(Z, N, D)                                        \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                       \
-        static lcos::future<naming::id_type, naming::gid_type>               \
-        create_async(naming::id_type const& gid,                             \
-            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                            \
-        {                                                                    \
-            return stubs::runtime_support::create_component_async<ServerComponent>\
-                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                \
-        }                                                                    \
-                                                                             \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                       \
-        static naming::id_type create(                                       \
-            naming::id_type const& gid,                                      \
-                BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                        \
-        {                                                                    \
-            return stubs::runtime_support::create_component<ServerComponent> \
-                (gid, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));                \
-        }                                                                    \
+#define HPX_STUB_BASE_CREATE(Z, N, D)                                         \
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
+        static lcos::future<naming::id_type, naming::gid_type>                \
+        create_async(naming::id_type const& gid,                              \
+            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
+        {                                                                     \
+            using stubs::runtime_support;                                     \
+            return runtime_support::create_component_async<ServerComponent>   \
+                (gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));                   \
+        }                                                                     \
+                                                                              \
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
+        static naming::id_type create(                                        \
+            naming::id_type const& gid,                                       \
+                HPX_ENUM_FWD_ARGS(N, Arg, arg))                               \
+        {                                                                     \
+            using stubs::runtime_support;                                     \
+            return runtime_support::create_component<ServerComponent>         \
+                (gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));                   \
+        }                                                                     \
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(

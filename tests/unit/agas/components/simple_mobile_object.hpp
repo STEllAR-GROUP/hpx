@@ -9,7 +9,7 @@
 #define HPX_1872ED70_555A_4F63_A8CE_113CFE76215C
 
 #include <hpx/async.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include <tests/unit/agas/components/server/simple_mobile_object.hpp>
 
@@ -44,7 +44,7 @@ struct simple_mobile_object
     boost::uint64_t get_lva()
     {
         typedef server_type::get_lva_action action_type;
-        return hpx::async<action_type>(this->gid_).get();
+        return hpx::async<action_type>(this->get_gid()).get();
     }
 };
 

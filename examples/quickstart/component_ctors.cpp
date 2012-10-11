@@ -44,7 +44,7 @@ HPX_REGISTER_ACTION(print_action);
 
 struct message : client_base<message, stub_base<message_server> >
 {
-    void print() { async<print_action>(this->gid_).get(); } 
+    void print() { async<print_action>(this->get_gid()).get(); } 
 };
 
 ///////////////////////////////////////////////////////////////////////////////

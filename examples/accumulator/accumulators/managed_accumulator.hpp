@@ -7,7 +7,7 @@
 #if !defined(HPX_F976C441_3AEF_4CC3_A47C_A51042E0F12C)
 #define HPX_F976C441_3AEF_4CC3_A47C_A51042E0F12C
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/components.hpp>
 
 #include "stubs/managed_accumulator.hpp"
 
@@ -49,8 +49,8 @@ namespace examples
         //[managed_accumulator_client_reset_non_blocking
         void reset_non_blocking()
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::reset_non_blocking(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::reset_non_blocking(this->get_gid());
         }
         //]
 
@@ -59,8 +59,8 @@ namespace examples
         /// \note This function is fully synchronous.
         void reset_sync()
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::reset_sync(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::reset_sync(this->get_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -71,8 +71,8 @@ namespace examples
         ///       immediately after the action has has been dispatched.
         void add_non_blocking(boost::uint64_t arg)
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::add_non_blocking(this->gid_, arg);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::add_non_blocking(this->get_gid(), arg);
         }
 
         /// Add \p arg to the accumulator's value.
@@ -81,8 +81,8 @@ namespace examples
         //[managed_accumulator_client_add_sync
         void add_sync(boost::uint64_t arg)
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::add_sync(this->gid_, arg);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::add_sync(this->get_gid(), arg);
         }
         //]
 
@@ -97,8 +97,8 @@ namespace examples
         //[managed_accumulator_client_query_async
         hpx::lcos::future<boost::uint64_t> query_async()
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::query_async(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::query_async(this->get_gid());
         }
         //]
 
@@ -107,10 +107,9 @@ namespace examples
         /// \note This function is fully synchronous.
         boost::uint64_t query_sync()
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::query_sync(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::query_sync(this->get_gid());
         }
-
     };
 }
 

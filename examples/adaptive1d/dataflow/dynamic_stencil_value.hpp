@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_DATAFLOW_STENCIL_VALUE_NOV_02_2011_0506PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/include/async.hpp>
 
 #include "stubs/dynamic_stencil_value.hpp"
@@ -44,12 +44,12 @@ namespace hpx { namespace components { namespace adaptive1d
         lcos::future<naming::id_type, naming::id_type> call_async(
             naming::id_type const& initial)
         {
-            return this->base_type::call_async(this->gid_, initial);
+            return this->base_type::call_async(this->get_gid(), initial);
         }
 
         naming::id_type call(naming::id_type const& initial)
         {
-            return this->base_type::call(this->gid_, initial);
+            return this->base_type::call(this->get_gid(), initial);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -58,13 +58,13 @@ namespace hpx { namespace components { namespace adaptive1d
         lcos::future<std::vector<naming::id_type> >
         get_output_ports_async()
         {
-            return this->base_type::get_output_ports_async(this->gid_);
+            return this->base_type::get_output_ports_async(this->get_gid());
         }
 
         std::vector<naming::id_type>
         get_output_ports()
         {
-            return this->base_type::get_output_ports(this->gid_);
+            return this->base_type::get_output_ports(this->get_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace adaptive1d
         /// instance.
         void connect_input_ports(std::vector<naming::id_type> const& gids)
         {
-            this->base_type::connect_input_ports(this->gid_, gids);
+            this->base_type::connect_input_ports(this->get_gid(), gids);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace adaptive1d
             int row, int column, int instencilsize, int outstencilsize,
             double cycle_time,parameter const& par)
         {
-            this->base_type::set_functional_component(this->gid_, functiongid,
+            this->base_type::set_functional_component(this->get_gid(), functiongid,
                 row, column, instencilsize, outstencilsize, cycle_time,par);
         }
 
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace adaptive1d
         /// Subset of set_functional_component functionality
         void start()
         {
-            this->base_type::start(this->gid_);
+            this->base_type::start(this->get_gid());
         }
     };
 

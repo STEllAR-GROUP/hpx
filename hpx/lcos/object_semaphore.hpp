@@ -8,7 +8,7 @@
 #define HPX_1FB4A979_B6B6_4845_BD95_3CEC605011A2
 
 #include <hpx/exception.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/lcos/stubs/object_semaphore.hpp>
 
 namespace hpx { namespace lcos
@@ -35,16 +35,16 @@ struct object_semaphore
         ValueType const& val
       , boost::uint64_t count = 1)
     {
-        BOOST_ASSERT(this->gid_);
-        return this->base_type::signal_async(this->gid_, val, count);
+        BOOST_ASSERT(this->get_gid());
+        return this->base_type::signal_async(this->get_gid(), val, count);
     }
 
     void signal_sync(
         ValueType const& val
       , boost::uint64_t count = 1)
     {
-        BOOST_ASSERT(this->gid_);
-        return this->base_type::signal_sync(this->gid_, val, count);
+        BOOST_ASSERT(this->get_gid());
+        return this->base_type::signal_sync(this->get_gid(), val, count);
     }
 
     void signal(
@@ -57,14 +57,14 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     lcos::future<ValueType> get_async()
     {
-        BOOST_ASSERT(this->gid_);
-        return this->base_type::get_async(this->gid_);
+        BOOST_ASSERT(this->get_gid());
+        return this->base_type::get_async(this->get_gid());
     }
 
     ValueType get_sync()
     {
-        BOOST_ASSERT(this->gid_);
-        return this->base_type::get_sync(this->gid_);
+        BOOST_ASSERT(this->get_gid());
+        return this->base_type::get_sync(this->get_gid());
     }
 
     ValueType get()
@@ -73,14 +73,14 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     void abort_pending_async(error ec = no_success)
     {
-        BOOST_ASSERT(this->gid_);
-        this->base_type::abort_pending_sync(this->gid_, ec);
+        BOOST_ASSERT(this->get_gid());
+        this->base_type::abort_pending_sync(this->get_gid(), ec);
     }
 
     void abort_pending_sync(error ec = no_success)
     {
-        BOOST_ASSERT(this->gid_);
-        this->base_type::abort_pending_sync(this->gid_, ec);
+        BOOST_ASSERT(this->get_gid());
+        this->base_type::abort_pending_sync(this->get_gid(), ec);
     }
 
     void abort_pending(error ec = no_success)
@@ -89,14 +89,14 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     void wait_async()
     {
-        BOOST_ASSERT(this->gid_);
-        this->base_type::wait_sync(this->gid_);
+        BOOST_ASSERT(this->get_gid());
+        this->base_type::wait_sync(this->get_gid());
     }
 
     void wait_sync()
     {
-        BOOST_ASSERT(this->gid_);
-        this->base_type::wait_sync(this->gid_);
+        BOOST_ASSERT(this->get_gid());
+        this->base_type::wait_sync(this->get_gid());
     }
 
     void wait()
