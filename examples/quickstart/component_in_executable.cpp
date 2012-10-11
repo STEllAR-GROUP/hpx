@@ -37,7 +37,7 @@ HPX_REGISTER_ACTION(print_action);
 
 struct hello_world : client_base<hello_world, stub_base<hello_world_server> >
 {
-    void print() { async<print_action>(this->gid_).get(); } 
+    void print() { async<print_action>(this->get_gid()).get(); } 
 };
 
 ///////////////////////////////////////////////////////////////////////////////

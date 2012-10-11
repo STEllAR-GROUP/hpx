@@ -39,6 +39,7 @@ endforeach()
 set(action_argument_limit_preprocessing_files
   "hpx/apply.hpp"
   "hpx/async.hpp"
+  "hpx/new.hpp"
   "hpx/lcos/async_fwd.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"

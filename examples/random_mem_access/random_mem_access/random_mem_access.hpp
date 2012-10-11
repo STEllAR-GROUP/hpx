@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_RANDOM_ACCESS_JUN_06_2011_1123AM
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/random_mem_access.hpp"
 

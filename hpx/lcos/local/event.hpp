@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local
 {
     /// Event semaphores can be used for synchronizing multiple threads that
     /// need to wait for an event to occur. When the event occurs, all threads
-    /// waiting for the event are woken up. 
+    /// waiting for the event are woken up.
     namespace detail
     {
         template <typename Mutex = lcos::local::spinlock>
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
-            /// \brief Check if the event has occurred. 
+            /// \brief Check if the event has occurred.
             bool occurred()
             {
                 // REVIEW: Is this memory order correct? See the example in
@@ -160,12 +160,12 @@ namespace hpx { namespace lcos { namespace local
                 while (!event_.load(boost::memory_order_acquire))
                 {
                     threads::thread_self& self = threads::get_self();
-    
+
                     queue_entry e(self.get_thread_id());
                     queue_.push_back(e);
-    
+
                     reset_queue_entry r(e, queue_);
-    
+
                     {
                         util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                         this_thread::suspend(threads::suspended,

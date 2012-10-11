@@ -6,7 +6,7 @@
 #if !defined(HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805)
 #define HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/point.hpp"
 

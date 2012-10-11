@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/async.hpp>
 #include <hpx/lcos/server/queue.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 

@@ -8,7 +8,7 @@
 #if !defined(HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6)
 #define HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
 
 namespace hpx { namespace agas
@@ -45,7 +45,7 @@ struct component_namespace :
       , error_code& ec = throws
         )
     {
-        return this->base_type::service(this->gid_, req, priority, ec);
+        return this->base_type::service(this->get_gid(), req, priority, ec);
     }
 
     void service_non_blocking(
@@ -53,7 +53,7 @@ struct component_namespace :
       , threads::thread_priority priority = threads::thread_priority_default
         )
     {
-        this->base_type::service_non_blocking(this->gid_, req, priority);
+        this->base_type::service_non_blocking(this->get_gid(), req, priority);
     }
 
     std::vector<response> bulk_service(
@@ -62,7 +62,7 @@ struct component_namespace :
       , error_code& ec = throws
         )
     {
-        return this->base_type::bulk_service(this->gid_, reqs, priority, ec);
+        return this->base_type::bulk_service(this->get_gid(), reqs, priority, ec);
     }
 
     void bulk_service_non_blocking(
@@ -70,7 +70,7 @@ struct component_namespace :
       , threads::thread_priority priority = threads::thread_priority_default
         )
     {
-        this->base_type::bulk_service_non_blocking(this->gid_, reqs, priority);
+        this->base_type::bulk_service_non_blocking(this->get_gid(), reqs, priority);
     }
 };
 

@@ -6,8 +6,9 @@
 
 #include <sstream>
 
-#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include "throttle/throttle.hpp"
 

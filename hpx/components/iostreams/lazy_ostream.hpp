@@ -16,7 +16,7 @@
 #include <boost/iostreams/stream.hpp>
 
 #include <hpx/state.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
 #include <hpx/util/iterator_sink.hpp>
@@ -83,7 +83,7 @@ struct lazy_ostream
 
             // Perform the write operation, then destroy the old buffer and
             // stream.
-            this->base_type::write_async(gid_, next->out_buffer);
+            this->base_type::write_async(get_gid(), next->out_buffer);
 
             delete next;
             next = 0;
@@ -113,7 +113,7 @@ struct lazy_ostream
 
             // Perform the write operation, then destroy the old buffer and
             // stream.
-            this->base_type::write_sync(gid_, next->out_buffer);
+            this->base_type::write_sync(get_gid(), next->out_buffer);
 
             delete next;
             next = 0;

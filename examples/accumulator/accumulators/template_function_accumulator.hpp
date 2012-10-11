@@ -45,8 +45,8 @@ namespace examples
         ///       immediately after the action has has been dispatched.
         void reset_non_blocking()
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::reset_non_blocking(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::reset_non_blocking(this->get_gid());
         }
 
         /// Reset the accumulator's value to 0.
@@ -54,8 +54,8 @@ namespace examples
         /// \note This function is fully synchronous.
         void reset_sync()
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::reset_sync(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::reset_sync(this->get_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -67,8 +67,8 @@ namespace examples
         template <typename T>
         void add_non_blocking(T arg)
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::add_non_blocking(this->gid_, arg);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::add_non_blocking(this->get_gid(), arg);
         }
 
         /// Add \p arg to the accumulator's value.
@@ -77,8 +77,8 @@ namespace examples
         template <typename T>
         void add_sync(T arg)
         {
-            BOOST_ASSERT(this->gid_);
-            this->base_type::add_sync(this->gid_, arg);
+            BOOST_ASSERT(this->get_gid());
+            this->base_type::add_sync(this->get_gid(), arg);
         }
         //]
 
@@ -92,8 +92,8 @@ namespace examples
         ///          until the value is ready.
         hpx::lcos::future<double> query_async()
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::query_async(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::query_async(this->get_gid());
         }
 
         /// Query the current value of the accumulator.
@@ -101,8 +101,8 @@ namespace examples
         /// \note This function is fully synchronous.
         double query_sync()
         {
-            BOOST_ASSERT(this->gid_);
-            return this->base_type::query_sync(this->gid_);
+            BOOST_ASSERT(this->get_gid());
+            return this->base_type::query_sync(this->get_gid());
         }
     };
 }

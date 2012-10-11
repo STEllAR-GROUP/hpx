@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_CLIENT_POINT
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/register/point.hpp>

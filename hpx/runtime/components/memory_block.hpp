@@ -12,7 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -107,14 +107,14 @@ namespace hpx { namespace components
         /// Get the \a memory_block_data maintained by this memory_block
         memory_block_data get()
         {
-            return this->base_type::get(gid_);
+            return this->base_type::get(get_gid());
         }
 
         /// Asynchronously get the \a memory_block_data maintained by this
         /// memory_block
         lcos::future<memory_block_data> get_async()
         {
-            return this->base_type::get_async(gid_);
+            return this->base_type::get_async(get_gid());
         }
 
         /// Get the \a memory_block_data maintained by this memory_block, use
@@ -123,7 +123,7 @@ namespace hpx { namespace components
         /// return value of this get())
         memory_block_data get(memory_block_data const& config)
         {
-            return this->base_type::get(gid_, config);
+            return this->base_type::get(get_gid(), config);
         }
 
         /// Asynchronously get the \a memory_block_data maintained by this
@@ -133,21 +133,21 @@ namespace hpx { namespace components
         lcos::future<memory_block_data> get_async(
             memory_block_data const& config)
         {
-            return this->base_type::get_async(gid_, config);
+            return this->base_type::get_async(get_gid(), config);
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Clone the \a memory_block_data maintained by this memory_block
         naming::id_type clone()
         {
-            return this->base_type::clone(gid_);
+            return this->base_type::clone(get_gid());
         }
 
         /// Asynchronously clone the \a memory_block_data maintained by this
         /// memory_block
         lcos::future<naming::id_type, naming::gid_type> clone_async()
         {
-            return this->base_type::clone_async(gid_);
+            return this->base_type::clone_async(get_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ namespace hpx { namespace components
         template <typename T>
         void checkin(components::access_memory_block<T> const& data)
         {
-            this->base_type::checkin(gid_, data);
+            this->base_type::checkin(get_gid(), data);
         }
 
         /// Asynchronously clone the \a memory_block_data maintained by this
@@ -164,7 +164,7 @@ namespace hpx { namespace components
         lcos::future<void> checkin_async(
             components::access_memory_block<T> const& data)
         {
-            return this->base_type::checkin_async(gid_, data);
+            return this->base_type::checkin_async(get_gid(), data);
         }
     };
 

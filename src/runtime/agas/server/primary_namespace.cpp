@@ -9,6 +9,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 

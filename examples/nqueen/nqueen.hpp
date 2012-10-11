@@ -8,7 +8,7 @@
 #define HPX_527D225B_F1EC_4BC5_9245_3A69C6AE5304
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include <examples/nqueen/stubs/nqueen.hpp>
 

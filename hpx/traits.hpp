@@ -64,6 +64,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct is_future;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Enable = void>
+    struct is_component;
 }}
 
 #endif

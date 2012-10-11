@@ -6,7 +6,7 @@
 #if !defined(HPX_EXAMPLE_BFS_CONCURRENT_BGL_GRAPH_JAN_02_2012_0529PM)
 #define HPX_EXAMPLE_BFS_CONCURRENT_BGL_GRAPH_JAN_02_2012_0529PM
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <boost/assert.hpp>
 
 #include "stubs/concurrent_bgl_graph.hpp"

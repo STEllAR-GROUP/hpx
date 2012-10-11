@@ -11,7 +11,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/unigrid_mesh.hpp"
 
@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace amr
             components::component_type logging_type,
             parameter const& par)
         {
-            return this->base_type::init_execute_async(this->gid_,
+            return this->base_type::init_execute_async(this->get_gid(),
                 interp_src_data,time,function_type,
                 numvalues, numsteps, logging_type,par);
         }
@@ -62,7 +62,7 @@ namespace hpx { namespace components { namespace amr
             components::component_type logging_type,
             parameter const& par)
         {
-            return this->base_type::init_execute(this->gid_,
+            return this->base_type::init_execute(this->get_gid(),
                 interp_src_data,time, function_type,
                 numvalues, numsteps,logging_type,par);
         }
@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace amr
             std::size_t numvalues, std::size_t numsteps,
             components::component_type logging_type, parameter const& par)
         {
-            return this->base_type::execute_async(this->gid_, initial_data,
+            return this->base_type::execute_async(this->get_gid(), initial_data,
                 function_type, numvalues, numsteps, logging_type,par);
         }
 
@@ -85,7 +85,7 @@ namespace hpx { namespace components { namespace amr
             std::size_t numvalues, std::size_t numsteps,
             components::component_type logging_type, parameter const& par)
         {
-            return this->base_type::execute(this->gid_, initial_data,
+            return this->base_type::execute(this->get_gid(), initial_data,
                 function_type, numvalues, numsteps, logging_type,par);
         }
     };

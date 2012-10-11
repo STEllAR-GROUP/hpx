@@ -94,7 +94,7 @@ namespace hpx { namespace components { namespace adaptive1d
         ///////////////////////////////////////////////////////////////////////
         void logentry(stencil_data const& val, int row,int column, parameter const& par)
         {
-            this->base_type::logentry(this->gid_, val, row, column, par);
+            this->base_type::logentry(this->get_gid(), val, row, column, par);
         }
     };
 

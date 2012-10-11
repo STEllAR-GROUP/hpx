@@ -49,7 +49,7 @@ struct hello_world
 
     void invoke()
     {
-        this->base_type::invoke(this->gid_);
+        this->base_type::invoke(this->get_gid());
     }
 };
 

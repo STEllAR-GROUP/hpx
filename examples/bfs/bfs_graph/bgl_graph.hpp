@@ -6,7 +6,7 @@
 #if !defined(HPX_EXAMPLE_BFS_BGL_GRAPH_JAN_01_2012_0519PM)
 #define HPX_EXAMPLE_BFS_BGL_GRAPH_JAN_01_2012_0519PM
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <boost/assert.hpp>
 
 #include "stubs/bgl_graph.hpp"

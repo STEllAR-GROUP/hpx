@@ -36,7 +36,7 @@ namespace jacobi
 
         void run(std::size_t max_iterations)
         {
-            hpx::async<server::solver::run_action>(this->gid_, max_iterations).get();
+            hpx::async<server::solver::run_action>(this->get_gid(), max_iterations).get();
         }
 
     };

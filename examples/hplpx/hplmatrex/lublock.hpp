@@ -10,7 +10,7 @@
 /*This is the lublock interface header file.*/
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/lublock.hpp"
 
