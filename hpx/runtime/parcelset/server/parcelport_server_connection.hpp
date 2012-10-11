@@ -86,7 +86,7 @@ namespace hpx { namespace parcelset { namespace server
 #if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack;
-            socket_.set_option(boost::asio::ip::tcp::quickack(true));
+            socket_.set_option(quickack(true));
 #endif
 
             boost::asio::async_read(socket_, buffers,
@@ -122,7 +122,7 @@ namespace hpx { namespace parcelset { namespace server
 #if defined(__linux) || defined(linux) || defined(__linux__)
                 boost::asio::detail::socket_option::boolean<
                     IPPROTO_TCP, TCP_QUICKACK> quickack;
-                socket_.set_option(boost::asio::ip::tcp::quickack(true));
+                socket_.set_option(quickack(true));
 #endif
 
                 boost::asio::async_read(socket_,
