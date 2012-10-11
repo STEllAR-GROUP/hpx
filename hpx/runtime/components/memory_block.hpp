@@ -381,7 +381,7 @@ namespace hpx { namespace components
 namespace hpx { namespace components
 {
     template <typename T>
-    inline boost::tuple<BOOST_PP_REPEAT(N, HPX_ACCESS_ARGUMENT, _)>
+    inline HPX_STD_TUPLE<BOOST_PP_REPEAT(N, HPX_ACCESS_ARGUMENT, _)>
     get_memory_block_async(BOOST_PP_REPEAT(N, HPX_GET_ASYNC_ARGUMENT, _))
     {
         return lcos::wait(BOOST_PP_REPEAT(N, HPX_WAIT_ARGUMENT, _));

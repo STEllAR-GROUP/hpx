@@ -214,14 +214,14 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, multiple futures, non-void return.
         {
-            boost::tuple<bool, bool, bool> r 
+            HPX_STD_TUPLE<bool, bool, bool> r 
                 = wait(async<null_result_action>(here_)
                      , async<null_result_action>(here_)
                      , async<null_result_action>(here_));
 
-            HPX_TEST_EQ(true, boost::get<0>(r));
-            HPX_TEST_EQ(true, boost::get<1>(r));
-            HPX_TEST_EQ(true, boost::get<2>(r));
+            HPX_TEST_EQ(true, HPX_STD_GET(0, r));
+            HPX_TEST_EQ(true, HPX_STD_GET(1, r));
+            HPX_TEST_EQ(true, HPX_STD_GET(2, r));
             HPX_TEST_EQ(3U, result_counter.load());
 
             result_counter.store(0);
