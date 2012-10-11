@@ -10,6 +10,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/lcos/future.hpp>
+
 #include <vector>
 
 #include <boost/foreach.hpp>
