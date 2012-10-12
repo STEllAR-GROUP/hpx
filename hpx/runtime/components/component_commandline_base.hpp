@@ -6,13 +6,13 @@
 #if !defined(HPX_COMPONENT_COMMANDLINE_BASE_JAN_09_2012_1132AM)
 #define HPX_COMPONENT_COMMANDLINE_BASE_JAN_09_2012_1132AM
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
+
 #include <boost/plugin.hpp>
 #include <boost/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/program_options/options_description.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

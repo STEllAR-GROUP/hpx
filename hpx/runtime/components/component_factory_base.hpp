@@ -6,15 +6,14 @@
 #if !defined(HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM)
 #define HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
+
 #include <boost/plugin.hpp>
 #include <boost/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
