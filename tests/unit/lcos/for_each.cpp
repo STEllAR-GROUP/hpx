@@ -54,7 +54,7 @@ int hpx_main(variables_map & vm)
 
         std::cout << t.elapsed() << "\n";
 
-        int ref = 0;
+        std::size_t ref = 0;
         BOOST_FOREACH(std::size_t i, v)
         {
             HPX_TEST_EQ(i, ref++);
