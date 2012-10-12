@@ -6,12 +6,12 @@
 #if !defined(HPX_COMPONENT_STARTUP_SHUTDOWN_BASE_SEP_20_2011_0809PM)
 #define HPX_COMPONENT_STARTUP_SHUTDOWN_BASE_SEP_20_2011_0809PM
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
+
 #include <boost/plugin.hpp>
 #include <boost/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

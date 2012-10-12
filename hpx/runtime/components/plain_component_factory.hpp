@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
