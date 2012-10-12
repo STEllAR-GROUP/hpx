@@ -402,7 +402,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            agas_logger()->writer().add_destination("android_log", android_log("hpx.agas"));
+            agas_logger()->writer().add_destination("android_log", 
+                android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -456,7 +457,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            timing_logger()->writer().add_destination("android_log", android_log("hpx.timing"));
+            timing_logger()->writer().add_destination("android_log", 
+                android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -511,7 +513,8 @@ namespace hpx { namespace util
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "android_log" : "console";
         hpx_logger()->writer().add_destination("android_log", android_log("hpx"));
-        hpx_error_logger()->writer().add_destination("android_log", android_log("hpx"));
+        hpx_error_logger()->writer().add_destination("android_log", 
+            android_log("hpx"));
 #else
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
@@ -537,7 +540,10 @@ namespace hpx { namespace util
             // errors are logged to the given destination and to cerr
             hpx_error_logger()->writer().add_destination("console",
                 console(lvl, destination_hpx));
-            hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+#if !defined(ANDROID) && !defined(__ANDROID__)
+            if (logdest != "cerr")
+                hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+#endif
             hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
@@ -608,7 +614,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            app_logger()->writer().add_destination("android_log", android_log("hpx.application"));
+            app_logger()->writer().add_destination("android_log", 
+                android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -661,7 +668,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            agas_console_logger()->writer().add_destination("android_log", android_log("hpx.agas"));
+            agas_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -704,7 +712,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            timing_console_logger()->writer().add_destination("android_log", android_log("hpx.timing"));
+            timing_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -745,7 +754,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            hpx_console_logger()->writer().add_destination("android_log", android_log("hpx"));
+            hpx_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -789,7 +799,8 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            app_console_logger()->writer().add_destination("android_log", android_log("hpx.application"));
+            app_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
