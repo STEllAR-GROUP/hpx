@@ -548,18 +548,18 @@ namespace hpx { namespace util
         return s;
     }
 
-    void add_as_option(std::string& command_line, std::string const& k, 
+    void add_as_option(std::string& command_line, std::string const& k,
         std::string const& v)
     {
         command_line += "--" + k;
-        if (!v.empty()) 
+        if (!v.empty())
             command_line += "=" + v;
     }
 
-    std::string 
+    std::string
     reconstruct_command_line(boost::program_options::variables_map const &vm)
     {
-        typedef std::pair<std::string, boost::program_options::variable_value> 
+        typedef std::pair<std::string, boost::program_options::variable_value>
             value_type;
 
         std::string command_line;
@@ -567,27 +567,33 @@ namespace hpx { namespace util
         {
             boost::any const& value = v.second.value();
             if (boost::any_cast<std::string>(&value)) {
-                add_as_option(command_line, v.first, 
+                add_as_option(command_line, v.first,
                     embed_in_quotes(v.second.as<std::string>()));
-            } 
+                if (!command_line.empty())
+                    command_line += " ";
+            }
             else if (boost::any_cast<double>(&value)) {
-                add_as_option(command_line, v.first, 
+                add_as_option(command_line, v.first,
                     boost::lexical_cast<std::string>(v.second.as<double>()));
+                if (!command_line.empty())
+                    command_line += " ";
             }
             else if (boost::any_cast<int>(&value)) {
-                add_as_option(command_line, v.first, 
+                add_as_option(command_line, v.first,
                     boost::lexical_cast<std::string>(v.second.as<int>()));
+                if (!command_line.empty())
+                    command_line += " ";
             }
             else if (boost::any_cast<std::vector<std::string> >(&value)) {
-                std::vector<std::string> const& vec = 
+                std::vector<std::string> const& vec =
                     v.second.as<std::vector<std::string> >();
                 BOOST_FOREACH(std::string const& e, vec)
                 {
                     add_as_option(command_line, v.first, embed_in_quotes(e));
+                    if (!command_line.empty())
+                        command_line += " ";
                 }
             }
-            if (!command_line.empty())
-                command_line += " ";
         }
         return command_line;
     }
