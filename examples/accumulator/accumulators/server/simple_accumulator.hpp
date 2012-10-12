@@ -28,14 +28,14 @@ namespace examples { namespace server
     ///
     /// Components are first-class objects in HPX. This means that they are
     /// globally addressable; all components have a unique GID.
-    /// 
+    ///
     /// This example demonstrates how to write a simple component. Simple
     /// components are allocated one at a time with the C++'s new allocator.
     /// When a component needs to be created in small quantities, simple
     /// components should be used. At least two AGAS requests will be made when
-    /// a simple component is created. 
+    /// a simple component is created.
     ///
-    /// This component exposes 3 different actions: reset, add and query.  
+    /// This component exposes 3 different actions: reset, add and query.
     class simple_accumulator
       : public hpx::components::simple_component_base<simple_accumulator>
     {
@@ -60,9 +60,9 @@ namespace examples { namespace server
         }
 
         /// Return the current value to the caller.
-        boost::uint64_t query()
+        boost::uint64_t query() const
         {
-            // Get the value of value_. 
+            // Get the value of value_.
             return value_.load();
         }
 
