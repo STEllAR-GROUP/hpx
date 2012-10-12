@@ -78,8 +78,8 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        HPX_DEFINE_COMPONENT_ACTION(template_function_accumulator, reset, reset_action);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(template_function_accumulator, query, query_action);
+        HPX_DEFINE_COMPONENT_ACTION(template_function_accumulator, reset);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(template_function_accumulator, query);
 
         // Actions with template arguments (see add<>() above) require special
         // type definitions. The simplest way to define such an action type is

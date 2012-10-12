@@ -71,44 +71,9 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes. 
-        enum actions
-        {
-            accumulator_reset = 0,
-            accumulator_add   = 1,
-            accumulator_query = 2
-        };
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            simple_accumulator,
-            // Action code.
-            accumulator_reset,
-            // Method bound to this action.
-            &simple_accumulator::reset
-        > reset_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            simple_accumulator,
-            // Action code.
-            accumulator_add,
-            // Arguments of this action.
-            boost::uint64_t,
-            // Method bound to this action.
-            &simple_accumulator::add
-        > add_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            simple_accumulator,
-            // Return type.
-            boost::uint64_t,
-            // Action code.
-            accumulator_query,
-            // Method bound to this action.
-            &simple_accumulator::query
-        > query_action;
+        HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, reset);
+        HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, add);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(simple_accumulator, query);
 
     private:
         boost::atomic<boost::uint64_t> value_;
