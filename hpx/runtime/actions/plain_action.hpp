@@ -477,9 +477,9 @@ namespace hpx { namespace traits
 /// \note The macro \a HPX_PLAIN_ACTION can be used with 1, 2, or 3 arguments.
 /// The second and third arguments are optional. The default value for the 
 /// second argument (the typename of the defined action) is derived from the 
-/// name of the function (as passed as the first argument) by appending '_type'.
+/// name of the function (as passed as the first argument) by appending '_action'.
 /// The second argument can be omitted only if the first argument with an 
-/// appended suffix '_type' resolves to a valid, unqualified C++ type name.
+/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
 /// The default value for the third argument is \a hpx::components::factory_check.
 ///
 #define HPX_PLAIN_ACTION(...)                                                 \
@@ -497,8 +497,8 @@ namespace hpx { namespace traits
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_PLAIN_ACTION_1(func)                                              \
-    HPX_DEFINE_PLAIN_ACTION(func, BOOST_PP_CAT(func, _type));                 \
-    HPX_REGISTER_PLAIN_ACTION_1(BOOST_PP_CAT(func, _type))                    \
+    HPX_DEFINE_PLAIN_ACTION(func, BOOST_PP_CAT(func, _action));               \
+    HPX_REGISTER_PLAIN_ACTION_1(BOOST_PP_CAT(func, _action))                  \
 /**/
 #define HPX_PLAIN_ACTION_2(func, name)                                        \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                      \

@@ -459,9 +459,9 @@ namespace hpx { namespace actions
 /// \note The macro \a HPX_DEFINE_COMPONENT_ACTION can be used with 1 or 
 /// 2 arguments. The second argument is optional. The default value for the 
 /// second argument (the typename of the defined action) is derived from the 
-/// name of the function (as passed as the first argument) by appending '_type'.
+/// name of the function (as passed as the first argument) by appending '_action'.
 /// The second argument can be omitted only if the first argument with an 
-/// appended suffix '_type' resolves to a valid, unqualified C++ type name.
+/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
 #define HPX_DEFINE_COMPONENT_ACTION(...)                                      \
     HPX_DEFINE_COMPONENT_ACTION_(__VA_ARGS__)                                 \
 /**/
@@ -473,7 +473,7 @@ namespace hpx { namespace actions
 
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                        \
     typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type                  \
-        BOOST_PP_CAT(func, _type)                                             \
+        BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_ACTION_3(component, func, action_type)           \
     typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type action_type      \
@@ -519,9 +519,9 @@ namespace hpx { namespace actions
 /// \note The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used with 1 or 
 /// 2 arguments. The second argument is optional. The default value for the 
 /// second argument (the typename of the defined action) is derived from the 
-/// name of the function (as passed as the first argument) by appending '_type'.
+/// name of the function (as passed as the first argument) by appending '_action'.
 /// The second argument can be omitted only if the first argument with an 
-/// appended suffix '_type' resolves to a valid, unqualified C++ type name.
+/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
 #define HPX_DEFINE_COMPONENT_CONST_ACTION(...)                                \
     HPX_DEFINE_COMPONENT_CONST_ACTION_(__VA_ARGS__)                           \
 /**/
@@ -533,7 +533,7 @@ namespace hpx { namespace actions
 
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_2(component, func)                  \
     typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type            \
-        BOOST_PP_CAT(func, _type)                                             \
+        BOOST_PP_CAT(func, _action)                                           \
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_3(component, func, action_type)     \
     typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type action_type\
