@@ -211,7 +211,7 @@ namespace hpx { namespace components
 #define HPX_REGISTER_PLAIN_ACTION_3(action_type, plain_action_name, state)    \
     BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<action_type>,       \
         BOOST_PP_STRINGIZE(plain_action_name))                                \
-    HPX_REGISTER_ACTION_2(plain_action, plain_action_name)                    \
+    HPX_REGISTER_ACTION_2(action_type, plain_action_name)                     \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<action_type>,                \
         plain_action_name)                                                    \
