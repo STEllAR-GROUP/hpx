@@ -47,22 +47,11 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of a memory_block component on the locality as
         /// given by the parameter \a targetgid
-//         template <typename T>
-//         memory_block& create(naming::id_type const& targetgid, std::size_t count,
-//             hpx::actions::manage_object_action<T> const& act)
-//         {
-//             this->base_type::free();
-//             gid_ = stub_type::create(targetgid, count, act);
-//             return *this;
-//         }
-
         template <typename T, typename Config>
         memory_block& create(naming::id_type const& targetgid, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
-            this->base_type::free();
-            gid_ = stub_type::create(targetgid, count, act);
-            return *this;
+            return base_type::create(targetgid, count, act);
         }
 
         /// Create a new instance of a memory_block component on the locality as
