@@ -68,8 +68,8 @@ void hpx_test_main(
             monitor1.take_reference(monitor0.get_gid());
 
             // Detach the references.
-            monitor0.detach();
-            monitor1.detach();
+            id_type id1 = monitor0.detach().get();
+            id_type id2 = monitor1.detach().get();
 
             // Both components should still be alive.
             HPX_TEST_EQ(false, monitor0.ready(milliseconds(delay)));
