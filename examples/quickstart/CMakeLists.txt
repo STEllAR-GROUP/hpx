@@ -18,6 +18,7 @@ set(example_programs
     #fractals_oclm
     interest_calculator
     non_atomic_rma
+    pingpong
     quicksort
     simplest_hello_world
     timed_wake
