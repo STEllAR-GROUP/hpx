@@ -59,8 +59,7 @@ namespace hpx { namespace geometry
                                             std::size_t numpoints,
                                             std::size_t objectid)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
+            return this->base_type::init_async(get_gid(), xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
         void init(double xmin, double xmax,
@@ -68,131 +67,110 @@ namespace hpx { namespace geometry
                   double velx, double vely,
                   std::size_t numpoints,std::size_t objectid)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
+            this->base_type::init_async(get_gid(),xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
         /// Initialize the server#point instance with the given \a gid
         lcos::future<int> search_async(std::vector<hpx::naming::id_type> const& search_objects)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::search_async(gid_, search_objects);
+            return this->base_type::search_async(get_gid(), search_objects);
         }
 
         lcos::future<void> recompute_async(std::vector<hpx::naming::id_type> const& search_objects)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::recompute_async(gid_, search_objects);
+            return this->base_type::recompute_async(get_gid(), search_objects);
         }
 
         int search(std::vector<hpx::naming::id_type> const& search_objects)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::search(gid_, search_objects);
+            return this->base_type::search(get_gid(), search_objects);
         }
 
         void recompute(std::vector<hpx::naming::id_type> const& search_objects)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::recompute(gid_, search_objects);
+            this->base_type::recompute(get_gid(), search_objects);
         }
 
         lcos::future<polygon_type> get_poly_async() const
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_poly_async(gid_);
+            return this->base_type::get_poly_async(get_gid());
         }
 
         polygon_type get_poly() const
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_poly(gid_);
+            return this->base_type::get_poly(get_gid());
         }
 
         lcos::future<void> move_async(double dt,double time)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::move_async(gid_,dt,time);
+            return this->base_type::move_async(get_gid(),dt,time);
         }
 
         lcos::future<void> adjust_async(double dt)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::adjust_async(gid_,dt);
+            return this->base_type::adjust_async(get_gid(),dt);
         }
 
         lcos::future<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt,
                                                std::size_t n,std::size_t N)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::enforce_async(gid_,master_gids,dt,n,N);
+            return this->base_type::enforce_async(get_gid(),master_gids,dt,n,N);
         }
 
         void move(double dt,double time)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::move(gid_,dt,time);
+            this->base_type::move(get_gid(),dt,time);
         }
 
         void adjust(double dt)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::adjust(gid_,dt);
+            this->base_type::adjust(get_gid(),dt);
         }
 
         void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,
                      std::size_t n,std::size_t N)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::enforce(gid_,master_gids,dt,n,N);
+            this->base_type::enforce(get_gid(),master_gids,dt,n,N);
         }
 
         /// Query the current coordinate values of the server#point
         /// instance with the given \a gid.
         lcos::future<double> get_X_async() const
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_X_async(gid_);
+            return this->base_type::get_X_async(get_gid());
         }
         lcos::future<double> get_Y_async()  const
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_Y_async(gid_);
+            return this->base_type::get_Y_async(get_gid());
         }
 
         double get_X() const
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_X(gid_);
+            return this->base_type::get_X(get_gid());
         }
         double get_Y() const
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_Y(gid_);
+            return this->base_type::get_Y(get_gid());
         }
 
         /// Modify the current coordinate values of the server#point
         /// instance with the given \a gid.
         lcos::future<void> set_X_async(double x)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::set_X_async(gid_, x);
+            return this->base_type::set_X_async(get_gid(), x);
         }
         lcos::future<void> set_Y_async(double y)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::set_Y_async(gid_, y);
+            return this->base_type::set_Y_async(get_gid(), y);
         }
 
         void set_X(double x)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::set_X(gid_, x);
+            this->base_type::set_X(get_gid(), x);
         }
         void set_Y(double y)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::set_Y(gid_, y);
+            this->base_type::set_Y(get_gid(), y);
         }
     };
 }}

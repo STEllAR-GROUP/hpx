@@ -38,143 +38,121 @@ namespace graph500
         hpx::lcos::future<void> init_async(std::size_t objectid,
             std::size_t scale,std::size_t number_partitions,double overlap)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,scale,number_partitions,overlap);
+            return this->base_type::init_async(get_gid(),objectid,scale,number_partitions,overlap);
         }
 
         // kernel 1
         void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,double overlap)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid, scale,number_partitions,overlap);
+            this->base_type::init_async(get_gid(),objectid, scale,number_partitions,overlap);
         }
 
         hpx::lcos::future<void> root_async(std::vector<int64_t> const& bfs_roots)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::root_async(gid_,bfs_roots);
+            return this->base_type::root_async(get_gid(),bfs_roots);
         }
 
         void root(std::vector<int64_t> const& bfs_roots)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::root(gid_,bfs_roots);
+            this->base_type::root(get_gid(),bfs_roots);
         }
 
         hpx::lcos::future<void> receive_duplicates_async(int64_t j,
                           std::vector<hpx::naming::id_type> const& duplicate_components,
                           std::vector<std::size_t> const& duplicateid)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::receive_duplicates_async(gid_,j,duplicate_components,duplicateid);
+            return this->base_type::receive_duplicates_async(get_gid(),j,duplicate_components,duplicateid);
         }
 
         void receive_duplicates(int64_t j,
                           std::vector<hpx::naming::id_type> const& duplicate_components,
                           std::vector<std::size_t> const& duplicateid)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::receive_duplicates(gid_,j,duplicate_components,duplicateid);
+            this->base_type::receive_duplicates(get_gid(),j,duplicate_components,duplicateid);
         }
 
         hpx::lcos::future<void> ppedge_async(int64_t start,int64_t stop,
                           std::vector<hpx::naming::id_type> const& point_components)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::ppedge_async(gid_,start,stop,point_components);
+            return this->base_type::ppedge_async(get_gid(),start,stop,point_components);
         }
 
         void ppedge(int64_t start,int64_t stop, 
                     std::vector<hpx::naming::id_type> const& point_components)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::ppedge(gid_,start,stop,point_components);
+            this->base_type::ppedge(get_gid(),start,stop,point_components);
         }
 
         hpx::lcos::future<void> bfs_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::bfs_async(gid_);
+            return this->base_type::bfs_async(get_gid());
         }
 
         void bfs()
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::bfs(gid_);
+            this->base_type::bfs(get_gid());
         }
 
         hpx::lcos::future<void> resolve_conflict_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::resolve_conflict_async(gid_);
+            return this->base_type::resolve_conflict_async(get_gid());
         }
 
         void resolve_conflict()
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::resolve_conflict(gid_);
+            this->base_type::resolve_conflict(get_gid());
         }
 
         hpx::lcos::future< std::vector<int> > distributed_validate_async(std::size_t scale)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::distributed_validate_async(gid_,scale);
+            return this->base_type::distributed_validate_async(get_gid(),scale);
         }
 
         std::vector<int> distributed_validate(std::size_t scale)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::distributed_validate(gid_,scale);
+            return this->base_type::distributed_validate(get_gid(),scale);
         }
 
         hpx::lcos::future< std::vector<bool> > findwhohasthisedge_async(int64_t edge,
                             std::vector<hpx::naming::id_type> const& point_components)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::findwhohasthisedge_async(gid_,edge,point_components);
+            return this->base_type::findwhohasthisedge_async(get_gid(),edge,point_components);
         }
 
         std::vector<bool> findwhohasthisedge(int64_t edge,
                             std::vector<hpx::naming::id_type> const& point_components)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::findwhohasthisedge(gid_,edge,point_components);
+            return this->base_type::findwhohasthisedge(get_gid(),edge,point_components);
         }
 
         hpx::lcos::future< std::vector<int64_t> > get_numedges_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_numedges_async(gid_);
+            return this->base_type::get_numedges_async(get_gid());
         }
 
         std::vector<int64_t> get_numedges()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_numedges(gid_);
+            return this->base_type::get_numedges(get_gid());
         }
 
         hpx::lcos::future< bool > has_edge_async(int64_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::has_edge_async(gid_,edge);
+            return this->base_type::has_edge_async(get_gid(),edge);
         }
 
         bool has_edge(int64_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::has_edge(gid_,edge);
+            return this->base_type::has_edge(get_gid(),edge);
         }
 
         hpx::lcos::future< resolvedata > get_parent_async(int64_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_parent_async(gid_,edge);
+            return this->base_type::get_parent_async(get_gid(),edge);
         }
 
         resolvedata get_parent(int64_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_parent(gid_,edge);
+            return this->base_type::get_parent(get_gid(),edge);
         }
     };
 }

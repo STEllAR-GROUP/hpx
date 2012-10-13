@@ -31,20 +31,17 @@ namespace hpx { namespace components
     smphplmatrex(){}
     smphplmatrex(naming::id_type gid) : base_type(gid){}
     void destruct(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::destruct(gid_);
+        return this->base_type::destruct(get_gid());
     }
 
     //initialization function
     int construct(unsigned int h, unsigned int ab, unsigned int bs){
-        BOOST_ASSERT(gid_);
-        return this->base_type::construct(gid_,h,ab,bs);
+        return this->base_type::construct(get_gid(),h,ab,bs);
     }
 
     //functions for solving the matrix
     double LUsolve(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::LUsolve(gid_);
+        return this->base_type::LUsolve(get_gid());
     }
     };
 }}
