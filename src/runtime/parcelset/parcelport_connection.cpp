@@ -45,7 +45,7 @@ namespace hpx { namespace parcelset
                 boost::iostreams::stream<io_device_type> io(out_buffer_);
 
                 // Serialize the data
-                util::portable_binary_oarchive archive(io);
+                util::portable_binary_oarchive archive(io, boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;
