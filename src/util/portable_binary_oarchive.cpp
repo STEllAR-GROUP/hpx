@@ -94,10 +94,12 @@ void portable_binary_oarchive::init(unsigned int flags)
     }
 
     if (0 == (flags & boost::archive::no_header)) {
+/*
         // write signature in an archive version independent manner
         const std::string file_signature(
             boost::archive::BOOST_ARCHIVE_SIGNATURE());
         *this << file_signature;
+*/
 
         // write library version
         const boost::archive::version_type v(
