@@ -117,8 +117,7 @@ namespace hpx { namespace parcelset
 
                 {
                     // De-serialize the parcel data
-                    hpx::util::portable_binary_iarchive archive(io,
-                        boost::archive::no_header);
+                    hpx::util::portable_binary_iarchive archive(io);
 
                     std::size_t parcel_count = 0;
                     archive >> parcel_count;
