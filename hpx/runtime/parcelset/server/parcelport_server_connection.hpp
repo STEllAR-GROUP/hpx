@@ -125,7 +125,7 @@ namespace hpx { namespace parcelset { namespace server
                 socket_.set_option(quickack);
 #endif
 
-                boost::asio::async_read(socket_,
+                boost::asio::async_read(socket_, 
                     boost::asio::buffer(*in_buffer_.get()),
                     boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
@@ -154,10 +154,22 @@ namespace hpx { namespace parcelset { namespace server
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
 
+                // now send acknowledgement byte
+                socket_.set_option(boost::asio::ip::tcp::no_delay(true));
+                socket_.set_option(boost::asio::socket_base::linger(true, 0));
+
+                ack_ = true;
+                boost::asio::async_write(socket_, 
+                    boost::asio::buffer(&ack_, sizeof(ack_)),
+                    boost::bind(&parcelport_connection::handle_write_ack, 
+                        shared_from_this()));
+
                 // Issue a read operation to read the parcel priority.
                 async_read(boost::get<0>(handler));
             }
         }
+
+        void handle_write_ack() {}
 
     private:
         /// Socket for the parcelport_connection.
@@ -167,6 +179,7 @@ namespace hpx { namespace parcelset { namespace server
         boost::integer::ulittle8_t in_priority_;
         boost::integer::ulittle64_t in_size_;
         boost::shared_ptr<std::vector<char> > in_buffer_;
+        bool ack_;
 
         /// The handler used to process the incoming request.
         parcelport_queue& parcels_;
