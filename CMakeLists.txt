@@ -468,19 +468,19 @@ if(MSVC)
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
-    add_definitions(-DHPX_BUILD_TYPE="debug")
+    add_definitions(-DHPX_BUILD_TYPE=debug)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    add_definitions(-DHPX_BUILD_TYPE="relwithdebinfo")
+    add_definitions(-DHPX_BUILD_TYPE=relwithdebinfo)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    add_definitions(-DHPX_BUILD_TYPE="minsizerel")
+    add_definitions(-DHPX_BUILD_TYPE=minsizerel)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    add_definitions(-DHPX_BUILD_TYPE="release")
+    add_definitions(-DHPX_BUILD_TYPE=release)
   endif()
 endif()
 
@@ -733,12 +733,12 @@ else()
     hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
   endif()
 
-  ##############################################################################
-  # Stacktraces
-  ##############################################################################
-  if(HPX_STACKTRACES)
-    # Export all visible symbols, not just those that are used
+  hpx_option(HPX_PIE BOOL "Compile executables as shared objects" ON ADVANCED)
+
+  # This is necessary to ensure that our executables are ELF DYN objects.
+  if(HPX_PIE)
     hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
 
   ##############################################################################
