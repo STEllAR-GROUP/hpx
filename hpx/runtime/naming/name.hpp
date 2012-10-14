@@ -678,7 +678,10 @@ namespace hpx { namespace traits
     struct promise_local_result<std::vector<naming::gid_type> >
       : boost::mpl::identity<std::vector<naming::id_type> >
     {};
-}}
+}
+
+    using naming::invalid_id;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
