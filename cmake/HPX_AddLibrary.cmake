@@ -10,6 +10,7 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
+            AppendProperty
             Install)
 
 macro(add_hpx_library name)
@@ -194,21 +195,17 @@ macro(add_hpx_library name)
   endif()
 
   if(${name}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_lib APPEND
-      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+    hpx_append_property(${name}_lib COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
   if(${name}_LINK_FLAGS)
-    set_property(TARGET ${name}_lib APPEND
-      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+    hpx_append_property(${name}_lib LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
 
   if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_lib APPEND
-      PROPERTY COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
+    hpx_append_property(${name}_lib COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_lib APPEND
-        PROPERTY LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
+      hpx_append_property(${name}_lib LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     endif()
   endif()
 

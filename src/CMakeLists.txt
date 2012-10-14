@@ -8,7 +8,6 @@ add_subdirectory(components)
 
 if(UNIX)
   hpx_use_flag_if_available(-fPIC)
-  hpx_use_flag_if_available(-pie)
 
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wextra)
