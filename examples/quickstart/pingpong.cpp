@@ -28,7 +28,7 @@ void onRecv(hpx::naming::id_type to, std::vector<double> const & in, std::size_t
     std::vector<double> mydata(in);
 
     onRecv_action act;
-    act(to, hpx::find_here(), mydata, counter);
+    act(to, hpx::find_here(), boost::move(mydata), counter);
 }
 
 int hpx_main(boost::program_options::variables_map &b_arg)
