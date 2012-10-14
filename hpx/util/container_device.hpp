@@ -107,7 +107,11 @@ namespace hpx { namespace util
 
             if (next < (static_cast<boost::iostreams::stream_offset>(0))
              || next >= (static_cast<boost::iostreams::stream_offset>(container_.size())))
-                throw std::ios_base::failure("bad seek offset");
+            {
+                HPX_THROW_EXCEPTION(serialization_error,
+                    "container_device::seek",
+                    "bad seek offset");
+            }
 
             pos_ = next;
             return pos_;
