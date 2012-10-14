@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2012 Louisiana State University
+.. Copyright (c) 2007-2012 The STE||AR Group 
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,6 @@
 HPX is a a general purpose C++ runtime system for parallel and distributed 
 applications of any scale. Even if that's quite a mouthful, we mean every 
 word of it!
-
 
 The goal of HPX is to create a high quality, freely available, open source 
 implementation of the ParalleX model for conventional systems, such as 
@@ -25,7 +24,7 @@ after the interfaces defined by the C++11 ISO standard and adheres to the
 programming guidelines used by the Boost collection of C++ libraries. 
 
 ****************************
-What’s so special about HPX?
+What's so special about HPX?
 ****************************
 
 * HPX exposes an uniform, standards-oriented API for ease of programming 
@@ -65,7 +64,6 @@ trick their way into the code base - you have been warned!
 In any case, if you happen to run into problems we very much encourage and appreciate
 any problem reports through the `issue tracker for this Github project 
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
-
 
 ********************
  Build Instructions 
