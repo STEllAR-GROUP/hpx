@@ -90,11 +90,6 @@ namespace hpx { namespace parcelset
                     boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
 
-            // make sure the Nagle algorithm is disabled for this socket,
-            // disable lingering on close
-            socket_.set_option(boost::asio::ip::tcp::no_delay(true));
-            socket_.set_option(boost::asio::socket_base::linger(true, 0));
-
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, _2,
@@ -135,18 +130,23 @@ namespace hpx { namespace parcelset
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);
             socket_.set_option(quickack);
 #endif
+
+            void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
+                = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
+
             boost::asio::async_read(socket_, 
                 boost::asio::buffer(&ack_, sizeof(ack_)),
-                boost::bind(&parcelport_connection::handle_read_ack, 
-                    shared_from_this()));
+                boost::bind(f, shared_from_this(), handler));
+        }
 
+        template <typename Handler, typename ParcelPostprocess>
+        void handle_read_ack(boost::tuple<Handler, ParcelPostprocess> handler) 
+        {
             // Call post-processing handler, which will send remaining pending 
             // parcels. Pass along the connection so it can be reused if more 
             // parcels have to be sent.
             boost::get<1>(handler)(there_, shared_from_this());
         }
-
-        void handle_read_ack() {}
 
     private:
         /// Socket for the parcelport_connection.

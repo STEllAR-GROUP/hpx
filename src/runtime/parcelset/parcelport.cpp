@@ -281,6 +281,12 @@ namespace hpx { namespace parcelset
                 BOOST_ASSERT(locality_id.get_port() == connection_port);
             }
 #endif
+            // make sure the Nagle algorithm is disabled for this socket,
+            // disable lingering on close
+            client_connection->socket().set_option(
+                boost::asio::ip::tcp::no_delay(true));
+            client_connection->socket().set_option(
+                boost::asio::socket_base::linger(true, 0));
         }
 #if defined(HPX_DEBUG)
         else {
