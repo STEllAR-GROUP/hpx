@@ -155,9 +155,6 @@ namespace hpx { namespace parcelset { namespace server
                 boost::get<0>(handler)(e);
 
                 // now send acknowledgement byte
-                socket_.set_option(boost::asio::ip::tcp::no_delay(true));
-                socket_.set_option(boost::asio::socket_base::linger(true, 0));
-
                 ack_ = true;
                 boost::asio::async_write(socket_, 
                     boost::asio::buffer(&ack_, sizeof(ack_)),
