@@ -372,8 +372,8 @@ subroutine pushi(hpx4_bti,&
        !     MPI_SUM,MPI_COMM_WORLD,ierror)
        call comm_allreduce_cmm(hpx4_bti,sum_of_weights,total_sum_of_weights,1)
        !call MPI_ALLREDUCE(mi,mi_total,1,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierror)
-       !residual_weight=total_sum_of_weights/real(mi_total,wp)
        call int_comm_allreduce_cmm(hpx4_bti,mi,mi_total,1)
+       residual_weight=total_sum_of_weights/real(mi_total,wp)
        if(mype==0)write(49,*)istep,mi_total,total_sum_of_weights,residual_weight
        do m=1,mi
           zion(5,m)=zion(5,m)-residual_weight
