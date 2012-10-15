@@ -19,7 +19,7 @@ namespace hpx { namespace util
         static boost::uint64_t now()
         {
             boost::chrono::nanoseconds ns =
-                boost::chrono::high_resolution_clock::now().time_since_epoch();
+                boost::chrono::steady_clock::now().time_since_epoch();
             BOOST_ASSERT(ns.count() >= 0);
             return static_cast<boost::uint64_t>(ns.count());
         }
