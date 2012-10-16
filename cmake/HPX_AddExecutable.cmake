@@ -96,7 +96,7 @@ macro(add_hpx_executable name)
                                      INSTALL_RPATH_USE_LINK_PATH TRUE
                                      INSTALL_RPATH ${HPX_RPATH})
     if(HPX_PIE)
-      hpx_append_property(${name}_exe LINK_FLAGS "-pie")
+      hpx_append_property(${name}_exe LINK_FLAGS -pie)
     endif()
   endif()
 
