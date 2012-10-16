@@ -9,11 +9,12 @@ include(HPX_Include)
 
 hpx_include(ParseArguments)
 
-macro(hpx_append_property target property value)
+macro(hpx_append_property target property)
   get_target_property(existing ${target} ${property})
   if(existing)
-    set(value "${existing} ${value}")
+    set_property(TARGET ${target} PROPERTY ${property} "${existing} ${ARGN}")
+  else()
+    set_property(TARGET ${target} PROPERTY ${property} "${ARGN}")
   endif()
-  set_target_properties(${target} PROPERTIES ${property} ${value})
 endmacro()
 
