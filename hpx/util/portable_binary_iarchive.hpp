@@ -7,7 +7,7 @@
 #if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
 #include <boost/archive/binary_iarchive.hpp>
 
-namespace hox { namespace util
+namespace hpx { namespace util
 {
     typedef boost::archive::binary_iarchive portable_binary_iarchive;
 }}
