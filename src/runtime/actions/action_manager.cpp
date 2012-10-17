@@ -95,41 +95,25 @@ namespace hpx { namespace actions
                     hpx::util::osstream_get_string(strm));
             }
 
-            // either directly execute the action or create a new thread
-            if (actions::base_action::direct_action == acttype)
-            {
-                // direct execution of the action
-                if (!cont) {
-                    // No continuation is to be executed.
-                    act->get_thread_function(lva)(threads::wait_signaled);
-                }
-                else {
-                    // This parcel carries a continuation, we execute a wrapper
-                    // handling all related functionality.
-                    act->get_thread_function(cont, lva)(threads::wait_signaled);
-                }
+            // dispatch action, register work item either with or without
+            // continuation support
+            if (!cont) {
+                // No continuation is to be executed, register the plain 
+                // action and the local-virtual address with the TM only.
+                threads::thread_init_data data;
+                tm.register_work(
+                    act->get_thread_init_data(lva, data),
+                    threads::pending);
             }
             else {
-                // dispatch action, register work item either with or without
-                // continuation support
-                if (!cont) {
-                    // No continuation is to be executed, register the plain 
-                    // action and the local-virtual address with the TM only.
-                    threads::thread_init_data data;
-                    tm.register_work(
-                        act->get_thread_init_data(lva, data),
-                        threads::pending);
-                }
-                else {
-                    // This parcel carries a continuation, register a wrapper 
-                    // which first executes the original thread function as 
-                    // required by the action and triggers the continuations 
-                    // afterwards.
-                    threads::thread_init_data data;
-                    tm.register_work(
-                        act->get_thread_init_data(cont, lva, data),
-                        threads::pending);
-                }
+                // This parcel carries a continuation, register a wrapper 
+                // which first executes the original thread function as 
+                // required by the action and triggers the continuations 
+                // afterwards.
+                threads::thread_init_data data;
+                tm.register_work(
+                    act->get_thread_init_data(cont, lva, data),
+                    threads::pending);
             }
         }
     }
