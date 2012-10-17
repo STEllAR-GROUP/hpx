@@ -34,14 +34,11 @@ namespace hpx { namespace parcelset
         static void default_write_handler(boost::system::error_code const&,
             std::size_t /*size*/) {}
 
-        void parcel_sink(parcelport& pp,
-            boost::shared_ptr<std::vector<char> > parcel_data,
+        void parcel_sink(boost::shared_ptr<std::vector<parcel> > parcel_data,
             threads::thread_priority priority,
             performance_counters::parcels::data_point const& receive_data);
 
-        threads::thread_state_enum decode_parcel(
-            boost::shared_ptr<std::vector<char> > parcel_data,
-            performance_counters::parcels::data_point receive_data);
+        void error_sink(boost::exception_ptr e);
 
         // make sure the parcel has been properly initialized
         void init_parcel(parcel& p)
@@ -70,11 +67,9 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver, parcelport& pp,
-            threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
+            parcelhandler_queue_base* policy);
 
-        ~parcelhandler()
-        {
-        }
+        ~parcelhandler() {}
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -209,7 +204,7 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p)
         {
-            return parcels_->get_parcel(p);
+            return parcel_queue_->get_parcel(p);
         }
 
         /// The function \a get_parcel returns the next available parcel
@@ -231,7 +226,7 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
         {
-            return parcels_->get_parcel(p, parcel_id);
+            return parcel_queue_->get_parcel(p, parcel_id);
         }
 
         /// Register an event handler to be called whenever a parcel has been
@@ -254,7 +249,7 @@ namespace hpx { namespace parcelset
         bool register_event_handler(
             parcelhandler_queue_base::callback_type const& sink)
         {
-            return parcels_->register_event_handler(sink);
+            return parcel_queue_->register_event_handler(sink);
         }
 
         /// Register an event handler to be called whenever a parcel has been
@@ -284,7 +279,7 @@ namespace hpx { namespace parcelset
             parcelhandler_queue_base::callback_type const& sink
           , parcelhandler_queue_base::connection_type& conn)
         {
-            return parcels_->register_event_handler(sink, conn);
+            return parcel_queue_->register_event_handler(sink, conn);
         }
 
         /// The 'scoped_connection_type' typedef simplifies to manage registered
@@ -315,7 +310,7 @@ namespace hpx { namespace parcelset
     protected:
         std::size_t get_incoming_queue_length() const
         {
-            return parcels_->get_queue_length();
+            return parcel_queue_->get_queue_length();
         }
 
         std::size_t get_outgoing_queue_length() const
@@ -333,11 +328,8 @@ namespace hpx { namespace parcelset
         /// the parcelport this handler is associated with
         parcelport& pp_;
 
-        /// the thread-manager to use (optional)
-        threads::threadmanager_base* tm_;
-
-        ///
-        boost::shared_ptr<parcelhandler_queue_base> parcels_;
+        /// the parcel queue all received parcels are being queued up in
+        boost::shared_ptr<parcelhandler_queue_base> parcel_queue_;
     };
 
 }}

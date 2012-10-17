@@ -62,7 +62,6 @@ namespace hpx { namespace parcelset
           , std::size_t max_connections_per_loc)
       : io_service_pool_(io_service_pool),
         acceptor_(NULL),
-        parcels_(This()),
         connection_cache_(max_connections, max_connections_per_loc),
         here_(h)
     {}
