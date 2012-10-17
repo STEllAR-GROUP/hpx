@@ -1321,7 +1321,7 @@ namespace boost
         } else {                                                              \
             ec = make_error_code(static_cast<hpx::error>(errcode), msg, f,    \
                 __FILE__, __LINE__,                                           \
-                ec.category() == hpx::get_lightweight_hpx_category()) ?       \
+                (ec.category() == hpx::get_lightweight_hpx_category()) ?      \
                     hpx::lightweight_rethrow : hpx::rethrow);                 \
         }                                                                     \
     }                                                                         \
