@@ -15,6 +15,7 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/integer/endian.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include <vector>
