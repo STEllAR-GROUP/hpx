@@ -202,9 +202,9 @@ namespace hpx { namespace parcelset
         /// The returned parcel will be no longer available from the
         /// parcelhandler as it is removed from the internal queue of received
         /// parcels.
-        bool get_parcel(parcel& p)
+        bool get_parcel(parcel& p, error_code& ec = throws)
         {
-            return parcel_queue_->get_parcel(p);
+            return parcel_queue_->get_parcel(p, ec);
         }
 
         /// The function \a get_parcel returns the next available parcel
@@ -224,9 +224,10 @@ namespace hpx { namespace parcelset
         /// The returned parcel will be no longer available from the
         /// parcelhandler as it is removed from the internal queue of received
         /// parcels.
-        bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
+        bool get_parcel(parcel& p, naming::gid_type const& parcel_id,
+            error_code& ec = throws)
         {
-            return parcel_queue_->get_parcel(p, parcel_id);
+            return parcel_queue_->get_parcel(p, parcel_id, ec);
         }
 
         /// Register an event handler to be called whenever a parcel has been
