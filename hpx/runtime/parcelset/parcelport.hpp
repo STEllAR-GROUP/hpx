@@ -131,10 +131,10 @@ namespace parcelset
         ///                 where \a pp is a reference to the parcelport this
         ///                 function object instance is invoked by, and \a dest
         ///                 is the local destination address of the parcel.
-        template <typename F, typename Error>
-        void register_event_handlers(F sink, Error error_sink)
+        template <typename F>
+        void register_event_handler(F sink)
         {
-            parcels_.register_event_handlers(sink, error_sink);
+            parcels_.register_event_handler(sink);
         }
 
         /// \brief Allow access to the locality this parcelport is associated

@@ -32,9 +32,6 @@ namespace hpx { namespace parcelset
         /// add a new parcel to the end of the parcel queue
         virtual bool add_parcel(parcel const& p) = 0;
 
-        /// add an exception to the parcel queue
-        virtual bool add_exception(boost::exception_ptr e) = 0;
-
         /// return next available parcel
         virtual bool get_parcel(parcel& p) = 0;
 

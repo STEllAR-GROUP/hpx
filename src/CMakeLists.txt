@@ -146,9 +146,6 @@ endif()
 # libhpx_serialization headers
 add_hpx_library_headers(hpx_serialization
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/portable_binary_*archive.hpp")
-add_hpx_library_headers(hpx_serialization
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/zero_copy_*.hpp"
-  APPEND)
 
 # libhpx headers
 add_hpx_library_headers(hpx
@@ -177,7 +174,7 @@ add_hpx_library_headers(hpx
   APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
-  EXCLUDE "(.*portable_binary_.*archive[.]hpp)|(zero_copy_.*[.]hpp)"
+  EXCLUDE ".*portable_binary_.*archive[.]hpp"
   APPEND)
 
 # libhpx_init headers

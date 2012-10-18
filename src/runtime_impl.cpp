@@ -119,7 +119,7 @@ namespace hpx {
         thread_manager_(new hpx::threads::threadmanager_impl<
             SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
         agas_client_(parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, 
+        parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_,

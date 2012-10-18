@@ -71,45 +71,136 @@ namespace hpx { namespace parcelset
         wfp.wait();          // wait for the parcel to be sent
     }
 
-    void parcelhandler::parcel_sink(
-        boost::shared_ptr<std::vector<parcel> > parcel_data,
+    void parcelhandler::parcel_sink(parcelport& pp,
+        boost::shared_ptr<std::vector<char> > parcel_data,
         threads::thread_priority priority,
         performance_counters::parcels::data_point const& receive_data)
     {
-        BOOST_FOREACH(parcel const& p, *parcel_data)
+        // wait for thread-manager to become active
+        while (tm_->status() & starting)
         {
-            // make sure this parcel ended up on the right locality
-            BOOST_ASSERT(p.get_destination_locality() == here());
-            parcel_queue_->add_parcel(p);
+            boost::this_thread::sleep(boost::get_system_time() +
+                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
-        pp_.add_received_data(receive_data);
+        // Give up if we're shutting down.
+        if (tm_->status() & stopping)
+        {
+            LPT_(debug) << "parcel_sink: dropping late parcel";
+            return;
+        }
+        else
+        {
+            // create a new thread which decodes and handles the parcel
+            threads::thread_init_data data(
+                boost::bind(&parcelhandler::decode_parcel, this,
+                    parcel_data, receive_data),
+                "decode_parcel", 0, priority);
+            tm_->register_thread(data);
+        }
     }
 
-    void parcelhandler::error_sink(boost::exception_ptr e)
+    threads::thread_state_enum parcelhandler::decode_parcel(
+        boost::shared_ptr<std::vector<char> > parcel_data,
+        performance_counters::parcels::data_point receive_data)
     {
-        parcel_queue_->add_exception(e);
-//        pp_.add_received_data(receive_data);
+        // protect from un-handled exceptions bubbling up into thread manager
+        try {
+            try {
+                // create a special io stream on top of in_buffer_
+                typedef util::container_device<std::vector<char> > io_device_type;
+                boost::iostreams::stream<io_device_type> io(*parcel_data);
+
+                // mark start of serialization
+                util::high_resolution_timer timer;
+                boost::int64_t overall_add_parcel_time = 0;
+
+                {
+                    // De-serialize the parcel data
+                    hpx::util::portable_binary_iarchive archive(io);
+
+                    std::size_t parcel_count = 0;
+                    archive >> parcel_count;
+                    for(std::size_t i = 0; i < parcel_count; ++i)
+                    {
+                        // de-serialize parcel and add it to incoming parcel queue
+                        parcel p;
+                        archive >> p;
+
+                        // make sure this parcel ended up on the right locality
+                        BOOST_ASSERT(p.get_destination_locality() == here());
+
+                        // be sure not to measure add_parcel as serialization time
+                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
+                        parcels_->add_parcel(p);
+                        overall_add_parcel_time += timer.elapsed_nanoseconds() - 
+                            add_parcel_time;
+                    }
+
+                    // complete received data with parcel count
+                    receive_data.num_parcels_ = parcel_count;
+                }
+
+                // store the time required for serialization
+                receive_data.serialization_time_ = timer.elapsed_nanoseconds() - 
+                    overall_add_parcel_time;
+
+                pp_.add_received_data(receive_data);
+            }
+            catch (hpx::exception const& e) {
+                LPT_(error)
+                    << "decode_parcel: caught hpx::exception: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::system::system_error const& e) {
+                LPT_(error)
+                    << "decode_parcel: caught boost::system::error: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::exception const&) {
+                LPT_(error)
+                    << "decode_parcel: caught boost::exception.";
+                hpx::report_error(boost::current_exception());
+            }
+            catch (std::exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem, due to slicing.
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what())));
+            }
+        }
+        catch (...) {
+            // Prevent exceptions from boiling up into the thread-manager.
+            LPT_(error)
+                << "decode_parcel: caught unknown exception.";
+            hpx::report_error(boost::current_exception());
+        }
+
+        return threads::terminated;
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
-            parcelport& pp, parcelhandler_queue_base* policy)
+            parcelport& pp, threads::threadmanager_base* tm,
+            parcelhandler_queue_base* policy)
       : resolver_(resolver)
       , pp_(pp)
-      , parcel_queue_(policy)
+      , tm_(tm)
+      , parcels_(policy)
     {
-        BOOST_ASSERT(parcel_queue_);
+        BOOST_ASSERT(parcels_);
 
         // AGAS v2 registers itself in the client before the parcelhandler
         // is booted.
         locality_ = resolver_.local_locality();
 
-        parcel_queue_->set_parcelhandler(this);
+        parcels_->set_parcelhandler(this);
 
         // register our callback function with the parcelport
-        pp_.register_event_handlers(
-            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3),
-            boost::bind(&parcelhandler::error_sink, this, _1));
+        pp_.register_event_handler(
+            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3, _4));
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
