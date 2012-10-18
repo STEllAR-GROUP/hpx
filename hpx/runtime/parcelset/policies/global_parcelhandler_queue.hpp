@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset { namespace policies
             return true;
         }
 
-        bool get_parcel(parcel& p, error_code& ec)
+        bool get_parcel(parcel& p)
         {
             // Remove the first parcel from queue.
             mutex_type::scoped_lock l(mtx_);
@@ -84,9 +84,7 @@ namespace hpx { namespace parcelset { namespace policies
                 errors_.pop();
 
                 // now rethrow the topmost exception
-                // now rethrow the topmost exception
-                HPX_RETHROWS_IF(ec, serialization_error, 
-                    "parcelset::get_parcel", boost::to_string(e));
+                boost::rethrow_exception(e);
             }
             else if (!parcels_.empty()) {
                 parcel_map_type::iterator front = parcels_.begin();
@@ -98,28 +96,16 @@ namespace hpx { namespace parcelset { namespace policies
             return false;
         }
 
-        bool get_parcel(parcel& p, naming::gid_type const& parcel_id,
-            error_code& ec)
+        bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
         {
             // Remove the requested parcel from queue.
             mutex_type::scoped_lock l(mtx_);
 
-            if (!errors_.empty()) {
-                // handle pending exceptions first
-                boost::exception_ptr e = errors_.front();
-                errors_.pop();
-
-                // now rethrow the topmost exception
-                HPX_RETHROWS_IF(ec, serialization_error, 
-                    "parcelset::get_parcel", boost::to_string(e));
-            }
-            else {
-                parcel_map_type::iterator it = parcels_.find(parcel_id);
-                if (it != parcels_.end()) {
-                    p = (*it).second;
-                    parcels_.erase(it);
-                    return true;
-                }
+            parcel_map_type::iterator it = parcels_.find(parcel_id);
+            if (it != parcels_.end()) {
+                p = (*it).second;
+                parcels_.erase(it);
+                return true;
             }
 
             return false;
