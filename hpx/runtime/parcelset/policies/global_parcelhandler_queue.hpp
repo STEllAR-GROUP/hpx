@@ -17,8 +17,6 @@
 
 #include <boost/assert.hpp>
 
-#include <queue>
-
 namespace hpx { namespace parcelset { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -60,33 +58,12 @@ namespace hpx { namespace parcelset { namespace policies
             return true;
         }
 
-        bool add_exception(boost::exception_ptr e)
-        {
-            {
-                mutex_type::scoped_lock l(mtx_);
-                errors_.push(e);
-            }
-
-            // do some work (notify event handlers)
-            BOOST_ASSERT(ph_ != 0);
-            notify_(*ph_, naming::invalid_gid);
-            return true;
-        }
-
         bool get_parcel(parcel& p)
         {
             // Remove the first parcel from queue.
             mutex_type::scoped_lock l(mtx_);
 
-            if (!errors_.empty()) {
-                // handle pending exceptions first
-                boost::exception_ptr e = errors_.front();
-                errors_.pop();
-
-                // now rethrow the topmost exception
-                boost::rethrow_exception(e);
-            }
-            else if (!parcels_.empty()) {
+            if (!parcels_.empty()) {
                 parcel_map_type::iterator front = parcels_.begin();
                 p = (*front).second;
                 parcels_.erase(front);
@@ -137,7 +114,6 @@ namespace hpx { namespace parcelset { namespace policies
     private:
         mutable mutex_type mtx_;
         parcel_map_type parcels_;
-        std::queue<boost::exception_ptr> errors_;
 
         parcelhandler* ph_;
 

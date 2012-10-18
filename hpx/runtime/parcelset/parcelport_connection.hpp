@@ -15,7 +15,7 @@
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
-#include <hpx/util/zero_copy_output.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -28,6 +28,7 @@
 #include <boost/bind/protect.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/integer/endian.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -46,7 +47,7 @@ namespace hpx { namespace parcelset
                 naming::locality const& locality_id,
                 util::connection_cache<parcelport_connection, naming::locality>& cache,
                 performance_counters::parcels::gatherer& parcels_sent)
-          : socket_(io_service), there_(locality_id),
+          : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
             connection_cache_(cache), parcels_sent_(parcels_sent)
         {}
 
@@ -75,6 +76,13 @@ namespace hpx { namespace parcelset
             /// Increment sends and begin timer.
             send_data_.time_ = timer_.elapsed_nanoseconds();
 
+            // Write the serialized data to the socket. We use "gather-write"
+            // to send both the header and the data in a single write operation.
+            std::vector<boost::asio::const_buffer> buffers;
+            buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
+            buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
+            buffers.push_back(boost::asio::buffer(out_buffer_));
+
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
@@ -82,7 +90,7 @@ namespace hpx { namespace parcelset
                     boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
 
-            boost::asio::async_write(socket_, output_data_.get_buffers(),
+            boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, _2,
                     boost::make_tuple(handler, parcel_postprocess)));
@@ -107,7 +115,9 @@ namespace hpx { namespace parcelset
             parcels_sent_.add_data(send_data_);
 
             // now we can give this connection back to the cache
-            output_data_.clear();
+            out_buffer_.clear();
+            out_priority_ = 0;
+            out_size_ = 0;
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -143,7 +153,6 @@ namespace hpx { namespace parcelset
         boost::asio::ip::tcp::socket socket_;
 
         /// buffer for outgoing data
-        util::zero_copy_output output_data_;
         boost::integer::ulittle8_t out_priority_;
         boost::integer::ulittle64_t out_size_;
         std::vector<char> out_buffer_;

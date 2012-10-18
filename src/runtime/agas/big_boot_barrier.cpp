@@ -49,12 +49,22 @@ typedef components::detail::heap_factory<
 
 // TODO: Make assertions exceptions
 void early_parcel_sink(
-    boost::shared_ptr<std::vector<parcelset::parcel> > parcel_data
+    boost::shared_ptr<std::vector<char> > parcel_data
     )
 { // {{{
+    typedef util::container_device<std::vector<char> > io_device_type;
+    boost::iostreams::stream<io_device_type> io (*parcel_data);
 
-    BOOST_FOREACH(parcelset::parcel& p, *parcel_data)
+    // De-serialize the parcel data
+    util::portable_binary_iarchive archive(io);
+
+    std::size_t parcel_count = 0;
+    archive >> parcel_count;
+    for(std::size_t i = 0; i < parcel_count; ++i)
     {
+        parcelset::parcel p;
+        archive >> p;
+
         // decode the action-type in the parcel
         actions::action_type act = p.get_action();
 
@@ -77,14 +87,6 @@ void early_parcel_sink(
         }
     }
 } // }}}
-
-void early_error_sink(
-    boost::exception_ptr e
-    )
-{
-    std::cerr << hpx::diagnostic_information(e) << std::endl;
-    std::abort();
-}
 
 void early_write_handler(
     boost::system::error_code const& e
@@ -594,8 +596,7 @@ big_boot_barrier::big_boot_barrier(
              : 1)
   , thunks(16)
 {
-    pp_.register_event_handlers(boost::bind(&early_parcel_sink, _1),
-        boost::bind(&early_error_sink, _1));
+    pp_.register_event_handler(boost::bind(&early_parcel_sink, _2));
 }
 
 void big_boot_barrier::apply(
