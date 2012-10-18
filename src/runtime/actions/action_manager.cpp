@@ -51,7 +51,7 @@ namespace hpx { namespace actions
         // decode the action-type in the parcel
         continuation_type cont = p.get_continuation();
         actions::action_type act = p.get_action();
-        //actions::base_action::action_type acttype = act->get_action_type();
+        actions::base_action::action_type acttype = act->get_action_type();
         int comptype = act->get_component_type();
         naming::locality dest = p.get_destination_locality();
 
