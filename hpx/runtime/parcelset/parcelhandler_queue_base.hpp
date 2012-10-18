@@ -36,11 +36,10 @@ namespace hpx { namespace parcelset
         virtual bool add_exception(boost::exception_ptr e) = 0;
 
         /// return next available parcel
-        virtual bool get_parcel(parcel& p, error_code& ec = throws) = 0;
+        virtual bool get_parcel(parcel& p) = 0;
 
         /// return parcel with given id
-        virtual bool get_parcel(parcel& p, naming::gid_type const& parcel_id,
-            error_code& ec = throws) = 0;
+        virtual bool get_parcel(parcel& p, naming::gid_type const& parcel_id) = 0;
 
         /// register event handler to be notified whenever a parcel arrives
         virtual bool register_event_handler(callback_type const& sink) = 0;

@@ -27,14 +27,9 @@ namespace hpx { namespace actions
         parcelset::parcelhandler& parcel_handler,
         naming::gid_type const& parcel_id)
     {
-        error_code ec;
-
         parcelset::parcel p;
-        if (!parcel_handler.get_parcel(p, parcel_id, ec))
-        {
-            hpx::report_error(hpx::detail::access_exception(ec));
+        if (!parcel_handler.get_parcel(p, parcel_id))
             return;
-        }
 
         while (threads::threadmanager_is(starting))
         {
