@@ -9,8 +9,8 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
+#include <hpx/async.hpp>
 
 namespace hpx { namespace lcos { namespace stubs
 {

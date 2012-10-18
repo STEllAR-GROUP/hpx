@@ -28,14 +28,14 @@ namespace examples { namespace server
     ///
     /// Components are first-class objects in HPX. This means that they are
     /// globally addressable; all components have a unique GID.
-    /// 
+    ///
     /// This example demonstrates how to write a simple component. Simple
     /// components are allocated one at a time with the C++'s new allocator.
     /// When a component needs to be created in small quantities, simple
     /// components should be used. At least two AGAS requests will be made when
-    /// a simple component is created. 
+    /// a simple component is created.
     ///
-    /// This component exposes 3 different actions: reset, add and query.  
+    /// This component exposes 3 different actions: reset, add and query.
     class simple_accumulator
       : public hpx::components::simple_component_base<simple_accumulator>
     {
@@ -60,9 +60,9 @@ namespace examples { namespace server
         }
 
         /// Return the current value to the caller.
-        boost::uint64_t query()
+        boost::uint64_t query() const
         {
-            // Get the value of value_. 
+            // Get the value of value_.
             return value_.load();
         }
 
@@ -71,44 +71,9 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes. 
-        enum actions
-        {
-            accumulator_reset = 0,
-            accumulator_add   = 1,
-            accumulator_query = 2
-        };
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            simple_accumulator,
-            // Action code.
-            accumulator_reset,
-            // Method bound to this action.
-            &simple_accumulator::reset
-        > reset_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            simple_accumulator,
-            // Action code.
-            accumulator_add,
-            // Arguments of this action.
-            boost::uint64_t,
-            // Method bound to this action.
-            &simple_accumulator::add
-        > add_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            simple_accumulator,
-            // Return type.
-            boost::uint64_t,
-            // Action code.
-            accumulator_query,
-            // Method bound to this action.
-            &simple_accumulator::query
-        > query_action;
+        HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, reset);
+        HPX_DEFINE_COMPONENT_ACTION(simple_accumulator, add);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(simple_accumulator, query);
 
     private:
         boost::atomic<boost::uint64_t> value_;

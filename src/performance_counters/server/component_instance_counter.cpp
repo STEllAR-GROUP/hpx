@@ -7,6 +7,7 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail

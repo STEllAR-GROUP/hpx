@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
+#include <map>
+#include <set>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
@@ -22,9 +24,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/bind.hpp>
-#if defined(HPX_DEBUG)
 #include <boost/foreach.hpp>
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -84,7 +84,7 @@ namespace hpx { namespace parcelset
 
         using boost::asio::ip::tcp;
         if (NULL == acceptor_)
-            acceptor_ = new boost::asio::ip::tcp::acceptor(io_service_pool_.get_io_service());
+            acceptor_ = new tcp::acceptor(io_service_pool_.get_io_service());
 
         // initialize network
         std::size_t tried = 0;
@@ -133,6 +133,20 @@ namespace hpx { namespace parcelset
             // now it's safe to take everything down
             connection_cache_.clear();
 
+            {
+                // cancel all pending read operations, close those sockets
+                util::spinlock::scoped_lock l(mtx_);
+                BOOST_FOREACH(server::parcelport_connection_ptr c, 
+                    accepted_connections_)
+                {
+                    boost::system::error_code ec;
+                    c->socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                    c->socket().close(ec);    // close the socket to give it back to the OS
+                }
+                accepted_connections_.clear();
+            }
+
+            // cancel all pending accept operations
             if (NULL != acceptor_)
             {
                 boost::system::error_code ec;
@@ -160,6 +174,16 @@ namespace hpx { namespace parcelset
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
+
+            {
+                // keep track of all the accepted connections
+                util::spinlock::scoped_lock l(mtx_);
+                accepted_connections_.insert(c);
+            }
+
+            // disable Nagle algorithm, disable lingering on close
+            c->socket().set_option(boost::asio::ip::tcp::no_delay(true));
+            c->socket().set_option(boost::asio::socket_base::linger(true, 0));
 
             // now accept the incoming connection by starting to read from the
             // socket
@@ -257,6 +281,12 @@ namespace hpx { namespace parcelset
                 BOOST_ASSERT(locality_id.get_port() == connection_port);
             }
 #endif
+            // make sure the Nagle algorithm is disabled for this socket,
+            // disable lingering on close
+            client_connection->socket().set_option(
+                boost::asio::ip::tcp::no_delay(true));
+            client_connection->socket().set_option(
+                boost::asio::socket_base::linger(true, 0));
         }
 #if defined(HPX_DEBUG)
         else {

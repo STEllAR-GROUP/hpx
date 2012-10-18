@@ -125,7 +125,7 @@ void hpx_test_main(
     Client monitor(here);
 
     {
-        id_type id = monitor.detach();
+        id_type id = monitor.detach().get();
 
         cout << "id: " << id << " "
              << get_management_type_name(id.get_management_type()) << "\n"

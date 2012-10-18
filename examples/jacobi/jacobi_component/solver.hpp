@@ -15,9 +15,8 @@
 namespace jacobi
 {
     struct solver
+        : hpx::components::client_base<solver, hpx::components::stub_base<server::solver> >
     {
-        hpx::naming::id_type id;
-
         solver(grid const & g, std::size_t nx, std::size_t line_block)
         {
             // make get the type of the solver component
@@ -32,25 +31,12 @@ namespace jacobi
 
             BOOST_ASSERT(localities.size() > 0);
 
-            typedef
-                hpx::components::server::create_component_action3<
-                    hpx::components::managed_component<server::solver>
-                  , grid
-                  , std::size_t
-                  , std::size_t
-                > create_component_action;
-
-            id = hpx::async<create_component_action>(
-                    localities[0]
-                  , g
-                  , nx
-                  , line_block
-                ).get();
+            this->create(localities[0], g, nx, line_block);
         }
 
         void run(std::size_t max_iterations)
         {
-            hpx::async<server::solver::run_action>(id, max_iterations).get();
+            hpx::async<server::solver::run_action>(this->get_gid(), max_iterations).get();
         }
 
     };

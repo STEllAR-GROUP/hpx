@@ -10,6 +10,7 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
+            AppendProperty
             HandleComponentDependencies
             Install
             AddSourceGroup)
@@ -17,7 +18,7 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;INI;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;LANGUAGE"
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;INI;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
     "ESSENTIAL;NOLIBS;AUTOGLOB;STATIC" ${ARGN})
 
   if(NOT ${name}_LANGUAGE)
@@ -119,6 +120,8 @@ macro(add_hpx_component name)
     set(libs ${hpx_LIBRARIES})
     set_property(TARGET ${name}_component APPEND
                  PROPERTY COMPILE_DEFINITIONS
+                 "HPX_PREFIX=\"${HPX_PREFIX}\""
+                 "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
                  "BOOST_ENABLE_ASSERT_HANDLER")
   endif()
 
@@ -192,12 +195,11 @@ macro(add_hpx_component name)
   endif()
 
   if(${name}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_component APPEND
-      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+    hpx_append_property(${name}_component COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
   if(${name}_LINK_FLAGS)
-    set_property(TARGET ${name}_component APPEND
+    hpx_append_propert(TARGET ${name}_component APPEND
       PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
 
@@ -207,25 +209,6 @@ macro(add_hpx_component name)
     if(NOT MSVC)
       set_property(TARGET ${name}_component APPEND
         PROPERTY LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    endif()
-  endif()
-
-  if(${name}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_component APPEND
-      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
-  endif()
-
-  if(${name}_LINK_FLAGS)
-    set_property(TARGET ${name}_component APPEND
-      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
-  endif()
-
-  if(HPX_COMPILE_FLAGS)
-    set_property(TARGET ${name}_component APPEND
-      PROPERTY COMPILE_FLAGS ${HPX_COMPILE_FLAGS})
-    if(NOT MSVC)
-      set_property(TARGET ${name}_component APPEND
-        PROPERTY LINK_FLAGS ${HPX_COMPILE_FLAGS})
     endif()
   endif()
 
@@ -248,7 +231,11 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_EXPORTS")
 
   if(NOT HPX_NO_INSTALL)
-    hpx_library_install(${name}_component)
+    if(${name}_INSTALL_SUFFIX)
+      hpx_library_install(${name}_component ${${name}_INSTALL_SUFFIX})
+    else()
+      hpx_library_install(${name}_component lib/hpx)
+    endif()
 
     foreach(target ${${name}_INI})
       hpx_debug("add_component.${name}" "installing ini: ${name}")

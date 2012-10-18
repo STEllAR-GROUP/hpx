@@ -86,7 +86,7 @@ void hpx_test_main(
 
         {
             // Detach the reference.
-            id_type id = monitor.detach();
+            id_type id = monitor.detach().get();
 
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));

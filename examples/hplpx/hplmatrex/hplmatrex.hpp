@@ -15,7 +15,7 @@ a destructor, and access operators.
 */
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/hplmatrex.hpp"
 
@@ -33,14 +33,12 @@ namespace hpx { namespace components
 
     //initialization function
     int construct(unsigned int h, unsigned int ab, unsigned int bs){
-        BOOST_ASSERT(gid_);
-        return this->base_type::construct(gid_,h,ab,bs);
+        return this->base_type::construct(get_gid(),h,ab,bs);
     }
 
     //functions for solving the matrix
     double LUsolve(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::LUsolve(gid_);
+        return this->base_type::LUsolve(get_gid());
     }
     };
 }}

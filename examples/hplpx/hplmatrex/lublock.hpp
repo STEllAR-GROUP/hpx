@@ -10,7 +10,7 @@
 /*This is the lublock interface header file.*/
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/lublock.hpp"
 
@@ -30,41 +30,34 @@ namespace hpx { namespace components
     int construct_block(const int h, const int w, const int px, const int py,
         const int size, const vector<vector<id_type> > gidList,
         const vector<vector<double> > theData){
-        BOOST_ASSERT(gid_);
+        BOOST_ASSERT(get_gid());
         return this->base_type::construct_block(
-            gid_,h,w,px,py,size,gidList,theData);
+            get_gid(),h,w,px,py,size,gidList,theData);
     }
 
     //Gaussian functions below
     server::lublock::gcFuture gauss_corner(const int iter){
-        BOOST_ASSERT(gid_);
-        return this->base_type::gauss_corner(gid_,iter);
+        return this->base_type::gauss_corner(get_gid(),iter);
     }
     server::lublock::gtoFuture gauss_top(const int iter){
-        BOOST_ASSERT(gid_);
-        return this->base_type::gauss_top(gid_,iter);
+        return this->base_type::gauss_top(get_gid(),iter);
     }
     server::lublock::glFuture gauss_left(const int iter){
-        BOOST_ASSERT(gid_);
-        return this->base_type::gauss_left(gid_,iter);
+        return this->base_type::gauss_left(get_gid(),iter);
     }
     server::lublock::gtrFuture gauss_trail(const int iter){
-        BOOST_ASSERT(gid_);
-        return this->base_type::gauss_trail(gid_,iter);
+        return this->base_type::gauss_trail(get_gid(),iter);
     }
 
     //get functions
     int get_rows(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::get_rows(gid_);
+        return this->base_type::get_rows(get_gid());
     }
     int get_columns(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::get_columns(gid_);
+        return this->base_type::get_columns(get_gid());
     }
     vector<vector<double> > get_data(){
-        BOOST_ASSERT(gid_);
-        return this->base_type::get_data(gid_);
+        return this->base_type::get_data(get_gid());
     }
     };
 }}

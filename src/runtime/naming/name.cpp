@@ -13,6 +13,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>

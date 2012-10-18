@@ -131,7 +131,7 @@ namespace hpx
 
     std::string build_type()
     {
-        return HPX_BUILD_TYPE;
+        return BOOST_PP_STRINGIZE(HPX_BUILD_TYPE);
     }
 
     std::string build_date_time()

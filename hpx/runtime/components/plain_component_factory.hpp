@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
@@ -202,27 +203,27 @@ namespace hpx { namespace components
         ::hpx::components::factory_check)                                     \
 /**/
 
-#define HPX_REGISTER_PLAIN_ACTION_2(plain_action, plain_action_name)          \
-    HPX_REGISTER_PLAIN_ACTION_3(plain_action, plain_action_name,              \
+#define HPX_REGISTER_PLAIN_ACTION_2(action_type, plain_action_name)           \
+    HPX_REGISTER_PLAIN_ACTION_3(action_type, plain_action_name,               \
         ::hpx::components::factory_check)                                     \
 /**/
 
-#define HPX_REGISTER_PLAIN_ACTION_3(plain_action, plain_action_name, state)   \
-    BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<plain_action>,      \
+#define HPX_REGISTER_PLAIN_ACTION_3(action_type, plain_action_name, state)    \
+    BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<action_type>,       \
         BOOST_PP_STRINGIZE(plain_action_name))                                \
-    HPX_REGISTER_ACTION_2(plain_action, plain_action_name)                    \
+    HPX_REGISTER_ACTION_2(action_type, plain_action_name)                     \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
-        hpx::components::plain_component_factory<plain_action>,               \
+        hpx::components::plain_component_factory<action_type>,                \
         plain_action_name)                                                    \
     HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
-        hpx::components::plain_component_factory<plain_action>,               \
+        hpx::components::plain_component_factory<action_type>,                \
         plain_action_name)                                                    \
-    template struct hpx::components::plain_component_factory<plain_action>;   \
+    template struct hpx::components::plain_component_factory<action_type>;    \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(                                \
-        hpx::components::server::plain_function<plain_action>,                \
+        hpx::components::server::plain_function<action_type>,                 \
         plain_action_name, state)                                             \
     HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
-        hpx::components::server::plain_function<plain_action>)                \
+        hpx::components::server::plain_function<action_type>)                 \
 /**/
 
 /// \endcond

@@ -484,7 +484,8 @@ namespace hpx { namespace naming
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
 
-        // This function is used in AGAS unit tests, do not remove.
+        // This function is used in AGAS unit tests and application code, do not
+        // remove.
         management_type get_management_type() const
         {
             return management_type(gid_->get_management_type());
@@ -678,7 +679,10 @@ namespace hpx { namespace traits
     struct promise_local_result<std::vector<naming::gid_type> >
       : boost::mpl::identity<std::vector<naming::id_type> >
     {};
-}}
+}
+
+    using naming::invalid_id;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format

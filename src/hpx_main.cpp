@@ -31,8 +31,16 @@ int hpx_main()
     std::size_t argcount = 0;
     for (std::size_t i = 0; i < args.size(); ++i)
     {
-        if (0 != args[i].find("--hpx:"))
+        if (0 != args[i].find("--hpx:")) {
             argv[argcount++] = const_cast<char*>(args[i].data());
+        }
+        else if (6 == args[i].find("positional", 6)) {
+            std::string::size_type p = args[i].find_last_of("=");
+            if (p != std::string::npos) {
+                args[i] = args[i].substr(p+1);
+                argv[argcount++] = const_cast<char*>(args[i].data());
+            }
+        }
     }
 
     // Invoke hpx_main

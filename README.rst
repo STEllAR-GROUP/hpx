@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2012 Louisiana State University
+.. Copyright (c) 2007-2012 Louisiana State University 
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,6 +6,10 @@
 *****
  HPX 
 *****
+
+HPX is a a general purpose C++ runtime system for parallel and distributed 
+applications of any scale. Even if that's quite a mouthful, we mean every 
+word of it!
 
 The goal of HPX is to create a high quality, freely available, open source 
 implementation of the ParalleX model for conventional systems, such as 
@@ -18,6 +22,28 @@ functionalities and converging onto a stable API which will provide a
 smooth migration path for developers. The API exposed by HPX is modelled 
 after the interfaces defined by the C++11 ISO standard and adheres to the 
 programming guidelines used by the Boost collection of C++ libraries. 
+
+****************************
+What's so special about HPX?
+****************************
+
+* HPX exposes an uniform, standards-oriented API for ease of programming 
+  parallel and distributed applications.
+* It enables programmers to write fully asynchronous  code using hundreds 
+  of millions of threads.
+* HPX provides unified syntax and semantics for local and remote operations.
+* HPX makes concurrency manageable with dataflow and future based 
+  synchronization 
+* It implements a rich set of runtime services supporting a broad range of 
+  use cases.
+* It is designed to solve problems conventionally considered to be 
+  scaling-impaired.
+* HPX has been designed and developed for systems of any scale, from 
+  hand-held devices to very large scale systems.
+* It is the first fully functional implementation of the ParalleX execution 
+  model.
+* HPX is published under a liberal open-source license and has a open, 
+  active, and thriving developer community.
 
 
 The documentation for the latest release of HPX (currently V0.9.0) can be 
@@ -38,7 +64,6 @@ trick their way into the code base - you have been warned!
 In any case, if you happen to run into problems we very much encourage and appreciate
 any problem reports through the `issue tracker for this Github project 
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
-
 
 ********************
  Build Instructions 

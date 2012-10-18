@@ -10,10 +10,10 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/client.hpp>
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/lockfree/fifo.hpp>

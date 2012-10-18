@@ -23,6 +23,9 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
+
+#include <boost/preprocessor/cat.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -452,7 +455,27 @@ namespace hpx { namespace actions
 ///
 /// \note This macro should be used for non-const member functions only. Use
 /// the macro \a HPX_DEFINE_COMPONENT_CONST_ACTION for const member functions.
-#define HPX_DEFINE_COMPONENT_ACTION(component, func, action_type)             \
+///
+/// \note The macro \a HPX_DEFINE_COMPONENT_ACTION can be used with 1 or 
+/// 2 arguments. The second argument is optional. The default value for the 
+/// second argument (the typename of the defined action) is derived from the 
+/// name of the function (as passed as the first argument) by appending '_action'.
+/// The second argument can be omitted only if the first argument with an 
+/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
+#define HPX_DEFINE_COMPONENT_ACTION(...)                                      \
+    HPX_DEFINE_COMPONENT_ACTION_(__VA_ARGS__)                                 \
+/**/
+
+#define HPX_DEFINE_COMPONENT_ACTION_(...)                                     \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DEFINE_COMPONENT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)           \
+    )(__VA_ARGS__))                                                           \
+
+#define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                        \
+    typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type                  \
+        BOOST_PP_CAT(func, _action)                                           \
+    /**/
+#define HPX_DEFINE_COMPONENT_ACTION_3(component, func, action_type)           \
     typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type action_type      \
     /**/
 
@@ -492,19 +515,71 @@ namespace hpx { namespace actions
 ///
 /// \note This macro should be used for const member functions only. Use
 /// the macro \a HPX_DEFINE_COMPONENT_ACTION for non-const member functions.
-#define HPX_DEFINE_COMPONENT_CONST_ACTION(component, func, name)              \
-    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type name       \
+///
+/// \note The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used with 1 or 
+/// 2 arguments. The second argument is optional. The default value for the 
+/// second argument (the typename of the defined action) is derived from the 
+/// name of the function (as passed as the first argument) by appending '_action'.
+/// The second argument can be omitted only if the first argument with an 
+/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
+#define HPX_DEFINE_COMPONENT_CONST_ACTION(...)                                \
+    HPX_DEFINE_COMPONENT_CONST_ACTION_(__VA_ARGS__)                           \
+/**/
+
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_(...)                               \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DEFINE_COMPONENT_CONST_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)     \
+    )(__VA_ARGS__))                                                           \
+
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_2(component, func)                  \
+    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type            \
+        BOOST_PP_CAT(func, _action)                                           \
+    /**/
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_3(component, func, action_type)     \
+    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type action_type\
     /**/
 
 /// \cond NOINTERNAL
 
-#define HPX_DEFINE_COMPONENT_DIRECT_ACTION(component, func, name)             \
-    typedef HPX_MAKE_DIRECT_COMPONENT_ACTION(component, func)::type name      \
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION(...)                               \
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION_(__VA_ARGS__)                          \
+/**/
+
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION_(...)                              \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)    \
+    )(__VA_ARGS__))                                                           \
+
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \
+    typedef HPX_MAKE_DIRECT_COMPONENT_ACTION(component, func)::type           \
+        BOOST_PP_CAT(func, _type)                                             \
     /**/
-#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(component, func, name)       \
-    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type name\
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, action_type)    \
+    typedef HPX_MAKE_DIRECT_COMPONENT_ACTION(component, func)::type           \
+        action_type                                                           \
     /**/
 
+
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(...)                         \
+    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_(__VA_ARGS__)                    \
+/**/
+
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_(...)                        \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    )(__VA_ARGS__))                                                           \
+
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_2(component, func)           \
+    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type     \
+        BOOST_PP_CAT(func, _type)                                             \
+    /**/
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_3(component, func, action_type)\
+    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type     \
+        action_type                                                           \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+// same as above, just for template functions
 #define HPX_DEFINE_COMPONENT_ACTION_TPL(component, func, name)                \
     typedef typename HPX_MAKE_COMPONENT_ACTION_TPL(component, func)::type name\
     /**/

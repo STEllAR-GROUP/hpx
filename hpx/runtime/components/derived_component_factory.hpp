@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 

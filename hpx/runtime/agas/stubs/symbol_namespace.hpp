@@ -18,6 +18,7 @@ namespace hpx { namespace agas { namespace stubs
 struct HPX_EXPORT symbol_namespace
 {
     typedef server::symbol_namespace server_type;
+    typedef server::symbol_namespace server_component_type;
 
     typedef server_type::iterate_names_function_type
         iterate_names_function_type;

@@ -183,15 +183,20 @@ namespace hpx { namespace util
                     continue;
 
                 // instance name and module name are the same
-                std::string name (fs::basename(curr));
+                std::string name(fs::basename(curr));
+
+#if !defined(BOOST_WINDOWS)
+                if (0 == name.find("lib"))
+                    name = name.substr(3);
+#endif
 
                 try {
                     // get the handle of the library
-                    boost::plugin::dll d (curr.string(), name);
+                    boost::plugin::dll d(curr.string(), name);
 
                     // get the factory
                     boost::plugin::plugin_factory<components::component_registry_base>
-                        pf (d, BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(registry)));
+                        pf(d, "registry");
 
                     // retrieve the names of all known registries
                     std::vector<std::string> names;
@@ -204,8 +209,8 @@ namespace hpx { namespace util
                         // default configuration data.
                         using namespace boost::assign;
                         ini_data += std::string("[hpx.components.") + name + "]";
-                        ini_data += "mangledname = " + name;
-                        ini_data += "path = $[hpx.location]/lib/hpx/";
+                        ini_data += "name = " + name;
+                        ini_data += "path = " + curr.parent_path().string();
                         ini_data += "no_factory = 1";
                         ini_data += "enabled = 1";
                     }

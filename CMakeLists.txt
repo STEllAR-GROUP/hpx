@@ -292,7 +292,7 @@ else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
 endif()
 
-add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
+#add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 
 # Make sure the specified build type is valid.
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
@@ -468,19 +468,19 @@ if(MSVC)
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
-    add_definitions(-DHPX_BUILD_TYPE="debug")
+    add_definitions(-DHPX_BUILD_TYPE=debug)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    add_definitions(-DHPX_BUILD_TYPE="relwithdebinfo")
+    add_definitions(-DHPX_BUILD_TYPE=relwithdebinfo)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    add_definitions(-DHPX_BUILD_TYPE="minsizerel")
+    add_definitions(-DHPX_BUILD_TYPE=minsizerel)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
-    add_definitions(-DHPX_BUILD_TYPE="release")
+    add_definitions(-DHPX_BUILD_TYPE=release)
   endif()
 endif()
 
@@ -733,12 +733,12 @@ else()
     hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
   endif()
 
-  ##############################################################################
-  # Stacktraces
-  ##############################################################################
-  if(HPX_STACKTRACES)
-    # Export all visible symbols, not just those that are used
+  hpx_option(HPX_PIE BOOL "Compile executables as shared objects" ON ADVANCED)
+
+  # This is necessary to ensure that our executables are ELF DYN objects.
+  if(HPX_PIE)
     hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
 
   ##############################################################################
@@ -976,15 +976,17 @@ else()
   set(hpx_MALLOC_LIBRARY "")
 
   if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
-    if(TCMALLOC_FOUND OR JEMALLOC_FOUND)
-      if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" OR NOT JEMALLOC_FOUND)
+    if(TCMALLOC_FOUND)
+      if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
         #hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
         hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
-      else()
+      endif()
+    elseif(JEMALLOC_FOUND)
+      if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC")
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
@@ -992,7 +994,9 @@ else()
         hpx_link_sys_directories(${JEMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_JEMALLOC)
       endif()
+    endif()
 
+    if(JEMALLOC_FOUND OR TCMALLOC_FOUND)    
       hpx_use_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
       hpx_use_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
       hpx_use_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)
@@ -1002,14 +1006,10 @@ else()
       hpx_use_flag_if_available(-fno-builtin-valloc LANGUAGES CXX C)
       hpx_use_flag_if_available(-fno-builtin-memalign LANGUAGES CXX C)
       hpx_use_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
-    else()
-      hpx_info("malloc" "Using system allocator.")
-
-      hpx_warn("malloc"
-        "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
     endif()
   else()
     hpx_info("malloc" "Using system allocator.")
+
     hpx_warn("malloc"
       "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()

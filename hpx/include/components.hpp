@@ -27,11 +27,14 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
+
+#include <hpx/runtime/components/new.hpp>
 
 #endif
 

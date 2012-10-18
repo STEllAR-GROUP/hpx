@@ -7,7 +7,7 @@
 #define HPX_COMPONENTS_RANDOM_ACCESS_JUN_06_2011_1123AM
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/random_mem_access.hpp"
 
@@ -42,47 +42,41 @@ namespace hpx { namespace components
         /// Initialize the random_mem_access value
         void init(int i)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::init(gid_,i);
+            this->base_type::init(get_gid(),i);
         }
 
         /// Add the given number to the random_mem_access
         void add ()
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::add(gid_);
+            this->base_type::add(get_gid());
         }
 
         hpx::lcos::future<void> add_async ()
         {
-            BOOST_ASSERT(gid_);
-            return(this->base_type::add_async(gid_));
+            return(this->base_type::add_async(get_gid()));
         }
 
         /// Print the current value of the random_mem_access
         void print()
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::print(gid_);
+            this->base_type::print(get_gid());
         }
         /// Asynchronously query the current value of the random_mem_access
         hpx::lcos::future<void> print_async ()
         {
-            BOOST_ASSERT(gid_);
-            return(this->base_type::print_async(gid_));
+            return(this->base_type::print_async(get_gid()));
         }
 
         /// Query the current value of the random_mem_access
         int query()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::query(gid_);
+            return this->base_type::query(get_gid());
         }
 
         /// Asynchronously query the current value of the random_mem_access
         lcos::future<int> query_async()
         {
-            return this->base_type::query_async(gid_);
+            return this->base_type::query_async(get_gid());
         }
     };
 

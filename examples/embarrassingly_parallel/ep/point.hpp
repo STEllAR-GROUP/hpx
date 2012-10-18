@@ -6,7 +6,7 @@
 #if !defined(HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805)
 #define HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/point.hpp"
 
@@ -36,14 +36,12 @@ namespace ep
 
         hpx::lcos::future<void> bfs_async(std::size_t scale)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::bfs_async(gid_,scale);
+            return this->base_type::bfs_async(get_gid(),scale);
         }
 
         void bfs(std::size_t scale)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::bfs(gid_,scale);
+            this->base_type::bfs(get_gid(),scale);
         }
     };
 }

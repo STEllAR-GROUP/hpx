@@ -11,6 +11,7 @@ hpx_include(Message
             Option
             ListContains
             ParseArguments
+            AppendProperty
             Install
             GetIncludeDirectory
             Compile

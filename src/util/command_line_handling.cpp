@@ -309,6 +309,40 @@ namespace hpx { namespace util
         bool run_agas_server = vm.count("hpx:run-agas-server") ? true : false;
         std::size_t node = env.retrieve_node_number();
 
+        // If the user has not specified an explicit runtime mode we
+        // retrieve it from the command line.
+        if (hpx::runtime_mode_default == mode) {
+            // The default mode is console, i.e. all workers need to be
+            // started with --worker/-w.
+            mode = hpx::runtime_mode_console;
+            if (vm.count("hpx:console") + vm.count("hpx:worker") +
+                vm.count("hpx:connect") > 1)
+            {
+                throw std::logic_error("Ambiguous command line options. "
+                    "Do not specify more than one of --hpx:console, "
+                    "--hpx:worker, or --hpx:connect");
+            }
+
+            // In these cases we default to executing with an empty
+            // hpx_main, except if specified otherwise.
+            if (vm.count("hpx:worker")) {
+                mode = hpx::runtime_mode_worker;
+
+                // do not execute any explicit hpx_main except if asked
+                // otherwise
+                if (!vm.count("hpx:run-hpx-main"))
+                    f = 0;
+            }
+            else if (vm.count("hpx:connect")) {
+                mode = hpx::runtime_mode_connect;
+
+                // do not execute any explicit hpx_main except if asked
+                // otherwise
+                if (!vm.count("hpx:run-hpx-main"))
+                    f = 0;
+            }
+        }
+
         // we initialize certain settings if --node is specified (or data
         // has been retrieved from the environment)
         if (node != std::size_t(-1) || vm.count("hpx:node")) {
@@ -360,40 +394,6 @@ namespace hpx { namespace util
         queuing = "priority_local";
         if (vm.count("hpx:queuing"))
             queuing = vm["hpx:queuing"].as<std::string>();
-
-        // If the user has not specified an explicit runtime mode we
-        // retrieve it from the command line.
-        if (hpx::runtime_mode_default == mode) {
-            // The default mode is console, i.e. all workers need to be
-            // started with --worker/-w.
-            mode = hpx::runtime_mode_console;
-            if (vm.count("hpx:console") + vm.count("hpx:worker") +
-                vm.count("hpx:connect") > 1)
-            {
-                throw std::logic_error("Ambiguous command line options. "
-                    "Do not specify more than one of --hpx:console, "
-                    "--hpx:worker, or --hpx:connect");
-            }
-
-            // In these cases we default to executing with an empty
-            // hpx_main, except if specified otherwise.
-            if (vm.count("hpx:worker")) {
-                mode = hpx::runtime_mode_worker;
-
-                // do not execute any explicit hpx_main except if asked
-                // otherwise
-                if (!vm.count("hpx:run-hpx-main"))
-                    f = 0;
-            }
-            else if (vm.count("hpx:connect")) {
-                mode = hpx::runtime_mode_connect;
-
-                // do not execute any explicit hpx_main except if asked
-                // otherwise
-                if (!vm.count("hpx:run-hpx-main"))
-                    f = 0;
-            }
-        }
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);

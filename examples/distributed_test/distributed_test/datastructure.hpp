@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/datastructure.hpp"
 
@@ -53,7 +53,7 @@ namespace distributed
             , std::size_t my_cardinality, std::size_t initial_length
             , std::size_t initial_value)
         {
-            return stubs::datastructure::data_init_async(this->gid_,
+            return stubs::datastructure::data_init_async(this->get_gid(),
                 symbolic_name, num_instances, my_cardinality, initial_length
                 , initial_value);
         }
@@ -62,7 +62,7 @@ namespace distributed
             , std::size_t my_cardinality, std::size_t initial_length
             , std::size_t initial_value)
         {
-            stubs::datastructure::data_init(this->gid_, symbolic_name,
+            stubs::datastructure::data_init(this->get_gid(), symbolic_name,
                 num_instances, my_cardinality, initial_length, initial_value);
         }
         //////////////////////////////////////////////////////////////////////
@@ -70,48 +70,48 @@ namespace distributed
         data_write_async(std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality, std::vector<std::size_t> client_data)
         {
-            return stubs::datastructure::data_write_async(this->gid_,
+            return stubs::datastructure::data_write_async(this->get_gid(),
                 symbolic_name, num_instances, my_cardinality, client_data);
         }
         
         void data_write(std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality, std::vector<std::size_t> client_data)
         {
-            stubs::datastructure::data_write(this->gid_, symbolic_name,
+            stubs::datastructure::data_write(this->get_gid(), symbolic_name,
                 num_instances, my_cardinality, client_data);
         }
         //////////////////////////////////////////////////////////////////////
         hpx::lcos::future<distributed::config_comp>
         get_config_info_async()
         {
-            return stubs::datastructure::get_config_info_async(this->gid_);
+            return stubs::datastructure::get_config_info_async(this->get_gid());
         }
 
         distributed::config_comp get_config_info()
         {
-            return stubs::datastructure::get_config_info(this->gid_);
+            return stubs::datastructure::get_config_info(this->get_gid());
         }
         //////////////////////////////////////////////////////////////////////
         hpx::lcos::future<std::vector<std::size_t>>
         get_data_async()
         {
-            return stubs::datastructure::get_data_async(this->gid_);
+            return stubs::datastructure::get_data_async(this->get_gid());
         }
 
         std::vector<std::size_t> get_data()
         {
-            return stubs::datastructure::get_data(this->gid_);
+            return stubs::datastructure::get_data(this->get_gid());
         }
         //////////////////////////////////////////////////////////////////////
         hpx::lcos::future<std::size_t>
         get_data_at_async(std::size_t pos)
         {
-            return stubs::datastructure::get_data_at_async(this->gid_, pos);
+            return stubs::datastructure::get_data_at_async(this->get_gid(), pos);
         }
 
         std::size_t get_data_at(std::size_t pos)
         {
-            return stubs::datastructure::get_data_at(this->gid_, pos);
+            return stubs::datastructure::get_data_at(this->get_gid(), pos);
         }
 //////////////////////////////////////////////////////////////////////////////
     };

@@ -13,6 +13,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 

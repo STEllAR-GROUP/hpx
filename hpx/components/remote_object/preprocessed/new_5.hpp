@@ -11,7 +11,9 @@
     
     
     template <typename T, typename A0>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0)
     {
         lcos::packaged_action<
@@ -32,7 +34,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         lcos::packaged_action<
@@ -53,7 +57,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1 , typename A2>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         lcos::packaged_action<
@@ -74,7 +80,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         lcos::packaged_action<
@@ -95,7 +103,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         lcos::packaged_action<
@@ -116,7 +126,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         lcos::packaged_action<
@@ -137,7 +149,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         lcos::packaged_action<
@@ -158,7 +172,9 @@
         return p.get_future();
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         lcos::packaged_action<

@@ -6,7 +6,7 @@
 #if !defined(HPX_EXAMPLE_BFS_BGL_GRAPH_JAN_01_2012_0519PM)
 #define HPX_EXAMPLE_BFS_BGL_GRAPH_JAN_01_2012_0519PM
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <boost/assert.hpp>
 
 #include "stubs/bgl_graph.hpp"
@@ -41,53 +41,45 @@ namespace bfs
             std::size_t idx, std::size_t grainsize,
             std::vector<std::pair<std::size_t, std::size_t> > const& edgelist)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_, idx, grainsize, edgelist);
+            return this->base_type::init_async(get_gid(), idx, grainsize, edgelist);
         }
         void init(std::size_t idx, std::size_t grainsize,
             std::vector<std::pair<std::size_t, std::size_t> > const& edgelist)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_, idx, grainsize, edgelist);
+            this->base_type::init_async(get_gid(), idx, grainsize, edgelist);
         }
 
         /// Perform a BFS on the graph.
         hpx::lcos::future<double>
         bfs_async(std::size_t root)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::bfs_async(gid_, root);
+            return this->base_type::bfs_async(get_gid(), root);
         }
         double bfs(std::size_t root)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::bfs(gid_, root);
+            return this->base_type::bfs(get_gid(), root);
         }
 
         /// validate the BFS on the graph.
         hpx::lcos::future<std::vector<std::size_t> >
         get_parents_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_parents_async(gid_);
+            return this->base_type::get_parents_async(get_gid());
         }
         std::vector<std::size_t> get_parents()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_parents(gid_);
+            return this->base_type::get_parents(get_gid());
         }
 
         /// Reset for the next BFS
         hpx::lcos::future<void>
         reset_async()
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::reset_async(gid_);
+            return this->base_type::reset_async(get_gid());
         }
         void reset()
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::reset(gid_);
+            this->base_type::reset(get_gid());
         }
     };
 }

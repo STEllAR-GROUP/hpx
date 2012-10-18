@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/partition3d.hpp"
 
@@ -46,14 +46,14 @@ namespace interpolate3d
         init_async(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            return stubs::partition3d::init_async(this->gid_, datafilename,
+            return stubs::partition3d::init_async(this->get_gid(), datafilename,
                 dimx, dimy, dimz);
         }
 
         void init(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            stubs::partition3d::init(this->gid_, datafilename, dimx, dimy, dimz);
+            stubs::partition3d::init(this->get_gid(), datafilename, dimx, dimy, dimz);
         }
 
         // ask this partition to interpolate, note that value must be in the
@@ -61,13 +61,13 @@ namespace interpolate3d
         hpx::lcos::future<double>
         interpolate_async(double value_x, double value_y, double value_z)
         {
-            return stubs::partition3d::interpolate_async(this->gid_,
+            return stubs::partition3d::interpolate_async(this->get_gid(),
                 value_x, value_y, value_z);
         }
 
         double interpolate(double value_x, double value_y, double value_z)
         {
-            return stubs::partition3d::interpolate(this->gid_,
+            return stubs::partition3d::interpolate(this->get_gid(),
                 value_x, value_y, value_z);
         }
     };

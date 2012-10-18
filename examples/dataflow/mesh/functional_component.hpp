@@ -11,7 +11,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/functional_component.hpp"
 
@@ -43,14 +43,14 @@ namespace hpx { namespace components { namespace amr
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             double cycle_time, parameter const& par)
         {
-            return this->base_type::eval_async(this->gid_, result, gids, row, column, cycle_time, par);
+            return this->base_type::eval_async(this->get_gid(), result, gids, row, column, cycle_time, par);
         }
 
         int eval(naming::id_type const& result,
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             double cycle_time, parameter const& par)
         {
-            return this->base_type::eval(this->gid_, result, gids, row, column, cycle_time, par);
+            return this->base_type::eval(this->get_gid(), result, gids, row, column, cycle_time, par);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ namespace hpx { namespace components { namespace amr
             double time,
             parameter const& par)
         {
-            return this->base_type::alloc_data_async(this->gid_, item,
+            return this->base_type::alloc_data_async(this->get_gid(), item,
                 maxitems, row, interp_src_data,time, par);
         }
 
@@ -68,14 +68,14 @@ namespace hpx { namespace components { namespace amr
             int row,std::vector<naming::id_type> const& interp_src_data,
             double time, parameter const& par)
         {
-            return this->base_type::alloc_data(this->gid_, item, maxitems,
+            return this->base_type::alloc_data(this->get_gid(), item, maxitems,
                 row, interp_src_data,time,par);
         }
 
         ///////////////////////////////////////////////////////////////////////
         void init(std::size_t numsteps, naming::id_type const& val)
         {
-            this->base_type::init(this->gid_, numsteps, val);
+            this->base_type::init(this->get_gid(), numsteps, val);
         }
     };
 

@@ -10,13 +10,14 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
+            AppendProperty 
             HandleComponentDependencies
             Install)
 
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;LANGUAGE"
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
     "ESSENTIAL;NOLIBS;NOHPXINIT" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
@@ -74,21 +75,17 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_EXPORTS")
 
   if(${name}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_exe APPEND
-      PROPERTY COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
+    hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
   if(${name}_LINK_FLAGS)
-    set_property(TARGET ${name}_exe APPEND
-      PROPERTY LINK_FLAGS ${${name}_LINK_FLAGS})
+    hpx_append_property(${name}_exe LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
 
   if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
-    set_property(TARGET ${name}_exe APPEND
-      PROPERTY COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
+    hpx_append_property(${name}_exe COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     if(NOT MSVC)
-      set_property(TARGET ${name}_exe APPEND
-        PROPERTY LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
+      hpx_append_property(${name}_exe LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     endif()
   endif()
 
@@ -98,6 +95,9 @@ macro(add_hpx_executable name)
                                      BUILD_WITH_INSTALL_RPATH TRUE
                                      INSTALL_RPATH_USE_LINK_PATH TRUE
                                      INSTALL_RPATH ${HPX_RPATH})
+    if(HPX_PIE)
+      hpx_append_property(${name}_exe LINK_FLAGS -pie)
+    endif()
   endif()
 
   # linker instructions
@@ -125,13 +125,19 @@ macro(add_hpx_executable name)
       ${hpx_libs})
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
+                 "HPX_PREFIX=\"${HPX_PREFIX}\""
+                 "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
                  "BOOST_ENABLE_ASSERT_HANDLER")
   else()
     target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
   endif()
 
   if(NOT HPX_NO_INSTALL)
-    hpx_executable_install(${name}_exe)
+    if(${name}_INSTALL_SUFFIX)
+      hpx_executable_install(${name}_exe ${${name}_INSTALL_SUFFIX})
+    else()
+      hpx_executable_install(${name}_exe bin)
+    endif()
   endif()
 endmacro()
 

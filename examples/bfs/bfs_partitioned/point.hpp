@@ -6,7 +6,7 @@
 #if !defined(HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805)
 #define HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805
 
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 
 #include "stubs/point.hpp"
 
@@ -42,8 +42,7 @@ namespace bfs
             boost::numeric::ublas::mapped_vector<std::size_t> const& index,
             std::size_t max_levels)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,grainsize,
+            return this->base_type::init_async(get_gid(),objectid,grainsize,
                                                 max_num_neighbors,nodefile,neighborfile,index,max_levels);
         }
 
@@ -55,8 +54,7 @@ namespace bfs
             boost::numeric::ublas::mapped_vector<std::size_t> const& index,
             std::size_t max_levels)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid, grainsize,
+            this->base_type::init_async(get_gid(),objectid, grainsize,
                                         max_num_neighbors,nodefile,neighborfile,index,max_levels);
         }
 
@@ -64,74 +62,64 @@ namespace bfs
         hpx::lcos::future<std::vector<std::size_t> >
         traverse_async(std::size_t level, std::size_t parent,std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::traverse_async(gid_,level,parent,edge);
+            return this->base_type::traverse_async(get_gid(),level,parent,edge);
         }
 
         /// Traverse the graph. 
         std::vector<std::size_t> traverse(std::size_t level,std::size_t parent,std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::traverse(gid_,level,parent,edge);
+            return this->base_type::traverse(get_gid(),level,parent,edge);
         }
 
         /// Traverse the graph. 
         hpx::lcos::future<std::vector<nodedata> >
         depth_traverse_async(std::size_t level, std::size_t parent,std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::depth_traverse_async(gid_,level,parent,edge);
+            return this->base_type::depth_traverse_async(get_gid(),level,parent,edge);
         }
 
         /// Traverse the graph. 
         std::vector<nodedata> depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::depth_traverse(gid_,level,parent,edge);
+            return this->base_type::depth_traverse(get_gid(),level,parent,edge);
         }
 
         /// get parent
         hpx::lcos::future<std::size_t>
         get_parent_async(std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_parent_async(gid_,edge);
+            return this->base_type::get_parent_async(get_gid(),edge);
         }
 
         /// get parent
         std::size_t get_parent(std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_parent(gid_,edge);
+            return this->base_type::get_parent(get_gid(),edge);
         }
 
         /// get level
         hpx::lcos::future<std::size_t>
         get_level_async(std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_level_async(gid_,edge);
+            return this->base_type::get_level_async(get_gid(),edge);
         }
 
         /// get level
         std::size_t get_level(std::size_t edge)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::get_level(gid_,edge);
+            return this->base_type::get_level(get_gid(),edge);
         }
 
         // reset_visited
         hpx::lcos::future<void> reset_visited_async(std::size_t objectid)
         {
-            BOOST_ASSERT(gid_);
-            return this->base_type::reset_visited_async(gid_,objectid);
+            return this->base_type::reset_visited_async(get_gid(),objectid);
         }
 
         // reset_visited
         void reset_visited(std::size_t objectid)
         {
-            BOOST_ASSERT(gid_);
-            this->base_type::reset_visited_async(gid_,objectid);
+            this->base_type::reset_visited_async(get_gid(),objectid);
         }
 
     };

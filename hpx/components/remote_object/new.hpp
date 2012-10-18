@@ -16,6 +16,9 @@
 #include <hpx/components/remote_object/ctor_fun.hpp>
 #include <hpx/components/remote_object/object.hpp>
 #include <hpx/components/remote_object/new_impl.hpp>
+#include <hpx/traits/is_component.hpp>
+
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace components
 {
@@ -38,7 +41,9 @@ namespace hpx { namespace components
     }
     // asynchronously creates an instance of type T on locality target_id
     template <typename T>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id)
     {
         lcos::packaged_action<
@@ -92,7 +97,9 @@ namespace hpx { namespace components
 #define N BOOST_PP_ITERATION()
 
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
-    lcos::future<object<T> >
+    inline typename boost::disable_if<
+        traits::is_component<T>, lcos::future<object<T> >
+    >::type
     new_(naming::id_type const & target_id, HPX_ENUM_FWD_ARGS(N, A, a))
     {
         lcos::packaged_action<

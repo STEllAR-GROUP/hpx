@@ -281,8 +281,9 @@ namespace hpx { namespace lcos { namespace local
         void unlock()
         {
             // We unregister ourselves before the actual unlock is executed as
-            // the spinlock below might be contented and the HPX-thread
-            // executing this unlock will be suspended.
+            // the spinlock below might be there might be contention for the 
+            // spinlock and the HPX-thread executing this unlock will be 
+            // suspended.
             util::unregister_lock(this);
 
             HPX_ITT_SYNC_RELEASING(this);

@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/promise.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/include/client.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <tests/unit/agas/components/stubs/managed_refcnt_checker.hpp>
@@ -61,16 +61,14 @@ struct managed_refcnt_monitor
         naming::id_type const& gid
         )
     {
-        BOOST_ASSERT(gid_);
-        return this->base_type::take_reference_async(gid_, gid);
+        return this->base_type::take_reference_async(get_gid(), gid);
     }
 
     void take_reference(
         naming::id_type const& gid
         )
     {
-        BOOST_ASSERT(gid_);
-        return this->base_type::take_reference(gid_, gid);
+        return this->base_type::take_reference(get_gid(), gid);
     }
 
     bool ready()

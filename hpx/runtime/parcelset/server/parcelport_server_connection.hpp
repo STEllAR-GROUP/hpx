@@ -83,6 +83,12 @@ namespace hpx { namespace parcelset { namespace server
             buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
             buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
 
+#if defined(__linux) || defined(linux) || defined(__linux__)
+            boost::asio::detail::socket_option::boolean<
+                IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+            socket_.set_option(quickack);
+#endif
+
             boost::asio::async_read(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
@@ -113,7 +119,13 @@ namespace hpx { namespace parcelset { namespace server
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;
 
-                boost::asio::async_read(socket_,
+#if defined(__linux) || defined(linux) || defined(__linux__)
+                boost::asio::detail::socket_option::boolean<
+                    IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                socket_.set_option(quickack);
+#endif
+
+                boost::asio::async_read(socket_, 
                     boost::asio::buffer(*in_buffer_.get()),
                     boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
@@ -142,10 +154,19 @@ namespace hpx { namespace parcelset { namespace server
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
 
+                // now send acknowledgement byte
+                ack_ = true;
+                boost::asio::async_write(socket_, 
+                    boost::asio::buffer(&ack_, sizeof(ack_)),
+                    boost::bind(&parcelport_connection::handle_write_ack, 
+                        shared_from_this()));
+
                 // Issue a read operation to read the parcel priority.
                 async_read(boost::get<0>(handler));
             }
         }
+
+        void handle_write_ack() {}
 
     private:
         /// Socket for the parcelport_connection.
@@ -155,6 +176,7 @@ namespace hpx { namespace parcelset { namespace server
         boost::integer::ulittle8_t in_priority_;
         boost::integer::ulittle64_t in_size_;
         boost::shared_ptr<std::vector<char> > in_buffer_;
+        bool ack_;
 
         /// The handler used to process the incoming request.
         parcelport_queue& parcels_;
@@ -165,6 +187,13 @@ namespace hpx { namespace parcelset { namespace server
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
+
+    // this makes sure we can store our connections in a set
+    inline bool operator<(server::parcelport_connection_ptr const& lhs, 
+        server::parcelport_connection_ptr const& rhs)
+    {
+        return lhs.get() < rhs.get();
+    }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}}

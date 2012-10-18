@@ -30,8 +30,7 @@ namespace hpx { namespace util
     {
 #if !defined(__ANDROID__) && !defined(ANDROID)
         try {
-            boost::plugin::dll dll(
-                HPX_MANGLE_NAME_STR(library) + HPX_SHARED_LIB_EXTENSION);
+            boost::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 
             using boost::filesystem::path;
 

@@ -124,6 +124,24 @@ namespace hpx { namespace parcelset
             send_data_.serialization_time_ = 0;
             send_data_.num_parcels_ = 0;
 
+            // now handle the acknowledgement byte which is sent by the receiver
+#if defined(__linux) || defined(linux) || defined(__linux__)
+            boost::asio::detail::socket_option::boolean<
+                IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+            socket_.set_option(quickack);
+#endif
+
+            void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
+                = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
+
+            boost::asio::async_read(socket_, 
+                boost::asio::buffer(&ack_, sizeof(ack_)),
+                boost::bind(f, shared_from_this(), handler));
+        }
+
+        template <typename Handler, typename ParcelPostprocess>
+        void handle_read_ack(boost::tuple<Handler, ParcelPostprocess> handler) 
+        {
             // Call post-processing handler, which will send remaining pending 
             // parcels. Pass along the connection so it can be reused if more 
             // parcels have to be sent.
@@ -138,6 +156,7 @@ namespace hpx { namespace parcelset
         boost::integer::ulittle8_t out_priority_;
         boost::integer::ulittle64_t out_size_;
         std::vector<char> out_buffer_;
+        bool ack_;
 
         /// the other (receiving) end of this connection
         naming::locality there_;

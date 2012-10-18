@@ -28,6 +28,10 @@
 #include <cstddef>
 #include <cstdlib>
 
+#if defined(ANDROID) || defined(__ANDROID__)
+#include <android/log.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -345,6 +349,28 @@ namespace hpx { namespace util
         logging_destination dest_;
     };
 
+#if defined(ANDROID) || defined(__ANDROID__)
+    // default log destination for Android
+    struct android_log : boost::logging::destination::is_generic
+    {
+        android_log(char const* tag_)
+          : tag(tag_)
+        {}
+
+        template<typename MsgType>
+        void operator()(MsgType const& msg) const
+        {
+            __android_log_write(ANDROID_LOG_DEBUG, tag.c_str(), msg.c_str());
+        }
+
+        bool operator==(console const& rhs) const
+        {
+            return tag == rhs.tag;
+        }
+
+        std::string tag;
+    };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
@@ -373,8 +399,15 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl)
         {
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = isconsole ? "android_log" : "console";
+            agas_logger()->writer().add_destination("android_log", 
+                android_log("hpx.agas"));
+#else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
+#endif
             if (logformat.empty())
                 logformat = "|\\n";
 
@@ -421,8 +454,15 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl)
         {
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = isconsole ? "android_log" : "console";
+            timing_logger()->writer().add_destination("android_log", 
+                android_log("hpx.timing"));
+#else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
+#endif
             if (logformat.empty())
                 logformat = "|\\n";
 
@@ -469,8 +509,16 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
+#if defined(ANDROID) || defined(__ANDROID__)
+        if (logdest.empty())      // ensure minimal defaults
+            logdest = isconsole ? "android_log" : "console";
+        hpx_logger()->writer().add_destination("android_log", android_log("hpx"));
+        hpx_error_logger()->writer().add_destination("android_log", 
+            android_log("hpx"));
+#else
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
+#endif
         if (logformat.empty())
             logformat = "|\\n";
 
@@ -492,7 +540,10 @@ namespace hpx { namespace util
             // errors are logged to the given destination and to cerr
             hpx_error_logger()->writer().add_destination("console",
                 console(lvl, destination_hpx));
-            hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+#if !defined(ANDROID) && !defined(__ANDROID__)
+            if (logdest != "cerr")
+                hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+#endif
             hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
@@ -512,7 +563,11 @@ namespace hpx { namespace util
                 hpx_error_logger()->writer().write(logformat, "console");
             }
             else {
+#if defined(ANDROID) || defined(__ANDROID__)
+                hpx_error_logger()->writer().write(logformat, "android_log");
+#else
                 hpx_error_logger()->writer().write(logformat, "cerr");
+#endif
             }
             hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -556,8 +611,15 @@ namespace hpx { namespace util
             lvl = detail::get_log_level(loglevel);
 
         if (boost::logging::level::disable_all != lvl) {
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = isconsole ? "android_log" : "console";
+            app_logger()->writer().add_destination("android_log", 
+                android_log("hpx.application"));
+#else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
+#endif
             if (logformat.empty())
                 logformat = "|\\n";
 
@@ -603,8 +665,15 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl)
         {
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "android_log";
+            agas_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx.agas"));
+#else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
+#endif
             if (logformat.empty())
                 logformat = "|\\n";
 
@@ -640,8 +709,15 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl)
         {
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "android_log";
+            timing_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx.timing"));
+#else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
+#endif
             if (logformat.empty())
                 logformat = "|\\n";
 
@@ -675,8 +751,15 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (logdest.empty())      // ensure minimal defaults
-            logdest = "cerr";
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "android_log";
+            hpx_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx"));
+#else
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "cerr";
+#endif
         if (logformat.empty())
             logformat = "|";
 
@@ -713,8 +796,15 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl)
         {
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "android_log";
+            app_console_logger()->writer().add_destination("android_log", 
+                android_log("hpx.application"));
+#else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
+#endif
             if (logformat.empty())
                 logformat = "|\\n";
 
@@ -723,7 +813,6 @@ namespace hpx { namespace util
             app_console_level()->set_enabled(lvl);
         }
     }
-
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -759,7 +848,11 @@ namespace hpx { namespace util { namespace detail
                 // general console logging
                 "[hpx.logging.console]",
                 "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+                "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
+#else
                 "destination = ${HPX_CONSOLE_LOGDESTINATION:file(hpx.$[system.pid].log)}",
+#endif
                 "format = ${HPX_CONSOLE_LOGFORMAT:|}",
 
                 // logging related to timing
@@ -774,7 +867,11 @@ namespace hpx { namespace util { namespace detail
                 // console logging related to timing
                 "[hpx.logging.console.timing]",
                 "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
+#else
                 "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+#endif
                 "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
 
                 // logging related to AGAS
@@ -790,7 +887,11 @@ namespace hpx { namespace util { namespace detail
                 // console logging related to AGAS
                 "[hpx.logging.console.agas]",
                 "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
+#else
                 "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+#endif
                 "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
 
                 // logging related to applications
@@ -805,7 +906,11 @@ namespace hpx { namespace util { namespace detail
                 // console logging related to applications
                 "[hpx.logging.console.application]",
                 "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
+#else
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid].log)}",
+#endif
                 "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}"
             ;
         }

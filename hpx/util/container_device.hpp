@@ -68,6 +68,8 @@ namespace hpx { namespace util
             }
             if (result < n) {
                 BOOST_ASSERT(n < (std::numeric_limits<difference_type>::max)());
+                if (container_.capacity() < container_.size() + n)
+                    container_.reserve(container_.size() + n);
                 container_.insert(container_.end(), s, s + static_cast<difference_type>(n));
                 pos_ = static_cast<boost::iostreams::stream_offset>(container_.size());
             }
@@ -105,7 +107,11 @@ namespace hpx { namespace util
 
             if (next < (static_cast<boost::iostreams::stream_offset>(0))
              || next >= (static_cast<boost::iostreams::stream_offset>(container_.size())))
-                throw std::ios_base::failure("bad seek offset");
+            {
+                HPX_THROW_EXCEPTION(serialization_error,
+                    "container_device::seek",
+                    "bad seek offset");
+            }
 
             pos_ = next;
             return pos_;

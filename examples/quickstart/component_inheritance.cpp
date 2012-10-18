@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -10,23 +10,18 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 
-// FIXME: This facility hopefully will exist in HPX sometime in the future 
-// (in a form that can take up to HPX_ACTION_ARGUMENT_LIMIT ctor args).
-template <typename Component>
-hpx::id_type new_(hpx::id_type const& locality)
-{
-    return hpx::components::stub_base<Component>::create(locality);
-}
-
-struct A : hpx::components::abstract_managed_component_base<A> 
+///////////////////////////////////////////////////////////////////////////////
+// Define a base component which exposes the required interface
+struct A : hpx::components::abstract_managed_component_base<A>
 {
     A() { hpx::cout << "A::A\n" << hpx::flush; }
     virtual ~A() { hpx::cout << "A::~A\n" << hpx::flush; }
 
     virtual void print() const = 0;
 
+    // It is not possible to bind a virtual function to an action, thus we
+    // bind a simple forwarding function, which is not virtual.
     void print_nonvirt() const { print(); }
-
     HPX_DEFINE_COMPONENT_CONST_ACTION(A, print_nonvirt, print_action);
 };
 
@@ -36,41 +31,49 @@ typedef A::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
 HPX_REGISTER_ACTION(print_action);
 
-struct client
-  : hpx::components::client_base<client, hpx::components::stub_base<A> >
-{
-    typedef hpx::components::client_base<client, hpx::components::stub_base<A> >
-        base_type;
-
-    client() {}
-    client(hpx::id_type const& gid) : base_type(gid) {} 
-
-    virtual void print() { hpx::async<print_action>(this->gid_).get(); } 
-};
-
 ///////////////////////////////////////////////////////////////////////////////
-
+// Define a component which implements the required interface by deriving from
+// the base component 'A' defined above.
 struct B : A, hpx::components::managed_component_base<B>
 {
     typedef B type_holder;
     typedef A base_type_holder;
 
     B() { hpx::cout << "B::B\n" << hpx::flush; }
-    virtual ~B() { hpx::cout << "B::~B\n" << hpx::flush; }
+    ~B() { hpx::cout << "B::~B\n" << hpx::flush; }
 
-    void print() const { hpx::cout << "B::print\n" << hpx::flush; } 
+    void print() const { hpx::cout << "B::print\n" << hpx::flush; }
 };
 
 typedef hpx::components::managed_component<B> server_type;
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(server_type, B, "A");
 
 ///////////////////////////////////////////////////////////////////////////////
+// Define a client side representation for a remote component instance 'B',
+// Note: this client has no notion of using 'B', but wraps the base 'A' only.
+struct client : hpx::components::client_base<client, A>
+{
+    typedef hpx::components::client_base<client, A> base_type;
+
+    client(hpx::future<hpx::id_type, hpx::naming::gid_type> const& gid)
+      : base_type(gid)
+    {}
+
+    void print()
+    {
+        print_action act;
+        act(base_type::get_gid());
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    client hw(new_<B>(hpx::find_here()));
+    // Use the client class to invoke the print functionality of the compound
+    // component 'B'.
+    client hw(hpx::components::new_<B>(hpx::find_here()));
+    hw.print();
 
-    hw.print();    
-
-    return 0; 
+    return 0;
 }
 

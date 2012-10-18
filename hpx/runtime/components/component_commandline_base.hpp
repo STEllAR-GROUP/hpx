@@ -6,13 +6,13 @@
 #if !defined(HPX_COMPONENT_COMMANDLINE_BASE_JAN_09_2012_1132AM)
 #define HPX_COMPONENT_COMMANDLINE_BASE_JAN_09_2012_1132AM
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
+
 #include <boost/plugin.hpp>
 #include <boost/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/program_options/options_description.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -43,9 +43,9 @@ namespace hpx { namespace components
 /// component factory with Boost.Plugin. This macro has to be used for each of
 /// the components.
 #define HPX_REGISTER_COMMANDLINE_REGISTRY(RegistryType, componentname)        \
-        BOOST_PLUGIN_EXPORT(HPX_COMPONENT_LIB_NAME,                           \
+        BOOST_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                \
             hpx::components::component_commandline_base, RegistryType,        \
-            componentname, HPX_MANGLE_COMPONENT_NAME(commandline_options))    \
+            componentname, commandline_options)                               \
     /**/
 
 /// The macro \a HPX_REGISTER_COMMANDLINE_OPTIONS is used to define the
@@ -53,8 +53,7 @@ namespace hpx { namespace components
 /// This macro has to be used in not more than one compilation unit of a
 /// component module.
 #define HPX_REGISTER_COMMANDLINE_OPTIONS()                                    \
-        BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(commandline_options))                   \
+        BOOST_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, commandline_options)      \
     /**/
 
 #endif

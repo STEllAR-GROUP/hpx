@@ -8,6 +8,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
+#include <boost/assign/std/vector.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -79,7 +80,12 @@ int main(int argc, char* argv[])
     options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // We force this application to use at least 2 threads by default.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=2";
+
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    return init(desc_commandline, argc, argv, cfg);
 }
 
