@@ -403,6 +403,15 @@ struct HPX_EXPORT primary_namespace :
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_route, route_action);
+
+    /// This is the default hook implementation for decorate_action which 
+    /// does no hooking at all.
+    static HPX_STD_FUNCTION<threads::thread_function_type> 
+    wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+        naming::address::address_type)
+    {
+        return boost::move(f);
+    }
 };
 
 }}}

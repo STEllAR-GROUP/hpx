@@ -18,7 +18,7 @@ namespace hpx { namespace components
     template <typename Component>
     class abstract_simple_component_base
     {
-      public:
+    public:
         virtual ~abstract_simple_component_base() {}
 
         typedef simple_component<Component> wrapping_type;
@@ -33,6 +33,15 @@ namespace hpx { namespace components
         {
             hpx::components::set_component_type<wrapping_type>();
         }
+
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
+        }
     };
 
     template <typename Component, typename Derived>
@@ -41,7 +50,7 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper>
     class abstract_managed_component_base
     {
-      public:
+    public:
         virtual ~abstract_managed_component_base() {}
 
         typedef managed_component<Component, Wrapper> wrapping_type;
@@ -55,6 +64,15 @@ namespace hpx { namespace components
         static void set_component_type(component_type t)
         {
             hpx::components::set_component_type<wrapping_type>();
+        }
+
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
         }
     };
 }}

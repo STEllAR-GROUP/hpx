@@ -17,6 +17,8 @@
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/util/stringstream.hpp>
 
+#include <boost/move/move.hpp>
+
 namespace hpx { namespace components
 {
     template <typename Component>
@@ -26,7 +28,7 @@ namespace hpx { namespace components
     template <typename Component>
     class simple_component_base : public detail::simple_component_tag
     {
-    private:
+    protected:
         typedef typename boost::mpl::if_<
                 boost::is_same<Component, detail::this_type>,
                 simple_component_base, Component
@@ -110,6 +112,15 @@ namespace hpx { namespace components
             // components derived from this template have to be allocated one
             // at a time
             return factory_none;
+        }
+
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
         }
 
     private:

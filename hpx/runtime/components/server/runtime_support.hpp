@@ -343,6 +343,15 @@ namespace hpx { namespace components { namespace server
 
         void remove_here_from_connection_cache();
 
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
+        }
+
     protected:
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,

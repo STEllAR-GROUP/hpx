@@ -11,6 +11,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
+#include <boost/move/move.hpp>
+
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -149,6 +151,14 @@ namespace hpx { namespace components { namespace server
             &memory::load64
         > load64_action;
 
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
+        }
     };
 }}}
 

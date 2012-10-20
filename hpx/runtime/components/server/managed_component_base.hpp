@@ -22,6 +22,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/move/move.hpp>
 
 #include <stdexcept>
 
@@ -259,6 +260,15 @@ namespace hpx { namespace components
         naming::id_type get_gid() const;
 
         naming::gid_type get_base_gid() const;
+
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
+        }
 
     private:
         template <typename, typename>

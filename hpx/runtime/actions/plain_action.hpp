@@ -97,14 +97,15 @@ namespace hpx { namespace actions
         /// the \a applier in case no continuation has been supplied.
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_thread_function(naming::address::address_type,
+        construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) /*args*/)
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(threads::thread_state_ex_enum) =
                 &Derived::template thread_function<threads::thread_state_ex_enum>;
-            return f;
+
+            return boost::move(base_type::decorate_action(f, lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -114,11 +115,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
+            return boost::move(base_type::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)));
+                    cont, F, boost::forward<Arguments>(args)), lva));
         }
     };
 
@@ -238,14 +239,15 @@ namespace hpx { namespace actions
         /// case no continuation has been supplied.
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_thread_function(naming::address::address_type,
+        construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) /*args*/)
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(threads::thread_state_ex_enum) =
                 &Derived::template thread_function<threads::thread_state_ex_enum>;
-            return f;
+
+            return boost::move(base_type::decorate_action(f, lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -255,11 +257,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
+            return boost::move(base_type::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)));
+                    cont, F, boost::forward<Arguments>(args)), lva));
         }
     };
 

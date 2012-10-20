@@ -669,6 +669,27 @@ namespace hpx { namespace actions
         {
             return base_action::plain_action;
         }
+
+        /// Enable hooking into the execution of all actions. This function is 
+        /// called for each thread function which is to be returned to the applier.
+        ///
+        /// This allows to hook into the execution of all actions for a particular
+        /// component type.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        decorate_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type lva)
+        {
+            return boost::move(Derived::wrap_action(boost::move(f), lva));
+        }
+
+        /// This is the default hook implementation for decorate_action which 
+        /// forwards to the Component type this action belongs to
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type lva)
+        {
+            return boost::move(Component::wrap_action(boost::move(f), lva));
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////

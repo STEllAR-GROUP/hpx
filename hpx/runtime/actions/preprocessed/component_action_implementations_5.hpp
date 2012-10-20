@@ -81,9 +81,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                typename Derived::thread_function(),
-                lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(),
+                    lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0)), lva));
         }
         
         
@@ -94,10 +94,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -295,9 +295,9 @@ namespace hpx { namespace actions
         {
             
             
-            return HPX_STD_BIND(
-                typename Derived::thread_function(), lva,
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0)), lva));
         }
         
         
@@ -308,10 +308,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function_void(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function_void(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -511,9 +511,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                typename Derived::thread_function(),
-                lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(),
+                    lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1)), lva));
         }
         
         
@@ -524,10 +524,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -725,9 +725,9 @@ namespace hpx { namespace actions
         {
             
             
-            return HPX_STD_BIND(
-                typename Derived::thread_function(), lva,
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1)), lva));
         }
         
         
@@ -738,10 +738,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function_void(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function_void(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -941,9 +941,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                typename Derived::thread_function(),
-                lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(),
+                    lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2)), lva));
         }
         
         
@@ -954,10 +954,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -1155,9 +1155,9 @@ namespace hpx { namespace actions
         {
             
             
-            return HPX_STD_BIND(
-                typename Derived::thread_function(), lva,
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2)), lva));
         }
         
         
@@ -1168,10 +1168,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function_void(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function_void(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -1371,9 +1371,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                typename Derived::thread_function(),
-                lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(),
+                    lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3)), lva));
         }
         
         
@@ -1384,10 +1384,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -1585,9 +1585,9 @@ namespace hpx { namespace actions
         {
             
             
-            return HPX_STD_BIND(
-                typename Derived::thread_function(), lva,
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3)), lva));
         }
         
         
@@ -1598,10 +1598,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function_void(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function_void(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -1801,9 +1801,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                typename Derived::thread_function(),
-                lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(),
+                    lva, util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4)), lva));
         }
         
         
@@ -1814,10 +1814,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
@@ -2015,9 +2015,9 @@ namespace hpx { namespace actions
         {
             
             
-            return HPX_STD_BIND(
-                typename Derived::thread_function(), lva,
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
+            return boost::move(base_type::decorate_action(
+                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4)), lva));
         }
         
         
@@ -2028,10 +2028,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(
-                base_type::construct_continuation_thread_object_function_void(
-                    cont, F, get_lva<Component>::call(lva),
-                    boost::forward<Arguments>(args)));
+            return boost::move(base_type::decorate_action(
+                    base_type::construct_continuation_thread_object_function_void(
+                        cont, F, get_lva<Component>::call(lva),
+                        boost::forward<Arguments>(args)), lva));
         }
     };
     
