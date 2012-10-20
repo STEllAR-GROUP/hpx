@@ -64,13 +64,13 @@ namespace hpx
     std::string full_build_string()
     {
         hpx::util::osstream strm;
-        strm << "[version]: " << build_string() << "\n"
-             << "[boost]: " << boost_version() << "\n"
-             << "[build-type]: " << build_type() << "\n"
-             << "[date]: " << build_date_time() << "\n"
-             << "[platform]: " << boost_platform() << "\n"
-             << "[compiler]: " << boost_compiler() << "\n"
-             << "[stdlib]: " << boost_stdlib() << "\n";
+        strm << "{version}: " << build_string() << "\n"
+             << "{boost}: " << boost_version() << "\n"
+             << "{build-type}: " << build_type() << "\n"
+             << "{date}: " << build_date_time() << "\n"
+             << "{platform}: " << boost_platform() << "\n"
+             << "{compiler}: " << boost_compiler() << "\n"
+             << "{stdlib}: " << boost_stdlib() << "\n";
         return util::osstream_get_string(strm);
     }
 

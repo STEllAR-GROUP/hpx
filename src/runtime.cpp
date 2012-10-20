@@ -49,9 +49,9 @@ namespace hpx
     {
         std::cerr 
 #if defined(HPX_HAVE_STACKTRACES)
-            << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
+            << "{stack-trace}: " << hpx::detail::backtrace() << "\n"
 #endif
-            << "[what]: " << (reason ? reason : "Unknown reason") << "\n"
+            << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
             << full_build_string();           // add full build information
 
         std::abort();
@@ -100,9 +100,9 @@ namespace hpx
         char* reason = strsignal(signum);
         std::cerr 
 #if defined(HPX_HAVE_STACKTRACES)
-            << "[stack-trace]: " << hpx::detail::backtrace() << "\n"
+            << "{stack-trace}: " << hpx::detail::backtrace() << "\n"
 #endif
-            << "[what]: " << (reason ? reason : "Unknown signal") << "\n"
+            << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
             << full_build_string();           // add full build information
 
         std::abort();

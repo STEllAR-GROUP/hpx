@@ -254,7 +254,7 @@ namespace hpx { namespace detail
         // so that the program doesn't abort without any diagnostics.
         if (!threw) {
             std::cerr << "Runtime is not available, reporting error locally\n"
-                         "[what]: " << str << std::endl;
+                         "{what}: " << str << std::endl;
         }
         std::abort();
     }
@@ -289,78 +289,78 @@ namespace hpx
             boost::get_error_info<hpx::detail::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
-            strm << "[stack-trace]: " << *back_trace << "\n";
+            strm << "{stack-trace}: " << *back_trace << "\n";
         }
 
         std::string const* env =
             boost::get_error_info<hpx::detail::throw_env>(e);
         if (env && !env->empty())
-            strm << "[env]: " << *env;
+            strm << "{env}: " << *env;
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
         std::exception const* se = dynamic_cast<std::exception const*>(&e);
         if (se)
-            strm << "[what]: " << se->what() << "\n";
+            strm << "{what}: " << se->what() << "\n";
 
         boost::uint32_t const* locality =
             boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
-            strm << "[locality-id]: " << *locality << "\n";
+            strm << "{locality-id}: " << *locality << "\n";
 
         std::string const* hostname_ =
             boost::get_error_info<hpx::detail::throw_hostname>(e);
         if (hostname_ && !hostname_->empty())
-            strm << "[hostname]: " << *hostname_ << "\n";
+            strm << "{hostname}: " << *hostname_ << "\n";
 
         boost::int64_t const* pid_ =
             boost::get_error_info<hpx::detail::throw_pid>(e);
         if (pid_ && -1 != *pid_)
-            strm << "[process-id]: " << *pid_ << "\n";
+            strm << "{process-id}: " << *pid_ << "\n";
 
         char const* const* func =
             boost::get_error_info<boost::throw_function>(e);
         if (func) {
-            strm << "[function]: " << *func << "\n";
+            strm << "{function}: " << *func << "\n";
         }
         else {
             std::string const* s =
                 boost::get_error_info<hpx::detail::throw_function>(e);
             if (s)
-                strm << "[function]: " << *s << "\n";
+                strm << "{function}: " << *s << "\n";
         }
 
         char const* const* file =
             boost::get_error_info<boost::throw_file>(e);
         if (file) {
-            strm << "[file]: " << *file << "\n";
+            strm << "{file}: " << *file << "\n";
         }
         else {
             std::string const* s =
                 boost::get_error_info<hpx::detail::throw_file>(e);
             if (s)
-                strm << "[file]: " << *s << "\n";
+                strm << "{file}: " << *s << "\n";
         }
 
         int const* line =
             boost::get_error_info<boost::throw_line>(e);
         if (line)
-            strm << "[line]: " << *line << "\n";
+            strm << "{line}: " << *line << "\n";
 
         std::size_t const* shepherd =
             boost::get_error_info<hpx::detail::throw_shepherd>(e);
         if (shepherd && std::size_t(-1) != *shepherd)
-            strm << "[os-thread]: " << *shepherd << "\n";
+            strm << "{os-thread}: " << *shepherd << "\n";
 
         std::size_t const* thread_id =
             boost::get_error_info<hpx::detail::throw_thread_id>(e);
         if (thread_id && *thread_id)
-            strm << (boost::format("[thread-id]: %016x\n") % *thread_id);
+            strm << (boost::format("{thread-id}: %016x\n") % *thread_id);
 
         std::string const* thread_description =
             boost::get_error_info<hpx::detail::throw_thread_name>(e);
         if (thread_description && !thread_description->empty())
-            strm << "[thread-description]: " << *thread_description << "\n";
+            strm << "{thread-description}: " << *thread_description << "\n";
 
         // add full build information
         strm << full_build_string();
