@@ -140,8 +140,16 @@ namespace hpx { namespace components { namespace amr { namespace server
             std::size_t, naming::id_type const&,
             &functional_component::init_nonvirt
         > init_action;
-    };
 
+        /// This is the default hook implementation for decorate_action which 
+        /// does no hooking at all.
+        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type)
+        {
+            return boost::move(f);
+        }
+    };
 }}}}
 
 HPX_REGISTER_ACTION_DECLARATION(
