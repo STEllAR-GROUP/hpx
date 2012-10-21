@@ -31,8 +31,11 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/assert.hpp>
+#include <boost/move/move.hpp>
+
 #include <hpx/util/coroutine/detail/fix_result.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
+#include <hpx/util/function.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail 
 {
@@ -104,8 +107,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #else
 
-    yield_result_type yield(typename yield_traits::arg0_type arg0 =
-        typename yield_traits::arg0_type())
+    typedef typename yield_traits::arg0_type arg0_type;
+
+    yield_result_type yield(arg0_type arg0 = arg0_type())
+    {
+        return !yield_decorator_.empty() ? yield_decorator_(arg0) : yield_impl(arg0);
+    }
+
+    yield_result_type yield_impl(arg0_type arg0)
     {
       BOOST_ASSERT(m_pimpl);
 
@@ -116,6 +125,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       }
 
       return *m_pimpl->args();
+    }
+
+    template <typename F>
+    void decorate_yield(BOOST_FWD_REF(F) f)
+    {
+        yield_decorator_ = boost::forward<F>(f);
     }
 
 #endif
@@ -153,12 +168,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       : m_pimpl(pimpl)
     {}
 
+#if defined(HPX_GENERIC_COROUTINES)
   private:
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) 
       : m_pimpl(pimpl) 
     {}
 
-#if defined(HPX_GENERIC_COROUTINES)
     yield_result_type yield_impl(
         typename coroutine_type::result_slot_type result_)
     {
@@ -191,6 +206,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::arg_slot_traits traits_type;
       return detail::fix_result<traits_type>(*m_pimpl->args());
     }
+
+#else
+
+  private:
+    typedef util::function_nonser<yield_result_type(arg0_type)> 
+        yield_decorator_type;
+    yield_decorator_type yield_decorator_;
+
 #endif
 
     impl_ptr get_impl() {

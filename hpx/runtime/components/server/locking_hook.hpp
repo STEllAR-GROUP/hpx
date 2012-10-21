@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/util/unlock_lock.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 namespace hpx { namespace components
@@ -40,9 +41,9 @@ namespace hpx { namespace components
             naming::address::address_type lva)
         {
             using HPX_STD_PLACEHOLDERS::_1;
+
             return HPX_STD_BIND(&locking_hook::thread_function, 
-                get_lva<this_component_type>::call(lva), _1, 
-                boost::move(base_type::wrap_action(boost::move(f), lva)));
+                get_lva<this_component_type>::call(lva), _1, boost::move(f));
         }
 
     protected:
@@ -50,10 +51,26 @@ namespace hpx { namespace components
         // safe action invocation.
         threads::thread_state_enum thread_function(
             threads::thread_state_ex_enum state, 
-            HPX_STD_FUNCTION<threads::thread_function_type> f)
+            HPX_STD_FUNCTION<threads::thread_function_type> f) 
         {
+            using HPX_STD_PLACEHOLDERS::_1;
+
+            // register our yield decorator
+            threads::get_self().decorate_yield(
+                HPX_STD_BIND(&locking_hook::yield_function, this, _1));
+
+            // now lock the mutex and execute the action
             typename mutex_type::scoped_lock l(mtx_);
             return f(state);
+        }
+
+        // The yield decorator unlocks the mutex and calls the system yield 
+        // which gives up control back to the thread manager.
+        threads::thread_state_ex_enum yield_function(
+            threads::thread_state_enum state) 
+        {
+            util::unlock_the_lock<mutex_type> ul(mtx_);
+            return threads::get_self().yield_impl(state);
         }
 
     private:

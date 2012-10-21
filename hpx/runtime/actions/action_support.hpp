@@ -679,15 +679,6 @@ namespace hpx { namespace actions
         decorate_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type lva)
         {
-            return boost::move(Derived::wrap_action(boost::move(f), lva));
-        }
-
-        /// This is the default hook implementation for decorate_action which 
-        /// forwards to the Component type this action belongs to
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
-        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type lva)
-        {
             return boost::move(Component::wrap_action(boost::move(f), lva));
         }
     };
