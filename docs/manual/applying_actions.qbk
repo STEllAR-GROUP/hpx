@@ -195,6 +195,13 @@ locality (the locality this code is executed on).
 [note The use of a `hpx::future<void>` allows to synchronize with any remote
       operation not returning any value.]
 
+[note Any `std::future<>` returned from `std::async()` is required to block in its
+      destructor if the value has not been set for this future yet. This is not
+      true for `hpx::future<>` which will never block in its destriuctor, even 
+      if the value has not been returned to the future yet. We believe that
+      consistency in the behavior of futures is more important than standards 
+      conformance in this case.]
+
 Any component member function can be invoked using the same syntactic
 construct. Given that `id` is the global address for a component instance
 created earlier, this invocation looks like:
