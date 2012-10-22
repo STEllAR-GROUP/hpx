@@ -137,7 +137,7 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(base_type::decorate_action(
+            return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva));
         }
@@ -151,7 +151,7 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(base_type::decorate_action(
+            return boost::move(Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
                     cont, F, boost::forward<Arguments>(args)), lva));
         }
@@ -319,7 +319,7 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(base_type::decorate_action(
+            return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva));
         }
@@ -333,7 +333,7 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(base_type::decorate_action(
+            return boost::move(Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
                     cont, F, boost::forward<Arguments>(args)), lva));
         }
