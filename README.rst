@@ -33,7 +33,7 @@ What's so special about HPX?
   of millions of threads.
 * HPX provides unified syntax and semantics for local and remote operations.
 * HPX makes concurrency manageable with dataflow and future based 
-  synchronization 
+  synchronization. 
 * It implements a rich set of runtime services supporting a broad range of 
   use cases.
 * It is designed to solve problems conventionally considered to be 
