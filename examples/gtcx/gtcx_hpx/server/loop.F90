@@ -1815,6 +1815,7 @@
                  ) ! }}}
 
 ! solve GK Poisson equation using adiabatic electron
+#if 0
          call poisson(0,hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters
@@ -1846,6 +1847,7 @@
               left_pe,right_pe,&
               toroidal_domain_location,particle_domain_location&
                   )   ! }}}
+#endif
 
         do ihybrid=1,nhybrid
 ! smooth potential
@@ -2134,6 +2136,7 @@
                  ) ! }}}
 
 ! solve GK Poisson equation using non-adiabatic electron
+#if 0
          call poisson(1,hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters
@@ -2165,6 +2168,7 @@
               left_pe,right_pe,&
               toroidal_domain_location,particle_domain_location&
                   )   ! }}}
+#endif
         enddo
      enddo
 
