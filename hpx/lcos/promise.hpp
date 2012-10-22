@@ -374,17 +374,17 @@ namespace hpx { namespace lcos
         virtual ~promise()
         {}
 
-        lcos::future<Result, RemoteResult> get_future(error_code& ec = throws)
+        lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
                     "future already has been retrieved from this packaged_action");
-                return lcos::future<Result, RemoteResult>();
+                return lcos::future<Result>();
             }
 
             future_obtained_ = true;
-            return lcos::future<Result, RemoteResult>(impl_->get());
+            return lcos::future<Result>(impl_->get());
         }
 
         ///

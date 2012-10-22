@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace stubs
         /// The caller needs to call \a future#get on the result
         /// of this function to obtain the global ids of the newly created
         /// objects.
-        static lcos::future<result_type, remote_result_type>
+        static lcos::future<result_type>
         create_components_async(
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count)

@@ -21,8 +21,8 @@ namespace hpx { namespace traits
       : boost::mpl::false_
     {};
 
-    template <typename Result, typename RemoteResult>
-    struct is_future<lcos::future<Result, RemoteResult> >
+    template <typename Result>
+    struct is_future<lcos::future<Result> >
       : boost::mpl::true_
     {};
 }}

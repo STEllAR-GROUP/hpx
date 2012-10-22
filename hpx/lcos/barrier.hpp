@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
         barrier(naming::id_type gid)
           : base_type(gid)
         {}
-        barrier(lcos::future<naming::id_type, naming::gid_type> gid)
+        barrier(lcos::future<naming::id_type> gid)
           : base_type(gid)
         {}
 

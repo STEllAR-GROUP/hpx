@@ -13,7 +13,7 @@
 #include <hpx/components/dataflow/stubs/dataflow.hpp>
 #include <boost/intrusive_ptr.hpp>
 
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     template <typename Result, typename RemoteResult>
     struct dataflow_base
@@ -24,7 +24,7 @@ namespace hpx { namespace lcos
         dataflow_base()
         {}
 
-        dataflow_base(future<naming::id_type, naming::gid_type> const & promise)
+        dataflow_base(future<naming::id_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
 
@@ -32,8 +32,8 @@ namespace hpx { namespace lcos
         {
             impl->connect(id);
         }
-        
-        future<Result, remote_result_type> get_future() const
+
+        future<Result> get_future() const
         {
             promise<Result, remote_result_type> p;
             impl->connect(p.get_gid());

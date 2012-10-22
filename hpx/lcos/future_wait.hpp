@@ -31,9 +31,9 @@ namespace hpx { namespace lcos
 
     /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
-    template <typename T1, typename TR1, typename F>
+    template <typename T1, typename F>
     inline std::size_t
-    wait (lcos::future<T1, TR1> const& f1, F const& f)
+    wait (lcos::future<T1> const& f1, F const& f)
     {
         f(0, f1.get());
         return 1;
@@ -51,9 +51,9 @@ namespace hpx { namespace lcos
     // This overload of wait() will make sure that the passed function will be
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
-    template <typename T1, typename TR1, typename F>
+    template <typename T1, typename F>
     inline std::size_t
-    wait (std::vector<lcos::future<T1, TR1> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<T1> > const& lazy_values, F const& f,
         boost::int32_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
@@ -129,9 +129,9 @@ namespace hpx { namespace lcos
 
     /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
-    template <typename T1, typename TR1>
+    template <typename T1>
     inline T1
-    wait (lcos::future<T1, TR1> const& f1)
+    wait (lcos::future<T1> const& f1)
     {
         return f1.get();
     }
@@ -142,9 +142,9 @@ namespace hpx { namespace lcos
         f1.get();
     }
 
-    template <typename T1, typename T2, typename TR1, typename TR2>
+    template <typename T1, typename T2>
     inline HPX_STD_TUPLE<T1, T2>
-    wait (lcos::future<T1, TR1> const& f1, lcos::future<T2, TR2> const& f2)
+    wait (lcos::future<T1> const& f1, lcos::future<T2> const& f2)
     {
         return HPX_STD_MAKE_TUPLE(f1.get(), f2.get());
     }
@@ -181,22 +181,22 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename TR>
+    template <typename T>
     inline void
-    wait (std::vector<lcos::future<T, TR> > const& v, std::vector<TR>& r)
+    wait (std::vector<lcos::future<T> > const& v, std::vector<T>& r)
     {
         r.reserve(v.size());
 
-        typedef lcos::future<T, TR> value_type;
+        typedef lcos::future<T> value_type;
         BOOST_FOREACH(value_type const& f, v)
             r.push_back(f.get());
     }
 
-    template <typename T, typename TR>
+    template <typename T>
     inline void
-    wait (std::vector<lcos::future<T, TR> > const& v)
+    wait (std::vector<lcos::future<T> > const& v)
     {
-        typedef lcos::future<T, TR> value_type;
+        typedef lcos::future<T> value_type;
         BOOST_FOREACH(value_type const& f, v)
             f.get();
     }
@@ -225,8 +225,7 @@ namespace hpx
 #define N BOOST_PP_ITERATION()
 
 #define HPX_FUTURE_WAIT_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)             \
-        lcos::future<BOOST_PP_CAT(T, n), BOOST_PP_CAT(TR, n)> const&          \
-            BOOST_PP_CAT(f, n)                                                \
+        lcos::future<BOOST_PP_CAT(T, n)> const& BOOST_PP_CAT(f, n)            \
     /**/
 #define HPX_FUTURE_WAIT_VOID_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)        \
         lcos::future<void> const& BOOST_PP_CAT(f, n)                          \
@@ -238,9 +237,7 @@ namespace hpx
 
 namespace hpx { namespace lcos
 {
-    template <
-        BOOST_PP_ENUM_PARAMS(N, typename T),
-        BOOST_PP_ENUM_PARAMS(N, typename TR)>
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     inline HPX_STD_TUPLE<BOOST_PP_ENUM_PARAMS(N, T)>
     wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_ARGUMENT, _))
     {

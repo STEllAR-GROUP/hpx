@@ -55,7 +55,7 @@ struct client : hpx::components::client_base<client, A>
 {
     typedef hpx::components::client_base<client, A> base_type;
 
-    client(hpx::future<hpx::id_type, hpx::naming::gid_type> const& gid)
+    client(hpx::future<hpx::id_type> const& gid)
       : base_type(gid)
     {}
 

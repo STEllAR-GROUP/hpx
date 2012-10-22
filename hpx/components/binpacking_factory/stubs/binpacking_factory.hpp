@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace stubs
         /// \brief Create new components of the given type while
         ///        taking into account the current number of instances existing
         ///        on the target localities.
-        static lcos::future<result_type, remote_result_type>
+        static lcos::future<result_type>
         create_components_async(
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count)
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace stubs
         /// \brief Create new components of the given type while
         ///        taking into account the current number of instances existing
         ///        on the target localities.
-        static lcos::future<result_type, remote_result_type>
+        static lcos::future<result_type>
         create_components_counterbased_async(
             naming::id_type const& targetgid, components::component_type type,
             std::size_t count, std::string const& countername)

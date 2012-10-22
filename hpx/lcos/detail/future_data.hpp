@@ -73,15 +73,14 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename RemoteResult =
-        typename traits::promise_remote_result<Result>::type>
+    template <typename Result>
     struct future_data_base : future_data_refcnt_base
     {
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
         typedef
-            HPX_STD_FUNCTION<void(lcos::future<Result, RemoteResult>)>
+            HPX_STD_FUNCTION<void(lcos::future<Result>)> 
         completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
@@ -190,10 +189,10 @@ namespace hpx { namespace lcos { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult =
         typename traits::promise_remote_result<Result>::type>
-    struct future_data : future_data_base<Result, RemoteResult>
+    struct future_data : future_data_base<Result>
     {
     public:
-        typedef future_data_base<Result, RemoteResult> base_type;
+        typedef future_data_base<Result> base_type;
         typedef typename base_type::result_type result_type;
         typedef typename base_type::mutex_type mutex_type;
         typedef boost::exception_ptr error_type;
@@ -202,7 +201,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename base_type::completed_callback_type
             completed_callback_type;
 
-        friend class lcos::future<Result, RemoteResult>;
+        friend class lcos::future<Result>;
 
     protected:
         future_data() : set_on_completed_(false) {}
@@ -282,7 +281,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_data(BOOST_FWD_REF(T) result)
         {
             // this future instance coincidentally keeps us alive
-            lcos::future<Result, RemoteResult> f(this);
+            lcos::future<Result> f(this);
 
             // set the received result, reset error status
             try {
@@ -330,7 +329,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // this future instance coincidentally keeps us alive
-            lcos::future<Result, RemoteResult> f(this);
+            lcos::future<Result> f(this);
 
             // store the error code
             if (set_on_completed_) {
@@ -410,7 +409,7 @@ namespace hpx { namespace lcos { namespace detail
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             // this future coincidentally instance keeps us alive
-            lcos::future<Result, RemoteResult> f(this);
+            lcos::future<Result> f(this);
 
             completed_callback_type retval = boost::move(on_completed_);
             set_on_completed_ = !data_sink.empty();

@@ -9,7 +9,7 @@
 
 
         template <typename A0>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0
           , boost::mpl::false_

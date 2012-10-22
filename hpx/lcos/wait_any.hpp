@@ -39,7 +39,7 @@ namespace hpx
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename RT>
+        template <typename T>
         struct when_any
         {
         private:
@@ -61,8 +61,8 @@ namespace hpx
 
         public:
             typedef lcos::local::spinlock mutex_type;
-            typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > result_type;
-            typedef std::vector<lcos::future<T, RT> > argument_type;
+            typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+            typedef std::vector<lcos::future<T> > argument_type;
 
             when_any(argument_type const& lazy_values)
               : lazy_values_(lazy_values), index_(index_error)
@@ -130,13 +130,13 @@ namespace hpx
                 return result_type(static_cast<int>(index_), lazy_values_[index_]);
             }
 
-            std::vector<lcos::future<T, RT> > lazy_values_;
+            std::vector<lcos::future<T> > lazy_values_;
             std::size_t index_;
             mutable mutex_type mtx_;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Tuple, typename T, typename RT>
+        template <typename Tuple, typename T>
         struct when_any_tuple
         {
         private:
@@ -150,7 +150,7 @@ namespace hpx
 
                 typedef std::size_t result_type;
 
-                result_type operator()(std::size_t i, lcos::future<T, RT> f) const
+                result_type operator()(std::size_t i, lcos::future<T> f) const
                 {
                     f.when(util::bind(&when_any_tuple::on_future_ready,
                         outer_, ++i, id_));
@@ -166,7 +166,7 @@ namespace hpx
             {
                 typedef void result_type;
 
-                result_type operator()(lcos::future<T, RT> f) const
+                result_type operator()(lcos::future<T> f) const
                 {
                     f.when();
                 };
@@ -188,7 +188,7 @@ namespace hpx
 
             // extract element idx from given tuple
             template <typename First, typename Last>
-            static lcos::future<T, RT> const&
+            static lcos::future<T> const&
             get_element(First const& first, Last const& last, std::size_t idx,
                 boost::mpl::false_)
             {
@@ -203,15 +203,15 @@ namespace hpx
             }
 
             template <typename First, typename Last>
-            static lcos::future<T, RT> const&
+            static lcos::future<T> const&
             get_element(First const&, Last const&, std::size_t,
                 boost::mpl::true_)
             {
-                static lcos::future<T, RT> f;
+                static lcos::future<T> f;
                 return f;   // shouldn't ever be called
             }
 
-            static lcos::future<T, RT> const&
+            static lcos::future<T> const&
             get_element(Tuple const& t, std::size_t idx)
             {
                 BOOST_ASSERT(idx < 
@@ -225,7 +225,7 @@ namespace hpx
 
         public:
             typedef lcos::local::spinlock mutex_type;
-            typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > result_type;
+            typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
             typedef Tuple argument_type;
 
             when_any_tuple(argument_type const& lazy_values)
@@ -305,26 +305,26 @@ namespace hpx
     /// \return   The returned future holds a pair of values, the first value
     ///           is the index of the future which returned first and the second
     ///           value represents the actual future which returned first.
-    template <typename T, typename RT>
-    lcos::future<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    template <typename T>
+    lcos::future<HPX_STD_TUPLE<int, lcos::future<T> > >
     when_any(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<T, RT> >))) lazy_values)
+        std::vector<lcos::future<T> >))) lazy_values)
     {
-        typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::when_any<T, RT>(boost::move(lazy_values)));
+            detail::when_any<T>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
     }
 
-    template <typename T, typename RT>
-    lcos::future<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
-    when_any(std::vector<lcos::future<T, RT> > const& lazy_values)
+    template <typename T>
+    lcos::future<HPX_STD_TUPLE<int, lcos::future<T> > >
+    when_any(std::vector<lcos::future<T> > const& lazy_values)
     {
-        typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > return_type;
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_any<T, RT>(lazy_values));
+                detail::when_any<T>(lazy_values));
         p.apply();
         return p.get_future();
     }
@@ -337,17 +337,17 @@ namespace hpx
     /// \return   The returned tuple holds a pair of values, the first value
     ///           is the index of the future which returned first and the second
     ///           value represents the actual future which returned first.
-    template <typename T, typename RT>
-    HPX_STD_TUPLE<int, lcos::future<T, RT> >
+    template <typename T>
+    HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<T, RT> >))) lazy_values)
+        std::vector<lcos::future<T> >))) lazy_values)
     {
         return when_any(lazy_values).get();
     }
 
-    template <typename T, typename RT>
-    HPX_STD_TUPLE<int, lcos::future<T, RT> >
-    wait_any(std::vector<lcos::future<T, RT> > const& lazy_values)
+    template <typename T>
+    HPX_STD_TUPLE<int, lcos::future<T> >
+    wait_any(std::vector<lcos::future<T> > const& lazy_values)
     {
         return when_any(lazy_values).get();
     }
@@ -380,10 +380,10 @@ namespace hpx
 #define N BOOST_PP_ITERATION()
 
 #define HPX_WHEN_ANY_FUTURE_ARG(z, n, _)                                      \
-        lcos::future<T, RT> BOOST_PP_CAT(f, n)                                \
+        lcos::future<T> BOOST_PP_CAT(f, n)                                    \
     /**/
 #define HPX_WHEN_ANY_FUTURE_TYPE(z, n, _)                                     \
-        lcos::future<T, RT>                                                   \
+        lcos::future<T>                                                       \
     /**/
 #define HPX_WHEN_ANY_FUTURE_VAR(z, n, _) BOOST_PP_CAT(f, n)                   \
     /**/
@@ -391,24 +391,24 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename RT>
-    lcos::future<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
+    template <typename T>
+    lcos::future<HPX_STD_TUPLE<int, lcos::future<T> > >
     when_any (BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_ARG, _))
     {
-        typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > return_type;
         typedef boost::fusion::tuple<
             BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_TYPE, _)
         > argument_type;
 
         lcos::local::futures_factory<return_type()> p(
-            detail::when_any_tuple<argument_type, T, RT>(
+            detail::when_any_tuple<argument_type, T>(
                 argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _))));
         p.apply();
         return p.get_future();
     }
 
-    template <typename T, typename RT>
-    HPX_STD_TUPLE<int, lcos::future<T, RT> >
+    template <typename T>
+    HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_ARG, _))
     {
         return when_any(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _)).get();

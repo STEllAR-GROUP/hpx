@@ -23,7 +23,7 @@ namespace hpx { namespace components
     template <typename Component>
     inline typename boost::enable_if<
         traits::is_component<Component>, 
-        lcos::future<naming::id_type, naming::gid_type>
+        lcos::future<naming::id_type>
     >::type
     new_(id_type const& locality)
     {
@@ -62,7 +62,7 @@ namespace hpx { namespace components
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline typename boost::enable_if<
         traits::is_component<Component>, 
-        lcos::future<naming::id_type, naming::gid_type>
+        lcos::future<naming::id_type>
     >::type
     new_(id_type const& locality, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {

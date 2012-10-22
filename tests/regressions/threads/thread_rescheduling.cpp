@@ -45,9 +45,9 @@ using hpx::find_here;
 ///////////////////////////////////////////////////////////////////////////////
 namespace detail
 {
-    template <typename T1, typename TR1>
+    template <typename T1>
     boost::uint64_t wait(
-        std::vector<future<T1, TR1> > const& lazy_values
+        std::vector<future<T1> > const& lazy_values
       , boost::int32_t suspend_for = 10
         )
     {

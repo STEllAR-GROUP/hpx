@@ -13,7 +13,7 @@ namespace hpx
     
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
@@ -25,7 +25,7 @@ namespace hpx
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
@@ -37,7 +37,7 @@ namespace hpx
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
@@ -49,7 +49,7 @@ namespace hpx
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
@@ -61,7 +61,7 @@ namespace hpx
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
@@ -73,7 +73,7 @@ namespace hpx
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived

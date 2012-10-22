@@ -59,7 +59,7 @@ bool register_name(
     return false;
 }
 
-lcos::future<bool, response> register_name_async(
+lcos::future<bool> register_name_async(
     std::string const& name
   , naming::id_type const& id
     )
@@ -140,7 +140,7 @@ bool unregister_name(
     return false;
 }
 
-lcos::future<naming::id_type, response> unregister_name_async(
+lcos::future<naming::id_type> unregister_name_async(
     std::string const& name
     )
 {
@@ -189,7 +189,7 @@ bool resolve_name(
     return false;
 }
 
-lcos::future<naming::id_type, response> resolve_name_async(
+lcos::future<naming::id_type> resolve_name_async(
     std::string const& name
     )
 {

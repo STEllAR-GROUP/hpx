@@ -548,9 +548,7 @@ namespace hpx
             typename DirectExecute = typename Action::direct_execution>
         class deferred_packaged_task;
 
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
+        template <typename Result>
         class future;
 
         template <typename ValueType>

@@ -23,7 +23,7 @@ namespace hpx { namespace lcos { namespace stubs
             return hpx::async<action_type>(gid);
         }
 
-        static lcos::future<void, util::unused_type>
+        static lcos::future<void>
         set_exception_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {

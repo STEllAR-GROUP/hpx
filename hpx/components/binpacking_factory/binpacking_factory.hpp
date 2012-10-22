@@ -41,8 +41,7 @@ namespace hpx { namespace components
         typedef base_type::iterator_type iterator_type;
         typedef base_type::iterator_range_type iterator_range_type;
 
-        typedef lcos::future<result_type, remote_result_type>
-            async_create_result_type;
+        typedef lcos::future<result_type> async_create_result_type;
 
         ///////////////////////////////////////////////////////////////////////
         ///

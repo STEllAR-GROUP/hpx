@@ -134,7 +134,7 @@ namespace hpx { namespace components
 
         /// Asynchronously clone the \a memory_block_data maintained by this
         /// memory_block
-        lcos::future<naming::id_type, naming::gid_type> clone_async()
+        lcos::future<naming::id_type> clone_async()
         {
             return this->base_type::clone_async(get_gid());
         }

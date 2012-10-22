@@ -35,7 +35,7 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        lcos::future<ValueType, RemoteType>
+        lcos::future<ValueType>
         get_value_async()
         {
             BOOST_ASSERT(this->get_gid());

@@ -1360,7 +1360,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::future<naming::id_type, response> resolve_name_async(
+    lcos::future<naming::id_type> resolve_name_async(
         std::string const& name
         );
 

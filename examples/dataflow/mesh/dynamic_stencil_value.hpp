@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace amr
         /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        lcos::future<naming::id_type, naming::id_type> call_async(
+        lcos::future<naming::id_type> call_async(
             naming::id_type const& initial)
         {
             return this->base_type::call_async(this->get_gid(), initial);

@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace stubs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename Component>
-        static lcos::future<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         create_component_async(naming::id_type const& gid)
         {
             // Create a future, execute the required action,
@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace stubs
 /**/
 #define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static lcos::future<naming::id_type, naming::gid_type>                \
+        static lcos::future<naming::id_type>                \
         create_component_async(naming::id_type const& gid,                    \
             HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
         {                                                                     \
@@ -111,8 +111,7 @@ namespace hpx { namespace components { namespace stubs
 #undef HPX_RUNTIME_SUPPORT_STUB_REMOVE_REFERENCE
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<
-            std::vector<naming::id_type>, std::vector<naming::gid_type> >
+        static lcos::future<std::vector<naming::id_type> >
         bulk_create_components_async(
             naming::id_type const& gid, components::component_type type,
             std::size_t count = 1);
@@ -134,7 +133,7 @@ namespace hpx { namespace components { namespace stubs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename T, typename Config>
-        static lcos::future<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         create_memory_block_async(
             naming::id_type const& id, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act);
@@ -242,7 +241,7 @@ namespace hpx { namespace components { namespace stubs
         garbage_collect(naming::id_type const& targetgid);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         create_performance_counter_async(naming::id_type targetgid,
             performance_counters::counter_info const& info);
 

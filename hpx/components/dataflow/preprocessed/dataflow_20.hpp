@@ -9,7 +9,7 @@
 
 
         template <typename A0>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0
           , boost::mpl::false_
@@ -65,7 +65,7 @@
         {
         }
         template <typename A0 , typename A1>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
           , boost::mpl::false_
@@ -121,7 +121,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
           , boost::mpl::false_
@@ -177,7 +177,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
           , boost::mpl::false_
@@ -233,7 +233,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
           , boost::mpl::false_
@@ -289,7 +289,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
           , boost::mpl::false_
@@ -345,7 +345,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
           , boost::mpl::false_
@@ -401,7 +401,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
           , boost::mpl::false_
@@ -457,7 +457,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8
           , boost::mpl::false_
@@ -513,7 +513,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9
           , boost::mpl::false_
@@ -569,7 +569,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10
           , boost::mpl::false_
@@ -625,7 +625,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11
           , boost::mpl::false_
@@ -681,7 +681,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12
           , boost::mpl::false_
@@ -737,7 +737,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13
           , boost::mpl::false_
@@ -793,7 +793,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14
           , boost::mpl::false_
@@ -849,7 +849,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15>
-        static inline lcos::future<naming::id_type, naming::gid_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15
           , boost::mpl::false_

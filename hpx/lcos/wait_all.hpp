@@ -33,7 +33,7 @@ namespace hpx
 {
     namespace detail
     {
-        template <typename T, typename RT>
+        template <typename T>
         struct when_all
         {
         private:
@@ -54,8 +54,8 @@ namespace hpx
         public:
             typedef lcos::local::spinlock mutex_type;
 
-            typedef std::vector<lcos::future<T, RT> > argument_type;
-            typedef std::vector<lcos::future<T, RT> > result_type;
+            typedef std::vector<lcos::future<T> > argument_type;
+            typedef std::vector<lcos::future<T> > result_type;
 
             when_all(argument_type const& lazy_values)
               : lazy_values_(lazy_values),
@@ -127,7 +127,7 @@ namespace hpx
                 return lazy_values_;
             }
 
-            std::vector<lcos::future<T, RT> > lazy_values_;
+            std::vector<lcos::future<T> > lazy_values_;
             std::size_t ready_count_;
             mutable mutex_type mtx_;
         };
@@ -140,26 +140,26 @@ namespace hpx
     ///
     /// \return   The returned future holds the same list of futures as has
     ///           been passed to when_all.
-    template <typename T, typename RT>
-    lcos::future<std::vector<lcos::future<T, RT> > >
+    template <typename T>
+    lcos::future<std::vector<lcos::future<T> > >
     when_all(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<T, RT> >))) lazy_values)
+        std::vector<lcos::future<T> >))) lazy_values)
     {
-        typedef std::vector<lcos::future<T, RT> > return_type;
+        typedef std::vector<lcos::future<T> > return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::when_all<T, RT>(boost::move(lazy_values)));
+            detail::when_all<T>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
     }
 
-    template <typename T, typename RT>
-    lcos::future<std::vector<lcos::future<T, RT> > >
-    when_all(std::vector<lcos::future<T, RT> > const& lazy_values)
+    template <typename T>
+    lcos::future<std::vector<lcos::future<T> > >
+    when_all(std::vector<lcos::future<T> > const& lazy_values)
     {
-        typedef std::vector<lcos::future<T, RT> > return_type;
+        typedef std::vector<lcos::future<T> > return_type;
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_all<T, RT>(lazy_values));
+                detail::when_all<T>(lazy_values));
         p.apply();
         return p.get_future();
     }
@@ -170,17 +170,17 @@ namespace hpx
     /// list of futures after they finished executing.
     ///
     /// \a wait_all returns after all futures have been triggered.
-    template <typename T, typename RT>
-    std::vector<lcos::future<T, RT> >
+    template <typename T>
+    std::vector<lcos::future<T> >
     wait_all(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<T, RT> >))) lazy_values)
+        std::vector<lcos::future<T> >))) lazy_values)
     {
         return when_all(lazy_values).get();
     }
 
-    template <typename T, typename RT>
-    std::vector<lcos::future<T, RT> >
-    wait_all (std::vector<lcos::future<T, RT> > const& lazy_values)
+    template <typename T>
+    std::vector<lcos::future<T> >
+    wait_all (std::vector<lcos::future<T> > const& lazy_values)
     {
         return when_all(lazy_values).get();
     }
@@ -216,7 +216,7 @@ namespace hpx
         lazy_values.push_back(BOOST_PP_CAT(f, n));                            \
     /**/
 #define HPX_WHEN_ALL_FUTURE_ARG(z, n, _)                                      \
-        lcos::future<T, RT> BOOST_PP_CAT(f, n)                                \
+        lcos::future<T> BOOST_PP_CAT(f, n)                                    \
     /**/
 #define HPX_WHEN_ALL_FUTURE_VAR(z, n, _) BOOST_PP_CAT(f, n)                   \
     /**/
@@ -224,23 +224,23 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename RT>
-    lcos::future<std::vector<lcos::future<T, RT> > >
+    template <typename T>
+    lcos::future<std::vector<lcos::future<T> > >
     when_all (BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_ARG, _))
     {
-        std::vector<lcos::future<T, RT> > lazy_values;
+        std::vector<lcos::future<T> > lazy_values;
         lazy_values.reserve(N);
         BOOST_PP_REPEAT(N, HPX_WHEN_ALL_PUSH_BACK_ARG, _)
 
-        typedef std::vector<lcos::future<T, RT> > return_type;
+        typedef std::vector<lcos::future<T> > return_type;
         lcos::local::futures_factory<return_type()> p(
-            detail::when_all<T, RT>(boost::move(lazy_values)));
+            detail::when_all<T>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
     }
 
-    template <typename T, typename RT>
-    std::vector<lcos::future<T, RT> >
+    template <typename T>
+    std::vector<lcos::future<T> >
     wait_all(BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_ARG, _))
     {
         return when_all(BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_VAR, _)).get();

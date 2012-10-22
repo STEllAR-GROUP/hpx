@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::future<std::vector<naming::id_type>, std::vector<naming::gid_type> >
+    lcos::future<std::vector<naming::id_type> >
     runtime_support::bulk_create_components_async(
         naming::id_type const& gid, components::component_type type,
         std::size_t count)
@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace stubs
     /// to call \a future#get on the result of this function
     /// to obtain the global id of the newly created object.
     template <typename T, typename Config>
-    lcos::future<naming::id_type, naming::gid_type>
+    lcos::future<naming::id_type>
     runtime_support::create_memory_block_async(
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<T, Config> const& act)
@@ -215,7 +215,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::future<naming::id_type, naming::gid_type>
+    lcos::future<naming::id_type>
     runtime_support::create_performance_counter_async(naming::id_type targetgid,
         performance_counters::counter_info const& info)
     {

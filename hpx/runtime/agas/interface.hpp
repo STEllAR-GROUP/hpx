@@ -36,7 +36,7 @@ inline bool register_name(
     return register_name(name, tmp, ec);
 }
 
-HPX_API_EXPORT lcos::future<bool, response> register_name_async(
+HPX_API_EXPORT lcos::future<bool> register_name_async(
     std::string const& name
   , naming::id_type const& id
     );
@@ -53,7 +53,7 @@ HPX_API_EXPORT bool unregister_name(
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT lcos::future<naming::id_type, response> unregister_name_async(
+HPX_API_EXPORT lcos::future<naming::id_type> unregister_name_async(
     std::string const& name
     );
 

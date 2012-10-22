@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         template <typename T, typename Config>
-        static lcos::future<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         create_async(naming::id_type const& targetgid, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
@@ -115,7 +115,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         clone_async(naming::id_type const& targetgid)
         {
             // Create a future, execute the required action,

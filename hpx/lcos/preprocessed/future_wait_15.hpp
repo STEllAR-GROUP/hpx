@@ -10,11 +10,9 @@
 
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2,
-        typename TR0 , typename TR1 , typename TR2>
+    template <typename T0 , typename T1 , typename T2>
     inline HPX_STD_TUPLE<T0 , T1 , T2>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get());
     }
@@ -26,11 +24,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3>
+    template <typename T0 , typename T1 , typename T2 , typename T3>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get());
     }
@@ -42,11 +38,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get());
     }
@@ -58,11 +52,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get());
     }
@@ -74,11 +66,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get());
     }
@@ -90,11 +80,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get());
     }
@@ -106,11 +94,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get());
     }
@@ -122,11 +108,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8 , typename TR9>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8 , lcos::future<T9, TR9> const& f9)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get());
     }
@@ -138,11 +122,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8 , typename TR9 , typename TR10>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8 , lcos::future<T9, TR9> const& f9 , lcos::future<T10, TR10> const& f10)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get());
     }
@@ -154,11 +136,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8 , typename TR9 , typename TR10 , typename TR11>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8 , lcos::future<T9, TR9> const& f9 , lcos::future<T10, TR10> const& f10 , lcos::future<T11, TR11> const& f11)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get());
     }
@@ -170,11 +150,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8 , typename TR9 , typename TR10 , typename TR11 , typename TR12>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8 , lcos::future<T9, TR9> const& f9 , lcos::future<T10, TR10> const& f10 , lcos::future<T11, TR11> const& f11 , lcos::future<T12, TR12> const& f12)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11 , lcos::future<T12> const& f12)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get() , f12.get());
     }
@@ -186,11 +164,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8 , typename TR9 , typename TR10 , typename TR11 , typename TR12 , typename TR13>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8 , lcos::future<T9, TR9> const& f9 , lcos::future<T10, TR10> const& f10 , lcos::future<T11, TR11> const& f11 , lcos::future<T12, TR12> const& f12 , lcos::future<T13, TR13> const& f13)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11 , lcos::future<T12> const& f12 , lcos::future<T13> const& f13)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get() , f12.get() , f13.get());
     }
@@ -202,11 +178,9 @@ namespace hpx { namespace lcos
 }}
 namespace hpx { namespace lcos
 {
-    template <
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14,
-        typename TR0 , typename TR1 , typename TR2 , typename TR3 , typename TR4 , typename TR5 , typename TR6 , typename TR7 , typename TR8 , typename TR9 , typename TR10 , typename TR11 , typename TR12 , typename TR13 , typename TR14>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14>
-    wait (lcos::future<T0, TR0> const& f0 , lcos::future<T1, TR1> const& f1 , lcos::future<T2, TR2> const& f2 , lcos::future<T3, TR3> const& f3 , lcos::future<T4, TR4> const& f4 , lcos::future<T5, TR5> const& f5 , lcos::future<T6, TR6> const& f6 , lcos::future<T7, TR7> const& f7 , lcos::future<T8, TR8> const& f8 , lcos::future<T9, TR9> const& f9 , lcos::future<T10, TR10> const& f10 , lcos::future<T11, TR11> const& f11 , lcos::future<T12, TR12> const& f12 , lcos::future<T13, TR13> const& f13 , lcos::future<T14, TR14> const& f14)
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11 , lcos::future<T12> const& f12 , lcos::future<T13> const& f13 , lcos::future<T14> const& f14)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get() , f12.get() , f13.get() , f14.get());
     }

@@ -32,7 +32,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
@@ -67,7 +67,7 @@ namespace hpx
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived, 
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<typename traits::promise_local_result<Result>::type, Result>
+    lcos::future<typename traits::promise_local_result<Result>::type>
     async (
         hpx::actions::action<
             Component, Action, Result, Arguments, Derived
