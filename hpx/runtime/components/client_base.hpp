@@ -175,9 +175,7 @@ namespace hpx { namespace components
             naming::id_type id;
             ar & id;
 
-            lcos::promise<naming::id_type, naming::gid_type> p;
-            p.set_local_data(id);
-            gid_ = p.get_future();
+            gid_ = lcos::create_value(id);
         }
 
         template <typename Archive>
