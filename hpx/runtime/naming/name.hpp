@@ -40,6 +40,10 @@
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
+    // forward declaration
+    inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb) HPX_SUPER_PURE;
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Global identifier for components across the HPX system.
     struct HPX_EXPORT gid_type
     {
@@ -140,7 +144,9 @@ namespace hpx { namespace naming
         // comparison is required as well
         friend bool operator== (gid_type const& lhs, gid_type const& rhs)
         {
-            return (lhs.id_msb_ == rhs.id_msb_) && (lhs.id_lsb_ == rhs.id_lsb_);
+            return (strip_credit_from_gid(lhs.id_msb_) == 
+                    strip_credit_from_gid(rhs.id_msb_)) && 
+                (lhs.id_lsb_ == rhs.id_lsb_);
         }
         friend bool operator!= (gid_type const& lhs, gid_type const& rhs)
         {
@@ -280,8 +286,6 @@ namespace hpx { namespace naming
         BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
         return static_cast<boost::uint16_t>(c);
     }
-
-    inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb) HPX_SUPER_PURE;
 
     inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
     {

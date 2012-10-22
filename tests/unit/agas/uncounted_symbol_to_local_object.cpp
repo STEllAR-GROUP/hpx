@@ -80,13 +80,13 @@ void hpx_test_main(
 
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+
+            // Remove the symbolic name.
+            HPX_TEST_EQ(id, unregister_name(name));
         }
 
         // The component should be out of scope now.
         HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
-
-        // Remove the symbolic name.
-        HPX_TEST_EQ(true, unregister_name(name));
     }
 }
 
