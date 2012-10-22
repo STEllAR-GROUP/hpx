@@ -1292,6 +1292,20 @@ public:
       , error_code& ec = throws
         );
 
+    lcos::future<bool> register_name_async(
+        std::string const& name
+      , naming::id_type const& id
+        );
+
+    bool register_name(
+        std::string const& name
+      , naming::id_type const& id
+      , error_code& ec = throws
+        )
+    {
+        return register_name_async(name, id).get(ec);
+    }
+
     /// \brief Unregister a global name (release any existing association)
     ///
     /// This function releases any existing association of the given global
@@ -1316,18 +1330,21 @@ public:
     ///                   of hpx#exception.
     bool unregister_name(
         std::string const& name
-      , error_code& ec = throws
-        )
-    {
-        naming::gid_type gid;
-        return unregister_name(name, gid, ec);
-    }
-
-    bool unregister_name(
-        std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws
         );
+
+    lcos::future<naming::id_type> unregister_name_async(
+        std::string const& name
+        );
+
+    naming::id_type unregister_name(
+        std::string const& name
+      , error_code& ec = throws
+        )
+    {
+        return unregister_name_async(name).get(ec);
+    }
 
     /// \brief Query for the global address associated with a given global name.
     ///
@@ -1363,6 +1380,14 @@ public:
     lcos::future<naming::id_type> resolve_name_async(
         std::string const& name
         );
+
+    naming::id_type resolve_name(
+        std::string const& name
+      , error_code& ec = throws
+        )
+    {
+        return resolve_name_async(name).get(ec);
+    }
 
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.

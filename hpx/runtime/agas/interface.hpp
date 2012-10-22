@@ -22,19 +22,15 @@ namespace hpx { namespace agas
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT bool register_name(
     std::string const& name
-  , naming::id_type const& gid
+  , naming::gid_type const& gid
   , error_code& ec = throws
     );
 
-inline bool register_name(
+HPX_API_EXPORT bool register_name(
     std::string const& name
-  , naming::gid_type const& gid
+  , naming::id_type const& gid
   , error_code& ec = throws
-    )
-{
-    naming::id_type tmp(gid, naming::id_type::unmanaged);
-    return register_name(name, tmp, ec);
-}
+    );
 
 HPX_API_EXPORT lcos::future<bool> register_name_async(
     std::string const& name
@@ -44,12 +40,12 @@ HPX_API_EXPORT lcos::future<bool> register_name_async(
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT bool unregister_name(
     std::string const& name
+  , naming::id_type& gid
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT bool unregister_name(
+HPX_API_EXPORT naming::id_type unregister_name(
     std::string const& name
-  , naming::id_type& gid
   , error_code& ec = throws
     );
 
@@ -60,14 +56,23 @@ HPX_API_EXPORT lcos::future<naming::id_type> unregister_name_async(
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT bool resolve_name(
     std::string const& name
-  , naming::id_type& gid
+  , naming::gid_type& gid
   , error_code& ec = throws
     );
 
 HPX_API_EXPORT bool resolve_name(
     std::string const& name
-  , naming::gid_type& gid
+  , naming::id_type& gid
   , error_code& ec = throws
+    );
+
+HPX_API_EXPORT naming::id_type resolve_name(
+    std::string const& name
+  , error_code& ec = throws
+    );
+
+HPX_API_EXPORT lcos::future<naming::id_type> resolve_name_async(
+    std::string const& name
     );
 
 ///////////////////////////////////////////////////////////////////////////////

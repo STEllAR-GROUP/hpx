@@ -1353,6 +1353,7 @@ void addressing_service::decref(
     }
 } // }}}
 
+///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::register_name(
     std::string const& name
   , naming::gid_type const& id
@@ -1384,6 +1385,56 @@ bool addressing_service::register_name(
     }
 } // }}}
 
+static void correct_credit_on_failure(future<bool> f, naming::id_type id, 
+    boost::uint16_t mutable_gid_credit, boost::uint16_t new_gid_credit)
+{
+    // Return the credit to the GID if the operation failed
+    if (f.has_exception() && mutable_gid_credit != 0) 
+        naming::add_credit_to_gid(id.get_gid(), new_gid_credit);
+}
+
+lcos::future<bool> addressing_service::register_name_async(
+    std::string const& name
+  , naming::id_type const& id
+    )
+{ // {{{
+    // We need to modify the reference count.
+    naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
+    naming::gid_type new_gid;
+
+    // FIXME: combine incref with register_name, if needed
+    if (naming::get_credit_from_gid(mutable_gid) != 0)
+    {
+        new_gid = split_credits_for_gid(mutable_gid);
+
+        // Credit exhaustion - we need to get more.
+        if (0 == naming::get_credit_from_gid(new_gid))
+        {
+            BOOST_ASSERT(1 == naming::get_credit_from_gid(mutable_gid));
+            naming::get_agas_client().incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT);
+
+            naming::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::add_credit_to_gid(mutable_gid, HPX_INITIAL_GLOBALCREDIT);
+        }
+    }
+    else {
+        new_gid = mutable_gid;
+    }
+
+    request req(symbol_ns_bind, name, new_gid);
+    naming::id_type const target = bootstrap_symbol_namespace_id();
+    future<bool> f = stubs::symbol_namespace::service_async<bool>(target, req);
+
+    using HPX_STD_PLACEHOLDERS::_1;
+    f.when(
+        HPX_STD_BIND(correct_credit_on_failure, _1, id,
+            naming::get_credit_from_gid(mutable_gid), 
+            naming::get_credit_from_gid(new_gid))
+    );
+    return f;
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::unregister_name(
     std::string const& name
   , naming::gid_type& id
@@ -1421,6 +1472,16 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
+lcos::future<naming::id_type> addressing_service::unregister_name_async(
+    std::string const& name
+    )
+{ // {{{
+    request req(symbol_ns_unbind, name);
+    naming::id_type const target = bootstrap_symbol_namespace_id();
+    return stubs::symbol_namespace::service_async<naming::id_type>(target, req);
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::resolve_name(
     std::string const& name
   , naming::gid_type& id
@@ -1457,6 +1518,15 @@ bool addressing_service::resolve_name(
 
         return false;
     }
+} // }}}
+
+lcos::future<naming::id_type> addressing_service::resolve_name_async(
+    std::string const& name
+    )
+{ // {{{
+    request req(symbol_ns_resolve, name);
+    naming::id_type const gid = bootstrap_symbol_namespace_id();
+    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
 } // }}}
 
 /// Invoke the supplied hpx::function for every registered global name
