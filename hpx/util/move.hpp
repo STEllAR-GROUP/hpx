@@ -84,6 +84,26 @@ namespace hpx { namespace util { namespace detail
             return t;
         }
     };
+    
+    template <typename T, int N>
+    struct move_if_no_ref<T[N], false>
+    {
+        template <typename A>
+        static T * call(A * t)
+        {
+            return t;
+        }
+    };
+    
+    template <typename T, int N>
+    struct move_if_no_ref<const T[N], false>
+    {
+        template <typename A>
+        static const T * call(const A * t)
+        {
+            return t;
+        }
+    };
 
     template <typename T>
     struct move_if_no_ref<T, true>
