@@ -14,6 +14,7 @@
 
 Here is a list of the important tickets we closed for this release:
 
+* #581 - Remove `RemoteResult` template parameter for `future<>`
 * #580 - Add possibility to hook into actions
 * #578 - Use angle brackets in HPX error dumps
 * #575 - HPX(bad_component_type) with gcc 4.7.2 and boost 1.51
@@ -25,7 +26,7 @@ Here is a list of the important tickets we closed for this release:
 * #563 - Add `hpx::start`/`hpx::stop` to avoid blocking main thread
 * #562 - All command line arguments swallowed by hpx
 * #561 - Boost.Tuple is not move aware
-* #558 - boost::shared_ptr<> style semantics/syntax for client classes 
+* #558 - boost::shared_ptr<> style semantics/syntax for client classes
 * #556 - Creation of partially preprocessed headers should be enabled for Boost
          newer than V1.50
 * #555 - `BOOST_FORCEINLINE` does not name a type
