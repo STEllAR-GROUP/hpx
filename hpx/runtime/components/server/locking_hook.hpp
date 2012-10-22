@@ -43,7 +43,8 @@ namespace hpx { namespace components
             using HPX_STD_PLACEHOLDERS::_1;
 
             return HPX_STD_BIND(&locking_hook::thread_function, 
-                get_lva<this_component_type>::call(lva), _1, boost::move(f));
+                get_lva<this_component_type>::call(lva), _1, 
+                boost::move(base_type::wrap_action(boost::move(f), lva)));
         }
 
     protected:
