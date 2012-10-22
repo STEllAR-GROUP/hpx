@@ -25,6 +25,10 @@
 
 #include <hwloc.h>
 
+#if defined(__linux__) && !defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
+#  include <sys/syscall.h>      // make SYS_gettid available
+#endif
+
 std::size_t thread_affinity_worker(std::size_t desired)
 {
     // Returns the OS-thread number of the worker that is running this
