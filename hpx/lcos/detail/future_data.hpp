@@ -187,8 +187,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename RemoteResult =
-        typename traits::promise_remote_result<Result>::type>
+    template <typename Result>
     struct future_data : future_data_base<Result>
     {
     public:

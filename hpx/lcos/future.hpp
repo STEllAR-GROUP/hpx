@@ -89,8 +89,7 @@ namespace hpx { namespace lcos
         friend struct local::detail::continuation_base;
         template <typename Result_, typename RemoteResult_>
         friend class promise;
-        template <typename Result_, typename RemoteResult_>
-        friend struct detail::future_data;
+        friend struct detail::future_data<Result>;
 
         friend class hpx::thread;
 
@@ -285,7 +284,7 @@ namespace hpx { namespace lcos
         friend struct local::detail::continuation_base;
 
         friend class promise<void, util::unused_type>;
-        friend struct detail::future_data<void, util::unused_type>;
+        friend struct detail::future_data<void>;
 
         friend class hpx::thread;
 
@@ -295,9 +294,9 @@ namespace hpx { namespace lcos
         explicit future(int)
         {
             boost::intrusive_ptr<future_data_type> p =
-                new lcos::detail::future_data<void, util::unused_type>();
-            static_cast<lcos::detail::future_data<void, util::unused_type> *>(
-                p.get())->set_data(util::unused);
+                new lcos::detail::future_data<void>();
+            static_cast<lcos::detail::future_data<void> *>(p.get())->
+                set_data(util::unused);
             future_data_ = p;
         }
 

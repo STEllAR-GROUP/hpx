@@ -52,10 +52,10 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Result, typename RemoteResult>
     class promise
       : public lcos::base_lco_with_value<Result, RemoteResult>,
-        public lcos::detail::future_data<Result, RemoteResult>
+        public lcos::detail::future_data<Result>
     {
     protected:
-        typedef lcos::detail::future_data<Result, RemoteResult> future_data_type;
+        typedef lcos::detail::future_data<Result> future_data_type;
         typedef typename future_data_type::result_type result_type;
 
     public:
@@ -152,10 +152,10 @@ namespace hpx { namespace lcos { namespace detail
     template <>
     class promise<void, util::unused_type>
       : public lcos::base_lco_with_value<void, util::unused_type>,
-        public lcos::detail::future_data<void, util::unused_type>
+        public lcos::detail::future_data<void>
     {
     protected:
-        typedef lcos::detail::future_data<void, util::unused_type> future_data_type;
+        typedef lcos::detail::future_data<void> future_data_type;
         typedef future_data_type::result_type result_type;
 
     public:
