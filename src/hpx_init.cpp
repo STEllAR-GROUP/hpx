@@ -745,7 +745,11 @@ namespace hpx
             result = util::command_line_handling(desc_cmdline, argc, argv, 
                 ini_config, mode, 
                 f, vm, rtcfg, num_threads, num_localities, queuing);
-            if (result) return result;
+            if (result != 0) {
+                if (result > 0)
+                    result = 0;     // --hpx:help
+                return result;
+            }
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queuing)) {

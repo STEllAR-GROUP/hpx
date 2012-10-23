@@ -132,22 +132,6 @@ namespace hpx { namespace util
         if (vm.count("hpx:version"))
             return detail::print_version(std::cout);
 
-        if (vm.count("hpx:help")) {
-            std::string help_option(vm["hpx:help"].as<std::string>());
-            if (0 == std::string("minimal").find(help_option))
-            {
-                std::cout << help << std::endl;
-                return 0;
-            }
-            else {
-                hpx::util::osstream strm;
-                strm << help << std::endl;
-                ini_config += "hpx.cmd_line_help=" +
-                    detail::encode_string(strm.str());
-                ini_config += "hpx.cmd_line_help_option=" + help_option;
-            }
-        }
-
         bool debug_clp = vm.count("hpx:debug-clp") ? true : false;
 
         // create host name mapping
@@ -431,6 +415,23 @@ namespace hpx { namespace util
             // otherwise
             if (!vm.count("hpx:run-hpx-main"))
                 f = 0;
+        }
+
+        // help can be printed only after the runtime mode has been set
+        if (vm.count("hpx:help")) {
+            std::string help_option(vm["hpx:help"].as<std::string>());
+            if (0 == std::string("minimal").find(help_option))
+            {
+                std::cout << help << std::endl;
+                return 1;
+            }
+            else {
+                hpx::util::osstream strm;
+                strm << help << std::endl;
+                ini_config += "hpx.cmd_line_help=" +
+                    detail::encode_string(strm.str());
+                ini_config += "hpx.cmd_line_help_option=" + help_option;
+            }
         }
 
         // write HPX and AGAS network parameters to the proper ini-file entries
