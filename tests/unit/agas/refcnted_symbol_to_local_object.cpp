@@ -75,15 +75,15 @@ void hpx_test_main(
 
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+
+            // The component should still be alive, as the symbolic binding holds
+            // a reference to it.
+            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+
+            // Remove the symbolic name. This should return the final credits
+            // to AGAS.
+            HPX_TEST_EQ(id, unregister_name(name));
         }
-
-        // The component should still be alive, as the symbolic binding holds
-        // a reference to it.
-        HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
-
-        // Remove the symbolic name. This should return the final credits
-        // to AGAS.
-        HPX_TEST_EQ(true, unregister_name(name));
 
         // The component should be destroyed.
         HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
