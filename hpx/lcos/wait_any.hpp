@@ -105,7 +105,7 @@ namespace hpx
                     threads::thread_id_type id = threads::get_self().get_thread_id();
                     for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     {
-                        lazy_values_[i].when(
+                        lazy_values_[i].then(
                             util::bind(&when_any::on_future_ready, this, i, id)
                         );
                     }
@@ -125,7 +125,7 @@ namespace hpx
                 // reset all pending callback functions
                 l.unlock();
                 for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    lazy_values_[i].when();
+                    lazy_values_[i].then();
 
                 return result_type(static_cast<int>(index_), lazy_values_[index_]);
             }
@@ -152,7 +152,7 @@ namespace hpx
 
                 result_type operator()(std::size_t i, lcos::future<T> f) const
                 {
-                    f.when(util::bind(&when_any_tuple::on_future_ready,
+                    f.then(util::bind(&when_any_tuple::on_future_ready,
                         outer_, ++i, id_));
                     return i;
                 };
@@ -168,7 +168,7 @@ namespace hpx
 
                 result_type operator()(lcos::future<T> f) const
                 {
-                    f.when();
+                    f.then();
                 };
             };
 

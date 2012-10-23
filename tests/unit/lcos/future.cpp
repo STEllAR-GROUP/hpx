@@ -555,7 +555,7 @@ void test_wait_callback()
     hpx::lcos::local::promise<int> pi;
     hpx::lcos::future<int> fi = pi.get_future();
 
-    fi.when(&wait_callback);
+    fi.then(&wait_callback);
     hpx::thread t(hpx::util::bind(&promise_set_value, boost::ref(pi)));
 
     fi.wait();
@@ -581,7 +581,7 @@ void test_wait_callback()
 //     hpx::lcos::local::promise<int> pi;
 //     hpx::lcos::future<int> fi = pi.get_future();
 //
-//     fi.when(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
+//     fi.then(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
 //
 //     BOOST_SCOPED_ENUM(hpx::lcos::future_status) state =
 //         fi.wait_for(boost::posix_time::milliseconds(10));

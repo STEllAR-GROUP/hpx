@@ -24,11 +24,11 @@ struct cout_continuation
 int hpx_main(boost::program_options::variables_map& vm)
 {
     {
-        hpx::future<int> a = hpx::lcos::create_value<int>(17);
-        hpx::future<int> b = hpx::lcos::create_value<int>(42);
-        hpx::future<int> c = hpx::lcos::create_value<int>(-1);
+        hpx::future<int> a = hpx::lcos::make_future<int>(17);
+        hpx::future<int> b = hpx::lcos::make_future<int>(42);
+        hpx::future<int> c = hpx::lcos::make_future<int>(-1);
 
-        hpx::when_all(a, b, c).when(cout_continuation());
+        hpx::when_all(a, b, c).then(cout_continuation());
     }
 
     return hpx::finalize();

@@ -52,12 +52,12 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
-        return hpx::lcos::create_value(n);
+        return hpx::lcos::make_future(n);
 
     // asynchronously launch the calculation of one of the sub-terms
     // attach a continuation to this future which is called asynchronously on
     // its completion and which calculates the other sub-term
-    return hpx::async(&fib, n-1).when(fibonacci_future_one_continuation(n));
+    return hpx::async(&fib, n-1).then(fibonacci_future_one_continuation(n));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
-        return hpx::lcos::create_value(n);
+        return hpx::lcos::make_future(n);
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
@@ -98,7 +98,7 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
-        return hpx::lcos::create_value(n);
+        return hpx::lcos::make_future(n);
 
     using hpx::lcos::future;
 

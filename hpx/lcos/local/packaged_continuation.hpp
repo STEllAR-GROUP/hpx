@@ -419,9 +419,8 @@ namespace hpx { namespace lcos
     // attach a local continuation to this future instance
     template <typename Result>
     template <typename F>
-//     inline typename detail::future_when_result<future<Result, RemoteResult>, F>::type
     inline future<typename boost::result_of<F(future<Result>)>::type>
-    future<Result>::when(BOOST_FWD_REF(F) f)
+    future<Result>::then(BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;
 
@@ -436,16 +435,14 @@ namespace hpx { namespace lcos
 
         // bind a on_completed handler to this future which will invoke the
         // continuation
-        future_data_->set_on_completed(
-            util::bind(&cont_type::on_value_ready, p, util::placeholders::_1));
+        future_data_->set_on_completed(util::bind(&cont_type::on_value_ready, p, *this));
 
         return p->get_future();
     }
-    
+
     template <typename F>
-//     inline typename detail::future_when_result<future<Result, RemoteResult>, F>::type
     inline future<typename boost::result_of<F(future<void>)>::type>
-    future<void>::when(BOOST_FWD_REF(F) f)
+    future<void>::then(BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;
 
@@ -460,8 +457,7 @@ namespace hpx { namespace lcos
 
         // bind a on_completed handler to this future which will invoke the
         // continuation
-        future_data_->set_on_completed(
-            util::bind(&cont_type::on_value_ready, p, util::placeholders::_1));
+        future_data_->set_on_completed(util::bind(&cont_type::on_value_ready, p, *this));
 
         return p->get_future();
     }

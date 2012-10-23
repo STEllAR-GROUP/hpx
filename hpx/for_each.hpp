@@ -109,8 +109,8 @@ namespace hpx {
         
         std::vector<hpx::lcos::future<void> > v;
         v.reserve(2);
-        v.push_back(left_future.when(detail::for_each_copy_future<futures_iterator_type>(futures_begin)));
-        v.push_back(right_future.when(detail::for_each_copy_future<futures_iterator_type>(futures_mid)));
+        v.push_back(left_future.then(detail::for_each_copy_future<futures_iterator_type>(futures_begin)));
+        v.push_back(right_future.then(detail::for_each_copy_future<futures_iterator_type>(futures_mid)));
         hpx::lcos::wait(v);
 
         return futures;

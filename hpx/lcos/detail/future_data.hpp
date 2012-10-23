@@ -79,9 +79,8 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
-        typedef
-            HPX_STD_FUNCTION<void(lcos::future<Result>)> 
-        completed_callback_type;
+        typedef HPX_STD_FUNCTION<void(lcos::future<Result>)> 
+            completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
         virtual void deleting_owner() {}
@@ -136,13 +135,13 @@ namespace hpx { namespace lcos { namespace detail
 
         void wait()
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
                     &future_data_base::wake_me_up, this_, threads::get_self_id()));
 
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                 this_thread::suspend(threads::suspended);
             }
         }
@@ -150,13 +149,13 @@ namespace hpx { namespace lcos { namespace detail
         BOOST_SCOPED_ENUM(future_status)
         wait_for(boost::posix_time::time_duration const& p)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
                     &future_data_base::wake_me_up, this_, threads::get_self_id()));
 
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(p) == threads::wait_signaled) ?
                     future_status::ready : future_status::timeout;
             }
@@ -166,13 +165,13 @@ namespace hpx { namespace lcos { namespace detail
         BOOST_SCOPED_ENUM(future_status)
         wait_until(boost::posix_time::ptime const& at)
         {
-            mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
                     &future_data_base::wake_me_up, this_, threads::get_self_id()));
 
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(at) == threads::wait_signaled) ?
                     future_status::ready : future_status::timeout;
             }
@@ -413,10 +412,11 @@ namespace hpx { namespace lcos { namespace detail
             completed_callback_type retval = boost::move(on_completed_);
             set_on_completed_ = !data_sink.empty();
             on_completed_ = boost::move(data_sink);
-            if (!on_completed_.empty() && this->is_ready()) {
+            if (!on_completed_.empty() && this->is_ready()) 
+            {
                 // invoke the callback (continuation) function
-                on_completed_(f);
                 set_on_completed_ = false;
+                on_completed_(f);
                 on_completed_.clear();
             }
             return retval;

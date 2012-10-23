@@ -35,33 +35,6 @@ namespace hpx { namespace lcos
         }
     }
 
-//     namespace detail
-//     {
-//         template <typename Future, typename F, typename Enable = void>
-//         struct future_when_result;
-//
-//         template <typename Future, typename F>
-//         struct future_when_result<
-//             Future, F, typename boost::result_of<F(Future)>::type
-//         >
-//         {
-//             typedef typename boost::result_of<F(Future)>::type result_type;
-//             typedef typename traits::promise_remote_result<result_type>::type remote_type;
-//             typedef lcos::future<typename boost::result_of<F(Future)>::type> type;
-//         };
-//
-//         template <typename Future, typename F>
-//         struct future_when_result<
-//             Future, F,
-//             typename boost::result_of<F(typename Future::result_type)>::type
-//         >
-//         {
-//             typedef typename boost::result_of<F(typename Future::result_type)>::type result_type;
-//             typedef typename traits::promise_remote_result<result_type>::type remote_type;
-//             typedef lcos::future<result_type> type;
-//         };
-//     }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
@@ -204,14 +177,18 @@ namespace hpx { namespace lcos
             future_data_->cancel();
         }
 
+        bool valid() const BOOST_NOEXCEPT
+        {
+            return future_data_;
+        }
+
         // continuation support
         template <typename F>
-//         typename detail::future_when_result<future, F>::type
         future<typename boost::result_of<F(future)>::type>
-        when(BOOST_FWD_REF(F) f);
+        then(BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function
-        void when()
+        void then()
         {
             future_data_->reset_on_completed();
         }
@@ -253,7 +230,7 @@ namespace hpx { namespace lcos
 
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<Result> create_value(Result const& init)
+    future<Result> make_future(Result const& init)
     {
         return future<Result>(init);
     }
@@ -288,8 +265,8 @@ namespace hpx { namespace lcos
 
         friend class hpx::thread;
 
-        // create_void uses the dummy argument constructor below
-        friend future<void> create_void();
+        // make_future uses the dummy argument constructor below
+        friend future<void> make_future();
 
         explicit future(int)
         {
@@ -396,11 +373,10 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
-//         typename detail::future_when_result<future, F>::type
-        when(BOOST_FWD_REF(F) f);
+        then(BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function
-        void when()
+        void then()
         {
             future_data_->reset_on_completed();
         }
@@ -442,7 +418,7 @@ namespace hpx { namespace lcos
     };
 
     // extension: create a pre-initialized future object
-    inline future<void> create_void()
+    inline future<void> make_future()
     {
         return future<void>(1);   // dummy argument
     }

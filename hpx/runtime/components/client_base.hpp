@@ -82,12 +82,12 @@ namespace hpx { namespace components
         // copy assignment and move assignment
         client_base& operator=(BOOST_COPY_ASSIGN_REF(naming::id_type) gid)
         {
-            gid_ = lcos::create_value(gid);
+            gid_ = lcos::make_future(gid);
             return *this;
         }
         client_base& operator=(BOOST_RV_REF(naming::id_type) gid)
         {
-            gid_ = lcos::create_value(boost::move(gid));
+            gid_ = lcos::make_future(boost::move(gid));
             return *this;
         }
 
@@ -175,7 +175,7 @@ namespace hpx { namespace components
             naming::id_type id;
             ar & id;
 
-            gid_ = lcos::create_value(id);
+            gid_ = lcos::make_future(id);
         }
 
         template <typename Archive>

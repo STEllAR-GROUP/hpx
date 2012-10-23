@@ -1426,7 +1426,7 @@ lcos::future<bool> addressing_service::register_name_async(
     future<bool> f = stubs::symbol_namespace::service_async<bool>(target, req);
 
     using HPX_STD_PLACEHOLDERS::_1;
-    f.when(
+    f.then(
         HPX_STD_BIND(correct_credit_on_failure, _1, id,
             naming::get_credit_from_gid(mutable_gid), 
             naming::get_credit_from_gid(new_gid))

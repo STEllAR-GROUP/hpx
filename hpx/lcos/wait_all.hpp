@@ -100,7 +100,7 @@ namespace hpx
                     threads::thread_id_type id = threads::get_self().get_thread_id();
                     for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     {
-                        lazy_values_[i].when(
+                        lazy_values_[i].then(
                             util::bind(&when_all::on_future_ready, this, id)
                         );
                     }
@@ -122,7 +122,7 @@ namespace hpx
                 // reset all pending callback functions
                 l.unlock();
                 for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    lazy_values_[i].when();
+                    lazy_values_[i].then();
 
                 return lazy_values_;
             }

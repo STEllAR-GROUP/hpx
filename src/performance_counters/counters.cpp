@@ -635,7 +635,7 @@ namespace hpx { namespace performance_counters
                 }
 
                 // attach the function which registers the id_type with AGAS
-                f.when(util::bind(&register_with_agas, util::placeholders::_1, 
+                f.then(util::bind(&register_with_agas, util::placeholders::_1, 
                     complemented_info.fullname_));
 
                 return f;
