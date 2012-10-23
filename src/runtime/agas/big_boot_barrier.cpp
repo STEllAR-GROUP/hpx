@@ -56,7 +56,7 @@ void early_parcel_sink(
     boost::iostreams::stream<io_device_type> io (*parcel_data);
 
     // De-serialize the parcel data
-    util::portable_binary_iarchive archive(io);
+    util::portable_binary_iarchive archive(io, boost::archive::no_header);
 
     std::size_t parcel_count = 0;
     archive >> parcel_count;

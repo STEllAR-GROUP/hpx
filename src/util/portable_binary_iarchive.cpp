@@ -110,7 +110,6 @@ void portable_binary_iarchive::init(unsigned int flags)
     if (0 == (flags & boost::archive::no_header))
     {
         // read signature in an archive version independent manner
-/*
         std::string file_signature;
         *this >> file_signature;
         if (file_signature != boost::archive::BOOST_ARCHIVE_SIGNATURE()) {
@@ -118,7 +117,6 @@ void portable_binary_iarchive::init(unsigned int flags)
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::invalid_signature));
         }
-*/
 
         // make sure the version of the reading archive library can
         // support the format of the archive being read
