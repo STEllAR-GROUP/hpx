@@ -214,7 +214,7 @@ namespace hpx
             static lcos::future<T> const&
             get_element(Tuple const& t, std::size_t idx)
             {
-                BOOST_ASSERT(idx < 
+                BOOST_ASSERT(idx <
                     static_cast<std::size_t>(boost::fusion::result_of::size<Tuple>::value));
                 return get_element(
                     boost::fusion::begin(t), boost::fusion::end(t), idx,
@@ -305,14 +305,51 @@ namespace hpx
     /// \return   The returned future holds a pair of values, the first value
     ///           is the index of the future which returned first and the second
     ///           value represents the actual future which returned first.
+
+    template <typename Iterator>
+    lcos::future<HPX_STD_TUPLE<int, lcos::future<
+        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+    > > >
+    when_any(Iterator begin, Iterator end)
+    {
+        typedef typename lcos::future_iterator_traits<
+            Iterator>::traits_type::value_type value_type;
+        typedef HPX_STD_TUPLE<int, lcos::future<value_type> > return_type;
+
+        std::vector<lcos::future<value_type> > lazy_values;
+        std::copy(begin, end, std::back_inserter(lazy_values));
+
+        if (lazy_values.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::lcos::when_any",
+                "empty container passed to when_any");
+            return lcos::make_future(return_type());
+        }
+
+        lcos::local::futures_factory<return_type()> p(
+            detail::when_any<value_type>(boost::move(lazy_values)));
+
+        p.apply();
+        return p.get_future();
+    }
+
     template <typename T>
     lcos::future<HPX_STD_TUPLE<int, lcos::future<T> > >
     when_any(BOOST_RV_REF(HPX_UTIL_STRIP((
         std::vector<lcos::future<T> >))) lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T> > return_type;
+
+        if (lazy_values.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::lcos::when_any",
+                "empty container passed to when_any");
+            return lcos::make_future(return_type());
+        }
+
         lcos::local::futures_factory<return_type()> p(
             detail::when_any<T>(boost::move(lazy_values)));
+
         p.apply();
         return p.get_future();
     }
@@ -322,9 +359,18 @@ namespace hpx
     when_any(std::vector<lcos::future<T> > const& lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T> > return_type;
+
+        if (lazy_values.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::lcos::when_any",
+                "empty container passed to when_any");
+            return lcos::make_future(return_type());
+        }
+
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
                 detail::when_any<T>(lazy_values));
+
         p.apply();
         return p.get_future();
     }
@@ -337,6 +383,16 @@ namespace hpx
     /// \return   The returned tuple holds a pair of values, the first value
     ///           is the index of the future which returned first and the second
     ///           value represents the actual future which returned first.
+
+    template <typename Iterator>
+    HPX_STD_TUPLE<int, lcos::future<
+        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+    > >
+    wait_any(Iterator begin, Iterator end)
+    {
+        return when_any(begin, end).get();
+    }
+
     template <typename T>
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any(BOOST_RV_REF(HPX_UTIL_STRIP((
@@ -403,6 +459,7 @@ namespace hpx
         lcos::local::futures_factory<return_type()> p(
             detail::when_any_tuple<argument_type, T>(
                 argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _))));
+
         p.apply();
         return p.get_future();
     }

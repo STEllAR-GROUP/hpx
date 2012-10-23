@@ -16,6 +16,7 @@
 #include <boost/utility/result_of.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/function_types/result_type.hpp>
+# include <boost/detail/iterator.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -422,6 +423,31 @@ namespace hpx { namespace lcos
     {
         return future<void>(1);   // dummy argument
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct future_traits
+    {
+    };
+
+    template <typename T>
+    struct future_traits<lcos::future<T> >
+    {
+        typedef T value_type;
+    };
+
+    template <typename Iter>
+    struct future_iterator_traits
+    {
+        typedef future_traits<
+            typename boost::detail::iterator_traits<Iter>::value_type
+        > traits_type;
+    };
+
+    template <typename T>
+    struct future_iterator_traits<future<T> >
+    {
+    };
 }}
 
 #endif

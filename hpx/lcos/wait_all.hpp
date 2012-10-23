@@ -140,14 +140,43 @@ namespace hpx
     ///
     /// \return   The returned future holds the same list of futures as has
     ///           been passed to when_all.
+
+    template <typename Iterator>
+    lcos::future<std::vector<lcos::future<
+        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+    > > >
+    when_all(Iterator begin, Iterator end)
+    {
+        typedef typename lcos::future_iterator_traits<
+            Iterator>::traits_type::value_type value_type;
+        typedef std::vector<lcos::future<value_type> > return_type;
+
+        return_type lazy_values;
+        std::copy(begin, end, std::back_inserter(lazy_values));
+
+        if (lazy_values.empty())
+            return lcos::make_future(return_type());
+
+        lcos::local::futures_factory<return_type()> p(
+            detail::when_all<value_type>(boost::move(lazy_values)));
+
+        p.apply();
+        return p.get_future();
+    }
+
     template <typename T>
     lcos::future<std::vector<lcos::future<T> > >
     when_all(BOOST_RV_REF(HPX_UTIL_STRIP((
         std::vector<lcos::future<T> >))) lazy_values)
     {
         typedef std::vector<lcos::future<T> > return_type;
+
+        if (lazy_values.empty())
+            return lcos::make_future(return_type());
+
         lcos::local::futures_factory<return_type()> p(
             detail::when_all<T>(boost::move(lazy_values)));
+
         p.apply();
         return p.get_future();
     }
@@ -157,9 +186,14 @@ namespace hpx
     when_all(std::vector<lcos::future<T> > const& lazy_values)
     {
         typedef std::vector<lcos::future<T> > return_type;
+
+        if (lazy_values.empty())
+            return lcos::make_future(return_type());
+
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
                 detail::when_all<T>(lazy_values));
+
         p.apply();
         return p.get_future();
     }
@@ -170,6 +204,16 @@ namespace hpx
     /// list of futures after they finished executing.
     ///
     /// \a wait_all returns after all futures have been triggered.
+
+    template <typename Iterator>
+    std::vector<
+        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+    >
+    wait_all(Iterator begin, Iterator end)
+    {
+        return when_all(begin, end).get();
+    }
+
     template <typename T>
     std::vector<lcos::future<T> >
     wait_all(BOOST_RV_REF(HPX_UTIL_STRIP((
@@ -228,13 +272,15 @@ namespace hpx
     lcos::future<std::vector<lcos::future<T> > >
     when_all (BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_ARG, _))
     {
-        std::vector<lcos::future<T> > lazy_values;
+        typedef std::vector<lcos::future<T> > return_type;
+
+        return_type lazy_values;
         lazy_values.reserve(N);
         BOOST_PP_REPEAT(N, HPX_WHEN_ALL_PUSH_BACK_ARG, _)
 
-        typedef std::vector<lcos::future<T> > return_type;
         lcos::local::futures_factory<return_type()> p(
             detail::when_all<T>(boost::move(lazy_values)));
+
         p.apply();
         return p.get_future();
     }

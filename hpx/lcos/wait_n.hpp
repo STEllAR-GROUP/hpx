@@ -153,6 +153,42 @@ namespace hpx
     ///
     /// \return   The returned future holds the same list of futures as has
     ///           been passed to when_n.
+
+    template <typename Iterator>
+    lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<
+        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+    > > > >
+    when_n(Iterator begin, Iterator end)
+    {
+        typedef typename lcos::future_iterator_traits<
+            Iterator>::traits_type::value_type value_type;
+        typedef std::vector<HPX_STD_TUPLE<int, lcos::future<value_type> > > 
+            return_type;
+
+        std::vector<lcos::future<value_type> > lazy_values;
+        std::copy(begin, end, std::back_inserter(lazy_values));
+
+        if (n == 0 || n > lazy_values.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "hpx::lcos::when_n", 
+                "number of results to wait for is out of bounds");
+            return lcos::make_future(return_type());
+        }
+
+        if (lazy_values.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "hpx::lcos::when_n", 
+                "empty container passed to when_n");
+            return lcos::make_future(return_type());
+        }
+
+        lcos::local::futures_factory<return_type()> p(
+            detail::when_n<value_type>(boost::move(lazy_values), n));
+
+        p.apply();
+        return p.get_future();
+    }
+
     template <typename T>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > >
     when_n(std::size_t n, BOOST_RV_REF(HPX_UTIL_STRIP((
@@ -160,8 +196,24 @@ namespace hpx
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+
+        if (n == 0 || n > lazy_values.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "hpx::lcos::when_n", 
+                "number of results to wait for is out of bounds");
+            return lcos::make_future(return_type());
+        }
+
+        if (lazy_values.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "hpx::lcos::when_n", 
+                "empty container passed to when_n");
+            return lcos::make_future(return_type());
+        }
+
         lcos::local::futures_factory<return_type()> p(
             detail::when_n<T>(boost::move(lazy_values), n));
+
         p.apply();
         return p.get_future();
     }
@@ -172,9 +224,25 @@ namespace hpx
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+
+        if (n == 0 || n > lazy_values.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "hpx::lcos::when_n", 
+                "number of results to wait for is out of bounds");
+            return lcos::make_future(return_type());
+        }
+
+        if (lazy_values.empty()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                "hpx::lcos::when_n", 
+                "empty container passed to when_n");
+            return lcos::make_future(return_type());
+        }
+
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
                 detail::when_n<T>(lazy_values, n));
+
         p.apply();
         return p.get_future();
     }
@@ -186,6 +254,16 @@ namespace hpx
     ///
     /// \return   The returned vector holds the same list of futures as has
     ///           been passed to wait_n.
+
+    template <typename Iterator>
+    std::vector<HPX_STD_TUPLE<int, lcos::future<
+        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+    > > >
+    wait_n(Iterator begin, Iterator end)
+    {
+        return wait_n(begin, end).get();
+    }
+
     template <typename T>
     std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
     wait_n(std::size_t n, BOOST_RV_REF(HPX_UTIL_STRIP((
