@@ -220,16 +220,28 @@ namespace parcelset
             return parcels_received_.total_serialization_time();
         }
 
-        /// total data received (bytes)
+        /// total data sent (bytes)
         std::size_t get_data_sent() const
         {
             return parcels_sent_.total_bytes();
+        }
+
+        /// total data (argument only) sent (bytes)                              
+        std::size_t get_total_argument_sent() const                              
+        {                                                                        
+            return parcels_sent_.total_argument_bytes();                         
         }
 
         /// total data received (bytes)
         std::size_t get_data_received() const
         {
             return parcels_received_.total_bytes();
+        }
+
+        /// total data (argument only) received (bytes)                          
+        std::size_t get_total_argument_received() const                          
+        {                                                                        
+            return parcels_received_.total_argument_bytes();                     
         }
 
         std::size_t get_pending_parcels_count() const

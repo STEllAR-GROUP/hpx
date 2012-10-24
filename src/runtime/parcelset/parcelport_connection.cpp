@@ -23,6 +23,10 @@ namespace hpx { namespace parcelset
         // we choose the highest priority of all parcels for this message
         threads::thread_priority priority = threads::thread_priority_default;
 
+        // temporary variable to sum up size of each 
+        // parcel from parcel vector
+        std::size_t sum_p_arg_size = 0;
+
 #if defined(HPX_DEBUG)
         BOOST_FOREACH(parcel const& p, pv)
         {
@@ -48,6 +52,9 @@ namespace hpx { namespace parcelset
 
                 BOOST_FOREACH(parcel const & p, pv)
                 {
+                    // collect argument size from each parcel action
+                    sum_p_arg_size+=p.get_action()->get_argument_size();
+
                     priority = (std::max)(p.get_thread_priority(), priority);
                     archive << p;
                 }
@@ -90,6 +97,7 @@ namespace hpx { namespace parcelset
 
         send_data_.num_parcels_ = pv.size();
         send_data_.bytes_ = out_buffer_.size();
+        send_data_.argument_bytes_ = sum_p_arg_size;
     }
 }}
 
