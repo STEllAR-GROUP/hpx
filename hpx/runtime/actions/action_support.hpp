@@ -15,6 +15,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/argument_size.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -54,7 +55,6 @@
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
-
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
@@ -176,6 +176,9 @@ namespace hpx { namespace actions
 
         /// Return the thread stacksize this action has to be executed with
         virtual threads::thread_stacksize get_thread_stacksize() const = 0;
+
+        /// Return the size of action arguments in bytes
+        virtual std::size_t get_argument_size() const = 0;
 
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data&
@@ -474,6 +477,12 @@ namespace hpx { namespace actions
         threads::thread_stacksize get_thread_stacksize() const
         {
             return stacksize_;
+        }
+
+        /// Return the size of action arguments in bytes
+        std::size_t get_argument_size() const
+        {
+            return traits::argument_size<arguments_type>::call(arguments_);
         }
 
         /// Return all data needed for thread initialization

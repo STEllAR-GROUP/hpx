@@ -62,6 +62,11 @@ namespace hpx { namespace traits
     struct action_stacksize;
 
     ///////////////////////////////////////////////////////////////////////////
+    // Customization point for argument_size
+    template <typename T, typename Enable = void>
+    struct argument_size;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct is_future;
 
