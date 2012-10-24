@@ -121,39 +121,36 @@ void portable_binary_oarchive::init(unsigned int flags)
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT
-    detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive>;
+    template class HPX_ALWAYS_EXPORT
+        detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive>;
 
 } // namespace archive
 } // namespace boost
+
 #else
+
 #include <boost/archive/detail/archive_serializer_map.hpp>
 #include <boost/archive/impl/archive_serializer_map.ipp>
 
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT
-    detail::archive_serializer_map<hpx::util::portable_binary_oarchive>;
+    template class HPX_ALWAYS_EXPORT
+        detail::archive_serializer_map<hpx::util::portable_binary_oarchive>;
 
 } // namespace archive
 } // namespace boost
 
 #endif
 
-// explicitly instantiate for this type of stream
-#include <boost/archive/impl/basic_binary_oprimitive.ipp>
+#include <hpx/util/basic_binary_oprimitive_impl.hpp>
 
-namespace boost {
-namespace archive {
-
-template class basic_binary_oprimitive<
-    hpx::util::portable_binary_oarchive,
-    std::ostream::char_type,
-    std::ostream::traits_type
->;
-
-} // namespace archive
-} // namespace boost
+namespace hpx { namespace util
+{
+    // explicitly instantiate base primitive
+    template class basic_binary_oprimitive<
+        hpx::util::portable_binary_oarchive
+    >;
+}}
 
 #endif // BOOST_VERSION >= 103700 && HPX_USE_PORTABLE_ARCHIVES != 0

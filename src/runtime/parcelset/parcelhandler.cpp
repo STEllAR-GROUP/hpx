@@ -10,7 +10,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/container_device.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -107,17 +106,13 @@ namespace hpx { namespace parcelset
         // protect from un-handled exceptions bubbling up into thread manager
         try {
             try {
-                // create a special io stream on top of in_buffer_
-                typedef util::container_device<std::vector<char> > io_device_type;
-                boost::iostreams::stream<io_device_type> io(*parcel_data);
-
                 // mark start of serialization
                 util::high_resolution_timer timer;
                 boost::int64_t overall_add_parcel_time = 0;
 
                 {
                     // De-serialize the parcel data
-                    util::portable_binary_iarchive archive(io, boost::archive::no_header);
+                    util::portable_binary_iarchive archive(*parcel_data, boost::archive::no_header);
 
                     std::size_t parcel_count = 0;
                     archive >> parcel_count;

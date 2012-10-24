@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/container_device.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -52,11 +51,8 @@ void early_parcel_sink(
     boost::shared_ptr<std::vector<char> > parcel_data
     )
 { // {{{
-    typedef util::container_device<std::vector<char> > io_device_type;
-    boost::iostreams::stream<io_device_type> io (*parcel_data);
-
     // De-serialize the parcel data
-    util::portable_binary_iarchive archive(io, boost::archive::no_header);
+    util::portable_binary_iarchive archive(*parcel_data, boost::archive::no_header);
 
     std::size_t parcel_count = 0;
     archive >> parcel_count;

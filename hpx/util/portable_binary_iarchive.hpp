@@ -36,23 +36,11 @@ namespace hpx { namespace util
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <istream>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
-
-#if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility push(default)
-#endif
-
-#include <boost/archive/basic_binary_iprimitive.hpp>
-
-#if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility pop
-#endif
-
 #include <boost/archive/detail/common_iarchive.hpp>
 #include <boost/archive/shared_ptr_helper.hpp>
 #include <boost/archive/detail/register_archive.hpp>
@@ -62,6 +50,7 @@ namespace hpx { namespace util
 
 #include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
+#include <hpx/util/basic_binary_iprimitive.hpp>
 
 namespace hpx { namespace util
 {
@@ -77,7 +66,8 @@ public:
         incompatible_integer_size
     };
     portable_binary_iarchive_exception(exception_code c = incompatible_integer_size )
-      : boost::archive::archive_exception(static_cast<boost::archive::archive_exception::exception_code>(c))
+      : boost::archive::archive_exception(
+            static_cast<boost::archive::archive_exception::exception_code>(c))
     {}
     virtual const char *what() const throw()
     {
@@ -103,20 +93,16 @@ public:
 #endif
 
 class HPX_SERIALIZATION_EXPORT portable_binary_iarchive :
-    public boost::archive::basic_binary_iprimitive<
-        portable_binary_iarchive,
-        std::istream::char_type,
-        std::istream::traits_type
+    public hpx::util::basic_binary_iprimitive<
+        portable_binary_iarchive
     >,
     public boost::archive::detail::common_iarchive<
         portable_binary_iarchive
     >,
     public boost::archive::detail::shared_ptr_helper
 {
-    typedef boost::archive::basic_binary_iprimitive<
-        portable_binary_iarchive,
-        std::istream::char_type,
-        std::istream::traits_type
+    typedef hpx::util::basic_binary_iprimitive<
+        portable_binary_iarchive
     > primitive_base_t;
     typedef boost::archive::detail::common_iarchive<
         portable_binary_iarchive
@@ -257,27 +243,8 @@ protected:
     init(unsigned int flags);
 
 public:
-    portable_binary_iarchive(std::istream & is, unsigned flags = 0)
-      : primitive_base_t(
-            *is.rdbuf(),
-            0 != (flags & boost::archive::no_codecvt)
-        ),
-        archive_base_t(flags),
-        m_flags(0)
-    {
-        init(flags);
-    }
-
-    portable_binary_iarchive(
-            std::basic_streambuf<
-                std::istream::char_type,
-                std::istream::traits_type
-            > & bsb,
-            unsigned int flags)
-      : primitive_base_t(
-            bsb,
-            0 != (flags & boost::archive::no_codecvt)
-        ),
+    portable_binary_iarchive(std::vector<char> const& buffer, unsigned flags = 0)
+      : primitive_base_t(buffer, flags),
         archive_base_t(flags),
         m_flags(0)
     {

@@ -36,23 +36,11 @@ namespace hpx { namespace util
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <ostream>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/archive_exception.hpp>
-
-#if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility push(default)
-#endif
-
-#include <boost/archive/basic_binary_oprimitive.hpp>
-
-#if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility pop
-#endif
-
 #include <boost/archive/detail/common_oarchive.hpp>
 #include <boost/archive/detail/register_archive.hpp>
 #if BOOST_VERSION >= 104400
@@ -61,6 +49,7 @@ namespace hpx { namespace util
 
 #include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
+#include <hpx/util/basic_binary_oprimitive.hpp>
 
 namespace hpx { namespace util
 {
@@ -103,19 +92,15 @@ public:
 #endif
 
 class HPX_SERIALIZATION_EXPORT portable_binary_oarchive :
-    public boost::archive::basic_binary_oprimitive<
-        portable_binary_oarchive,
-        std::ostream::char_type,
-        std::ostream::traits_type
+    public hpx::util::basic_binary_oprimitive<
+        portable_binary_oarchive
     >,
     public boost::archive::detail::common_oarchive<
         portable_binary_oarchive
     >
 {
-    typedef boost::archive::basic_binary_oprimitive<
-        portable_binary_oarchive,
-        std::ostream::char_type,
-        std::ostream::traits_type
+    typedef hpx::util::basic_binary_oprimitive<
+        portable_binary_oarchive
     > primitive_base_t;
     typedef boost::archive::detail::common_oarchive<
         portable_binary_oarchive
@@ -195,23 +180,23 @@ protected:
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void save(const std::wstring& t) {
+    void save(std::wstring const& t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    void save(const float& t) {
+    void save(float const& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const double& t) {
+    void save(double const& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const char& t) {
+    void save(char const& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const unsigned char& t) {
+    void save(unsigned char const& t) {
         this->primitive_base_t::save(t);
     }
-    void save(const signed char& t) {
+    void save(signed char const& t) {
         this->primitive_base_t::save(t);
     }
 
@@ -237,29 +222,10 @@ protected:
     HPX_ALWAYS_EXPORT void init(unsigned int flags);
 
 public:
-    portable_binary_oarchive(std::ostream & os, unsigned flags = 0)
-      : primitive_base_t(
-            * os.rdbuf(),
-            0 != (flags & boost::archive::no_codecvt)
-        ),
+    portable_binary_oarchive(std::vector<char>& buffer, unsigned flags = 0)
+      : primitive_base_t(buffer, flags & boost::archive::no_codecvt),
         archive_base_t(flags),
         m_flags(flags & (endian_big | endian_little))
-    {
-        init(flags);
-    }
-
-    portable_binary_oarchive(
-            std::basic_streambuf<
-                std::ostream::char_type,
-                std::ostream::traits_type
-            > & bsb,
-            unsigned int flags)
-      : primitive_base_t(
-            bsb,
-            0 != (flags & boost::archive::no_codecvt)
-        ),
-        archive_base_t(flags),
-        m_flags(0)
     {
         init(flags);
     }

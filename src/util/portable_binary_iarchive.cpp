@@ -146,7 +146,6 @@ void portable_binary_iarchive::init(unsigned int flags)
 #endif
 #endif
 
-
 }}
 
 // explicitly instantiate for this type
@@ -156,8 +155,8 @@ void portable_binary_iarchive::init(unsigned int flags)
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT
-    detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive>;
+    template class HPX_ALWAYS_EXPORT
+        detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive>;
 
 } // namespace archive
 } // namespace boost
@@ -168,8 +167,8 @@ template class HPX_ALWAYS_EXPORT
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT
-    detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
+    template class HPX_ALWAYS_EXPORT
+        detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
 
 } // namespace archive
 } // namespace boost
@@ -177,18 +176,13 @@ template class HPX_ALWAYS_EXPORT
 #endif
 
 // explicitly instantiate for this type of stream
-#include <boost/archive/impl/basic_binary_iprimitive.ipp>
+#include <hpx/util/basic_binary_iprimitive_impl.hpp>
 
-namespace boost {
-namespace archive {
-
-template class basic_binary_iprimitive<
-    hpx::util::portable_binary_iarchive,
-    std::istream::char_type,
-    std::istream::traits_type
->;
-
-} // namespace archive
-} // namespace boost
+namespace hpx { namespace util
+{
+    template class basic_binary_iprimitive<
+        hpx::util::portable_binary_iarchive
+    >;
+}}
 
 #endif // BOOST_VERSION >= 103700 && HPX_USE_PORTABLE_ARCHIVES != 0

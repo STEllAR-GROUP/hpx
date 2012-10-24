@@ -8,7 +8,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/container_device.hpp>
 #include <hpx/util/stringstream.hpp>
 
 #include <boost/iostreams/stream.hpp>
@@ -41,11 +40,8 @@ namespace hpx { namespace parcelset
             util::high_resolution_timer timer;
 
             {
-                typedef util::container_device<std::vector<char> > io_device_type;
-                boost::iostreams::stream<io_device_type> io(out_buffer_);
-
                 // Serialize the data
-                util::portable_binary_oarchive archive(io, boost::archive::no_header);
+                util::portable_binary_oarchive archive(out_buffer_, boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;
