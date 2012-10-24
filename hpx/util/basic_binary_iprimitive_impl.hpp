@@ -14,6 +14,8 @@
 #endif
 
 #include <hpx/util/basic_binary_iprimitive.hpp>
+
+#include <boost/throw_exception.hpp>
 #include <boost/archive/archive_exception.hpp>
 
 namespace hpx { namespace util
@@ -30,7 +32,7 @@ namespace hpx { namespace util
         unsigned char size;
         This()->load(size);
         if (sizeof(int) != size) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::incompatible_native_format,
                     "size of int"
@@ -39,7 +41,7 @@ namespace hpx { namespace util
         }
         This()->load(size);
         if (sizeof(long) != size) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::incompatible_native_format,
                     "size of long"
@@ -48,7 +50,7 @@ namespace hpx { namespace util
         }
         This()->load(size);
         if (sizeof(float) != size) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::incompatible_native_format,
                     "size of float"
@@ -57,7 +59,7 @@ namespace hpx { namespace util
         }
         This()->load(size);
         if (sizeof(double) != size) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::incompatible_native_format,
                     "size of double"
@@ -69,7 +71,7 @@ namespace hpx { namespace util
         int i;
         This()->load(i);
         if (1 != i) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::incompatible_native_format,
                     "endian setting"

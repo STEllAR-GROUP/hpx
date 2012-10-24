@@ -33,7 +33,7 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/serialization/throw_exception.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/integer.hpp>
 #include <boost/integer_traits.hpp>
 
@@ -64,7 +64,14 @@ namespace hpx { namespace util
     protected:
         void load_binary(void* address, std::size_t count)
         {
-            BOOST_ASSERT(current_+count <= buffer_.size());
+            if (current_+count > buffer_.size())
+            {
+                BOOST_THROW_EXCEPTION(
+                    boost::archive::archive_exception(
+                        boost::archive::archive_exception::input_stream_error,
+                        "archive data bstream is too short"));
+                return;
+            }
             std::memcpy(address, &buffer_[current_], count);
             current_ += count;
         }

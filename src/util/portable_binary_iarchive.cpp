@@ -38,7 +38,7 @@
 //#include <cstring> // memcpy
 
 #include <boost/detail/endian.hpp>
-#include <boost/serialization/throw_exception.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/archive/archive_exception.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
