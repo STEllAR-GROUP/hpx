@@ -31,7 +31,7 @@ namespace hpx { namespace components
 
         static void set_component_type(component_type t)
         {
-            hpx::components::set_component_type<wrapping_type>();
+            hpx::components::set_component_type<wrapping_type>(t);
         }
 
         /// This is the default hook implementation for decorate_action which 
@@ -63,7 +63,7 @@ namespace hpx { namespace components
 
         static void set_component_type(component_type t)
         {
-            hpx::components::set_component_type<wrapping_type>();
+            hpx::components::set_component_type<wrapping_type>(t);
         }
 
         /// This is the default hook implementation for decorate_action which 
