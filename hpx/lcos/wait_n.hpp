@@ -158,7 +158,7 @@ namespace hpx
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<
         typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
     > > > >
-    when_n(Iterator begin, Iterator end)
+    when_n(std::size_t n, Iterator begin, Iterator end)
     {
         typedef typename lcos::future_iterator_traits<
             Iterator>::traits_type::value_type value_type;

@@ -22,6 +22,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <cstring> // memcpy
 #include <cstddef> // size_t
 #include <vector>
 
