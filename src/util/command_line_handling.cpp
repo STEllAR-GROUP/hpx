@@ -31,7 +31,7 @@ namespace hpx { namespace util
         {
             out << std::endl << hpx::copyright() << std::endl;
             out << hpx::complete_version() << std::endl;
-            return 0;
+            return 1;
         }
 
         ///////////////////////////////////////////////////////////////////////
