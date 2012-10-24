@@ -59,8 +59,9 @@ namespace hpx { namespace util
     protected:
         void save_binary(const void *address, std::size_t count)
         {
-            buffer_.resize(buffer_.size() + count);
-            std::memcpy(&buffer_[buffer_.size()], address, count);
+            std::size_t size = buffer_.size();
+            buffer_.resize(size + count);
+            std::memcpy(&buffer_[size], address, count);
         }
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS

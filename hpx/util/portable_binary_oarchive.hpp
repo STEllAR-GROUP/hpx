@@ -223,7 +223,7 @@ protected:
 
 public:
     portable_binary_oarchive(std::vector<char>& buffer, unsigned flags = 0)
-      : primitive_base_t(buffer, flags & boost::archive::no_codecvt),
+      : primitive_base_t(buffer, flags),
         archive_base_t(flags),
         m_flags(flags & (endian_big | endian_little))
     {
