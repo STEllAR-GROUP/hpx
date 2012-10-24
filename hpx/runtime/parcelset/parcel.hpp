@@ -98,7 +98,7 @@ namespace hpx { namespace parcelset
             // default copy constructor is ok
             // default assignment operator is ok
 
-            actions::action_type get_action()
+            actions::action_type get_action() const
             {
                 return action_;
             }
@@ -263,7 +263,7 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok
         // default assignment operator is ok
 
-        actions::action_type get_action()
+        actions::action_type get_action() const
         {
             return data_->get_action();
         }

@@ -15,6 +15,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/argument_size.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -170,6 +171,9 @@ namespace hpx { namespace actions
 
         /// Return the thread phase of the parent thread
         virtual std::size_t get_parent_thread_phase() const = 0;
+
+        /// Return the size of action arguments in bytes
+        virtual std::size_t get_argument_size() const = 0;
 
         /// Return the thread priority this action has to be executed with
         virtual threads::thread_priority get_thread_priority() const = 0;
@@ -572,6 +576,15 @@ namespace hpx { namespace actions
 #endif
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
+
+    public:
+        /// return the total size of arguments for an action before it gets 
+        /// serialized.
+        std::size_t get_argument_size() const
+        {
+            return hpx::traits::argument_size<arguments_type>::call(arguments_);
+        }
+
     };
 
     ///////////////////////////////////////////////////////////////////////////

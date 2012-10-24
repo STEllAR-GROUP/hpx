@@ -120,6 +120,7 @@ namespace hpx { namespace parcelset
                     hpx::util::portable_binary_iarchive archive(io);
 
                     std::size_t parcel_count = 0;
+                    std::size_t sum_p_arg_size = 0;
                     archive >> parcel_count;
                     for(std::size_t i = 0; i < parcel_count; ++i)
                     {
@@ -130,6 +131,9 @@ namespace hpx { namespace parcelset
                         // make sure this parcel ended up on the right locality
                         BOOST_ASSERT(p.get_destination_locality() == here());
 
+                        //sum of incoming parcel's argument
+                        sum_p_arg_size += p.get_action()->get_argument_size();
+
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
                         parcels_->add_parcel(p);
@@ -139,6 +143,9 @@ namespace hpx { namespace parcelset
 
                     // complete received data with parcel count
                     receive_data.num_parcels_ = parcel_count;
+
+                    // total received argument size for incoming parcels
+                    receive_data.argument_bytes_ = sum_p_arg_size;
                 }
 
                 // store the time required for serialization
@@ -285,6 +292,11 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t()> data_received(
             boost::bind(&parcelport::get_data_received, &pp_));
 
+        HPX_STD_FUNCTION<boost::int64_t()> data_argument_sent(
+            boost::bind(&parcelport::get_total_argument_sent, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> data_argument_received(
+            boost::bind(&parcelport::get_total_argument_received, &pp_));
+
         HPX_STD_FUNCTION<boost::int64_t()> incoming_queue_length(
             boost::bind(&parcelhandler::get_incoming_queue_length, this));
         HPX_STD_FUNCTION<boost::int64_t()> outgoing_queue_length(
@@ -381,6 +393,25 @@ namespace hpx { namespace parcelset
                   _1, data_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
+            },
+
+            { "/argument/count/sent", performance_counters::counter_raw,         
+              "returns the amount of parcel argument data sent "                 
+              "by the referenced locality",                                      
+              HPX_PERFORMANCE_COUNTER_V1,                                        
+              boost::bind(&performance_counters::locality_raw_counter_creator,   
+              _1, data_argument_sent, _2),                                   
+              &performance_counters::locality_counter_discoverer,                
+              "bytes"                                                            
+            },                                                                   
+            { "/argument/count/received", performance_counters::counter_raw,     
+              "returns the amount of parcel argument data received "             
+              "by the referenced locality",                                      
+              HPX_PERFORMANCE_COUNTER_V1,                                        
+              boost::bind(&performance_counters::locality_raw_counter_creator,   
+              _1, data_argument_received, _2),                               
+              &performance_counters::locality_counter_discoverer,                
+              "bytes"                                                            
             },
 
             { "/parcelqueue/length/receive", performance_counters::counter_raw,
