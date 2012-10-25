@@ -211,7 +211,18 @@ namespace hpx
     >
     wait_all(Iterator begin, Iterator end)
     {
-        return when_all(begin, end).get();
+        typedef std::vector<
+            typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+        > result_type;
+
+        lcos::future<result_type> f = when_all(begin, end);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+
+        return f.get();
     }
 
     template <typename T>
@@ -219,14 +230,32 @@ namespace hpx
     wait_all(BOOST_RV_REF(HPX_UTIL_STRIP((
         std::vector<lcos::future<T> >))) lazy_values)
     {
-        return when_all(lazy_values).get();
+        typedef std::vector<lcos::future<T> > result_type;
+
+        lcos::future<result_type> f = when_all(lazy_values);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+
+        return f.get();
     }
 
     template <typename T>
     std::vector<lcos::future<T> >
     wait_all (std::vector<lcos::future<T> > const& lazy_values)
     {
-        return when_all(lazy_values).get();
+        typedef std::vector<lcos::future<T> > result_type;
+
+        lcos::future<result_type> f = when_all(lazy_values);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+
+        return f.get();
     }
 }
 
@@ -289,7 +318,17 @@ namespace hpx
     std::vector<lcos::future<T> >
     wait_all(BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_ARG, _))
     {
-        return when_all(BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_VAR, _)).get();
+        typedef std::vector<lcos::future<T> > result_type;
+
+        lcos::future<result_type> f = when_all(
+            BOOST_PP_ENUM(N, HPX_WHEN_ALL_FUTURE_VAR, _));
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+
+        return f.get();
     }
 }
 

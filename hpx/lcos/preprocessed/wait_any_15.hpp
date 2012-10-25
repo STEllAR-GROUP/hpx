@@ -29,7 +29,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0)
     {
-        return when_any(f0).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -53,7 +61,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1)
     {
-        return when_any(f0 , f1).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -77,7 +93,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2)
     {
-        return when_any(f0 , f1 , f2).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -101,7 +125,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3)
     {
-        return when_any(f0 , f1 , f2 , f3).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -125,7 +157,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -149,7 +189,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -173,7 +221,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -197,7 +253,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -221,7 +285,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -245,7 +317,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -269,7 +349,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -293,7 +381,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -317,7 +413,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11 , lcos::future<T> f12)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -341,7 +445,15 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11 , lcos::future<T> f12 , lcos::future<T> f13)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
 namespace hpx
@@ -365,6 +477,14 @@ namespace hpx
     HPX_STD_TUPLE<int, lcos::future<T> >
     wait_any (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11 , lcos::future<T> f12 , lcos::future<T> f13 , lcos::future<T> f14)
     {
-        return when_any(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14).get();
+        typedef HPX_STD_TUPLE<int, lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_any(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14);
+        if (!f.valid()) {
+            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_any", 
+                "lcos::when_any didn't return a valid future");
+            return result_type();
+        }
+        return f.get();
     }
 }
