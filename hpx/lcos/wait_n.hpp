@@ -261,7 +261,9 @@ namespace hpx
     > > >
     wait_n(Iterator begin, Iterator end)
     {
-        typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > result_type;
+        typedef std::vector<HPX_STD_TUPLE<int, lcos::future<
+            typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+        > > > result_type;
 
         lcos::future<result_type> f = wait_n(begin, end);
         if (!f.valid()) {
