@@ -86,6 +86,21 @@ system and application performance.
           based) number identifying the locality.
         ]
         [None]
+        [Returns the overall number of bytes of memory consumed by the messages 
+         (see `<operation>`, e.g. `sent` or `received`).]
+    ]
+    [   [`/serialize/count/<operation>`
+
+          where:[br] `<operation>` is one of the following:
+          `sent`, `received`
+        ]
+        [`locality#<*>/total`
+
+          where:[br] `<*>` is the locality id of the locality the overall number of
+          transmitted bytes should be queried for. The locality id is a (zero
+          based) number identifying the locality.
+        ]
+        [None]
         [Returns the overall number of bytes transferred (see `<operation>`,
          e.g. `sent` or `received`) over the network by the given locality.]
     ]
