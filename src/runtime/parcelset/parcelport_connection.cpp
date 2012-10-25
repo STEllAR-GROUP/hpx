@@ -36,23 +36,30 @@ namespace hpx { namespace parcelset
 
         // guard against serialization errors
         try {
-            // create a special io stream on top of out_buffer_
+            // clear and preallocate out_buffer_
             out_buffer_.clear();
+
+            BOOST_FOREACH(parcel const & p, pv)
+            {
+                arg_size += p.get_action()->get_argument_size();
+                priority = (std::max)(p.get_thread_priority(), priority);
+            }
+
+            out_buffer_.reserve(arg_size*2);
 
             // mark start of serialization
             util::high_resolution_timer timer;
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(out_buffer_, boost::archive::no_header);
+                util::portable_binary_oarchive archive(out_buffer_,
+                    boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;
 
                 BOOST_FOREACH(parcel const & p, pv)
                 {
-                    arg_size += p.get_action()->get_argument_size();
-                    priority = (std::max)(p.get_thread_priority(), priority);
                     archive << p;
                 }
             }
