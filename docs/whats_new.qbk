@@ -14,14 +14,20 @@
 
 Here is a list of the important tickets we closed for this release:
 
+* #584 - counting argument size of actions, initial pass.
 * #581 - Remove `RemoteResult` template parameter for `future<>`
 * #580 - Add possibility to hook into actions
 * #578 - Use angle brackets in HPX error dumps
+* #576 - Exception incorrectly thrown when --help is used
 * #575 - HPX(bad_component_type) with gcc 4.7.2 and boost 1.51
 * #574 - `--hpx:connect` command line parameter not working correctly
+* #571 - `hpx::wait()` (callback version) should pass the future to the callback 
+         function
+* #570 - `hpx::wait` should operate on `boost::arrays` and `std::lists`
 * #569 - Add a logging sink for Android
 * #568 - 2-argument version of `HPX_DEFINE_COMPONENT_ACTION`
 * #567 - Connecting to a running HPX application works only once
+* #565 - HPX doesn't shutdown properly
 * #564 - Partial preprocessing of new component creation interface
 * #563 - Add `hpx::start`/`hpx::stop` to avoid blocking main thread
 * #562 - All command line arguments swallowed by hpx
