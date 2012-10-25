@@ -263,6 +263,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , util::runtime_configuration const& ini_
         );
 
+    void adjust_local_cache_size();
+
     state status() const
     {
         if (!hosted && !bootstrap)

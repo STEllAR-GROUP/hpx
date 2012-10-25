@@ -143,6 +143,24 @@ void addressing_service::launch_hosted(
     state_.store(running);
 } // }}}
 
+void addressing_service::adjust_local_cache_size()
+{ // {{{
+    // adjust the local AGAS cache size for the number of connected localities
+    if (caching_)
+    {
+        util::runtime_configuration const& cfg = get_runtime().get_config();
+        std::size_t local_cache_size = cfg.get_agas_local_cache_size();
+        std::size_t local_cache_size_per_node = 
+            cfg.get_agas_local_cache_size_per_node();
+
+        std::vector<naming::gid_type> localities;
+        get_localities(localities);
+
+        gva_cache_.reserve((std::max)(local_cache_size, 
+            local_cache_size_per_node * localities.size()));
+    }
+} // }}}
+
 response addressing_service::service(
     request const& req
   , error_code& ec

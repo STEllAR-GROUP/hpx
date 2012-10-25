@@ -247,6 +247,10 @@ bool pre_main(runtime_mode mode)
         return false;
     }
 
+    // now adjust the number of local AGAS cache entries for the number of 
+    // connected localities
+    agas_client.adjust_local_cache_size();
+
     return true;
 }
 

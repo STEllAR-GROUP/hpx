@@ -118,6 +118,8 @@ namespace hpx { namespace util
             "dedicated_server = 0",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE) "}",
+            "local_cache_size_per_node = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE:"
+                BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
             "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
@@ -426,15 +428,34 @@ namespace hpx { namespace util
 
     std::size_t runtime_configuration::get_agas_local_cache_size() const
     {
+        std::size_t cache_size = HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE;
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
+                cache_size = boost::lexical_cast<std::size_t>(
                     sec->get_entry("local_cache_size",
                         HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE));
             }
         }
-        return HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE;
+        if (cache_size < 16)
+            cache_size = 16;      // limit lower bound
+        return cache_size;
+    }
+
+    std::size_t runtime_configuration::get_agas_local_cache_size_per_node() const
+    {
+        std::size_t cache_size = HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE;
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                cache_size = boost::lexical_cast<std::size_t>(
+                    sec->get_entry("local_cache_size_per_node",
+                        HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE));
+            }
+        }
+        if (cache_size < 16)
+            cache_size = 16;      // limit lower bound
+        return cache_size;
     }
 
     bool runtime_configuration::get_agas_caching_mode() const

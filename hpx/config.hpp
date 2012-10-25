@@ -199,9 +199,20 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of AGAS address translations kept in the local
+/// cache on a per node basis.
+#if !defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE)
+#  define HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE 32
+#endif
+
+/// This defines the number of AGAS address translations kept in the local
 /// cache. This is just the initial size which may be adjusted depending on the
 /// load of the system, etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
+/// The actual number of local cache entries used is determined by
+///
+///  max(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE,
+///      HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE * num_nodes)
+///
 #if !defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
 #  define HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE 256
 #endif
@@ -247,7 +258,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the parent thread information in debug builds 
+/// By default, enable storing the parent thread information in debug builds
 /// only.
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
 #  if defined(HPX_DEBUG)
@@ -272,7 +283,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the target address of the data the thread is 
+/// By default, enable storing the target address of the data the thread is
 /// accessing in debug builds only.
 #if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
 #  if defined(HPX_DEBUG)
@@ -281,7 +292,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// By default, enable guard pages. 
+/// By default, enable guard pages.
 #if !defined(HPX_THREAD_GUARD_PAGE)
 #  define HPX_THREAD_GUARD_PAGE 1
 #endif
@@ -325,21 +336,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(BOOST_WINDOWS)
 #  if defined(HPX_DEBUG)
-#    define HPX_MAKE_DLL_STRING(n) "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION 
+#    define HPX_MAKE_DLL_STRING(n) "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION
 #  else
-#    define HPX_MAKE_DLL_STRING(n) "lib" + n + HPX_SHARED_LIB_EXTENSION 
+#    define HPX_MAKE_DLL_STRING(n) "lib" + n + HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG)
-#  define HPX_MAKE_DLL_STRING(n)   n + "d" + HPX_SHARED_LIB_EXTENSION 
+#  define HPX_MAKE_DLL_STRING(n)   n + "d" + HPX_SHARED_LIB_EXTENSION
 #else
-#  define HPX_MAKE_DLL_STRING(n)   n + HPX_SHARED_LIB_EXTENSION 
+#  define HPX_MAKE_DLL_STRING(n)   n + HPX_SHARED_LIB_EXTENSION
 #endif
 
 #if defined(HPX_DEBUG)
 #  define HPX_MANGLE_NAME(n)     BOOST_PP_CAT(n, d)
 #  define HPX_MANGLE_STRING(n)   n + "d"
 #else
-#  define HPX_MANGLE_NAME(n)     n 
+#  define HPX_MANGLE_NAME(n)     n
 #  define HPX_MANGLE_STRING(n)   n
 #endif
 
@@ -359,7 +370,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_DLL_STRING)
-#  define HPX_DLL_STRING HPX_MAKE_DLL_STRING(HPX_COMPONENT_NAME) 
+#  define HPX_DLL_STRING HPX_MAKE_DLL_STRING(HPX_COMPONENT_NAME)
 #endif
 
 #if !defined(HPX_APPLICATION_STRING)
@@ -390,7 +401,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Count number of busy thread manager loop executions before forcefully 
+// Count number of busy thread manager loop executions before forcefully
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
 #  define HPX_BUSY_LOOP_COUNT_MAX 20000
