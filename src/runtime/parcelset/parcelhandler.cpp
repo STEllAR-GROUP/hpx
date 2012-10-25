@@ -371,25 +371,6 @@ namespace hpx { namespace parcelset
             },
 
             { "/data/count/sent", performance_counters::counter_raw,
-              "returns the amount of parcel data (including headers) sent "
-              "by the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_sent, _2),
-              &performance_counters::locality_counter_discoverer,
-              "bytes"
-            },
-            { "/data/count/received", performance_counters::counter_raw,
-              "returns the amount of parcel data (including headers) received "
-              "by the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_received, _2),
-              &performance_counters::locality_counter_discoverer,
-              "bytes"
-            },
-
-            { "/argument/count/sent", performance_counters::counter_raw,
               "returns the amount of parcel argument data sent "
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -398,12 +379,30 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { "/argument/count/received", performance_counters::counter_raw,
+            { "/data/count/received", performance_counters::counter_raw,
               "returns the amount of parcel argument data received "
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_argument_received, _2),
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
+            },
+            { "/serialize/count/sent", performance_counters::counter_raw,
+              "returns the amount of parcel data (including headers) sent "
+              "by the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, data_sent, _2),
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
+            },
+            { "/serialize/count/received", performance_counters::counter_raw,
+              "returns the amount of parcel data (including headers) received "
+              "by the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, data_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
