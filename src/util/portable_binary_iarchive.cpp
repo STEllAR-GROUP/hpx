@@ -46,7 +46,7 @@
 namespace hpx { namespace util
 {
 
-void portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
+void portable_binary_iarchive::load_impl(boost::intmax_t& l, char maxsize)
 {
     char size;
     l = 0;
@@ -56,14 +56,14 @@ void portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
         return;
 
     bool negative = (size < 0) ? true : false;
-    if(negative)
+    if (negative)
         size = static_cast<char>(-size);
 
-    if(size > maxsize) {
+    if (size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
     }
 
-    char* cptr = reinterpret_cast<char *>(& l);
+    char* cptr = reinterpret_cast<char *>(&l);
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::intmax_t) - size);
 #endif
@@ -107,7 +107,7 @@ void portable_binary_iarchive::load_override(
 
 void portable_binary_iarchive::init(unsigned int flags)
 {
-    if (0 == (flags & boost::archive::no_header))
+    if (!(flags & boost::archive::no_header))
     {
         // read signature in an archive version independent manner
         std::string file_signature;
@@ -129,8 +129,9 @@ void portable_binary_iarchive::init(unsigned int flags)
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::unsupported_version));
         }
+
 #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
-        this->set_library_version(input_library_version);
+        set_library_version(input_library_version);
         boost::archive::detail::basic_iarchive::set_library_version(
             input_library_version);
 #endif

@@ -143,7 +143,7 @@ protected:
 #endif
 
     template <typename T>
-    void load(T& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
+    void load(T& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0)
     {
         this->primitive_base_t::load(t);
     }
@@ -229,18 +229,17 @@ protected:
         detail_common_iarchive;
 
     template <typename T>
-    void load_override(T & t, BOOST_PFTO int) {
+    void load_override(T& t, BOOST_PFTO int) {
         this->detail_common_iarchive::load_override(t, 0);
     }
 
     HPX_ALWAYS_EXPORT void
-    load_override(boost::archive::class_name_type & t, int);
+    load_override(boost::archive::class_name_type& t, int);
 
     // binary files don't include the optional information
     void load_override(boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void
-    init(unsigned int flags);
+    HPX_ALWAYS_EXPORT void init(unsigned int flags);
 
 public:
     portable_binary_iarchive(std::vector<char> const& buffer, unsigned flags = 0)
@@ -251,11 +250,11 @@ public:
         init(flags);
     }
 
-    // the optimized load_array dispatches to load_binary 
+    // the optimized load_array dispatches to load_binary
     template <typename T>
     void load_array(boost::serialization::array<T>& a, unsigned int)
     {
-        // If we need to potentially flip bytes we serialize each element 
+        // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
         if (m_flags & endian_little) {

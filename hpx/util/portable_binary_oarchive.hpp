@@ -65,7 +65,8 @@ public:
         invalid_flags
     };
     portable_binary_oarchive_exception(exception_code c = invalid_flags)
-      : boost::archive::archive_exception(static_cast<boost::archive::archive_exception::exception_code>(c))
+      : boost::archive::archive_exception(
+          static_cast<boost::archive::archive_exception::exception_code>(c))
     {}
     virtual const char *what() const throw()
     {
@@ -126,14 +127,14 @@ protected:
 
     // default fall through for any types not specified here
     template <typename T>
-    void save(T const& val, typename boost::enable_if<boost::is_integral<T> >::type* = 0) 
+    void save(T const& val, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
     {
         boost::intmax_t t = static_cast<boost::intmax_t>(val);
         save_impl(t, sizeof(T));
     }
 
     template <typename T>
-    void save(T const& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0) 
+    void save(T const& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0)
     {
         this->primitive_base_t::save(t);
     }
@@ -230,13 +231,13 @@ public:
         init(flags);
     }
 
-    // the optimized save_array dispatches to save_binary 
+    // the optimized save_array dispatches to save_binary
 
     // default fall through for any types not specified here
     template <typename T>
     void save_array(boost::serialization::array<T> const& a, unsigned int)
     {
-        // If we need to potentially flip bytes we serialize each element 
+        // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
         if (m_flags & endian_little) {

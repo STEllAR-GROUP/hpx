@@ -88,12 +88,14 @@ void portable_binary_oarchive::save_impl(
 #endif
 void portable_binary_oarchive::init(unsigned int flags)
 {
-    if (m_flags == (endian_big | endian_little)) {
+    if ((m_flags & (endian_big | endian_little)) == (endian_big | endian_little))
+    {
+        // bail out if both flags are specified
         BOOST_THROW_EXCEPTION(
             portable_binary_oarchive_exception());
     }
 
-    if (0 == (flags & boost::archive::no_header)) {
+    if (!(flags & boost::archive::no_header)) {
         // write signature in an archive version independent manner
         const std::string file_signature(
             boost::archive::BOOST_ARCHIVE_SIGNATURE());
@@ -104,6 +106,7 @@ void portable_binary_oarchive::init(unsigned int flags)
             boost::archive::BOOST_ARCHIVE_VERSION());
         *this << v;
     }
+
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 }
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
