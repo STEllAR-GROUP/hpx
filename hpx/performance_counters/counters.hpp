@@ -474,7 +474,10 @@ namespace hpx { namespace performance_counters
     inline naming::id_type get_counter(std::string const& name, 
         error_code& ec = throws)
     {
-        return get_counter_async(name, ec).get();
+        lcos::future<naming::id_type> f = get_counter_async(name, ec);
+        if (ec) return naming::invalid_id;
+
+        return f.get(ec);
     }
 
     /// \brief Get the global id of an existing performance counter, if the
@@ -486,7 +489,10 @@ namespace hpx { namespace performance_counters
     inline naming::id_type get_counter(counter_info const& info, 
         error_code& ec = throws)
     {
-        return get_counter_async(info, ec).get();
+        lcos::future<naming::id_type> f = get_counter_async(info, ec);
+        if (ec) return naming::invalid_id;
+
+        return f.get(ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
