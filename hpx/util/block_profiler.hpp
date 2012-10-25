@@ -7,7 +7,7 @@
 #define HPX_UTIL_BLOCK_PROFILER_NOV_16_0811PM
 
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/version.hpp>
@@ -221,7 +221,7 @@ namespace hpx { namespace util
         static detail::accumulator_stats&
         get_stats(char const* description)
         {
-            static_<detail::accumulator_stats, Tag> stats(description);
+            reinitializable_static<detail::accumulator_stats, Tag> stats(description);
             return stats.get();
         };
 

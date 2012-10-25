@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/stringstream.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -584,8 +584,9 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
-                heap(component_memory_block);
+            util::reinitializable_static<
+                heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
+            > heap(component_memory_block);
             return heap.get(get_runtime_instance_number());
         }
 

@@ -12,7 +12,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/components/iostreams/lazy_ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
@@ -59,7 +59,7 @@ namespace hpx { namespace iostreams
     {
         typedef components::managed_component<server::output_stream> ostream_type;
 
-        stream_raii(char const* cout_name)
+        stream_raii(std::string const& cout_name)
         {
             LRT_(info) << "stream_raii::stream_raii: creating '"
                        << cout_name << "' stream object";
@@ -113,15 +113,15 @@ namespace hpx { namespace iostreams
     // return the singleton stream objects
     lazy_ostream& cout()
     {
-        util::static_<stream_raii<raii_cout_tag>, raii_cout_tag> cout_(
-            "/locality(console)/output_stream(cout)");
+        util::reinitializable_static<stream_raii<raii_cout_tag>, raii_cout_tag> cout_(
+            std::string("/locality(console)/output_stream(cout)"));
         return *cout_.get().client;
     }
 
     lazy_ostream& cerr()
     {
-        util::static_<stream_raii<raii_cerr_tag>, raii_cerr_tag> cerr_(
-            "/locality(console)/output_stream(cerr)");
+        util::reinitializable_static<stream_raii<raii_cerr_tag>, raii_cerr_tag> cerr_(
+            std::string("/locality(console)/output_stream(cerr)"));
         return *cerr_.get().client;
     }
 

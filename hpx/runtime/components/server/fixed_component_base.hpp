@@ -15,7 +15,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/stringstream.hpp>
 
 namespace hpx { namespace components
@@ -109,7 +109,7 @@ class fixed_component_base : public detail::fixed_component_tag
 
     static naming::gid_type const& fixed_gid()
     {
-        util::static_<naming::gid_type, gid_tag<MSB, LSB>, 1>
+        util::reinitializable_static<naming::gid_type, gid_tag<MSB, LSB>, 1>
             fixed(naming::gid_type(MSB, LSB));
 
         return fixed.get();

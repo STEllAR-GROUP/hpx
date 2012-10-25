@@ -14,32 +14,11 @@
 
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/fusion/include/accumulate.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
-namespace hpx{ namespace traits
+namespace hpx { namespace traits
 {
-    //////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(value_type)
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(iterator)
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(size_type)
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(reference)
-    }
-
-    template <typename T, typename Enable = void>
-    struct is_container
-      : boost::mpl::bool_<
-            detail::has_value_type<T>::value &&
-            detail::has_iterator<T>::value &&
-            detail::has_size_type<T>::value &&
-            detail::has_reference<T>::value>
-    {};
-
-    template <typename T>
-    struct is_container<T&>
-      : is_container<T>
-    {};
-
     //////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -57,9 +36,44 @@ namespace hpx{ namespace traits
         }
     };
 
+    // handle references
+    template <typename T>
+    struct argument_size<T&>
+      : argument_size<T>
+    {};
+
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+    template <typename T>
+    struct argument_size<T&&>
+      : argument_size<T>
+    {};
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    // handle containers
+    namespace detail
+    {
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(value_type)
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(iterator)
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(size_type)
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(reference)
+
+        template <typename T>
+        struct is_container
+          : boost::mpl::bool_<
+                has_value_type<T>::value && has_iterator<T>::value &&
+                has_size_type<T>::value && has_reference<T>::value>
+        {};
+
+        template <typename T>
+        struct is_container<T&>
+          : is_container<T>
+        {};
+    }
+
     template <typename T>
     struct argument_size<T,
-        typename boost::enable_if<traits::is_container<T> >::type>
+        typename boost::enable_if<traits::detail::is_container<T> >::type>
     {
         template <typename T_>
         static std::size_t call(T_ const& v, boost::mpl::false_)
@@ -68,7 +82,6 @@ namespace hpx{ namespace traits
             typename T_::const_iterator end = v.end();
             for (typename T_::const_iterator it = v.begin(); it != end; ++it)
                 sum += argument_size<typename T_::value_type>::call(*it);
-
             return sum;
         }
 
@@ -81,13 +94,15 @@ namespace hpx{ namespace traits
         static std::size_t call(T const& v)
         {
             typedef boost::mpl::bool_<
-                detail::has_uses_sizeof<
+                traits::detail::has_uses_sizeof<
                     traits::argument_size<typename T::value_type>
                 >::value> predicate;
             return call(v, predicate());
         }
     };
 
+    //////////////////////////////////////////////////////////////////////////
+    // handle Fusion sequences
     namespace detail
     {
         struct get_size
@@ -109,7 +124,27 @@ namespace hpx{ namespace traits
         static std::size_t call(T const& v)
         {
             std::size_t sum = sizeof(T);
-            return boost::fusion::accumulate(v, sum, detail::get_size());
+            return boost::fusion::accumulate(v, sum, traits::detail::get_size());
+        }
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct argument_size<boost::shared_ptr<T> >
+    {
+        static std::size_t call(boost::shared_ptr<T> const& p)
+        {
+            return argument_size<T>::call(*p);
+        }
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct argument_size<boost::intrusive_ptr<T> >
+    {
+        static std::size_t call(boost::intrusive_ptr<T> const& p)
+        {
+            return argument_size<T>::call(*p);
         }
     };
 }}

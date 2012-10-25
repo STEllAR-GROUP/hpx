@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/util/static_reinit.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -213,6 +214,8 @@ namespace hpx
         void set_state(state s) { state_ = s; }
 
     protected:
+        util::reinit_helper reinit_;
+
         // list of functions to call on exit
         typedef std::vector<HPX_STD_FUNCTION<void()> > on_exit_type;
         on_exit_type on_exit_functions_;

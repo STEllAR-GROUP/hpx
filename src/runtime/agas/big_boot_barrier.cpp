@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -797,7 +797,7 @@ void create_big_boot_barrier(
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
 ) {
-    util::static_<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (bbb.get())
     {
         HPX_THROW_EXCEPTION(internal_server_error,
@@ -809,7 +809,7 @@ void create_big_boot_barrier(
 
 void destroy_big_boot_barrier()
 {
-    util::static_<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (!bbb.get())
     {
         HPX_THROW_EXCEPTION(internal_server_error,
@@ -821,7 +821,7 @@ void destroy_big_boot_barrier()
 
 big_boot_barrier& get_big_boot_barrier()
 {
-    util::static_<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
+    util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (!bbb.get())
     {
         HPX_THROW_EXCEPTION(internal_server_error,

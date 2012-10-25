@@ -46,7 +46,7 @@
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/coroutine/detail/context_base.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
@@ -469,7 +469,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static heap_type& get_heap(std::size_t i)
     {
         // ensure thread-safe initialization
-        util::static_<heap_type, Tag, NumHeaps> heap;
+        util::reinitializable_static<heap_type, Tag, NumHeaps> heap;
         return heap.get(i);
     }
 

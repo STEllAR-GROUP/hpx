@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ namespace hpx { namespace components { namespace server
 
     console_error_dispatcher& get_error_dispatcher()
     {
-        util::static_<console_error_dispatcher, error_dispatcher_tag> disp;
+        util::reinitializable_static<console_error_dispatcher, error_dispatcher_tag> disp;
         return disp.get();
     }
 }}}

@@ -13,7 +13,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
@@ -926,7 +926,7 @@ namespace hpx { namespace util { namespace detail
     struct init_logging_tag {};
     std::vector<std::string> const& get_logging_data()
     {
-        static_<logging_configuration, init_logging_tag> init;
+        reinitializable_static<logging_configuration, init_logging_tag> init;
         return init.get().prefill_;
     }
 

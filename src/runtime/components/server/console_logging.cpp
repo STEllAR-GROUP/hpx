@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/util/ini.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -62,7 +62,7 @@ namespace {
 
     hpx::util::spinlock& get_log_lock()
     {
-        hpx::util::static_<hpx::util::spinlock, log_lock_tag> lock;
+        hpx::util::reinitializable_static<hpx::util::spinlock, log_lock_tag> lock;
         return lock.get();
     }
 }

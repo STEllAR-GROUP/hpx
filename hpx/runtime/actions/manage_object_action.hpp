@@ -17,7 +17,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/util/void_cast.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -206,7 +206,7 @@ namespace hpx { namespace actions
         virtual manage_object_action_base const& get_instance() const
         {
             // ensure thread-safe initialization
-            util::static_<manage_object_action, tag> instance;
+            util::reinitializable_static<manage_object_action, tag> instance;
             return instance.get();
         }
 
@@ -254,7 +254,7 @@ namespace hpx { namespace actions
     manage_object_action_base::get_instance() const
     {
         // ensure thread-safe initialization
-        util::static_<manage_object_action<boost::uint8_t>,
+        util::reinitializable_static<manage_object_action<boost::uint8_t>,
             manage_object_action_base::tag> instance;
         return instance.get();
     }
@@ -307,7 +307,7 @@ namespace hpx { namespace actions
         manage_object_action_base const& get_instance() const
         {
             // ensure thread-safe initialization
-            util::static_<manage_object_action, tag> instance;
+            util::reinitializable_static<manage_object_action, tag> instance;
             return instance.get();
         }
 

@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>
@@ -305,8 +305,9 @@ namespace hpx { namespace components
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
-                util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
-                    heap(components::get_component_type<Component>());
+                util::reinitializable_static<
+                    heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
+                > heap(components::get_component_type<Component>());
                 return heap.get(get_runtime_instance_number());
             }
 

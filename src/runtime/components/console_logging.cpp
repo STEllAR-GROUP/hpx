@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/assert.hpp>
@@ -210,7 +211,7 @@ namespace hpx { namespace components
     {
         pending_logs& logger()
         {
-            util::static_<pending_logs, pending_logs_tag> logs;
+            util::reinitializable_static<pending_logs, pending_logs_tag> logs;
             return logs.get();
         }
     }

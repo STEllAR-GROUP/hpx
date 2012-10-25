@@ -1,12 +1,14 @@
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_STATIC_JUN_12_2008_0934AM)
-#define HPX_UTIL_STATIC_JUN_12_2008_0934AM
+#if !defined(HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM)
+#define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/static_reinit.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
@@ -20,13 +22,12 @@
 
 #include <boost/thread/once.hpp>
 #include <boost/bind.hpp>
-#include <boost/static_assert.hpp>
 
 #include <memory>   // for placement new
 
 namespace hpx { namespace util
 {
-    //
+    ///////////////////////////////////////////////////////////////////////////
     //  Provides thread-safe initialization of a single static instance of T.
     //
     //  This instance is guaranteed to be constructed on static storage in a
@@ -37,57 +38,67 @@ namespace hpx { namespace util
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
+    //  In addition this type registers global construction and destruction 
+    //  functions used by the HPX runtime system to reinitialize the held data 
+    //  structures.
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct static_ : boost::noncopyable
+    struct reinitializable_static : boost::noncopyable
     {
     public:
         typedef T value_type;
 
     private:
-        struct destructor
+        static void default_construct()
         {
-            ~destructor()
-            {
-                for (std::size_t i = 0; i < N; ++i)
-                    static_::get_address(i)->~value_type();
-            }
-        };
-
-        struct default_constructor
-        {
-            static void construct()
-            {
-                for (std::size_t i = 0; i < N; ++i)
-                    new (static_::get_address(i)) value_type();
-                static destructor d;
-            }
-        };
+            for (std::size_t i = 0; i < N; ++i)
+                new (get_address(i)) value_type();
+        }
 
         template <typename U>
-        struct copy_constructor
+        static void value_construct(U const& v)
         {
-            static void construct(U const* pv)
-            {
-                for (std::size_t i = 0; i < N; ++i)
-                    new (static_::get_address(i)) value_type(*pv);
-                static destructor d;
-            }
-        };
+            for (std::size_t i = 0; i < N; ++i)
+                new (get_address(i)) value_type(v);
+        }
+
+        static void destruct()
+        {
+            for (std::size_t i = 0; i < N; ++i)
+                get_address(i)->~value_type();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static void default_constructor()
+        {
+            default_construct();
+            reinit_register(
+                &reinitializable_static::default_construct, &destruct);
+        }
+
+        template <typename U>
+        static void value_constructor(U const* pv)
+        {
+            value_construct(*pv);
+            reinit_register(boost::bind(
+                &reinitializable_static::value_construct<U>, *pv), &destruct);
+        }
 
     public:
         typedef typename boost::call_traits<T>::reference reference;
         typedef typename boost::call_traits<T>::const_reference const_reference;
 
-        static_()
+        reinitializable_static()
         {
-            boost::call_once(&default_constructor::construct, constructed_);
+            boost::call_once(constructed_,
+                &reinitializable_static::default_constructor);
         }
 
         template <typename U>
-        static_(U const& val)
+        reinitializable_static(U const& val)
         {
             boost::call_once(constructed_,
-                boost::bind(&copy_constructor<U>::construct, boost::addressof(val)));
+                boost::bind(&reinitializable_static::value_constructor<U>, 
+                    boost::addressof(val)));
         }
 
         operator reference()
@@ -127,10 +138,14 @@ namespace hpx { namespace util
     };
 
     template <typename T, typename Tag, std::size_t N>
-    typename static_<T, Tag, N>::storage_type static_<T, Tag, N>::data_[N];
+    typename reinitializable_static<T, Tag, N>::storage_type 
+        reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    boost::once_flag static_<T, Tag, N>::constructed_ = BOOST_ONCE_INIT;
+    boost::once_flag reinitializable_static<T, Tag, N>::constructed_ = 
+        BOOST_ONCE_INIT;
 }}
 
-#endif // include guard
+#endif
+
+
