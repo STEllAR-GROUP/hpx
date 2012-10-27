@@ -36,7 +36,7 @@ namespace hpx { namespace lcos
     void base_lco::disconnect(naming::id_type const &)
     {
     }
-        
+
     components::component_type base_lco::get_component_type()
     {
         return components::get_component_type<base_lco>();
@@ -58,7 +58,7 @@ namespace hpx { namespace lcos
     {
         set_exception(e);
     }
-        
+
     void base_lco::connect_nonvirt(naming::id_type const & id)
     {
         connect(id);
