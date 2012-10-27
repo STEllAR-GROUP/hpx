@@ -363,7 +363,7 @@ namespace hpx { namespace util
             __android_log_write(ANDROID_LOG_DEBUG, tag.c_str(), msg.c_str());
         }
 
-        bool operator==(console const& rhs) const
+        bool operator==(android_log const& rhs) const
         {
             return tag == rhs.tag;
         }
