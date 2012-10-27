@@ -409,24 +409,18 @@ namespace hpx
     ///        for the running application.
     boost::uint32_t get_num_localities()
     {
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (NULL == hpx::get_runtime_ptr())
             return 0;
 
-        // FIXME: this is overkill
-        std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids);
-        return static_cast<boost::uint32_t>(locality_ids.size());
+        return get_runtime().get_agas_client().get_num_localities();
     }
 
     boost::uint32_t get_num_localities(components::component_type type)
     {
-        if (NULL == hpx::applier::get_applier_ptr())
+        if (NULL == hpx::get_runtime_ptr())
             return 0;
 
-        // FIXME: this is overkill
-        std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids, type);
-        return static_cast<boost::uint32_t>(locality_ids.size());
+        return get_runtime().get_agas_client().get_num_localities(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////
