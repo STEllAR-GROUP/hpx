@@ -725,12 +725,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0>
+            template <typename A0>
             bound_functor1(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0))
+            {}
+            template <typename A0>
+            bound_functor1(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0))
             {}
             bound_functor1(
@@ -1531,12 +1539,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1>
+            template <typename A0 , typename A1>
             bound_functor2(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1))
+            {}
+            template <typename A0 , typename A1>
+            bound_functor2(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1))
             {}
             bound_functor2(
@@ -2337,12 +2353,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2>
+            template <typename A0 , typename A1 , typename A2>
             bound_functor3(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2))
+            {}
+            template <typename A0 , typename A1 , typename A2>
+            bound_functor3(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2))
             {}
             bound_functor3(
@@ -3143,12 +3167,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3>
+            template <typename A0 , typename A1 , typename A2 , typename A3>
             bound_functor4(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3>
+            bound_functor4(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3))
             {}
             bound_functor4(
@@ -3949,12 +3981,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
             bound_functor5(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
+            bound_functor5(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4))
             {}
             bound_functor5(
@@ -4755,12 +4795,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
             bound_functor6(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
+            bound_functor6(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5))
             {}
             bound_functor6(
@@ -5561,12 +5609,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
             bound_functor7(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
+            bound_functor7(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6))
             {}
             bound_functor7(
@@ -6367,12 +6423,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
             bound_functor8(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
+            bound_functor8(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7))
             {}
             bound_functor8(
@@ -7173,12 +7237,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
             bound_functor9(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
+            bound_functor9(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8))
             {}
             bound_functor9(
@@ -7979,12 +8051,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
             bound_functor10(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
+            bound_functor10(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9))
             {}
             bound_functor10(
@@ -8785,12 +8865,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
             bound_functor11(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9)) , arg10(boost::forward<A10>(a10))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
+            bound_functor11(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9)) , arg10(boost::forward<A10>(a10))
             {}
             bound_functor11(
@@ -9591,12 +9679,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
             bound_functor12(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9)) , arg10(boost::forward<A10>(a10)) , arg11(boost::forward<A11>(a11))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
+            bound_functor12(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9)) , arg10(boost::forward<A10>(a10)) , arg11(boost::forward<A11>(a11))
             {}
             bound_functor12(
@@ -10397,12 +10493,20 @@
         {
             F f;
             typedef typename F::result_type result_type;
-            template <typename FF, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
             bound_functor13(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9)) , arg10(boost::forward<A10>(a10)) , arg11(boost::forward<A11>(a11)) , arg12(boost::forward<A12>(a12))
+            {}
+            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
+            bound_functor13(
+                F const & f_
+              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12
+            )
+                : f(f_)
                 , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7)) , arg8(boost::forward<A8>(a8)) , arg9(boost::forward<A9>(a9)) , arg10(boost::forward<A10>(a10)) , arg11(boost::forward<A11>(a11)) , arg12(boost::forward<A12>(a12))
             {}
             bound_functor13(
