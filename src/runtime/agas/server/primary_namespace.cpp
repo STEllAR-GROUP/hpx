@@ -116,6 +116,24 @@ response primary_namespace::service(
                 counter_data_.increment_localities_count();
                 return localities(req, ec);
             }
+        case primary_ns_num_localities:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.num_localities_.time_
+                );
+                counter_data_.increment_num_localities_count();
+                return get_num_localities(req, ec);
+            }
+        case primary_ns_num_threads:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.num_threads_.time_
+                );
+                counter_data_.increment_num_threads_count();
+                return get_num_threads(req, ec);
+            }
         case primary_ns_statistics_counter:
             return statistics_counter(req, ec);
 
@@ -125,6 +143,7 @@ response primary_namespace::service(
         case component_ns_unbind_name:
         case component_ns_iterate_types:
         case component_ns_get_component_type_name:
+        case component_ns_num_localities:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "
@@ -251,6 +270,7 @@ response primary_namespace::allocate(
     naming::locality ep = req.get_locality();
     boost::uint64_t const count = req.get_count();
     boost::uint64_t const real_count = (count) ? (count - 1) : (0);
+    boost::uint32_t const num_threads = req.get_num_threads();
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -360,7 +380,7 @@ response primary_namespace::allocate(
 
         if (HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
                 std::make_pair(ep,
-                    partition_type(prefix, lower_id))), pit)))
+                    partition_type(prefix, lower_id, num_threads))), pit)))
         {
             // If this branch is taken, then the partition table was updated
             // at some point after we first checked it, which would indicate
@@ -1336,6 +1356,53 @@ primary_namespace::resolve_gid_locked(
         (naming::invalid_gid, gva());
 } // }}}
 
+response primary_namespace::get_num_localities(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ get_num_localities implementation
+    mutex_type::scoped_lock l(mutex_);
+
+    boost::uint32_t num_localities = 
+        static_cast<boost::uint32_t>(partitions_.size());
+
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::get_num_localities, localities(%1%)")
+        % num_localities);
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(primary_ns_num_localities, num_localities);
+} // }}}
+
+response primary_namespace::get_num_threads(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ get_num_threads implementation
+    mutex_type::scoped_lock l(mutex_);
+
+    std::vector<boost::uint32_t> num_threads;
+
+    partition_table_type::iterator end = partitions_.end();
+    for (partition_table_type::iterator it = partitions_.begin(); 
+         it != end; ++it)
+    {
+        using boost::fusion::at_c;
+        num_threads.push_back(at_c<2>(it->second));
+    }
+
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::get_num_threads, localities(%1%)")
+        % num_threads.size());
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(primary_ns_num_threads, num_threads);
+} // }}}
+
 response primary_namespace::statistics_counter(
     request const& req
   , error_code& ec
@@ -1412,6 +1479,12 @@ response primary_namespace::statistics_counter(
         case primary_ns_localities:
             get_data_func = boost::bind(&cd::get_localities_count, &counter_data_);
             break;
+        case primary_ns_num_localities:
+            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_);
+            break;
+        case primary_ns_num_threads:
+            get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_);
+            break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
               , "primary_namespace::statistics"
@@ -1447,6 +1520,12 @@ response primary_namespace::statistics_counter(
             break;
         case primary_ns_localities:
             get_data_func = boost::bind(&cd::get_localities_time, &counter_data_);
+            break;
+        case primary_ns_num_localities:
+            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_);
+            break;
+        case primary_ns_num_threads:
+            get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1528,6 +1607,18 @@ boost::int64_t primary_namespace::counter_data::get_localities_count() const
     return localities_.count_;
 }
 
+boost::int64_t primary_namespace::counter_data::get_num_localities_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return num_localities_.count_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_num_threads_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return num_localities_.count_;
+}
+
 // access execution time counters
 boost::int64_t primary_namespace::counter_data::get_allocate_time() const
 {
@@ -1583,6 +1674,18 @@ boost::int64_t primary_namespace::counter_data::get_localities_time() const
     return localities_.time_;
 }
 
+boost::int64_t primary_namespace::counter_data::get_num_localities_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return num_localities_.time_;
+}
+
+boost::int64_t primary_namespace::counter_data::get_num_threads_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return num_localities_.time_;
+}
+
 // increment counter values
 void primary_namespace::counter_data::increment_allocate_count()
 {
@@ -1636,6 +1739,18 @@ void primary_namespace::counter_data::increment_localities_count()
 {
     mutex_type::scoped_lock l(mtx_);
     ++localities_.count_;
+}
+
+void primary_namespace::counter_data::increment_num_localities_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++num_localities_.count_;
+}
+
+void primary_namespace::counter_data::increment_num_threads_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++num_localities_.count_;
 }
 
 }}}

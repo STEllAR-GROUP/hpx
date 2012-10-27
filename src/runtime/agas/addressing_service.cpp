@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach and Hartmut Kaiser
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
+//  Copyright (c) 2011-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +16,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace hpx { namespace agas
 {
@@ -104,9 +106,11 @@ void addressing_service::launch_bootstrap(
         boost::str(boost::format("hpx.locality=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
+    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
+        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
     request reqs[] =
     {
-        request(primary_ns_allocate, ep, 3)
+        request(primary_ns_allocate, ep, 3, num_threads)
       , request(primary_ns_bind_gid, primary_gid, primary_gva)
       , request(primary_ns_bind_gid, component_gid, component_gva)
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
@@ -150,14 +154,11 @@ void addressing_service::adjust_local_cache_size()
     {
         util::runtime_configuration const& cfg = get_runtime().get_config();
         std::size_t local_cache_size = cfg.get_agas_local_cache_size();
-        std::size_t local_cache_size_per_node = 
-            cfg.get_agas_local_cache_size_per_node();
-
-        std::vector<naming::gid_type> localities;
-        get_localities(localities);
+        std::size_t local_cache_size_per_thread = 
+            cfg.get_agas_local_cache_size_per_thread();
 
         gva_cache_.reserve((std::max)(local_cache_size, 
-            local_cache_size_per_node * localities.size()));
+            local_cache_size_per_thread * get_num_overall_threads()));
     }
 } // }}}
 
@@ -214,11 +215,12 @@ std::vector<response> addressing_service::bulk_service(
 bool addressing_service::register_locality(
     naming::locality const& ep
   , naming::gid_type& prefix
+  , boost::uint32_t num_threads
   , error_code& ec
     )
 { // {{{
     try {
-        request req(primary_ns_allocate, ep, 0);
+        request req(primary_ns_allocate, ep, 0, num_threads);
         response rep;
 
         if (is_bootstrap())
@@ -450,6 +452,113 @@ bool addressing_service::get_localities(
     }
 } // }}}
 
+boost::uint32_t addressing_service::get_num_localities(
+    components::component_type type
+  , error_code& ec
+    )
+{ // {{{ get_num_localities implementation
+    try {
+        if (type == components::component_invalid)
+        {
+            request req(primary_ns_num_localities, type);
+            response rep;
+
+            if (is_bootstrap())
+                rep = bootstrap->primary_ns_server.service(req, ec);
+            else
+                rep = hosted->primary_ns_.service(req, action_priority_, ec);
+
+            if (ec || (success != rep.get_status()))
+                return boost::uint32_t(-1);
+
+            return rep.get_num_localities();
+        }
+
+        request req(component_ns_num_localities, type);
+        response rep;
+
+        if (is_bootstrap())
+            rep = bootstrap->component_ns_server.service(req, ec);
+        else
+            rep = hosted->component_ns_.service(req, action_priority_, ec);
+
+        if (ec || (success != rep.get_status()))
+            return boost::uint32_t(-1);
+
+        return rep.get_num_localities();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "addressing_service::get_num_localities", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+    return boost::uint32_t(-1);
+} // }}}
+
+boost::uint32_t addressing_service::get_num_overall_threads(
+    error_code& ec
+    )
+{ // {{{ get_num_overall_threads implementation
+    try {
+        request req(primary_ns_num_threads);
+        response rep;
+
+        if (is_bootstrap())
+            rep = bootstrap->primary_ns_server.service(req, ec);
+        else
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+
+        if (ec || (success != rep.get_status()))
+            return boost::uint32_t(-1);
+
+        return rep.get_num_overall_threads();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "addressing_service::get_num_overall_threads", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+    return boost::uint32_t(-1);
+} // }}}
+
+std::vector<boost::uint32_t> addressing_service::get_num_threads(
+    error_code& ec
+    )
+{ // {{{ get_num_threads implementation
+    try {
+        request req(primary_ns_num_threads);
+        response rep;
+
+        if (is_bootstrap())
+            rep = bootstrap->primary_ns_server.service(req, ec);
+        else
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+
+        if (ec || (success != rep.get_status()))
+            return std::vector<boost::uint32_t>();
+
+        return rep.get_num_threads();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error(),
+                "addressing_service::get_num_threads", e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+    return std::vector<boost::uint32_t>();
+} // }}}
+
 components::component_type addressing_service::get_component_id(
     std::string const& name
   , error_code& ec
@@ -640,7 +749,7 @@ bool addressing_service::get_id_range(
     future_type* f = 0;
 
     try {
-        request req(primary_ns_allocate, ep, count);
+        request req(primary_ns_allocate, ep, count, boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())

@@ -101,9 +101,10 @@ struct request
         namespace_action_code type_
       , naming::locality const& locality_
       , boost::uint64_t count_
+      , boost::uint32_t num_threads_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(locality_, count_))
+      , data(boost::fusion::make_vector(locality_, count_, num_threads_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -379,6 +380,13 @@ struct request
         return get_data<subtype_name, 0>(ec);
     }
 
+    boost::uint32_t get_num_threads(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_locality_count, 2>(ec);
+    }
+
   private:
     friend class boost::serialization::access;
 
@@ -430,9 +438,10 @@ struct request
         >
         // 0x4
         // primary_ns_allocate
-      , boost::fusion::vector2<
+      , boost::fusion::vector3<
             naming::locality // locality
           , boost::uint64_t  // count
+          , boost::uint32_t  // num_threads
         >
         // 0x5
         // primary_ns_free
@@ -580,16 +589,16 @@ struct request
         boost::apply_visitor(save_visitor<Archive>(ar), data);
     } // }}}
 
-#define HPX_LOAD_SEQUENCE(z, n, _)                                          \
-    case n:                                                                 \
-        {                                                                   \
-            typename boost::mpl::at_c<                                      \
-                typename data_type::types, n                                \
-            >::type d;                                                      \
-            util::serialize_sequence(ar, d);                                \
-            data = d;                                                       \
-            return;                                                         \
-        }                                                                   \
+#define HPX_LOAD_SEQUENCE(z, n, _)                                            \
+    case n:                                                                   \
+        {                                                                     \
+            typename boost::mpl::at_c<                                        \
+                typename data_type::types, n                                  \
+            >::type d;                                                        \
+            util::serialize_sequence(ar, d);                                  \
+            data = d;                                                         \
+            return;                                                           \
+        }                                                                     \
     /**/
 
     template <

@@ -29,6 +29,8 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 
+#include <numeric>
+
 // The number of types that response's variant can represent.
 #define HPX_AGAS_RESPONSE_SUBTYPES 9
 
@@ -220,6 +222,30 @@ struct response
         return get_data<subtype_prefixes, 0>(ec);
     }
 
+    boost::uint32_t get_num_localities(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_prefix, 0>(ec);
+    }
+
+    boost::uint32_t get_num_overall_threads(
+        error_code& ec = throws
+        ) const
+    {
+        std::vector<boost::uint32_t> const& v =
+            get_data<subtype_prefixes, 0>(ec);
+
+        return std::accumulate(v.begin(), v.end(), boost::uint32_t(0));
+    }
+
+    std::vector<boost::uint32_t> get_num_threads(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_prefixes, 0>(ec);
+    }
+
     components::component_type get_component_type(
         error_code& ec = throws
         ) const
@@ -303,15 +329,15 @@ struct response
 
     enum subtype
     {
-        subtype_gid_gid_prefix  = 0x0
-      , subtype_gid_gva         = 0x1
-      , subtype_gva             = 0x2
-      , subtype_ctype           = 0x3
-      , subtype_prefixes        = 0x4
-      , subtype_gid             = 0x5
-      , subtype_prefix          = 0x6
-      , subtype_void            = 0x7
-      , subtype_string          = 0x8
+        subtype_gid_gid_prefix      = 0x0
+      , subtype_gid_gva             = 0x1
+      , subtype_gva                 = 0x2
+      , subtype_ctype               = 0x3
+      , subtype_prefixes            = 0x4
+      , subtype_gid                 = 0x5
+      , subtype_prefix              = 0x6
+      , subtype_void                = 0x7
+      , subtype_string              = 0x8
       // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
     };
 

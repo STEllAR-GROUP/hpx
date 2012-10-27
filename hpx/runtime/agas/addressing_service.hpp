@@ -376,6 +376,7 @@ public:
     bool register_locality(
         naming::locality const& l
       , naming::gid_type& prefix
+      , boost::uint32_t num_threads
       , error_code& ec = throws
         );
 
@@ -457,6 +458,44 @@ public:
     {
         return get_localities(locality_ids, components::component_invalid, ec);
     }
+
+    /// \brief Query for the number of all known localities.
+    ///
+    /// This function returns the number of localities known to the AGAS server 
+    /// or the number of localities having a registered factory for a given 
+    /// component type.
+    ///
+    /// \param type       [in] The component type will be used to determine
+    ///                   the set of prefixes having a registered factory
+    ///                   for this component. The default value for this
+    ///                   parameter is \a components#component_invalid,
+    ///                   which will return prefixes of all localities.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    boost::uint32_t get_num_localities(
+        components::component_type type
+      , error_code& ec = throws
+        );
+
+    boost::uint32_t get_num_localities(error_code& ec = throws)
+    {
+        return get_num_localities(components::component_invalid, ec);
+    }
+
+    boost::uint32_t get_num_overall_threads(
+        error_code& ec = throws
+        );
+
+    std::vector<boost::uint32_t> get_num_threads(
+        error_code& ec = throws
+        );
 
     /// \brief Return a unique id usable as a component type.
     ///

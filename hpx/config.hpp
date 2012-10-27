@@ -199,9 +199,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of AGAS address translations kept in the local
-/// cache on a per node basis.
-#if !defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE)
-#  define HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE 32
+/// cache on a per OS-thread basis (system wide used OS threads).
+#if !defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD)
+#  define HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD 32
 #endif
 
 /// This defines the number of AGAS address translations kept in the local
@@ -211,7 +211,7 @@
 /// The actual number of local cache entries used is determined by
 ///
 ///  max(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE,
-///      HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE * num_nodes)
+///      HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD * num_nodes)
 ///
 #if !defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
 #  define HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE 256

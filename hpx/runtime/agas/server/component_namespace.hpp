@@ -100,14 +100,16 @@ struct HPX_EXPORT component_namespace :
       boost::int64_t get_resolve_id_count() const;
       boost::int64_t get_unbind_name_count() const;
       boost::int64_t get_iterate_types_count() const;
-      boost::int64_t get_get_component_type_name_count() const;
+      boost::int64_t get_component_type_name_count() const;
+      boost::int64_t get_num_localities_count() const;
 
       boost::int64_t get_bind_prefix_time() const;
       boost::int64_t get_bind_name_time() const;
       boost::int64_t get_resolve_id_time() const;
       boost::int64_t get_unbind_name_time() const;
       boost::int64_t get_iterate_types_time() const;
-      boost::int64_t get_get_component_type_name_time() const;
+      boost::int64_t get_component_type_name_time() const;
+      boost::int64_t get_num_localities_time() const;
 
       // increment counter values
       void increment_bind_prefix_count();
@@ -116,6 +118,7 @@ struct HPX_EXPORT component_namespace :
       void increment_unbind_name_ount();
       void increment_iterate_types_count();
       void increment_get_component_type_name_count();
+      void increment_num_localities_count();
 
     private:
       friend struct update_time_on_exit;
@@ -128,6 +131,7 @@ struct HPX_EXPORT component_namespace :
       api_counter_data unbind_name_;          // component_ns_unbind_name
       api_counter_data iterate_types_;        // component_ns_iterate_types
       api_counter_data get_component_type_name_; // component_ns_get_component_type_name
+      api_counter_data num_localities_;  // component_ns_num_localities
     };
     counter_data counter_data_;
 
@@ -226,6 +230,11 @@ struct HPX_EXPORT component_namespace :
       , error_code& ec = throws
         );
 
+    response get_num_localities(
+        request const& req
+      , error_code& ec = throws
+        );
+
     response statistics_counter(
         request const& req
       , error_code& ec = throws
@@ -244,6 +253,7 @@ struct HPX_EXPORT component_namespace :
       , namespace_unbind_name             = component_ns_unbind_name
       , namespace_iterate_types           = component_ns_iterate_types
       , namespace_get_component_type_name = component_ns_get_component_type_name
+      , namespace_num_localities     = component_ns_num_localities
       , namespace_statistics              = component_ns_statistics_counter
     }; // }}}
 

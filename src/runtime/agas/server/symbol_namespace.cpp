@@ -85,6 +85,8 @@ response symbol_namespace::service(
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
         case primary_ns_localities:
+        case primary_ns_num_localities:
+        case primary_ns_num_threads:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "
@@ -98,6 +100,7 @@ response symbol_namespace::service(
         case component_ns_unbind_name:
         case component_ns_iterate_types:
         case component_ns_get_component_type_name:
+        case component_ns_num_localities:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

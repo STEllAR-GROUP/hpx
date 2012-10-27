@@ -29,6 +29,7 @@
 #include <boost/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace hpx { namespace agas
 {
@@ -284,7 +285,10 @@ void register_console(registration_header const& header)
                    , parcel_lower, parcel_upper
                    , heap_lower, heap_upper;
 
-    agas_client.register_locality(header.locality, prefix);
+    util::runtime_configuration const& cfg = get_runtime().get_config();
+    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
+        cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
+    agas_client.register_locality(header.locality, prefix, num_threads);
 
     agas_client.get_id_range(header.locality, header.parcelport_allocation
                            , parcel_lower, parcel_upper);
@@ -437,7 +441,10 @@ void register_worker(registration_header const& header)
                    , parcel_lower, parcel_upper
                    , heap_lower, heap_upper;
 
-    agas_client.register_locality(header.locality, prefix);
+    util::runtime_configuration const& cfg = get_runtime().get_config();
+    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
+        cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
+    agas_client.register_locality(header.locality, prefix, num_threads);
 
     agas_client.get_id_range(header.locality, header.parcelport_allocation
                            , parcel_lower, parcel_upper);

@@ -356,7 +356,7 @@ sections, one for each component.
     dedicated_server = 0
     max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:<hpx_initial_agas_max_pending_refcnt_requests>}
     local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_initial_agas_local_cache_size>}
-    local_cache_size_per_node = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_initial_agas_local_cache_size_per_node>}
+    local_cache_size_per_thread = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD:<hpx_initial_agas_local_cache_size_per_thread>}
     use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
     use_caching = ${HPX_AGAS_USE_CACHING:1}
 ``
@@ -413,11 +413,11 @@ sections, one for each component.
       refer to the maximum number of ranges stored in the cache, not the number
       of entries spanned by the cache. Note also, that the size of the cache 
       will be determined by the large of the following two numbers: the value
-      of this key and the value of `hpx.agas.local_cache_size_per_node` 
-      multiplied by the number of nodes connected to the running application.]
+      of this key and the value of `hpx.agas.local_cache_size_per_thread` 
+      multiplied by the number of threads used systemwide in the running application.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE` (`256`)]]
-    [[`hpx.agas.local_cache_size_per_node`]
+    [[`hpx.agas.local_cache_size_per_thread`]
      [This property defines the size of the software address translation cache
       for AGAS services on a per node basis. This property is ignored if 
       `hpx.agas.use_caching` is false. Note that if `hpx.agas.use_range_caching` 
@@ -425,9 +425,9 @@ sections, one for each component.
       the cache, not the number of entries spanned by the cache. Note also, 
       that the size of the cache will be determined by the large of the following 
       two numbers: the `hpx.agas.local_cache_size` and the value of this key
-      multiplied by the number of nodes connected to the running application.]
+      multiplied by the number of threads used system wide in the running application.]
      [static information, the default depends on the compile time preprocessor
-      constant `HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE` (`32`)]]
+      constant `HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD` (`32`)]]
 ]
 
 [endsect] [/ Default Configuration Settings]

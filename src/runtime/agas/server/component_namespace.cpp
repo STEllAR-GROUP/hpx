@@ -90,10 +90,19 @@ response component_namespace::service(
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.iterate_types_.time_
+                  , counter_data_.get_component_type_name_.time_
                 );
                 counter_data_.increment_get_component_type_name_count();
                 return get_component_type_name(req, ec);
+            }
+        case component_ns_num_localities:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.num_localities_.time_
+                );
+                counter_data_.increment_num_localities_count();
+                return get_num_localities(req, ec);
             }
         case component_ns_statistics_counter:
             return statistics_counter(req, ec);
@@ -106,6 +115,8 @@ response component_namespace::service(
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
         case primary_ns_localities:
+        case primary_ns_num_localities:
+        case primary_ns_num_threads:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "
@@ -495,7 +506,7 @@ response component_namespace::get_component_type_name(
     request const& req
   , error_code& ec
     )
-{ // {{{ iterate implementation
+{ // {{{ get_component_type_name implementation
     components::component_type t = req.get_component_type();
 
     mutex_type::scoped_lock l(mutex_);
@@ -534,6 +545,46 @@ response component_namespace::get_component_type_name(
         ec = make_success_code();
 
     return response(component_ns_get_component_type_name, result);
+} // }}}
+
+response component_namespace::get_num_localities(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ get_num_localities implementation
+    component_id_type key = req.get_component_type();
+
+    // If the requested component type is a derived type, use only its derived
+    // part for the lookup.
+    if (key != components::get_base_type(key))
+        key = components::get_derived_type(key);
+
+    mutex_type::scoped_lock l(mutex_);
+
+    factory_table_type::const_iterator it = factories_.find(key)
+                                     , end = factories_.end();
+    if (it == end)
+    {
+        LAGAS_(info) << (boost::format(
+            "component_namespace::get_num_localities, key(%1%), localities(0)")
+            % key);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        response(component_ns_num_localities, boost::uint32_t(0), no_success);
+    }
+
+    boost::uint32_t num_localities = static_cast<boost::uint32_t>(it->second.size());
+
+    LAGAS_(info) << (boost::format(
+        "component_namespace::get_num_localities, key(%1%), localities(%2%)")
+        % key % num_localities);
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(component_ns_num_localities, num_localities);
 } // }}}
 
 response component_namespace::statistics_counter(
@@ -601,7 +652,10 @@ response component_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_);
             break;
         case component_ns_get_component_type_name:
-            get_data_func = boost::bind(&cd::get_get_component_type_name_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_component_type_name_count, &counter_data_);
+            break;
+        case component_ns_num_localities:
+            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -628,7 +682,10 @@ response component_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_);
             break;
         case component_ns_get_component_type_name:
-            get_data_func = boost::bind(&cd::get_get_component_type_name_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_component_type_name_time, &counter_data_);
+            break;
+        case component_ns_num_localities:
+            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -686,10 +743,16 @@ boost::int64_t component_namespace::counter_data::get_iterate_types_count() cons
     return iterate_types_.count_;
 }
 
-boost::int64_t component_namespace::counter_data::get_get_component_type_name_count() const
+boost::int64_t component_namespace::counter_data::get_component_type_name_count() const
 {
     mutex_type::scoped_lock l(mtx_);
     return get_component_type_name_.count_;
+}
+
+boost::int64_t component_namespace::counter_data::get_num_localities_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return num_localities_.count_;
 }
 
 // access execution time counters
@@ -723,10 +786,16 @@ boost::int64_t component_namespace::counter_data::get_iterate_types_time() const
     return iterate_types_.time_;
 }
 
-boost::int64_t component_namespace::counter_data::get_get_component_type_name_time() const
+boost::int64_t component_namespace::counter_data::get_component_type_name_time() const
 {
     mutex_type::scoped_lock l(mtx_);
     return get_component_type_name_.time_;
+}
+
+boost::int64_t component_namespace::counter_data::get_num_localities_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return num_localities_.time_;
 }
 
 // increment counter values
@@ -764,6 +833,12 @@ void component_namespace::counter_data::increment_get_component_type_name_count(
 {
     mutex_type::scoped_lock l(mtx_);
     ++get_component_type_name_.count_;
+}
+
+void component_namespace::counter_data::increment_num_localities_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++num_localities_.count_;
 }
 
 }}}
