@@ -28,6 +28,8 @@ namespace examples
         > base_type;
         //]
 
+        typedef base_type::argument_type argument_type;
+
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
@@ -36,7 +38,7 @@ namespace examples
 
         /// Create a client side representation for the existing
         /// \a server::managed_accumulator instance with the given GID.
-        managed_accumulator(hpx::naming::id_type const& gid)
+        managed_accumulator(hpx::future<hpx::naming::id_type> const& gid)
           : base_type(gid)
         {}
 
@@ -69,7 +71,7 @@ namespace examples
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        void add_non_blocking(boost::uint64_t arg)
+        void add_non_blocking(argument_type arg)
         {
             BOOST_ASSERT(this->get_gid());
             this->base_type::add_non_blocking(this->get_gid(), arg);
@@ -79,7 +81,7 @@ namespace examples
         ///
         /// \note This function is fully synchronous.
         //[managed_accumulator_client_add_sync
-        void add_sync(boost::uint64_t arg)
+        void add_sync(argument_type arg)
         {
             BOOST_ASSERT(this->get_gid());
             this->base_type::add_sync(this->get_gid(), arg);
@@ -95,7 +97,7 @@ namespace examples
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[managed_accumulator_client_query_async
-        hpx::lcos::future<boost::uint64_t> query_async()
+        hpx::lcos::future<argument_type> query_async()
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::query_async(this->get_gid());
@@ -105,7 +107,7 @@ namespace examples
         /// Query the current value of the accumulator.
         ///
         /// \note This function is fully synchronous.
-        boost::uint64_t query_sync()
+        argument_type query_sync()
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::query_sync(this->get_gid());

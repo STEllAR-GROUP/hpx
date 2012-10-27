@@ -21,6 +21,8 @@ namespace examples { namespace stubs
       : hpx::components::stub_base<server::managed_accumulator>
     //]
     {
+        typedef server::managed_accumulator::argument_type argument_type;
+
         ///////////////////////////////////////////////////////////////////////
         /// Reset the accumulator's value to 0.
         ///
@@ -62,7 +64,7 @@ namespace examples { namespace stubs
         /// \note This function is fully synchronous.
         //[managed_accumulator_stubs_add_sync
         static void
-        add_sync(hpx::naming::id_type const& gid, boost::uint64_t arg)
+        add_sync(hpx::naming::id_type const& gid, argument_type arg)
         {
             typedef server::managed_accumulator::add_action action_type;
             hpx::async<action_type>(gid, arg).get();
@@ -78,7 +80,7 @@ namespace examples { namespace stubs
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[managed_accumulator_stubs_query_async
-        static hpx::lcos::future<boost::uint64_t>
+        static hpx::lcos::future<argument_type>
         query_async(hpx::naming::id_type const& gid)
         {
             typedef server::managed_accumulator::query_action action_type;
@@ -89,7 +91,7 @@ namespace examples { namespace stubs
         /// Query the current value of the accumulator.
         ///
         /// \note This function is fully synchronous.
-        static boost::uint64_t query_sync(hpx::naming::id_type const& gid)
+        static argument_type query_sync(hpx::naming::id_type const& gid)
         {
             // The following get yields control while the action is executed.
             return query_async(gid).get();

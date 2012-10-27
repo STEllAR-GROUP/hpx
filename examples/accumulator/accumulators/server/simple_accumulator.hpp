@@ -48,6 +48,8 @@ namespace examples { namespace server
             hpx::components::simple_component_base<simple_accumulator> >
     {
     public:
+        typedef boost::int64_t argument_type;
+
         simple_accumulator() : value_(0) {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -61,14 +63,14 @@ namespace examples { namespace server
         }
 
         /// Add the given number to the accumulator.
-        void add(boost::uint64_t arg)
+        void add(argument_type arg)
         {
             // Atomically add value_ to arg, and store the result in value_.
             value_ += arg;
         }
 
         /// Return the current value to the caller.
-        boost::uint64_t query() const
+        argument_type query() const
         {
             // Get the value of value_.
             return value_;
@@ -84,7 +86,7 @@ namespace examples { namespace server
         HPX_DEFINE_COMPONENT_CONST_ACTION(simple_accumulator, query);
 
     private:
-        boost::uint64_t value_;
+        argument_type value_;
     };
 }}
 

@@ -19,6 +19,8 @@ namespace examples { namespace stubs
     struct simple_accumulator
       : hpx::components::stub_base<server::simple_accumulator>
     {
+        typedef server::simple_accumulator::argument_type argument_type;
+
         ///////////////////////////////////////////////////////////////////////
         /// Reset the accumulator's value to 0.
         ///
@@ -47,7 +49,7 @@ namespace examples { namespace stubs
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         static void
-        add_non_blocking(hpx::naming::id_type const& gid, boost::uint64_t arg)
+        add_non_blocking(hpx::naming::id_type const& gid, argument_type arg)
         {
             typedef server::simple_accumulator::add_action action_type;
             hpx::apply<action_type>(gid, arg);
@@ -57,7 +59,7 @@ namespace examples { namespace stubs
         ///
         /// \note This function is fully synchronous.
         static void
-        add_sync(hpx::naming::id_type const& gid, boost::uint64_t arg)
+        add_sync(hpx::naming::id_type const& gid, argument_type arg)
         {
             typedef server::simple_accumulator::add_action action_type;
             hpx::async<action_type>(gid, arg).get();
@@ -71,7 +73,7 @@ namespace examples { namespace stubs
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
-        static hpx::lcos::future<boost::uint64_t>
+        static hpx::lcos::future<argument_type>
         query_async(hpx::naming::id_type const& gid)
         {
             typedef server::simple_accumulator::query_action action_type;
@@ -81,7 +83,7 @@ namespace examples { namespace stubs
         /// Query the current value of the accumulator.
         ///
         /// \note This function is fully synchronous.
-        static boost::uint64_t query_sync(hpx::naming::id_type const& gid)
+        static argument_type query_sync(hpx::naming::id_type const& gid)
         {
             // The following get yields control while the action is executed.
             return query_async(gid).get();

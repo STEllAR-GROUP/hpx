@@ -184,8 +184,8 @@ namespace hpx
         };
 
         /// \ cond NODETAIL
-        ///   Please note that if you change the value of threads::terminated 
-        ///   above, you will need to adjust do_call(dummy<1> = 1) in 
+        ///   Please note that if you change the value of threads::terminated
+        ///   above, you will need to adjust do_call(dummy<1> = 1) in
         ///   util/coroutine /detail/coroutine_impl.hpp as well.
         /// \ endcond
 
@@ -223,7 +223,7 @@ namespace hpx
         /// \enum thread_stacksize
         enum thread_stacksize
         {
-            thread_stacksize_small = 1,         ///< use small stack size 
+            thread_stacksize_small = 1,         ///< use small stack size
             thread_stacksize_medium = 2,        ///< use medium sized stack size
             thread_stacksize_large = 3,         ///< use large stack size
             thread_stacksize_huge = 4,          ///< use very large stack size
@@ -276,7 +276,7 @@ namespace hpx
         /// current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
-        /// \note This function will return a meaningful value only if the  
+        /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         ///       being defined.
         HPX_API_EXPORT thread_id_type get_parent_id();
@@ -285,7 +285,7 @@ namespace hpx
         /// current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
-        /// \note This function will return a meaningful value only if the  
+        /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         ///       being defined.
         HPX_API_EXPORT std::size_t get_parent_phase();
@@ -294,7 +294,7 @@ namespace hpx
         /// the current's thread parent (or zero if the current thread is not a
         /// PX thread).
         ///
-        /// \note This function will return a meaningful value only if the  
+        /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         ///       being defined.
         HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
@@ -302,7 +302,7 @@ namespace hpx
         /// The function \a get_self_component_id returns the lva of the
         /// component the current thread is acting on
         ///
-        /// \note This function will return a meaningful value only if the  
+        /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         ///       being defined.
         HPX_API_EXPORT boost::uint64_t get_self_component_id();
@@ -428,19 +428,19 @@ namespace hpx
             component_invalid = -1,
 
             // Runtime support component (provides system services such as
-            // component creation, etc). One per locality. 
-            component_runtime_support = 0,  
+            // component creation, etc). One per locality.
+            component_runtime_support = 0,
 
             // Pseudo-component for direct access to local virtual memory.
             component_memory = 1,
 
-            // Generic memory blocks. 
+            // Generic memory blocks.
             component_memory_block = 2,
 
             // Base component for LCOs that do not produce a value.
-            component_base_lco = 3,         
+            component_base_lco = 3,
 
-            // Base component for LCOs that do produce values. 
+            // Base component for LCOs that do produce values.
             component_base_lco_with_value = 4,
 
             // Synchronization barrier LCO.
@@ -910,9 +910,9 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the name of the calling thread.
-    /// 
+    ///
     /// This function returns the name of the calling thread. This name uniquely
-    /// identifies the thread in the context of HPX. If the function is called 
+    /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, it will return zero.
     HPX_API_EXPORT std::string const* get_thread_name();
 }

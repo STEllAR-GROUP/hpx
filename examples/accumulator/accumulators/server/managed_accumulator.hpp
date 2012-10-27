@@ -9,9 +9,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-
-#include <boost/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server
@@ -26,6 +25,12 @@ namespace examples { namespace server
     ///     * Exposes methods that can be called asynchronously and/or remotely.
     ///       These constructs are known as HPX actions.
     ///
+    /// By deriving this component from \a locking_hook the runtime system 
+    /// ensures that all action invocations are serialized. That means that 
+    /// the system ensures that no two actions are invoked at the same time on
+    /// a given component instance. This makes the component thread safe and no
+    /// additional locking has to be implemented by the user.
+    ///
     /// Components are first-class objects in HPX. This means that they are
     /// globally addressable; all components have a unique GID.
     ///
@@ -38,10 +43,14 @@ namespace examples { namespace server
     /// This component exposes 3 different actions: reset, add and query.
     //[managed_accumulator_server_inherit
     class managed_accumulator
-      : public hpx::components::managed_component_base<managed_accumulator>
+      : public hpx::components::locking_hook<
+            hpx::components::managed_component_base<managed_accumulator> 
+        >
     //]
     {
     public:
+        typedef boost::int64_t argument_type;
+
         //[managed_accumulator_server_ctor
         managed_accumulator() : value_(0) {}
         //]
@@ -54,21 +63,21 @@ namespace examples { namespace server
         void reset()
         {
             // Atomically set value_ to 0.
-            value_.store(0);
+            value_= 0;
         }
 
         /// Add the given number to the accumulator.
-        void add(boost::uint64_t arg)
+        void add(argument_type arg)
         {
             // Atomically add value_ to arg, and store the result in value_.
-            value_.fetch_add(arg);
+            value_ += arg;
         }
 
         /// Return the current value to the caller.
-        boost::uint64_t query() const
+        argument_type query() const
         {
             // Get the value of value_.
-            return value_.load();
+            return value_;
         }
         //]
 
@@ -85,7 +94,7 @@ namespace examples { namespace server
 
     //[managed_accumulator_server_data_member
     private:
-        boost::atomic<boost::uint64_t> value_;
+        argument_type value_;
     //]
     };
 }}

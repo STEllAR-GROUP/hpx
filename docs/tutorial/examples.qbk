@@ -439,9 +439,15 @@ base class. There are currently two component base classes:
   if you are creating a small number (e.g. only a handful per machine) of
   component instances.
 
-The managed_accumulator component is a managed component, because it inherits
-from [classref hpx::components::managed_component_base]`<>`, as we can see in the following
-snippet:
+The managed_accumulator component inherits from [classref hpx::components::locking_hock]`<>`.
+This allows the runtime system to ensure that all action invocations are 
+serialized. That means that the system ensures that no two actions are invoked 
+at the same time on a given component instance. This makes the component thread 
+safe and no additional locking has to be implemented by the user. Moreover,
+managed_accumulator component is a managed component, because it also inherits
+from [classref hpx::components::managed_component_base]`<>` (the template 
+argument passed to locking_hook is used as its base class). The following 
+snippet shows the corresponding code:
 
 [import ../../examples/accumulator/accumulators/server/managed_accumulator.hpp]
 [managed_accumulator_server_inherit]
