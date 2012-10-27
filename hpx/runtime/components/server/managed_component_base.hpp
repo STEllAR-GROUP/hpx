@@ -201,13 +201,12 @@ namespace hpx { namespace components
     class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
     {
-    private:
+    public:
         typedef typename boost::mpl::if_<
             boost::is_same<Component, detail::this_type>,
             managed_component_base, Component
         >::type this_component_type;
 
-    public:
         typedef this_component_type wrapped_type;
 
         typedef void has_managed_component_base;
