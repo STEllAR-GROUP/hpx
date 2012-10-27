@@ -33,9 +33,12 @@ namespace hpx { namespace util { namespace detail
         {
         }
 
-        template <typename FF>
-        explicit protected_bind(BOOST_FWD_REF(FF) f)
-          : f_(boost::forward<FF>(f))
+        explicit protected_bind(F const & f)
+          : f_(f)
+        {}
+
+        explicit protected_bind(BOOST_FWD_REF(F) f)
+          : f_(boost::move(f))
         {}
 
         protected_bind& operator=(BOOST_COPY_ASSIGN_REF(protected_bind) rhs)

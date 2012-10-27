@@ -44,6 +44,7 @@ namespace hpx { namespace util { namespace coroutines
             T* fun = reinterpret_cast<T*>(pv);
             BOOST_ASSERT(fun);
             (*fun)();
+            std::abort();
         }
 
         class fcontext_context_impl
@@ -65,6 +66,7 @@ namespace hpx { namespace util { namespace coroutines
                 std::size_t stack_size_
                     = (stack_size == -1) ? 
                       alloc_.minimum_stacksize() : std::size_t(stack_size);
+
                 void * stack_pointer_
                     = alloc_.allocate(stack_size_);
 
@@ -77,10 +79,11 @@ namespace hpx { namespace util { namespace coroutines
 
             ~fcontext_context_impl()
             {
-                if (ctx_.fc_stack.size) 
+                if (ctx_.fc_stack.sp) 
                 {
                     alloc_.deallocate(ctx_.fc_stack.sp, ctx_.fc_stack.size);
                     ctx_.fc_stack.size = 0;
+                    ctx_.fc_stack.sp = 0;
                 }
             }
 
@@ -96,7 +99,9 @@ namespace hpx { namespace util { namespace coroutines
             static void thread_shutdown() {}
 
             // handle stack operations
-            void reset_stack() {}
+            void reset_stack()
+            {
+            }
             void rebind_stack() 
             {
                 if (ctx_.fc_stack.sp) 

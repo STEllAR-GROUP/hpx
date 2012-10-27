@@ -238,7 +238,11 @@ namespace hpx { namespace util {
                 return *this;
             }
 
-            bound_functor0(BOOST_FWD_REF(F) f_)
+            bound_functor0(BOOST_RV_REF(F) f_)
+                : f(boost::move(f_))
+            {}
+
+            bound_functor0(F const & f_)
                 : f(f_)
             {}
 
@@ -780,12 +784,21 @@ namespace hpx { namespace util {
 
             typedef typename F::result_type result_type;
 
-            template <typename FF, BOOST_PP_ENUM_PARAMS(N, typename A)>
+            template <BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(bound_functor, N)(
-                BOOST_FWD_REF(FF) f_
+                BOOST_RV_REF(F) f_
               , HPX_ENUM_FWD_ARGS(N, A, a)
             )
-                : f(boost::forward<FF>(f_))
+                : f(boost::move(f_))
+                , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MEMBER, _)
+            {}
+
+            template <BOOST_PP_ENUM_PARAMS(N, typename A)>
+            BOOST_PP_CAT(bound_functor, N)(
+                F const & f_
+              , HPX_ENUM_FWD_ARGS(N, A, a)
+            )
+                : f(f_)
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MEMBER, _)
             {}
 

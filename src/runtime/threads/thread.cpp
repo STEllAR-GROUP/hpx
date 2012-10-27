@@ -157,9 +157,11 @@ namespace hpx
             return;
         }
 
-        mutex_type::scoped_lock l(mtx_);
-        if (id_ == uninitialized)
-            id_ = ident;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (id_ == uninitialized)
+                id_ = ident;
+        }
     }
 
     static void resume_thread(threads::thread_id_type id)
