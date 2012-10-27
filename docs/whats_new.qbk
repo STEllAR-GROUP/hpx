@@ -12,8 +12,12 @@
 
 [heading Bug Fixes (Closed Tickets)]
 
-Here is a list of the important tickets we closed for this release:
+Here is a list of the important tickets we closed for this release. This is by
+far the longest list of newly implemented features and fixed issues for any of
+HPX' releases so far.
 
+* #587 - Add get_num_localities and get_num_threads to AGAS API
+* #586 - Adjust local AGAS cache size based on number of localities
 * #584 - counting argument size of actions, initial pass.
 * #581 - Remove `RemoteResult` template parameter for `future<>`
 * #580 - Add possibility to hook into actions
@@ -21,7 +25,7 @@ Here is a list of the important tickets we closed for this release:
 * #576 - Exception incorrectly thrown when --help is used
 * #575 - HPX(bad_component_type) with gcc 4.7.2 and boost 1.51
 * #574 - `--hpx:connect` command line parameter not working correctly
-* #571 - `hpx::wait()` (callback version) should pass the future to the callback 
+* #571 - `hpx::wait()` (callback version) should pass the future to the callback
          function
 * #570 - `hpx::wait` should operate on `boost::arrays` and `std::lists`
 * #569 - Add a logging sink for Android
