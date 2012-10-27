@@ -200,11 +200,6 @@ namespace detail
           , counter_target_count
           , primary_ns_localities
           , primary_ns_statistics_counter }
-      , {   "count/num_localities"
-          , ""
-          , counter_target_count
-          , primary_ns_num_localities
-          , primary_ns_statistics_counter }
       , {   "count/num_threads"
           , ""
           , counter_target_count
@@ -255,11 +250,6 @@ namespace detail
           , "ns"
           , counter_target_time
           , primary_ns_localities
-          , primary_ns_statistics_counter }
-      , {   "time/num_localities"
-          , "ns"
-          , counter_target_time
-          , primary_ns_num_localities
           , primary_ns_statistics_counter }
       , {   "time/num_threads"
           , "ns"
