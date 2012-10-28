@@ -95,6 +95,11 @@ namespace hpx
     /// \namespace parcelset
     namespace parcelset
     {
+        enum connection_type
+        {
+            connection_tcpip = 1
+        };
+
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
         class parcelport_connection;

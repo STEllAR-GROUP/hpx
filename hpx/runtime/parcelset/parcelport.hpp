@@ -37,15 +37,14 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
+namespace hpx { namespace agas 
+{
+    // forward declaration only
+    struct HPX_EXPORT big_boot_barrier;
+}}
 
-namespace agas {
-
-struct HPX_EXPORT big_boot_barrier;
-
-}
-
-namespace parcelset
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parcelset
 {
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
@@ -152,7 +151,7 @@ namespace parcelset
             return io_service_pool_;
         }
 
-        util::connection_cache<parcelport_connection,naming::locality>&
+        util::connection_cache<parcelport_connection, naming::locality>&
             get_connection_cache()
         {
             return connection_cache_;
@@ -256,6 +255,11 @@ namespace parcelset
             parcels_received_.add_data(data);
         }
 
+        connection_type get_type() const
+        {
+            return connection_tcpip;
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -293,14 +297,12 @@ namespace parcelset
         mutable util::spinlock mtx_;
 
         /// The cache for pending parcels
-        typedef
-            std::map<
-                naming::locality
-              , std::pair<
-                    std::vector<parcel>
-                  , std::vector<write_handler_type>
-                >
-            > pending_parcels_map;
+        typedef std::map<
+            naming::locality,
+            std::pair<
+                std::vector<parcel>, std::vector<write_handler_type> 
+            >
+        > pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
         /// The local locality

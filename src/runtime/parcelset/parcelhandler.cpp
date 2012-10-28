@@ -92,14 +92,14 @@ namespace hpx { namespace parcelset
             // create a new thread which decodes and handles the parcel
             threads::thread_init_data data(
                 boost::bind(&parcelhandler::decode_parcel, this,
-                    parcel_data, receive_data),
+                    boost::ref(pp), parcel_data, receive_data),
                 "decode_parcel", 0, priority);
             tm_->register_thread(data);
         }
     }
 
     threads::thread_state_enum parcelhandler::decode_parcel(
-        boost::shared_ptr<std::vector<char> > parcel_data,
+        parcelport& pp, boost::shared_ptr<std::vector<char> > parcel_data,
         performance_counters::parcels::data_point receive_data)
     {
         // protect from un-handled exceptions bubbling up into thread manager
@@ -146,7 +146,7 @@ namespace hpx { namespace parcelset
                 receive_data.serialization_time_ = timer.elapsed_nanoseconds() -
                     overall_add_parcel_time;
 
-                pp_.add_received_data(receive_data);
+                pp.add_received_data(receive_data);
             }
             catch (hpx::exception const& e) {
                 LPT_(error)
@@ -187,7 +187,6 @@ namespace hpx { namespace parcelset
             parcelport& pp, threads::threadmanager_base* tm,
             parcelhandler_queue_base* policy)
       : resolver_(resolver)
-      , pp_(pp)
       , tm_(tm)
       , parcels_(policy)
     {
@@ -199,9 +198,36 @@ namespace hpx { namespace parcelset
 
         parcels_->set_parcelhandler(this);
 
+        attach_parcelport(pp);
+    }
+
+    // find and return the specified parcelport
+    parcelport* parcelhandler::find_parcelport(connection_type type,
+        error_code& ec) const
+    {
+        std::map<connection_type, parcelport*>::const_iterator it = 
+            pports_.find(type);
+        if (it == pports_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport", 
+                "unknown parcel port")
+            return 0;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return (*it).second;
+    }
+
+    void parcelhandler::attach_parcelport(parcelport& pp)
+    {
         // register our callback function with the parcelport
-        pp_.register_event_handler(
-            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3, _4));
+        pp.register_event_handler(
+            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3, _4)
+        );
+
+        // add the new parcelport to the list of parcelports we care about
+        pports_.insert(std::make_pair(pp.get_type(), &pp));
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
@@ -255,41 +281,43 @@ namespace hpx { namespace parcelset
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
 
-        pp_.put_parcel(p, f);
+        find_parcelport(connection_tcpip)->put_parcel(p, f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::register_counter_types()
+    void parcelhandler::register_counter_types(connection_type pp_type)
     {
+        parcelport* pp = find_parcelport(pp_type);
+
         HPX_STD_FUNCTION<boost::int64_t()> num_parcel_sends(
-            boost::bind(&parcelport::get_parcel_send_count, &pp_));
+            boost::bind(&parcelport::get_parcel_send_count, pp));
         HPX_STD_FUNCTION<boost::int64_t()> num_parcel_receives(
-            boost::bind(&parcelport::get_parcel_receive_count, &pp_));
+            boost::bind(&parcelport::get_parcel_receive_count, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> num_message_sends(
-            boost::bind(&parcelport::get_message_send_count, &pp_));
+            boost::bind(&parcelport::get_message_send_count, pp));
         HPX_STD_FUNCTION<boost::int64_t()> num_message_receives(
-            boost::bind(&parcelport::get_message_receive_count, &pp_));
+            boost::bind(&parcelport::get_message_receive_count, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> sending_time(
-            boost::bind(&parcelport::get_sending_time, &pp_));
+            boost::bind(&parcelport::get_sending_time, pp));
         HPX_STD_FUNCTION<boost::int64_t()> receiving_time(
-            boost::bind(&parcelport::get_receiving_time, &pp_));
+            boost::bind(&parcelport::get_receiving_time, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> sending_serialization_time(
-            boost::bind(&parcelport::get_sending_serialization_time, &pp_));
+            boost::bind(&parcelport::get_sending_serialization_time, pp));
         HPX_STD_FUNCTION<boost::int64_t()> receiving_serialization_time(
-            boost::bind(&parcelport::get_receiving_serialization_time, &pp_));
+            boost::bind(&parcelport::get_receiving_serialization_time, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> data_sent(
-            boost::bind(&parcelport::get_data_sent, &pp_));
+            boost::bind(&parcelport::get_data_sent, pp));
         HPX_STD_FUNCTION<boost::int64_t()> data_received(
-            boost::bind(&parcelport::get_data_received, &pp_));
+            boost::bind(&parcelport::get_data_received, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> data_argument_sent(
-            boost::bind(&parcelport::get_total_argument_sent, &pp_));
+            boost::bind(&parcelport::get_total_argument_sent, pp));
         HPX_STD_FUNCTION<boost::int64_t()> data_argument_received(
-            boost::bind(&parcelport::get_total_argument_received, &pp_));
+            boost::bind(&parcelport::get_total_argument_received, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> incoming_queue_length(
             boost::bind(&parcelhandler::get_incoming_queue_length, this));

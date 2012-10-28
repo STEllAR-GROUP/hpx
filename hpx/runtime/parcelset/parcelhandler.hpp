@@ -23,6 +23,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include <map>
+
 namespace hpx { namespace parcelset
 {
     /// The \a parcelhandler is the representation of the parcelset inside a
@@ -40,7 +42,7 @@ namespace hpx { namespace parcelset
             performance_counters::parcels::data_point const& receive_data);
 
         threads::thread_state_enum decode_parcel(
-            boost::shared_ptr<std::vector<char> > parcel_data,
+            parcelport& pp, boost::shared_ptr<std::vector<char> > parcel_data,
             performance_counters::parcels::data_point receive_data);
 
         // make sure the parcel has been properly initialized
@@ -53,6 +55,10 @@ namespace hpx { namespace parcelset
             // set the current local time for this locality
             p.set_start_time(get_current_time());
         }
+
+        // find and return the specified parcelport
+        parcelport* find_parcelport(connection_type type,
+            error_code& ec = throws) const;
 
     public:
         typedef parcelport::read_handler_type read_handler_type;
@@ -76,6 +82,9 @@ namespace hpx { namespace parcelset
         {
         }
 
+        /// \brief Attach the given parcel port to this handler
+        void attach_parcelport(parcelport& pp);
+
         /// \brief Allow access to AGAS resolver instance.
         ///
         /// This accessor returns a reference to the AGAS resolver client
@@ -92,7 +101,7 @@ namespace hpx { namespace parcelset
         /// parcelhandler has been initialized with.
         parcelport& get_parcelport()
         {
-            return pp_;
+            return *find_parcelport(connection_tcpip);
         }
 
         /// Return the locality_id of this locality
@@ -304,13 +313,13 @@ namespace hpx { namespace parcelset
         /// this parcelhandler is associated with.
         naming::locality const& here() const
         {
-            return pp_.here();
+            return find_parcelport(connection_tcpip)->here();
         }
 
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
         /// parcel-handler instance.
-        void register_counter_types();
+        void register_counter_types(connection_type pp_type = connection_tcpip);
 
     protected:
         std::size_t get_incoming_queue_length() const
@@ -320,7 +329,7 @@ namespace hpx { namespace parcelset
 
         std::size_t get_outgoing_queue_length() const
         {
-            return pp_.get_pending_parcels_count();
+            return find_parcelport(connection_tcpip)->get_pending_parcels_count();
         }
 
     private:
@@ -331,7 +340,7 @@ namespace hpx { namespace parcelset
         naming::gid_type locality_;
 
         /// the parcelport this handler is associated with
-        parcelport& pp_;
+        std::map<connection_type, parcelport*> pports_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
