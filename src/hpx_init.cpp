@@ -85,15 +85,29 @@ namespace hpx { namespace detail
     }
 
     // List the names of all registered performance counters.
-    void list_counter_names()
+    void list_counter_names_header(bool skeleton)
     {
         // print header
         print("List of available counter instances");
-        print("(replace <*> below with the appropriate sequence number)");
+        if (skeleton)
+            print("(replace '*' below with the appropriate sequence number)");
         print(std::string(78, '-'));
+    }
 
+    void list_counter_names_minimal()
+    {
         // list all counter names
-        performance_counters::discover_counter_types(&list_counter);
+        list_counter_names_header(true);
+        performance_counters::discover_counter_types(&list_counter,
+            performance_counters::discover_counters_minimal);
+    }
+
+    void list_counter_names_full()
+    {
+        // list all counter names
+        list_counter_names_header(false);
+        performance_counters::discover_counter_types(&list_counter, 
+            performance_counters::discover_counters_full);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -126,14 +140,29 @@ namespace hpx { namespace detail
     }
 
     // List the names of all registered performance counters.
-    void list_counter_infos()
+    void list_counter_infos_header(bool skeleton)
     {
         // print header
         print("Information about available counter instances");
-        print("(replace <*> below with the appropriate sequence number)");
+        if (skeleton)
+            print("(replace '*' below with the appropriate sequence number)");
+        print(std::string(78, '-'));
+    }
 
+    void list_counter_infos_minimal()
+    {
         // list all counter information
-        performance_counters::discover_counter_types(&list_counter_info);
+        list_counter_infos_header(true);
+        performance_counters::discover_counter_types(&list_counter_info,
+            performance_counters::discover_counters_minimal);
+    }
+
+    void list_counter_infos_full()
+    {
+        // list all counter information
+        list_counter_infos_header(false);
+        performance_counters::discover_counter_types(&list_counter_info,
+            performance_counters::discover_counters_full);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -226,11 +255,33 @@ namespace hpx
         {
             if (vm.count("hpx:list-counters")) {
                 // Print the names of all registered performance counters.
-                rt.add_startup_function(&list_counter_names);
+                std::string option(vm["hpx:list-counters"].as<std::string>());
+                if (0 == std::string("minimal").find(option))
+                    rt.add_startup_function(&list_counter_names_minimal);
+                else if (0 == std::string("full").find(option))
+                    rt.add_startup_function(&list_counter_names_full);
+                else {
+                    std::string msg ("Invalid command line option value"
+                        "for --hpx:list-counters: ");
+                    msg += option;
+                    msg += ", allowed values are 'minimal' and 'full'";
+                    throw std::logic_error(msg.c_str());
+                }
             }
             if (vm.count("hpx:list-counter-infos")) {
                 // Print info about all registered performance counters.
-                rt.add_startup_function(&list_counter_infos);
+                std::string option(vm["hpx:list-counters"].as<std::string>());
+                if (0 == std::string("minimal").find(option))
+                    rt.add_startup_function(&list_counter_infos_minimal);
+                else if (0 == std::string("full").find(option))
+                    rt.add_startup_function(&list_counter_infos_full);
+                else {
+                    std::string msg ("Invalid command line option value"
+                        "for --hpx:list-counter-infos: ");
+                    msg += option;
+                    msg += ", allowed values are 'minimal' and 'full'";
+                    throw std::logic_error(msg.c_str());
+                }
             }
             if (vm.count("hpx:list-symbolic-names")) {
                 // Print all registered symbolic names.

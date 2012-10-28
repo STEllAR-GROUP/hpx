@@ -22,7 +22,8 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It will pass the \a counter_info and the
     /// \a error_code to the supplied function.
     bool default_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counters_mode mode, error_code& ec)
     {
         return f(info, ec);
     }
@@ -34,7 +35,8 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     bool locality_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
 
@@ -44,26 +46,32 @@ namespace hpx { namespace performance_counters
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality#<*>";
-        p.parentinstanceindex_ = -1;
-        p.instancename_ = "total";
-        p.instanceindex_ = -1;
+        if (mode == discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
 
-        status = get_counter_name(p, i.fullname_, ec);
-        if (!status_is_valid(status) || !f(i, ec) || ec)
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
             return false;
-
-//         boost::uint32_t last_locality = get_num_localities();
-//         for (boost::uint32_t l = 0; l < last_locality; ++l)
-//         {
-//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-//             status = get_counter_name(p, i.fullname_, ec);
-//             if (!status_is_valid(status) || !f(i, ec) || ec)
-//                 return false;
-//         }
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
+
         return true;
     }
 
@@ -74,7 +82,8 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/thread#<threadnum>}/<instancename>
     ///
     bool locality_thread_counter_discoverer(counter_info const& info,
-        HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
 
@@ -84,45 +93,39 @@ namespace hpx { namespace performance_counters
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality#<*>";
-        p.parentinstanceindex_ = -1;
-        p.instancename_ = "total";
-        p.instanceindex_ = -1;
+        if (mode == discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
 
-        status = get_counter_name(p, i.fullname_, ec);
-        if (!status_is_valid(status) || !f(i, ec) || ec)
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+
+            p.instancename_ = "worker-thread#*";
+            p.instanceindex_ = -1;
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
             return false;
-
-        p.instancename_ = "worker-thread#<*>";
-        p.instanceindex_ = -1;
-
-        status = get_counter_name(p, i.fullname_, ec);
-        if (!status_is_valid(status) || !f(i, ec) || ec)
-            return false;
-
-//         boost::uint32_t last_locality = get_num_localities();
-//         std::size_t num_threads = get_os_thread_count();
-//         for (boost::uint32_t l = 0; l <= last_locality; ++l)
-//         {
-//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-//             p.instancename_ = "total";
-//             p.instanceindex_ = -1;
-//             status = get_counter_name(p, i.fullname_, ec);
-//             if (!status_is_valid(status) || !f(i, ec) || ec)
-//                 return false;
-//
-//             for (std::size_t t = 0; t < num_threads; ++t)
-//             {
-//                 p.instancename_ = "worker-thread";
-//                 p.instanceindex_ = static_cast<boost::int32_t>(t);
-//                 status = get_counter_name(p, i.fullname_, ec);
-//                 if (!status_is_valid(status) || !f(i, ec) || ec)
-//                     return false;
-//             }
-//         }
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
+
         return true;
     }
 

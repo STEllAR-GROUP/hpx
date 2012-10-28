@@ -876,7 +876,8 @@ described in the table below:
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*__hpx__ options (allowed on command line only)]]]
-    [[`--hpx:help`, `--help` or `-h`]       [print out program usage]]
+    [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible 
+                                             values: 'full' (additionally prints options from components)]]
     [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
     [[`--hpx:options-file arg`]             [specify a file containing command line options
                                              (alternatively: @filepath)]]
@@ -956,8 +957,12 @@ described in the table below:
                                  (default: 0, which means print once at shutdown)]]
     [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
                                  to the given file (default: console)]]
-    [[`--hpx:list-counters`]    [list the names of all registered performance counters]]
-    [[`--hpx:list-counter-infos`][list the description of all registered performance counters]]
+    [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible 
+                                 values: 'minimal' (prints counter name skeletons), 
+                                 'full' (prints all available counter names)]]
+    [[`--hpx:list-counter-infos`][list the description of all registered performance counters, 
+                                   possible values: 'minimal' (prints info for counter name skeletons), 
+                                  'full' (prints all available counter infos)]]
 ]
 
 Additionally, every __hpx__ application defines certain shortcuts allowing to

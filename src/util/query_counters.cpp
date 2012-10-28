@@ -34,46 +34,71 @@ namespace hpx { namespace util
             performance_counters::ensure_counter_prefix(name);
     }
 
+    bool query_counters::find_counter(
+        performance_counters::counter_info const& info, error_code& ec)
+    {
+        naming::id_type id = performance_counters::get_counter(info.fullname_, ec);
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "query_counters::find_counter",
+                boost::str(boost::format(
+                    "unknown performance counter: '%1%' (%2%)") %
+                    info.fullname_ % ec.get_message()));
+            return false;
+        }
+
+        names_.push_back(info.fullname_);
+        ids_.push_back(id);
+
+//         using performance_counters::stubs::performance_counter;
+//         performance_counters::counter_info info =
+//             performance_counter::get_info(id);
+
+        uoms_.push_back(info.unit_of_measure_);
+        return true;
+    }
+
     void query_counters::find_counters()
     {
         mutex_type::scoped_lock l(mtx_);
+
+        std::vector<std::string> names;
+        std::swap(names, names_);
+
+        names_.reserve(names.size());
         if (ids_.empty())
         {
             // do INI expansion on all counter names
-            for (std::size_t i = 0; i < names_.size(); ++i)
-                util::expand(names_[i]);
+            for (std::size_t i = 0; i < names.size(); ++i)
+                util::expand(names[i]);
 
-            ids_.reserve(names_.size());
-            BOOST_FOREACH(std::string const& name, names_)
+            error_code ec(lightweight);
+
+            using HPX_STD_PLACEHOLDERS::_1;
+            using HPX_STD_PLACEHOLDERS::_2;
+
+            HPX_STD_FUNCTION<performance_counters::discover_counter_func> func(
+                HPX_STD_BIND(&query_counters::find_counter, this, _1, boost::ref(ec)));
+
+            ids_.reserve(names.size());
+            uoms_.reserve(names.size());
+            BOOST_FOREACH(std::string const& name, names)
             {
-                error_code ec(lightweight);
-                naming::id_type id =
-                    performance_counters::get_counter(name, ec);
-                if (HPX_UNLIKELY(!id))
-                {
-                    HPX_THROW_EXCEPTION(bad_parameter,
-                        "query_counters::find_counters",
-                        boost::str(boost::format(
-                            "unknown performance counter: '%1%' (%2%)") %
-                            name % ec.get_message()))
-                }
-
-                ids_.push_back(id);
-
-                using performance_counters::stubs::performance_counter;
-                performance_counters::counter_info info =
-                    performance_counter::get_info(id);
-                uoms_.push_back(info.unit_of_measure_);
+                performance_counters::discover_counter_type(name, func,
+                    performance_counters::discover_counters_full);
             }
         }
+
         BOOST_ASSERT(ids_.size() == names_.size());
+        BOOST_ASSERT(ids_.size() == uoms_.size());
     }
 
     void query_counters::start()
     {
         find_counters();
 
-        for (std::size_t i = 0; i < names_.size(); ++i)
+        for (std::size_t i = 0; i < ids_.size(); ++i)
         {
             // start the performance counter
             using performance_counters::stubs::performance_counter;
@@ -136,7 +161,7 @@ namespace hpx { namespace util
         using performance_counters::stubs::performance_counter;
         std::vector<future<performance_counters::counter_value> > values;
         values.reserve(ids_.size());
-        for (std::size_t i = 0; i < names_.size(); ++i)
+        for (std::size_t i = 0; i < ids_.size(); ++i)
             values.push_back(performance_counter::get_value_async(ids_[i]));
 
         // wait for all values to be returned

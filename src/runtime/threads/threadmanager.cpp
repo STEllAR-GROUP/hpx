@@ -216,7 +216,7 @@ namespace hpx { namespace threads
                    << get_thread_state_name(initial_state) << "), "
                    << "run_now(" << (run_now ? "true" : "false")
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
-                   << "), description(" << data.description 
+                   << "), description(" << data.description
 #endif
                    << ")";
 
@@ -271,7 +271,7 @@ namespace hpx { namespace threads
                    << get_thread_state_name(initial_state) << "), thread_priority("
                    << get_thread_priority_name(data.priority)
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
-                   << "), description(" << data.description 
+                   << "), description(" << data.description
 #endif
                    << ")";
 
@@ -469,7 +469,7 @@ namespace hpx { namespace threads
         thrd->set_state(new_state);
 
         if (new_state == pending) {
-            // REVIEW: Passing a specific target thread may interfere with the 
+            // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
             scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
             do_some_work();
@@ -523,14 +523,14 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_description",
                 "NULL thread id encountered");
-            return NULL; 
+            return NULL;
         }
 
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd)
             return thrd->set_description(desc);
-        return NULL; 
+        return NULL;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -557,7 +557,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_lco_description",
                 "NULL thread id encountered");
-            return NULL; 
+            return NULL;
         }
 
         // we know that the id is actually the pointer to the thread
@@ -1093,7 +1093,7 @@ namespace hpx { namespace threads
     bool locality_allocator_counter_discoverer(
         performance_counters::counter_info const& info,
         HPX_STD_FUNCTION<performance_counters::discover_counter_func> const& f,
-        error_code& ec)
+        performance_counters::discover_counters_mode mode, error_code& ec)
     {
         performance_counters::counter_info i = info;
 
@@ -1103,37 +1103,44 @@ namespace hpx { namespace threads
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality#<*>";
-        p.parentinstanceindex_ = -1;
-        p.instancename_ = "allocator#<*>";
-        p.instanceindex_ = -1;
+        if (mode == performance_counters::discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
 
-        status = get_counter_name(p, i.fullname_, ec);
-        if (!status_is_valid(status) || !f(i, ec) || ec)
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "allocator#*";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (p.instancename_ == "allocator#*") {
+            BOOST_ASSERT(mode == performance_counters::discover_counters_full);
+
+            for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
+            {
+                p.instancename_ = "allocator";
+                p.instanceindex_ = static_cast<boost::int32_t>(t);
+                status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
+        }
+        else if (!f(i, ec) || ec) {
             return false;
-
-//         boost::uint32_t last_locality = get_locality_id();
-//         for (boost::uint32_t l = 0; l <= last_locality; ++l)
-//         {
-//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-//             p.instancename_ = "total";
-//             p.instanceindex_ = -1;
-//             status = get_counter_name(p, i.fullname_, ec);
-//             if (!status_is_valid(status) || !f(i, ec) || ec)
-//                 return false;
-//
-//             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
-//             {
-//                 p.instancename_ = "allocator";
-//                 p.instanceindex_ = static_cast<boost::int32_t>(t);
-//                 status = get_counter_name(p, i.fullname_, ec);
-//                 if (!status_is_valid(status) || !f(i, ec) || ec)
-//                     return false;
-//             }
-//         }
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
+
         return true;
     }
 

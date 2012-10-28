@@ -59,9 +59,9 @@ system and application performance.
           where:[br] `<cache_statistics>` is one of the following:
           `cache-evictions`, `cache-hits`, `cache-inserts`, `cache-misses`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the AGAS cache should
+          where:[br] `*` is the locality id of the locality the AGAS cache should
           be queried. The locality id is a (zero based) number identifying the
           locality.
         ]
@@ -79,9 +79,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `sent`, `received`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the overall number of
+          where:[br] `*` is the locality id of the locality the overall number of
           transmitted bytes should be queried for. The locality id is a (zero
           based) number identifying the locality.
         ]
@@ -94,9 +94,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `sent`, `received`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the overall number of
+          where:[br] `*` is the locality id of the locality the overall number of
           transmitted bytes should be queried for. The locality id is a (zero
           based) number identifying the locality.
         ]
@@ -109,9 +109,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `sent`, `received`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the total transmission
+          where:[br] `*` is the locality id of the locality the total transmission
           time should be queried for. The locality id is a (zero based) number
           identifying the locality.
         ]
@@ -126,9 +126,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `sent`, `received`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the number of messages
+          where:[br] `*` is the locality id of the locality the number of messages
           should be queried for. The locality id is a (zero based) number
           identifying the locality.
         ]
@@ -143,9 +143,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `sent`, `received`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the number of parcels
+          where:[br] `*` is the locality id of the locality the number of parcels
           should be queried for. The locality id is a (zero based) number
           identifying the locality.
         ]
@@ -158,9 +158,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `send`, `receive`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the parcel queue should
+          where:[br] `*` is the locality id of the locality the parcel queue should
           be queried. The locality id is a (zero based) number identifying the
           locality.
         ]
@@ -173,9 +173,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `sent`, `received`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the serialization time
+          where:[br] `*` is the locality id of the locality the serialization time
           should be queried for. The locality id is a (zero based) number
           identifying the locality.
         ]
@@ -189,18 +189,18 @@ system and application performance.
 [table Thread Manager Performance Counters
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
     [   [`/threads/count/cumulative`]
-        [`locality#<*>/total` or[br]
-         `locality#<*>/worker-thread#<*>`
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#<*>` is defining the locality for which the
+          `locality#*` is defining the locality for which the
           overall number of retired __hpx__-threads should be queried for. The
-          locality id (given by `<*>`) is a (zero based) number identifying the
+          locality id (given by `*`) is a (zero based) number identifying the
           locality
 
-          `worker-thread#<*>` is defining the worker thread for which the
+          `worker-thread#*` is defining the worker thread for which the
           overall number of retired __hpx__-threads should be queried for. The
-          worker thread number (given by the `<*>`) is a (zero based) number
+          worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
@@ -210,7 +210,7 @@ system and application performance.
          given locality since application start. If the instance name is `total`
          the counter returns the accumulated number of retired __hpx__-threads
          for all worker threads (cores) on that locality. If the instance name
-         is `worker-thread#<*>` the counter will return the overall number of
+         is `worker-thread#*` the counter will return the overall number of
          retired __hpx__-threads for the specified worker thread.]
     ]
     [   [`/threads/count/instantaneous/<thread-state>`
@@ -218,18 +218,18 @@ system and application performance.
           where:[br] `<thread-state>` is one of the following:
           `all`, `active`, `pending`, `suspended`, `terminated`
         ]
-        [`locality#<*>/total` or[br]
-         `locality#<*>/worker-thread#<*>`
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#<*>` is defining the locality for which the
+          `locality#*` is defining the locality for which the
           overall number of retired __hpx__-threads should be queried for. The
-          locality id (given by `<*>`) is a (zero based) number identifying the
+          locality id (given by `*`) is a (zero based) number identifying the
           locality
 
-          `worker-thread#<*>` is defining the worker thread for which the
+          `worker-thread#*` is defining the worker thread for which the
           overall number of retired __hpx__-threads should be queried for. The
-          worker thread number (given by the `<*>`) is a (zero based) number
+          worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
@@ -239,23 +239,23 @@ system and application performance.
          state on the given locality since application start. If the instance
          name is `total` the counter returns the current number of __hpx__-threads
          of the given state for all worker threads (cores) on that locality. If
-         the instance name is `worker-thread#<*>` the counter will return the
+         the instance name is `worker-thread#*` the counter will return the
          current number of __hpx__-threads in the given state for the specified
          worker thread.]
     ]
     [   [`/threads/idle-rate`]
-        [`locality#<*>/total` or[br]
-         `locality#<*>/worker-thread#<*>`
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#<*>` is defining the locality for which the average
+          `locality#*` is defining the locality for which the average
           idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `<*>`) is a (zero based) number identifying the
+          locality id (given by `*`) is a (zero based) number identifying the
           locality
 
-          `worker-thread#<*>` is defining the worker thread for which the
+          `worker-thread#*` is defining the worker thread for which the
           averaged idle rate should be queried for. The
-          worker thread number (given by the `<*>`) is a (zero based) number
+          worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
@@ -267,18 +267,18 @@ system and application performance.
          executing work since the application started.]
     ]
     [   [`/threadqueue/length`]
-        [`locality#<*>/total` or[br]
-         `locality#<*>/worker-thread#<*>`
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#<*>` is defining the locality for which the current length
+          `locality#*` is defining the locality for which the current length
           of all thread queues in the scheduler for all (or one) worker threads
-          should be queried for. The locality id (given by `<*>`) is a (zero
+          should be queried for. The locality id (given by `*`) is a (zero
           based) number identifying the locality
 
-          `worker-thread#<*>` is defining the worker thread for which the
+          `worker-thread#*` is defining the worker thread for which the
           current length of all thread queues in the scheduler should be
-          queried for. The worker thread number (given by the `<*>`) is a
+          queried for. The worker thread number (given by the `*`) is a
           (zero based) number identifying the worker thread. The number of
           available worker threads is usually specified on the command line
           for the application using the option [hpx_cmdline `--hpx:threads`].
@@ -290,9 +290,9 @@ system and application performance.
          executing work since the application started.]
     ]
     [   [`/threads/count/stack-unbinds`]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the unbind
+          where:[br] `*` is the locality id of the locality the unbind
           (madvise) operations should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
@@ -302,9 +302,9 @@ system and application performance.
          available on Windows based platforms.]
     ]
     [   [`/threads/count/stack-recycles`]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the unbind
+          where:[br] `*` is the locality id of the locality the unbind
           (madvise) operations should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
@@ -322,9 +322,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `constructed`, `destructed`, `read_enqueued`, `read_dequeued`, `fired`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the number of
+          where:[br] `*` is the locality id of the locality the number of
           invocations of the specified operation should be queried for (see
           `<operation>`, e.g. `constructed`, `destructed`, `read_enqueued`,
           `read_dequeued`, `fired`). The locality id is a (zero based) number
@@ -338,9 +338,9 @@ system and application performance.
           where:[br] `<operation>` is one of the following:
           `constructed`, `destructed`, `initialized`, `fired`
         ]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the number of
+          where:[br] `*` is the locality id of the locality the number of
           invocations of the specified operation should be queried for (see
           `<operation>`, e.g. `constructed`, `destructed`, `initialized`,
           `fired`). The locality id is a (zero based) number identifying the
@@ -355,9 +355,9 @@ system and application performance.
 [table General Performance Counters exposing Characteristics of Localities
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
     [   [`/runtime/count/component`]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the number of
+          where:[br] `*` is the locality id of the locality the number of
           components should be queried. The locality id is a (zero based)
           number identifying the locality.
         ]
@@ -370,9 +370,9 @@ system and application performance.
          specified type on the given locality.]
     ]
     [   [`/runtime/uptime`]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the system uptime
+          where:[br] `*` is the locality id of the locality the system uptime
           should be queried. The locality id is a (zero based) number
           identifying the locality.
         ]
@@ -382,9 +382,9 @@ system and application performance.
         ]
     ]
     [   [`/runtime/memory/vm`]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the allocated
+          where:[br] `*` is the locality id of the locality the allocated
           virtual memory should be queried. The locality id is a (zero based)
           number identifying the locality.
         ]
@@ -393,9 +393,9 @@ system and application performance.
          referenced locality (in bytes).]
     ]
     [   [`/runtime/memory/resident`]
-        [`locality#<*>/total`
+        [`locality#*/total`
 
-          where:[br] `<*>` is the locality id of the locality the the allocated
+          where:[br] `*` is the locality id of the locality the the allocated
           resident memory should be queried. The locality id is a (zero based)
           number identifying the locality.
         ]

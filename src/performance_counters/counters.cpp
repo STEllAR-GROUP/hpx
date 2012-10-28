@@ -207,10 +207,10 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     struct instance_name
     {
-        instance_name() : index_(-1), basename_(false) {}
+        instance_name() : basename_(false) {}
 
         std::string name_;
-        boost::int64_t index_;
+        std::string index_;
         bool basename_;
     };
 
@@ -232,7 +232,7 @@ namespace hpx { namespace performance_counters
 BOOST_FUSION_ADAPT_STRUCT(
     hpx::performance_counters::instance_name,
     (std::string, name_)
-    (boost::int64_t, index_)
+    (std::string, index_)
     (bool, basename_)
 )
 
@@ -254,6 +254,7 @@ namespace hpx { namespace performance_counters
 {
     ///
     ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
+    ///    /objectname{parentinstancename#*/instancename#*}/countername#parameters
     ///    /objectname{/basecounter}/countername,parameters
     ///
     namespace qi = boost::spirit::qi;
@@ -269,16 +270,28 @@ namespace hpx { namespace performance_counters
                 >> -('/' >>  +~qi::char_("#}@")) >> -('@' >> +qi::char_);
             instance = '{' >> parent >> -('/' >> child) >> '}';
             parent =
-                    &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)  // base counter
-                |  +~qi::char_("#/}") >> -('#' >> qi::uint_) >> qi::attr(false) // counter instance name
+                    &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)   // base counter
+                |  +~qi::char_("#/}")
+                    >>  (   '#' >> raw_uint     // counter parentinstance name
+                        |  -qi::string("#*")    // counter parentinstance skeleton name
+                        )
+                    >> qi::attr(false)
                 ;
-            child = +~qi::char_("#}") >> -('#' >> qi::uint_) >> qi::attr(true);
+            child =
+                   +~qi::char_("#}")
+                    >>  (   '#' >> raw_uint     // counter instance name
+                        |  -qi::string("#*")    // counter instance skeleton name
+                        )
+                    >> qi::attr(false)
+                ;
+            raw_uint = qi::raw[qi::uint_];
         }
 
         qi::rule<Iterator, path_elements()> start;
         qi::rule<Iterator, instance_elements()> instance;
         qi::rule<Iterator, instance_name()> parent;
         qi::rule<Iterator, instance_name()> child;
+        qi::rule<Iterator, std::string()> raw_uint;
     };
 
     /// \brief Fill the given \a counter_path_elements instance from the given
@@ -302,10 +315,27 @@ namespace hpx { namespace performance_counters
 
         path.objectname_ = elements.object_;
         path.countername_ = elements.counter_;
+
         path.parentinstancename_ = elements.instance_.parent_.name_;
-        path.parentinstanceindex_ = elements.instance_.parent_.index_;
+        path.parentinstanceindex_ = -1;
+        if (elements.instance_.parent_.index_ == "#*") {
+            path.parentinstancename_ += "#*";
+        }
+        else if (!elements.instance_.parent_.index_.empty()) {
+            path.parentinstanceindex_ =
+                boost::lexical_cast<boost::uint64_t>(elements.instance_.parent_.index_);
+        }
+
         path.instancename_ = elements.instance_.child_.name_;
-        path.instanceindex_ = elements.instance_.child_.index_;
+        path.instanceindex_ = -1;
+        if (elements.instance_.child_.index_ == "#*") {
+            path.instancename_ += "#*";
+        }
+        else if (!elements.instance_.child_.index_.empty()) {
+            path.instanceindex_ =
+                boost::lexical_cast<boost::uint64_t>(elements.instance_.child_.index_);
+        }
+
         path.parameters_ = elements.parameters_;
         path.parentinstance_is_basename_ = elements.instance_.parent_.basename_;
 
@@ -434,6 +464,7 @@ namespace hpx { namespace performance_counters
         HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
         error_code& ec)
     {
+        runtime* rt = get_runtime_ptr();
         return get_runtime().get_counter_registry().add_counter_type(
             info, create_counter, discover_counters, ec);
     }
@@ -442,12 +473,35 @@ namespace hpx { namespace performance_counters
     /// \brief Call the supplied function for each registered counter type
     counter_status discover_counter_types(
         HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
-        error_code& ec)
+        discover_counters_mode mode, error_code& ec)
     {
-        return get_runtime().get_counter_registry().discover_counter_types(
-            discover_counter, ec);
+        runtime* rt = get_runtime_ptr();
+        return rt ? rt->get_counter_registry().discover_counter_types(
+            discover_counter, mode, ec) : status_generic_error;
     }
 
+    /// \brief Call the supplied function for the given registered counter type.
+    counter_status discover_counter_type(
+        counter_info const& info,
+        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counters_mode mode, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        return rt ? rt->get_counter_registry().discover_counter_type(
+            info, discover_counter, mode, ec) : status_generic_error;
+    }
+
+    counter_status discover_counter_type(
+        std::string const& name,
+        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counters_mode mode, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        return rt ? rt->get_counter_registry().discover_counter_type(
+            name, discover_counter, mode, ec) : status_generic_error;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     counter_status remove_counter_type(counter_info const& info, error_code& ec)
     {
         // the runtime might not be available any more
@@ -567,6 +621,80 @@ namespace hpx { namespace performance_counters
 
             return gid;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        bool expand_counter_info_threads(
+            counter_info& i, counter_path_elements& p,
+            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        {
+            std::size_t num_threads = get_os_thread_count();
+            for (std::size_t l = 0; l < num_threads; ++l)
+            {
+                p.instanceindex_ = static_cast<boost::int64_t>(l);
+                counter_status status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
+            return true;
+        }
+
+        bool expand_counter_info_localities(
+            counter_info& i, counter_path_elements& p,
+            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        {
+            bool expand_threads = false;
+            if (p.instancename_ == "worker-thread#*") {
+                p.instancename_ = "worker-thread";
+                expand_threads = true;
+            }
+
+            boost::uint32_t last_locality = get_num_localities();
+            for (boost::uint32_t l = 0; l < last_locality; ++l)
+            {
+                p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+                if (expand_threads) {
+                    if (!detail::expand_counter_info_threads(i, p, f, ec))
+                        return false;
+                }
+                else {
+                    counter_status status = get_counter_name(p, i.fullname_, ec);
+                    if (!status_is_valid(status) || !f(i, ec) || ec)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief call the supplied function will all expanded versions of the
+    /// supplied counter info.
+    bool expand_counter_info(counter_info const& info,
+        HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+    {
+        counter_info i = info;
+
+        // first expand "locality*"
+        counter_path_elements p;
+        counter_status status = get_counter_path_elements(i.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        if (p.parentinstancename_ == "locality#*")
+        {
+            p.parentinstancename_ = "locality";
+            return detail::expand_counter_info_localities(i, p, f, ec);
+        }
+
+        // now expand "worker-thread#*"
+        if (p.instancename_ == "worker-thread#*")
+        {
+            p.instancename_ = "worker-thread";
+            return detail::expand_counter_info_threads(i, p, f, ec);
+        }
+
+        // everything else is handled directly
+        return f(info, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -635,7 +763,7 @@ namespace hpx { namespace performance_counters
                 }
 
                 // attach the function which registers the id_type with AGAS
-                f.then(util::bind(&register_with_agas, util::placeholders::_1, 
+                f.then(util::bind(&register_with_agas, util::placeholders::_1,
                     complemented_info.fullname_));
 
                 return f;

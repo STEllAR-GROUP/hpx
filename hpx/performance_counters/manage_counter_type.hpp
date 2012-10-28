@@ -191,7 +191,7 @@ namespace hpx { namespace performance_counters
     ///
     /// The counter type is registered such that there can be one counter
     /// instance per locality. The expected naming scheme for the counter
-    /// instances is: \c '/objectname{locality#<*>/total}/countername' where \c <*>
+    /// instances is: \c '/objectname{locality#*/total}/countername' where \c *
     /// is a zero based integer identifying the locality the counter
     /// is created on.
     ///

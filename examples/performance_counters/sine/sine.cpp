@@ -82,7 +82,7 @@ namespace performance_counters { namespace sine
     bool explicit_sine_counter_discoverer(
         hpx::performance_counters::counter_info const& info,
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
-        hpx::error_code& ec)
+        hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
         hpx::performance_counters::counter_info i = info;
 
@@ -92,26 +92,42 @@ namespace performance_counters { namespace sine
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality#<*>";
-        p.parentinstanceindex_ = -1;
-        p.instancename_ = "instance#<*>";
-        p.instanceindex_ = -1;
+        if (mode == hpx::performance_counters::discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
 
-        status = get_counter_name(p, i.fullname_, ec);
-        if (!status_is_valid(status) || !f(i, ec) || ec)
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "instance#*";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else (p.instancename_ == "instance#*") {
+            BOOST_ASSERT(mode == hpx::performance_counters::discover_counters_full);
+
+            // FIXME: expand for all instances
+            p.instancename_ = "instance";
+            p.instanceindex_ = 0;
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
             return false;
-
-//         boost::uint32_t last_locality = hpx::get_num_localities();
-//         for (boost::uint32_t l = 0; l <= last_locality; ++l)
-//         {
-//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-//             status = get_counter_name(p, i.fullname_, ec);
-//             if (!status_is_valid(status) || !f(i, ec) || ec)
-//                 return false;
-//         }
+        }
 
         if (&ec != &hpx::throws)
             ec = hpx::make_success_code();
+
         return true;    // everything is ok
     }
 

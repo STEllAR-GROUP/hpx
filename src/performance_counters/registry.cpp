@@ -91,15 +91,63 @@ namespace hpx { namespace performance_counters
         return status_invalid_data;
     }
 
+    /// \brief Call the supplied function for the given registered counter type.
+    counter_status registry::discover_counter_type(
+        std::string const& fullname,
+        HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+        discover_counters_mode mode, error_code& ec)
+    {
+        // create canonical type name
+        std::string type_name;
+        counter_status status = get_counter_type_name(fullname, type_name, ec);
+        if (!status_is_valid(status)) return status;
+
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        if (it == countertypes_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
+                "unknown counter type");
+            return status_counter_type_unknown;
+        }
+
+        if (mode == discover_counters_full) 
+        {
+            using HPX_STD_PLACEHOLDERS::_1;
+            discover_counter = HPX_STD_BIND(&expand_counter_info, _1, 
+                discover_counter, boost::ref(ec));
+        }
+
+        counter_info info = (*it).second.info_;
+        info.fullname_ = fullname;
+
+        if (!(*it).second.discover_counters_.empty() &&
+            !(*it).second.discover_counters_(info, discover_counter, mode, ec))
+        {
+            return status_invalid_data;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return status_valid_data;
+    }
+
     /// \brief Call the supplied function for all registered counter types.
     counter_status registry::discover_counter_types(
-        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
-        error_code& ec)
+        HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+        discover_counters_mode mode, error_code& ec)
     {
+        if (mode == discover_counters_full) 
+        {
+            using HPX_STD_PLACEHOLDERS::_1;
+            discover_counter = HPX_STD_BIND(&expand_counter_info, _1, 
+                discover_counter, boost::ref(ec));
+        }
+
         BOOST_FOREACH(counter_type_map_type::value_type const& d, countertypes_)
         {
             if (!d.second.discover_counters_.empty() &&
-                !d.second.discover_counters_(d.second.info_, discover_counter, ec))
+                !d.second.discover_counters_(
+                      d.second.info_, discover_counter, mode, ec))
             {
                 return status_invalid_data;
             }
@@ -107,6 +155,7 @@ namespace hpx { namespace performance_counters
 
         if (&ec != &throws)
             ec = make_success_code();
+
         return status_valid_data;
     }
 

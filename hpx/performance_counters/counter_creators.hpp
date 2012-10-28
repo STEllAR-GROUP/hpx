@@ -22,7 +22,8 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It will pass the \a counter_info and the
     /// \a error_code to the supplied function.
     HPX_API_EXPORT bool default_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
+        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode, 
+        error_code&);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
@@ -31,7 +32,8 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
     HPX_API_EXPORT bool locality_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
+        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode, 
+        error_code&);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
@@ -40,7 +42,8 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/thread#<threadnum>)/<instancename>
     ///
     HPX_API_EXPORT bool locality_thread_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
+        HPX_STD_FUNCTION<discover_counter_func> const&, 
+        discover_counters_mode, error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Creation function for raw counters. The passed function is encapsulating
@@ -70,7 +73,8 @@ namespace hpx { namespace performance_counters
     ///   /agas(<objectinstance>/total)/<instancename>
     ///
     HPX_API_EXPORT bool agas_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
+        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode,
+        error_code&);
 }}
 
 #endif

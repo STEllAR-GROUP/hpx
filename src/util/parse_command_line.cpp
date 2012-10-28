@@ -398,10 +398,16 @@ namespace hpx { namespace util
                 ("hpx:print-counter-destination", value<std::string>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "to the given file (default: console)")
-                ("hpx:list-counters", "list the names of all registered performance "
-                  "counters")
-                ("hpx:list-counter-infos", "list the description of all registered "
-                  "performance counters")
+                ("hpx:list-counters", value<std::string>()->implicit_value("minimal"), 
+                  "list the names of all registered performance counters, "
+                  "possible values:\n"
+                  "   'minimal' (prints counter name skeletons)\n"
+                  "   'full' (prints all available counter names)")
+                ("hpx:list-counter-infos", value<std::string>()->implicit_value("minimal"), 
+                  "list the description of all registered performance counters, "
+                  "possible values:\n"
+                  "   'minimal' (prints infos for counter name skeletons)\n"
+                  "   'full' (prints all available counter infos)")
             ;
 
             // move all positional options into the hpx:positional option group

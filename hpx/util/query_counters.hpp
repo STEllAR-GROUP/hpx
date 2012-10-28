@@ -33,6 +33,8 @@ namespace hpx { namespace util
 
     protected:
         void find_counters();
+        bool find_counter(performance_counters::counter_info const& info, 
+            error_code& ec);
 
         template <typename Stream>
         void print_value(Stream& out, std::string const& name,

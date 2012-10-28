@@ -44,8 +44,21 @@ namespace hpx { namespace performance_counters
 
         /// \brief Call the supplied function for all registered counter types.
         counter_status discover_counter_types(
-            HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
-            error_code& ec = throws);
+            HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+            discover_counters_mode mode, error_code& ec = throws);
+
+        /// \brief Call the supplied function for the given registered counter type.
+        counter_status registry::discover_counter_type(
+            std::string const& fullname,
+            HPX_STD_FUNCTION<discover_counter_func> discover_counter,
+            discover_counters_mode mode, error_code& ec = throws);
+
+        counter_status registry::discover_counter_type(
+            counter_info const& info, HPX_STD_FUNCTION<discover_counter_func> f,
+            discover_counters_mode mode, error_code& ec = throws)
+        {
+            return discover_counter_type(info.fullname_, f, mode, ec);
+        }
 
         /// \brief Retrieve the counter creation function which is associated
         ///        with a given counter type.

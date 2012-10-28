@@ -100,11 +100,11 @@ namespace hpx { namespace performance_counters { namespace papi
             if (pos == label.npos)
                 cats.insert(std::make_pair(label, false));
             else
-	        cats.insert(std::make_pair(label.substr(0, pos), true));
+            cats.insert(std::make_pair(label.substr(0, pos), true));
         }
         std::set<thread_category>::iterator si;
         for (si = cats.begin(); si != cats.end(); si++)
-            tdesc.push_back(si->second? si->first+"#<*>": si->first);
+            tdesc.push_back(si->second? si->first+"#*": si->first);
     }
 
     template<class T>
@@ -142,7 +142,7 @@ namespace hpx { namespace performance_counters { namespace papi
     bool discover_papi_counters(
         hpx::performance_counters::counter_info const& info,
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
-        hpx::error_code& ec)
+        hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
     {
         hpx::performance_counters::counter_info cnt_info = info;
 
@@ -159,7 +159,7 @@ namespace hpx { namespace performance_counters { namespace papi
         // fill in common path segments for all counters
         counter_path_elements cpe;
         cpe.objectname_ = p.objectname_;
-        cpe.parentinstancename_ = "locality#<*>";
+        cpe.parentinstancename_ = "locality#*";
         cpe.parentinstanceindex_ = -1;
         cpe.instanceindex_ = -1;
 

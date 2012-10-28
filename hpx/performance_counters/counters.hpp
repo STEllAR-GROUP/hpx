@@ -357,11 +357,18 @@ namespace hpx { namespace performance_counters
     ///        discovered performance counter instance.
     typedef bool discover_counter_func(counter_info const&, error_code&);
 
+    enum discover_counters_mode
+    {
+        discover_counters_minimal,
+        discover_counters_full      ///< fully expand all wild cards
+    };
+
     /// \brief This declares the type of a function, which will be called by
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
     typedef bool discover_counters_func(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
+        HPX_STD_FUNCTION<discover_counter_func> const&,
+        discover_counters_mode, error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Complement the counter info if parent instance name is missing
@@ -450,7 +457,29 @@ namespace hpx { namespace performance_counters
     /// \brief Call the supplied function for each registered counter type
     HPX_API_EXPORT counter_status discover_counter_types(
         HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counters_mode mode = discover_counters_minimal,
         error_code& ec = throws);
+
+    /// \brief Call the supplied function for the given registered counter type.
+    HPX_API_EXPORT counter_status discover_counter_type(
+        std::string const& name,
+        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counters_mode mode = discover_counters_minimal,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT counter_status discover_counter_type(
+        counter_info const& info,
+        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counters_mode mode = discover_counters_minimal,
+        error_code& ec = throws);
+
+    /// \brief call the supplied function will all expanded versions of the
+    /// supplied counter info.
+    ///
+    /// This function expands all locality#* and worker-thread#* wild
+    /// cards only.
+    HPX_API_EXPORT bool expand_counter_info(counter_info const&,
+        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
 
     /// \brief Remove an existing counter type from the (local) registry
     ///
@@ -471,7 +500,7 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT lcos::future<naming::id_type>
         get_counter_async(std::string const& name, error_code& ec = throws);
 
-    inline naming::id_type get_counter(std::string const& name, 
+    inline naming::id_type get_counter(std::string const& name,
         error_code& ec = throws)
     {
         lcos::future<naming::id_type> f = get_counter_async(name, ec);
@@ -486,7 +515,7 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT lcos::future<naming::id_type>
         get_counter_async(counter_info const& info, error_code& ec = throws);
 
-    inline naming::id_type get_counter(counter_info const& info, 
+    inline naming::id_type get_counter(counter_info const& info,
         error_code& ec = throws)
     {
         lcos::future<naming::id_type> f = get_counter_async(info, ec);
