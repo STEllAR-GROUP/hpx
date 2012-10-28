@@ -60,8 +60,11 @@ namespace hpx { namespace util
         void save_binary(const void *address, std::size_t count)
         {
             std::size_t size = buffer_.size();
-            buffer_.resize(size + count);
-            std::memcpy(&buffer_[size], address, count);
+            if (count != 0) 
+            {
+                buffer_.resize(size + count);
+                std::memcpy(&buffer_[size], address, count);
+            }
         }
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
@@ -99,14 +102,16 @@ namespace hpx { namespace util
         {
             std::size_t l = s.size();
             This()->save(l);
-            save_binary(s.data(), l);
+            if (l != 0)
+                save_binary(s.data(), l);
         }
 #ifndef BOOST_NO_STD_WSTRING
         void save(std::wstring const& s)
         {
             std::size_t l = s.size();
             This()->save(l);
-            save_binary(s.data(), l * sizeof(wchar_t) / sizeof(char));
+            if (l != 0)
+                save_binary(s.data(), l * sizeof(wchar_t) / sizeof(char));
         }
 #endif
 

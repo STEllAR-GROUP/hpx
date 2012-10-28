@@ -72,8 +72,12 @@ namespace hpx { namespace util
                         "archive data bstream is too short"));
                 return;
             }
-            std::memcpy(address, &buffer_[current_], count);
-            current_ += count;
+
+            if (count) 
+            {
+                std::memcpy(address, &buffer_[current_], count);
+                current_ += count;
+            }
         }
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
@@ -118,7 +122,7 @@ namespace hpx { namespace util
                 s.resize(l);
 
             // note breaking a rule here - could be a problem on some platform
-            if(0 < l)
+            if (l != 0)
                 load_binary(&(*s.begin()), l);
         }
 #ifndef BOOST_NO_STD_WSTRING
@@ -133,7 +137,11 @@ namespace hpx { namespace util
                 ws.resize(l);
 
             // note breaking a rule here - is could be a problem on some platform
-            load_binary(const_cast<wchar_t *>(ws.data()), l * sizeof(wchar_t) / sizeof(char));
+            if (l != 0)
+            {
+                load_binary(const_cast<wchar_t *>(ws.data()), 
+                    l * sizeof(wchar_t) / sizeof(char));
+            }
         }
 #endif
 
