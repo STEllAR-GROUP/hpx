@@ -72,6 +72,7 @@ HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = 0;
 
 #include <pthread.h>
 #include <boost/assert.hpp>
+#include <hpx/util/static.hpp>
 
 namespace hpx { namespace util
 {
