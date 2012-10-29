@@ -91,7 +91,7 @@ namespace hpx { namespace util
             {
                 LOSH_(warning)
                     << (boost::format(
-                       "%1%::~%1%: releasing %2% allocated objects")
+                       "%1%::~%1%: releasing with %2% allocated objects")
                        % name()
                        % (alloc_count_ - free_count_));
             }
