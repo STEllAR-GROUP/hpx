@@ -16,6 +16,11 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #592 - Add optional argument value to `--hpx:list-counters` and 
+         `--hpx:list-counter-infos`
+* #591 - Allow for wildcards in performance counter names specified with 
+         `--hpx:print-counter
+* #589 - Create API to query performance counter names
 * #587 - Add get_num_localities and get_num_threads to AGAS API
 * #586 - Adjust local AGAS cache size based on number of localities
 * #584 - counting argument size of actions, initial pass.
@@ -116,6 +121,7 @@ HPX' releases so far.
 * #317 - Implement network performance counters
 * #310 - Duplicate logging entries
 * #230 - Add compile time option to disable thread debugging info
+* #170 - OSHL internal counters are incorrect
 * #103 - Better diagnostics for multiple component/action registerations under
          the same name
 * #21  - Build fails with GCC 4.6

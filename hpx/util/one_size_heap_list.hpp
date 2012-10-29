@@ -152,9 +152,11 @@ namespace hpx { namespace util
                         (class_name_.c_str(), heap_count_ + 1, heap_step)));
 
                 if (HPX_UNLIKELY(itnew == heap_list_.end()))
+                {
                     HPX_THROW_EXCEPTION(out_of_memory,
                         name() + "::alloc",
                         "new heap could not be added");
+                }
 
                 bool result = (*itnew)->alloc(&p, count);
 
@@ -168,7 +170,9 @@ namespace hpx { namespace util
                             % count));
                 }
 
+                alloc_count_ += count;
                 ++heap_count_;
+
                 LOSH_(info)
                     << (boost::format(
                         "%1%::alloc: creating new heap[%2%], size is now %3%")
