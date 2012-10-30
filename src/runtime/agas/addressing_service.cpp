@@ -150,16 +150,16 @@ void addressing_service::launch_hosted(
 void addressing_service::adjust_local_cache_size()
 { // {{{
     // adjust the local AGAS cache size for the number of connected localities
-    if (caching_)
-    {
-        util::runtime_configuration const& cfg = get_runtime().get_config();
-        std::size_t local_cache_size = cfg.get_agas_local_cache_size();
-        std::size_t local_cache_size_per_thread = 
-            cfg.get_agas_local_cache_size_per_thread();
-
-        gva_cache_.reserve((std::max)(local_cache_size, 
-            local_cache_size_per_thread * get_num_overall_threads()));
-    }
+//     if (caching_)
+//     {
+//         util::runtime_configuration const& cfg = get_runtime().get_config();
+//         std::size_t local_cache_size = cfg.get_agas_local_cache_size();
+//         std::size_t local_cache_size_per_thread = 
+//             cfg.get_agas_local_cache_size_per_thread();
+// 
+//         gva_cache_.reserve((std::max)(local_cache_size, 
+//             local_cache_size_per_thread * get_num_overall_threads()));
+//     }
 } // }}}
 
 response addressing_service::service(
