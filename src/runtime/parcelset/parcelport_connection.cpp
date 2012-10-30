@@ -17,6 +17,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
+    parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
+            naming::locality const& locality_id,
+            util::connection_cache<parcelport_connection, naming::locality>& cache,
+            performance_counters::parcels::gatherer& parcels_sent)
+      : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
+        connection_cache_(cache), parcels_sent_(parcels_sent), 
+        archive_flags_(boost::archive::no_header)
+    {
+#ifdef BOOST_BIG_ENDIAN
+        std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
+#else
+        std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
+#endif
+        if (endian_out == "little")
+            archive_flags_ |= util::endian_little;
+        else if (endian_out == "big")
+            archive_flags_ |= util::endian_big;
+        else {
+            BOOST_ASSERT(endian_out =="little" || endian_out == "big");
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
@@ -53,7 +75,7 @@ namespace hpx { namespace parcelset
             {
                 // Serialize the data
                 util::portable_binary_oarchive archive(out_buffer_,
-                    boost::archive::no_header);
+                    archive_flags_);
 
                 std::size_t count = pv.size();
                 archive << count;

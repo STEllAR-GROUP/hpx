@@ -46,10 +46,7 @@ namespace hpx { namespace parcelset
         parcelport_connection(boost::asio::io_service& io_service,
                 naming::locality const& locality_id,
                 util::connection_cache<parcelport_connection, naming::locality>& cache,
-                performance_counters::parcels::gatherer& parcels_sent)
-          : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-            connection_cache_(cache), parcels_sent_(parcels_sent)
-        {}
+                performance_counters::parcels::gatherer& parcels_sent);
 
         ~parcelport_connection()
         {
@@ -168,6 +165,9 @@ namespace hpx { namespace parcelset
         util::high_resolution_timer timer_;
         performance_counters::parcels::data_point send_data_;
         performance_counters::parcels::gatherer& parcels_sent_;
+
+        // archive flags
+        int archive_flags_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;

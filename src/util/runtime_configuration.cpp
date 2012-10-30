@@ -11,6 +11,7 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
 
+#include <boost/config.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/tokenizer.hpp>
@@ -78,6 +79,11 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS) "}",
             "max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:"
                 BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY) "}",
+#ifdef BOOST_BIG_ENDIAN
+            "endian_out=${HPX_ENDIAN_OUT:big}",
+#else
+            "endian_out=${HPX_ENDIAN_OUT:little}",
+#endif
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -563,6 +569,26 @@ namespace hpx { namespace util
             }
         }
         return 2;     // the default size for all pools is 2
+    }
+
+    // Return the endianess to be used for out-serialization
+    std::string runtime_configuration::get_endian_out() const
+    {
+        if (has_section("hpx.parcel")) {
+            util::section const* sec = get_section("hpx.parcel");
+            if (NULL != sec) {
+#ifdef BOOST_BIG_ENDIAN
+                return sec->get_entry("endian_out", "big");
+#else
+                return sec->get_entry("endian_out", "little");
+#endif
+            }
+        }
+#ifdef BOOST_BIG_ENDIAN
+        return "big"
+#else
+        return "little";
+#endif
     }
 
     // Will return the stack size to use for all HPX-threads.

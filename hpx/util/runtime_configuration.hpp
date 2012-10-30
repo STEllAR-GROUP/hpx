@@ -101,6 +101,9 @@ namespace hpx { namespace util
         // Return the configured sizes of any of the know thread pools
         std::size_t get_thread_pool_size(char const* poolname) const;
 
+        // Return the endianess to be used for out-serialization
+        std::string get_endian_out() const;
+
     private:
         std::ptrdiff_t init_stack_size(char const* entryname, 
             char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const;
