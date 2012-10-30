@@ -960,6 +960,24 @@ namespace hpx { namespace util { namespace detail
         static std::vector<std::string> dummy_data;
         return dummy_data;
     }
+
+    init_logging::init_logging(runtime_configuration& ini, bool,
+        naming::resolver_client&)
+    {
+        // warn if logging is requested
+
+        if (ini.get_entry("hpx.logging.level", "0") != "0" ||
+            ini.get_entry("hpx.logging.timing.level", "0") != "0" ||
+            ini.get_entry("hpx.logging.agas.level", "0") != "0" ||
+            ini.get_entry("hpx.logging.application.level", "0") != "0")
+        {
+            std::cerr << "hpx::init_logging: warning: logging is requested even "
+                         "if it has has been disabled at compile time. If you "
+                         "need logging to be functional, please reconfigure and "
+                         "rebuild HPX with HPX_NO_LOGGING set to OFF."
+                      << endl;
+        }
+    }
 }}}
 
 #endif // HPX_NO_LOGGING

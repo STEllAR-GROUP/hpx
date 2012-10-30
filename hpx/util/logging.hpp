@@ -176,9 +176,7 @@ namespace hpx { namespace util { namespace detail
     // well
     struct init_logging
     {
-        init_logging(runtime_configuration&, bool, naming::resolver_client&)
-        {
-        }
+        init_logging(runtime_configuration&, bool, naming::resolver_client&);
     };
 
     struct dummy_log_impl {};
