@@ -16,13 +16,15 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
-* #592 - Add optional argument value to `--hpx:list-counters` and 
+* #593 - Warn if logging is disabled at compile time but requested at runtime
+* #592 - Add optional argument value to `--hpx:list-counters` and
          `--hpx:list-counter-infos`
-* #591 - Allow for wildcards in performance counter names specified with 
+* #591 - Allow for wildcards in performance counter names specified with
          `--hpx:print-counter
 * #589 - Create API to query performance counter names
 * #587 - Add get_num_localities and get_num_threads to AGAS API
 * #586 - Adjust local AGAS cache size based on number of localities
+* #585 - Error while using counters in HPX
 * #584 - counting argument size of actions, initial pass.
 * #581 - Remove `RemoteResult` template parameter for `future<>`
 * #580 - Add possibility to hook into actions
