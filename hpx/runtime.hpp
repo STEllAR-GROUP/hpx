@@ -172,9 +172,9 @@ namespace hpx
 
         virtual naming::locality const& here() const = 0;
 
-        virtual std::size_t get_runtime_support_lva() const = 0;
+        virtual boost::uint64_t get_runtime_support_lva() const = 0;
 
-        virtual std::size_t get_memory_lva() const = 0;
+        virtual boost::uint64_t get_memory_lva() const = 0;
 
         virtual void report_error(std::size_t num_thread,
             boost::exception_ptr const& e) = 0;

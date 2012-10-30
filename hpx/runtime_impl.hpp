@@ -289,14 +289,14 @@ namespace hpx {
             return thread_manager_->get_executed_threads(num);
         }
 
-        std::size_t get_runtime_support_lva() const
+        boost::uint64_t get_runtime_support_lva() const
         {
-            return reinterpret_cast<std::size_t>(&runtime_support_);
+            return reinterpret_cast<boost::uint64_t>(&runtime_support_);
         }
 
-        std::size_t get_memory_lva() const
+        boost::uint64_t get_memory_lva() const
         {
-            return reinterpret_cast<std::size_t>(&memory_);
+            return reinterpret_cast<boost::uint64_t>(&memory_);
         }
 
         naming::gid_type get_next_id();

@@ -48,16 +48,20 @@ namespace hpx { namespace util
 
 void portable_binary_iarchive::load_impl(boost::intmax_t& l, char maxsize)
 {
+    bool negative;
     char size;
     l = 0;
     this->primitive_base_t::load(size);
 
     if (0 == size)
         return;
+    
+    this->primitive_base_t::load(negative);
 
-    bool negative = (size < 0) ? true : false;
+    /*
     if (negative)
         size = static_cast<char>(-size);
+    */
 
     if (size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());

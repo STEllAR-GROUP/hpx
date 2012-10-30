@@ -61,7 +61,8 @@ void portable_binary_oarchive::save_impl(
         ++size;
     } while(ll != 0);
 
-    this->primitive_base_t::save(static_cast<char>(negative ? -size : size));
+    this->primitive_base_t::save(size);
+    this->primitive_base_t::save(negative);
 
     if(negative)
         ll = -l;

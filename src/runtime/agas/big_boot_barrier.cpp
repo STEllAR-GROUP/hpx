@@ -110,10 +110,10 @@ struct registration_header
       , boost::uint64_t parcelport_allocation_
       , boost::uint64_t response_allocation_
       , naming::address const& response_heap_address_
-      , std::size_t response_heap_offset_
-      , std::size_t response_heap_ptr_
-      , std::size_t component_runtime_support_ptr_
-      , std::size_t component_memory_ptr_
+      , boost::uint64_t response_heap_offset_
+      , boost::uint64_t response_heap_ptr_
+      , boost::uint64_t component_runtime_support_ptr_
+      , boost::uint64_t component_memory_ptr_
     ) :
         locality(locality_)
       , parcelport_allocation(parcelport_allocation_)
@@ -129,10 +129,10 @@ struct registration_header
     boost::uint64_t parcelport_allocation;
     boost::uint64_t response_allocation;
     naming::address response_heap_address;
-    std::size_t response_heap_offset;
-    std::size_t response_heap_ptr;
-    std::size_t component_runtime_support_ptr;
-    std::size_t component_memory_ptr;
+    boost::uint64_t response_heap_offset;
+    boost::uint64_t response_heap_ptr;
+    boost::uint64_t component_runtime_support_ptr;
+    boost::uint64_t component_memory_ptr;
 
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int)
@@ -748,7 +748,7 @@ void big_boot_barrier::wait()
                          response_heap_type::block_type::heap_step,
                          p->get_address(),
                          response_heap_type::block_type::heap_size,
-                         reinterpret_cast<std::size_t>(p),
+                         reinterpret_cast<boost::uint64_t>(p),
                          get_runtime().get_runtime_support_lva(),
                          get_runtime().get_memory_lva())));
             spin();
@@ -768,7 +768,7 @@ void big_boot_barrier::wait()
                          response_heap_type::block_type::heap_step,
                          p->get_address(),
                          response_heap_type::block_type::heap_size,
-                         reinterpret_cast<std::size_t>(p),
+                         reinterpret_cast<boost::uint64_t>(p),
                          get_runtime().get_runtime_support_lva(),
                          get_runtime().get_memory_lva())));
             spin();

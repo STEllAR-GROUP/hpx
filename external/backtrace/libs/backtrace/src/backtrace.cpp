@@ -13,7 +13,7 @@
 #include <boost/backtrace.hpp>
 #include <boost/lexical_cast.hpp>
 
-#if defined(__linux) || defined(__APPLE__) || defined(__sun)
+#if (defined(__linux) || defined(__APPLE__) || defined(__sun)) && (!defined(__ANDROID__) || !defined(ANDROID))
 #define BOOST_HAVE_EXECINFO
 #define BOOST_HAVE_DLFCN
 #if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)) && !defined(__clang__)
