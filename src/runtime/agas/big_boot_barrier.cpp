@@ -157,7 +157,7 @@ struct notification_header
     notification_header(
         naming::gid_type const& prefix_
       , naming::address const& response_pool_address_
-      , std::size_t response_heap_ptr_
+      , boost::uint64_t response_heap_ptr_
       , naming::gid_type const& response_lower_gid_
       , naming::gid_type const& response_upper_gid_
       , naming::gid_type const& parcelport_lower_gid_
@@ -180,7 +180,7 @@ struct notification_header
 
     naming::gid_type prefix;
     naming::address response_pool_address;
-    std::size_t response_heap_ptr;
+    boost::uint64_t response_heap_ptr;
     naming::gid_type response_lower_gid;
     naming::gid_type response_upper_gid;
     naming::gid_type parcelport_lower_gid;
