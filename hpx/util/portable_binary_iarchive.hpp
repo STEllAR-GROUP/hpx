@@ -188,17 +188,17 @@ protected:
     void load(boost::archive::version_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
-        t = boost::archive::version_type(static_cast<std::size_t>(l));
+        t = boost::archive::version_type(static_cast<unsigned int>(l));
     }
     void load(boost::archive::library_version_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint16_t));
-        t = boost::archive::library_version_type(static_cast<std::size_t>(l));
+        t = boost::archive::library_version_type(static_cast<unsigned int>(l));
     }
     void load(boost::serialization::item_version_type& t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::intmax_t));
-        t = boost::serialization::item_version_type(static_cast<std::size_t>(l));
+        t = boost::serialization::item_version_type(static_cast<unsigned int>(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
