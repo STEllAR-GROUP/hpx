@@ -48,7 +48,7 @@
     transfer_action(HPX_ENUM_FWD_ARGS(N, Arg, arg))
         : arguments_(HPX_ENUM_FORWARD_ARGS(N, Arg, arg)),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -65,7 +65,7 @@
               HPX_ENUM_FWD_ARGS(N, Arg, arg))
         : arguments_(HPX_ENUM_FORWARD_ARGS(N, Arg, arg)),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<

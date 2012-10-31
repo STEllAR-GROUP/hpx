@@ -288,7 +288,7 @@ namespace hpx { namespace actions
           : arguments_(),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
-            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+            parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
 #endif
             priority_(
@@ -306,7 +306,7 @@ namespace hpx { namespace actions
           : arguments_(boost::forward<Arg0>(arg0)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
-            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+            parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
 #endif
             priority_(
@@ -324,7 +324,7 @@ namespace hpx { namespace actions
           : arguments_(boost::forward<Arg0>(arg0)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
-            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+            parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
 #endif
             priority_(
@@ -554,8 +554,8 @@ namespace hpx { namespace actions
             // compatibility on the wire.
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             boost::uint32_t parent_locality_ = naming::invalid_locality_id;
-            std::size_t parent_id_ = std::size_t(-1);
-            std::size_t parent_phase_ = 0;
+            boost::uint64_t parent_id_ = boost::uint64_t(-1);
+            boost::uint64_t parent_phase_ = 0;
 #endif
             ar & parent_locality_;
             ar & parent_id_;
@@ -576,8 +576,8 @@ namespace hpx { namespace actions
         arguments_type arguments_;
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_;
-        std::size_t parent_id_;
-        std::size_t parent_phase_;
+        boost::uint64_t parent_id_;
+        boost::uint64_t parent_phase_;
 #endif
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;

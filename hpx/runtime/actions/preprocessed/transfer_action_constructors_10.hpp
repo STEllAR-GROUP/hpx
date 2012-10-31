@@ -12,7 +12,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -28,7 +28,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -43,7 +43,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -59,7 +59,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -74,7 +74,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -90,7 +90,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -105,7 +105,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -121,7 +121,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -136,7 +136,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -152,7 +152,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -167,7 +167,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -183,7 +183,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -198,7 +198,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -214,7 +214,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -229,7 +229,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -245,7 +245,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -260,7 +260,7 @@
     transfer_action(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
@@ -276,7 +276,7 @@
               BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
         : arguments_(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 )),
           parent_locality_(transfer_action::get_locality_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+          parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(
                 detail::thread_priority<
