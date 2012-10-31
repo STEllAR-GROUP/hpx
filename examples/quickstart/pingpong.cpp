@@ -1,5 +1,4 @@
 //  Copyright (c) 2012 Mehmet Balman
-//  Copyright (c) 2012 Aydin Buluc
 //  Copyright (c) 2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
