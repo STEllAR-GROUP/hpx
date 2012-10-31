@@ -58,8 +58,8 @@ namespace hpx { namespace util
 
     protected:
         bool regex_init();
-        void line_msg(std::string const& msg, std::string const& file,
-            int lnum = 0);
+        void line_msg(std::string msg, std::string const& file,
+            int lnum = 0, std::string const& line = "");
 
         section& clone_from(section const& rhs, section* root = 0);
 
@@ -72,14 +72,14 @@ namespace hpx { namespace util
         section& operator=(section const& rhs);
 
         void parse(std::string const& sourcename,
-            std::vector<std::string> const& lines);
+            std::vector<std::string> const& lines, bool verify_existing = true);
 
         void parse(std::string const& sourcename,
-            std::string const& line)
+            std::string const& line, bool verify_existing = true)
         {
             std::vector<std::string> lines;
             lines.push_back(line);
-            parse(sourcename, lines);
+            parse(sourcename, lines, verify_existing);
         }
 
         void read(std::string const& filename);

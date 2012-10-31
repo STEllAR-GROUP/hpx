@@ -227,7 +227,7 @@ namespace hpx { namespace util
 
                     // incorporate all information from this module's
                     // registry into our internal ini object
-                    ini.parse("component registry", ini_data);
+                    ini.parse("component registry", ini_data, false);
 
                     continue;   // handle next module
                 }

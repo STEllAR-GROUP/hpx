@@ -46,7 +46,7 @@ namespace hpx { namespace util
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
-            "component_path = $[hpx.location]/lib/hpx" 
+            "component_path = $[hpx.location]/lib/hpx"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
 #if HPX_USE_ITT != 0
@@ -62,6 +62,22 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
             "huge_stack_size = ${HPX_HUGE_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
+
+            // add placeholders for key to be added by command line handling
+            "os_threads = 1",
+            "locality = 0",
+            "localities = 1",
+            "runtime_mode = 0",
+
+            "program_name = <unknown>",
+            "cmd_line = console",
+            "reconstructed_cmd_line = ",
+            "unknown_cmd_line =",
+            "cmd_line_help = ",
+            "cmd_line_help_option = ",
+
+            "nodefile = ",
+            "nodes = ",
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
@@ -153,7 +169,7 @@ namespace hpx { namespace util
             "enabled = 1"
         ;
         // don't overload user overrides
-        this->parse("static defaults", lines);
+        this->parse("static defaults", lines, false);
 
         need_to_call_pre_initialize = false;
     }
@@ -257,7 +273,7 @@ namespace hpx { namespace util
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
-            this->parse("static prefill defaults", prefill);
+            this->parse("static prefill defaults", prefill, false);
 
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
@@ -281,7 +297,7 @@ namespace hpx { namespace util
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
-            this->parse("static prefill defaults", prefill);
+            this->parse("static prefill defaults", prefill, false);
 
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
@@ -593,7 +609,7 @@ namespace hpx { namespace util
 
     // Will return the stack size to use for all HPX-threads.
     std::ptrdiff_t runtime_configuration::init_stack_size(
-        char const* entryname, char const* defaultvaluestr, 
+        char const* entryname, char const* defaultvaluestr,
         std::ptrdiff_t defaultvalue) const
     {
         if (has_section("hpx")) {
@@ -613,25 +629,25 @@ namespace hpx { namespace util
 
     std::ptrdiff_t runtime_configuration::init_small_stack_size() const
     {
-        return init_stack_size("small_stack_size", 
+        return init_stack_size("small_stack_size",
             BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_medium_stack_size() const
     {
-        return init_stack_size("medium_stack_size", 
+        return init_stack_size("medium_stack_size",
             BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_large_stack_size() const
     {
-        return init_stack_size("large_stack_size", 
+        return init_stack_size("large_stack_size",
             BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_huge_stack_size() const
     {
-        return init_stack_size("huge_stack_size", 
+        return init_stack_size("huge_stack_size",
             BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
     }
 

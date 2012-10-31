@@ -451,6 +451,7 @@ namespace hpx { namespace util
             throw std::logic_error("Command line option --hpx:run-agas-server-only "
                 "can be specified only for the node running the AGAS server.");
         }
+
         if (1 == num_localities && vm.count("hpx:run-agas-server-only")) {
             std::cerr << "hpx::init: command line warning: --hpx:run-agas-server-only "
                 "used for single locality execution, application might "

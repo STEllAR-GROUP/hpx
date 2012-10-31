@@ -192,7 +192,7 @@ void section::read (std::string const& filename)
 
 // parse file
 void section::parse (std::string const& sourcename,
-    std::vector<std::string> const& lines)
+    std::vector<std::string> const& lines, bool verify_existing)
 {
     int linenum = 0;
     section* current = this;
@@ -235,7 +235,7 @@ void section::parse (std::string const& sourcename,
             // found a entry line
             if (4 != what.size())
             {
-                line_msg("Cannot parse key/value in ", sourcename, linenum);
+                line_msg("Cannot parse key/value in ", sourcename, linenum, line);
             }
 
             section* s = current;  // save the section we're in
@@ -255,6 +255,11 @@ void section::parse (std::string const& sourcename,
             current = add_section_if_new (current, sec_name.substr(pos));
 
             // add key/val to this section
+            if (verify_existing && !current->has_entry(what[2])) 
+            {
+                line_msg ("Attempt to initialize unknown entry ", sourcename, 
+                    linenum, line);
+            }
             current->add_entry (what[2], what[3]);
 
             // restore the old section
@@ -264,9 +269,9 @@ void section::parse (std::string const& sourcename,
         else if (boost::regex_match(line, what, regex_section))
         {
             // found a section line
-            if(2 != what.size())
+            if (2 != what.size())
             {
-                line_msg("Cannot parse section in ", sourcename, linenum);
+                line_msg("Cannot parse section in ", sourcename, linenum, line);
             }
 
             current = this;     // start adding sections at the root
@@ -291,15 +296,21 @@ void section::parse (std::string const& sourcename,
             // found a entry line
             if (3 != what.size())
             {
-                line_msg("Cannot parse key/value in ", sourcename, linenum);
+                line_msg("Cannot parse key/value in ", sourcename, linenum, line);
             }
 
             // add key/val to current section
+            if (verify_existing && !current->has_entry(what[1])) 
+            {
+                line_msg ("Attempt to initialize unknown entry ", sourcename, 
+                    linenum, line);
+            }
             current->add_entry (what[1], what[2]);
         }
         else {
-            // Hmm, is not a section, is not an entry, is not empty - must be an error!
-            line_msg ("Cannot parse line at ", sourcename, linenum);
+            // Hmm, is not a section, is not an entry, is not empty - must be 
+            // an error!
+            line_msg ("Cannot parse line at ", sourcename, linenum, line);
         }
     }
 }
@@ -579,15 +590,16 @@ bool section::regex_init (void)
     return true;
 }
 
-void section::line_msg(std::string const& msg, std::string const& file,
-    int lnum)
+void section::line_msg(std::string msg, std::string const& file,
+    int lnum, std::string const& line)
 {
+    msg += " " + file;
     if (lnum > 0)
-    {
-        HPX_THROW_EXCEPTION(no_success, "section::line_msg",
-            msg + " " + file + ":" + boost::lexical_cast<std::string>(lnum));
-    }
-    HPX_THROW_EXCEPTION(no_success, "section::line_msg", msg + " " + file);
+        msg += ": line " + boost::lexical_cast<std::string>(lnum);
+    if (!line.empty())
+        msg += " (offending entry: " + line + ")";
+
+    HPX_THROW_EXCEPTION(no_success, "section::line_msg", msg);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
