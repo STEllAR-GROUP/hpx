@@ -357,8 +357,34 @@ namespace hpx { namespace threads
         /// Return number of the processing unit the given thread is running on
         virtual std::size_t get_pu_num(std::size_t num_thread) = 0;
         
-        virtual boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const = 0;
+        virtual boost::int64_t get_executed_threads(
+            std::size_t num = std::size_t(-1)) const = 0;
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+        /// The get_thread_data function is part of the thread related
+        /// API. It queries the currently stored thread specific data pointer.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        ///
+        /// \returns        This function returns the thread specific data 
+        ///                 pointer or zero if none is set.
+        virtual std::size_t get_thread_data(thread_id_type id,
+            error_code& ec = throws) const = 0;
+
+        /// The set_thread_data function is part of the thread related
+        /// API. It sets the currently stored thread specific data pointer.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        /// \param data     [in] The thread specific data pointer to set for 
+        ///                 the given thread.
+        ///
+        /// \returns        This function returns the previously set thread 
+        ///                 specific data pointer or zero if none was set.
+        virtual std::size_t set_thread_data(thread_id_type id,
+            std::size_t data, error_code& ec = throws) = 0;
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
         static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);

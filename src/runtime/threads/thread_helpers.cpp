@@ -114,6 +114,18 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_phase(id);
     }
 
+    void interrupt_thread(thread_id_type id, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::interrupt_thread",
+                "global applier object is not accessible");
+            return;
+        }
+        app->get_thread_manager().interrupt(id, ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     bool get_thread_interruption_enabled(thread_id_type id, error_code& ec)
@@ -156,18 +168,42 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_interruption_requested(id, ec);
     }
 
-    void interrupt_thread(thread_id_type id, error_code& ec)
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t get_thread_data(thread_id_type id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
             HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::interrupt_thread",
+                "hpx::threads::get_thread_data",
                 "global applier object is not accessible");
-            return;
+            return 0;
         }
-        app->get_thread_manager().interrupt(id, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return app->get_thread_manager().get_thread_data(id, ec);
     }
+
+    std::size_t set_thread_data(thread_id_type id, std::size_t d, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::set_thread_data",
+                "global applier object is not accessible");
+            return 0;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return app->get_thread_manager().set_thread_data(id, d, ec);
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     void run_thread_exit_callbacks(thread_id_type id, error_code& ec)

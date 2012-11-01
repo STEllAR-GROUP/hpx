@@ -145,17 +145,20 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         typename coroutine_type::arg_slot_traits>(*m_pimpl->args());
     }
 
-    bool pending() const {
+    bool pending() const 
+    {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->pending();
     }
 
-    thread_id_type get_thread_id() const {
+    thread_id_type get_thread_id() const 
+    {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->get_thread_id();
     }
 
-    std::size_t get_thread_phase() const {
+    std::size_t get_thread_phase() const 
+    {
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->get_thread_phase();
@@ -167,6 +170,19 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     explicit coroutine_self(impl_type * pimpl)
       : m_pimpl(pimpl)
     {}
+
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    std::size_t get_thread_data() const
+    {
+        BOOST_ASSERT(m_pimpl);
+        return m_pimpl->get_thread_data();
+    }
+    std::size_t set_thread_data(std::size_t data)
+    {
+        BOOST_ASSERT(m_pimpl);
+        return m_pimpl->set_thread_data(data);
+    }
+#endif
 
 #if defined(HPX_GENERIC_COROUTINES)
   private:
@@ -216,7 +232,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #endif
 
-    impl_ptr get_impl() {
+    impl_ptr get_impl() 
+    {
       return m_pimpl;
     }
     impl_ptr m_pimpl;

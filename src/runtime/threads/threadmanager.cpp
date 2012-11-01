@@ -651,6 +651,42 @@ namespace hpx { namespace threads
         }
     }
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_data(thread_id_type id, error_code& ec) const
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::get_thread_data",
+                "NULL thread id encountered");
+            return 0;
+        }
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->get_thread_data() : 0;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_thread_data(thread_id_type id, std::size_t data, 
+            error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::set_thread_data",
+                "NULL thread id encountered");
+            return 0;
+        }
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->set_thread_data(data) : 0;
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::

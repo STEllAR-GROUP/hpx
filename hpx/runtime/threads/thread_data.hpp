@@ -504,6 +504,17 @@ namespace hpx { namespace threads
             requested_interrupt_ = true;
         }
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+        std::size_t get_thread_data() const
+        {
+            return coroutine_.get_thread_data();
+        }
+        std::size_t set_thread_data(std::size_t data)
+        {
+            return coroutine_.set_thread_data(data);
+        }
+#endif
+
         bool add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f);
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();

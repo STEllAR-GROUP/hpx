@@ -215,6 +215,17 @@ namespace hpx
         threads::interrupt_thread(id.id_);
     }
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    std::size_t thread::get_thread_data() const
+    {
+        return threads::get_thread_data(native_handle());
+    }
+    std::size_t thread::set_thread_data(std::size_t data)
+    {
+        return threads::set_thread_data(native_handle(), data);
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {

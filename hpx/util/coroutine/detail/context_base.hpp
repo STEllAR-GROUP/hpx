@@ -52,6 +52,8 @@
 #include <hpx/util/coroutine/detail/swap_context.hpp> //for swap hints
 #include <hpx/util/coroutine/exception.hpp>
 
+#define HPX_THREAD_MAINTAIN_OPERATIONS_COUNT  0
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_COROUTINE_NUM_ALL_HEAPS (HPX_COROUTINE_NUM_HEAPS +                \
     HPX_COROUTINE_NUM_HEAPS/2 + HPX_COROUTINE_NUM_HEAPS/4 +                   \
@@ -98,20 +100,26 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     template<typename Derived>
         context_base(Derived& derived,
-                     std::ptrdiff_t stack_size) :
-      context_impl(derived, stack_size),
-      m_caller(),
-      m_counter(0),
-      m_deleter(&deleter<Derived>),
-      m_state(ctx_ready),
-      m_exit_state(ctx_exit_not_requested),
-      m_exit_status(ctx_not_exited),
-      m_wait_counter(0),
-      m_operation_counter(0),
-#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
-      m_phase(0),
+                     std::ptrdiff_t stack_size) 
+      : context_impl(derived, stack_size),
+        m_caller(),
+        m_counter(0),
+        m_deleter(&deleter<Derived>),
+        m_state(ctx_ready),
+        m_exit_state(ctx_exit_not_requested),
+        m_exit_status(ctx_not_exited),
+#if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
+        m_wait_counter(0),
+        m_operation_counter(0),
 #endif
-      m_type_info() {}
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+        m_phase(0),
+#endif
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+        m_thread_data(0),
+#endif
+        m_type_info()
+    {}
 
     friend
     void intrusive_ptr_add_ref(type * ctx) {
@@ -148,6 +156,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_deleter(this, deleter_reset);
     }
 
+#if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
     void count_down() throw() {
       BOOST_ASSERT(m_operation_counter) ;
       --m_operation_counter;
@@ -161,6 +170,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     int pending() const {
       return m_operation_counter;
     }
+#else
+    int pending() const {
+      return 0;
+    }
+#endif
 
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t phase() const {
@@ -168,6 +182,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
+#if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
     /*
      * A signal may occur only when a context is
      * not running (is delivered synchronously).
@@ -185,6 +200,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         m_state = ctx_ready;
       return ready();
     }
+#endif
 
     /*
      * Wake up a waiting context.
@@ -299,6 +315,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       check_exit_state();
     }
 
+#if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
     //
     // If n > 0, put the coroutine in the wait state
     // then relinquish control to caller.
@@ -335,6 +352,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       check_exit_state();
       BOOST_ASSERT(m_wait_counter == 0);
     }
+#endif
 
     // Throws: exit_exception.
     void yield_to(context_base& to) {
@@ -384,6 +402,19 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       } catch(...) {}
     }
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    std::size_t get_thread_data() const
+    {
+        return m_thread_data;
+    }
+    std::size_t set_thread_data(std::size_t data)
+    {
+        std::size_t t = m_thread_data;
+        m_thread_data = data;
+        return t;
+    }
+#endif
+
     static boost::uint64_t get_allocation_count_all()
     {
         boost::uint64_t count = 0;
@@ -427,7 +458,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     void rebind()
     {
+#if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
       BOOST_ASSERT(exited() && 0 == m_wait_counter && !pending());
+#else
+      BOOST_ASSERT(exited() && !pending());
+#endif
+
       m_state = ctx_ready;
       m_exit_state = ctx_exit_not_requested;
       m_exit_status = ctx_not_exited;
@@ -491,10 +527,15 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     context_state m_state;
     context_exit_state m_exit_state;
     context_exit_status m_exit_status;
+#if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
     int m_wait_counter;
     int m_operation_counter;
+#endif
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t m_phase;
+#endif
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    std::size_t m_thread_data;
 #endif
 
     // This is used to generate a meaningful exception trace.

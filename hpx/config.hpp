@@ -292,6 +292,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// By default, always enable storing the thread data.
+#if !defined(HPX_THREAD_MAINTAIN_THREAD_DATA)
+#  define HPX_THREAD_MAINTAIN_THREAD_DATA 1
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable guard pages.
 #if !defined(HPX_THREAD_GUARD_PAGE)
 #  define HPX_THREAD_GUARD_PAGE 1

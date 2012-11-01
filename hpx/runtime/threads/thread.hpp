@@ -109,6 +109,11 @@ namespace hpx
 
         lcos::future<void> get_future(error_code& ec = throws);
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+        std::size_t get_thread_data() const;
+        std::size_t set_thread_data(std::size_t);
+#endif
+
     private:
         void start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func);
         static threads::thread_state_enum thread_function_nullary(
@@ -202,6 +207,9 @@ namespace hpx
 
         HPX_API_EXPORT void sleep_until(boost::posix_time::ptime const& at);
         HPX_API_EXPORT void sleep_for(boost::posix_time::time_duration const& p);
+
+        HPX_API_EXPORT std::size_t get_thread_data();
+        HPX_API_EXPORT std::size_t set_thread_data(std::size_t);
 
         template <typename Clock, typename Duration>
         void sleep_until(boost::chrono::time_point<Clock, Duration> const& at)

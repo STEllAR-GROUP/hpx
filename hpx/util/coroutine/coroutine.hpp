@@ -181,6 +181,17 @@ namespace hpx { namespace util { namespace coroutines
     }
 #endif
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+    std::size_t get_thread_data() const
+    {
+        return m_pimpl->get_thread_data();
+    }
+    std::size_t set_thread_data(std::size_t data)
+    {
+        return m_pimpl->set_thread_data(data);
+    }
+#endif
+
     template <typename Functor>
     void rebind(Functor f, thread_id_type id = 0)
     {

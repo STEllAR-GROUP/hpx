@@ -367,6 +367,30 @@ namespace hpx { namespace threads
         char const* get_lco_description(thread_id_type id) const;
         char const* set_lco_description(thread_id_type id, char const* desc = 0);
 
+#if HPX_THREAD_MAINTAIN_THREAD_DATA
+        /// The get_thread_data function is part of the thread related
+        /// API. It queries the currently stored thread specific data pointer.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        ///
+        /// \returns        This function returns the thread specific data 
+        ///                 pointer or zero if none is set.
+        std::size_t get_thread_data(thread_id_type id, 
+            error_code& ec = throws) const;
+
+        /// The set_thread_data function is part of the thread related
+        /// API. It sets the currently stored thread specific data pointer.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        /// \param data     [in] The thread specific data pointer to set for 
+        ///                 the given thread.
+        ///
+        /// \returns        This function returns the previously set thread 
+        ///                 specific data pointer or zero if none was set.
+        std::size_t set_thread_data(thread_id_type id,
+            std::size_t data, error_code& ec = throws);
+#endif
+
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate() const;
         boost::int64_t avg_idle_rate(std::size_t num_thread) const;
