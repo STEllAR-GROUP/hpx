@@ -176,7 +176,7 @@ struct windows_topology : topology
         if (ec)
             return 0;
 
-        std::size_t mask = 0;
+        ULONGLONG mask = 0;
         if (!GetNumaNodeProcessorMask(info.VirtualAttributes.Node, &mask))
         {
             HPX_THROWS_IF(ec, kernel_error
@@ -188,7 +188,7 @@ struct windows_topology : topology
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return mask;
+        return static_cast<std::size_t>(mask);
     } // }}}
 
   private:
@@ -227,7 +227,7 @@ struct windows_topology : topology
         if (GetNumaHighestNodeNumber(&numa_nodes))
             ++numa_nodes;
 
-        std::size_t mask = 0;
+        ULONGLONG mask = 0;
         if (numa_sensitive) {
             UCHAR numa_node = affinity % numa_nodes;
             if (!GetNumaNodeProcessorMask(numa_node, &mask))
@@ -239,7 +239,7 @@ struct windows_topology : topology
                         "thread %1%")
                         % num_thread));
             }
-            return mask;
+            return static_cast<std::size_t>(mask);
         }
 
         UCHAR numa_node = UCHAR(get_numa_node_number(num_thread));
@@ -253,7 +253,7 @@ struct windows_topology : topology
                     % num_thread));
         }
 
-        return mask;
+        return static_cast<std::size_t>(mask);
     } // }}}
 
     std::size_t init_thread_affinity_mask(
@@ -269,8 +269,8 @@ struct windows_topology : topology
             ++numa_nodes;
 
         std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
-        std::size_t node_affinity_mask = 0;
-        std::size_t mask = 0x01LL;
+        ULONGLONG node_affinity_mask = 0;
+        ULONGLONG mask = 0x01LL;
 
         if (numa_sensitive) {
             UCHAR numa_node = UCHAR(affinity % numa_nodes);
@@ -307,7 +307,7 @@ struct windows_topology : topology
                 mask = 0x01LL;
         }
 
-        return mask;
+        return static_cast<std::size_t>(mask);
     } // }}}
 
     std::vector<std::size_t> numa_node_numbers_;

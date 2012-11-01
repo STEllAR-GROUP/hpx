@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset { namespace server
                 receive_data_.bytes_ = std::size_t(inbound_data_size);
 
                 // Start an asynchronous call to receive the data.
-                in_buffer_->resize(inbound_data_size);
+                in_buffer_->resize(static_cast<std::size_t>(inbound_data_size));
                 void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;

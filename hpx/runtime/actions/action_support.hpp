@@ -169,7 +169,7 @@ namespace hpx { namespace actions
         virtual threads::thread_id_type get_parent_thread_id() const = 0;
 
         /// Return the thread phase of the parent thread
-        virtual std::size_t get_parent_thread_phase() const = 0;
+        virtual boost::uint64_t get_parent_thread_phase() const = 0;
 
         /// Return the thread priority this action has to be executed with
         virtual threads::thread_priority get_thread_priority() const = 0;
@@ -443,7 +443,7 @@ namespace hpx { namespace actions
         }
 
         /// Return the phase of the parent thread
-        std::size_t get_parent_thread_phase() const
+        boost::uint64_t get_parent_thread_phase() const
         {
             return 0;
         }
@@ -461,7 +461,7 @@ namespace hpx { namespace actions
         }
 
         /// Return the phase of the parent thread
-        std::size_t get_parent_thread_phase() const
+        boost::uint64_t get_parent_thread_phase() const
         {
             return parent_phase_;
         }

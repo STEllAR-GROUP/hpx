@@ -223,7 +223,7 @@ namespace hpx
 {
     // Print stack trace and exit.
 #if defined(BOOST_WINDOWS)
-    extern BOOL termination_handler(DWORD ctrl_type);
+    extern BOOL WINAPI termination_handler(DWORD ctrl_type);
 #else
     extern void termination_handler(int signum);
 #endif
@@ -693,7 +693,8 @@ namespace hpx
             // non-blocking version
             start(*rt, f, vm, mode, startup, shutdown, num_threads, 
                 num_localities);
-            rt.detach();          // pointer to runtime is stored in TLS
+
+            rt.release();          // pointer to runtime is stored in TLS
             return 0;
         }
 #endif

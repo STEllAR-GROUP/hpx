@@ -408,7 +408,7 @@ bool addressing_service::get_localities(
                 return false;
 
             locality_ids.clear();
-            for (boost::uint64_t i = 0; i < p.size(); ++i)
+            for (std::size_t i = 0; i < p.size(); ++i)
                 locality_ids.push_back(naming::get_gid_from_locality_id(p[i]));
 
             return true;
@@ -433,7 +433,7 @@ bool addressing_service::get_localities(
                 return false;
 
             locality_ids.clear();
-            for (boost::uint64_t i = 0; i < p.size(); ++i)
+            for (std::size_t i = 0; i < p.size(); ++i)
                 locality_ids.push_back(naming::get_gid_from_locality_id(p[i]));
 
             return true;
