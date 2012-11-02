@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace server
             boost::uint64_t r = 0;
             for(std::size_t i = 0; i < N; ++i)
             {
-                r |= (std::size_t(1)<<i);
+                r |= (boost::uint64_t(1)<<i);
             }
             return r;
         }
@@ -141,7 +141,7 @@ namespace hpx { namespace lcos { namespace server
                 lcos::local::spinlock::scoped_lock l(mtx);
                 if(slots_set != slots_complete)
                 {
-                    slots_set |= (std::size_t(1)<<slot);
+                    slots_set |= (boost::uint64_t(1)<<slot);
                     trigger = (slots_set == slots_complete);
                     if(trigger) std::swap(tmp, targets);
                 }

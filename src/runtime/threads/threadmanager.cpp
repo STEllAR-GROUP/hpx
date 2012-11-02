@@ -1118,7 +1118,7 @@ namespace hpx { namespace threads
             using performance_counters::detail::create_raw_counter;
             return create_raw_counter(info,
                 HPX_STD_BIND(&spt::get_queue_length, &scheduler_,
-                    paths.instanceindex_), ec);
+                    static_cast<std::size_t>(paths.instanceindex_)), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
@@ -1217,7 +1217,8 @@ namespace hpx { namespace threads
             // specific counter
             using performance_counters::detail::create_raw_counter;
             return create_raw_counter(info,
-                HPX_STD_BIND(&ti::avg_idle_rate, this, paths.instanceindex_), ec);
+                HPX_STD_BIND(&ti::avg_idle_rate, this, 
+                    static_cast<std::size_t>(paths.instanceindex_)), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
@@ -1294,42 +1295,48 @@ namespace hpx { namespace threads
             // /threads{locality#%d/worker-thread%d}/count/cumulative
             { "count/cumulative",
               HPX_STD_BIND(&ti::get_executed_threads, this, -1),
-              HPX_STD_BIND(&ti::get_executed_threads, this, paths.instanceindex_),
+              HPX_STD_BIND(&ti::get_executed_threads, this, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/all
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/all
             { "count/instantaneous/all",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown, -1),
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown, paths.instanceindex_),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/active
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/active
             { "count/instantaneous/active",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active, -1),
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active, paths.instanceindex_),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/pending
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/pending
             { "count/instantaneous/pending",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending, -1),
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending, paths.instanceindex_),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/suspended
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/suspended
             { "count/instantaneous/suspended",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended, -1),
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended, paths.instanceindex_),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/terminated
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/terminated
             { "count/instantaneous/terminated",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated, -1),
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated, paths.instanceindex_),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/stack-recycles
@@ -1348,7 +1355,8 @@ namespace hpx { namespace threads
             // /threads(locality#%d/allocator%d)/count/objects
             { "count/objects",
               &coroutine_type::impl_type::get_allocation_count_all,
-              HPX_STD_BIND(&coroutine_type::impl_type::get_allocation_count, paths.instanceindex_),
+              HPX_STD_BIND(&coroutine_type::impl_type::get_allocation_count, 
+                  static_cast<std::size_t>(paths.instanceindex_)),
               "allocator", HPX_COROUTINE_NUM_ALL_HEAPS
             },
         };
