@@ -46,11 +46,14 @@ namespace hpx { namespace util
 #include <boost/archive/detail/register_archive.hpp>
 #if BOOST_VERSION >= 104400
 #include <boost/serialization/item_version_type.hpp>
+#include <boost/serialization/collection_size_type.hpp>
 #endif
 
 #include <hpx/config.hpp>
 #include <hpx/util/portable_binary_archive.hpp>
 #include <hpx/util/basic_binary_iprimitive.hpp>
+
+#include <limits>
 
 namespace hpx { namespace util
 {
@@ -119,7 +122,7 @@ protected:
 #endif
     unsigned int m_flags;
     HPX_ALWAYS_EXPORT void
-    load_impl(boost::intmax_t& l, char maxsize);
+    load_impl(boost::int64_t& l, char maxsize);
 
     // default fall through for any types not specified here
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -131,7 +134,7 @@ protected:
     template <typename T>
     void load(T& t, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
     {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(T));
         // use cast to avoid compile time warning
         t = static_cast<T>(l);
@@ -153,32 +156,32 @@ protected:
     }
 #if BOOST_VERSION >= 104400
     void load(boost::archive::class_id_reference_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_reference_type(
-            boost::archive::class_id_type(std::size_t(l)));
+                boost::archive::class_id_type(std::size_t(l)));
     }
     void load(boost::archive::class_id_optional_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_optional_type(
-            boost::archive::class_id_type(std::size_t(l)));
+                boost::archive::class_id_type(std::size_t(l)));
     }
     void load(boost::archive::class_id_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_type(std::size_t(l));
     }
     void load(boost::archive::object_id_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::object_id_type(static_cast<std::size_t>(l));
     }
     void load(boost::archive::object_reference_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::object_reference_type(
-            boost::archive::object_id_type(std::size_t(l)));
+                boost::archive::object_id_type(std::size_t(l)));
     }
     void load(boost::archive::tracking_type& t) {
         bool l = false;
@@ -186,19 +189,30 @@ protected:
         t = boost::archive::tracking_type(l);
     }
     void load(boost::archive::version_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::version_type(static_cast<unsigned int>(l));
     }
     void load(boost::archive::library_version_type& t) {
-        boost::intmax_t l = 0;
+        boost::int64_t l = 0;
         load_impl(l, sizeof(boost::uint16_t));
         t = boost::archive::library_version_type(static_cast<unsigned int>(l));
     }
     void load(boost::serialization::item_version_type& t) {
-        boost::intmax_t l = 0;
-        load_impl(l, sizeof(boost::intmax_t));
+        boost::int64_t l = 0;
+        load_impl(l, sizeof(boost::int64_t));
+        if (l > static_cast<boost::int64_t>((std::numeric_limits<unsigned int>::max)())) {
+            BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
+        }
         t = boost::serialization::item_version_type(static_cast<unsigned int>(l));
+    }
+    void load(boost::serialization::collection_size_type& t) {
+        boost::int64_t l = 0;
+        load_impl(l, sizeof(boost::int64_t));
+        if (l > static_cast<boost::int64_t>((std::numeric_limits<unsigned int>::max)())) {
+            BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
+        }
+        t = boost::serialization::collection_size_type(static_cast<unsigned int>(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING

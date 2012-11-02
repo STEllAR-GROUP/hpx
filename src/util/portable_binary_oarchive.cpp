@@ -41,7 +41,7 @@ namespace hpx { namespace util
 {
 
 void portable_binary_oarchive::save_impl(
-    const boost::intmax_t l, const char maxsize)
+    const boost::int64_t l, const char maxsize)
 {
     char size = 0;
     if (l == 0) {
@@ -49,7 +49,7 @@ void portable_binary_oarchive::save_impl(
         return;
     }
 
-    boost::intmax_t ll;
+    boost::int64_t ll;
     bool negative = (l < 0);
     if (negative)
         ll = -l;
@@ -71,7 +71,7 @@ void portable_binary_oarchive::save_impl(
 
     char* cptr = reinterpret_cast<char *>(& ll);
 #ifdef BOOST_BIG_ENDIAN
-    cptr += (sizeof(boost::intmax_t) - size);
+    cptr += (sizeof(boost::int64_t) - size);
     if(m_flags & endian_little)
         reverse_bytes(size, cptr);
 #else

@@ -45,6 +45,7 @@ namespace hpx { namespace util
 #include <boost/archive/detail/register_archive.hpp>
 #if BOOST_VERSION >= 104400
 #include <boost/serialization/item_version_type.hpp>
+#include <boost/serialization/collection_size_type.hpp>
 #endif
 
 #include <hpx/config.hpp>
@@ -119,7 +120,7 @@ protected:
 #endif
     unsigned int m_flags;
     HPX_ALWAYS_EXPORT void
-    save_impl(const boost::intmax_t l, const char maxsize);
+    save_impl(const boost::int64_t l, const char maxsize);
     // add base class to the places considered when matching
     // save function to a specific set of arguments.  Note, this didn't
     // work on my MSVC 7.0 system so we use the sure-fire method below
@@ -129,7 +130,7 @@ protected:
     template <typename T>
     void save(T const& val, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
     {
-        boost::intmax_t t = static_cast<boost::intmax_t>(val);
+        boost::int64_t t = static_cast<boost::int64_t>(val);
         save_impl(t, sizeof(T));
     }
 
@@ -144,23 +145,23 @@ protected:
     }
 #if BOOST_VERSION >= 104400
     void save(const boost::archive::class_id_reference_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
     void save(const boost::archive::class_id_optional_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
     void save(const boost::archive::class_id_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
     void save(const boost::archive::object_id_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
     void save(const boost::archive::object_reference_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
     void save(const boost::archive::tracking_type& t) {
@@ -168,16 +169,20 @@ protected:
         this->primitive_base_t::save(l);
     }
     void save(const boost::archive::version_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
     void save(const boost::archive::library_version_type& t) {
-        boost::intmax_t l = t;
+        boost::int64_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
     void save(const boost::serialization::item_version_type& t) {
-        boost::intmax_t l = t;
-        save_impl(l, sizeof(boost::intmax_t));
+        boost::int64_t l = t;
+        save_impl(l, sizeof(boost::int64_t));
+    }
+    void save(const boost::serialization::collection_size_type& t) {
+        boost::int64_t l = t;
+        save_impl(l, sizeof(boost::int64_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
