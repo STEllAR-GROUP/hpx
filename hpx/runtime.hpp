@@ -93,8 +93,9 @@ namespace hpx
         // the TSS holds a pointer to the runtime associated with a given
         // OS thread
         struct tls_tag {};
-        static hpx::util::thread_specific_ptr<runtime*, tls_tag> runtime_;
+        static util::thread_specific_ptr<runtime*, tls_tag> runtime_;
         static util::thread_specific_ptr<std::string, tls_tag> thread_name_;
+        static util::thread_specific_ptr<boost::uint64_t, tls_tag> uptime_;
 
         /// \brief access configuration information
         util::runtime_configuration& get_config()
@@ -113,6 +114,9 @@ namespace hpx
 
         /// \brief Return the name of the calling thread.
         static std::string const* get_thread_name();
+
+        /// \brief Return the system uptime measure on the thread executing this call
+        static boost::uint64_t runtime::get_system_uptime();
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.

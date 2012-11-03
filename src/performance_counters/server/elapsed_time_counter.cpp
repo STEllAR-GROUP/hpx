@@ -28,8 +28,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
-      : base_type_holder(info),
-        started_at_(static_cast<boost::int64_t>(util::high_resolution_clock::now()))
+      : base_type_holder(info)
     {
         if (info.type_ != counter_elapsed_time) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -41,12 +40,11 @@ namespace hpx { namespace performance_counters { namespace server
     void elapsed_time_counter::get_counter_value(counter_value& value)
     {
         // gather the current value
-        boost::int64_t now = static_cast<boost::int64_t>(util::high_resolution_clock::now());
-        value.value_ = now - started_at_;
+        value.value_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         value.scaling_ = 1000000000LL;      // coefficient to get seconds
         value.scale_inverse_ = true;
         value.status_ = status_new_data;
-        value.time_ = static_cast<boost::uint64_t>(now);
+        value.time_ = static_cast<boost::uint64_t>(util::high_resolution_clock::now());
         value.count_ = ++invocation_count_;
     }
 }}}

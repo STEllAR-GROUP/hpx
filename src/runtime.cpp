@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 
 #if defined(HPX_HAVE_HWLOC)
     #include <hpx/runtime/threads/policies/hwloc_topology.hpp>
@@ -180,8 +181,9 @@ namespace hpx
 
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
-    hpx::util::thread_specific_ptr<std::string, runtime::tls_tag> runtime::thread_name_;
+    util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
+    util::thread_specific_ptr<std::string, runtime::tls_tag> runtime::thread_name_;
+    util::thread_specific_ptr<boost::uint64_t, runtime::tls_tag> runtime::uptime_;
 
     void runtime::init_tss()
     {
@@ -191,6 +193,7 @@ namespace hpx
             BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
+            runtime::uptime_.reset(new boost::uint64_t (util::high_resolution_clock::now()));
             threads::coroutine_type::impl_type::init_self();
         }
     }
@@ -199,12 +202,19 @@ namespace hpx
     {
         // reset our TSS
         threads::coroutine_type::impl_type::reset_self();
+        runtime::uptime_.reset();
         runtime::runtime_.reset();
     }
 
     std::string const* runtime::get_thread_name()
     {
         return runtime::thread_name_.get();
+    }
+
+    boost::uint64_t runtime::get_system_uptime()
+    {
+        boost::int64_t diff = util::high_resolution_clock::now() - *runtime::uptime_.get();
+        return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
     }
 
     /// \brief Register all performance counter types related to this runtime
@@ -547,6 +557,11 @@ namespace hpx
     std::string const* get_thread_name()
     {
         return runtime::get_thread_name();
+    }
+
+    boost::uint64_t get_system_uptime()
+    {
+        return runtime::get_system_uptime();
     }
 }
 

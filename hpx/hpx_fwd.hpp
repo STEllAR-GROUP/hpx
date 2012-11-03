@@ -920,6 +920,14 @@ namespace hpx
     /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, it will return zero.
     HPX_API_EXPORT std::string const* get_thread_name();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the system uptime measure on the thread executing this call.
+    ///
+    /// This function returns the system uptime measured in nanoseconds for the
+    /// thread executing this call. If the function is called while no HPX
+    /// runtime system is active, it will return zero.
+    HPX_API_EXPORT boost::uint64_t get_system_uptime();
 }
 
 #include <hpx/lcos/async_fwd.hpp>

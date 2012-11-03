@@ -46,9 +46,6 @@ namespace hpx { namespace performance_counters { namespace server
         {
             base_type::set_component_type(t);
         }
-
-    private:
-        boost::int64_t started_at_;
     };
 }}}
 
