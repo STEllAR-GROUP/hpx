@@ -584,6 +584,50 @@ struct get_remote_result<bool, agas::response>
     }
 };
 
+template <>
+struct get_remote_result<boost::uint32_t, agas::response>
+{
+    static boost::uint32_t call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::primary_ns_num_localities:
+        case agas::component_ns_num_localities:
+            return rep.get_num_localities();
+
+        case agas::primary_ns_num_threads:
+            return rep.get_num_overall_threads();
+
+        default:
+            break;
+        }
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            "get_remote_result<boost::uint32_t, agas::response>::call", 
+            "unexpected action code in result conversion");
+    }
+};
+
+template <>
+struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
+{
+    static std::vector<boost::uint32_t> call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::primary_ns_num_threads:
+            return rep.get_num_threads();
+
+        default:
+            break;
+        }
+        HPX_THROW_EXCEPTION(bad_parameter, 
+            "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call", 
+            "unexpected action code in result conversion");
+    }
+};
+
 }}
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)

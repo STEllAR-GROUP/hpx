@@ -479,6 +479,10 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
+    lcos::future<boost::uint32_t> get_num_localities_async(
+        components::component_type type = components::component_invalid
+        );
+
     boost::uint32_t get_num_localities(
         components::component_type type
       , error_code& ec = throws
@@ -489,9 +493,13 @@ public:
         return get_num_localities(components::component_invalid, ec);
     }
 
+    lcos::future<boost::uint32_t> get_num_overall_threads_async();
+
     boost::uint32_t get_num_overall_threads(
         error_code& ec = throws
         );
+
+    lcos::future<std::vector<boost::uint32_t> > get_num_threads_async();
 
     std::vector<boost::uint32_t> get_num_threads(
         error_code& ec = throws

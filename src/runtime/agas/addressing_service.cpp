@@ -452,6 +452,7 @@ bool addressing_service::get_localities(
     }
 } // }}}
 
+///////////////////////////////////////////////////////////////////////////////
 boost::uint32_t addressing_service::get_num_localities(
     components::component_type type
   , error_code& ec
@@ -499,6 +500,23 @@ boost::uint32_t addressing_service::get_num_localities(
     return boost::uint32_t(-1);
 } // }}}
 
+lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
+    components::component_type type
+    )
+{ // {{{ get_num_localities implementation
+    if (type == components::component_invalid)
+    {
+        naming::id_type const target = bootstrap_primary_namespace_id();
+        request req(primary_ns_num_localities, type);
+        return stubs::primary_namespace::service_async<boost::uint32_t>(target, req);
+    }
+
+    naming::id_type const target = bootstrap_component_namespace_id();
+    request req(component_ns_num_localities, type);
+    return stubs::component_namespace::service_async<boost::uint32_t>(target, req);
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
 boost::uint32_t addressing_service::get_num_overall_threads(
     error_code& ec
     )
@@ -527,6 +545,13 @@ boost::uint32_t addressing_service::get_num_overall_threads(
         }
     }
     return boost::uint32_t(-1);
+} // }}}
+
+lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
+{ // {{{
+    naming::id_type const target = bootstrap_primary_namespace_id();
+    request req(primary_ns_num_threads);
+    return stubs::primary_namespace::service_async<boost::uint32_t>(target, req);
 } // }}}
 
 std::vector<boost::uint32_t> addressing_service::get_num_threads(
@@ -559,6 +584,15 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
     return std::vector<boost::uint32_t>();
 } // }}}
 
+lcos::future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
+{ // {{{
+    naming::id_type const target = bootstrap_primary_namespace_id();
+    request req(primary_ns_num_threads);
+    return stubs::primary_namespace::service_async<
+        std::vector<boost::uint32_t> >(target, req);
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
 components::component_type addressing_service::get_component_id(
     std::string const& name
   , error_code& ec

@@ -142,6 +142,69 @@ naming::id_type resolve_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// lcos::future<std::vector<naming::id_type> > get_localities_async(
+//     components::component_type type
+//     )
+// {
+//     naming::resolver_client& agas_ = naming::get_agas_client();
+//     return agas_.get_localities_async();
+// }
+// 
+// std::vector<naming::id_type> get_localities(
+//     components::component_type type
+//   , error_code& ec
+//     )
+// {
+//     naming::resolver_client& agas_ = naming::get_agas_client();
+//     return agas_.get_localities(type, ec);
+// }
+
+lcos::future<boost::uint32_t> get_num_localities_async(
+    components::component_type type
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_num_localities_async();
+}
+
+boost::uint32_t get_num_localities(
+    components::component_type type
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_num_localities(type, ec);
+}
+
+lcos::future<std::vector<boost::uint32_t> > get_num_threads_async()
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_num_threads_async();
+}
+
+std::vector<boost::uint32_t> get_num_threads(
+    error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_num_threads(ec);
+}
+
+lcos::future<boost::uint32_t> get_num_overall_threads_async()
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_num_overall_threads_async();
+}
+
+boost::uint32_t get_num_overall_threads(
+    error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.get_num_overall_threads(ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 bool is_local_address(
     naming::gid_type const& gid
   , error_code& ec
