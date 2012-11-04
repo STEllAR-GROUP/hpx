@@ -580,7 +580,7 @@ struct get_remote_result<bool, agas::response>
         agas::response const& rep
         )
     {
-        return success != rep.get_status();
+        return success == rep.get_status();
     }
 };
 
