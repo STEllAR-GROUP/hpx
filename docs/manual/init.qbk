@@ -139,7 +139,7 @@ by section basis below.
      [This is initialized to the base directory __hpx__ has been loaded from.]
      [dynamic information]]
     [[`system.executable_prefix`]
-     [This is initialized to the base directory the current executable has been 
+     [This is initialized to the base directory the current executable has been
       loaded from.]
      [dynamic information]]
 ]
@@ -411,19 +411,19 @@ sections, one for each component.
       for AGAS services. This property is ignored if `hpx.agas.use_caching` is
       false. Note that if `hpx.agas.use_range_caching` is true, this size will
       refer to the maximum number of ranges stored in the cache, not the number
-      of entries spanned by the cache. Note also, that the size of the cache 
+      of entries spanned by the cache. Note also, that the size of the cache
       will be determined by the large of the following two numbers: the value
-      of this key and the value of `hpx.agas.local_cache_size_per_thread` 
+      of this key and the value of `hpx.agas.local_cache_size_per_thread`
       multiplied by the number of threads used systemwide in the running application.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE` (`256`)]]
     [[`hpx.agas.local_cache_size_per_thread`]
      [This property defines the size of the software address translation cache
-      for AGAS services on a per node basis. This property is ignored if 
-      `hpx.agas.use_caching` is false. Note that if `hpx.agas.use_range_caching` 
-      is true, this size will refer to the maximum number of ranges stored in 
-      the cache, not the number of entries spanned by the cache. Note also, 
-      that the size of the cache will be determined by the large of the following 
+      for AGAS services on a per node basis. This property is ignored if
+      `hpx.agas.use_caching` is false. Note that if `hpx.agas.use_range_caching`
+      is true, this size will refer to the maximum number of ranges stored in
+      the cache, not the number of entries spanned by the cache. Note also,
+      that the size of the cache will be determined by the large of the following
       two numbers: the `hpx.agas.local_cache_size` and the value of this key
       multiplied by the number of threads used system wide in the running application.]
      [static information, the default depends on the compile time preprocessor
@@ -490,10 +490,19 @@ __iniformat__.
   [hpx_cmdline `--hpx:app-config`]. Note that this file will be merged as the
   content for a top level section `[application]`.
 
-[note Any changes made to the configuration database caused by one of the files
-      will influence the loading process for all subsequent files. For instance,
+[note Any changes made to the configuration database caused by one of the steps
+      will influence the loading process for all subsequent steps. For instance,
       if one of the ini files loaded changes the property `hpx.ini_path`, this
       will influence the directories searched in step 9 as described above.]
+
+[important The __hpx__ core library will verify that all configuration settings
+           specified on the command line (using the [hpx_cmdline `--hpx:ini`]
+           option) will be checked for validity. That means that the library
+           will accept only /known/ configuration settings. This is to protect
+           the user from unintentional typos while specifying those settings.
+           This behavior can be overwritten by appending a `'!'` to the
+           configuration key, thus forcing the setting to be entered into the
+           configuration database, for instance: `--hpx:ini=hpx.foo! = 1`.]
 
 If any of the environment variables or files listed above is not found the
 corresponding loading step will be silently skipped.
@@ -876,7 +885,7 @@ described in the table below:
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*__hpx__ options (allowed on command line only)]]]
-    [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible 
+    [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible
                                              values: 'full' (additionally prints options from components)]]
     [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
     [[`--hpx:options-file arg`]             [specify a file containing command line options
@@ -957,11 +966,11 @@ described in the table below:
                                  (default: 0, which means print once at shutdown)]]
     [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
                                  to the given file (default: console)]]
-    [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible 
-                                 values: 'minimal' (prints counter name skeletons), 
+    [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible
+                                 values: 'minimal' (prints counter name skeletons),
                                  'full' (prints all available counter names)]]
-    [[`--hpx:list-counter-infos`][list the description of all registered performance counters, 
-                                   possible values: 'minimal' (prints info for counter name skeletons), 
+    [[`--hpx:list-counter-infos`][list the description of all registered performance counters,
+                                   possible values: 'minimal' (prints info for counter name skeletons),
                                   'full' (prints all available counter infos)]]
 ]
 
@@ -996,6 +1005,28 @@ predefined command line option shortcuts:
     [[-8]               [--hpx:node=8]]
     [[-9]               [--hpx:node=9]]
 ]
+
+For runs involving more than one locality it is sometimes desireable to supply
+specific command line options to single localities only. Especially when the
+__hpx__ application is launched using a scheduler (like PBS, for more details
+see section __pbs__), specifying dedicated command line options for single
+localities could prove to be tricky. For this reason all of the command line
+options which have the general format `--hpx:<some_key>` can be used in a more 
+general form: `--hpx:<N>:<some_key>`, where <N> is the number of the locality
+this command line options will be applied to, all other localities will simply 
+ignore the option. For instance, the following PBS script passes the option
+[hpx_cmdline `--hpx:pu-offset=4`] to the locality `'1'` only.
+
+```
+    #!/bin/bash
+    #
+    #PBS -l nodes=2:ppn=4
+
+    APP_PATH=~/packages/hpx/bin/hello_world
+    APP_OPTIONS=
+
+    __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:1:pu-offset=4]`` ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+```
 
 [endsect] [/ Command Line Handling]
 
