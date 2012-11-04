@@ -438,7 +438,7 @@ namespace hpx
     {
         naming::gid_type get_next_id()
         {
-            if (NULL == hpx::applier::get_applier_ptr())
+            if (NULL == get_runtime_ptr())
                 return naming::invalid_gid;
 
             return get_runtime().get_next_id();
