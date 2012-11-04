@@ -96,9 +96,18 @@ void hpx_test_main(
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
 
-            // Remove the symbolic name.
-            HPX_TEST_EQ(id, unregister_name(name));
+            // let id go out of scope
         }
+
+        // Flush pending reference counting operations.
+        garbage_collect();
+
+        // The component should still be alive, as the symbolic binding holds
+        // a reference to it.
+        HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+
+        // Remove the symbolic name.
+        HPX_TEST_EQ(raw_gid, unregister_name(name).get_gid());
 
         // Flush pending reference counting operations.
         garbage_collect();
