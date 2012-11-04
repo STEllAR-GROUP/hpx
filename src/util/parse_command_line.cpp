@@ -39,6 +39,52 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // All command line options which are normally formatted as --hpx:foo
+        // should be usable as --hpx:N:foo, where N is the node number this 
+        // option should be exclusively used for.
+        bool handle_node_specific_option(std::string const& s, std::size_t node, 
+            std::pair<std::string, std::string>& opt)
+        {
+            // any option not starting with --hpx: will be handled elsewhere
+            char hpx_prefix[] = "--hpx:";
+            std::string::size_type const hpx_prefix_len = sizeof(hpx_prefix)-1;
+            if (s.size() < hpx_prefix_len || s.find(hpx_prefix) != 0 || 
+                !std::isdigit(s[hpx_prefix_len]))
+            {
+                return false;
+            }
+
+            // any --hpx: option without a second ':' ishandled elsewhere as well
+            std::string::size_type p = s.find_first_of(":", hpx_prefix_len);
+            if (p == std::string::npos)
+                return false;
+
+            if (boost::lexical_cast<std::size_t>(
+                    s.substr(hpx_prefix_len, p-hpx_prefix_len)) == node)
+            {
+                // this option is for the current locality only
+                std::string::size_type p1 = s.find_first_of('=', p);
+                if (p1 != std::string::npos) {
+                    // the option has a value
+                    std::string o("hpx:" + trim_whitespace(s.substr(p+1, p1-p-1)));
+                    std::string v(trim_whitespace(s.substr(p1+1)));
+                    opt = std::make_pair(o, v);
+                }
+                else {
+                    // no value
+                    std::string o("hpx:" + trim_whitespace(s.substr(p+1)));
+                    opt = std::make_pair(o, "");
+                }
+                return true;
+            }
+
+            // This option is specificly not for us, so we return an option 
+            // which will be silently ignored.
+            opt = std::make_pair(std::string("hpx:ignore"), std::string());
+            return true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // Handle aliasing of command line options based on information stored
         // in the ini-configuration
         std::pair<std::string, std::string> handle_aliasing(
@@ -96,7 +142,7 @@ namespace hpx { namespace util
             }
             else {
                 // no value
-                result = std::make_pair(expand_to, "");
+                result = std::make_pair(expand_to, std::string());
             }
 
             return result;
@@ -108,19 +154,27 @@ namespace hpx { namespace util
         // resolve defined command line option aliases.
         struct option_parser
         {
-            option_parser(util::section const& ini)
-              : ini_(ini)
+            option_parser(util::section const& ini, std::size_t node)
+              : ini_(ini), node_(node)
             {}
 
             std::pair<std::string, std::string> operator()(std::string const& s) const
             {
+                // handle special syntax for  configuration files @filename
                 if ('@' == s[0])
                     return std::make_pair(std::string("hpx:options-file"), s.substr(1));
 
+                // handle node specific options
+                std::pair<std::string, std::string> opt;
+                if (handle_node_specific_option(s, node_, opt))
+                    return opt;
+
+                // handle aliasing
                 return handle_aliasing(ini_, s);
             }
 
             util::section const& ini_;
+            std::size_t node_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -233,7 +287,7 @@ namespace hpx { namespace util
         util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         int argc, char *argv[], boost::program_options::variables_map& vm,
-        commandline_error_mode error_mode,
+        std::size_t node, commandline_error_mode error_mode,
         hpx::runtime_mode mode,
         boost::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
@@ -417,6 +471,7 @@ namespace hpx { namespace util
             hidden_options.add_options()
                 ("hpx:positional", value<std::vector<std::string> >(),
                   "positional options")
+                ("hpx:ignore", "this option will be silently ignored")
             ;
 
             // construct the overall options description and parse the
@@ -436,7 +491,7 @@ namespace hpx { namespace util
                         .options(desc_cmdline)
                         .positional(pd)
                         .style(unix_style)
-                        .extra_parser(detail::option_parser(rtcfg)),
+                        .extra_parser(detail::option_parser(rtcfg, node)),
                     error_mode
                 ).run()
             );
@@ -486,7 +541,7 @@ namespace hpx { namespace util
         util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         std::string const& cmdline, boost::program_options::variables_map& vm,
-        commandline_error_mode error_mode, hpx::runtime_mode mode,
+        std::size_t node, commandline_error_mode error_mode, hpx::runtime_mode mode,
         boost::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
@@ -503,7 +558,7 @@ namespace hpx { namespace util
 
         return parse_commandline(
             rtcfg, app_options, static_cast<int>(args.size()), argv.get(), vm,
-            error_mode, mode, visible, unregistered_options);
+            node, error_mode, mode, visible, unregistered_options);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -523,11 +578,16 @@ namespace hpx { namespace util
         //     cmd_line=....
         //
         std::string cmdline;
+        std::size_t node = std::size_t(-1);
+
         hpx::util::section& cfg = hpx::get_runtime().get_config();
         if (cfg.has_entry("hpx.cmd_line"))
-            cmdline = cfg.get_entry("hpx.cmd_line", "");
+            cmdline = cfg.get_entry("hpx.cmd_line");
+        if (cfg.has_entry("hpx.locality"))
+            node = boost::lexical_cast<std::size_t>(cfg.get_entry("hpx.locality"));
 
-        return parse_commandline(cfg, app_options, cmdline, vm, allow_unregistered);
+        return parse_commandline(cfg, app_options, cmdline, vm, node,
+            allow_unregistered);
     }
 
     ///////////////////////////////////////////////////////////////////////////

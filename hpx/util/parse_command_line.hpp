@@ -25,7 +25,7 @@ namespace hpx { namespace util
         hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         std::string const& cmdline, boost::program_options::variables_map& vm,
-        commandline_error_mode error_mode = return_on_error,
+        std::size_t node, commandline_error_mode error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default,
         boost::program_options::options_description* visible = 0,
         std::vector<std::string>* unregistered_options = 0);
@@ -34,8 +34,8 @@ namespace hpx { namespace util
         hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         int argc, char *argv[], boost::program_options::variables_map& vm,
-        commandline_error_mode error_mode = return_on_error,
-        hpx::runtime_mode mode = runtime_mode_default,
+        std::size_t node, commandline_error_mode error_mode = return_on_error,
+        hpx::runtime_mode mode = runtime_mode_default, 
         boost::program_options::options_description* visible = 0,
         std::vector<std::string>* unregistered_options = 0);
 

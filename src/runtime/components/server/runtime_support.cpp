@@ -843,8 +843,9 @@ namespace hpx { namespace components { namespace server
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 boost::program_options::variables_map vm;
 
-                util::parse_commandline(ini, options, unknown_cmd_line, vm,
-                    util::rethrow_on_error, get_runtime_mode_from_name(runtime_mode));
+                util::parse_commandline(ini, options, unknown_cmd_line, vm, 
+                    std::size_t(-1), util::rethrow_on_error, 
+                    get_runtime_mode_from_name(runtime_mode));
             }
 
             std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
@@ -866,7 +867,7 @@ namespace hpx { namespace components { namespace server
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 boost::program_options::variables_map vm;
 
-                util::parse_commandline(ini, options, cmd_line, vm,
+                util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
                     util::allow_unregistered, get_runtime_mode_from_name(runtime_mode));
 
                 if (vm.count("hpx:exit"))

@@ -795,8 +795,8 @@ namespace hpx
             boost::program_options::variables_map vm;
 
             result = util::command_line_handling(desc_cmdline, argc, argv, 
-                ini_config, mode, 
-                f, vm, rtcfg, num_threads, num_localities, queuing);
+                ini_config, mode, f, vm, rtcfg, num_threads, num_localities, 
+                queuing);
             if (result != 0) {
                 if (result > 0)
                     result = 0;     // --hpx:help
