@@ -31,6 +31,16 @@ namespace test
                 "instancename",
                 2, 1, false)
         },
+        {   "/objectname{parentinstancename#*/instancename#*}/countername",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "",
+                "parentinstancename#*",
+                "instancename#*",
+                -1, -1, false)
+        },
         {   "/objectname{parentinstancename#2/instancename#1}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
@@ -40,6 +50,16 @@ namespace test
                 "parentinstancename",
                 "instancename",
                 2, 1, false)
+        },
+        {   "/objectname{parentinstancename#*/instancename#*}/countername@parameter",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "parameter",
+                "parentinstancename#*",
+                "instancename#*",
+                -1, -1, false)
         },
         {   "/objectname{/objectname{parentinstancename#2/instancename#1}/countername}/countername",
             "/objectname/countername",
@@ -71,6 +91,16 @@ namespace test
                 "instancename",
                 2, 1, false)
         },
+        {   "/objectname{parentinstancename#*/instancename#*}/countername/morecountername",
+            "/objectname/countername/morecountername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername/morecountername",
+                "",
+                "parentinstancename#*",
+                "instancename#*",
+                -1, -1, false)
+        },
         {   "/objectname{parentinstancename#2/instancename#1}/countername/morecountername@parameter",
             "/objectname/countername/morecountername",
             hpx::performance_counters::counter_path_elements(
@@ -80,6 +110,16 @@ namespace test
                 "parentinstancename",
                 "instancename",
                 2, 1, false)
+        },
+        {   "/objectname{parentinstancename#*/instancename#*}/countername/morecountername@parameter",
+            "/objectname/countername/morecountername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername/morecountername",
+                "parameter",
+                "parentinstancename#*",
+                "instancename#*",
+                -1, -1, false)
         },
         {   "/objectname{parentinstancename/instancename#1}/countername",
             "/objectname/countername",
@@ -111,6 +151,16 @@ namespace test
                 "moreparent/instancename",
                 -1, 1, false)
         },
+        {   "/objectname{parentinstancename/moreparent/instancename#*}/countername",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "",
+                "parentinstancename",
+                "moreparent/instancename#*",
+                -1, -1, false)
+        },
         {   "/objectname{parentinstancename/moreparent/instancename#1}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
@@ -120,6 +170,16 @@ namespace test
                 "parentinstancename",
                 "moreparent/instancename",
                 -1, 1, false)
+        },
+        {   "/objectname{parentinstancename/moreparent/instancename#*}/countername@parameter",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "parameter",
+                "parentinstancename",
+                "moreparent/instancename#*",
+                -1, -1, false)
         },
         {   "/objectname{parentinstancename/instancename}/countername",
             "/objectname/countername",

@@ -317,27 +317,31 @@ namespace hpx { namespace performance_counters
         path.countername_ = elements.counter_;
 
         path.parentinstancename_ = elements.instance_.parent_.name_;
+        path.parentinstance_is_basename_ = elements.instance_.parent_.basename_;
         path.parentinstanceindex_ = -1;
-        if (elements.instance_.parent_.index_ == "#*") {
-            path.parentinstancename_ += "#*";
-        }
-        else if (!elements.instance_.parent_.index_.empty()) {
-            path.parentinstanceindex_ =
-                boost::lexical_cast<boost::uint64_t>(elements.instance_.parent_.index_);
-        }
 
         path.instancename_ = elements.instance_.child_.name_;
         path.instanceindex_ = -1;
-        if (elements.instance_.child_.index_ == "#*") {
-            path.instancename_ += "#*";
-        }
-        else if (!elements.instance_.child_.index_.empty()) {
-            path.instanceindex_ =
-                boost::lexical_cast<boost::uint64_t>(elements.instance_.child_.index_);
-        }
 
         path.parameters_ = elements.parameters_;
-        path.parentinstance_is_basename_ = elements.instance_.parent_.basename_;
+
+        if (!path.parentinstance_is_basename_) {
+            if (elements.instance_.parent_.index_ == "#*") {
+                path.parentinstancename_ += "#*";
+            }
+            else if (!elements.instance_.parent_.index_.empty()) {
+                path.parentinstanceindex_ =
+                    boost::lexical_cast<boost::uint64_t>(elements.instance_.parent_.index_);
+            }
+
+            if (elements.instance_.child_.index_ == "#*") {
+                path.instancename_ += "#*";
+            }
+            else if (!elements.instance_.child_.index_.empty()) {
+                path.instanceindex_ =
+                    boost::lexical_cast<boost::uint64_t>(elements.instance_.child_.index_);
+            }
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
