@@ -130,8 +130,8 @@ int main(
     // We need to explicitly enable the test components used by this test.
     using namespace boost::assign;
     std::vector<std::string> cfg;
-    cfg += "hpx.components.simple_refcnt_checker.enabled = 1";
-    cfg += "hpx.components.managed_refcnt_checker.enabled = 1";
+    cfg += "hpx.components.simple_refcnt_checker.enabled! = 1";
+    cfg += "hpx.components.managed_refcnt_checker.enabled! = 1";
 
     // Initialize and run HPX.
     return init(cmdline, argc, argv, cfg);

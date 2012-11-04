@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     // we need to explicitly enable the test components used by this test
     using namespace boost::assign;
     std::vector<std::string> cfg;
-    cfg += "hpx.components.action_move_semantics.enabled = 1";
+    cfg += "hpx.components.action_move_semantics.enabled! = 1";
 
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv, cfg);

@@ -190,6 +190,17 @@ void section::read (std::string const& filename)
     parse(filename, lines);
 }
 
+bool force_entry(std::string& str)
+{
+    std::string::size_type p = str.find_last_of("!");
+    if (p != std::string::npos && str.find_first_not_of(" \t", p+1) == std::string::npos)
+    {
+        str = str.substr(0, p);   // remove forcing modifier ('!')
+        return true;
+    }
+    return false;
+}
+
 // parse file
 void section::parse (std::string const& sourcename,
     std::vector<std::string> const& lines, bool verify_existing)
@@ -235,7 +246,7 @@ void section::parse (std::string const& sourcename,
             // found a entry line
             if (4 != what.size())
             {
-                line_msg("Cannot parse key/value in ", sourcename, linenum, line);
+                line_msg("Cannot parse key/value in: ", sourcename, linenum, line);
             }
 
             section* s = current;  // save the section we're in
@@ -255,12 +266,13 @@ void section::parse (std::string const& sourcename,
             current = add_section_if_new (current, sec_name.substr(pos));
 
             // add key/val to this section
-            if (verify_existing && !current->has_entry(what[2])) 
+            std::string key(what[2]);
+            if (!force_entry(key) && verify_existing && !current->has_entry(key)) 
             {
-                line_msg ("Attempt to initialize unknown entry ", sourcename, 
+                line_msg ("Attempt to initialize unknown entry: ", sourcename, 
                     linenum, line);
             }
-            current->add_entry (what[2], what[3]);
+            current->add_entry (key, what[3]);
 
             // restore the old section
             current = s;
@@ -271,7 +283,7 @@ void section::parse (std::string const& sourcename,
             // found a section line
             if (2 != what.size())
             {
-                line_msg("Cannot parse section in ", sourcename, linenum, line);
+                line_msg("Cannot parse section in: ", sourcename, linenum, line);
             }
 
             current = this;     // start adding sections at the root
@@ -296,21 +308,22 @@ void section::parse (std::string const& sourcename,
             // found a entry line
             if (3 != what.size())
             {
-                line_msg("Cannot parse key/value in ", sourcename, linenum, line);
+                line_msg("Cannot parse key/value in: ", sourcename, linenum, line);
             }
 
             // add key/val to current section
-            if (verify_existing && !current->has_entry(what[1])) 
+            std::string key(what[1]);
+            if (!force_entry(key) && verify_existing && !current->has_entry(key)) 
             {
-                line_msg ("Attempt to initialize unknown entry ", sourcename, 
+                line_msg ("Attempt to initialize unknown entry: ", sourcename, 
                     linenum, line);
             }
-            current->add_entry (what[1], what[2]);
+            current->add_entry (key, what[2]);
         }
         else {
             // Hmm, is not a section, is not an entry, is not empty - must be 
             // an error!
-            line_msg ("Cannot parse line at ", sourcename, linenum, line);
+            line_msg ("Cannot parse line at: ", sourcename, linenum, line);
         }
     }
 }
