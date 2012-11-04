@@ -39,6 +39,19 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        inline T safe_lexical_cast(std::string const& s, T dflt)
+        {
+            try {
+                return boost::lexical_cast<T>(s);
+            }
+            catch (boost::bad_lexical_cast const&) {
+                /**/;
+            }
+            return dflt;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // All command line options which are normally formatted as --hpx:foo
         // should be usable as --hpx:N:foo, where N is the node number this 
         // option should be exclusively used for.
@@ -59,8 +72,8 @@ namespace hpx { namespace util
             if (p == std::string::npos)
                 return false;
 
-            if (boost::lexical_cast<std::size_t>(
-                    s.substr(hpx_prefix_len, p-hpx_prefix_len)) == node)
+            if (safe_lexical_cast(s.substr(hpx_prefix_len, p-hpx_prefix_len),
+                    std::size_t(-1)) == node)
             {
                 // this option is for the current locality only
                 std::string::size_type p1 = s.find_first_of('=', p);
@@ -73,7 +86,7 @@ namespace hpx { namespace util
                 else {
                     // no value
                     std::string o("hpx:" + trim_whitespace(s.substr(p+1)));
-                    opt = std::make_pair(o, "");
+                    opt = std::make_pair(o, std::string());
                 }
                 return true;
             }
