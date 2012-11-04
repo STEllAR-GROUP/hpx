@@ -469,8 +469,8 @@ namespace hpx { namespace performance_counters
         error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        return get_runtime().get_counter_registry().add_counter_type(
-            info, create_counter, discover_counters, ec);
+        return rt ? rt->get_counter_registry().add_counter_type(
+            info, create_counter, discover_counters, ec) : status_generic_error;
     }
 
     ///////////////////////////////////////////////////////////////////////////
