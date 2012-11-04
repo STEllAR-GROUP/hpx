@@ -116,7 +116,7 @@ namespace hpx
         static std::string const* get_thread_name();
 
         /// \brief Return the system uptime measure on the thread executing this call
-        static boost::uint64_t runtime::get_system_uptime();
+        static boost::uint64_t get_system_uptime();
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
