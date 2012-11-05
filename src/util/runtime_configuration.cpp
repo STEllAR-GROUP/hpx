@@ -63,21 +63,10 @@ namespace hpx { namespace util
             "huge_stack_size = ${HPX_HUGE_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
 
-            // add placeholders for key to be added by command line handling
+            // add placeholders for keys to be added by command line handling
             "os_threads = 1",
-            "locality = 0",
             "localities = 1",
             "runtime_mode = 0",
-
-            "program_name = <unknown>",
-            "cmd_line = console",
-            "reconstructed_cmd_line = ",
-            "unknown_cmd_line =",
-            "cmd_line_help = ",
-            "cmd_line_help_option = ",
-
-            "nodefile = ",
-            "nodes = ",
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
