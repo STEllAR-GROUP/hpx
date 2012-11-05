@@ -72,7 +72,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -126,7 +126,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R()>::template get<
                     IArchive
@@ -296,7 +296,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -350,7 +350,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0)>::template get<
                     IArchive
@@ -520,7 +520,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -574,7 +574,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1)>::template get<
                     IArchive
@@ -744,7 +744,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -798,7 +798,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1 , A2)>::template get<
                     IArchive
@@ -968,7 +968,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1022,7 +1022,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1 , A2 , A3)>::template get<
                     IArchive
@@ -1192,7 +1192,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1246,7 +1246,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4)>::template get<
                     IArchive
@@ -1416,7 +1416,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1470,7 +1470,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5)>::template get<
                     IArchive
@@ -1640,7 +1640,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1694,7 +1694,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::template get<
                     IArchive
@@ -1864,7 +1864,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1918,7 +1918,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::template get<
                     IArchive
