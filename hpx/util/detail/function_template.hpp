@@ -394,7 +394,7 @@ namespace hpx { namespace util {
                           , OArchive
                         >();
 
-                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -452,7 +452,7 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
                     IArchive
