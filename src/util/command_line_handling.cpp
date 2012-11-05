@@ -58,6 +58,35 @@ namespace hpx { namespace util
                 return std::string("\"") + arg + "\"";
             return arg;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        void report_thread_warning(std::string const& batch_name, 
+            std::size_t threads, std::size_t batch_threads)
+        {
+            std::cerr << "hpx::init: command line warning: --hpx:threads "
+                    "used when running with "
+                << batch_name 
+                << ", requesting a larger number of threads ("
+                << threads
+                << ") than cores have been assigned by "
+                << batch_name
+                << " ("
+                << batch_threads
+                << "), the application might not run properly."
+                << std::endl;
+        }
+
+        void report_locality_warning(std::string const& batch_name)
+        {
+            std::cerr << "hpx::init: command line warning: "
+                    "--hpx:localities used when running with "
+                << batch_name
+                << ", requesting a different number of localities than have "
+                    "been assigned by " 
+                << batch_name
+                << ", the application might not run properly."
+                << std::endl;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -157,17 +186,8 @@ namespace hpx { namespace util
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
             using_nodelist && (num_threads_ > batch_threads))
         {
-            std::cerr << "hpx::init: command line warning: "
-                    "--hpx:ini=hpx.os_threads used when running with "
-                << env.get_batch_name()
-                << ", requesting a larger number of threads ("
-                << num_threads_
-                << ") than cores have been assigned by "
-                << env.get_batch_name()
-                << " ("
-                << batch_threads
-                << "), the application might not run properly."
-                << std::endl;
+            detail::report_thread_warning(env.get_batch_name(), 
+                num_threads_, batch_threads);
         }
 
         if (vm.count("hpx:threads")) {
@@ -183,17 +203,8 @@ namespace hpx { namespace util
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
                 using_nodelist && (threads > batch_threads))
             {
-                std::cerr << "hpx::init: command line warning: --hpx:threads "
-                        "used when running with "
-                    << env.get_batch_name() << ", requesting a larger "
-                        "number of threads ("
-                    << threads
-                    << ") than cores have been assigned by "
-                    << env.get_batch_name()
-                    << " ("
-                    << batch_threads
-                    << "), the application might not run properly."
-                    << std::endl;
+                detail::report_thread_warning(env.get_batch_name(), 
+                    threads, batch_threads);
             }
             num_threads_ = threads;
         }
@@ -206,13 +217,7 @@ namespace hpx { namespace util
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
             using_nodelist && (batch_localities != num_localities_))
         {
-            std::cerr << "hpx::init: command line warning: "
-                    "--hpx:ini=hpx.localities used when running with "
-                << env.get_batch_name()
-                << ", requesting a different number of localities than have "
-                    "been assigned by " << env.get_batch_name()
-                << ", the application might not run properly."
-                << std::endl;
+            detail::report_locality_warning(env.get_batch_name());
         }
 
         if (vm.count("hpx:localities")) {
@@ -220,13 +225,7 @@ namespace hpx { namespace util
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
                 using_nodelist && (localities != num_localities_))
             {
-                std::cerr << "hpx::init: command line warning: --hpx:localities "
-                        "used when running with " << env.get_batch_name()
-                    << ", requesting a different "
-                        "number of localities than have been assigned by "
-                    << env.get_batch_name()
-                    << ", the application might not run properly."
-                    << std::endl;
+                detail::report_locality_warning(env.get_batch_name());
             }
             num_localities_ = localities;
         }
