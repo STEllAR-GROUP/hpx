@@ -280,7 +280,7 @@ namespace hpx { namespace util
                 }
                 node = vm["hpx:node"].as<std::size_t>();
             }
-            if (env.agas_node() == node) {
+            if (env.agas_node() == node && mode_ != hpx::runtime_mode_connect) {
                 // console node, by default runs AGAS
                 run_agas_server = true;
                 mode_ = hpx::runtime_mode_console;
