@@ -225,10 +225,10 @@ namespace hpx { namespace parcelset
             return parcels_sent_.total_bytes();
         }
 
-        /// total data (arguments only) sent (bytes)
-        std::size_t get_total_argument_sent() const
+        /// total data (type only) sent (bytes)
+        std::size_t get_total_type_sent() const
         {
-            return parcels_sent_.total_argument_bytes();
+            return parcels_sent_.total_type_bytes();
         }
 
         /// total data received (bytes)
@@ -237,10 +237,10 @@ namespace hpx { namespace parcelset
             return parcels_received_.total_bytes();
         }
 
-        /// total data (arguments only) received (bytes)
-        std::size_t get_total_argument_received() const
+        /// total data (type only) received (bytes)
+        std::size_t get_total_type_received() const
         {
-            return parcels_received_.total_argument_bytes();
+            return parcels_received_.total_type_bytes();
         }
 
         std::size_t get_pending_parcels_count() const

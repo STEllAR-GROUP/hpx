@@ -15,7 +15,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/traits/argument_size.hpp>
+#include <hpx/traits/type_size.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -178,7 +178,7 @@ namespace hpx { namespace actions
         virtual threads::thread_stacksize get_thread_stacksize() const = 0;
 
         /// Return the size of action arguments in bytes
-        virtual std::size_t get_argument_size() const = 0;
+        virtual std::size_t get_type_size() const = 0;
 
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data&
@@ -480,9 +480,9 @@ namespace hpx { namespace actions
         }
 
         /// Return the size of action arguments in bytes
-        std::size_t get_argument_size() const
+        std::size_t get_type_size() const
         {
-            return traits::argument_size<arguments_type>::call(arguments_);
+            return traits::type_size<arguments_type>::call(arguments_);
         }
 
         /// Return all data needed for thread initialization

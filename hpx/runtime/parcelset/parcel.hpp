@@ -393,6 +393,16 @@ BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 #endif
 #endif
 
+#include <hpx/traits/type_size.hpp>
+
 #include <hpx/config/warnings_suffix.hpp>
 
+namespace hpx { namespace traits 
+{
+    template<>
+    struct type_size<hpx::parcelset::parcel>
+    {
+        static std::size_t call(hpx::parcelset::parcel const& parcel_);
+    };
+}}
 #endif
