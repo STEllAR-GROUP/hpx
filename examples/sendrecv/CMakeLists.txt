@@ -31,7 +31,7 @@ if(HDF5_CPP_FOUND AND HDF5_THREAD_SAFE AND CMAKE_Fortran_COMPILER AND HDF5_FORTR
   add_hpx_executable(sendrecv_client
     SOURCES ${sources}
     DEPENDENCIES sendrecv_hpx_component ${dependencies}
-    FOLDER "Examples/Applications/sendrecv")
+    FOLDER "Examples/Applications/GTCX")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.sendrecv.sendrecv_hpx)
