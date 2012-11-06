@@ -36,6 +36,7 @@ set(subdirs
     quickstart
     qt
     random_mem_access
+    sendrecv
     sheneos
     spell_check
     startup_shutdown
