@@ -66,7 +66,7 @@ namespace hpx { namespace util
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
             "localities = 1",
-            "runtime_mode = 0",
+            "runtime_mode = console",
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"

@@ -270,7 +270,11 @@ namespace hpx { namespace util
 
         // we initialize certain settings if --node is specified (or data
         // has been retrieved from the environment)
-        if (node != std::size_t(-1) || vm.count("hpx:node")) {
+        if (mode_ == hpx::runtime_mode_connect) {
+            // when connecting we need to select a unique port
+            hpx_port = HPX_CONNECTING_IP_PORT;
+        }
+        else if (node != std::size_t(-1) || vm.count("hpx:node")) {
             // command line overwrites the environment
             if (vm.count("hpx:node")) {
                 if (vm.count("hpx:agas")) {
@@ -279,14 +283,11 @@ namespace hpx { namespace util
                 }
                 node = vm["hpx:node"].as<std::size_t>();
             }
-            if (env.agas_node() == node && mode_ != hpx::runtime_mode_connect) {
+
+            if (env.agas_node() == node) {
                 // console node, by default runs AGAS
                 run_agas_server = true;
                 mode_ = hpx::runtime_mode_console;
-            }
-            else if (mode_ == hpx::runtime_mode_connect) {
-                // when connecting we need to select a unique port
-                hpx_port = HPX_CONNECTING_IP_PORT;
             }
             else {
                 // each node gets an unique port
@@ -301,10 +302,6 @@ namespace hpx { namespace util
             // store node number in configuration
             ini_config += "hpx.locality!=" +
                 boost::lexical_cast<std::string>(node);
-        }
-        else if (mode_ == hpx::runtime_mode_connect) {
-            // when connecting we need to select a unique port
-            hpx_port = HPX_CONNECTING_IP_PORT;
         }
 
         if (vm.count("hpx:ini")) {
