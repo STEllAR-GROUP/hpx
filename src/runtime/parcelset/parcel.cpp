@@ -156,3 +156,12 @@ namespace hpx { namespace parcelset
     }
 }}
 
+namespace hpx { namespace traits
+{
+    std::size_t 
+    type_size<hpx::parcelset::parcel>::call(hpx::parcelset::parcel const& parcel_)
+    {
+        return sizeof(hpx::parcelset::parcel) + parcel_.get_action()->get_type_size();
+    }
+}}
+

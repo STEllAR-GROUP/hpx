@@ -20,7 +20,7 @@ namespace hpx { namespace performance_counters { namespace parcels
     {
         data_point()
           : bytes_(0), time_(0), serialization_time_(0), num_parcels_(0),
-            argument_bytes_(0)
+            type_bytes_(0)
         {}
 
         std::size_t bytes_;           ///< number of bytes processed for this parcel
@@ -30,7 +30,7 @@ namespace hpx { namespace performance_counters { namespace parcels
                                       ///< start serialization timestamp after
                                       ///< processing holds elapsed serialization time
         std::size_t num_parcels_;     ///< The number of parcels precessed by this message
-        std::size_t argument_bytes_;  ///< number of bytes processed for action in
+        std::size_t type_bytes_;  ///< number of bytes processed for action in
                                       ///< this parcel
     };
 }}}

@@ -128,7 +128,7 @@ namespace hpx { namespace parcelset
                         BOOST_ASSERT(p.get_destination_locality() == here());
 
                         // incoming argument's size
-                        arg_size += p.get_action()->get_argument_size();
+                        arg_size += hpx::traits::type_size<parcel>::call(p);
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
@@ -139,7 +139,7 @@ namespace hpx { namespace parcelset
 
                     // complete received data with parcel count
                     receive_data.num_parcels_ = parcel_count;
-                    receive_data.argument_bytes_ = arg_size;
+                    receive_data.type_bytes_ = arg_size;
                 }
 
                 // store the time required for serialization
@@ -314,10 +314,10 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t()> data_received(
             boost::bind(&parcelport::get_data_received, pp));
 
-        HPX_STD_FUNCTION<boost::int64_t()> data_argument_sent(
-            boost::bind(&parcelport::get_total_argument_sent, pp));
-        HPX_STD_FUNCTION<boost::int64_t()> data_argument_received(
-            boost::bind(&parcelport::get_total_argument_received, pp));
+        HPX_STD_FUNCTION<boost::int64_t()> data_type_sent(
+            boost::bind(&parcelport::get_total_type_sent, pp));
+        HPX_STD_FUNCTION<boost::int64_t()> data_type_received(
+            boost::bind(&parcelport::get_total_type_received, pp));
 
         HPX_STD_FUNCTION<boost::int64_t()> incoming_queue_length(
             boost::bind(&parcelhandler::get_incoming_queue_length, this));
@@ -403,7 +403,7 @@ namespace hpx { namespace parcelset
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_argument_sent, _2),
+                  _1, data_type_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
@@ -412,7 +412,7 @@ namespace hpx { namespace parcelset
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_argument_received, _2),
+                  _1, data_type_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
