@@ -9,6 +9,7 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/traits/argument_size.hpp>
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
@@ -63,7 +64,7 @@ namespace hpx { namespace parcelset
 
             BOOST_FOREACH(parcel const & p, pv)
             {
-                arg_size += p.get_action()->get_argument_size();
+                arg_size += hpx::traits::argument_size<parcel>::call(p);
                 priority = (std::max)(p.get_thread_priority(), priority);
             }
 

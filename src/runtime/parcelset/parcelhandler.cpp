@@ -128,7 +128,7 @@ namespace hpx { namespace parcelset
                         BOOST_ASSERT(p.get_destination_locality() == here());
 
                         // incoming argument's size
-                        arg_size += p.get_action()->get_argument_size();
+                        arg_size += hpx::traits::argument_size<parcel>::call(p);
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();

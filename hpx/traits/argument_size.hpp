@@ -147,6 +147,17 @@ namespace hpx { namespace traits
             return argument_size<T>::call(*p);
         }
     };
+
+    //////////////////////////////////////////////////////////////////////////
+    /// Handle parcel 
+    template <>
+    struct argument_size<hpx::parcelset::parcel>
+    {
+        static std::size_t call(hpx::parcelset::parcel const& parcel)
+        {
+            return sizeof(parcel) + parcel.get_action()->get_argument_size();
+        }
+    };
 }}
 
 #endif
