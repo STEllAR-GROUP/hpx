@@ -1,0 +1,6 @@
+6 Nov 2012
+Code maintained by Matt Anderson (andersmw@indiana.edu)
+
+Compares sendreceive between MPI and HPX.
+The MPI version runs without arguments.  The HPX version should have the oversubscription factor set to the number
+of cores per locality.
