@@ -20,9 +20,6 @@
   repeats = 1000
 
   allocate(send(mgrid),recv(mgrid))
-  do i=1,mgrid
-    send(i) = hpx4_mype + i*(hpx4_mype*i)**(1.0d0/hpx4_mype)
-  enddo  
 
   right_pe = hpx4_mype + 1
   if ( right_pe .ge. hpx4_numberpe ) then
@@ -37,8 +34,9 @@
     send(j) = hpx4_mype + j*(j*(hpx4_mype+1))**(1.0d0/(hpx4_mype+1))
   enddo
   
-  call sndrecv_toroidal_cmm(hpx4_bti,send,icount,recv,icount,&
-                            idest,repeats)
+  do j=1,repeats
+    call sndrecv_toroidal_cmm(hpx4_bti,send,icount,recv,icount,idest)
+  enddo
 
   deallocate(send,recv)
 end subroutine loop

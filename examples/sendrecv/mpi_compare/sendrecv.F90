@@ -17,6 +17,7 @@
       real*8 NOWTIME,PASTTIME,TIME,MAXTIME
 
       call mpi_init(ierror)
+      PASTTIME = MPI_WTIME()
       call mpi_comm_size(mpi_comm_world,numberpe,ierror)
       call mpi_comm_rank(mpi_comm_world,mype,ierror)
 
@@ -46,7 +47,6 @@
         send(j) = mype + j*(j*(mype+1))**(1.0d0/(mype+1))
       enddo
 
-      PASTTIME = MPI_WTIME()
       do i=1,repeats
         call MPI_SENDRECV(send,icount,MPI_DOUBLE_PRECISION,&
                         idest,isendtag,&

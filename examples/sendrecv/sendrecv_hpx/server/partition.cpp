@@ -21,15 +21,9 @@
 extern "C" {
             void FNAME(loop)(void* opaque_ptr_to_class, int *,int *);
             void FNAME(sndrecv_toroidal_cmm) (void* pfoo,double *send, int *send_size,
-                                               double *receive,int *receive_size,int *dest,
-                                               int* repeats) {
-                    hpx::util::high_resolution_timer computetime;
+                                               double *receive,int *receive_size,int *dest) {
                     sendrecv::server::partition *ptr_to_class = *static_cast<sendrecv::server::partition**>(pfoo);
-                    for (std::size_t i=0;i<*repeats;i++) {
-                      ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
-                    }
-                    double ctime = computetime.elapsed();
-                    std::cout << " Time " << ctime << std::endl;
+                    ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
                     return; };
 }
 
@@ -51,7 +45,10 @@ namespace sendrecv { namespace server
       int t2 = static_cast<int>(numberpe);
       int t1 = static_cast<int>(mype);
 
+      hpx::util::high_resolution_timer computetime;
       FNAME(loop)(static_cast<void*>(this), &t1,&t2);
+      double ctime = computetime.elapsed();
+      std::cout << " Time " << ctime << std::endl;
     }
 
     void partition::toroidal_sndrecv(double *csend,int* csend_size,double *creceive,int *creceive_size,int* dest)
