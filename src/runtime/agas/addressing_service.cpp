@@ -103,7 +103,7 @@ void addressing_service::launch_bootstrap(
 
     local_locality(here);
     get_runtime().get_config().parse("assigned locality",
-        boost::str(boost::format("hpx.locality=%1%")
+        boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
