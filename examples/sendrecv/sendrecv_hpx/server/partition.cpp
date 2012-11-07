@@ -21,9 +21,15 @@
 extern "C" {
             void FNAME(loop)(void* opaque_ptr_to_class, int *,int *);
             void FNAME(sndrecv_toroidal_cmm) (void* pfoo,double *send, int *send_size,
-                                               double *receive,int *receive_size,int *dest) {
+                                               double *receive,int *receive_size,int *dest,
+                                               int* repeats) {
+                    hpx::util::high_resolution_timer computetime;
                     sendrecv::server::partition *ptr_to_class = *static_cast<sendrecv::server::partition**>(pfoo);
-                    ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
+                    for (std::size_t i=0;i<*repeats;i++) {
+                      ptr_to_class->toroidal_sndrecv(send,send_size,receive,receive_size,dest);
+                    }
+                    double ctime = computetime.elapsed();
+                    std::cout << " Time " << ctime << std::endl;
                     return; };
 }
 
