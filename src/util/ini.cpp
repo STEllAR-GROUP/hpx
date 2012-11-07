@@ -187,7 +187,7 @@ void section::read (std::string const& filename)
         lines.push_back (line);
 
     // parse file
-    parse(filename, lines);
+    parse(filename, lines, false);
 }
 
 bool force_entry(std::string& str)
