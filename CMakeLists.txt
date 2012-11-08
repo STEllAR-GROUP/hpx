@@ -210,8 +210,13 @@ hpx_include(GCCVersion)
 if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
-  if(040400 GREATER ${GCC_VERSION})
-    hpx_error("gcc_config" "GCC 4.4.x or higher is required.")
+  hpx_option(HPX_IGNORE_GCC_VERSION BOOL
+    "Ignore version reported by gcc (default: OFF)." OFF ADVANCED)
+
+  if(HPX_IGNORE_GCC_VERSION)
+    hpx_warn("gcc_config" "GCC 4.4.5 or higher is required. Building HPX will proceed but may fail.")
+  elseif(040405 GREATER ${GCC_VERSION})
+    hpx_error("gcc_config" "GCC 4.4.5 or higher is required. Specify HPX_IGNORE_GCC_VERSION=ON to overwrite this error.")
   endif()
 elseif(MSVC)
   if(NOT (MSVC10 OR MSVC11))
