@@ -217,11 +217,23 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
+        typedef
+            hpx::components::server::create_component_action1<
+                barrier
+              , std::size_t
+            >
+            create_component_action;
+
     private:
         std::size_t const number_of_threads_;
         queue_type queue_;
     };
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::lcos::server::barrier::create_component_action
+  , hpx_lcos_server_barrier_create_component_action
+)
 
 #endif
 

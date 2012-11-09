@@ -26,3 +26,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(barrier_type, barrier,
     "hpx::lcos::base_lco", hpx::components::factory_enabled)
 
+HPX_REGISTER_ACTION(
+    hpx::lcos::server::barrier::create_component_action
+  , hpx_lcos_server_barrier_create_component_action
+)

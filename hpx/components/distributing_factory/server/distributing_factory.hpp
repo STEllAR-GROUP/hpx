@@ -128,6 +128,11 @@ namespace boost { namespace serialization
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the distributing_factory actions
 HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::create_component_action0<hpx::components::server::distributing_factory>
+  , distributing_factory_create_component_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::distributing_factory::create_components_action
   , distributing_factory_create_components_action
 )
