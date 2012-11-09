@@ -694,8 +694,12 @@ if(MSVC)
 ################################################################################
 else()
   # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
-  #hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX C Fortran
-  #                          NAME copy_dt_needed_entries)
+
+  ##############################################################################
+  # DO NOT COMMENT OUT THIS CODE, DOING SO BREAKS BUILDS FOR EVERYONE ELSE
+  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX C Fortran
+                            NAME copy_dt_needed_entries)
+  ##############################################################################
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
