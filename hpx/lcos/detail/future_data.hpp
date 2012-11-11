@@ -201,14 +201,13 @@ namespace hpx { namespace lcos { namespace detail
 
         friend class lcos::future<Result>;
 
-    protected:
+    public:
         future_data() : set_on_completed_(false) {}
 
         future_data(completed_callback_type const& data_sink)
           : on_completed_(data_sink), set_on_completed_(!data_sink.empty())
         {}
 
-    public:
         static result_type handle_error(data_type const& d, error_code &ec)
         {
             // an error has been reported in the meantime, throw or set
