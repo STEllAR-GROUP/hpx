@@ -66,8 +66,6 @@ namespace hpx { namespace util
     }
 }}
 
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<
-        std::vector<hpx::util::remote_locality_result>
-    >::set_value_action
-  , set_value_action_factory_locality_result)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    std::vector<hpx::util::remote_locality_result>,
+    factory_locality_result)

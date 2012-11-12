@@ -221,12 +221,12 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::stop_action,
     performance_counter_stop_action)
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_value_action,
-    set_value_action_counter_info)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_value_action,
-    set_value_action_counter_value)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::performance_counters::counter_info,
+    counter_info)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::performance_counters::counter_value,
+    counter_value)
 
 #endif
 

@@ -54,6 +54,54 @@ HPX_PLAIN_ACTION(hpx::detail::list_symbolic_name,
 HPX_PLAIN_ACTION(hpx::detail::list_component_type,
     list_component_type_action, hpx::components::factory_enabled)
 
+typedef
+    hpx::util::detail::bound_action3<
+        hpx::actions::plain_action2<
+            const std::basic_string<char>&
+          , const hpx::naming::gid_type&
+          , hpx::detail::list_symbolic_name
+          , hpx::actions::detail::this_type
+        >
+      , hpx::naming::id_type
+      , hpx::util::placeholders::arg<0>
+      , hpx::util::placeholders::arg<1>
+    >
+    bound_list_symbolic_name_action;
+
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
+    void(const std::basic_string<char>&, const hpx::naming::gid_type&)
+  , bound_list_symbolic_name_action
+  , list_symbolic_name_function)
+
+HPX_UTIL_REGISTER_FUNCTION(
+    void(const std::basic_string<char>&, const hpx::naming::gid_type&)
+  , bound_list_symbolic_name_action
+  , list_symbolic_name_function)
+
+typedef
+    hpx::util::detail::bound_action3<
+        hpx::actions::plain_action2<
+            const std::basic_string<char>&
+          , int
+          , hpx::detail::list_component_type
+          , hpx::actions::detail::this_type
+        >
+      , hpx::naming::id_type
+      , hpx::util::placeholders::arg<0>
+      , hpx::util::placeholders::arg<1>
+    >
+    bound_list_component_type_action;
+
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
+    void(const std::basic_string<char>&, hpx::components::component_type)
+  , bound_list_component_type_action
+  , list_component_type_function)
+
+HPX_UTIL_REGISTER_FUNCTION(
+    void(const std::basic_string<char>&, hpx::components::component_type)
+  , bound_list_component_type_action
+  , list_component_type_function)
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////

@@ -731,9 +731,9 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::components::memory_block_data>::set_value_action,
-    set_value_action_memory_data_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::components::memory_block_data,
+    memory_data_type)
 
 #include <hpx/config/warnings_suffix.hpp>
 

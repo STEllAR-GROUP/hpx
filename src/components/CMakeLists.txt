@@ -6,11 +6,11 @@
 
 set(subdirs
     binpacking_factory
-    dataflow
+    #    dataflow
     distributing_factory
     iostreams
     memory
-    remote_object
+    #    remote_object
    )
 
 if(PAPI_FOUND)

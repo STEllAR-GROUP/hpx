@@ -28,57 +28,15 @@ namespace hpx { namespace lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIXME: Do we still need these? Don't these auto-register?
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::set_value_action,
-    set_value_action_gid_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::get_value_action,
-    get_value_action_gid_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::set_value_action,
-    set_value_action_vector_gid_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::get_value_action,
-    get_value_action_vector_gid_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_value_action,
-    set_value_action_id_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::get_value_action,
-    get_value_action_id_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_value_action,
-    set_value_action_vector_id_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::get_value_action,
-    get_value_action_vector_id_type)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<double>::set_value_action,
-    set_value_action_double)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<double>::get_value_action,
-    get_value_action_double)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<int>::set_value_action,
-    set_value_action_int)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<int>::get_value_action,
-    get_value_action_int)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<bool>::set_value_action,
-    set_value_action_bool)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<bool>::get_value_action,
-    get_value_action_bool)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::util::section>::set_value_action,
-    set_value_action_section)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::util::section>::get_value_action,
-    get_value_action_section)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::set_value_action,
-    set_value_action_void)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::get_value_action,
-    get_value_action_void)
+//        For the time being: Yes we still need them
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::naming::gid_type, gid_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(std::vector<hpx::naming::gid_type>, vector_gid_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::naming::id_type, id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(std::vector<hpx::naming::id_type>, vector_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(float, float)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(double, double)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(int, int)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(long int, long_int)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(bool, bool)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::section, section)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::unused_type, void)
