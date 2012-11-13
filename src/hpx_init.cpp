@@ -794,30 +794,6 @@ namespace hpx
             return 0;
         }
 #endif
-
-        ///////////////////////////////////////////////////////////////////////
-        void set_error_handlers()
-        {
-#if defined(BOOST_WINDOWS)
-            // Set console control handler to allow server to be stopped.
-            SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
-#else
-            struct sigaction new_action;
-            new_action.sa_handler = hpx::termination_handler;
-            sigemptyset(&new_action.sa_mask);
-            new_action.sa_flags = 0;
-
-            sigaction(SIGINT, &new_action, NULL);  // Interrupted 
-            sigaction(SIGBUS, &new_action, NULL);  // Bus error
-            sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
-            sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
-            sigaction(SIGPIPE, &new_action, NULL); // Bad pipe
-            sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault
-            sigaction(SIGSYS, &new_action, NULL);  // Bad syscall
-#endif
-
-            std::set_new_handler(hpx::new_handler);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -829,7 +805,7 @@ namespace hpx
         bool blocking)
     {
         int result = 0;
-        detail::set_error_handlers();
+        set_error_handlers();
 
         try {
             // handle all common command line switches

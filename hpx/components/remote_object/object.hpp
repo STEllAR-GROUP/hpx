@@ -102,7 +102,6 @@ namespace hpx { namespace components
         object() {}
         explicit object(naming::id_type const & gid) : gid_(gid) {}
         naming::id_type gid_;
-
         template <typename F>
         lcos::future<
             typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type

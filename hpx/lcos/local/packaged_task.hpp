@@ -131,7 +131,7 @@ namespace hpx { namespace lcos { namespace local
                 if (task_->is_ready() && !future_obtained_)
                 {
                     task_->set_error(broken_promise,
-                        "promise<Result>::operator=()",
+                        "promise<Result>::~promise()",
                         "deleting owner before future has been retrieved");
                 }
                 task_->deleting_owner();

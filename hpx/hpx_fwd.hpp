@@ -928,6 +928,8 @@ namespace hpx
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
     HPX_API_EXPORT boost::uint64_t get_system_uptime();
+
+    HPX_EXPORT void set_error_handlers();
 }
 
 #include <hpx/lcos/async_fwd.hpp>
