@@ -12,12 +12,10 @@
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <vector>
@@ -27,6 +25,8 @@
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/iterate.hpp>
+
+#include <boost/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -41,9 +41,7 @@ namespace hpx
 
             void on_future_ready(threads::thread_id_type id)
             {
-                mutex_type::scoped_lock l(mtx_);
-                if (ready_count_ != lazy_values_.size() &&
-                    ++ready_count_ == lazy_values_.size())
+                if (ready_count_.fetch_add(1) + 1 == lazy_values_.size())
                 {
                     // reactivate waiting thread only if it's not us
                     if (id != threads::get_self().get_thread_id())
@@ -52,8 +50,6 @@ namespace hpx
             }
 
         public:
-            typedef lcos::local::spinlock mutex_type;
-
             typedef std::vector<lcos::future<T> > argument_type;
             typedef std::vector<lcos::future<T> > result_type;
 
@@ -69,8 +65,7 @@ namespace hpx
 
             when_all(BOOST_RV_REF(when_all) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
-                ready_count_(rhs.ready_count_),
-                mtx_(boost::move(rhs.mtx_))
+                ready_count_(rhs.ready_count_.load())
             {
                 rhs.ready_count_ = 0;
             }
@@ -78,27 +73,21 @@ namespace hpx
             when_all& operator= (BOOST_RV_REF(when_all) rhs)
             {
                 if (this != &rhs) {
-                    mutex_type::scoped_lock l1(mtx_);
-                    mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     ready_count_ = rhs.ready_count_;
                     rhs.ready_count_ = 0;
-                    mtx_ = boost::move(rhs.mtx_);
                 }
                 return *this;
             }
 
             result_type operator()()
             {
-                mutex_type::scoped_lock l(mtx_);
-                ready_count_ = 0;
+                ready_count_.store(0);
 
                 {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-
                     // set callback functions to executed when future is ready
                     threads::thread_id_type id = threads::get_self().get_thread_id();
-                    for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                    for (std::size_t i = 0; i != lazy_values_.size(); ++i)
                     {
                         lazy_values_[i].then(
                             util::bind(&when_all::on_future_ready, this, id)
@@ -106,13 +95,12 @@ namespace hpx
                     }
                 }
 
-                // if all of the requested futures are already set, our
+                // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
-                // ourselves
+                // ourselves.
                 if (ready_count_ != lazy_values_.size())
                 {
-                    // wait for any of the futures to return to become ready
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
@@ -120,7 +108,6 @@ namespace hpx
                 BOOST_ASSERT(ready_count_ == lazy_values_.size());
 
                 // reset all pending callback functions
-                l.unlock();
                 for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     lazy_values_[i].then();
 
@@ -128,8 +115,7 @@ namespace hpx
             }
 
             std::vector<lcos::future<T> > lazy_values_;
-            std::size_t ready_count_;
-            mutable mutex_type mtx_;
+            boost::atomic<std::size_t> ready_count_;
         };
     }
 
