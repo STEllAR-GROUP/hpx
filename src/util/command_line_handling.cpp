@@ -284,21 +284,24 @@ namespace hpx { namespace util
                 node = vm["hpx:node"].as<std::size_t>();
             }
 
-            if (env.agas_node() == node) {
-                // console node, by default runs AGAS
-                run_agas_server = true;
-                mode_ = hpx::runtime_mode_console;
-            }
-            else {
-                // each node gets an unique port
-                hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
-                mode_ = hpx::runtime_mode_worker;
+            if (!vm.count("hpx:worker")) {
+                if (env.agas_node() == node) {
+                    // console node, by default runs AGAS
+                    run_agas_server = true;
+                    mode_ = hpx::runtime_mode_console;
+                }
+                else {
+                    // each node gets an unique port
+                    hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
+                    mode_ = hpx::runtime_mode_worker;
 
-                // do not execute any explicit hpx_main except if asked
-                // otherwise
-                if (!vm.count("hpx:run-hpx-main"))
-                    hpx_main_f_ = 0;
+                    // do not execute any explicit hpx_main except if asked
+                    // otherwise
+                    if (!vm.count("hpx:run-hpx-main"))
+                        hpx_main_f_ = 0;
+                }
             }
+
             // store node number in configuration
             ini_config += "hpx.locality!=" +
                 boost::lexical_cast<std::string>(node);
