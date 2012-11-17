@@ -1,4 +1,5 @@
 //  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2009 Oliver Kowalke
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,8 +26,47 @@
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
+#include <cstddef>
+#include <cstdlib>
+#include <stdexcept>
+
 namespace hpx { namespace util { namespace coroutines 
 {
+    template <std::size_t Max, std::size_t Default, std::size_t Min>
+    class simple_stack_allocator
+    {
+    public:
+        static std::size_t maximum_stacksize()
+        { return Max; }
+
+        static std::size_t default_stacksize()
+        { return Default; }
+
+        static std::size_t minimum_stacksize()
+        { return Min; }
+
+        void * allocate(std::size_t size) const
+        {
+            BOOST_ASSERT(minimum_stacksize() <= size);
+            BOOST_ASSERT(maximum_stacksize() >= size);
+
+            void * limit = std::calloc(size, sizeof(char) );
+            if (! limit) throw std::bad_alloc();
+
+            return static_cast< char * >(limit) + size;
+        }
+
+        void deallocate(void * vp, std::size_t size) const
+        {
+            BOOST_ASSERT(vp);
+            BOOST_ASSERT(minimum_stacksize() <= size);
+            BOOST_ASSERT(maximum_stacksize() >= size);
+
+            void * limit = static_cast< char * >(vp) - size;
+            std::free(limit);
+        }
+    };
+
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
@@ -133,7 +173,9 @@ namespace hpx { namespace util { namespace coroutines
 
         private:
             boost::context::fcontext_t ctx_;
-            boost::context::simple_stack_allocator<HPX_HUGE_STACK_SIZE, HPX_MEDIUM_STACK_SIZE, HPX_SMALL_STACK_SIZE> alloc_;
+            simple_stack_allocator<
+                HPX_HUGE_STACK_SIZE, HPX_MEDIUM_STACK_SIZE, HPX_SMALL_STACK_SIZE
+            > alloc_;
             intptr_t cb_;
         };
 
