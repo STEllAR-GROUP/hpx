@@ -110,15 +110,14 @@ namespace hpx {
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
-            ini_.get_max_connections(), ini_.get_max_connections_per_loc()),
+        parcel_port_(boost::make_shared<parcelset::parcelport>(parcel_pool_, ini_)),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(new hpx::threads::threadmanager_impl<
             SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
-        agas_client_(parcel_port_, ini_, mode_),
+        agas_client_(*parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
@@ -154,7 +153,7 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(entering)";
 
         // stop all services
-        parcel_port_.stop();      // stops parcel_pool_ as well
+        parcel_handler_.stop();      // stops parcel_pool_ as well
         thread_manager_->stop();   // stops timer_pool_ as well
         io_pool_.stop();
 
@@ -348,7 +347,7 @@ namespace hpx {
         t.join();
 
         // stop the rest of the system
-        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
+        parcel_handler_.stop(blocking);        // stops parcel_pool_ as well
         io_pool_.stop();                    // stops parcel_pool_ as well
 
         deinit_tss();
@@ -428,7 +427,7 @@ namespace hpx {
         int result = wait();
         stop();
 
-        parcel_port_.stop();      // stops parcelport for sure
+        parcel_handler_.stop();      // stops parcelport for sure
         return result;
     }
 
@@ -444,7 +443,7 @@ namespace hpx {
         int result = wait();
         stop();
 
-        parcel_port_.stop();      // stops parcelport for sure
+        parcel_handler_.stop();      // stops parcelport for sure
         return result;
     }
 
@@ -509,7 +508,7 @@ namespace hpx {
     naming::gid_type
     runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id()
     {
-        return id_pool.get_id(parcel_port_.here(), agas_client_);
+        return id_pool.get_id(parcel_handler_.here(), agas_client_);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

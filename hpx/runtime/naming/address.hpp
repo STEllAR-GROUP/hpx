@@ -75,6 +75,11 @@ namespace hpx { namespace naming
         component_type type_;   /// component type this address is referring to
         address_type address_;  /// address (sequence number)
 
+        parcelset::connection_type get_connection_type() const
+        {
+            return locality_.get_type();
+        }
+
     private:
         friend std::ostream& operator<< (std::ostream&, address const&);
 

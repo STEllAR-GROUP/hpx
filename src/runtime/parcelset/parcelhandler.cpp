@@ -38,6 +38,22 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
+    std::string get_connection_type_name(connection_type t)
+    {
+        switch(t) {
+        case connection_tcpip: 
+            return "tcpip";
+
+        case connection_portals4:
+            return "portals4";
+
+        default:
+            break;
+        }
+        return "<unknown>";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.
@@ -184,7 +200,7 @@ namespace hpx { namespace parcelset
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
-            parcelport& pp, threads::threadmanager_base* tm,
+            boost::shared_ptr<parcelport> pp, threads::threadmanager_base* tm,
             parcelhandler_queue_base* policy)
       : resolver_(resolver)
       , tm_(tm)
@@ -205,29 +221,58 @@ namespace hpx { namespace parcelset
     parcelport* parcelhandler::find_parcelport(connection_type type,
         error_code& ec) const
     {
-        std::map<connection_type, parcelport*>::const_iterator it = 
+        std::map<connection_type, boost::shared_ptr<parcelport> >::const_iterator it =
             pports_.find(type);
         if (it == pports_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport", 
-                "unknown parcel port")
+            HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport",
+                "cannot find parcelport for connection type " +
+                    get_connection_type_name(type));
             return 0;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return (*it).second;
+        return (*it).second.get();
     }
 
-    void parcelhandler::attach_parcelport(parcelport& pp)
+    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> pp)
     {
         // register our callback function with the parcelport
-        pp.register_event_handler(
+        pp->register_event_handler(
             boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3, _4)
         );
 
         // add the new parcelport to the list of parcelports we care about
-        pports_.insert(std::make_pair(pp.get_type(), &pp));
+        pports_.insert(std::make_pair(pp->get_type(), pp));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Make sure the specified locality is not held by any 
+    /// connection caches anymore
+    void parcelhandler::remove_from_connection_cache(naming::locality const& loc)
+    {
+        parcelport* pp = find_parcelport(loc.get_type());
+        if (!pp) {
+            HPX_THROW_EXCEPTION(network_error, 
+                "parcelhandler::remove_from_connection_cache", 
+                "cannot find parcelport for connection type " +
+                    get_connection_type_name(loc.get_type()));
+            return;
+        }
+        pp->remove_from_connection_cache(loc);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void parcelhandler::stop(bool blocking)
+    {
+        typedef
+            std::map<connection_type, boost::shared_ptr<parcelport> >::iterator
+        iterator_type;
+
+        iterator_type end = pports_.end();
+        for (iterator_type it = pports_.begin(); it != end; ++it)
+            (*it).second->stop(blocking);
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
@@ -269,6 +314,18 @@ namespace hpx { namespace parcelset
         std::vector<naming::gid_type> const& gids = p.get_destinations();
         std::vector<naming::address>& addrs = p.get_destination_addrs();
 
+        if (gids.empty()) {
+            HPX_THROW_EXCEPTION(network_error, "parcelhandler::put_parcel",
+                "no destination address given");
+            return;
+        }
+
+        if (gids.size() != addrs.size()) {
+            HPX_THROW_EXCEPTION(network_error, "parcelhandler::put_parcel",
+                "inconsistent number of destination addresses");
+            return;
+        }
+
         if (1 == gids.size()) {
             if (!addrs[0])
                 resolver_.resolve(gids[0], addrs[0]);
@@ -281,7 +338,9 @@ namespace hpx { namespace parcelset
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
 
-        find_parcelport(connection_tcpip)->put_parcel(p, f);
+        // send the parcel using the parcelport corresponding to the
+        // locality type of the destination
+        find_parcelport(addrs[0].get_connection_type())->put_parcel(p, f);
     }
 
     ///////////////////////////////////////////////////////////////////////////

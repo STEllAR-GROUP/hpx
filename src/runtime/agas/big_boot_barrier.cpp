@@ -93,7 +93,7 @@ void early_write_handler(
     // no-op
 }
 
-void early_pending_parcel_handler(naming::locality const&, 
+void early_pending_parcel_handler(naming::locality const&,
     parcelset::parcelport_connection_ptr const&)
 {
     // no-op
@@ -585,8 +585,6 @@ big_boot_barrier::big_boot_barrier(
   , runtime_mode runtime_type_
 ):
     pp(pp_)
-  , connection_cache_(pp_.get_connection_cache())
-  , io_service_pool_(pp_.get_io_service_pool())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , bootstrap_agas(ini_.get_agas_locality())
@@ -609,116 +607,12 @@ void big_boot_barrier::apply(
 ) { // {{{
     parcelset::parcel p(naming::get_gid_from_locality_id(locality_id), addr, act);
 
-    parcelset::parcelport_connection_ptr client_connection;
+    parcelset::parcelport_connection_ptr client_connection =
+        pp.get_connection(addr.locality_);
 
-    bool got_cache_space = false;
+    BOOST_ASSERT(client_connection);
 
-    for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-    {
-        // Get a connection or reserve space for a new connection.
-        if (connection_cache_.get_or_reserve(addr.locality_, client_connection))
-        {
-            got_cache_space = true;
-            break;
-        }
-
-        // Wait for a really short amount of time (usually 100 ms).
-        boost::this_thread::sleep(boost::get_system_time() +
-            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-    }
-
-    // If we didn't get a connection or permission to create one (which is
-    // unlikely), bail.
-    if (!got_cache_space)
-    {
-        HPX_THROW_EXCEPTION(network_error,
-            "big_boot_barrier::apply",
-            "timed out while trying to find room in the connection cache");
-    }
-
-    // Check if we need to create the new connection.
-    if (!client_connection)
-    {
-        // The parcel gets serialized inside the connection constructor, no
-        // need to keep the original parcel alive after this call returned.
-        client_connection.reset(new parcelset::parcelport_connection(
-            io_service_pool_.get_io_service(), addr.locality_,
-            connection_cache_, pp.parcels_sent_));
-        client_connection->set_parcel(p);
-
-        // Connect to the target locality, retry if needed
-        boost::system::error_code error = boost::asio::error::try_again;
-
-        for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-        {
-            try
-            { // {{{
-                naming::locality::iterator_type
-                    it = addr.locality_.connect_begin
-                        (io_service_pool_.get_io_service()),
-                    end = addr.locality_.connect_end();
-
-                for (; it != end; ++it)
-                {
-                    client_connection->socket().close();
-                    client_connection->socket().connect(*it, error);
-
-                    if (!error)
-                        break;
-                }
-
-                if (!error)
-                    break;
-
-                // wait for a really short amount of time (usually 100 ms)
-                boost::this_thread::sleep(boost::get_system_time() +
-                    boost::posix_time::milliseconds
-                        (HPX_NETWORK_RETRIES_SLEEP));
-            } // }}}
-
-            catch (boost::system::error_code const& e)
-            {
-                HPX_THROW_EXCEPTION(network_error,
-                    "big_boot_barrier::apply", e.message());
-            }
-        }
-
-        if (error)
-        { // {{{
-            client_connection->socket().close();
-
-            hpx::util::osstream strm;
-            strm << error.message() << " (while trying to connect to: "
-                 << addr.locality_ << ")";
-            HPX_THROW_EXCEPTION(network_error,
-                "big_boot_barrier::get_connection",
-                hpx::util::osstream_get_string(strm));
-        } // }}}
-#if defined(HPX_DEBUG)
-        else
-        {
-            std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
-            boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
-            BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
-            BOOST_ASSERT(addr.locality_.get_port() == connection_port);
-        }
-#endif
-    }
-
-    else
-    {
-        client_connection->set_parcel(p);
-
-#if defined(HPX_DEBUG)
-        BOOST_ASSERT(addr.locality_ == client_connection->destination());
-
-        std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
-        boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
-        BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
-        BOOST_ASSERT(addr.locality_.get_port() == connection_port);
-#endif
-    }
-
+    client_connection->set_parcel(p);
     client_connection->async_write(early_write_handler, early_pending_parcel_handler);
 } // }}}
 
@@ -797,6 +691,7 @@ void big_boot_barrier::trigger()
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
 struct bbb_tag;
 
 void create_big_boot_barrier(

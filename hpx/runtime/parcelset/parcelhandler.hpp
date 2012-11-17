@@ -75,7 +75,8 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(naming::resolver_client& resolver, parcelport& pp,
+        parcelhandler(naming::resolver_client& resolver, 
+            boost::shared_ptr<parcelport> pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
         ~parcelhandler()
@@ -83,7 +84,10 @@ namespace hpx { namespace parcelset
         }
 
         /// \brief Attach the given parcel port to this handler
-        void attach_parcelport(parcelport& pp);
+        void attach_parcelport(boost::shared_ptr<parcelport> pp);
+
+        /// \brief Stop all parcelports associated with this parcelhandler
+        void stop(bool blocking = true);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -321,6 +325,10 @@ namespace hpx { namespace parcelset
         /// parcel-handler instance.
         void register_counter_types(connection_type pp_type = connection_tcpip);
 
+        /// \brief Make sure the specified locality is not held by any 
+        /// connection caches anymore
+        void remove_from_connection_cache(naming::locality const& loc);
+
     protected:
         std::size_t get_incoming_queue_length() const
         {
@@ -340,7 +348,7 @@ namespace hpx { namespace parcelset
         naming::gid_type locality_;
 
         /// the parcelport this handler is associated with
-        std::map<connection_type, parcelport*> pports_;
+        std::map<connection_type, boost::shared_ptr<parcelport> > pports_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;

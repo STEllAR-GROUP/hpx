@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2007      Richard D Guidry Jr
-//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
+//  Copyright (c) 2007 Richard D Guidry Jr
+//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +16,6 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/runtime/parcelset/server/parcelport_server_connection.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -37,7 +37,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace agas 
+namespace hpx { namespace agas
 {
     // forward declaration only
     struct HPX_EXPORT big_boot_barrier;
@@ -73,10 +73,8 @@ namespace hpx { namespace parcelset
         ///                 [in] The pool of networking threads to use to serve
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
-        parcelport(util::io_service_pool& io_service_pool
-          , naming::locality here
-          , std::size_t max_connection_cache_size
-          , std::size_t max_connections_per_locality);
+        parcelport(util::io_service_pool& io_service_pool,
+            util::runtime_configuration const& ini);
 
         ~parcelport();
 
@@ -136,6 +134,9 @@ namespace hpx { namespace parcelset
             parcels_.register_event_handler(sink);
         }
 
+        /// \brief Retrieve a new connection
+        parcelport_connection_ptr get_connection(naming::locality const& l);
+
         /// \brief Allow access to the locality this parcelport is associated
         /// with.
         ///
@@ -151,21 +152,13 @@ namespace hpx { namespace parcelset
             return io_service_pool_;
         }
 
-        util::connection_cache<parcelport_connection, naming::locality>&
-            get_connection_cache()
+        /// Cache specific functionality
+        void remove_from_connection_cache(naming::locality const& loc)
         {
-            return connection_cache_;
+            connection_cache_.clear(loc);
         }
 
-        util::unique_ids& get_id_range()
-        {
-            return id_range_;
-        }
-
-        void set_range(naming::gid_type const& lower, naming::gid_type const& upper)
-        {
-            id_range_.set_range(lower, upper);
-        }
+        /// Performance counter data
 
         /// number of parcels sent
         std::size_t get_parcel_send_count() const
@@ -249,15 +242,17 @@ namespace hpx { namespace parcelset
             return pending_parcels_.size();
         }
 
+        /// Update performance counter data
         void add_received_data(
             performance_counters::parcels::data_point const& data)
         {
             parcels_received_.add_data(data);
         }
 
+        /// Retrieve the type of the locality represented by this parcelport
         connection_type get_type() const
         {
-            return connection_tcpip;
+            return here_.get_type();
         }
 
     protected:
@@ -274,9 +269,6 @@ namespace hpx { namespace parcelset
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
     private:
-        /// The site current range of ids to be used for id_type instances
-        util::unique_ids id_range_;
-
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool& io_service_pool_;
 
@@ -300,7 +292,7 @@ namespace hpx { namespace parcelset
         typedef std::map<
             naming::locality,
             std::pair<
-                std::vector<parcel>, std::vector<write_handler_type> 
+                std::vector<parcel>, std::vector<write_handler_type>
             >
         > pending_parcels_map;
         pending_parcels_map pending_parcels_;

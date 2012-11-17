@@ -97,8 +97,11 @@ namespace hpx
     {
         enum connection_type
         {
-            connection_tcpip = 1
+            connection_unknown = -1,
+            connection_tcpip = 1,
+            connection_portals4 = 2
         };
+        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;

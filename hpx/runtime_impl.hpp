@@ -26,8 +26,10 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/thread_mapper.hpp>
+
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -233,13 +235,6 @@ namespace hpx {
             return agas_client_;
         }
 
-        /// \brief Allow access to the parcel port instance used by the HPX
-        ///        runtime.
-        parcelset::parcelport& get_parcel_port()
-        {
-            return parcel_port_;
-        }
-
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
         parcelset::parcelhandler& get_parcel_handler()
@@ -275,7 +270,7 @@ namespace hpx {
         /// instance is associated with.
         naming::locality const& here() const
         {
-            return parcel_port_.here();
+            return parcel_port_->here();
         }
 
         /// \brief Return the number of executed PX threads
@@ -375,7 +370,7 @@ namespace hpx {
         util::io_service_pool io_pool_;
         util::io_service_pool parcel_pool_;
         util::io_service_pool timer_pool_;
-        parcelset::parcelport parcel_port_;
+        boost::shared_ptr<parcelset::parcelport> parcel_port_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;

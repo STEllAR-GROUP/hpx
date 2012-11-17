@@ -54,7 +54,7 @@ namespace hpx { namespace naming
             boost::filter_iterator<
                 is_valid_endpoint, boost::asio::ip::tcp::resolver::iterator
             >
-        locality_iterator_type;
+        tcp_locality_iterator_type;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,27 +87,7 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        typedef detail::locality_iterator_type iterator_type;
-
-        /// \brief Returns an iterator which when dereferenced will give an
-        ///        endpoint suitable for a call to accept() related to this
-        ///        locality
-        iterator_type accept_begin(boost::asio::io_service& io_service) const;
-
-        iterator_type accept_end() const
-        {
-            return locality::iterator_type();
-        }
-
-        /// \brief Returns an iterator which when dereferenced will give an
-        ///        endpoint suitable for a call to connect() related to this
-        ///        locality
-        iterator_type connect_begin(boost::asio::io_service& io_service) const;
-
-        iterator_type connect_end() const
-        {
-            return locality::iterator_type();
-        }
+        typedef detail::tcp_locality_iterator_type iterator_type;
 
         ///////////////////////////////////////////////////////////////////////
         friend bool operator==(locality const& lhs, locality const& rhs)
@@ -139,6 +119,10 @@ namespace hpx { namespace naming
 
         std::string const& get_address() const { return address_; }
         boost::uint16_t get_port() const { return port_; }
+        parcelset::connection_type get_type() const
+        {
+            return parcelset::connection_tcpip;
+        }
 
     private:
         friend std::ostream& operator<< (std::ostream& os, locality const& l);
@@ -180,7 +164,28 @@ namespace hpx { namespace naming
         return os;
     }
 
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Returns an iterator which when dereferenced will give an
+    ///        endpoint suitable for a call to accept() related to this
+    ///        locality
+    locality::iterator_type accept_begin(locality const& loc,
+        boost::asio::io_service& io_service);
+
+    inline locality::iterator_type accept_end(locality const&)
+    {
+        return locality::iterator_type();
+    }
+
+    /// \brief Returns an iterator which when dereferenced will give an
+    ///        endpoint suitable for a call to connect() related to this
+    ///        locality
+    locality::iterator_type connect_begin(locality const& loc,
+        boost::asio::io_service& io_service);
+
+    inline locality::iterator_type connect_end(locality const&)
+    {
+        return locality::iterator_type();
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

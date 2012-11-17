@@ -508,11 +508,10 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_from_connection_cache(naming::locality const& l)
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0)
-            return;
+        if (rt == 0) return;
 
         // instruct our connection cache to drop all connections it is holding
-        rt->get_parcel_handler().get_parcelport().get_connection_cache().clear(l);
+        rt->get_parcel_handler().remove_from_connection_cache(l);
     }
 
     ///////////////////////////////////////////////////////////////////////////
