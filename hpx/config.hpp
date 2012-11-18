@@ -433,13 +433,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_SMALL_STACK_SIZE)
-#  if defined(BOOST_WINDOWS)
-#    define HPX_SMALL_STACK_SIZE 0x4000           // 16kByte
+#  if defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
+#    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_SMALL_STACK_SIZE 0x10000        // 64kByte
+#      define HPX_SMALL_STACK_SIZE  0x10000       // 64kByte
 #    else
-#      define HPX_SMALL_STACK_SIZE 0x8000         // 32kByte
+#      define HPX_SMALL_STACK_SIZE  0x8000        // 32kByte
 #    endif
 #  endif
 #endif
