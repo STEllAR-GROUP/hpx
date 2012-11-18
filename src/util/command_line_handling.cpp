@@ -96,10 +96,6 @@ namespace hpx { namespace util
     {
         using namespace boost::assign;
 
-        // print version/copyright information
-        if (vm.count("hpx:version"))
-            return detail::print_version(std::cout);
-
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
 
         // create host name mapping
@@ -592,6 +588,10 @@ namespace hpx { namespace util
 
         // add all remaining ini settings to the global configuration
         rtcfg_.reconfigure(ini_config_);
+
+        // print version/copyright information
+        if (vm_.count("hpx:version"))
+            return detail::print_version(std::cout);
 
         // help can be printed only after the runtime mode has been set
         if (handle_help_options(help))
