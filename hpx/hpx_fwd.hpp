@@ -340,7 +340,7 @@ namespace hpx
 
         class HPX_API_EXPORT action_manager;
 
-        template <typename Component, int Action, typename Result,
+        template <typename Component, typename Result,
             typename Arguments, typename Derived>
         struct action;
     }

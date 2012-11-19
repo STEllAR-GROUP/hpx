@@ -18,18 +18,6 @@
 
 namespace hpx { namespace lcos
 {
-    // parcel action code: the action to be performed on the destination
-    // object
-    enum actions
-    {
-        lco_set_event = 0,
-        lco_set_value = 1,
-        lco_set_exception = 2,
-        lco_get_value = 3,
-        lco_connect = 4,
-        lco_disconnect = 5
-    };
-
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
     class HPX_API_EXPORT base_lco
@@ -104,7 +92,7 @@ namespace hpx { namespace lcos
 //         HPX_COMPONENT_DIRECT_ACTION(base_lco, set_event_nonvirt,
 //             set_event_action);
         typedef hpx::actions::direct_action0<
-            base_lco, lco_set_event, &base_lco::set_event_nonvirt
+            base_lco, &base_lco::set_event_nonvirt
         > set_event_action;
 
         /// The \a set_exception_action may be used to transfer arbitrary error
@@ -117,14 +105,14 @@ namespace hpx { namespace lcos
 //         HPX_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,
 //             set_exception_action);
         typedef hpx::actions::direct_action1<
-            base_lco, lco_set_exception, boost::exception_ptr const&,
+            base_lco, boost::exception_ptr const&,
             &base_lco::set_exception_nonvirt
         > set_exception_action;
 
         /// The \a connect_action may be used to
 //         HPX_COMPONENT_DIRECT_ACTION(base_lco, connect_nonvirt, connect_action);
         typedef hpx::actions::direct_action1<
-            base_lco, lco_connect, naming::id_type const&,
+            base_lco, naming::id_type const&,
             &base_lco::connect_nonvirt
         > connect_action;
 
@@ -132,7 +120,7 @@ namespace hpx { namespace lcos
 //         HPX_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
 //             disconnect_action);
         typedef hpx::actions::direct_action1<
-            base_lco, lco_disconnect, naming::id_type const&,
+            base_lco, naming::id_type const&,
             &base_lco::disconnect_nonvirt
         > disconnect_action;
 

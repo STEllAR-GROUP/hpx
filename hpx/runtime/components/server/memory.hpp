@@ -21,20 +21,6 @@ namespace hpx { namespace components { namespace server
     public:
         typedef memory type_holder;
 
-        // parcel action code: the action to be performed on the destination
-        // object
-        enum actions
-        {
-            memory_store8 = 0,        ///< store a 8 bit value to a memory location
-            memory_store16 = 1,       ///< store a 16 bit value to a memory location
-            memory_store32 = 2,       ///< store a 32 bit value to a memory location
-            memory_store64 = 3,       ///< store a 64 bit value to a memory location
-            memory_load8 = 4,         ///< load a 8 bit value from a memory location
-            memory_load16 = 5,        ///< load a 16 bit value from a memory location
-            memory_load32 = 6,        ///< load a 32 bit value from a memory location
-            memory_load64 = 7         ///< load a 64 bit value from a memory location
-        };
-
         static component_type get_component_type()
         {
             return components::get_component_type<memory>();
@@ -111,45 +97,15 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::direct_action2<
-            memory, memory_store8, boost::uint64_t, boost::uint8_t,
-            &memory::store8
-        > store8_action;
+        HPX_DEFINE_COMPONENT_ACTION(memory, store8);
+        HPX_DEFINE_COMPONENT_ACTION(memory, store16);
+        HPX_DEFINE_COMPONENT_ACTION(memory, store32);
+        HPX_DEFINE_COMPONENT_ACTION(memory, store64);
 
-        typedef hpx::actions::direct_action2<
-            memory, memory_store16, boost::uint64_t, boost::uint16_t,
-            &memory::store16
-        > store16_action;
-
-        typedef hpx::actions::direct_action2<
-            memory, memory_store32, boost::uint64_t, boost::uint32_t,
-            &memory::store32
-        > store32_action;
-
-        typedef hpx::actions::direct_action2<
-            memory, memory_store64, boost::uint64_t, boost::uint64_t,
-            &memory::store64
-        > store64_action;
-
-        typedef hpx::actions::direct_result_action1<
-            memory, boost::uint8_t, memory_load8, boost::uint64_t,
-            &memory::load8
-        > load8_action;
-
-        typedef hpx::actions::direct_result_action1<
-            memory, boost::uint16_t, memory_load16, boost::uint64_t,
-            &memory::load16
-        > load16_action;
-
-        typedef hpx::actions::direct_result_action1<
-            memory, boost::uint32_t, memory_load32, boost::uint64_t,
-            &memory::load32
-        > load32_action;
-
-        typedef hpx::actions::direct_result_action1<
-            memory, boost::uint64_t, memory_load64, boost::uint64_t,
-            &memory::load64
-        > load64_action;
+        HPX_DEFINE_COMPONENT_ACTION(memory, load8);
+        HPX_DEFINE_COMPONENT_ACTION(memory, load16);
+        HPX_DEFINE_COMPONENT_ACTION(memory, load32);
+        HPX_DEFINE_COMPONENT_ACTION(memory, load64);
 
         /// This is the default hook implementation for decorate_action which 
         /// does no hooking at all.

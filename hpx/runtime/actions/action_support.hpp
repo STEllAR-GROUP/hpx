@@ -115,10 +115,6 @@ namespace hpx { namespace actions
         /// of the component this action belongs to.
         virtual int get_component_type() const = 0;
 
-        /// The function \a get_action_code returns the code of the action
-        /// instance it is called for.
-        virtual std::size_t get_action_code() const = 0;
-
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         virtual char const* get_action_name() const = 0;
@@ -264,10 +260,6 @@ namespace hpx { namespace actions
         typedef typename Action::result_type result_type;
         typedef typename Action::arguments_type arguments_type;
 
-        // This is the action code (id) of this action. It is exposed to allow
-        // generic handling of actions.
-        enum { value = Action::value };
-
         // This is the priority value this action has been instantiated with
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
@@ -363,13 +355,6 @@ namespace hpx { namespace actions
         int get_component_type() const
         {
             return Action::get_component_type();
-        }
-
-        /// The function \a get_action_code returns the code of the action
-        /// instance it is called for.
-        std::size_t get_action_code() const
-        {
-            return static_cast<std::size_t>(value);
         }
 
         /// The function \a get_action_name returns the name of this action
@@ -597,11 +582,10 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
-    /// \tparam Action            action code
     /// \tparam Result            return type
     /// \tparam Arguments         arguments (fusion vector)
     /// \tparam Derived           derived action class
-    template <typename Component, int ActionCode, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived>
     struct action
     {
@@ -611,10 +595,6 @@ namespace hpx { namespace actions
         typedef Arguments arguments_type;
 
         typedef void action_tag;
-
-        // This is the action code (id) of this action. It is exposed to allow
-        // generic handling of actions.
-        enum { value = ActionCode };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Func, typename Arguments_>

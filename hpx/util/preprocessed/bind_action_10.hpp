@@ -527,7 +527,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0
     >
@@ -537,7 +537,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0
     )
@@ -1099,7 +1099,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1
     >
@@ -1109,7 +1109,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
     )
@@ -1671,7 +1671,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2
     >
@@ -1681,7 +1681,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
     )
@@ -2243,7 +2243,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
@@ -2253,7 +2253,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
     )
@@ -2815,7 +2815,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
@@ -2825,7 +2825,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
     )
@@ -3387,7 +3387,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
@@ -3397,7 +3397,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
     )
@@ -3959,7 +3959,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
@@ -3969,7 +3969,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
     )
@@ -4531,7 +4531,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
@@ -4541,7 +4541,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
     )
@@ -5103,7 +5103,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
@@ -5113,7 +5113,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8
     )
@@ -5675,7 +5675,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
@@ -5685,7 +5685,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9
     )
@@ -6247,7 +6247,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
     >
@@ -6257,7 +6257,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10
     )
@@ -6819,7 +6819,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
     >
@@ -6829,7 +6829,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11
     )
@@ -7391,7 +7391,7 @@ namespace hpx { namespace util
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ));
     }
     
-    template <typename Component, int Action, typename Result,
+    template <typename Component, typename Result,
         typename Arguments, typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
     >
@@ -7401,7 +7401,7 @@ namespace hpx { namespace util
     >
     bind(
         hpx::actions::action<
-            Component, Action, Result, Arguments, Derived
+            Component, Result, Arguments, Derived
         > 
       , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12
     )

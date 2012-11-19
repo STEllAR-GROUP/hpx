@@ -33,13 +33,7 @@ namespace hpx { namespace components { namespace server
             BOOST_ASSERT(dtor);
             dtor(&object);
         }
-
-        enum actions
-        {
-            remote_object_apply    = 1
-          , remote_object_set_dtor = 2
-        };
-
+        
         template <typename F>
         typename F::result_type apply1(F const & f);
         template <typename F, typename A>
@@ -47,14 +41,8 @@ namespace hpx { namespace components { namespace server
 
         void set_dtor(hpx::util::function<void(void**)> const & dtor);
 
-        typedef
-            hpx::actions::action1<
-                remote_object
-              , remote_object_set_dtor
-              , hpx::util::function<void(void**)> const &
-              , &remote_object::set_dtor
-            >
-            set_dtor_action;
+        HPX_DEFINE_COMPONENT_ACTION(remote_object, set_dtor);
+
     private:
         void *object;
         hpx::util::function<void(void**)> dtor;
@@ -78,7 +66,6 @@ namespace hpx { namespace components { namespace server
       : hpx::actions::result_action1<
             remote_object
           , typename F::result_type
-          , remote_object::remote_object_apply
           , F const &
           , &remote_object::apply1<F>
           , remote_object_apply_action1<F>
@@ -91,7 +78,6 @@ namespace hpx { namespace components { namespace server
       : hpx::actions::result_action2<
             remote_object
           , typename F::result_type
-          , remote_object::remote_object_apply
           , F const &
           , A const &
           , &remote_object::apply2<F, A>

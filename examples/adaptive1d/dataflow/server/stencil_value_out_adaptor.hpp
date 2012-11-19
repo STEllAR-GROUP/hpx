@@ -40,14 +40,6 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             }
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            stencil_value_out_get_value = 0,
-        };
-
         /// This is the main entry point of this component. Calling this
         /// function (by applying the get_value) will return the value as
         /// computed by the current time step.
@@ -62,7 +54,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action0<
             stencil_value_out_adaptor, naming::id_type,
-            stencil_value_out_get_value, &stencil_value_out_adaptor::get_value
+            &stencil_value_out_adaptor::get_value
         > get_value_action;
 
     private:

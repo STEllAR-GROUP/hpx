@@ -79,16 +79,6 @@ namespace hpx { namespace components { namespace amr { namespace server
             BOOST_ASSERT(false);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            functional_component_alloc_data = 0,
-            functional_component_eval = 1,
-            functional_component_init = 2
-        };
-
         /// This is the main entry point of this component. Calling this
         /// function (by applying the eval_action) will compute the next
         /// time step value based on the result values of the previous time
@@ -119,27 +109,9 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action6<
-            functional_component, naming::id_type,
-            functional_component_alloc_data,
-            int, int, int,
-            std::vector<naming::id_type> const&, double,
-            parameter const&,
-            &functional_component::alloc_data_nonvirt
-        > alloc_data_action;
-
-        typedef hpx::actions::result_action6<
-            functional_component, int, functional_component_eval,
-            naming::id_type const&, std::vector<naming::id_type> const&,
-            std::size_t, std::size_t,double,parameter const&,
-            &functional_component::eval_nonvirt
-        > eval_action;
-
-        typedef hpx::actions::result_action2<
-            functional_component, util::unused_type, functional_component_init,
-            std::size_t, naming::id_type const&,
-            &functional_component::init_nonvirt
-        > init_action;
+        HPX_DEFINE_COMPONENT_ACTION(functional_component, alloc_data_nonvirt, alloc_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(functional_component, eval_nonvirt, eval_action);
+        HPX_DEFINE_COMPONENT_ACTION(functional_component, init_nonvirt, init_action);
 
         /// This is the default hook implementation for decorate_action which 
         /// does no hooking at all.

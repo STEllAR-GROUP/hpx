@@ -19,7 +19,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/plain_action_enum.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
@@ -45,14 +44,14 @@ namespace hpx { namespace actions
     class plain_base_result_action0
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg0, Result, hpx::util::tuple0<>, Derived>
+            Result, hpx::util::tuple0<>, Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple0<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg0, result_type, arguments_type, Derived
+            result_type, arguments_type, Derived
         > base_type;
 
     protected:
@@ -187,7 +186,7 @@ namespace hpx { namespace actions
     class plain_base_action0
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg0, util::unused_type, hpx::util::tuple0<>,
+            util::unused_type, hpx::util::tuple0<>,
             Derived>
     {
     public:
@@ -195,7 +194,7 @@ namespace hpx { namespace actions
         typedef hpx::util::tuple0<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg0, result_type, arguments_type, Derived
+            result_type, arguments_type, Derived
         > base_type;
 
     protected:

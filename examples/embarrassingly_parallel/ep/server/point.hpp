@@ -33,23 +33,7 @@ namespace ep { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-
-        /// Action codes.
-        enum actions
-        {
-            point_bfs = 0
-        };
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            point,
-            // Action code.
-            point_bfs,
-            // Arguments of this action.
-            std::size_t,
-            // Method bound to this action.
-            &point::bfs
-        > bfs_action;
+        HPX_DEFINE_COMPONENT_ACTION(point, bfs);
 
     private:
         hpx::lcos::local::mutex mtx_;

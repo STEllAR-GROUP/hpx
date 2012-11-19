@@ -73,16 +73,6 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             BOOST_ASSERT(false);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            functional_component_alloc_data = 0,
-            functional_component_eval = 1,
-            functional_component_init = 2
-        };
-
         /// This is the main entry point of this component. Calling this
         /// function (by applying the eval_action) will compute the next
         /// time step value based on the result values of the previous time
@@ -115,7 +105,6 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action6<
             functional_component, naming::id_type,
-            functional_component_alloc_data,
             int, int, int,
             std::vector<naming::id_type> const&, double,
             parameter const&,
@@ -123,14 +112,14 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         > alloc_data_action;
 
         typedef hpx::actions::result_action6<
-            functional_component, int, functional_component_eval,
+            functional_component, int,
             naming::id_type const&, std::vector<naming::id_type> const&,
             std::size_t, std::size_t,double,parameter const&,
             &functional_component::eval_nonvirt
         > eval_action;
 
         typedef hpx::actions::result_action2<
-            functional_component, util::unused_type, functional_component_init,
+            functional_component, util::unused_type,
             std::size_t, naming::id_type const&,
             &functional_component::init_nonvirt
         > init_action;

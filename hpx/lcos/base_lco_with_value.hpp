@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
 //         HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, set_value_nonvirt,
 //             set_value_action);
         typedef hpx::actions::direct_action1<
-            base_lco_with_value, lco_set_value, BOOST_RV_REF(RemoteResult),
+            base_lco_with_value, BOOST_RV_REF(RemoteResult),
             &base_lco_with_value::set_value_nonvirt
         > set_value_action;
 
@@ -109,7 +109,7 @@ namespace hpx { namespace lcos
 //         HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, get_value_nonvirt,
 //             get_value_action);
         typedef hpx::actions::direct_result_action0<
-            base_lco_with_value, Result, lco_get_value,
+            base_lco_with_value, Result,
             &base_lco_with_value::get_value_nonvirt
         > get_value_action;
     };

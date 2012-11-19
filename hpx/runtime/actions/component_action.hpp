@@ -19,7 +19,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/component_action_enum.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
@@ -41,15 +40,15 @@ namespace hpx { namespace actions
 
     // zero argument version
     template <
-        typename Component, typename Result, int Action,
+        typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     class base_result_action0
-      : public action<Component, Action, Result, hpx::util::tuple0<>, Derived>
+      : public action<Component, Result, hpx::util::tuple0<>, Derived>
     {
     public:
         typedef Result result_type;
         typedef hpx::util::tuple0<> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type, Derived>
+        typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
     protected:
@@ -123,12 +122,12 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component, typename Result, int Action,
+        typename Component, typename Result,
         Result (Component::*F)(), typename Derived = detail::this_type>
     struct result_action0
-      : base_result_action0<Component, Result, Action, F,
+      : base_result_action0<Component, Result, F,
             typename detail::action_type<
-                result_action0<Component, Result, Action, F>, Derived
+                result_action0<Component, Result, F>, Derived
             >::type>
     {
         typedef typename detail::action_type<
@@ -162,32 +161,32 @@ namespace hpx { namespace actions
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::false_>
-      : result_action0<Component, Result, component_result_action_arg0, F, Derived>
+      : result_action0<Component, Result, F, Derived>
     {
         typedef result_action0<
-            Component, Result, component_result_action_arg0, F, Derived
+            Component, Result, F, Derived
         > type;
     };
 
     template <typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>
     struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::false_>
-      : result_action0<Component const, Result, component_result_action_arg0, 
+      : result_action0<Component const, Result, 
             F, Derived> 
     {
         typedef result_action0<
-            Component const, Result, component_result_action_arg0, F, Derived
+            Component const, Result, F, Derived
         > type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component, typename Result, int Action,
+        typename Component, typename Result,
         Result (Component::*F)(), typename Derived = detail::this_type>
     struct direct_result_action0
-      : public base_result_action0<Component, Result, Action, F,
+      : public base_result_action0<Component, Result, F,
             typename detail::action_type<
-                direct_result_action0<Component, Result, Action, F>, Derived
+                direct_result_action0<Component, Result, F>, Derived
             >::type>
     {
         typedef typename detail::action_type<
@@ -221,36 +220,35 @@ namespace hpx { namespace actions
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_result_action0<Component, Result, component_result_action_arg0, 
+      : direct_result_action0<Component, Result, 
             F, Derived>
     {
         typedef direct_result_action0<
-            Component, Result, component_result_action_arg0, F, Derived
+            Component, Result, F, Derived
         > type;
     };
 
     template <typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>
     struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::true_>
-      : direct_result_action0<Component const, Result, 
-            component_result_action_arg0, F, Derived>
+      : direct_result_action0<Component const, Result, F, Derived>
     {
         typedef direct_result_action0<
-            Component const, Result, component_result_action_arg0, F, Derived
+            Component const, Result, F, Derived
         > type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
-    template <typename Component, int Action, void (Component::*F)(), typename Derived>
+    template <typename Component, void (Component::*F)(), typename Derived>
     class base_action0
-      : public action<Component, Action, util::unused_type, 
+      : public action<Component, util::unused_type, 
             hpx::util::tuple0<>, Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef hpx::util::tuple0<> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type, Derived>
+        typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
     protected:
@@ -323,12 +321,12 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, int Action, void (Component::*F)(),
+    template <typename Component, void (Component::*F)(),
         typename Derived = detail::this_type>
     struct action0
-      : base_action0<Component, Action, F,
+      : base_action0<Component, F,
             typename detail::action_type<
-                action0<Component, Action, F>, Derived
+                action0<Component, F>, Derived
             >::type>
     {
         typedef typename detail::action_type<
@@ -340,29 +338,29 @@ namespace hpx { namespace actions
 
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::false_>
-      : action0<Component, component_result_action_arg0, F, Derived> 
+      : action0<Component, F, Derived> 
     {
         typedef action0<
-            Component, component_result_action_arg0, F, Derived
+            Component, F, Derived
         > type;
     };
 
     template <typename Component, void (Component::*F)() const, typename Derived>
     struct make_action<void (Component::*)() const, F, Derived, boost::mpl::false_>
-      : action0<Component const, component_result_action_arg0, F, Derived>
+      : action0<Component const, F, Derived>
     {
         typedef action0<
-            Component const, component_result_action_arg0, F, Derived
+            Component const, F, Derived
         > type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, int Action, void (Component::*F)(),
+    template <typename Component, void (Component::*F)(),
         typename Derived = detail::this_type>
     struct direct_action0
-      : base_action0<Component, Action, F,
+      : base_action0<Component, F,
             typename detail::action_type<
-                direct_action0<Component, Action, F>, Derived
+                direct_action0<Component, F>, Derived
             >::type>
     {
         typedef typename detail::action_type<
@@ -395,27 +393,27 @@ namespace hpx { namespace actions
 
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_action0<Component, component_result_action_arg0, F, Derived>
+      : direct_action0<Component, F, Derived>
     {
         typedef direct_action0<
-            Component, component_result_action_arg0, F, Derived
+            Component, F, Derived
         > type;
     };
 
     template <typename Component, void (Component::*F)() const, typename Derived>
     struct make_action<void (Component::*)() const, F, Derived, boost::mpl::true_>
-      : direct_action0<Component const, component_result_action_arg0, F, Derived>
+      : direct_action0<Component const, F, Derived>
     {
         typedef direct_action0<
-            Component const, component_result_action_arg0, F, Derived
+            Component const, F, Derived
         > type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // the specialization for void return type is just a template alias
-    template <typename Component, int Action, void (Component::*F)(), typename Derived>
-    struct result_action0<Component, void, Action, F, Derived>
-      : action0<Component, Action, F, Derived>
+    template <typename Component, void (Component::*F)(), typename Derived>
+    struct result_action0<Component, void, F, Derived>
+      : action0<Component, F, Derived>
     {};
 
     /// \endcond

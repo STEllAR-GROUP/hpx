@@ -106,27 +106,9 @@ namespace graph500 { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes.
-        enum actions
-        {
-            point_init = 0,
-            point_bfs = 1,
-            point_has_edge = 2,
-            point_root = 3,
-            point_receive_duplicates = 4,
-            point_resolve_conflict = 5,
-            point_get_parent = 6,
-            point_distributed_validate = 7,
-            point_get_numedges = 8,
-            point_ppedge = 9,
-            point_findwhohasthisedge = 10
-        };
-
         typedef hpx::actions::action4<
             // Component server type.
             point,
-            // Action code.
-            point_init,
             // Arguments of this action.
             std::size_t,
             std::size_t,
@@ -139,8 +121,6 @@ namespace graph500 { namespace server
         typedef hpx::actions::action1<
             // Component server type.
             point,
-            // Action code.
-            point_root,
             // Arguments of this action.
             std::vector<int64_t> const&,
             // Method bound to this action.
@@ -150,8 +130,6 @@ namespace graph500 { namespace server
         typedef hpx::actions::action3<
             // Component server type.
             point,
-            // Action code.
-            point_receive_duplicates,
             // Arguments of this action.
             int64_t,
             std::vector<hpx::naming::id_type> const&,
@@ -163,8 +141,6 @@ namespace graph500 { namespace server
         typedef hpx::actions::action3<
             // Component server type.
             point,
-            // Action code.
-            point_ppedge,
             // Arguments of this action.
             int64_t,
             int64_t,
@@ -176,8 +152,6 @@ namespace graph500 { namespace server
         typedef hpx::actions::action0<
             // Component server type.
             point,
-            // Action code.
-            point_bfs,
             // Arguments of this action.
             // Method bound to this action.
             &point::bfs
@@ -186,8 +160,6 @@ namespace graph500 { namespace server
         typedef hpx::actions::action0<
             // Component server type.
             point,
-            // Action code.
-            point_resolve_conflict,
             // Arguments of this action.
             // Method bound to this action.
             &point::resolve_conflict
@@ -198,8 +170,6 @@ namespace graph500 { namespace server
             point,
             // Return type.
             std::vector<int>,
-            // Action code.
-            point_distributed_validate,
             // Arguments of this action.
             std::size_t,
             // Method bound to this action.
@@ -211,8 +181,6 @@ namespace graph500 { namespace server
             point,
             // Return type.
             std::vector<bool>,
-            // Action code.
-            point_findwhohasthisedge,
             // Arguments of this action.
             int64_t,
             std::vector<hpx::naming::id_type> const&,
@@ -225,8 +193,6 @@ namespace graph500 { namespace server
             point,
             // Return type.
             std::vector<int64_t>,
-            // Action code.
-            point_get_numedges,
             // Arguments of this action.
             // Method bound to this action.
             &point::get_numedges
@@ -237,8 +203,6 @@ namespace graph500 { namespace server
             point,
             // Return type.
             resolvedata, 
-            // Action code.
-            point_get_parent,
             // Arguments of this action.
             int64_t,
             // Method bound to this action.
@@ -250,8 +214,6 @@ namespace graph500 { namespace server
             point,
             // Return type.
             bool,
-            // Action code.
-            point_has_edge,
             // Arguments of this action.
             int64_t,
             // Method bound to this action.

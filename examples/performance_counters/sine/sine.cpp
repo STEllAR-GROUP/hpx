@@ -111,7 +111,7 @@ namespace performance_counters { namespace sine
             if (!status_is_valid(status) || !f(i, ec) || ec)
                 return false;
         }
-        else (p.instancename_ == "instance#*") {
+        else if(p.instancename_ == "instance#*") {
             BOOST_ASSERT(mode == hpx::performance_counters::discover_counters_full);
 
             // FIXME: expand for all instances

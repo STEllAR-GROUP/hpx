@@ -34,15 +34,6 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // component type used to encapsulate instances of this component
         typedef adaptive1d::server::dataflow_stencil wrapping_type;
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            dataflow_stencil_init_execute = 0,
-            dataflow_stencil_execute = 1
-        };
-
         /// This is the main entry point of this component.
         boost::shared_ptr<std::vector<naming::id_type> > init_execute(
             std::vector<naming::id_type> const& interp_src_data,
@@ -64,7 +55,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action7<
             dataflow_stencil, boost::shared_ptr<std::vector<naming::id_type> >,
-            dataflow_stencil_init_execute,std::vector<naming::id_type> const&,
+            std::vector<naming::id_type> const&,
             double,
             components::component_type,
             std::size_t, std::size_t, components::component_type,
@@ -72,7 +63,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         > init_execute_action;
 
         typedef hpx::actions::result_action6<
-            dataflow_stencil, std::vector<naming::id_type>, dataflow_stencil_execute,
+            dataflow_stencil, std::vector<naming::id_type>,
             std::vector<naming::id_type> const&,
             components::component_type, std::size_t, std::size_t,
             components::component_type, parameter const&, &dataflow_stencil::execute

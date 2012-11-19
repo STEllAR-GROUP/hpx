@@ -86,7 +86,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action0<
                     remote_lse<T>
-                  , 0
                   , &remote_lse<T>::clear_timestamps
                 >
                 clear_timestamps_action;
@@ -106,7 +105,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action0<
                     remote_lse<T>
-                  , 0
                   , &remote_lse<T>::print_timestamps
                 >
                 print_timestamps_action;
@@ -120,17 +118,6 @@ namespace bright_future {
 
             typedef remote_lse<T> wrapper_type;
 
-            enum actions
-            {
-                remote_lse_init     = 0
-              , remote_lse_init_rhs = 1
-              , remote_lse_init_u   = 2
-              , remote_lse_apply    = 3
-              , remote_lse_apply_region = 4
-              , remote_lse_init_u_blocked  = 5
-              , remote_lse_init_rhs_blocked  = 6
-            };
-
             void init(
                 size_type size_x
               , size_type size_y
@@ -143,7 +130,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action6<
                     remote_lse<T>
-                  , remote_lse_init
                   , size_type
                   , size_type
                   , size_type
@@ -173,7 +159,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
-                  , remote_lse_init_rhs
                   , init_func_type
                   , size_type
                   , size_type
@@ -190,7 +175,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
-                  , remote_lse_init_rhs_blocked
                   , init_func_type
                   , range_type
                   , range_type
@@ -207,7 +191,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
-                  , remote_lse_init_u
                   , init_func_type
                   , size_type
                   , size_type
@@ -224,7 +207,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
-                  , remote_lse_init_u_blocked
                   , init_func_type
                   , range_type
                   , range_type
@@ -254,7 +236,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action4<
                     remote_lse<T>
-                  , remote_lse_apply
                   , apply_func_type
                   , size_type
                   , size_type
@@ -273,7 +254,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action4<
                     remote_lse<T>
-                  , remote_lse_apply_region
                   , apply_func_type
                   , range_type
                   , range_type
@@ -291,7 +271,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
-                  , remote_lse_apply_region
                   , apply_func_type
                   , range_type
                   , range_type
@@ -305,7 +284,6 @@ namespace bright_future {
                 hpx::actions::result_action2<
                     remote_lse<T>
                   , std::vector<T>
-                  , 0
                   , size_type
                   , range_type
                   , &remote_lse<T>::get_row
@@ -318,7 +296,6 @@ namespace bright_future {
                 hpx::actions::result_action2<
                     remote_lse<T>
                   , std::vector<T>
-                  , 0
                   , size_type
                   , range_type
                   , &remote_lse<T>::get_col
@@ -329,7 +306,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
-                  , 0
                   , std::vector<T> const &
                   , range_type
                   , &remote_lse<T>::update_top_boundary
@@ -340,7 +316,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
-                  , 0
                   , std::vector<T> const &
                   , range_type
                   , &remote_lse<T>::update_bottom_boundary
@@ -351,7 +326,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
-                  , 0
                   , std::vector<T> const &
                   , range_type
                   , &remote_lse<T>::update_left_boundary
@@ -362,7 +336,6 @@ namespace bright_future {
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
-                  , 0
                   , std::vector<T> const &
                   , range_type
                   , &remote_lse<T>::update_right_boundary

@@ -44,15 +44,6 @@ namespace server
 
     public:
 
-       enum actions {
-            board_init,
-            board_update,
-            board_access,
-            board_check,
-            board_solve,
-            board_clear
-        };
-
         board():list_(0), level_(0), size_(0), count_(0)
         {}
 
@@ -133,53 +124,12 @@ namespace server
             return b.count_;
         }
 
-        typedef hpx::actions::action1<
-            board,
-            board_init,
-            std::size_t,
-            &board::init_board
-            > init_action;
-
-        typedef hpx::actions::result_action0<
-            board,
-            list_type,
-            board_access,
-            &board::access_board
-            > access_action;
-
-        typedef hpx::actions::action2<
-            board,
-            board_update,
-            std::size_t,
-            std::size_t,
-            &board::update_board
-            > update_action;
-
-        typedef hpx::actions::result_action2<
-            board,
-            bool,
-            board_check,
-            list_type const&,
-            std::size_t,
-            &board::check_board
-            > check_action;
-
-        typedef hpx::actions::result_action4<
-            board,
-            std::size_t,
-            board_solve,
-            list_type const&,
-            std::size_t,
-            std::size_t,
-            std::size_t,
-            &board::solve_board
-            > solve_action;
-
-        typedef hpx::actions::action0<
-            board,
-            board_clear,
-            &board::clear_board
-            > clear_action;
+        HPX_DEFINE_COMPONENT_ACTION(board, init_board, init_action);
+        HPX_DEFINE_COMPONENT_ACTION(board, access_board, access_action);
+        HPX_DEFINE_COMPONENT_ACTION(board, update_board, update_action);
+        HPX_DEFINE_COMPONENT_ACTION(board, check_board, check_action);
+        HPX_DEFINE_COMPONENT_ACTION(board, solve_board, solve_action);
+        HPX_DEFINE_COMPONENT_ACTION(board, clear_board, clear_action);
     };
 
 }}

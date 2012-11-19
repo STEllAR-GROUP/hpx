@@ -12,13 +12,6 @@ namespace startup_shutdown { namespace server
       : public hpx::components::simple_component_base<startup_shutdown_component>
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            startup_shutdown_component_init = 0,
-        };
-
         // constructor: initialize accumulator value
         startup_shutdown_component()
           : arg_(0)
@@ -37,11 +30,7 @@ namespace startup_shutdown { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
-            startup_shutdown_component, startup_shutdown_component_init,
-            std::string const&, &startup_shutdown_component::init
-        > init_action;
-
+        HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init);
     private:
       std::string arg_;
     };

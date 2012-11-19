@@ -37,20 +37,9 @@ namespace ad { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes.
-        enum actions
-        {
-            point_init = 0,
-            point_compute = 1,
-            point_get_item = 2,
-            point_remove_item = 3
-        };
-
         typedef hpx::actions::action2<
             // Component server type.
             point,
-            // Action code.
-            point_init,
             // Arguments of this action.
             std::size_t,
             std::size_t,
@@ -61,8 +50,6 @@ namespace ad { namespace server
         typedef hpx::actions::action2<
             // Component server type.
             point,
-            // Action code.
-            point_remove_item,
             // Arguments of this action.
             std::size_t,
             std::size_t,
@@ -73,8 +60,6 @@ namespace ad { namespace server
         typedef hpx::actions::action1<
             // Component server type.
             point,
-            // Action code.
-            point_compute,
             // Arguments of this action.
             std::vector<hpx::naming::id_type> const&,
             // Method bound to this action.
@@ -86,8 +71,6 @@ namespace ad { namespace server
             point,
             // Return type
             std::size_t,
-            // Action code.
-            point_get_item,
             // Arguments of this action.
             // Method bound to this action.
             &point::get_item

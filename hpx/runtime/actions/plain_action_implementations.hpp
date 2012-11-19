@@ -68,7 +68,6 @@ namespace hpx { namespace actions
     class BOOST_PP_CAT(plain_base_result_action, N)
       : public action<
             components::server::plain_function<Derived>,
-            BOOST_PP_CAT(function_result_action_arg, N),
             Result,
             BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
@@ -78,8 +77,7 @@ namespace hpx { namespace actions
         typedef BOOST_PP_CAT(hpx::util::tuple, N)<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
-            components::server::plain_function<Derived>,
-            BOOST_PP_CAT(function_result_action_arg, N), result_type,
+            components::server::plain_function<Derived>, result_type,
             arguments_type, Derived> base_type;
 
     protected:
@@ -249,7 +247,6 @@ namespace hpx { namespace actions
     class BOOST_PP_CAT(plain_base_action, N)
       : public action<
             components::server::plain_function<Derived>,
-            BOOST_PP_CAT(function_action_arg, N),
             util::unused_type,
             BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
@@ -260,8 +257,7 @@ namespace hpx { namespace actions
             BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>
         arguments_type;
         typedef action<
-            components::server::plain_function<Derived>,
-            BOOST_PP_CAT(function_action_arg, N), result_type,
+            components::server::plain_function<Derived>, result_type,
             arguments_type, Derived> base_type;
 
     protected:

@@ -34,15 +34,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         // component type used to encapsulate instances of this component
         typedef amr::server::unigrid_mesh wrapping_type;
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            unigrid_mesh_init_execute = 0,
-            unigrid_mesh_execute = 1
-        };
-
         /// This is the main entry point of this component.
         boost::shared_ptr<std::vector<naming::id_type> > init_execute(
             std::vector<naming::id_type> const& interp_src_data,
@@ -62,21 +53,8 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action7<
-            unigrid_mesh, boost::shared_ptr<std::vector<naming::id_type> >,
-            unigrid_mesh_init_execute,std::vector<naming::id_type> const&,
-            double,
-            components::component_type,
-            std::size_t, std::size_t, components::component_type,
-            parameter const&, &unigrid_mesh::init_execute
-        > init_execute_action;
-
-        typedef hpx::actions::result_action6<
-            unigrid_mesh, std::vector<naming::id_type>, unigrid_mesh_execute,
-            std::vector<naming::id_type> const&,
-            components::component_type, std::size_t, std::size_t,
-            components::component_type, parameter const&, &unigrid_mesh::execute
-        > execute_action;
+        HPX_DEFINE_COMPONENT_ACTION(unigrid_mesh, init_execute);
+        HPX_DEFINE_COMPONENT_ACTION(unigrid_mesh, execute);
 
     protected:
         typedef

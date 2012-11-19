@@ -50,23 +50,6 @@ namespace hpx { namespace geometry { namespace server
       : public components::managed_component_base<point>
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            point_init = 0,
-            point_get_X = 1,
-            point_get_Y = 2,
-            point_set_X = 3,
-            point_set_Y = 4,
-            point_search = 5,
-            point_get_poly = 6,
-            point_move = 7,
-            point_enforce = 8,
-            point_adjust = 9,
-            point_recompute = 10
-        };
-
         // constructor: initialize accumulator value
         point()
         {}
@@ -208,49 +191,49 @@ namespace hpx { namespace geometry { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action8<
-            point, point_init, double, double,double,double,double,double,std::size_t,std::size_t, &point::init
+            point, double, double,double,double,double,double,std::size_t,std::size_t, &point::init
         > init_action;
 
         typedef hpx::actions::result_action0<
-            point const, double, point_get_X, &point::get_X
+            point const, double, &point::get_X
         > get_X_action;
 
         typedef hpx::actions::result_action0<
-            point const, polygon_type, point_get_poly, &point::get_poly
+            point const, polygon_type, &point::get_poly
         > get_poly_action;
 
         typedef hpx::actions::action2<
-            point, point_move, double, double, &point::move
+            point, double, double, &point::move
         > move_action;
 
         typedef hpx::actions::action1<
-            point, point_adjust, double, &point::adjust
+            point, double, &point::adjust
         > adjust_action;
 
         typedef hpx::actions::action4<
-            point, point_enforce,std::vector<hpx::naming::id_type> const&,double,std::size_t,std::size_t,
+            point, std::vector<hpx::naming::id_type> const&,double,std::size_t,std::size_t,
             &point::enforce
         > enforce_action;
 
         typedef hpx::actions::result_action0<
-            point const, double, point_get_Y, &point::get_Y
+            point const, double, &point::get_Y
         > get_Y_action;
 
         typedef hpx::actions::action1<
-            point, point_set_X, double, &point::set_X
+            point, double, &point::set_X
         > set_X_action;
 
         typedef hpx::actions::action1<
-            point, point_set_Y, double, &point::set_Y
+            point, double, &point::set_Y
         > set_Y_action;
 
         typedef hpx::actions::result_action1<
-            point, int, point_search, std::vector<hpx::naming::id_type> const&,
+            point, int, std::vector<hpx::naming::id_type> const&,
             &point::search
         > search_action;
 
         typedef hpx::actions::action1<
-            point, point_recompute, std::vector<hpx::naming::id_type> const&,
+            point, std::vector<hpx::naming::id_type> const&,
             &point::recompute
         > recompute_action;
 

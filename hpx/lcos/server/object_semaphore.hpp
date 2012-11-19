@@ -28,14 +28,6 @@ struct object_semaphore
         object_semaphore<ValueType>
     >
 {
-    enum action
-    {
-        object_semaphore_signal,
-        object_semaphore_get,
-        object_semaphore_abort_pending,
-        object_semaphore_wait
-    };
-
     typedef components::managed_component_base<object_semaphore> base_type;
 
     typedef hpx::lcos::local::spinlock mutex_type;
@@ -215,33 +207,10 @@ struct object_semaphore
         }
     } // }}}
 
-    typedef hpx::actions::action2<
-        object_semaphore<ValueType>
-      , object_semaphore_signal
-      , ValueType const&
-      , boost::uint64_t
-      , &object_semaphore<ValueType>::signal
-    > signal_action;
-
-    typedef hpx::actions::action1<
-        object_semaphore<ValueType>
-      , object_semaphore_get
-      , naming::id_type const& // lco
-      , &object_semaphore<ValueType>::get
-    > get_action;
-
-    typedef hpx::actions::action1<
-        object_semaphore<ValueType>
-      , object_semaphore_abort_pending
-      , error
-      , &object_semaphore<ValueType>::abort_pending
-    > abort_pending_action;
-
-    typedef hpx::actions::action0<
-        object_semaphore<ValueType>
-      , object_semaphore_wait
-      , &object_semaphore<ValueType>::wait
-    > wait_action;
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, signal, signal_action);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, get, get_action);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, abort_pending, abort_pending_action);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, wait, wait_action);
 
   private:
     value_queue_type value_queue_;
