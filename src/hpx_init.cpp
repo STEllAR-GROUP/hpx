@@ -318,7 +318,7 @@ namespace hpx
             }
             if (vm.count("hpx:list-counter-infos")) {
                 // Print info about all registered performance counters.
-                std::string option(vm["hpx:list-counters"].as<std::string>());
+                std::string option(vm["hpx:list-counter-infos"].as<std::string>());
                 if (0 == std::string("minimal").find(option))
                     rt.add_startup_function(&list_counter_infos_minimal);
                 else if (0 == std::string("full").find(option))
