@@ -123,14 +123,13 @@ namespace hpx { namespace components { namespace server
             naming::gid_type const& gid, naming::gid_type const& count);
 
         /// \brief Gracefully shutdown this runtime system instance
-        void shutdown(double timeout,
-            naming::id_type const& respond_to = naming::invalid_id);
+        void shutdown(double timeout, naming::id_type const& respond_to);
 
         /// \brief Gracefully shutdown runtime system instances on all localities
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        void terminate(naming::id_type const& respond_to = naming::invalid_id);
+        void terminate(naming::id_type const& respond_to);
 
         /// \brief Shutdown runtime system instances on all localities
         void terminate_all();
