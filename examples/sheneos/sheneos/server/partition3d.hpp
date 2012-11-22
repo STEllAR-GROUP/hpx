@@ -80,15 +80,6 @@ namespace sheneos { namespace server
         };
 
         ///////////////////////////////////////////////////////////////////////
-        enum actions
-        {
-            partition3d_init = 0,
-            partition3d_interpolate = 1,
-            partition3d_interpolate_one = 2,
-            partition3d_interpolate_bulk = 3,
-            partition3d_interpolate_one_bulk = 4
-        };
-
         partition3d();
 
         ///////////////////////////////////////////////////////////////////////
@@ -144,7 +135,6 @@ namespace sheneos { namespace server
         // serialization, etc.
         typedef hpx::actions::action4<
             partition3d,                        // Component server type.
-            partition3d_init,                   // Action code.
             std::string const&,                 // Arguments of this action.
             dimension const&,
             dimension const&,
@@ -155,7 +145,6 @@ namespace sheneos { namespace server
         typedef hpx::actions::result_action4<
             partition3d,                        // Component server type.
             std::vector<double>,                // Return type.
-            partition3d_interpolate,            // Action code.
             double,                             // Arguments of this action.
             double,
             double,
@@ -166,7 +155,6 @@ namespace sheneos { namespace server
         typedef hpx::actions::result_action4<
             partition3d,                        // Component server type.
             double,                             // Return type.
-            partition3d_interpolate_one,        // Action code.
             double,                             // Arguments of this action.
             double,
             double,
@@ -177,7 +165,6 @@ namespace sheneos { namespace server
         typedef hpx::actions::result_action2<
             partition3d,                        // Component server type.
             std::vector<std::vector<double> >,  // Return type.
-            partition3d_interpolate_bulk,       // Action code.
             std::vector<sheneos_coord> const&,  // Arguments of this action.
             boost::uint32_t,
             &partition3d::interpolate_bulk      // Method bound to this action.
@@ -186,7 +173,6 @@ namespace sheneos { namespace server
         typedef hpx::actions::result_action2<
             partition3d,                        // Component server type.
             std::vector<double>,                // Return type.
-            partition3d_interpolate_one_bulk,   // Action code.
             std::vector<sheneos_coord> const&,  // Arguments of this action.
             boost::uint32_t,
             &partition3d::interpolate_one_bulk  // Method bound to this action.
