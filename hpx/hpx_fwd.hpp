@@ -616,13 +616,6 @@ namespace hpx
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type);
 
-    /// \ cond NODETAIL
-    namespace detail
-    {
-        HPX_API_EXPORT naming::gid_type get_next_id();
-    }
-    /// \ endcond
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
@@ -931,8 +924,6 @@ namespace hpx
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
     HPX_API_EXPORT boost::uint64_t get_system_uptime();
-
-    HPX_EXPORT void set_error_handlers();
 }
 
 #include <hpx/lcos/async_fwd.hpp>
