@@ -250,5 +250,32 @@ namespace hpx { namespace naming
             return "invalid";
         return management_type_names[m + 1];
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline naming::id_type get_colocation_id(naming::id_type id, error_code& ec)
+    {
+        // FIXME: Resolve the locality instead of deducing it from the target 
+        //        GID, otherwise this will break once we start moving objects.
+        boost::uint32_t locality_id = get_locality_id_from_gid(id.get_gid());
+        return get_id_from_locality_id(locality_id);
+    }
+
+    inline lcos::future<naming::id_type> get_colocation_id_async(naming::id_type id)
+    {
+        return lcos::make_future(naming::get_colocation_id(id, throws));
+    }
 }}
+
+namespace hpx
+{
+    naming::id_type get_colocation_id(naming::id_type id, error_code& ec)
+    {
+        return naming::get_colocation_id_async(id).get(ec);
+    }
+
+    lcos::future<naming::id_type> get_colocation_id_async(naming::id_type id)
+    {
+        return naming::get_colocation_id_async(id);
+    }
+}
 

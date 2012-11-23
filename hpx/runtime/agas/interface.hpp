@@ -105,7 +105,7 @@ inline boost::uint32_t get_num_localities(
     error_code& ec = throws
     )
 {
-    return get_num_localities(components::component_invalid, ec);
+    return agas::get_num_localities(components::component_invalid, ec);
 }
 
 HPX_API_EXPORT lcos::future<std::vector<boost::uint32_t> > get_num_threads_async();

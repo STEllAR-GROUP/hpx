@@ -683,8 +683,12 @@ namespace hpx { namespace traits
     struct promise_local_result<std::vector<naming::gid_type> >
       : boost::mpl::identity<std::vector<naming::id_type> >
     {};
-}
+}}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    // pull invalid id into the mainnamespace
     using naming::invalid_id;
 }
 

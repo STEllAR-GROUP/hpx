@@ -709,8 +709,9 @@ namespace hpx
     ///        supports the given component type.
     ///
     /// The function \a find_locality() can be used to retrieve the
-    /// global ids of all localities currently available to this application
-    /// which support the creation of instances of the given component type.
+    /// global id of an arbitrary localities currently available to this 
+    /// application which supports the creation of instances of the given 
+    /// component type.
     ///
     /// \note     Generally, the id of a locality can be used for instance to
     ///           create new instances of components and to invoke plain actions
@@ -743,7 +744,8 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities
-    HPX_API_EXPORT boost::uint32_t get_num_localities();
+    HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async();
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
@@ -759,7 +761,10 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities
-    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type t);
+    HPX_API_EXPORT boost::uint32_t get_num_localities(
+        components::component_type t, error_code& ec = throws);
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async(
+        components::component_type t);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
@@ -924,6 +929,14 @@ namespace hpx
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
     HPX_API_EXPORT boost::uint64_t get_system_uptime();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the id of the locality where the object referenced by the 
+    ///        given id is currently located on
+    HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
+        error_code& ec = throws);
+    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
+        naming::id_type id);
 }
 
 #include <hpx/lcos/async_fwd.hpp>
