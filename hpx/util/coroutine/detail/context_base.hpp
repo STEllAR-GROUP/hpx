@@ -501,8 +501,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     // Nothrow.
-    void do_invoke() throw (){
+    void do_invoke() throw () {
       BOOST_ASSERT(ready() || waiting());
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+      ++m_phase;
+#endif
       m_state = ctx_running;
       swap_context(m_caller, *this, detail::invoke_hint());
     }
