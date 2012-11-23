@@ -138,7 +138,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
     template <BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(
-        HPX_TUPLE_LIMIT, typename A, util::unused_type)>
+        HPX_TUPLE_LIMIT, typename A, util::unused_type), typename Dummy = void>
     struct tuple;
 
     template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename A)>
@@ -147,7 +147,7 @@ namespace hpx { namespace util
     {};
 #else
     template <BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(
-        HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A, util::unused_type)>
+        HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A, util::unused_type), typename Dummy = void>
     struct tuple;
 
     template <BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A)>
