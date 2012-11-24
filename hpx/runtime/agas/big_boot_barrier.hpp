@@ -19,6 +19,7 @@
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/parcelset/tcp/parcelport.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

@@ -1,11 +1,12 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
+//  Copyright (c) 2011 Bryce Lelbach 
+//  Copyright (c) 2011 Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_PARCELPORT_CONNECTION_MAY_20_2008_1132PM)
-#define HPX_PARCELSET_PARCELPORT_CONNECTION_MAY_20_2008_1132PM
+#if !defined(HPX_PARCELSET_TCP_PARCELPORT_CONNECTION_MAY_20_2008_1132PM)
+#define HPX_PARCELSET_TCP_PARCELPORT_CONNECTION_MAY_20_2008_1132PM
 
 #include <sstream>
 #include <vector>
@@ -34,7 +35,7 @@
 #include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
+namespace hpx { namespace parcelset { namespace tcp
 {
     /// Represents a single parcelport_connection from a client.
     class parcelport_connection
@@ -171,6 +172,6 @@ namespace hpx { namespace parcelset
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
-}}
+}}}
 
 #endif

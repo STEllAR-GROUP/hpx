@@ -19,7 +19,7 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
@@ -84,20 +84,6 @@ void early_parcel_sink(
         }
     }
 } // }}}
-
-void early_write_handler(
-    boost::system::error_code const& e
-  , std::size_t size
-    )
-{
-    // no-op
-}
-
-void early_pending_parcel_handler(naming::locality const&,
-    parcelset::parcelport_connection_ptr const&)
-{
-    // no-op
-}
 
 struct registration_header
 {
@@ -606,14 +592,7 @@ void big_boot_barrier::apply(
   , actions::base_action* act
 ) { // {{{
     parcelset::parcel p(naming::get_gid_from_locality_id(locality_id), addr, act);
-
-    parcelset::parcelport_connection_ptr client_connection =
-        pp.get_connection(addr.locality_);
-
-    BOOST_ASSERT(client_connection);
-
-    client_connection->set_parcel(p);
-    client_connection->async_write(early_write_handler, early_pending_parcel_handler);
+    pp.send_early_parcel(p);
 } // }}}
 
 void big_boot_barrier::wait()

@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
@@ -16,7 +16,7 @@
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
+namespace hpx { namespace parcelset { namespace tcp
 {
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
@@ -126,5 +126,5 @@ namespace hpx { namespace parcelset
         send_data_.bytes_ = out_buffer_.size();
         send_data_.type_bytes_ = arg_size;
     }
-}}
+}}}
 

@@ -6,18 +6,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <string>
-#include <map>
-#include <set>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/tcp/parcelport.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <boost/version.hpp>
 #include <boost/asio/io_service.hpp>
@@ -29,7 +26,7 @@
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
+namespace hpx { namespace parcelset { namespace tcp
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -60,11 +57,10 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::io_service_pool& io_service_pool,
             util::runtime_configuration const& ini)
-      : io_service_pool_(io_service_pool),
+      : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
+        io_service_pool_(io_service_pool),
         acceptor_(NULL),
-        parcels_(This()),
-        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc()),
-        here_(ini.get_parcelport_address())
+        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
         if (here_.get_type() != connection_tcpip) {
             HPX_THROW_EXCEPTION(network_error, "parcelport::parcelport",
@@ -327,10 +323,33 @@ namespace hpx { namespace parcelset
                 ::_1, ::_2));
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    parcelport_connection_ptr parcelport::get_connection(naming::locality const& l)
+    void early_write_handler(boost::system::error_code const& e, std::size_t size)
     {
-        parcelset::parcelport_connection_ptr client_connection;
+        // no-op
+    }
+
+    void early_pending_parcel_handler(naming::locality const&,
+        parcelset::tcp::parcelport_connection_ptr const&)
+    {
+        // no-op
+    }
+
+    void parcelport::send_early_parcel(parcel& p)
+    {
+        naming::locality const& l = p.get_destination_locality();
+        parcelport_connection_ptr client_connection = get_connection(l);
+
+        BOOST_ASSERT(client_connection);
+
+        client_connection->set_parcel(p);
+        client_connection->async_write(early_write_handler, early_pending_parcel_handler);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    parcelport_connection_ptr parcelport::get_connection(
+        naming::locality const& l)
+    {
+        parcelport_connection_ptr client_connection;
         bool got_cache_space = false;
 
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
@@ -427,4 +446,4 @@ namespace hpx { namespace parcelset
 
         return client_connection;
     }
-}}
+}}}
