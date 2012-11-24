@@ -311,13 +311,19 @@ struct windows_topology : topology
     } // }}}
 
     std::vector<std::size_t> numa_node_numbers_;
-
+      
     std::vector<std::size_t> numa_node_affinity_masks_;
     std::vector<std::size_t> ns_numa_node_affinity_masks_;
 
     std::vector<std::size_t> thread_affinity_masks_;
     std::vector<std::size_t> ns_thread_affinity_masks_;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+inline topology* create_topology()
+{
+    return new windows_topology;
+}
 
 }}
 

@@ -6,31 +6,20 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <iostream>
-#include <vector>
-
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-
-#if defined(HPX_HAVE_HWLOC)
-    #include <hpx/runtime/threads/policies/hwloc_topology.hpp>
-#elif defined(BOOST_WINDOWS)
-    #include <hpx/runtime/threads/policies/windows_topology.hpp>
-#elif defined(__APPLE__)
-    #include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-    #include <hpx/runtime/threads/policies/linux_topology.hpp>
-#else
-    #include <hpx/runtime/threads/policies/noop_topology.hpp>
-#endif
-
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
+
+#include <iostream>
+#include <vector>
+
 #if defined(HPX_HAVE_STACKTRACES)
 #include <boost/backtrace.hpp>
 #endif
@@ -179,19 +168,7 @@ namespace hpx
             util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
-        topology_(
-#if defined(HPX_HAVE_HWLOC)
-            new threads::hwloc_topology
-#elif defined(BOOST_WINDOWS)
-            new threads::windows_topology
-#elif defined(__APPLE__)
-            new threads::macosx_topology
-#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-            new threads::linux_topology
-#else
-            new threads::noop_topology
-#endif
-        ),
+        topology_(threads::create_topology()),
         state_(state_invalid)
     {
         // initialize our TSS
@@ -202,7 +179,6 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
-
 
     ///////////////////////////////////////////////////////////////////////////
     util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;

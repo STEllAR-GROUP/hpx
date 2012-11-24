@@ -86,6 +86,12 @@ struct noop_topology : topology
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+inline topology* create_topology()
+{
+    return new noop_topology;
+}
+
 }}
 
 #endif // HPX_079E367D_741C_4FA1_913F_EA33A192BDAD
