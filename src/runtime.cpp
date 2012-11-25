@@ -581,5 +581,15 @@ namespace hpx
     {
         return runtime::get_system_uptime();
     }
+
+    util::runtime_configuration const& get_config()
+    {
+        return get_runtime().get_config();
+    }
+
+    hpx::util::io_service_pool* get_thread_pool(char const* name)
+    {
+        return get_runtime().get_thread_pool(name);
+    }
 }
 

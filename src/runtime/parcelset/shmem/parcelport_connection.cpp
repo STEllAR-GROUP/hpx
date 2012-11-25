@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
@@ -16,28 +16,16 @@
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace tcp
+namespace hpx { namespace parcelset { namespace shmem
 {
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
-            util::connection_cache<parcelport_connection, naming::locality>& cache,
+//             util::connection_cache<parcelport_connection, naming::locality>& cache,
             performance_counters::parcels::gatherer& parcels_sent)
-      : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-        connection_cache_(cache), parcels_sent_(parcels_sent), 
-        archive_flags_(boost::archive::no_header)
+      : window_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
+        /*connection_cache_(cache), */
+        parcels_sent_(parcels_sent)
     {
-#ifdef BOOST_BIG_ENDIAN
-        std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
-#else
-        std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
-#endif
-        if (endian_out == "little")
-            archive_flags_ |= util::endian_little;
-        else if (endian_out == "big")
-            archive_flags_ |= util::endian_big;
-        else {
-            BOOST_ASSERT(endian_out =="little" || endian_out == "big");
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -75,8 +63,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(out_buffer_,
-                    archive_flags_);
+                util::portable_binary_oarchive archive(out_buffer_);
 
                 std::size_t count = pv.size();
                 archive << count;
@@ -95,7 +82,7 @@ namespace hpx { namespace parcelset { namespace tcp
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
+                "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::archive::archive_exception: %s") % e.what()));
@@ -103,7 +90,7 @@ namespace hpx { namespace parcelset { namespace tcp
         }
         catch (boost::system::system_error const& e) {
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
+                "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::system::system_error: %d (%s)") %
@@ -112,14 +99,14 @@ namespace hpx { namespace parcelset { namespace tcp
         }
         catch (std::exception const& e) {
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
+                "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "std::exception: %s") % e.what()));
             return;
         }
 
-        out_priority_ = boost::integer::ulittle8_t(priority);
+        out_priority_ = priority;
         out_size_ = out_buffer_.size();
 
         send_data_.num_parcels_ = pv.size();

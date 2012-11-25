@@ -32,7 +32,7 @@ void output_stream::write_async(
     buffer const& in
 ) { // {{{
     // Perform the IO in another OS thread.
-    get_runtime().get_thread_pool("io_pool")->get_io_service().post(
+    hpx::get_thread_pool("io_pool")->get_io_service().post(
         boost::bind(&output_stream::call_write_async, this, in));
 } // }}}
 
@@ -59,7 +59,7 @@ void output_stream::write_sync(
     threads::thread_id_type id = self.get_thread_id();
 
     // Perform the IO in another OS thread.
-    get_runtime().get_thread_pool("io_pool")->get_io_service().post(
+    hpx::get_thread_pool("io_pool")->get_io_service().post(
         boost::bind(&output_stream::call_write_sync, this, in, id));
 
     // Sleep until the worker thread wakes us up.

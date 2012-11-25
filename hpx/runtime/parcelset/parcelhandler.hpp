@@ -57,6 +57,7 @@ namespace hpx { namespace parcelset
         }
 
         // find and return the specified parcelport
+        parcelport* find_parcelport(connection_type type);
         parcelport* find_parcelport(connection_type type,
             error_code& ec = throws) const;
 
@@ -75,7 +76,7 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(naming::resolver_client& resolver, 
+        parcelhandler(naming::resolver_client& resolver,
             boost::shared_ptr<parcelport> pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
@@ -103,7 +104,7 @@ namespace hpx { namespace parcelset
         /// the parcelhandler has been initialized with (see parcelhandler
         /// constructors). This is the same \a parcelport instance this
         /// parcelhandler has been initialized with.
-        parcelport& get_parcelport()
+        parcelport& get_parcelport() const
         {
             return *find_parcelport(connection_tcpip);
         }
@@ -202,7 +203,9 @@ namespace hpx { namespace parcelset
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
         void put_parcel(parcel& p)
-        { put_parcel(p, &parcelhandler::default_write_handler); }
+        {
+            put_parcel(p, &parcelhandler::default_write_handler);
+        }
 
         /// The function \a get_parcel returns the next available parcel
         ///
@@ -325,7 +328,7 @@ namespace hpx { namespace parcelset
         /// parcel-handler instance.
         void register_counter_types(connection_type pp_type = connection_tcpip);
 
-        /// \brief Make sure the specified locality is not held by any 
+        /// \brief Make sure the specified locality is not held by any
         /// connection caches anymore
         void remove_from_connection_cache(naming::locality const& loc);
 
@@ -348,7 +351,7 @@ namespace hpx { namespace parcelset
         naming::gid_type locality_;
 
         /// the parcelport this handler is associated with
-        std::map<connection_type, boost::shared_ptr<parcelport> > pports_;
+        std::vector<boost::shared_ptr<parcelport> > pports_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
@@ -356,7 +359,6 @@ namespace hpx { namespace parcelset
         ///
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
     };
-
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -107,6 +107,9 @@ namespace hpx { namespace parcelset
         /// Cache specific functionality
         virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
 
+        /// Retrieve the type of the locality represented by this parcelport
+        virtual connection_type get_type() const = 0;
+
         /// Register an event handler to be called whenever a parcel has been
         /// received.
         ///
@@ -230,11 +233,9 @@ namespace hpx { namespace parcelset
             parcels_received_.add_data(data);
         }
 
-        /// Retrieve the type of the locality represented by this parcelport
-        connection_type get_type() const
-        {
-            return here_.get_type();
-        }
+        /// Create a new instance of a parcelport
+        static boost::shared_ptr<parcelport> create(connection_type type,
+            util::io_service_pool& pool, util::runtime_configuration const& cfg);
 
     protected:
         /// mutex for all of the member data

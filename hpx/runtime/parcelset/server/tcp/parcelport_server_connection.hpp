@@ -8,8 +8,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM)
-#define HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM
+#if !defined(HPX_PARCELSET_SERVER_TCP_PARCELPORT_CONNECTION_MAR_26_2008_1221PM)
+#define HPX_PARCELSET_SERVER_TCP_PARCELPORT_CONNECTION_MAR_26_2008_1221PM
 
 #include <sstream>
 #include <vector>
@@ -29,13 +29,12 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
-#include <boost/iostreams/stream.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace server
+namespace hpx { namespace parcelset { namespace server { namespace tcp
 {
     /// Represents a single parcelport_connection from a client.
     class parcelport_connection
@@ -191,14 +190,12 @@ namespace hpx { namespace parcelset { namespace server
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
 
     // this makes sure we can store our connections in a set
-    inline bool operator<(server::parcelport_connection_ptr const& lhs, 
-        server::parcelport_connection_ptr const& rhs)
+    inline bool operator<(server::tcp::parcelport_connection_ptr const& lhs, 
+        server::tcp::parcelport_connection_ptr const& rhs)
     {
         return lhs.get() < rhs.get();
     }
-
-///////////////////////////////////////////////////////////////////////////////
-}}}
+}}}}
 
 #endif
 

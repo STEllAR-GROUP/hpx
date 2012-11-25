@@ -41,8 +41,11 @@ namespace hpx { namespace parcelset
     std::string get_connection_type_name(connection_type t)
     {
         switch(t) {
-        case connection_tcpip: 
+        case connection_tcpip:
             return "tcpip";
+
+        case connection_shmem:
+          return "shmem";
 
         case connection_portals4:
             return "portals4";
@@ -202,9 +205,10 @@ namespace hpx { namespace parcelset
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
             boost::shared_ptr<parcelport> pp, threads::threadmanager_base* tm,
             parcelhandler_queue_base* policy)
-      : resolver_(resolver)
-      , tm_(tm)
-      , parcels_(policy)
+      : resolver_(resolver),
+        pports_(connection_last),
+        tm_(tm),
+        parcels_(policy)
     {
         BOOST_ASSERT(parcels_);
 
@@ -218,12 +222,21 @@ namespace hpx { namespace parcelset
     }
 
     // find and return the specified parcelport
+    parcelport* parcelhandler::find_parcelport(connection_type type)
+    {
+        if (!pports_[type]) {
+            // lazily create the requested parcelport
+            attach_parcelport(parcelport::create(type,
+                *hpx::get_thread_pool("parcel_pool"),
+                hpx::get_config()));
+        }
+        return pports_[type].get();
+    }
+
     parcelport* parcelhandler::find_parcelport(connection_type type,
         error_code& ec) const
     {
-        std::map<connection_type, boost::shared_ptr<parcelport> >::const_iterator it =
-            pports_.find(type);
-        if (it == pports_.end()) {
+        if (!pports_[type]) {
             HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport",
                 "cannot find parcelport for connection type " +
                     get_connection_type_name(type));
@@ -233,7 +246,7 @@ namespace hpx { namespace parcelset
         if (&ec != &throws)
             ec = make_success_code();
 
-        return (*it).second.get();
+        return pports_[type].get();
     }
 
     void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> pp)
@@ -244,18 +257,18 @@ namespace hpx { namespace parcelset
         );
 
         // add the new parcelport to the list of parcelports we care about
-        pports_.insert(std::make_pair(pp->get_type(), pp));
+        pports_[pp->get_type()] = pp;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Make sure the specified locality is not held by any 
+    /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(naming::locality const& loc)
     {
         parcelport* pp = find_parcelport(loc.get_type());
         if (!pp) {
-            HPX_THROW_EXCEPTION(network_error, 
-                "parcelhandler::remove_from_connection_cache", 
+            HPX_THROW_EXCEPTION(network_error,
+                "parcelhandler::remove_from_connection_cache",
                 "cannot find parcelport for connection type " +
                     get_connection_type_name(loc.get_type()));
             return;
@@ -267,12 +280,12 @@ namespace hpx { namespace parcelset
     void parcelhandler::stop(bool blocking)
     {
         typedef
-            std::map<connection_type, boost::shared_ptr<parcelport> >::iterator
+            std::vector<boost::shared_ptr<parcelport> >::iterator
         iterator_type;
 
         iterator_type end = pports_.end();
         for (iterator_type it = pports_.begin(); it != end; ++it)
-            (*it).second->stop(blocking);
+            (*it)->stop(blocking);
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
