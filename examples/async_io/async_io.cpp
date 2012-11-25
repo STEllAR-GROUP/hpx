@@ -29,8 +29,7 @@ hpx::lcos::future<int> async_io(char const* string_to_write)
         boost::make_shared<hpx::lcos::local::promise<int> >();
 
     // Get a reference to one of the IO specific HPX io_service objects ...
-    hpx::util::io_service_pool* pool =
-        hpx::get_runtime().get_thread_pool("io_pool");
+    hpx::util::io_service_pool* pool = hpx::get_thread_pool("io_pool");
 
     // ... and schedule the handler to run on one of its OS-threads.
     pool->get_io_service().post(
