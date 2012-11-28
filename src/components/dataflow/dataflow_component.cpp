@@ -73,6 +73,30 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         return dataflow_counter_data_.destructed_;
     }
 
+    void update_constructed_count()
+    {
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        ++dataflow_counter_data_.constructed_;
+    }
+
+    void update_initialized_count()
+    {
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        ++dataflow_counter_data_.initialized_;
+    }
+
+    void update_fired_count()
+    {
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        ++dataflow_counter_data_.fired_;
+    }
+    
+    void update_destructed_count()
+    {
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        ++dataflow_counter_data_.destructed_;
+    }
+
     // call this to register all counter types for dataflow entries
     void register_counter_types()
     {
