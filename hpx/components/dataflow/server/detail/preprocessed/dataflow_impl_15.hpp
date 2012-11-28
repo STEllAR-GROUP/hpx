@@ -441,8 +441,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -735,8 +734,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -1029,8 +1027,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -1323,8 +1320,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -1617,8 +1613,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -1911,8 +1906,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -2205,8 +2199,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -2499,8 +2492,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -2793,8 +2785,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -3087,8 +3078,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -3381,8 +3371,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -3675,8 +3664,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -3969,8 +3957,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -4263,8 +4250,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -4557,8 +4543,7 @@
                   , action_id
                   , slots
                 );
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"
