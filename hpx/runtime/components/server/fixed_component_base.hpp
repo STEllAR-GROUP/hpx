@@ -18,11 +18,6 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/stringstream.hpp>
 
-namespace hpx { namespace detail
-{
-    HPX_API_EXPORT naming::gid_type get_next_id();
-}}
-
 namespace hpx { namespace components
 {
 
