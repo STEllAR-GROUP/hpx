@@ -29,7 +29,7 @@ namespace hpx { namespace util
 {
 
 template <typename T, typename Tag>
-struct thread_specific_ptr
+struct HPX_EXPORT thread_specific_ptr
 {
     typedef T element_type;
 
@@ -100,7 +100,7 @@ namespace hpx { namespace util
     }
 
 template <typename T, typename Tag>
-struct thread_specific_ptr
+struct HPX_EXPORT thread_specific_ptr
 {
     typedef T element_type;
 
@@ -173,7 +173,7 @@ namespace hpx { namespace util
 {
 
 template <typename T, typename Tag>
-struct thread_specific_ptr
+struct HPX_EXPORT thread_specific_ptr
 {
     typedef typename boost::thread_specific_ptr<T>::element_type element_type;
 
