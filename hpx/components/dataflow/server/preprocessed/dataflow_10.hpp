@@ -34,9 +34,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0>
         dataflow(
@@ -75,9 +73,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1>
         dataflow(
@@ -116,9 +112,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2>
         dataflow(
@@ -157,9 +151,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3>
         dataflow(
@@ -198,9 +190,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
         dataflow(
@@ -239,9 +229,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
         dataflow(
@@ -280,9 +268,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
         dataflow(
@@ -321,9 +307,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
         dataflow(
@@ -362,9 +346,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
         dataflow(
@@ -403,9 +385,7 @@
                 component_ptr = w;
             }
             (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9));
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
         dataflow(

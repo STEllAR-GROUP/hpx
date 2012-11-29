@@ -65,8 +65,7 @@ namespace hpx { namespace lcos { namespace server
             BOOST_ASSERT(component_ptr);
             delete component_ptr;
 
-            lcos::local::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.destructed_;
+            detail::update_destructed_count();
         }
 
         /// init initializes the dataflow, it creates a dataflow_impl object
@@ -93,8 +92,7 @@ namespace hpx { namespace lcos { namespace server
             }
             (*w)->init();
 
-            lcos::local::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count(); 
         }
 
         dataflow()
@@ -227,9 +225,7 @@ namespace hpx { namespace lcos { namespace server
             }
             (*w)->init(BOOST_PP_ENUM(N, M1, _));
 
-            lcos::local::spinlock::scoped_lock
-                l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.initialized_;
+            detail::update_initialized_count();
         }
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>

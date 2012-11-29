@@ -45,10 +45,7 @@ namespace sendrecv { namespace server
       int t2 = static_cast<int>(numberpe);
       int t1 = static_cast<int>(mype);
 
-      hpx::util::high_resolution_timer computetime;
       FNAME(loop)(static_cast<void*>(this), &t1,&t2);
-      double ctime = computetime.elapsed();
-      std::cout << " Time " << ctime << std::endl;
     }
 
     void partition::toroidal_sndrecv(double *csend,int* csend_size,double *creceive,int *creceive_size,int* dest)
