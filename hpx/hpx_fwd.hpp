@@ -616,13 +616,6 @@ namespace hpx
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type);
 
-    /// \ cond NODETAIL
-    namespace detail
-    {
-        HPX_API_EXPORT naming::gid_type get_next_id();
-    }
-    /// \ endcond
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
