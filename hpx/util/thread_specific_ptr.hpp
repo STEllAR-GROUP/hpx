@@ -25,6 +25,8 @@
 
 #include <boost/assert.hpp>
 
+#include <hpx/config/export_definitions.hpp>
+
 namespace hpx { namespace util
 {
 
