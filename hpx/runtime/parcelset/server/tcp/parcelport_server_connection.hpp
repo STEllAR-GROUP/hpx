@@ -14,7 +14,6 @@
 #include <sstream>
 #include <vector>
 
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -34,6 +33,16 @@
 #include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parcelset { namespace tcp
+{
+    // forward declaration only
+    class parcelport;
+
+    void decode_message(parcelport&, 
+        std::vector<char> const& buffer,
+        performance_counters::parcels::data_point receive_data);
+}}}
+
 namespace hpx { namespace parcelset { namespace server { namespace tcp
 {
     /// Represents a single parcelport_connection from a client.
@@ -44,9 +53,9 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
     public:
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                parcelport_queue& handler)
+                parcelset::tcp::parcelport& parcelport)
           : socket_(io_service), in_priority_(0), in_size_(0),
-            in_buffer_(), parcels_(handler)
+            in_buffer_(), parcelport_(parcelport)
         {}
 
         ~parcelport_connection()
@@ -147,15 +156,12 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                     receive_data_.time_;
 
                 // add parcel data to incoming parcel queue
-                boost::integer::ulittle8_t::value_type priority = in_priority_;
-                parcels_.add_parcel(in_buffer_,
-                    static_cast<threads::thread_priority>(priority),
-                    receive_data_);
+                decode_message(parcelport_, *in_buffer_, receive_data_);
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
 
-                // now send acknowledgement byte
+                // now send acknowledgment byte
                 ack_ = true;
                 boost::asio::async_write(socket_, 
                     boost::asio::buffer(&ack_, sizeof(ack_)),
@@ -180,7 +186,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         bool ack_;
 
         /// The handler used to process the incoming request.
-        parcelport_queue& parcels_;
+        parcelset::tcp::parcelport& parcelport_;
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;

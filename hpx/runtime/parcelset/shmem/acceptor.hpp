@@ -19,6 +19,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
+#include <boost/scope_exit.hpp>
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 
@@ -61,7 +62,7 @@ namespace hpx { namespace parcelset { namespace shmem
         void bind(std::string const& endpoint,
             boost::system::error_code &ec = boost::system::throws)
         {
-            this->service.bind(this->implementation, endpoint, ec);
+            this->service.bind(this->implementation, endpoint + ".acceptor", ec);
         }
 
         // synchronous and asynchronous accept
@@ -112,7 +113,9 @@ namespace hpx { namespace parcelset { namespace shmem
                 if (impl)
                 {
                     boost::system::error_code ec;
-                    impl->accept(window_, ec);
+                    while (!impl->try_accept(window_, ec) && !ec)
+                        io_service_.poll_one();   // try to do other stuff
+
                     io_service_.post(
                         boost::asio::detail::bind_handler(handler_, ec));
                 }
@@ -184,7 +187,8 @@ namespace hpx { namespace parcelset { namespace shmem
         void accept(implementation_type &impl, 
             basic_data_window<Service>& window, boost::system::error_code &ec)
         {
-            impl->accept(window, ec);
+            while (!impl->try_accept(window, ec) && !ec)
+                /* just wait for operation to succeed */;
             boost::asio::detail::throw_error(ec);
         }
 
@@ -218,7 +222,7 @@ namespace hpx { namespace parcelset { namespace shmem
     {
     public:
         acceptor_impl()
-          : msg_num_(1), aborted_(false), operation_active_(false)
+          : msg_num_(1), aborted_(false), executing_operation_(false)
         {}
 
         ~acceptor_impl()
@@ -232,7 +236,7 @@ namespace hpx { namespace parcelset { namespace shmem
         void open(bool open_queue_only, boost::system::error_code &ec)
         {
             if (mq_) {
-                ec = boost::asio::error::already_connected;
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else if (!open_queue_only) {
                 using namespace boost::interprocess;
@@ -250,10 +254,12 @@ namespace hpx { namespace parcelset { namespace shmem
         void bind(std::string const& endpoint, boost::system::error_code &ec)
         {
             if (mq_) {
-                ec = boost::asio::error::already_connected;
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else {
                 endpoint_ = endpoint;
+                boost::interprocess::message_queue::remove(endpoint_.c_str());
+                HPX_SHMEM_RESET_EC(ec);
             }
         }
 
@@ -262,9 +268,10 @@ namespace hpx { namespace parcelset { namespace shmem
             if (mq_) {
                 mq_.reset();
                 boost::interprocess::message_queue::remove(endpoint_.c_str());
+                HPX_SHMEM_RESET_EC(ec);
             }
             else {
-                ec = boost::asio::error::not_connected;
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
         }
 
@@ -272,52 +279,39 @@ namespace hpx { namespace parcelset { namespace shmem
         {
             // cancel operation
             aborted_ = true;
-            while (operation_active_)
+            while (executing_operation_) 
                 ;
         }
 
         template <typename Service>
-        void accept(basic_data_window<Service>& window, boost::system::error_code &ec)
+        bool try_accept(basic_data_window<Service>& window, boost::system::error_code &ec)
         {
             if (!mq_) {
-                ec = boost::asio::error::not_connected;
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
             else {
-                operation_active_ = true;
-                try {
-                    message msg;
-                    boost::interprocess::message_queue::size_type recvd_size;
-                    unsigned int priority;
-                    while(!mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
-                        boost::get_system_time() + boost::posix_time::milliseconds(1)))
-                    {
-                        if (aborted_) {
-                            ec = boost::asio::error::connection_aborted;
-                            break;
-                        }
-                    }
+                message msg;
+                if (!try_receive_command(msg, ec))
+                    return false;
 
-                    // verify that the received command was 'connect'
-                    if (!aborted_) {
-                        if (msg.command_ != message::connect) {
-                            ec = boost::asio::error::not_connected;
-                        }
-                        else {
-                            // establish connection with given data window
-                            window.bind(msg.data_, ec);
-                            if (!ec)
-                                window.open(ec);
-                        }
+                // verify that the received command was 'connect'
+                if (!ec) {
+                    if (msg.command_ == message::shutdown) {
+                        close(ec);
+                    }
+                    else if (msg.command_ != message::connect) {
+                        HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
                     }
                     else {
-                        aborted_ = false;
+                        // establish connection with given data window
+                        window.bind(msg.data_, ec);
+                        if (!ec) 
+                            window.open(ec);
+                        return true;
                     }
                 }
-                catch (boost::interprocess::interprocess_exception const& e) {
-                    ec = make_error_code(e.get_error_code());
-                }
-                operation_active_ = false;
             }
+            return false;
         }
 
         // set options
@@ -325,11 +319,41 @@ namespace hpx { namespace parcelset { namespace shmem
             boost::system::error_code &ec)
         {
             if (mq_) {
-                ec = boost::asio::error::already_connected;
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else {
                 msg_num_ = opt.val_;
+                HPX_SHMEM_RESET_EC(ec);
             }
+        }
+
+    protected:
+        bool try_receive_command(message& msg, boost::system::error_code &ec)
+        {
+            executing_operation_ = true;
+            BOOST_SCOPE_EXIT(&executing_operation_) {
+                executing_operation_ = false;
+            } BOOST_SCOPE_EXIT_END
+
+            try {
+                HPX_SHMEM_RESET_EC(ec);
+
+                boost::interprocess::message_queue::size_type recvd_size;
+                unsigned int priority;
+                if (!mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
+                    boost::get_system_time() + boost::posix_time::milliseconds(1)))
+                {
+                    if (aborted_) {
+                        aborted_ = false;
+                        HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
+                    }
+                    return false;
+                }
+            }
+            catch (boost::interprocess::interprocess_exception const& e) {
+                HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
+            }
+            return true;
         }
 
     private:
@@ -337,7 +361,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::string endpoint_;
         boost::shared_ptr<boost::interprocess::message_queue> mq_;
         bool aborted_;
-        bool operation_active_;
+        bool executing_operation_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

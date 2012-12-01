@@ -16,14 +16,18 @@
 namespace hpx { namespace parcelset
 {
     boost::shared_ptr<parcelport> parcelport::create(connection_type type,
-        util::io_service_pool& pool, util::runtime_configuration const& cfg)
+        util::runtime_configuration const& cfg,
+        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+        HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
         switch(type) {
         case connection_tcpip:
-            return boost::make_shared<parcelset::tcp::parcelport>(pool, cfg);
+            return boost::make_shared<parcelset::tcp::parcelport>(
+                cfg, on_start_thread, on_stop_thread);
 
         case connection_shmem:
-            return boost::make_shared<parcelset::shmem::parcelport>(pool, cfg);
+            return boost::make_shared<parcelset::shmem::parcelport>(
+                cfg, on_start_thread, on_stop_thread);
 
         case connection_portals4:
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",

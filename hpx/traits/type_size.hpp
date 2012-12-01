@@ -30,7 +30,7 @@ namespace hpx { namespace traits
     {
         typedef void uses_sizeof;
 
-        static std::size_t call(T const& t)
+        static BOOST_FORCEINLINE std::size_t call(T const& t)
         {
             return sizeof(T);
         }
@@ -76,7 +76,7 @@ namespace hpx { namespace traits
         typename boost::enable_if<traits::detail::is_container<T> >::type>
     {
         template <typename T_>
-        static std::size_t call(T_ const& v, boost::mpl::false_)
+        static BOOST_FORCEINLINE std::size_t call(T_ const& v, boost::mpl::false_)
         {
             std::size_t sum = sizeof(T_);
             typename T_::const_iterator end = v.end();
@@ -86,12 +86,12 @@ namespace hpx { namespace traits
         }
 
         template <typename T_>
-        static std::size_t call(T_ const& v, boost::mpl::true_)
+        static BOOST_FORCEINLINE std::size_t call(T_ const& v, boost::mpl::true_)
         {
             return sizeof(T_) + v.size() * sizeof(typename T_::value_type);
         }
 
-        static std::size_t call(T const& v)
+        static BOOST_FORCEINLINE std::size_t call(T const& v)
         {
             typedef boost::mpl::bool_<
                 traits::detail::has_uses_sizeof<
@@ -110,7 +110,7 @@ namespace hpx { namespace traits
             typedef std::size_t result_type;
 
             template <typename T>
-            std::size_t operator()(std::size_t size, T const& t) const
+            BOOST_FORCEINLINE std::size_t operator()(std::size_t size, T const& t) const
             {
                 return size + type_size<T>::call(t);
             }
@@ -121,7 +121,7 @@ namespace hpx { namespace traits
     struct type_size<T,
         typename boost::enable_if<boost::fusion::traits::is_sequence<T> >::type>
     {
-        static std::size_t call(T const& v)
+        static BOOST_FORCEINLINE std::size_t call(T const& v)
         {
             std::size_t sum = sizeof(T);
             return boost::fusion::accumulate(v, sum, traits::detail::get_size());
@@ -132,7 +132,7 @@ namespace hpx { namespace traits
     template <typename T>
     struct type_size<boost::shared_ptr<T> >
     {
-        static std::size_t call(boost::shared_ptr<T> const& p)
+        static BOOST_FORCEINLINE std::size_t call(boost::shared_ptr<T> const& p)
         {
             return type_size<T>::call(*p);
         }
@@ -142,22 +142,18 @@ namespace hpx { namespace traits
     template <typename T>
     struct type_size<boost::intrusive_ptr<T> >
     {
-        static std::size_t call(boost::intrusive_ptr<T> const& p)
+        static BOOST_FORCEINLINE std::size_t call(boost::intrusive_ptr<T> const& p)
         {
             return type_size<T>::call(*p);
         }
     };
 
     //////////////////////////////////////////////////////////////////////////
-    /// Handle parcel 
-    //template <>
-    //struct type_size<hpx::parcelset::parcel>
-    //{
-    //    static std::size_t call(hpx::parcelset::parcel const& parcel_)
-    //    {
-    //        return sizeof(hpx::parcelset::parcel) + parcel_.get_action()->get_type_size();
-    //    }
-    //};
+    template <typename T>
+    BOOST_FORCEINLINE std::size_t get_type_size(T const& t)
+    {
+        return type_size<T>::call(t);
+    }
 }}
 
 #endif

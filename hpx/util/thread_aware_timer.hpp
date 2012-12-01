@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/io_service_pool.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/chrono/chrono.hpp>

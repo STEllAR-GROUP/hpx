@@ -39,7 +39,7 @@ namespace hpx { namespace parcelset { namespace shmem
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-            naming::locality const& locality_id,
+            naming::locality const& here, naming::locality const& there,
 //             util::connection_cache<parcelport_connection, naming::locality>& cache,
             performance_counters::parcels::gatherer& parcels_sent);
 
@@ -68,24 +68,19 @@ namespace hpx { namespace parcelset { namespace shmem
             /// Increment sends and begin timer.
             send_data_.time_ = timer_.elapsed_nanoseconds();
 
-//             // Write the serialized data to the socket. We use "gather-write"
-//             // to send both the header and the data in a single write operation.
-//             std::vector<boost::asio::const_buffer> buffers;
-//             buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
-//             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
-//             buffers.push_back(boost::asio::buffer(out_buffer_));
-// 
-//             // this additional wrapping of the handler into a bind object is
-//             // needed to keep  this parcelport_connection object alive for the whole
-//             // write operation
-//             void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
-//                     boost::tuple<Handler, ParcelPostprocess>)
-//                 = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
-// 
-//             boost::asio::async_write(socket_, buffers,
-//                 boost::bind(f, shared_from_this(),
-//                     boost::asio::placeholders::error, _2,
-//                     boost::make_tuple(handler, parcel_postprocess)));
+            // Write the serialized data to the socket. 
+            //
+            // this additional wrapping of the handler into a bind object is
+            // needed to keep  this parcelport_connection object alive for the whole
+            // write operation
+            void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
+                    boost::tuple<Handler, ParcelPostprocess>)
+                = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
+
+            window_.async_write(out_buffer_,
+                boost::bind(f, shared_from_this(),
+                    boost::asio::placeholders::error, ::_2,
+                    boost::make_tuple(handler, parcel_postprocess)));
         }
 
         naming::locality const& destination() const
@@ -102,32 +97,28 @@ namespace hpx { namespace parcelset { namespace shmem
             // just call initial handler
             boost::get<0>(handler)(e, bytes);
 
-//             // complete data point and push back onto gatherer
-//             send_data_.time_ = timer_.elapsed_nanoseconds() - send_data_.time_;
-//             parcels_sent_.add_data(send_data_);
-// 
-//             // now we can give this connection back to the cache
-//             out_buffer_.clear();
-//             out_priority_ = 0;
-//             out_size_ = 0;
-// 
-//             send_data_.bytes_ = 0;
-//             send_data_.time_ = 0;
-//             send_data_.serialization_time_ = 0;
-//             send_data_.num_parcels_ = 0;
-// 
-//             // now handle the acknowledgment byte which is sent by the receiver
-//             void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
-//                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
-// 
-//             boost::asio::async_read(socket_,
-//                 boost::asio::buffer(&ack_, sizeof(ack_)),
-//                 boost::bind(f, shared_from_this(), handler));
+            // complete data point and push back onto gatherer
+            send_data_.time_ = timer_.elapsed_nanoseconds() - send_data_.time_;
+            parcels_sent_.add_data(send_data_);
+
+            // now handle the acknowledgment byte which is sent by the receiver
+            void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
+                = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
+
+            window_.async_read_ack(boost::bind(f, shared_from_this(), handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
         void handle_read_ack(boost::tuple<Handler, ParcelPostprocess> handler)
         {
+            // now we can give this connection back to the cache
+            out_buffer_.close();
+
+            send_data_.bytes_ = 0;
+            send_data_.time_ = 0;
+            send_data_.serialization_time_ = 0;
+            send_data_.num_parcels_ = 0;
+
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
@@ -139,10 +130,7 @@ namespace hpx { namespace parcelset { namespace shmem
         parcelset::shmem::data_window window_;
 
         /// buffer for outgoing data
-        unsigned char out_priority_;
-        std::size_t out_size_;
-        std::vector<char> out_buffer_;
-        bool ack_;
+        data_buffer out_buffer_;
 
         /// the other (receiving) end of this connection
         naming::locality there_;
@@ -157,6 +145,13 @@ namespace hpx { namespace parcelset { namespace shmem
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::string full_endpoint_name(hpx::naming::locality const& l)
+    {
+        return l.get_address() + "." +
+            boost::lexical_cast<std::string>(l.get_port());
+    }
 }}}
 
 #endif

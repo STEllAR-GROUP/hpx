@@ -11,7 +11,6 @@
 #include <sstream>
 #include <vector>
 
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -90,7 +89,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
-                    boost::asio::placeholders::error, _2,
+                    boost::asio::placeholders::error, ::_2,
                     boost::make_tuple(handler, parcel_postprocess)));
         }
 

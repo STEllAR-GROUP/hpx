@@ -49,10 +49,12 @@ namespace hpx { namespace parcelset { namespace shmem
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport::parcelport(util::io_service_pool& io_service_pool,
-            util::runtime_configuration const& ini)
+    parcelport::parcelport(util::runtime_configuration const& ini, 
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
-        io_service_pool_(io_service_pool),
+        io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 
+            on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
         acceptor_(NULL) //,
 //         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
@@ -69,11 +71,11 @@ namespace hpx { namespace parcelset { namespace shmem
         }
     }
 
-    inline std::string 
-    full_endpoint_name(boost::asio::ip::tcp::endpoint const& ep)
+    util::io_service_pool* parcelport::get_thread_pool(char const* name)
     {
-        return ep.address().to_string() + 
-            boost::lexical_cast<std::string>(ep.port());
+        if (std::strcmp(name, io_service_pool_.get_name()))
+            return &io_service_pool_;
+        return 0;
     }
 
     bool parcelport::run(bool blocking)
@@ -94,12 +96,15 @@ namespace hpx { namespace parcelset { namespace shmem
             try {
                 server::shmem::parcelport_connection_ptr conn(
                     new server::shmem::parcelport_connection(
-                        io_service_pool_.get_io_service(), parcels_));
+                        io_service_pool_.get_io_service(), here(), *this));
 
                 boost::asio::ip::tcp::endpoint ep = *it;
 
+                std::string fullname(ep.address().to_string() + "." + 
+                    boost::lexical_cast<std::string>(ep.port()));
+
                 acceptor_->set_option(acceptor::msg_num(10));
-                acceptor_->bind(full_endpoint_name(ep));
+                acceptor_->bind(fullname);
                 acceptor_->open();
 
                 acceptor_->async_accept(conn->window(),
@@ -171,7 +176,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::shmem::parcelport_connection(
-                io_service_pool_.get_io_service(), parcels_));
+                io_service_pool_.get_io_service(), here(), *this));
 
             acceptor_->async_accept(conn->window(),
                 boost::bind(&parcelport::handle_accept, this,
@@ -185,9 +190,8 @@ namespace hpx { namespace parcelset { namespace shmem
 
             // now accept the incoming connection by starting to read from the
             // data window
-//             c->async_read(
-//                 boost::bind(&parcelport::handle_read_completion, this,
-//                     boost::asio::placeholders::error, c));
+            c->async_read(boost::bind(&parcelport::handle_read_completion, 
+                this, boost::asio::placeholders::error, c));
         }
     }
 
@@ -309,11 +313,11 @@ namespace hpx { namespace parcelset { namespace shmem
         // need to keep the original parcel alive after this call returned.
         client_connection->set_parcel(parcels);
 
-//         // ... start an asynchronous write operation now.
-//         client_connection->async_write(
-//             detail::call_for_each(handlers),
-//             boost::bind(&parcelport::send_pending_parcels_trampoline, this,
-//                 ::_1, ::_2));
+        // ... start an asynchronous write operation now.
+        client_connection->async_write(
+            detail::call_for_each(handlers),
+            boost::bind(&parcelport::send_pending_parcels_trampoline, this,
+                ::_1, ::_2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -354,7 +358,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(), l,
+                io_service_pool_.get_io_service(), here_, l,
                 /*connection_cache_, */parcels_sent_));
 
             // Connect to the target locality, retry if needed
@@ -367,8 +371,12 @@ namespace hpx { namespace parcelset { namespace shmem
                             connect_begin(l, io_service_pool_.get_io_service());
                          it != end; ++it)
                     {
+                        boost::asio::ip::tcp::endpoint const& ep = *it;
+                        std::string fullname(ep.address().to_string() + "." + 
+                            boost::lexical_cast<std::string>(ep.port()));
+
                         client_connection->window().close();
-                        client_connection->window().connect(full_endpoint_name(*it), error);
+                        client_connection->window().connect(fullname, error);
                         if (!error)
                             break;
                     }
@@ -380,9 +388,9 @@ namespace hpx { namespace parcelset { namespace shmem
                         boost::posix_time::milliseconds(
                             HPX_NETWORK_RETRIES_SLEEP));
                 }
-                catch (boost::system::error_code const& e) {
+                catch (boost::system::system_error const& e) {
                     HPX_THROW_EXCEPTION(network_error,
-                        "shmem::parcelport::get_connection", e.message());
+                        "shmem::parcelport::get_connection", e.what());
                     return client_connection;
                 }
             }
@@ -410,5 +418,88 @@ namespace hpx { namespace parcelset { namespace shmem
 // #endif
 
         return client_connection;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void decode_message(parcelport& pp,
+        parcelset::shmem::data_buffer const& parcel_data,
+        performance_counters::parcels::data_point receive_data)
+    {
+        // protect from un-handled exceptions bubbling up 
+        try {
+            try {
+                // mark start of serialization
+                util::high_resolution_timer timer;
+                boost::int64_t overall_add_parcel_time = 0;
+
+                {
+                    // De-serialize the parcel data
+                    util::portable_binary_iarchive archive(
+                        parcel_data.get_buffer(), boost::archive::no_header);
+
+                    std::size_t parcel_count = 0;
+                    std::size_t arg_size = 0;
+
+                    archive >> parcel_count;
+                    for(std::size_t i = 0; i < parcel_count; ++i)
+                    {
+                        // de-serialize parcel and add it to incoming parcel queue
+                        parcel p;
+                        archive >> p;
+
+                        // make sure this parcel ended up on the right locality
+                        BOOST_ASSERT(p.get_destination_locality() == pp.here());
+
+                        // incoming argument's size
+                        arg_size += traits::get_type_size(p);
+
+                        // be sure not to measure add_parcel as serialization time
+                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
+                        pp.add_received_parcel(p);
+                        overall_add_parcel_time += timer.elapsed_nanoseconds() -
+                            add_parcel_time;
+                    }
+
+                    // complete received data with parcel count
+                    receive_data.num_parcels_ = parcel_count;
+                    receive_data.type_bytes_ = arg_size;
+                }
+
+                // store the time required for serialization
+                receive_data.serialization_time_ = timer.elapsed_nanoseconds() -
+                    overall_add_parcel_time;
+
+                pp.add_received_data(receive_data);
+            }
+            catch (hpx::exception const& e) {
+                LPT_(error)
+                    << "decode_message: caught hpx::exception: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::system::system_error const& e) {
+                LPT_(error)
+                    << "decode_message: caught boost::system::error: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::exception const&) {
+                LPT_(error)
+                    << "decode_message: caught boost::exception.";
+                hpx::report_error(boost::current_exception());
+            }
+            catch (std::exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem, due to slicing.
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what())));
+            }
+        }
+        catch (...) {
+            LPT_(error)
+                << "decode_message: caught unknown exception.";
+            hpx::report_error(boost::current_exception());
+        }
     }
 }}}

@@ -38,8 +38,9 @@ namespace hpx { namespace parcelset { namespace shmem
         ///                 [in] The pool of networking threads to use to serve
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
-        parcelport(util::io_service_pool& io_service_pool,
-            util::runtime_configuration const& ini);
+        parcelport(util::runtime_configuration const& ini, 
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
         ~parcelport();
 
@@ -89,6 +90,9 @@ namespace hpx { namespace parcelset { namespace shmem
             return connection_shmem;
         }
 
+        /// Return the thread pool if the name matches
+        util::io_service_pool* get_thread_pool(char const* name);
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -107,7 +111,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
-        util::io_service_pool& io_service_pool_;
+        util::io_service_pool io_service_pool_;
 
         /// Acceptor used to listen for incoming connections.
         acceptor* acceptor_;

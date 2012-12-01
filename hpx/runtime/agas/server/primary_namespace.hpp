@@ -162,6 +162,7 @@ struct HPX_EXPORT primary_namespace :
       boost::int64_t get_localities_count() const;
       boost::int64_t get_num_localities_count() const;
       boost::int64_t get_num_threads_count() const;
+      boost::int64_t get_resolved_localities_count() const;
 
       boost::int64_t get_allocate_time() const;
       boost::int64_t get_bind_gid_time() const;
@@ -174,6 +175,7 @@ struct HPX_EXPORT primary_namespace :
       boost::int64_t get_localities_time() const;
       boost::int64_t get_num_localities_time() const;
       boost::int64_t get_num_threads_time() const;
+      boost::int64_t get_resolved_localities_time() const;
 
       // increment counter values
       void increment_allocate_count();
@@ -187,6 +189,7 @@ struct HPX_EXPORT primary_namespace :
       void increment_localities_count();
       void increment_num_localities_count();
       void increment_num_threads_count();
+      void increment_resolved_localities_count();
 
     private:
       friend struct update_time_on_exit;
@@ -204,6 +207,7 @@ struct HPX_EXPORT primary_namespace :
       api_counter_data localities_;           // primary_ns_localities
       api_counter_data num_localities_;       // primary_ns_num_localities
       api_counter_data num_threads_;          // primary_ns_num_threads
+      api_counter_data resolved_localities_;  // primary_ns_resolved_localities
     };
     counter_data counter_data_;
 
@@ -330,6 +334,11 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
+    response resolved_localities(
+        request const& req
+      , error_code& ec = throws
+        );
+
     response get_num_localities(
         request const& req
       , error_code& ec = throws
@@ -421,6 +430,7 @@ struct HPX_EXPORT primary_namespace :
       , namespace_num_localities                = primary_ns_num_localities
       , namespace_num_threads                   = primary_ns_num_threads
       , namespace_statistics_counter            = primary_ns_statistics_counter
+      , namespace_resolved_localities           = primary_ns_resolved_localities
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);

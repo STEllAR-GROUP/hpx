@@ -256,7 +256,8 @@ protected:
     HPX_ALWAYS_EXPORT void init(unsigned int flags);
 
 public:
-    portable_binary_iarchive(std::vector<char> const& buffer, unsigned flags = 0)
+    template <typename Vector>
+    portable_binary_iarchive(Vector const& buffer, unsigned flags = 0)
       : primitive_base_t(buffer, flags),
         archive_base_t(flags),
         m_flags(0)

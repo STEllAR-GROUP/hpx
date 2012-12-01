@@ -36,10 +36,7 @@ namespace hpx { namespace parcelset
         static void default_write_handler(boost::system::error_code const&,
             std::size_t /*size*/) {}
 
-        void parcel_sink(parcelport& pp,
-            boost::shared_ptr<std::vector<char> > parcel_data,
-            threads::thread_priority priority,
-            performance_counters::parcels::data_point const& receive_data);
+        void parcel_sink(parcel const& p);
 
         threads::thread_state_enum decode_parcel(
             parcelport& pp, boost::shared_ptr<std::vector<char> > parcel_data,
@@ -57,7 +54,6 @@ namespace hpx { namespace parcelset
         }
 
         // find and return the specified parcelport
-        parcelport* find_parcelport(connection_type type);
         parcelport* find_parcelport(connection_type type,
             error_code& ec = throws) const;
 
@@ -85,7 +81,7 @@ namespace hpx { namespace parcelset
         }
 
         /// \brief Attach the given parcel port to this handler
-        void attach_parcelport(boost::shared_ptr<parcelport> pp);
+        void attach_parcelport(boost::shared_ptr<parcelport> pp, bool run = true);
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
@@ -332,16 +328,26 @@ namespace hpx { namespace parcelset
         /// connection caches anymore
         void remove_from_connection_cache(naming::locality const& loc);
 
+        /// \brief set list of resolved localities
+        void set_resolved_localities(std::vector<naming::locality> const& l);
+
+        void enable_alternative_parcelports()
+        {
+            use_alternative_parcelports_ = true;
+        }
+
+        /// Return the reference to an existing io_service
+        util::io_service_pool* get_thread_pool(char const* name);
+
     protected:
         std::size_t get_incoming_queue_length() const
         {
             return parcels_->get_queue_length();
         }
 
-        std::size_t get_outgoing_queue_length() const
-        {
-            return find_parcelport(connection_tcpip)->get_pending_parcels_count();
-        }
+        std::size_t get_outgoing_queue_length() const;
+
+        connection_type find_appropriate_connection_type(naming::locality dest);
 
     private:
         /// The AGAS client
@@ -356,8 +362,13 @@ namespace hpx { namespace parcelset
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
 
-        ///
+        /// queue of incoming parcels
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
+
+        /// Allow to use alternative parcel-ports (this is enabled only after
+        /// the runtime systems of all localities are guaranteed to have 
+        /// reached a certain state).
+        bool use_alternative_parcelports_;
     };
 }}
 

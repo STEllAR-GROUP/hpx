@@ -96,4 +96,13 @@ namespace boost { namespace system
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SHMEM_THROWS_IF(ec, code)                                         \
+        if (&ec != &boost::system::throws) ec = code;                         \
+        else boost::asio::detail::throw_error(code);                          \
+    /**/
+#define HPX_SHMEM_RESET_EC(ec)                                                \
+        if (&ec != &boost::system::throws) ec = boost::system::error_code();  \
+    /**/
+
 #endif

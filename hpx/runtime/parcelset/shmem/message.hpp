@@ -14,11 +14,13 @@ namespace hpx { namespace parcelset { namespace shmem
         enum commands
         {
             connect = 1,
-            shutdown = 2,
+            data = 2,
+            acknowledge = 3,
+            shutdown = 4,
         };
 
         commands command_;
-        char data_[32];
+        char data_[33];
     };
 }}}
 

@@ -117,6 +117,7 @@ response component_namespace::service(
         case primary_ns_localities:
         case primary_ns_num_localities:
         case primary_ns_num_threads:
+        case primary_ns_resolved_localities:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

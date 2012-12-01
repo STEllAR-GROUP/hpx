@@ -25,6 +25,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
@@ -144,8 +145,8 @@ namespace hpx { namespace naming
         // comparison is required as well
         friend bool operator== (gid_type const& lhs, gid_type const& rhs)
         {
-            return (strip_credit_from_gid(lhs.id_msb_) == 
-                    strip_credit_from_gid(rhs.id_msb_)) && 
+            return (strip_credit_from_gid(lhs.id_msb_) ==
+                    strip_credit_from_gid(rhs.id_msb_)) &&
                 (lhs.id_lsb_ == rhs.id_lsb_);
         }
         friend bool operator!= (gid_type const& lhs, gid_type const& rhs)
@@ -208,6 +209,15 @@ namespace hpx { namespace naming
         void set_lsb(void* lsb)
         {
             id_lsb_ = reinterpret_cast<boost::uint64_t>(lsb);
+        }
+
+        std::string to_string() const
+        {
+            hpx::util::osstream out;
+            out << std::hex
+                << std::right << std::setfill('0') << std::setw(16) << id_msb_
+                << std::right << std::setfill('0') << std::setw(16) << id_lsb_;
+            return hpx::util::osstream_get_string(out);
         }
 
         struct tag {};

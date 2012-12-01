@@ -7,6 +7,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
@@ -64,7 +65,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             BOOST_FOREACH(parcel const & p, pv)
             {
-                arg_size += hpx::traits::type_size<parcel>::call(p);
+                arg_size += traits::get_type_size(p);
                 priority = (std::max)(p.get_thread_priority(), priority);
             }
 

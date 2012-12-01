@@ -18,25 +18,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace shmem
 {
-    parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
-            naming::locality const& locality_id,
+    parcelport_connection::parcelport_connection(
+            boost::asio::io_service& io_service,
+            naming::locality const& here, naming::locality const& there,
 //             util::connection_cache<parcelport_connection, naming::locality>& cache,
             performance_counters::parcels::gatherer& parcels_sent)
-      : window_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
+      : window_(io_service), there_(there),
         /*connection_cache_(cache), */
         parcels_sent_(parcels_sent)
     {
+        window_.set_option(data_window::bound_to(full_endpoint_name(here)));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
-        // we choose the highest priority of all parcels for this message
-        threads::thread_priority priority = threads::thread_priority_default;
-
-        // collect argument sizes from parcels
-        std::size_t arg_size = 0;
-
 #if defined(HPX_DEBUG)
         BOOST_FOREACH(parcel const& p, pv)
         {
@@ -45,25 +41,29 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 #endif
 
+        // collect argument sizes from parcels
+        std::size_t arg_size = 0;
+
         // guard against serialization errors
         try {
-            // clear and preallocate out_buffer_
-            out_buffer_.clear();
-
             BOOST_FOREACH(parcel const & p, pv)
             {
-                arg_size += hpx::traits::type_size<parcel>::call(p);
-                priority = (std::max)(p.get_thread_priority(), priority);
+                arg_size += traits::get_type_size(p);
             }
 
-            out_buffer_.reserve(arg_size*2);
+            // generate the name for this data_buffer
+            std::string data_buffer_name(pv[0].get_parcel_id().to_string());
+
+            // clear and preallocate out_buffer_
+            out_buffer_ = data_buffer(data_buffer_name.c_str(), (arg_size * 12) / 10);
 
             // mark start of serialization
             util::high_resolution_timer timer;
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(out_buffer_);
+                util::portable_binary_oarchive archive(
+                    out_buffer_.get_buffer(), boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;
@@ -105,9 +105,6 @@ namespace hpx { namespace parcelset { namespace shmem
                     "std::exception: %s") % e.what()));
             return;
         }
-
-        out_priority_ = priority;
-        out_size_ = out_buffer_.size();
 
         send_data_.num_parcels_ = pv.size();
         send_data_.bytes_ = out_buffer_.size();

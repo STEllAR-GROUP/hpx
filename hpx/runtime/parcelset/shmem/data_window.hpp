@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/shmem/interprocess_errors.hpp>
 #include <hpx/runtime/parcelset/shmem/message.hpp>
+#include <hpx/runtime/parcelset/shmem/data_buffer.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
@@ -18,6 +19,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
+#include <boost/scope_exit.hpp>
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 
@@ -32,6 +34,12 @@ namespace hpx { namespace parcelset { namespace shmem
         {
             msg_num(std::size_t num) : val_(num) {}
             std::size_t val_;
+        };
+
+        struct bound_to
+        {
+            bound_to(std::string here) : val_(here) {}
+            std::string val_;
         };
     };
 
@@ -74,16 +82,63 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         // synchronous and asynchronous connect
-        void connect(std::string const& endpoint,
+        void connect(std::string const& there,
             boost::system::error_code &ec = boost::system::throws)
         {
-            return this->service.connect(this->implementation, endpoint, ec);
+            return this->service.connect(this->implementation, there, ec);
         }
 
         template <typename Handler>
-        void async_connect(std::string const& endpoint, Handler handler)
+        void async_connect(std::string const& there, Handler handler)
         {
-            this->service.async_connect(this->implementation, endpoint, handler);
+            this->service.async_connect(this->implementation, there, handler);
+        }
+
+        // synchronous and asynchronous read/write/read_ack/write_ack
+        void read(data_buffer& data,
+            boost::system::error_code &ec = boost::system::throws)
+        {
+            this->service.read(this->implementation, data, ec);
+        }
+
+        void write(data_buffer const& data,
+            boost::system::error_code &ec = boost::system::throws)
+        {
+            this->service.write(this->implementation, data, ec);
+        }
+
+        void read_ack(boost::system::error_code &ec = boost::system::throws)
+        {
+            this->service.read_ack(this->implementation, ec);
+        }
+
+        void write_ack(boost::system::error_code &ec = boost::system::throws)
+        {
+            this->service.write_ack(this->implementation, ec);
+        }
+
+        template <typename Handler>
+        void async_read(data_buffer& data, Handler handler)
+        {
+            this->service.async_read(this->implementation, data, handler);
+        }
+
+        template <typename Handler>
+        void async_write(data_buffer const& data, Handler handler)
+        {
+            this->service.async_write(this->implementation, data, handler);
+        }
+
+        template <typename Handler>
+        void async_read_ack(Handler handler)
+        {
+            this->service.async_read_ack(this->implementation, handler);
+        }
+
+        template <typename Handler>
+        void async_write_ack(Handler handler)
+        {
+            this->service.async_write_ack(this->implementation, handler);
         }
 
         // options
@@ -92,6 +147,12 @@ namespace hpx { namespace parcelset { namespace shmem
             boost::system::throws)
         {
             this->service.set_option(this->implementation, opt, ec);
+        }
+
+        template <typename Opt>
+        Opt get_option(boost::system::error_code &ec = boost::system::throws)
+        {
+            return this->service.get_option<Opt>(this->implementation, ec);
         }
     };
 
@@ -106,10 +167,10 @@ namespace hpx { namespace parcelset { namespace shmem
         public:
             connect_operation(implementation_type &impl,
                   boost::asio::io_service &io_service,
-                  std::string const& endpoint, Handler handler)
+                  std::string const& there, Handler handler)
               : impl_(impl),
                 io_service_(io_service),
-                endpoint_(endpoint),
+                there_(there),
                 handler_(handler)
             {}
 
@@ -119,22 +180,178 @@ namespace hpx { namespace parcelset { namespace shmem
                 if (impl)
                 {
                     boost::system::error_code ec;
-                    impl->connect(endpoint_, ec);
-                    io_service_.post(
-                        boost::asio::detail::bind_handler(handler_, ec));
+                    impl->connect(there_, ec);
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, ec));
                 }
                 else
                 {
-                    io_service_.post(
-                        boost::asio::detail::bind_handler(handler_,
-                            boost::asio::error::operation_aborted));
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted));
                 }
             }
 
         private:
             boost::weak_ptr<Implementation> impl_;
             boost::asio::io_service &io_service_;
-            std::string endpoint_;
+            std::string const& there_;
+            Handler handler_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Handler, typename Implementation>
+        class read_operation
+        {
+            typedef boost::shared_ptr<Implementation> implementation_type;
+
+        public:
+            read_operation(implementation_type &impl,
+                  boost::asio::io_service &io_service,
+                  data_buffer& data, Handler handler)
+              : impl_(impl),
+                io_service_(io_service),
+                data_(data),
+                handler_(handler)
+            {}
+
+            void operator()() const
+            {
+                implementation_type impl = impl_.lock();
+                if (impl)
+                {
+                    boost::system::error_code ec;
+
+                    std::size_t size = 0;
+                    while (0 == (size = impl->try_read(data_, ec)) && !ec)
+                        io_service_.poll_one();   // try to do other stuff
+
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, ec, size));
+                }
+                else
+                {
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted, 0));
+                }
+            }
+
+        private:
+            boost::weak_ptr<Implementation> impl_;
+            boost::asio::io_service &io_service_;
+            data_buffer& data_;
+            Handler handler_;
+        };
+
+        template <typename Handler, typename Implementation>
+        class write_operation
+        {
+            typedef boost::shared_ptr<Implementation> implementation_type;
+
+        public:
+            write_operation(implementation_type &impl,
+                  boost::asio::io_service &io_service,
+                  data_buffer const& data, Handler handler)
+              : impl_(impl),
+                io_service_(io_service),
+                data_(data),
+                handler_(handler)
+            {}
+
+            void operator()() const
+            {
+                implementation_type impl = impl_.lock();
+                if (impl)
+                {
+                    boost::system::error_code ec;
+                    std::size_t size = impl->write(data_, ec);
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, ec, size));
+                }
+                else
+                {
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted, 0));
+                }
+            }
+
+        private:
+            boost::weak_ptr<Implementation> impl_;
+            boost::asio::io_service &io_service_;
+            data_buffer const& data_;
+            Handler handler_;
+        };
+
+        template <typename Handler, typename Implementation>
+        class write_ack_operation
+        {
+            typedef boost::shared_ptr<Implementation> implementation_type;
+
+        public:
+            write_ack_operation(implementation_type &impl,
+                  boost::asio::io_service &io_service, Handler handler)
+              : impl_(impl),
+                io_service_(io_service),
+                handler_(handler)
+            {}
+
+            void operator()() const
+            {
+                implementation_type impl = impl_.lock();
+                if (impl)
+                {
+                    boost::system::error_code ec;
+                    impl->write_ack(ec);
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, ec));
+                }
+                else
+                {
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted));
+                }
+            }
+
+        private:
+            boost::weak_ptr<Implementation> impl_;
+            boost::asio::io_service &io_service_;
+            Handler handler_;
+        };
+
+        template <typename Handler, typename Implementation>
+        class read_ack_operation
+        {
+            typedef boost::shared_ptr<Implementation> implementation_type;
+
+        public:
+            read_ack_operation(implementation_type &impl,
+                  boost::asio::io_service &io_service, Handler handler)
+              : impl_(impl),
+                io_service_(io_service),
+                handler_(handler)
+            {}
+
+            void operator()() const
+            {
+                implementation_type impl = impl_.lock();
+                if (impl)
+                {
+                    boost::system::error_code ec;
+                    while (!impl->try_read_ack(ec) && !ec)
+                        io_service_.poll_one();   // try to do other stuff
+
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, ec));
+                }
+                else
+                {
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted));
+                }
+            }
+
+        private:
+            boost::weak_ptr<Implementation> impl_;
+            boost::asio::io_service &io_service_;
             Handler handler_;
         };
     }
@@ -176,7 +393,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void open(implementation_type &impl, boost::system::error_code &ec)
         {
-            impl->open(true, ec);         // open only
+            impl->open(ec);
         }
 
         void close(implementation_type &impl, boost::system::error_code &ec)
@@ -196,26 +413,92 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         // synchronous and asynchronous connect
-        void connect(implementation_type &impl, std::string const& endpoint,
+        void connect(implementation_type &impl, std::string const& there,
             boost::system::error_code &ec)
         {
-            impl->connect(endpoint, ec);
+            impl->connect(there, ec);
         }
 
         template <typename Handler>
-        void async_connect(implementation_type &impl,
-            std::string const& endpoint, Handler handler)
+        void async_connect(implementation_type &impl, std::string const& there, 
+            Handler handler)
         {
             this->get_io_service().post(
                 detail::connect_operation<Handler, Implementation>(
-                    impl, this->get_io_service(), endpoint, handler));
+                    impl, this->get_io_service(), there, handler));
         }
 
+        // synchronous and asynchronous read/write/read_ack/write_ack
+        std::size_t read(data_buffer& data, boost::system::error_code &ec)
+        {
+            std::size_t size 0;
+            while (0 == (size = impl->try_read(data, ec)) && !ec)
+                /* just wait for operation to succeed */;
+            return size;
+        }
+
+        std::size_t write(data_buffer const& data, boost::system::error_code &ec)
+        {
+            return impl->write(data, ec);
+        }
+
+        void read_ack(boost::system::error_code &ec)
+        {
+            while (!impl->try_read_ack(ec) && !ec)
+                /* just wait for operation to succeed */;
+        }
+
+        void write_ack(boost::system::error_code &ec)
+        {
+            impl->write_ack(ec);
+        }
+
+        template <typename Handler>
+        void async_read(implementation_type &impl, data_buffer& data,
+            Handler handler)
+        {
+            this->get_io_service().post(
+                detail::read_operation<Handler, Implementation>(
+                    impl, this->get_io_service(), data, handler));
+        }
+
+        template <typename Handler>
+        void async_write(implementation_type &impl, data_buffer const& data,
+            Handler handler)
+        {
+            this->get_io_service().post(
+                detail::write_operation<Handler, Implementation>(
+                    impl, this->get_io_service(), data, handler));
+        }
+
+        template <typename Handler>
+        void async_read_ack(implementation_type &impl, Handler handler)
+        {
+            this->get_io_service().post(
+                detail::read_ack_operation<Handler, Implementation>(
+                    impl, this->get_io_service(), handler));
+        }
+
+        template <typename Handler>
+        void async_write_ack(implementation_type &impl, Handler handler)
+        {
+            this->get_io_service().post(
+                detail::write_ack_operation<Handler, Implementation>(
+                    impl, this->get_io_service(), handler));
+        }
+
+        //
         template <typename Opt>
         void set_option(implementation_type &impl, Opt opt,
             boost::system::error_code &ec)
         {
             impl->set_option(opt, ec);
+        }
+
+        template <typename Opt>
+        Opt get_option(implementation_type &impl, boost::system::error_code &ec)
+        {
+            return impl->get_option<Opt>(ec);
         }
 
     private:
@@ -231,107 +514,215 @@ namespace hpx { namespace parcelset { namespace shmem
     {
     public:
         data_window_impl()
-          : msg_num_(1), aborted_(false), operation_active_(false)
+          : msg_num_(1), aborted_(false), executing_operation_(false)
         {}
 
         ~data_window_impl()
         {
-            if (mq_) {
-                mq_.reset();
-                boost::interprocess::message_queue::remove(endpoint_.c_str());
+            boost::system::error_code ec;
+            close(ec);
+        }
+
+    protected:
+        boost::shared_ptr<boost::interprocess::message_queue> 
+        open_helper(bool open_queue_only, std::string const& name, 
+            boost::system::error_code &ec)
+        {
+            try {
+                HPX_SHMEM_RESET_EC(ec);
+
+                if (!open_queue_only) {
+                    using namespace boost::interprocess;
+                    message_queue::remove(name.c_str());
+                    return boost::make_shared<message_queue>(
+                        create_only, name.c_str(), msg_num_, sizeof(message));
+                }
+                else {
+                    using namespace boost::interprocess;
+                    return boost::make_shared<message_queue>(
+                        open_only, name.c_str());
+                }
+                if (&ec != &boost::system::throws)
+                    ec = boost::system::error_code();
+            }
+            catch(boost::interprocess::interprocess_exception const& e) {
+                HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
+            }
+            return boost::shared_ptr<boost::interprocess::message_queue>();
+        }
+
+        void open(bool open_only, std::string const& here, 
+            boost::system::error_code &ec)
+        {
+            if (read_mq_ || write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
+            }
+            else {
+                read_mq_ = open_helper(open_only, there_, ec);
+                if (!ec) {
+                    write_mq_ = open_helper(open_only, here, ec);
+                }
+                else {
+                    boost::system::error_code ec1;
+                    close(ec1);
+                }
             }
         }
 
-        void open(bool open_queue_only, boost::system::error_code &ec)
+    public:
+        void open(boost::system::error_code &ec)
         {
-            if (mq_) {
-                if (&ec != &boost::system::throws)
-                    ec = boost::asio::error::already_connected;
-                else
-                    boost::asio::detail::throw_error(boost::asio::error::already_connected);
-            }
-            else if (!open_queue_only) {
-                using namespace boost::interprocess;
-                message_queue::remove(endpoint_.c_str());
-                mq_ = boost::make_shared<message_queue>(
-                    create_only, endpoint_.c_str(), msg_num_, sizeof(message));
-            }
-            else {
-                using namespace boost::interprocess;
-                mq_ = boost::make_shared<message_queue>(
-                    open_only, endpoint_.c_str());
-            }
+            std::string::size_type end = there_.find_last_of(".");
+            BOOST_ASSERT(end != std::string::npos);
+            std::string::size_type begin = there_.find_last_of(".", end-1);
+            BOOST_ASSERT(begin != std::string::npos);
+
+            std::string portstr(there_.substr(begin, end-begin));
+            open(true, here_ + portstr, ec);
         }
 
         void bind(std::string const& endpoint, boost::system::error_code &ec)
         {
-            if (mq_) {
-                if (&ec != &boost::system::throws)
-                    ec = boost::asio::error::already_connected;
-                else
-                    boost::asio::detail::throw_error(boost::asio::error::already_connected);
+            if (read_mq_ || write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else {
-                endpoint_ = endpoint;
+                there_ = endpoint;
+                HPX_SHMEM_RESET_EC(ec);
             }
         }
 
         void close(boost::system::error_code &ec)
         {
-            if (mq_) {
-                mq_.reset();
-                boost::interprocess::message_queue::remove(endpoint_.c_str());
+            // close does nothing if the data window was already closed
+            if (read_mq_) {
+                read_mq_.reset();
+                boost::interprocess::message_queue::remove(there_.c_str());
             }
-            else {
-                if (&ec != &boost::system::throws)
-                    ec = boost::asio::error::not_connected;
-                else
-                    boost::asio::detail::throw_error(boost::asio::error::not_connected);
+            if (write_mq_) {
+                write_mq_.reset();
+                boost::interprocess::message_queue::remove(here_.c_str());
             }
+            HPX_SHMEM_RESET_EC(ec);
         }
 
         void shutdown(boost::system::error_code &ec)
         {
-            if (mq_) 
-                send_command(message::shutdown, 0, ec);
+            if (write_mq_)
+                send_command(*write_mq_, message::shutdown, 0, ec);
         }
 
         void destroy()
         {
             // cancel operation
             aborted_ = true;
-            while (operation_active_)
+            while (executing_operation_)
                 ;
         }
 
-        void connect(std::string const& endpoint, boost::system::error_code &ec)
+        void connect(std::string const& there, boost::system::error_code &ec)
         {
-            if (mq_) {
-                if (&ec != &boost::system::throws)
-                    ec = boost::asio::error::already_connected;
-                else
-                    boost::asio::detail::throw_error(boost::asio::error::already_connected);
+            if (read_mq_ || write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else {
-                // set endpoint to connect to
-                endpoint_ = endpoint;
+                std::string portstr = there.substr(there.find_last_of("."));
+                there_ = there + here_.substr(here_.find_last_of("."));
 
-                // open endpoint
-                open(true, ec);
+                // create/open endpoint
+                open(false, here_ + portstr, ec);
                 if (!ec) {
-                    operation_active_ = true;
-                    try {
-                        // send connect command
-                        send_command(message::connect, endpoint.c_str(), ec);
-                    }
-                    catch (boost::interprocess::interprocess_exception const& e) {
-                        if (&ec != &boost::system::throws)
-                            ec = make_error_code(e.get_error_code());
-                        else
-                            boost::asio::detail::throw_error(make_error_code(e.get_error_code()));
-                    }
-                    operation_active_ = false;
+                    // send connect command to corresponding acceptor
+                    std::string acceptor_name(there + ".acceptor");
+                    boost::interprocess::message_queue mq(
+                        boost::interprocess::open_only, acceptor_name.c_str());
+                    send_command(mq, message::connect, (here_ + portstr).c_str(), ec);
                 }
+            }
+        }
+
+        // read, write, and acknowledge operations
+        std::size_t try_read(data_buffer& data, boost::system::error_code &ec)
+        {
+            if (!read_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+            }
+            else {
+                try {
+                    message msg;
+                    if (!try_receive_command(msg, ec))
+                        return 0;
+
+                    if (!ec) {
+                        if (msg.command_ == message::shutdown) {
+                            close(ec);
+                        }
+                        else if (msg.command_ != message::data) {
+                            HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+                        }
+                        else {
+                            // open the data_buffer as specified
+                            data = data_buffer(msg.data_);
+                            return data.size();
+                        }
+                    }
+                }
+                catch (boost::interprocess::interprocess_exception const& e) {
+                    HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
+                }
+            }
+            return 0;
+        }
+
+        std::size_t write(data_buffer const& data, boost::system::error_code &ec)
+        {
+            if (!write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+            }
+            else {
+                send_command(*write_mq_, message::data, data.get_segment_name(), ec);
+                return data.size();
+            }
+            return 0;
+        }
+
+        bool try_read_ack(boost::system::error_code &ec)
+        {
+            if (!read_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+            }
+            else {
+                try {
+                    message msg;
+                    if (!try_receive_command(msg, ec))
+                        return false;
+
+                    if (!ec) {
+                        if (msg.command_ == message::shutdown) {
+                            close(ec);
+                        }
+                        else if (msg.command_ != message::acknowledge) {
+                            HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                }
+                catch (boost::interprocess::interprocess_exception const& e) {
+                    HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
+                }
+            }
+            return false;
+        }
+
+        void write_ack(boost::system::error_code &ec)
+        {
+            if (!write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+            }
+            else {
+                send_command(*write_mq_, message::acknowledge, "", ec);
             }
         }
 
@@ -339,53 +730,110 @@ namespace hpx { namespace parcelset { namespace shmem
         void set_option(basic_data_window_options::msg_num opt,
             boost::system::error_code &ec)
         {
-            if (mq_) {
-                if (&ec != &boost::system::throws)
-                    ec = boost::asio::error::already_connected;
-                else
-                    boost::asio::detail::throw_error(boost::asio::error::already_connected);
+            if (read_mq_ || write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else {
                 msg_num_ = opt.val_;
+                HPX_SHMEM_RESET_EC(ec);
             }
         }
 
-    protected:
-        void send_command(message::commands cmd, char const* data,
+        void set_option(basic_data_window_options::bound_to opt,
             boost::system::error_code &ec)
         {
-            message msg;
-            msg.command_ = cmd;
-            if (data) {
-                std::strncpy(msg.data_, data, sizeof(msg.data_));
-                msg.data_[sizeof(msg.data_)-1] = '\0';
+            if (read_mq_ || write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
+            }
+            else {
+                here_ = opt.val_;
+                HPX_SHMEM_RESET_EC(ec);
+            }
+        }
+
+        basic_data_window_options::bound_to get_option(
+            boost::system::error_code &ec)
+        {
+            if (!read_mq_ || !write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+                return basic_data_window_options::bound_to("");
             }
 
-            while(!mq_->timed_send(&msg, sizeof(msg), 0,
+            HPX_SHMEM_RESET_EC(ec);
+            return basic_data_window_options::bound_to(here_);
+        }
+
+    protected:
+        bool try_receive_command(message& msg, boost::system::error_code &ec)
+        {
+            executing_operation_ = true;
+            BOOST_SCOPE_EXIT(&executing_operation_) {
+                executing_operation_ = false;
+            } BOOST_SCOPE_EXIT_END
+
+            HPX_SHMEM_RESET_EC(ec);
+
+            boost::interprocess::message_queue::size_type recvd_size;
+            unsigned int priority;
+            if (!read_mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
                 boost::get_system_time() + boost::posix_time::milliseconds(1)))
             {
                 if (aborted_) {
                     aborted_ = false;
-                    if (&ec != &boost::system::throws)
-                        ec = boost::asio::error::connection_aborted;
-                    else
-                        boost::asio::detail::throw_error(boost::asio::error::connection_aborted);
-                    break;
+                    HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
                 }
+                return false;
+            }
+            return true;
+        }
+
+        void send_command(boost::interprocess::message_queue& mq, 
+            message::commands cmd, char const* data,
+            boost::system::error_code &ec)
+        {
+            executing_operation_ = true;
+            BOOST_SCOPE_EXIT(&executing_operation_) {
+                executing_operation_ = false;
+            } BOOST_SCOPE_EXIT_END
+
+            try {
+                message msg;
+                msg.command_ = cmd;
+                if (data) {
+                    std::strncpy(msg.data_, data, sizeof(msg.data_));
+                    msg.data_[sizeof(msg.data_)-1] = '\0';
+                }
+
+                HPX_SHMEM_RESET_EC(ec);
+
+                while(!mq.timed_send(&msg, sizeof(msg), 0,
+                    boost::get_system_time() + boost::posix_time::milliseconds(1)))
+                {
+                    if (aborted_) {
+                        aborted_ = false;
+                        HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
+                        break;
+                    }
+                }
+            }
+            catch (boost::interprocess::interprocess_exception const& e) {
+                HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
             }
         }
 
     private:
         std::size_t msg_num_;
-        std::string endpoint_;
-        boost::shared_ptr<boost::interprocess::message_queue> mq_;
+        std::string there_;
+        boost::shared_ptr<boost::interprocess::message_queue> read_mq_;
+        std::string here_;
+        boost::shared_ptr<boost::interprocess::message_queue> write_mq_;
         bool aborted_;
-        bool operation_active_;
+        bool executing_operation_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     typedef basic_data_window<
-        basic_data_window_service<data_window_impl> 
+        basic_data_window_service<data_window_impl>
     > data_window;
 }}}
 

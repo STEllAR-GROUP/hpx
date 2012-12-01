@@ -54,10 +54,12 @@ namespace hpx { namespace parcelset { namespace tcp
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport::parcelport(util::io_service_pool& io_service_pool,
-            util::runtime_configuration const& ini)
+    parcelport::parcelport(util::runtime_configuration const& ini, 
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
-        io_service_pool_(io_service_pool),
+        io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 
+            on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp"),
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
@@ -79,6 +81,13 @@ namespace hpx { namespace parcelset { namespace tcp
         }
     }
 
+    util::io_service_pool* parcelport::get_thread_pool(char const* name)
+    {
+        if (std::strcmp(name, io_service_pool_.get_name()))
+            return 0;
+        return &io_service_pool_;
+    }
+
     bool parcelport::run(bool blocking)
     {
         io_service_pool_.run(false);    // start pool
@@ -98,7 +107,7 @@ namespace hpx { namespace parcelset { namespace tcp
             try {
                 server::tcp::parcelport_connection_ptr conn(
                     new server::tcp::parcelport_connection(
-                        io_service_pool_.get_io_service(), parcels_));
+                        io_service_pool_.get_io_service(), *this));
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -174,7 +183,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::tcp::parcelport_connection(
-                io_service_pool_.get_io_service(), parcels_));
+                io_service_pool_.get_io_service(), *this));
 
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
@@ -407,9 +416,9 @@ namespace hpx { namespace parcelset { namespace tcp
                         boost::posix_time::milliseconds(
                             HPX_NETWORK_RETRIES_SLEEP));
                 }
-                catch (boost::system::error_code const& e) {
+                catch (boost::system::system_error const& e) {
                     HPX_THROW_EXCEPTION(network_error,
-                        "tcp::parcelport::get_connection", e.message());
+                        "tcp::parcelport::get_connection", e.what());
                     return client_connection;
                 }
             }
@@ -444,5 +453,88 @@ namespace hpx { namespace parcelset { namespace tcp
 #endif
 
         return client_connection;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void decode_message(parcelport& pp,
+        std::vector<char> const& parcel_data,
+        performance_counters::parcels::data_point receive_data)
+    {
+        // protect from un-handled exceptions bubbling up 
+        try {
+            try {
+                // mark start of serialization
+                util::high_resolution_timer timer;
+                boost::int64_t overall_add_parcel_time = 0;
+
+                {
+                    // De-serialize the parcel data
+                    util::portable_binary_iarchive archive(parcel_data,
+                        boost::archive::no_header);
+
+                    std::size_t parcel_count = 0;
+                    std::size_t arg_size = 0;
+
+                    archive >> parcel_count;
+                    for(std::size_t i = 0; i < parcel_count; ++i)
+                    {
+                        // de-serialize parcel and add it to incoming parcel queue
+                        parcel p;
+                        archive >> p;
+
+                        // make sure this parcel ended up on the right locality
+                        BOOST_ASSERT(p.get_destination_locality() == pp.here());
+
+                        // incoming argument's size
+                        arg_size += hpx::traits::type_size<parcel>::call(p);
+
+                        // be sure not to measure add_parcel as serialization time
+                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
+                        pp.add_received_parcel(p);
+                        overall_add_parcel_time += timer.elapsed_nanoseconds() -
+                            add_parcel_time;
+                    }
+
+                    // complete received data with parcel count
+                    receive_data.num_parcels_ = parcel_count;
+                    receive_data.type_bytes_ = arg_size;
+                }
+
+                // store the time required for serialization
+                receive_data.serialization_time_ = timer.elapsed_nanoseconds() -
+                    overall_add_parcel_time;
+
+                pp.add_received_data(receive_data);
+            }
+            catch (hpx::exception const& e) {
+                LPT_(error)
+                    << "decode_message: caught hpx::exception: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::system::system_error const& e) {
+                LPT_(error)
+                    << "decode_message: caught boost::system::error: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::exception const&) {
+                LPT_(error)
+                    << "decode_message: caught boost::exception.";
+                hpx::report_error(boost::current_exception());
+            }
+            catch (std::exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem, due to slicing.
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what())));
+            }
+        }
+        catch (...) {
+            LPT_(error)
+                << "decode_message: caught unknown exception.";
+            hpx::report_error(boost::current_exception());
+        }
     }
 }}}

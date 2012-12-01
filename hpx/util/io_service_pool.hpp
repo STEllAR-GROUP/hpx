@@ -35,16 +35,18 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            HPX_STD_FUNCTION<void(std::size_t)> on_start_thread = HPX_STD_FUNCTION<void(std::size_t)>(),
-            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
-            char const* pool_name = "");
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread = 
+                HPX_STD_FUNCTION<void(std::size_t, char const*)>(),
+            HPX_STD_FUNCTION<void()> const& on_stop_thread = HPX_STD_FUNCTION<void()>(),
+            char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(HPX_STD_FUNCTION<void(std::size_t)> on_start_thread,
-            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
-            char const* pool_name = "");
+        explicit io_service_pool(
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread = HPX_STD_FUNCTION<void()>(),
+            char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();
 
@@ -69,6 +71,15 @@ namespace hpx { namespace util
 
         /// \brief Activate the thread \a index for this thread pool
         void thread_run(std::size_t index);
+
+        /// \brief Return name of this pool
+        char const* get_name() const { return pool_name_; }
+
+        /// \brief return the thread registration functions
+        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& 
+            get_on_start_thread() const { return on_start_thread_; }
+        HPX_STD_FUNCTION<void()> const& 
+            get_on_stop_thread() const { return on_stop_thread_; }
 
     protected:
         void stop_locked();
@@ -98,12 +109,11 @@ namespace hpx { namespace util
         std::size_t const pool_size_;
 
         /// call this for each thread start/stop
-        HPX_STD_FUNCTION<void(std::size_t)> on_start_thread_;
+        HPX_STD_FUNCTION<void(std::size_t, char const*)> on_start_thread_;
         HPX_STD_FUNCTION<void()> on_stop_thread_;
 
-#if defined(DEBUG)
         char const* pool_name_;
-#endif
+        char const* pool_name_postfix_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
