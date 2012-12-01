@@ -943,6 +943,8 @@ namespace hpx
         error_code& ec = throws);
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
         naming::id_type id);
+
+    HPX_EXPORT void set_error_handlers();
 }
 
 #include <hpx/lcos/async_fwd.hpp>

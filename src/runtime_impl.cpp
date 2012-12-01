@@ -179,12 +179,12 @@ namespace hpx {
 
         // Finish the bootstrap
         if (!hpx::pre_main(mode_)) {
-            LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap "
+            LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
             return threads::thread_state(threads::terminated);
         }
 
-        LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete";
+        LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
         state_ = state_running;
 
         parcel_handler_.enable_alternative_parcelports();
@@ -237,7 +237,7 @@ namespace hpx {
         LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
-        // invoke the AGAS v2 notifications, waking up the other localities
+        // invoke the AGAS v2 notifications
         agas::get_big_boot_barrier().trigger();
 
         // {{{ launch main

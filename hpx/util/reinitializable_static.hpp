@@ -42,7 +42,7 @@ namespace hpx { namespace util
     //  functions used by the HPX runtime system to reinitialize the held data 
     //  structures.
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct reinitializable_static : boost::noncopyable
+    struct HPX_EXPORT reinitializable_static : boost::noncopyable
     {
     public:
         typedef T value_type;

@@ -47,7 +47,17 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         boost::int64_t destructed_;
         lcos::local::spinlock mtx_;
     };
-    HPX_COMPONENT_EXPORT extern dataflow_counter_data dataflow_counter_data_;
+
+    /// counter function declarations
+    
+    HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count();
+    HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count();
+    HPX_COMPONENT_EXPORT boost::int64_t get_fired_count();
+    HPX_COMPONENT_EXPORT boost::int64_t get_destructed_count();
+    HPX_COMPONENT_EXPORT void update_constructed_count();
+    HPX_COMPONENT_EXPORT void update_initialized_count();
+    HPX_COMPONENT_EXPORT void update_fired_count();
+    HPX_COMPONENT_EXPORT void update_destructed_count();
 
     // call this to register all counter types for dataflow objects
     void register_counter_types();
@@ -439,8 +449,7 @@ namespace hpx { namespace traits
                   , slots
                 );
 
-                lcos::local::spinlock::scoped_lock l(mtx);
-                ++dataflow_counter_data_.fired_;
+                update_fired_count();
             }
             LLCO_(info)
                 << "dataflow_impl<"

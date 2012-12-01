@@ -38,7 +38,7 @@ namespace hpx { namespace util
     //          this is a requirement of boost::call_once.
     //
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct static_ : boost::noncopyable
+    struct HPX_EXPORT static_ : boost::noncopyable
     {
     public:
         typedef T value_type;

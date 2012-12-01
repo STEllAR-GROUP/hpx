@@ -74,23 +74,23 @@ const char* fourth_barrier = "/barrier(agas#0)/fourth_stage";
 inline void register_counter_types()
 {
      naming::get_agas_client().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered AGAS client-side "
+     LBT_(info) << "(2nd stage) pre_main: registered AGAS client-side "
                    "performance counter types";
 
      get_runtime().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered runtime performance "
+     LBT_(info) << "(2nd stage) pre_main: registered runtime performance "
                    "counter types";
 
      threads::get_thread_manager().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered thread-manager performance "
+     LBT_(info) << "(2nd stage) pre_main: registered thread-manager performance "
                    "counter types";
 
      applier::get_applier().get_parcel_handler().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered parcelset performance "
+     LBT_(info) << "(2nd stage) pre_main: registered parcelset performance "
                    "counter types";
 
      hpx::lcos::detail::register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered full_empty_entry "
+     LBT_(info) << "(2nd stage) pre_main: registered full_empty_entry "
                    "performance counter types";
 }
 
@@ -220,6 +220,7 @@ bool pre_main(runtime_mode mode)
 
         // Third stage separates pre-startup and startup function phase.
         third_stage.wait();
+        LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
         rt.set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
