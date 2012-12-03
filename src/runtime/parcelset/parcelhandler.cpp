@@ -232,33 +232,39 @@ namespace hpx { namespace parcelset
     }
 
     // this function  will be called right after pre_main
-    void parcelhandler::set_resolved_localities(std::vector<naming::locality> const& l)
+    void parcelhandler::set_resolved_localities(
+        std::vector<naming::locality> const& localities)
     {
-        // we use the provided information to decide what types of parcel-ports
-        // are needed
+        std::string enable_shmem = 
+            get_config_entry("hpx.parcel.enable_shmem_parcelport", "0");
 
-        // if there is just one locality, we need no additional network at all
-        if (1 == l.size())
-            return;
+        if (boost::lexical_cast<int>(enable_shmem)) {
+            // we use the provided information to decide what types of parcel-ports
+            // are needed
 
-        // if there are more localities sharing the same network node, we need
-        // to instantiate the shmem parcel-port
-        std::size_t here_count = 0;
-        std::string here(here().get_address());
-        BOOST_FOREACH(naming::locality const& t, l)
-        {
-            if (t.get_address() == here)
-                ++here_count;
-        }
+            // if there is just one locality, we need no additional network at all
+            if (1 == localities.size())
+                return;
 
-        if (here_count > 1) {
-            util::io_service_pool* pool =
-                pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
-            BOOST_ASSERT(0 != pool);
+            // if there are more localities sharing the same network node, we need
+            // to instantiate the shmem parcel-port
+            std::size_t here_count = 0;
+            std::string here(here().get_address());
+            BOOST_FOREACH(naming::locality const& t, localities)
+            {
+                if (t.get_address() == here)
+                    ++here_count;
+            }
 
-            attach_parcelport(parcelport::create(
-                connection_shmem, hpx::get_config(),
-                pool->get_on_start_thread(), pool->get_on_stop_thread()));
+            if (here_count > 1) {
+                util::io_service_pool* pool =
+                    pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
+                BOOST_ASSERT(0 != pool);
+
+                attach_parcelport(parcelport::create(
+                    connection_shmem, hpx::get_config(),
+                    pool->get_on_start_thread(), pool->get_on_stop_thread()));
+            }
         }
     }
 

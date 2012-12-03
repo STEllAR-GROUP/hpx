@@ -26,8 +26,22 @@ namespace hpx { namespace parcelset
                 cfg, on_start_thread, on_stop_thread);
 
         case connection_shmem:
-            return boost::make_shared<parcelset::shmem::parcelport>(
-                cfg, on_start_thread, on_stop_thread);
+            {
+                // Create shmem based parcelport only if allowed by the 
+                // configuration info.
+                std::string enable_shmem = 
+                    cfg.get_entry("hpx.parcel.enable_shmem_parcelport", "0");
+
+                if (boost::lexical_cast<int>(enable_shmem)) 
+                {
+                    return boost::make_shared<parcelset::shmem::parcelport>(
+                        cfg, on_start_thread, on_stop_thread);
+                }
+
+                HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
+                    "unsupported connection type 'connection_shmem'");
+            }
+            break;
 
         case connection_portals4:
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
