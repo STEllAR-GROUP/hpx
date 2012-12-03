@@ -231,8 +231,8 @@ namespace hpx { namespace parcelset { namespace shmem
             util::spinlock::scoped_lock l(mtx_);
 
             mapped_type& e = pending_parcels_[locality_id];
-            pending_parcels_[locality_id].first.push_back(p);
-            pending_parcels_[locality_id].second.push_back(f);
+            e.first.push_back(p);
+            e.second.push_back(f);
         }
 
         parcelport_connection_ptr client_connection = get_connection(locality_id);
