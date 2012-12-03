@@ -10,17 +10,42 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_5 __hpx__ V0.9.5]
 
+We have had roughly 1000 commits since the last release and we have closed
+approximately 130 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+This release is continuing along the lines of code and API consolidation, and
+overall usability inprovements. We dedicated much attention to performance and 
+we were able to significantly improve the threading and networking subsystems.
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #615 - Revert visibility 'fix' (fb0b6b8245dad1127b0c25ebafd9386b3945cca9)
+* #613 - find_here should throw an exception on failure
+* #612 - Thread phase doesn't show up in debug mode
+* #610 - Co-Locate Components
+* #609 - future_overhead
+* #608 - `--hpx:list-counter-infos` problem
+* #607 - Update Boost.Context based backend for coroutines
+* #604 - Connecting localities isn't working anymore
+* #603 - Do not verify any ini entries read from a file
+* #599 - Enable locality specific command line options
+* #598 - Need an API that accesses the performance counter reporting the
+         system uptime
+* #597 - compiling on ranger
+* #595 - I need a place to store data in a thread self pointer
+* #594 - 32/64 interoperability
 * #593 - Warn if logging is disabled at compile time but requested at runtime
 * #592 - Add optional argument value to `--hpx:list-counters` and
          `--hpx:list-counter-infos`
 * #591 - Allow for wildcards in performance counter names specified with
-         `--hpx:print-counter
+         `--hpx:print-counter`
+* #590 - Local promise semantic differences
 * #589 - Create API to query performance counter names
 * #587 - Add get_num_localities and get_num_threads to AGAS API
 * #586 - Adjust local AGAS cache size based on number of localities
@@ -29,7 +54,7 @@ HPX' releases so far.
 * #581 - Remove `RemoteResult` template parameter for `future<>`
 * #580 - Add possibility to hook into actions
 * #578 - Use angle brackets in HPX error dumps
-* #576 - Exception incorrectly thrown when --help is used
+* #576 - Exception incorrectly thrown when `--help` is used
 * #575 - HPX(bad_component_type) with gcc 4.7.2 and boost 1.51
 * #574 - `--hpx:connect` command line parameter not working correctly
 * #571 - `hpx::wait()` (callback version) should pass the future to the callback
@@ -43,22 +68,22 @@ HPX' releases so far.
 * #563 - Add `hpx::start`/`hpx::stop` to avoid blocking main thread
 * #562 - All command line arguments swallowed by hpx
 * #561 - Boost.Tuple is not move aware
-* #558 - boost::shared_ptr<> style semantics/syntax for client classes
+* #558 - `boost::shared_ptr<>` style semantics/syntax for client classes
 * #556 - Creation of partially preprocessed headers should be enabled for Boost
          newer than V1.50
 * #555 - `BOOST_FORCEINLINE` does not name a type
-* #554 - Possible race condition in thread get_id()
+* #554 - Possible race condition in thread `get_id()`
 * #552 - Move enable client_base
 * #550 - Add stack size category 'huge'
 * #549 - ShenEOS run seg-faults on single or distributed runs
-* #545 - AUTOGLOB broken for add_hpx_component
+* #545 - `AUTOGLOB` broken for add_hpx_component
 * #542 - FindHPX_HDF5 still searches multiple times
 * #541 - Quotes around application name in hpx::init
 * #539 - Race conditition occuring with new lightweight threads
 * #535 - hpx_run_tests.py exits with no error code when tests are missing
 * #530 - Thread description(<unknown>) in logs
 * #523 - Make thread objects more lightweight
-* #521 - hpx::error_code is not usable for lightweight error handling
+* #521 - `hpx::error_code` is not usable for lightweight error handling
 * #520 - Add full user environment to HPX logs
 * #519 - Build succeeds, running fails
 * #517 - Add a guard page to linux coroutine stacks
