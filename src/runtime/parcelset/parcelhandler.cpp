@@ -205,9 +205,8 @@ namespace hpx { namespace parcelset
 
     bool parcelhandler::get_raw_localities(
         std::vector<naming::gid_type>& locality_ids,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
-        error_code ec(lightweight);
         bool result = resolver_.get_localities(locality_ids, type, ec);
         if (ec || !result) return false;
 

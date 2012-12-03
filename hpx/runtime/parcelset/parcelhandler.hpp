@@ -149,7 +149,7 @@ namespace hpx { namespace parcelset
         ///          locality known by AGAS
         ///          (!prefixes.empty()).
         bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type, error_code& ec = throws) const;
 
         /// A parcel is submitted for transport at the source locality site to
         /// the parcel set of the locality with the put-parcel command

@@ -356,29 +356,45 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
-    naming::id_type find_here()
+    naming::id_type find_here(error_code& ec)
     {
         if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
+                "the runtime system is not available at this time");
             return naming::invalid_id;
+        }
 
-        return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
+        return naming::id_type(hpx::applier::get_applier().get_raw_locality(ec),
             naming::id_type::unmanaged);
     }
 
     std::vector<naming::id_type>
-    find_all_localities(components::component_type type)
+    find_all_localities(components::component_type type, error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_localities(locality_ids, type);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_localities(locality_ids, type, ec);
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_all_localities()
+    std::vector<naming::id_type> find_all_localities(error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_localities(locality_ids);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_localities(locality_ids, ec);
         return locality_ids;
     }
 
@@ -400,15 +416,19 @@ namespace hpx
     }
 
     // find a locality supporting the given component
-    naming::id_type find_locality(components::component_type type)
+    naming::id_type find_locality(components::component_type type, error_code& ec)
     {
         if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_locality",
+                "the runtime system is not available at this time");
             return naming::invalid_id;
+        }
 
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids, type);
+        hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 
-        if (locality_ids.empty()) 
+        if (ec || locality_ids.empty()) 
             return naming::invalid_id;
 
         // chose first locality to host the object
