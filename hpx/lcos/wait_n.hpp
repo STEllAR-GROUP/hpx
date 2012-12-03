@@ -38,8 +38,8 @@ namespace hpx
             boost::lockfree::fifo<std::size_t>& dest,
             boost::atomic<std::size_t>& dest_count)
         {
-            std::size_t count = src_count.load();
-            src_count.store(0);
+            std::size_t new_value = 0;
+            std::size_t count = src_count.exchange(new_value);
 
             std::size_t tmp;
             while(src.dequeue(tmp))

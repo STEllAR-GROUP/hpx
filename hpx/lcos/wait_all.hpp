@@ -67,7 +67,7 @@ namespace hpx
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 ready_count_(rhs.ready_count_.load())
             {
-                rhs.ready_count_ = 0;
+                rhs.ready_count_.store(0);
             }
 
             when_all& operator= (BOOST_RV_REF(when_all) rhs)

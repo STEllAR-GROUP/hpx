@@ -74,7 +74,7 @@ namespace hpx
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 index_(rhs.index_.load())
             {
-                rhs.index_ = index_error;
+                rhs.index_.store(index_error);
             }
 
             when_any& operator= (BOOST_RV_REF(when_any) rhs)
@@ -82,7 +82,7 @@ namespace hpx
                 if (this != &rhs) {
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     index_ = rhs.index_;
-                    rhs.index_ = index_error;
+                    rhs.index_.store(index_error);
                 }
                 return *this;
             }
@@ -226,7 +226,7 @@ namespace hpx
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 index_(rhs.index_.load())
             {
-                rhs.index_ = index_error;
+                rhs.index_.store(index_error);
             }
 
             when_any_tuple& operator= (BOOST_RV_REF(when_any_tuple) rhs)

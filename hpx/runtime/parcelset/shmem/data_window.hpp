@@ -430,7 +430,7 @@ namespace hpx { namespace parcelset { namespace shmem
         // synchronous and asynchronous read/write/read_ack/write_ack
         std::size_t read(data_buffer& data, boost::system::error_code &ec)
         {
-            std::size_t size 0;
+            std::size_t size;
             while (0 == (size = impl->try_read(data, ec)) && !ec)
                 /* just wait for operation to succeed */;
             return size;
