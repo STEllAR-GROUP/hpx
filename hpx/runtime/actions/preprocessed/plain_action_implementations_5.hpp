@@ -19,7 +19,6 @@ namespace hpx { namespace actions
     class plain_base_result_action1
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg1,
             Result,
             hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
             Derived>
@@ -30,7 +29,7 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg1, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -182,7 +181,6 @@ namespace hpx { namespace actions
     class plain_base_action1
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg1,
             util::unused_type,
             hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
             Derived>
@@ -194,7 +192,7 @@ namespace hpx { namespace actions
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg1, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -397,7 +395,6 @@ namespace hpx { namespace actions
     class plain_base_result_action2
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg2,
             Result,
             hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
             Derived>
@@ -408,7 +405,7 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg2, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -560,7 +557,6 @@ namespace hpx { namespace actions
     class plain_base_action2
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg2,
             util::unused_type,
             hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
             Derived>
@@ -572,7 +568,7 @@ namespace hpx { namespace actions
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg2, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -775,7 +771,6 @@ namespace hpx { namespace actions
     class plain_base_result_action3
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg3,
             Result,
             hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
             Derived>
@@ -786,7 +781,7 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg3, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -938,7 +933,6 @@ namespace hpx { namespace actions
     class plain_base_action3
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg3,
             util::unused_type,
             hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
             Derived>
@@ -950,7 +944,7 @@ namespace hpx { namespace actions
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg3, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -1153,7 +1147,6 @@ namespace hpx { namespace actions
     class plain_base_result_action4
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg4,
             Result,
             hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
             Derived>
@@ -1164,7 +1157,7 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg4, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -1316,7 +1309,6 @@ namespace hpx { namespace actions
     class plain_base_action4
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg4,
             util::unused_type,
             hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
             Derived>
@@ -1328,7 +1320,7 @@ namespace hpx { namespace actions
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg4, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -1531,7 +1523,6 @@ namespace hpx { namespace actions
     class plain_base_result_action5
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg5,
             Result,
             hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
             Derived>
@@ -1542,7 +1533,7 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_result_action_arg5, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         
@@ -1694,7 +1685,6 @@ namespace hpx { namespace actions
     class plain_base_action5
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg5,
             util::unused_type,
             hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
             Derived>
@@ -1706,7 +1696,7 @@ namespace hpx { namespace actions
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
-            function_action_arg5, result_type,
+            result_type,
             arguments_type, Derived> base_type;
     protected:
         

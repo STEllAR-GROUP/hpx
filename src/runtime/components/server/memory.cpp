@@ -36,16 +36,16 @@ HPX_REGISTER_ACTION(hpx::components::server::memory::load64_action, load64_actio
 
 ///////////////////////////////////////////////////////////////////////////////
 // make sure all needed action::get_action_name() functions get defined
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<boost::uint8_t>::set_value_action,
-    set_value_action_uint8_t)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<boost::uint16_t>::set_value_action,
-    set_value_action_uint16_t)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<boost::uint32_t>::set_value_action,
-    set_value_action_uint32_t)
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<boost::uint64_t>::set_value_action,
-    set_value_action_uint64_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    boost::uint8_t,
+    uint8_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    boost::uint16_t,
+    uint16_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    boost::uint32_t,
+    uint32_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    boost::uint64_t,
+    uint64_t)
 

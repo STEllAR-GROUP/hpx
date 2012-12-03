@@ -54,6 +54,54 @@ HPX_PLAIN_ACTION(hpx::detail::list_symbolic_name,
 HPX_PLAIN_ACTION(hpx::detail::list_component_type,
     list_component_type_action, hpx::components::factory_enabled)
 
+typedef
+    hpx::util::detail::bound_action3<
+        hpx::actions::plain_action2<
+            std::string const&
+          , const hpx::naming::gid_type&
+          , hpx::detail::list_symbolic_name
+          , hpx::actions::detail::this_type
+        >
+      , hpx::naming::id_type
+      , hpx::util::placeholders::arg<0>
+      , hpx::util::placeholders::arg<1>
+    >
+    bound_list_symbolic_name_action;
+
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
+    void(std::string const&, const hpx::naming::gid_type&)
+  , bound_list_symbolic_name_action
+  , list_symbolic_name_function)
+
+HPX_UTIL_REGISTER_FUNCTION(
+    void(std::string const&, const hpx::naming::gid_type&)
+  , bound_list_symbolic_name_action
+  , list_symbolic_name_function)
+
+typedef
+    hpx::util::detail::bound_action3<
+        hpx::actions::plain_action2<
+            std::string const&
+          , int
+          , hpx::detail::list_component_type
+          , hpx::actions::detail::this_type
+        >
+      , hpx::naming::id_type
+      , hpx::util::placeholders::arg<0>
+      , hpx::util::placeholders::arg<1>
+    >
+    bound_list_component_type_action;
+
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
+    void(std::string const&, hpx::components::component_type)
+  , bound_list_component_type_action
+  , list_component_type_function)
+
+HPX_UTIL_REGISTER_FUNCTION(
+    void(std::string const&, hpx::components::component_type)
+  , bound_list_component_type_action
+  , list_component_type_function)
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -270,7 +318,7 @@ namespace hpx
             }
             if (vm.count("hpx:list-counter-infos")) {
                 // Print info about all registered performance counters.
-                std::string option(vm["hpx:list-counters"].as<std::string>());
+                std::string option(vm["hpx:list-counter-infos"].as<std::string>());
                 if (0 == std::string("minimal").find(option))
                     rt.add_startup_function(&list_counter_infos_minimal);
                 else if (0 == std::string("full").find(option))
@@ -746,30 +794,6 @@ namespace hpx
             return 0;
         }
 #endif
-
-        ///////////////////////////////////////////////////////////////////////
-        void set_error_handlers()
-        {
-#if defined(BOOST_WINDOWS)
-            // Set console control handler to allow server to be stopped.
-            SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
-#else
-            struct sigaction new_action;
-            new_action.sa_handler = hpx::termination_handler;
-            sigemptyset(&new_action.sa_mask);
-            new_action.sa_flags = 0;
-
-            sigaction(SIGINT, &new_action, NULL);  // Interrupted 
-            sigaction(SIGBUS, &new_action, NULL);  // Bus error
-            sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
-            sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
-            sigaction(SIGPIPE, &new_action, NULL); // Bad pipe
-            sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault
-            sigaction(SIGSYS, &new_action, NULL);  // Bad syscall
-#endif
-
-            std::set_new_handler(hpx::new_handler);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -781,7 +805,7 @@ namespace hpx
         bool blocking)
     {
         int result = 0;
-        detail::set_error_handlers();
+        set_error_handlers();
 
         try {
             // handle all common command line switches

@@ -46,21 +46,7 @@ struct HPX_COMPONENT_EXPORT managed_refcnt_checker
         references_.push_back(gid);
     }
 
-    enum actions
-    {
-        action_take_reference
-    };
-
-    typedef hpx::actions::action1<
-        // component
-        managed_refcnt_checker
-        // action code
-      , action_take_reference
-        // arguments
-      , naming::id_type const&
-        // method
-      , &managed_refcnt_checker::take_reference
-    > take_reference_action;
+    HPX_DEFINE_COMPONENT_ACTION(managed_refcnt_checker, take_reference);
 };
 
 }}}

@@ -368,17 +368,6 @@ namespace hpx { namespace components { namespace server { namespace detail
     class HPX_EXPORT memory_block : public memory_block_header
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            memory_block_get = 0,
-            memory_block_checkout = 1,
-            memory_block_checkin = 2,
-            memory_block_clone = 3,
-            memory_block_get_config = 4
-        };
-
         // construct a new memory block
         memory_block(server::memory_block* wrapper, std::size_t size,
                 hpx::actions::manage_object_action_base const& act)
@@ -422,31 +411,11 @@ namespace hpx { namespace components { namespace server { namespace detail
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::direct_result_action0<
-            memory_block, components::memory_block_data, memory_block_get,
-            &memory_block::get
-        > get_action;
-
-        typedef hpx::actions::direct_result_action1<
-            memory_block, components::memory_block_data, memory_block_get_config,
-            components::memory_block_data const&, &memory_block::get_config
-        > get_config_action;
-
-        typedef hpx::actions::direct_result_action0<
-            memory_block, components::memory_block_data, memory_block_checkout,
-            &memory_block::checkout
-        > checkout_action;
-
-        typedef hpx::actions::direct_action1<
-            memory_block, memory_block_checkin,
-            components::memory_block_data const&,
-            &memory_block::checkin
-        > checkin_action;
-
-        typedef hpx::actions::direct_result_action0<
-            memory_block, naming::gid_type, memory_block_clone,
-            &memory_block::clone
-        > clone_action;
+        HPX_DEFINE_COMPONENT_ACTION(memory_block, get);
+        HPX_DEFINE_COMPONENT_ACTION(memory_block, get_config);
+        HPX_DEFINE_COMPONENT_ACTION(memory_block, checkout);
+        HPX_DEFINE_COMPONENT_ACTION(memory_block, checkin);
+        HPX_DEFINE_COMPONENT_ACTION(memory_block, clone);
 
         /// This is the default hook implementation for decorate_action which 
         /// does no hooking at all.
@@ -731,9 +700,9 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::components::memory_block_data>::set_value_action,
-    set_value_action_memory_data_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::components::memory_block_data,
+    memory_data_type)
 
 #include <hpx/config/warnings_suffix.hpp>
 

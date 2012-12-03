@@ -11,6 +11,7 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
@@ -101,7 +102,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::invoke = Vtable::invoke;
 
             // make sure the global gets instantiated;
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
 
         static void register_base()

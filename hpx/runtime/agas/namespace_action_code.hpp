@@ -35,6 +35,7 @@ enum namespace_action_code
     primary_ns_num_localities               = BOOST_BINARY_U(1001100),
     primary_ns_num_threads                  = BOOST_BINARY_U(1001101),
     primary_ns_statistics_counter           = BOOST_BINARY_U(1001110),
+    primary_ns_resolved_localities          = BOOST_BINARY_U(1001111),
     component_ns_service                    = BOOST_BINARY_U(0100000),
     component_ns_bulk_service               = BOOST_BINARY_U(0100001),
     component_ns_bind_prefix                = BOOST_BINARY_U(0100010),
@@ -200,6 +201,11 @@ namespace detail
           , counter_target_count
           , primary_ns_localities
           , primary_ns_statistics_counter }
+      , {   "count/resolved_localities"
+          , ""
+          , counter_target_count
+          , primary_ns_resolved_localities
+          , primary_ns_statistics_counter }
       , {   "count/num_threads"
           , ""
           , counter_target_count
@@ -250,6 +256,11 @@ namespace detail
           , "ns"
           , counter_target_time
           , primary_ns_localities
+          , primary_ns_statistics_counter }
+      , {   "time/resolved_localities"
+          , "ns"
+          , counter_target_time
+          , primary_ns_resolved_localities
           , primary_ns_statistics_counter }
       , {   "time/num_threads"
           , "ns"

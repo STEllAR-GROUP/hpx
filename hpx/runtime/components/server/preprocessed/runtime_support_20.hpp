@@ -18,7 +18,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action0<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
            
           , &runtime_support::create_component0<
                 Component
@@ -32,7 +31,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action0<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
            
           , &runtime_support::create_component0<
                 Component >
@@ -96,7 +94,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action1<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0
           , &runtime_support::create_component1<
                 Component
@@ -110,7 +107,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action1<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0
           , &runtime_support::create_component1<
                 Component , A0>
@@ -174,7 +170,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action2<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1
           , &runtime_support::create_component2<
                 Component
@@ -188,7 +183,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action2<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1
           , &runtime_support::create_component2<
                 Component , A0 , A1>
@@ -252,7 +246,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action3<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2
           , &runtime_support::create_component3<
                 Component
@@ -266,7 +259,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action3<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2
           , &runtime_support::create_component3<
                 Component , A0 , A1 , A2>
@@ -330,7 +322,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action4<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3
           , &runtime_support::create_component4<
                 Component
@@ -344,7 +335,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action4<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3
           , &runtime_support::create_component4<
                 Component , A0 , A1 , A2 , A3>
@@ -408,7 +398,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action5<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4
           , &runtime_support::create_component5<
                 Component
@@ -422,7 +411,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action5<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4
           , &runtime_support::create_component5<
                 Component , A0 , A1 , A2 , A3 , A4>
@@ -486,7 +474,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action6<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5
           , &runtime_support::create_component6<
                 Component
@@ -500,7 +487,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action6<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5
           , &runtime_support::create_component6<
                 Component , A0 , A1 , A2 , A3 , A4 , A5>
@@ -564,7 +550,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action7<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6
           , &runtime_support::create_component7<
                 Component
@@ -578,7 +563,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action7<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6
           , &runtime_support::create_component7<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6>
@@ -642,7 +626,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action8<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7
           , &runtime_support::create_component8<
                 Component
@@ -656,7 +639,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action8<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7
           , &runtime_support::create_component8<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7>
@@ -720,7 +702,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action9<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8
           , &runtime_support::create_component9<
                 Component
@@ -734,7 +715,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action9<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8
           , &runtime_support::create_component9<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8>
@@ -798,7 +778,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action10<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9
           , &runtime_support::create_component10<
                 Component
@@ -812,7 +791,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action10<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9
           , &runtime_support::create_component10<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9>
@@ -876,7 +854,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action11<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10
           , &runtime_support::create_component11<
                 Component
@@ -890,7 +867,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action11<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10
           , &runtime_support::create_component11<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10>
@@ -954,7 +930,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action12<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11
           , &runtime_support::create_component12<
                 Component
@@ -968,7 +943,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action12<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11
           , &runtime_support::create_component12<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11>
@@ -1032,7 +1006,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action13<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12
           , &runtime_support::create_component13<
                 Component
@@ -1046,7 +1019,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action13<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12
           , &runtime_support::create_component13<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12>
@@ -1110,7 +1082,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action14<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13
           , &runtime_support::create_component14<
                 Component
@@ -1124,7 +1095,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action14<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13
           , &runtime_support::create_component14<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13>
@@ -1188,7 +1158,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action15<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14
           , &runtime_support::create_component15<
                 Component
@@ -1202,7 +1171,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action15<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14
           , &runtime_support::create_component15<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14>
@@ -1266,7 +1234,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action16<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15
           , &runtime_support::create_component16<
                 Component
@@ -1280,7 +1247,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action16<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15
           , &runtime_support::create_component16<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15>
@@ -1344,7 +1310,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action17<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16
           , &runtime_support::create_component17<
                 Component
@@ -1358,7 +1323,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action17<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16
           , &runtime_support::create_component17<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16>
@@ -1422,7 +1386,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action18<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17
           , &runtime_support::create_component18<
                 Component
@@ -1436,7 +1399,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action18<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17
           , &runtime_support::create_component18<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17>
@@ -1500,7 +1462,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action19<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18
           , &runtime_support::create_component19<
                 Component
@@ -1514,7 +1475,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action19<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18
           , &runtime_support::create_component19<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18>
@@ -1578,7 +1538,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::result_action20<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19
           , &runtime_support::create_component20<
                 Component
@@ -1592,7 +1551,6 @@ namespace hpx { namespace components { namespace server
       : ::hpx::actions::direct_result_action20<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19
           , &runtime_support::create_component20<
                 Component , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19>

@@ -65,33 +65,6 @@ namespace hpx { namespace components { namespace server
     public:
         typedef runtime_support type_holder;
 
-        // parcel action code: the action to be performed on the destination
-        // object
-        enum actions
-        {
-            runtime_support_factory_properties = 0, ///< return whether more than
-                                                    ///< one instance of a component
-                                                    ///< can be created at once
-            runtime_support_create_component = 1,   ///< create new default constructed components
-            runtime_support_bulk_create_components = 3, ///< create N new default constructed components
-            runtime_support_free_component = 4,     ///< delete existing components
-            runtime_support_shutdown = 5,           ///< shut down this runtime instance
-            runtime_support_shutdown_all = 6,       ///< shut down the runtime instances of all localities
-            runtime_support_terminate = 7,          ///< terminate the runtime instances of all localities
-            runtime_support_terminate_all = 8,      ///< terminate the runtime instances of all localities
-
-            runtime_support_get_config = 9,         ///< get configuration information
-            runtime_support_create_memory_block = 10,  ///< create new memory block
-            runtime_support_load_components = 11,
-            runtime_support_call_startup_functions = 12,
-            runtime_support_call_shutdown_functions = 13,
-            runtime_support_insert_agas_cache_entry = 14,
-            runtime_support_garbage_collect = 15,
-            runtime_support_create_performance_counter = 16,
-            runtime_support_get_instance_count = 17,
-            runtime_support_remove_from_connection_cache = 18
-        };
-
         static component_type get_component_type()
         {
             return components::get_component_type<runtime_support>();
@@ -150,14 +123,13 @@ namespace hpx { namespace components { namespace server
             naming::gid_type const& gid, naming::gid_type const& count);
 
         /// \brief Gracefully shutdown this runtime system instance
-        void shutdown(double timeout,
-            naming::id_type const& respond_to = naming::invalid_id);
+        void shutdown(double timeout, naming::id_type const& respond_to);
 
         /// \brief Gracefully shutdown runtime system instances on all localities
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        void terminate(naming::id_type const& respond_to = naming::invalid_id);
+        void terminate(naming::id_type const& respond_to);
 
         /// \brief Shutdown runtime system instances on all localities
         void terminate_all();
@@ -193,102 +165,32 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action1<
-            runtime_support, int,
-            runtime_support_factory_properties, components::component_type,
-            &runtime_support::factory_properties
-        > factory_properties_action;
-
-        typedef hpx::actions::result_action2<
-            runtime_support, std::vector<naming::gid_type>,
-            runtime_support_bulk_create_components,
-            components::component_type, std::size_t,
-            &runtime_support::bulk_create_components
-        > bulk_create_components_action;
-
-        typedef hpx::actions::result_action2<
-            runtime_support, naming::gid_type, runtime_support_create_memory_block,
-            std::size_t, hpx::actions::manage_object_action_base const&,
-            &runtime_support::create_memory_block
-        > create_memory_block_action;
-
-        typedef hpx::actions::direct_result_action0<
-            runtime_support, bool, runtime_support_load_components,
-            &runtime_support::load_components
-        > load_components_action;
-
-        typedef hpx::actions::action1<
-            runtime_support, runtime_support_call_startup_functions, bool,
-            &runtime_support::call_startup_functions
-        > call_startup_functions_action;
-
-        typedef hpx::actions::action1<
-            runtime_support, runtime_support_call_shutdown_functions, bool,
-            &runtime_support::call_shutdown_functions
-        > call_shutdown_functions_action;
-
-        typedef hpx::actions::action3<
-            runtime_support, runtime_support_free_component,
-            components::component_type, naming::gid_type const&,
-            naming::gid_type const&, &runtime_support::free_component
-        > free_component_action;
-
-        typedef hpx::actions::action2<
-            runtime_support, runtime_support_shutdown, double,
-            naming::id_type const&, &runtime_support::shutdown
-        > shutdown_action;
-
-        typedef hpx::actions::action1<
-            runtime_support, runtime_support_shutdown_all, double,
-            &runtime_support::shutdown_all
-        > shutdown_all_action;
-
-        typedef hpx::actions::action1<
-            runtime_support, runtime_support_terminate, naming::id_type const&,
-            &runtime_support::terminate
-        > terminate_action;
-
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_terminate_all,
-            &runtime_support::terminate_all
-        > terminate_all_action;
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, factory_properties);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, bulk_create_components);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_memory_block);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, free_component);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
 
         // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
         // waiting for this thread to finish, which waits for the thread
         // manager to exit
         typedef hpx::actions::direct_result_action0<
-            runtime_support, util::section, runtime_support_get_config,
+            runtime_support, util::section,
             &runtime_support::get_config
         > get_config_action;
-
-        typedef hpx::actions::action2<
-            runtime_support, runtime_support_insert_agas_cache_entry,
-            naming::gid_type const&, naming::address const&,
-            &runtime_support::insert_agas_cache_entry
-        > insert_agas_cache_entry_action;
-
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_garbage_collect,
-            &runtime_support::garbage_collect
-        > garbage_collect_action;
-
-        typedef hpx::actions::result_action1<
-            runtime_support, naming::gid_type,
-            runtime_support_create_performance_counter,
-            performance_counters::counter_info const&,
-            &runtime_support::create_performance_counter
-        > create_performance_counter_action;
-
-        typedef hpx::actions::result_action1<
-            runtime_support, long, runtime_support_get_instance_count,
-            components::component_type, &runtime_support::get_instance_count
-        > get_instance_count_action;
-
-        typedef hpx::actions::action1<
-            runtime_support, runtime_support_remove_from_connection_cache,
-            naming::locality const&, &runtime_support::remove_from_connection_cache
-        > remove_from_connection_cache_action;
+        
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, insert_agas_cache_entry);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, get_instance_count);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, remove_from_connection_cache);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
@@ -576,7 +478,6 @@ namespace hpx { namespace components { namespace server
       : BOOST_PP_CAT( ::hpx::actions::result_action, N)<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
           , &runtime_support::BOOST_PP_CAT(create_component, N)<
                 Component
@@ -591,7 +492,6 @@ namespace hpx { namespace components { namespace server
       : BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<
             runtime_support
           , naming::gid_type
-          , runtime_support::runtime_support_create_component
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
           , &runtime_support::BOOST_PP_CAT(create_component, N)<
                 Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>

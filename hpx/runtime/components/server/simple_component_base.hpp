@@ -19,6 +19,11 @@
 
 #include <boost/move/move.hpp>
 
+namespace hpx { namespace detail
+{
+    HPX_API_EXPORT naming::gid_type get_next_id();
+}}
+
 namespace hpx { namespace components
 {
     template <typename Component>

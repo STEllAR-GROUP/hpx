@@ -140,7 +140,7 @@ if(HPX_INTERNAL_MOVE)
   add_definitions(-DHPX_INTERNAL_MOVE)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
-if(${BOOST_MINOR_VERSION} LESS 52)
+if(${BOOST_MINOR_VERSION} LESS 54)    # Boost V1.54 is an optimistic assumtion
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
@@ -156,7 +156,7 @@ if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
   add_definitions("-DHPX_COROUTINE_USE_GENERIC_CONTEXT=1")
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
 endif()
-if(${BOOST_MINOR_VERSION} LESS 52)
+if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
@@ -194,7 +194,7 @@ add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
-if(${BOOST_MINOR_VERSION} LESS 52)
+if(${BOOST_MINOR_VERSION} LESS 53)
   add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
 #else()
 #  add_definitions(-DBOOST_LOCKFREE_NO_HDR_ATOMIC)
@@ -207,7 +207,8 @@ endif()
 # C++
 hpx_include(GCCVersion)
 
-if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+               AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
   hpx_option(HPX_IGNORE_GCC_VERSION BOOL
@@ -341,12 +342,13 @@ else()
   add_definitions(-DHPX_VERIFY_LOCKS=0)
 endif()
 
-hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
-
-if(HPX_THREAD_GUARD_PAGE)
-  add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
-else()
-  add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
+if(NOT MSVC)
+  hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
+  if(HPX_THREAD_GUARD_PAGE)
+    add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
+  else()
+    add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
+  endif()
 endif()
 
 ################################################################################
@@ -694,8 +696,12 @@ if(MSVC)
 ################################################################################
 else()
   # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
-  #hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX C Fortran
-  #                          NAME copy_dt_needed_entries)
+
+  ##############################################################################
+  # DO NOT COMMENT OUT THIS CODE, DOING SO BREAKS BUILDS FOR EVERYONE ELSE
+  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX C Fortran
+                            NAME copy_dt_needed_entries)
+  ##############################################################################
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations

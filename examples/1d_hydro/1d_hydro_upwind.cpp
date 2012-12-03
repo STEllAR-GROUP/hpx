@@ -131,7 +131,7 @@ struct time_element{
   time_element()
     : dt(0.0)
     , elapsed_time(0.0)
-    , computed(false),fluid(0),fluid_future(0)
+    , computed(false),fluid_future(0),fluid(0)
   {}
   
   time_element(boost::uint64_t number_of_cells)
@@ -191,12 +191,13 @@ public:
     std::vector<future<cell> > GetTimeStepVector(boost::uint64_t time_step_row);//takes the timesteps position in the vector
     void remove_bottom_time_step();//takes the timesteps position in the vector
     void addNewTimeStep();
-    std::vector<time_element> time_array;//pointer to the Grid we will create whden the user starts a simulation
 
 private:
     
    boost::uint64_t number_t_steps;
    boost::uint64_t number_of_cells;
+public:
+   std::vector<time_element> time_array;//pointer to the Grid we will create whden the user starts a simulation
 
 };
 void One_Dimension_Grid::remove_bottom_time_step()

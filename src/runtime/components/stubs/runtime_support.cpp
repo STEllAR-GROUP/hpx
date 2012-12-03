@@ -106,11 +106,8 @@ namespace hpx { namespace components { namespace stubs
         }
         else {
             // apply remotely
-            // FIXME: Resolve the locality instead of deducing it from
-            // the target GID, otherwise this will break once we start
-            // moving objects.
-            boost::uint32_t locality_id = naming::get_locality_id_from_gid(gid);
-            naming::id_type id = naming::get_id_from_locality_id(locality_id);
+            naming::id_type id = get_colocation_id(
+                naming::id_type(gid, naming::id_type::unmanaged));
 
             lcos::packaged_action<action_type, void> p;
             p.apply(id, type, gid, count);

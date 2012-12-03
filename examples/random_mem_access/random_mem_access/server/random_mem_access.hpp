@@ -38,16 +38,6 @@ namespace hpx { namespace components { namespace server
       : public simple_component_base<random_mem_access>
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            random_mem_access_init = 0,
-            random_mem_access_add = 1,
-            random_mem_access_query_value = 2,
-            random_mem_access_print = 3
-        };
-
         // constructor: initialize random_mem_access value
         random_mem_access()
           : arg_(0), arg_init_(0), prefix_(0)
@@ -117,25 +107,10 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
-            random_mem_access, random_mem_access_init, int,
-            &random_mem_access::init
-        > init_action;
-
-        typedef hpx::actions::action0<
-            random_mem_access, random_mem_access_add,
-            &random_mem_access::add
-        > add_action;
-
-        typedef hpx::actions::result_action0<
-            random_mem_access, int, random_mem_access_query_value,
-            &random_mem_access::query
-        > query_action;
-
-        typedef hpx::actions::action0<
-            random_mem_access, random_mem_access_print,
-            &random_mem_access::print
-        > print_action;
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, init);
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, add);
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, query);
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, print);
 
     private:
         int arg_;

@@ -12,6 +12,8 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/util/stringstream.hpp>
 #if defined(HPX_HAVE_STACKTRACES)
   #include <boost/backtrace.hpp>

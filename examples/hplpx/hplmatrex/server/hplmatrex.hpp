@@ -39,16 +39,6 @@ namespace hpx { namespace components { namespace server
           public simple_component_base<hplmatrex>
     {
     public:
-    //enumerate all of the actions that will(or can) be employed
-    enum actions{
-        hpl_construct,
-        hpl_assign,
-        hpl_partbsub,
-        hpl_solve,
-        hpl_swap,
-        hpl_search,
-        hpl_check
-    };
 
     //constructors and destructor
     hplmatrex(){}
@@ -91,27 +81,19 @@ namespace hpx { namespace components { namespace server
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef hpx::actions::result_action4<hplmatrex, int, hpl_construct,
-        naming::id_type, int, int, int, &hplmatrex::construct>
-        construct_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, construct);
     //the assign function
-    typedef hpx::actions::result_action4<hplmatrex, int, hpl_assign, int,
-        int, bool, int, &hplmatrex::assign> assign_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, assign);
     //the solve function
-    typedef hpx::actions::result_action0<hplmatrex, double, hpl_solve,
-        &hplmatrex::lusolve> solve_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, lusolve, solve_action);
     //the search_pivots function
-    typedef hpx::actions::result_action1<hplmatrex, int, hpl_search, int,
-        &hplmatrex::search_pivots> search_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, search_pivots, search_action);
     //the swap function
-    typedef hpx::actions::result_action2<hplmatrex, int, hpl_swap, int,
-        int, &hplmatrex::swap> swap_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, swap);
     //part_bsub function
-    typedef hpx::actions::result_action2<hplmatrex, int, hpl_partbsub, int,
-        int, &hplmatrex::part_bsub> partbsub_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, part_bsub, partbsub_action);
     //checksolve function
-    typedef hpx::actions::result_action3<hplmatrex, double, hpl_check, int,
-        int, bool, &hplmatrex::checksolve> check_action;
+    HPX_DEFINE_COMPONENT_ACTION(hplmatrex, checksolve, check_action);
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action

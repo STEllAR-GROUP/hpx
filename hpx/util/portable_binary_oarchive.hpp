@@ -121,10 +121,6 @@ protected:
     unsigned int m_flags;
     HPX_ALWAYS_EXPORT void
     save_impl(const boost::int64_t l, const char maxsize);
-    // add base class to the places considered when matching
-    // save function to a specific set of arguments.  Note, this didn't
-    // work on my MSVC 7.0 system so we use the sure-fire method below
-    // using archive_base_t::save;
 
     // default fall through for any types not specified here
     template <typename T>
@@ -206,7 +202,6 @@ protected:
         this->primitive_base_t::save(t);
     }
 
-
     // default processing - kick back to base class.  Note the
     // extra stuff to get it passed borland compilers
     typedef boost::archive::detail::common_oarchive<portable_binary_oarchive>
@@ -228,7 +223,8 @@ protected:
     HPX_ALWAYS_EXPORT void init(unsigned int flags);
 
 public:
-    portable_binary_oarchive(std::vector<char>& buffer, unsigned flags = 0)
+    template <typename Container>
+    portable_binary_oarchive(Container& buffer, unsigned flags = 0)
       : primitive_base_t(buffer, flags),
         archive_base_t(flags),
         m_flags(flags & (endian_big | endian_little))

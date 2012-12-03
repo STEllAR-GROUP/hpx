@@ -23,6 +23,7 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/parcelset/tcp/parcelport.hpp>
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/include/performance_counters.hpp>
@@ -99,26 +100,25 @@ namespace hpx {
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
         main_pool_(1,
-            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1),
+            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
-        parcel_pool_(rtcfg.get_thread_pool_size("parcel_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1),
-            boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
-            ini_.get_max_connections(), ini_.get_max_connections_per_loc()),
+        parcel_port_(parcelset::parcelport::create(
+            parcelset::connection_tcpip, ini_,
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2),
+            boost::bind(&runtime_impl::deinit_tss, This()))),
         scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1),
+        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1, ::_2),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(new hpx::threads::threadmanager_impl<
             SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
-        agas_client_(parcel_port_, ini_, mode_),
+        agas_client_(*parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
@@ -154,8 +154,8 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(entering)";
 
         // stop all services
-        parcel_port_.stop();      // stops parcel_pool_ as well
-        thread_manager_->stop();   // stops timer_pool_ as well
+        parcel_handler_.stop();     // stops parcel pools as well
+        thread_manager_->stop();    // stops timer_pool_ as well
         io_pool_.stop();
 
         // unload libraries
@@ -179,17 +179,18 @@ namespace hpx {
 
         // Finish the bootstrap
         if (!hpx::pre_main(mode_)) {
-            LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap "
+            LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
             return threads::thread_state(threads::terminated);
         }
 
-        LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete";
+        LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
         state_ = state_running;
 
+        parcel_handler_.enable_alternative_parcelports();
+
         // Now, execute the user supplied thread function (hpx_main)
-        if (!!func)
-        {
+        if (!!func) {
             // Change our thread description, as we're about to call hpx_main
             threads::set_thread_description(threads::get_self_id(), "hpx_main");
 
@@ -236,7 +237,7 @@ namespace hpx {
         LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
-        // invoke the AGAS v2 notifications, waking up the other localities
+        // invoke the AGAS v2 notifications
         agas::get_big_boot_barrier().trigger();
 
         // {{{ launch main
@@ -348,8 +349,8 @@ namespace hpx {
         t.join();
 
         // stop the rest of the system
-        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
-        io_pool_.stop();                    // stops parcel_pool_ as well
+        parcel_handler_.stop(blocking);     // stops parcel pools as well
+        io_pool_.stop();                    // stops io_pool_ as well
 
         deinit_tss();
     }
@@ -428,7 +429,7 @@ namespace hpx {
         int result = wait();
         stop();
 
-        parcel_port_.stop();      // stops parcelport for sure
+        parcel_handler_.stop();      // stops parcelport for sure
         return result;
     }
 
@@ -444,7 +445,7 @@ namespace hpx {
         int result = wait();
         stop();
 
-        parcel_port_.stop();      // stops parcelport for sure
+        parcel_handler_.stop();      // stops parcelport for sure
         return result;
     }
 
@@ -462,11 +463,15 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
-        char const* context, std::size_t num)
+        char const* context, std::size_t num, char const* postfix)
     {
         BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
-        runtime::thread_name_.reset(new std::string(
-            context + ("#" + boost::lexical_cast<std::string>(num))));
+
+        std::string* fullname = new std::string(context);
+        if (postfix && *postfix) 
+            *fullname += postfix;
+        *fullname += "#" + boost::lexical_cast<std::string>(num);
+        runtime::thread_name_.reset(fullname);
 
         char const* name = runtime::thread_name_.get()->c_str();
 
@@ -509,7 +514,7 @@ namespace hpx {
     naming::gid_type
     runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id()
     {
-        return id_pool.get_id(parcel_port_.here(), agas_client_);
+        return id_pool.get_id(parcel_handler_.here(), agas_client_);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -557,7 +562,7 @@ namespace hpx {
         if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
         if (0 == std::strncmp(name, "parcel", 6))
-            return &parcel_pool_;
+            return parcel_handler_.get_thread_pool(name);
         if (0 == std::strncmp(name, "timer", 5))
             return &timer_pool_;
         if (0 == std::strncmp(name, "main", 4))

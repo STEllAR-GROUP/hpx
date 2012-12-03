@@ -213,31 +213,11 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        /// Action codes. 
-        enum actions
-        {
-            solver_init = 0,
-            solver_run = 1,
-            solver_report = 2,
-            solver_calculate = 3
-        };
-
         //global_solve_action_types
-        typedef hpx::actions::result_action2<
-            global_solve, int, solver_init, std::string, hpx::naming::id_type,
-            &global_solve::init> init_action;
-
-        typedef hpx::actions::action3<
-            global_solve, solver_run, int, int,
-            int, &global_solve::run> run_action;
-
-        typedef hpx::actions::action1<
-            global_solve, solver_report, std::string,
-            &global_solve::report> report_action;
-
-        typedef hpx::actions::action3<
-            global_solve, solver_calculate, bool, bool,
-            vector<int> const&, &global_solve::calculate> calc_action;
+        HPX_DEFINE_COMPONENT_ACTION(global_solve, init);
+        HPX_DEFINE_COMPONENT_ACTION(global_solve, run);
+        HPX_DEFINE_COMPONENT_ACTION(global_solve, report);
+        HPX_DEFINE_COMPONENT_ACTION(global_solve, calculate, calc_action);
 
     //global_solve_server_data_members
     private:

@@ -24,16 +24,6 @@ namespace hpx { namespace components { namespace server
       : public simple_component_base<binpacking_factory>
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object
-        enum actions
-        {
-            factory_create_components = 0,
-                // create new components, based on current population
-            factory_create_components_counterbased = 1
-                // create new components, based on performance counter
-        };
-
         // constructor
         binpacking_factory()
         {}
@@ -62,13 +52,12 @@ namespace hpx { namespace components { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action2<
             binpacking_factory const, remote_result_type,
-            factory_create_components, components::component_type, std::size_t,
+            components::component_type, std::size_t,
             &binpacking_factory::create_components
         > create_components_action;
 
         typedef hpx::actions::result_action3<
             binpacking_factory const, remote_result_type,
-            factory_create_components_counterbased,
             components::component_type, std::size_t, std::string const&,
             &binpacking_factory::create_components_counterbased
         > create_components_counterbased_action;

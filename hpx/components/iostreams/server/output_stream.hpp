@@ -130,23 +130,8 @@ struct HPX_COMPONENT_EXPORT output_stream
         buffer const& in
         );
 
-    enum actions
-    {
-        output_stream_write_async,
-        output_stream_write_sync
-    };
-
-    typedef hpx::actions::action1<
-        output_stream, output_stream_write_async,
-        buffer const&,
-        &output_stream::write_async
-    > write_async_action;
-
-    typedef hpx::actions::action1<
-        output_stream, output_stream_write_sync,
-        buffer const&,
-        &output_stream::write_sync
-    > write_sync_action;
+    HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async);
+    HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync);
 };
 
 }}}

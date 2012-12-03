@@ -490,6 +490,7 @@ struct request
         >
         // 0xc
         // primary_ns_localities
+        // primary_ns_resolved_localities
       , boost::fusion::vector0<
         >
     > data_type;
@@ -638,6 +639,18 @@ struct request
 };
 
 }}
+
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
+    void(std::string const&, hpx::naming::gid_type const&)
+  , hpx::util::function<void(std::string const&, hpx::naming::gid_type const&)>
+  , request_iterate_names_function_type
+)
+
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
+    void(std::string const&, hpx::components::component_type)
+  , hpx::util::function<void(std::string const&, hpx::components::component_type)>
+  , request_iterate_types_function_type
+)
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)

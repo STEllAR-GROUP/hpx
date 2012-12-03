@@ -95,21 +95,21 @@ namespace hpx { namespace actions
                     hpx::util::osstream_get_string(strm));
             }
 
-            // either directly execute the action or create a new thread
-            if (actions::base_action::direct_action == acttype)
-            {
-                // direct execution of the action
-                if (!cont) {
-                    // No continuation is to be executed.
-                    act->get_thread_function(lva)(threads::wait_signaled);
-                }
-                else {
-                    // This parcel carries a continuation, we execute a wrapper
-                    // handling all related functionality.
-                    act->get_thread_function(cont, lva)(threads::wait_signaled);
-                }
-            }
-            else {
+//             // either directly execute the action or create a new thread
+//             if (actions::base_action::direct_action == acttype)
+//             {
+//                 // direct execution of the action
+//                 if (!cont) {
+//                     // No continuation is to be executed.
+//                     act->get_thread_function(lva)(threads::wait_signaled);
+//                 }
+//                 else {
+//                     // This parcel carries a continuation, we execute a wrapper
+//                     // handling all related functionality.
+//                     act->get_thread_function(cont, lva)(threads::wait_signaled);
+//                 }
+//             }
+//             else {
                 // dispatch action, register work item either with or without
                 // continuation support
                 if (!cont) {
@@ -130,7 +130,7 @@ namespace hpx { namespace actions
                         act->get_thread_init_data(cont, lva, data),
                         threads::pending);
                 }
-            }
+//             }
         }
     }
 

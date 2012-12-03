@@ -8,6 +8,8 @@
 
 #include <hpx/traits.hpp>
 
+#include <boost/mpl/bool.hpp>
+
 namespace hpx { namespace traits
 {
     // This trait is used to decide whether a class (or specialization) is

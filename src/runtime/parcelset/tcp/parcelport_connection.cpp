@@ -6,7 +6,8 @@
 #include <stdexcept>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
@@ -16,7 +17,7 @@
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
+namespace hpx { namespace parcelset { namespace tcp
 {
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
@@ -64,7 +65,7 @@ namespace hpx { namespace parcelset
 
             BOOST_FOREACH(parcel const & p, pv)
             {
-                arg_size += hpx::traits::type_size<parcel>::call(p);
+                arg_size += traits::get_type_size(p);
                 priority = (std::max)(p.get_thread_priority(), priority);
             }
 
@@ -95,7 +96,7 @@ namespace hpx { namespace parcelset
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "parcelport_connection::set_parcel",
+                "tcp::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::archive::archive_exception: %s") % e.what()));
@@ -103,7 +104,7 @@ namespace hpx { namespace parcelset
         }
         catch (boost::system::system_error const& e) {
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "parcelport_connection::set_parcel",
+                "tcp::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::system::system_error: %d (%s)") %
@@ -112,7 +113,7 @@ namespace hpx { namespace parcelset
         }
         catch (std::exception const& e) {
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "parcelport_connection::set_parcel",
+                "tcp::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "std::exception: %s") % e.what()));
@@ -126,5 +127,5 @@ namespace hpx { namespace parcelset
         send_data_.bytes_ = out_buffer_.size();
         send_data_.type_bytes_ = arg_size;
     }
-}}
+}}}
 

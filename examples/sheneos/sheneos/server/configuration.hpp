@@ -32,12 +32,6 @@ namespace sheneos { namespace server
     {
     public:
         ///////////////////////////////////////////////////////////////////////
-        enum actions
-        {
-            configuration_init = 0,
-            configuration_get = 1
-        };
-
         configuration() {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -57,8 +51,6 @@ namespace sheneos { namespace server
         typedef hpx::actions::action3<
             // Component server type.
             configuration,
-            // Action code.
-            configuration_init,
             // Arguments of this action.
             std::string const&,
             std::string const&,
@@ -72,8 +64,6 @@ namespace sheneos { namespace server
             configuration const,
             // Return type.
             config_data,
-            // Action code.
-            configuration_get,
             // Method bound to this action.
             &configuration::get
         > get_action;

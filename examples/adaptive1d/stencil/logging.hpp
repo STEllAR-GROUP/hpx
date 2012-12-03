@@ -27,11 +27,6 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     public:
         logging() { count = 0;}
 
-        enum actions
-        {
-            logging_logentry = 0,
-        };
-
         /// This is the function implementing the logging functionality
         /// It takes the values as calculated during the current time step.
         void logentry(stencil_data const& memblock_gid, int row, int column, parameter const& par );
@@ -46,7 +41,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         /// \param Result [in] The type of the result to be transferred back to
         ///               this LCO instance.
         typedef hpx::actions::action4<
-            logging, logging_logentry, stencil_data const&, int,int,parameter const&,
+            logging, stencil_data const&, int,int,parameter const&,
             &logging::logentry
         > logentry_action;
 

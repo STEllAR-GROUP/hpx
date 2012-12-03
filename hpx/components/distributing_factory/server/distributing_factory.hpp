@@ -52,14 +52,6 @@ namespace hpx { namespace components { namespace server
       : public simple_component_base<distributing_factory>
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object
-        enum actions
-        {
-            factory_create_components = 0,  // create new components
-            factory_create_partitioned = 1  // create components in partitions
-        };
-
         // constructor
         distributing_factory()
         {}
@@ -102,13 +94,13 @@ namespace hpx { namespace components { namespace server
         // serialization, etc.
         typedef hpx::actions::result_action2<
             distributing_factory const, remote_result_type,
-            factory_create_components, components::component_type, std::size_t,
+            components::component_type, std::size_t,
             &distributing_factory::create_components
         > create_components_action;
 
         typedef hpx::actions::result_action4<
             distributing_factory const, remote_result_type,
-            factory_create_partitioned, components::component_type, std::size_t,
+            components::component_type, std::size_t,
             std::size_t, partition_info const&,
             &distributing_factory::create_partitioned
         > create_partitioned_action;

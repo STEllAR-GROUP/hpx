@@ -14,6 +14,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/apply.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/iterator_adaptors.hpp>
@@ -202,10 +203,8 @@ namespace hpx { namespace traits
 
 #include <hpx/config/warnings_suffix.hpp>
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<
-        std::vector<hpx::util::remote_locality_result>
-    >::set_value_action
-  , set_value_action_factory_locality_result)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<hpx::util::remote_locality_result>,
+    factory_locality_result)
 
 #endif

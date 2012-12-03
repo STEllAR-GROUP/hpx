@@ -224,7 +224,8 @@ struct thread_deque
         {
             // delete only this many threads
             boost::int64_t delete_count = 
-                (std::max)(terminated_items_count_ / 10, 
+                (std::max)(
+                    static_cast<boost::int64_t>(terminated_items_count_ / 10), 
                     static_cast<boost::int64_t>(max_delete_count));
             thread_id_type todelete;
             while ((delete_all || delete_count) && 
@@ -374,7 +375,7 @@ struct thread_deque
         if (thrd->is_created_from(&memory_pool_)) {
             thread_id_type id = thrd->get_thread_id();
             terminated_items_.enqueue(id);
-            if (++terminated_items_count_ > busy_count / 10)
+            if (static_cast<boost::int64_t>(++terminated_items_count_) > busy_count / 10)
                 cleanup_terminated();
             return true;
         }

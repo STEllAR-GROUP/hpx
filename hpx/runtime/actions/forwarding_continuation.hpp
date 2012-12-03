@@ -97,6 +97,30 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (hpx::actions::forwarding_continuation<Result>)
 )
 
+#define HPX_REGISTER_FORWARDING_CONTINUATION_DECLARATION(Result, Name)        \
+    namespace hpx { namespace traits {                                        \
+        template <>                                                           \
+        struct needs_guid_initialization<hpx::actions::forwarding_continuation<Result> >                              \
+          : boost::mpl::false_                                                \
+        {};                                                                   \
+    }}                                                                        \
+    namespace boost { namespace archive { namespace detail {                  \
+        namespace extra_detail {                                              \
+            template <>                                                       \
+            struct init_guid<hpx::actions::forwarding_continuation<Result> >; \
+        }                                                                     \
+    }}}                                                                       \
+    BOOST_CLASS_EXPORT_KEY2(hpx::actions::forwarding_continuation<Result>,    \
+        BOOST_PP_STRINGIZE(Name))                                             \
+/**/
+    
+#define HPX_REGISTER_FORWARDING_CONTINUATION(Result, Name)                    \
+    HPX_REGISTER_BASE_HELPER(                                                 \
+        hpx::actions::forwarding_continuation<Result>, Name)                  \
+    BOOST_CLASS_EXPORT_IMPLEMENT(                                             \
+        hpx::actions::forwarding_continuation<Result>)                        \
+/**/
+
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif

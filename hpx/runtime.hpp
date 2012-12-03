@@ -166,8 +166,6 @@ namespace hpx
 
         virtual void stop(bool blocking = true) = 0;
 
-        virtual parcelset::parcelport& get_parcel_port() = 0;
-
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
 
         virtual threads::threadmanager_base& get_thread_manager() = 0;

@@ -24,6 +24,12 @@
 
 #include <memory>   // for placement new
 
+#if !defined(BOOST_WINDOWS)
+#  define HPX_EXPORT_STATIC_ HPX_EXPORT
+#else
+#  define HPX_EXPORT_STATIC_
+#endif
+
 namespace hpx { namespace util
 {
     //
@@ -38,7 +44,7 @@ namespace hpx { namespace util
     //          this is a requirement of boost::call_once.
     //
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct static_ : boost::noncopyable
+    struct HPX_EXPORT_STATIC_ static_ : boost::noncopyable
     {
     public:
         typedef T value_type;

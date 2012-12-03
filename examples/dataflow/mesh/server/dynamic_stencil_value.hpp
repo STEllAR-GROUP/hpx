@@ -60,18 +60,6 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// the current value has been requested.
         naming::id_type get_value(int i);
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            dynamic_stencil_value_call = 0,
-            dynamic_stencil_value_get_output_ports = 1,
-            dynamic_stencil_value_connect_input_ports = 2,
-            dynamic_stencil_value_set_functional_component = 3,
-            dynamic_stencil_value_start = 4,
-        };
-
         /// Main thread function looping through all timesteps
         threads::thread_state main();
 
@@ -107,35 +95,11 @@ namespace hpx { namespace components { namespace amr { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action1<
-            dynamic_stencil_value, naming::id_type, dynamic_stencil_value_call,
-            naming::id_type const&, &dynamic_stencil_value::call
-        > call_action;
-
-        typedef hpx::actions::result_action0<
-            dynamic_stencil_value, std::vector<naming::id_type>,
-            dynamic_stencil_value_get_output_ports,
-            &dynamic_stencil_value::get_output_ports
-        > get_output_ports_action;
-
-        typedef hpx::actions::result_action1<
-            dynamic_stencil_value, util::unused_type,
-            dynamic_stencil_value_connect_input_ports,
-            std::vector<naming::id_type> const&,
-            &dynamic_stencil_value::connect_input_ports
-        > connect_input_ports_action;
-
-        typedef hpx::actions::result_action7<
-            dynamic_stencil_value, util::unused_type,
-            dynamic_stencil_value_set_functional_component,
-            naming::id_type const&, int, int, int, int,double, parameter const&,
-            &dynamic_stencil_value::set_functional_component
-        > set_functional_component_action;
-
-        typedef hpx::actions::result_action0<
-            dynamic_stencil_value, util::unused_type,
-            dynamic_stencil_value_start, &dynamic_stencil_value::start
-        > start_action;
+        HPX_DEFINE_COMPONENT_ACTION(dynamic_stencil_value, call);
+        HPX_DEFINE_COMPONENT_ACTION(dynamic_stencil_value, get_output_ports);
+        HPX_DEFINE_COMPONENT_ACTION(dynamic_stencil_value, connect_input_ports);
+        HPX_DEFINE_COMPONENT_ACTION(dynamic_stencil_value, set_functional_component);
+        HPX_DEFINE_COMPONENT_ACTION(dynamic_stencil_value, start);
 
     private:
         bool is_called_;                              // is one of the 'main' stencils

@@ -17,19 +17,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // parcel action code: the action to be performed on the destination
-    // object
-    enum actions
-    {
-        performance_counter_get_counter_info = 0,
-        performance_counter_get_counter_value = 1,
-        performance_counter_reset_counter_value = 2,
-        performance_counter_set_counter_value = 3,
-        performance_counter_start_counter = 4,
-        performance_counter_stop_counter = 5
-    };
-
     class base_performance_counter
     {
     protected:
@@ -129,7 +116,6 @@ namespace hpx { namespace performance_counters { namespace server
         /// information.
         typedef hpx::actions::result_action0<
             base_performance_counter, counter_info,
-            performance_counter_get_counter_info,
             &base_performance_counter::get_counter_info_nonvirt
         > get_counter_info_action;
 
@@ -137,14 +123,12 @@ namespace hpx { namespace performance_counters { namespace server
         /// counter.
         typedef hpx::actions::result_action0<
             base_performance_counter, counter_value,
-            performance_counter_get_counter_value,
             &base_performance_counter::get_counter_value_nonvirt
         > get_counter_value_action;
 
         /// The \a set_counter_value_action
         typedef hpx::actions::action1<
             base_performance_counter,
-            performance_counter_set_counter_value,
             counter_value const&,
             &base_performance_counter::set_counter_value_nonvirt
         > set_counter_value_action;
@@ -152,21 +136,18 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a reset_counter_value_action
         typedef hpx::actions::action0<
             base_performance_counter,
-            performance_counter_reset_counter_value,
             &base_performance_counter::reset_counter_value_nonvirt
         > reset_counter_value_action;
 
         /// The \a start_action
         typedef hpx::actions::result_action0<
             base_performance_counter, bool,
-            performance_counter_start_counter,
             &base_performance_counter::start_nonvirt
         > start_action;
 
         /// The \a stop_action
         typedef hpx::actions::result_action0<
             base_performance_counter, bool,
-            performance_counter_stop_counter,
             &base_performance_counter::stop_nonvirt
         > stop_action;
 
@@ -221,12 +202,12 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::performance_counters::server::base_performance_counter::stop_action,
     performance_counter_stop_action)
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_value_action,
-    set_value_action_counter_info)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_value_action,
-    set_value_action_counter_value)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::performance_counters::counter_info,
+    counter_info)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::performance_counters::counter_value,
+    counter_value)
 
 #endif
 

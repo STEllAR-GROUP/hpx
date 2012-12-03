@@ -128,6 +128,12 @@ struct macosx_topology : topology
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+inline topology* create_topology()
+{
+    return new macosx_topology;
+}
+
 }}
 
 #endif // HPX_AE753913_CC4F_4F15_B93B_CA38B59E8CCE

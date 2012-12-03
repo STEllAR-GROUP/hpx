@@ -38,16 +38,6 @@ namespace distributed { namespace server
     {
     public:
 
-        enum actions
-        {
-            datastructure_init = 0,
-            datastructure_get_data = 1,
-            datastructure_write = 2,
-            datastructure_config_get = 3,
-            datastructure_get_data_at = 4
-            //datastructure_config_init = 4;
-        };
-
         datastructure();// {}
         ~datastructure();//{}
 
@@ -70,48 +60,11 @@ namespace distributed { namespace server
 
         std::size_t get_data_at(std::size_t pos);
 
-        typedef hpx::actions::result_action1<
-        datastructure
-        , std::size_t
-        , datastructure_get_data_at
-        , std::size_t
-        , &datastructure::get_data_at
-        > get_data_at_action;
-
-        typedef hpx::actions::result_action0<
-        datastructure
-        , data_type
-        , datastructure_get_data
-        , &datastructure::get_data
-        > get_data_action;
-
-        typedef hpx::actions::result_action0<
-        datastructure const
-        , distributed::config_comp
-        , datastructure_config_get
-        , &datastructure::get_config_info
-        > get_config_action;
-
-        typedef hpx::actions::action4<
-        datastructure
-        , datastructure_write
-        , std::string const&
-        , std::size_t
-        , std::size_t
-        , data_type
-        , &datastructure::data_write
-        > write_action;
-
-        typedef hpx::actions::action5<
-        datastructure
-        , datastructure_init
-        , std::string const&
-        , std::size_t
-        , std::size_t
-        , std::size_t
-        , std::size_t
-        , &datastructure::data_init
-        > init_action;
+        HPX_DEFINE_COMPONENT_ACTION(datastructure, get_data_at);
+        HPX_DEFINE_COMPONENT_ACTION(datastructure, get_data);
+        HPX_DEFINE_COMPONENT_ACTION(datastructure, get_config_info, get_config_action);
+        HPX_DEFINE_COMPONENT_ACTION(datastructure, data_write, write_action);
+        HPX_DEFINE_COMPONENT_ACTION(datastructure, data_init, init_action);
 
     private:
         friend class boost::serialization::access;

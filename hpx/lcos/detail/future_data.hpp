@@ -34,7 +34,12 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail
+namespace hpx { namespace lcos
+{
+
+namespace local { template <typename T> struct channel; }
+
+namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
@@ -200,6 +205,9 @@ namespace hpx { namespace lcos { namespace detail
             completed_callback_type;
 
         friend class lcos::future<Result>;
+
+        template <typename T>
+        friend struct local::channel;
 
     protected:
         future_data() : set_on_completed_(false) {}

@@ -212,7 +212,7 @@ namespace boost { namespace plugin {
 
             init_library(handle);   // initialize library
 
-            // Cast the to right type.
+            // Cast to the right type.
             dlerror();              // Clear the error state.
 
             SymbolType address = very_detail::nasty_cast<SymbolType>(MyGetProcAddress(dll_handle, symbol_name.c_str()));

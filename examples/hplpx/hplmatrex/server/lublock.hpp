@@ -27,17 +27,6 @@ namespace hpx { namespace components { namespace server
           public simple_component_base<lublock>
     {
     public:
-        enum actions{
-            hpl_constructBlock,
-            hpl_gcorner,
-            hpl_gtop,
-            hpl_gleft,
-            hpl_gtrail,
-            hpl_getRows,
-            hpl_getColumns,
-            hpl_getData,
-            hpl_getFuture
-        };
         //constructors and destructor
         lublock(){}
         int construct_block(const int h, const int w, const int px,
@@ -60,33 +49,15 @@ namespace hpx { namespace components { namespace server
         vector<vector<id_type> > gidList;
 
         //actions
-        typedef hpx::actions::result_action7<lublock, int, hpl_constructBlock, int,
-            int, int, int, int,vector<vector<id_type> >,vector<vector<double> >,
-            &lublock::construct_block> constructBlock_action;
-
-        typedef hpx::actions::result_action1<lublock, int, hpl_gcorner, int,
-            &lublock::lu_gauss_corner> gcorner_action;
-
-        typedef hpx::actions::result_action1<lublock, int, hpl_gtop, int,
-            &lublock::lu_gauss_top> gtop_action;
-
-        typedef hpx::actions::result_action1<lublock, int, hpl_gleft, int,
-            &lublock::lu_gauss_left> gleft_action;
-
-        typedef hpx::actions::result_action1<lublock, int, hpl_gtrail, int,
-            &lublock::lu_gauss_trail> gtrail_action;
-
-        typedef hpx::actions::result_action0<lublock, int, hpl_getRows,
-            &lublock::get_rows> getRows_action;
-
-        typedef hpx::actions::result_action0<lublock, int, hpl_getColumns,
-            &lublock::get_columns> getColumns_action;
-
-        typedef hpx::actions::result_action0<lublock, vector<vector<double> >,
-            hpl_getData, &lublock::get_data> getData_action;
-
-        typedef hpx::actions::result_action2<lublock, int, hpl_getFuture, int, int,
-            &lublock::get_needed_future> getFuture_action;
+        HPX_DEFINE_COMPONENT_ACTION(lublock, construct_block, constructBlock_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, lu_gauss_corner, gcorner_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, lu_gauss_top, gtop_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, lu_gauss_left, gleft_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, lu_gauss_trail, gtrail_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, get_rows, getRows_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, get_columns, getColumns_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, get_data, getData_action);
+        HPX_DEFINE_COMPONENT_ACTION(lublock, get_needed_future, getFuture_action);
 
         //futures
         typedef hpx::lcos::packaged_action<server::lublock::getData_action> dataFuture;

@@ -72,16 +72,16 @@
 namespace hpx { namespace lcos { namespace local
 {
     template <typename T>
-    inline bool interlocked_bit_test_and_set(boost::atomic<T>& x, long bit)
+    inline bool interlocked_bit_test_and_set(boost::atomic<T>& x, boost::uint64_t bit)
     {
-        T const value = 1u << bit;
-        boost::uint32_t old = x.load(boost::memory_order_acquire);
+        T const value = 1 << bit;
+        T old = x.load(boost::memory_order_acquire);
         do {
-            boost::uint32_t tmp = old;
+            T tmp = old;
             if (x.compare_exchange_strong(tmp, T(old | value)))
                 break;
             old = tmp;
-        } while(true);
+        } while (true);
         return (old & value) != 0;
     }
 

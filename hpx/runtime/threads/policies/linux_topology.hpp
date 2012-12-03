@@ -126,6 +126,12 @@ struct linux_topology : topology
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+inline topology* create_topology()
+{
+    return new linux_topology;
+}
+
 }}
 
 #endif // HPX_66CC9C17_C5C8_412E_8C2C_0C991C83A5C1

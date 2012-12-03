@@ -97,25 +97,27 @@ namespace hpx
     {
         enum connection_type
         {
-            connection_tcpip = 1
+            connection_unknown = -1,
+            connection_tcpip = 0,
+            connection_shmem = 1,
+            connection_portals4 = 2,
+            connection_last
         };
+
+        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
-        class parcelport_connection;
         class HPX_API_EXPORT parcelhandler;
 
         namespace server
         {
             class parcelport_queue;
-            class parcelport_server_connection;
-
             struct parcelhandler_queue_base;
 
             namespace policies
             {
                 struct global_parcelhandler_queue;
-
                 typedef global_parcelhandler_queue parcelhandler_queue;
             }
         }
@@ -337,7 +339,7 @@ namespace hpx
 
         class HPX_API_EXPORT action_manager;
 
-        template <typename Component, int Action, typename Result,
+        template <typename Component, typename Result,
             typename Arguments, typename Derived>
         struct action;
     }
@@ -575,8 +577,9 @@ namespace hpx
     /// \namespace util
     namespace util
     {
-        class HPX_API_EXPORT section;
-        class runtime_configuration;
+        class HPX_EXPORT section;
+        class HPX_EXPORT runtime_configuration;
+        class HPX_EXPORT io_service_pool;
 
         /// \brief Expand INI variables in a string
         HPX_API_EXPORT std::string expand(std::string const& expand);
@@ -613,13 +616,6 @@ namespace hpx
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type);
 
-    /// \ cond NODETAIL
-    namespace detail
-    {
-        HPX_API_EXPORT naming::gid_type get_next_id();
-    }
-    /// \ endcond
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
@@ -627,6 +623,12 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT util::runtime_configuration const& get_config();
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
@@ -657,7 +659,7 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
-    HPX_API_EXPORT naming::id_type find_here();
+    HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities
@@ -677,7 +679,8 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities
@@ -706,15 +709,16 @@ namespace hpx
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
-        components::component_type type);
+        components::component_type type, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing an arbitrary locality which
     ///        supports the given component type.
     ///
     /// The function \a find_locality() can be used to retrieve the
-    /// global ids of all localities currently available to this application
-    /// which support the creation of instances of the given component type.
+    /// global id of an arbitrary localities currently available to this 
+    /// application which supports the creation of instances of the given 
+    /// component type.
     ///
     /// \note     Generally, the id of a locality can be used for instance to
     ///           create new instances of components and to invoke plain actions
@@ -734,7 +738,8 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
-    HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
+    HPX_API_EXPORT naming::id_type find_locality(components::component_type type,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered
@@ -747,7 +752,8 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities
-    HPX_API_EXPORT boost::uint32_t get_num_localities();
+    HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async();
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
@@ -763,7 +769,10 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities
-    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type t);
+    HPX_API_EXPORT boost::uint32_t get_num_localities(
+        components::component_type t, error_code& ec = throws);
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async(
+        components::component_type t);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
@@ -928,6 +937,16 @@ namespace hpx
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
     HPX_API_EXPORT boost::uint64_t get_system_uptime();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the id of the locality where the object referenced by the 
+    ///        given id is currently located on
+    HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
+        error_code& ec = throws);
+    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
+        naming::id_type id);
+
+    HPX_EXPORT void set_error_handlers();
 }
 
 #include <hpx/lcos/async_fwd.hpp>

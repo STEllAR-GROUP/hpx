@@ -44,7 +44,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -143,7 +143,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -242,7 +242,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -341,7 +341,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -440,7 +440,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -539,7 +539,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -638,7 +638,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -737,7 +737,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -836,7 +836,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -935,7 +935,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1034,7 +1034,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1133,7 +1133,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1232,7 +1232,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1331,7 +1331,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1430,7 +1430,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1529,7 +1529,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1628,7 +1628,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1727,7 +1727,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1826,7 +1826,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -1925,7 +1925,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -2024,7 +2024,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -2123,7 +2123,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -2222,7 +2222,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {
@@ -2321,7 +2321,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
             
-            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
+            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
         static void register_base()
         {

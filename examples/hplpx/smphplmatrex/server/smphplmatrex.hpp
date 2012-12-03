@@ -38,18 +38,6 @@ namespace hpx { namespace components { namespace server
           public simple_component_base<smphplmatrex>
     {
     public:
-    //enumerate all of the actions that will(or can) be employed
-        enum actions{
-            hpl_construct=0,
-            hpl_destruct=1,
-            hpl_assign=2,
-            hpl_partbsub=3,
-            hpl_solve=5,
-            hpl_swap=6,
-            hpl_gmain=7,
-            hpl_search=8,
-            hpl_check=9
-        };
 
     //constructors and destructor
     smphplmatrex(){}
@@ -97,33 +85,23 @@ namespace hpx { namespace components { namespace server
     public:
     //here we define the actions that will be used
     //the construct function
-    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_construct,
-        naming::id_type, int, int, int, &smphplmatrex::construct>
-        construct_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, construct);
     //the destruct function
-    typedef hpx::actions::action0<smphplmatrex, hpl_destruct,
-        &smphplmatrex::destruct> destruct_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, destruct);
     //the assign function
-    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_assign, int,
-        int, bool, int, &smphplmatrex::assign> assign_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, assign);
     //the solve function
-    typedef hpx::actions::result_action0<smphplmatrex, double, hpl_solve,
-        &smphplmatrex::LUsolve> solve_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, LUsolve, solve_action);
     //the search_pivots function
-    typedef hpx::actions::result_action1<smphplmatrex, int, hpl_search, int,
-        &smphplmatrex::search_pivots> search_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, search_pivots, search_action);
     //the swap function
-    typedef hpx::actions::result_action2<smphplmatrex, int, hpl_swap, int,
-        int, &smphplmatrex::swap> swap_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, swap);
     //the main gaussian function
-    typedef hpx::actions::result_action4<smphplmatrex, int, hpl_gmain, int,
-        int, int, int, &smphplmatrex::LU_gauss_main> gmain_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, LU_gauss_main, gmain_action);
     //part_bsub function
-    typedef hpx::actions::result_action2<smphplmatrex, int, hpl_partbsub, int,
-        int, &smphplmatrex::part_bsub> partbsub_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, part_bsub, partbsub_action);
     //checksolve function
-    typedef hpx::actions::result_action3<smphplmatrex, double, hpl_check, int,
-        int, bool, &smphplmatrex::checksolve> check_action;
+    HPX_DEFINE_COMPONENT_ACTION(smphplmatrex, checksolve, check_action);
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action

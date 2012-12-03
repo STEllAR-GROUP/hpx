@@ -9,11 +9,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/base_object.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/runtime/actions/guid_initialization.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -29,38 +29,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    namespace detail
-    {
-        template <typename Target>
-        void guid_initialization(boost::mpl::false_) {}
-
-        template <typename Target>
-        void guid_initialization(boost::mpl::true_)
-        {
-            // force serialization self registration to happen
-            using namespace boost::archive::detail::extra_detail;
-            init_guid<Target>::g.initialize();
-        }
-
-        template <typename Target>
-        void guid_initialization()
-        {
-            guid_initialization<Target>(
-                typename traits::needs_guid_initialization<Target>::type());
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Helper to invoke the registration code for serialization at startup
-        template <typename Target>
-        struct register_base_helper
-        {
-            register_base_helper()
-            {
-                Target::register_base();
-            }
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
@@ -192,6 +160,31 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (template <typename Result>),
     (hpx::actions::typed_continuation<Result>)
 )
+
+
+#define HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(Result, Name)             \
+    namespace hpx { namespace traits {                                        \
+        template <>                                                           \
+        struct needs_guid_initialization<hpx::actions::typed_continuation<Result> >                              \
+          : boost::mpl::false_                                                \
+        {};                                                                   \
+    }}                                                                        \
+    namespace boost { namespace archive { namespace detail {                  \
+        namespace extra_detail {                                              \
+            template <>                                                       \
+            struct init_guid<hpx::actions::typed_continuation<Result> >;      \
+        }                                                                     \
+    }}}                                                                       \
+    BOOST_CLASS_EXPORT_KEY2(hpx::actions::typed_continuation<Result>,         \
+        BOOST_PP_STRINGIZE(Name))                                             \
+/**/
+    
+#define HPX_REGISTER_TYPED_CONTINUATION(Result, Name)                    \
+    HPX_REGISTER_BASE_HELPER(                                                 \
+        hpx::actions::typed_continuation<Result>, Name)                       \
+    BOOST_CLASS_EXPORT_IMPLEMENT(                                             \
+        hpx::actions::typed_continuation<Result>)                             \
+/**/
 
 #include <hpx/config/warnings_suffix.hpp>
 

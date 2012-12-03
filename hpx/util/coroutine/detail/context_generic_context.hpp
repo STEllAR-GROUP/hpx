@@ -1,4 +1,5 @@
 //  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2009 Oliver Kowalke
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,6 +26,10 @@
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 
+#include <cstddef>
+#include <cstdlib>
+#include <stdexcept>
+
 namespace hpx { namespace util { namespace coroutines 
 {
     // some platforms need special preparation of the main thread
@@ -36,6 +41,42 @@ namespace hpx { namespace util { namespace coroutines
 
     namespace detail { namespace generic_context
     {
+        ///////////////////////////////////////////////////////////////////////
+        // This is taken directly from one of the Boost.Context examples
+        class simple_stack_allocator
+        {
+        public:
+            static std::size_t maximum_stacksize()
+            { return HPX_HUGE_STACK_SIZE; }
+
+            static std::size_t default_stacksize()
+            { return HPX_MEDIUM_STACK_SIZE; }
+
+            static std::size_t minimum_stacksize()
+            { return HPX_SMALL_STACK_SIZE; }
+
+            void* allocate(std::size_t size) const
+            {
+                BOOST_ASSERT(minimum_stacksize() <= size);
+                BOOST_ASSERT(maximum_stacksize() >= size);
+
+                void* limit = std::calloc(size, sizeof(char));
+                if (!limit) boost::throw_exception(std::bad_alloc());
+
+                return static_cast<char*>(limit) + size;
+            }
+
+            void deallocate(void* vp, std::size_t size) const
+            {
+                BOOST_ASSERT(vp);
+                BOOST_ASSERT(minimum_stacksize() <= size);
+                BOOST_ASSERT(maximum_stacksize() >= size);
+
+                void* limit = static_cast<char*>(vp) - size;
+                std::free(limit);
+            }
+        };
+
         // Generic implementation for the context_impl_base class based on 
         // Boost.Context.
         template <typename T>
@@ -63,16 +104,14 @@ namespace hpx { namespace util { namespace coroutines
             explicit fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
               : cb_(reinterpret_cast<intptr_t>(&cb))
             {
-                std::size_t stack_size_
-                    = (stack_size == -1) ? 
+                std::size_t stack_size_ = (stack_size == -1) ? 
                       alloc_.minimum_stacksize() : std::size_t(stack_size);
 
-                void * stack_pointer_
-                    = alloc_.allocate(stack_size_);
-
+                void* stack_pointer_ = alloc_.allocate(stack_size_);
                 void (*fn)(intptr_t) = &trampoline<Functor>;
 
-                boost::context::fcontext_t * ctx = boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
+                boost::context::fcontext_t* ctx = 
+                    boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
 
                 std::swap(*ctx, ctx_);
             }
@@ -133,7 +172,7 @@ namespace hpx { namespace util { namespace coroutines
 
         private:
             boost::context::fcontext_t ctx_;
-            boost::context::simple_stack_allocator<HPX_HUGE_STACK_SIZE, HPX_MEDIUM_STACK_SIZE, HPX_SMALL_STACK_SIZE> alloc_;
+            simple_stack_allocator alloc_;
             intptr_t cb_;
         };
 

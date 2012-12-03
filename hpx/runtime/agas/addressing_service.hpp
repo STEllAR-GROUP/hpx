@@ -254,14 +254,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     }
 
     void launch_bootstrap(
-        parcelset::parcelport& pp
-      , util::runtime_configuration const& ini_
+        util::runtime_configuration const& ini_
         );
 
-    void launch_hosted(
-        parcelset::parcelport& pp
-      , util::runtime_configuration const& ini_
-        );
+    void launch_hosted();
 
     void adjust_local_cache_size();
 
@@ -459,10 +455,28 @@ public:
         return get_localities(locality_ids, components::component_invalid, ec);
     }
 
+    /// \brief Query the resolved addresses for all know localities
+    ///
+    /// This function returns the resolved addresses for all localities known
+    /// to the AGAS server.
+    ///
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    lcos::future<std::vector<naming::locality> > get_resolved_localities_async();
+
+    std::vector<naming::locality> get_resolved_localities(
+        error_code& ec = throws
+        )
+    {
+        return get_resolved_localities_async().get(ec);
+    }
+
     /// \brief Query for the number of all known localities.
     ///
-    /// This function returns the number of localities known to the AGAS server 
-    /// or the number of localities having a registered factory for a given 
+    /// This function returns the number of localities known to the AGAS server
+    /// or the number of localities having a registered factory for a given
     /// component type.
     ///
     /// \param type       [in] The component type will be used to determine
@@ -650,7 +664,7 @@ public:
     ///
     /// \returns          This function returns \a true, if this global id
     ///                   got associated with an local address. It returns
-    ///                   \a false otherwise. 
+    ///                   \a false otherwise.
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -692,7 +706,7 @@ public:
     ///                   the function will throw on error instead.
     ///
     /// \returns          This function returns \a true, if the given range
-    ///                   was successfully bound. It returns \a false otherwise. 
+    ///                   was successfully bound. It returns \a false otherwise.
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -998,7 +1012,7 @@ public:
     {
         naming::address addr;
         resolve(id, addr, ec);
-        return addr; 
+        return addr;
     }
 
     naming::address resolve(
@@ -1008,7 +1022,7 @@ public:
     {
         naming::address addr;
         resolve(id.get_gid(), addr, ec);
-        return addr; 
+        return addr;
     }
 
     bool resolve_full(
@@ -1033,7 +1047,7 @@ public:
     {
         naming::address addr;
         resolve_full(id, addr, ec);
-        return addr; 
+        return addr;
     }
 
     naming::address resolve_full(
@@ -1043,7 +1057,7 @@ public:
     {
         naming::address addr;
         resolve_full(id.get_gid(), addr, ec);
-        return addr; 
+        return addr;
     }
 
     bool resolve_cached(

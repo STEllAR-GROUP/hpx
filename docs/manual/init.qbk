@@ -534,7 +534,7 @@ each found component the following information is generated:
     [hpx.components.<component_instance_name>]
     name = <name_of_shared_library>
     path = $[component_path]
-    enabled = $[hpx.location]/lib/hpx/
+    enabled = $[hpx.components.load_external]
     default = 1
 ``
 [c++]

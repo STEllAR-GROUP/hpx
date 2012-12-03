@@ -59,7 +59,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             hpx::applier::register_work(boost::bind(&worker, os.get_gid()));
 
         // add some values to the queue
-        for (std::size_t i = 0; i < 5; ++i)
+        for (int i = 0; i < 5; ++i)
             os.signal_sync(i);
 
         std::vector<hpx::lcos::future<void> > barrier;

@@ -32,7 +32,7 @@
 #include <numeric>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 9
+#define HPX_AGAS_RESPONSE_SUBTYPES 10
 
 namespace hpx { namespace agas
 {
@@ -172,6 +172,18 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
+    response(
+        namespace_action_code type_
+      , std::vector<naming::locality> const& localities_
+      , error status_ = success
+        )
+      : mc(type_)
+      , status(status_)
+      , data(boost::fusion::make_vector(localities_))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     response(
@@ -220,6 +232,13 @@ struct response
         ) const
     {
         return get_data<subtype_prefixes, 0>(ec);
+    }
+
+    std::vector<naming::locality> get_resolved_localities(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_resolved_localities, 0>(ec);
     }
 
     boost::uint32_t get_num_localities(
@@ -338,6 +357,7 @@ struct response
       , subtype_prefix              = 0x6
       , subtype_void                = 0x7
       , subtype_string              = 0x8
+      , subtype_resolved_localities = 0x9
       // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
     };
 
@@ -401,6 +421,11 @@ struct response
         // component_ns_get_component_typename
       , boost::fusion::vector1<
             std::string   // component typename
+        >
+        // 0x9
+        // primary_ns_esolved_localities
+      , boost::fusion::vector1<
+            std::vector<naming::locality>
         >
     > data_type;
 
@@ -628,6 +653,17 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
     }
 };
 
+template <>
+struct get_remote_result<std::vector<naming::locality>, agas::response>
+{
+    static std::vector<naming::locality> call(
+        agas::response const& rep
+        )
+    {
+        return rep.get_resolved_localities();
+    }
+};
+
 }}
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -644,9 +680,13 @@ BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
 #endif
 #endif
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<hpx::agas::response>::set_value_action,
-    set_value_action_agas_response_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::agas::response,
+    agas_response_type)
+
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<hpx::agas::response>,
+    agas_response_vector_type)
 
 namespace hpx { namespace agas { namespace create_result_ns {
     typedef
@@ -655,10 +695,8 @@ namespace hpx { namespace agas { namespace create_result_ns {
     typedef
         hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::agas::response>
         base_lco_id_type_response_type;
-    typedef
-        hpx::lcos::base_lco_with_value<std::vector<hpx::agas::response> >
-        base_lco_vector_response_type;
 }}}
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::create_result_ns::base_lco_bool_response_type::set_value_action,
     set_value_action_agas_bool_response_type)
@@ -666,10 +704,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::create_result_ns::base_lco_id_type_response_type::set_value_action,
     set_value_action_agas_id_type_response_type)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::create_result_ns::base_lco_vector_response_type::set_value_action,
-    set_value_action_agas_vector_response_type)
 
 #endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 

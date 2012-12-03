@@ -408,6 +408,12 @@ struct hwloc_topology : topology
     std::vector<std::size_t> ns_thread_affinity_masks_;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+inline topology* create_topology()
+{
+    return new hwloc_topology;
+}
+
 }}
 
 #endif // HPX_50DFC0FC_EE99_43F5_A918_01EC45A58036

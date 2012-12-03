@@ -6,31 +6,20 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <iostream>
-#include <vector>
-
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-
-#if defined(HPX_HAVE_HWLOC)
-    #include <hpx/runtime/threads/policies/hwloc_topology.hpp>
-#elif defined(BOOST_WINDOWS)
-    #include <hpx/runtime/threads/policies/windows_topology.hpp>
-#elif defined(__APPLE__)
-    #include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-    #include <hpx/runtime/threads/policies/linux_topology.hpp>
-#else
-    #include <hpx/runtime/threads/policies/noop_topology.hpp>
-#endif
-
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
+
+#include <iostream>
+#include <vector>
+
 #if defined(HPX_HAVE_STACKTRACES)
 #include <boost/backtrace.hpp>
 #endif
@@ -121,6 +110,30 @@ namespace hpx
             "new allocator failed to allocate memory");
     }
 
+    void set_error_handlers()
+    {
+#if defined(BOOST_WINDOWS)
+        // Set console control handler to allow server to be stopped.
+        SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
+#else
+        struct sigaction new_action;
+        new_action.sa_handler = hpx::termination_handler;
+        sigemptyset(&new_action.sa_mask);
+        new_action.sa_flags = 0;
+
+        sigaction(SIGINT, &new_action, NULL);  // Interrupted 
+        sigaction(SIGBUS, &new_action, NULL);  // Bus error
+        sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
+        sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
+        sigaction(SIGPIPE, &new_action, NULL); // Bad pipe
+        sigaction(SIGSEGV, &new_action, NULL); // Segmentation fault
+        sigaction(SIGSYS, &new_action, NULL);  // Bad syscall
+#endif
+
+        std::set_new_handler(hpx::new_handler);
+    }
+
+
     ///////////////////////////////////////////////////////////////////////////
     namespace strings
     {
@@ -155,19 +168,7 @@ namespace hpx
             util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
-        topology_(
-#if defined(HPX_HAVE_HWLOC)
-            new threads::hwloc_topology
-#elif defined(BOOST_WINDOWS)
-            new threads::windows_topology
-#elif defined(__APPLE__)
-            new threads::macosx_topology
-#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-            new threads::linux_topology
-#else
-            new threads::noop_topology
-#endif
-        ),
+        topology_(threads::create_topology()),
         state_(state_invalid)
     {
         // initialize our TSS
@@ -178,7 +179,6 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
-
 
     ///////////////////////////////////////////////////////////////////////////
     util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
@@ -356,29 +356,45 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
-    naming::id_type find_here()
+    naming::id_type find_here(error_code& ec)
     {
         if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
+                "the runtime system is not available at this time");
             return naming::invalid_id;
+        }
 
-        return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
+        return naming::id_type(hpx::applier::get_applier().get_raw_locality(ec),
             naming::id_type::unmanaged);
     }
 
     std::vector<naming::id_type>
-    find_all_localities(components::component_type type)
+    find_all_localities(components::component_type type, error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_localities(locality_ids, type);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_localities(locality_ids, type, ec);
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_all_localities()
+    std::vector<naming::id_type> find_all_localities(error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_localities(locality_ids);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_localities(locality_ids, ec);
         return locality_ids;
     }
 
@@ -400,15 +416,19 @@ namespace hpx
     }
 
     // find a locality supporting the given component
-    naming::id_type find_locality(components::component_type type)
+    naming::id_type find_locality(components::component_type type, error_code& ec)
     {
         if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_locality",
+                "the runtime system is not available at this time");
             return naming::invalid_id;
+        }
 
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids, type);
+        hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 
-        if (locality_ids.empty()) 
+        if (ec || locality_ids.empty()) 
             return naming::invalid_id;
 
         // chose first locality to host the object
@@ -417,20 +437,38 @@ namespace hpx
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
-    boost::uint32_t get_num_localities()
+    boost::uint32_t get_num_localities(error_code& ec)
     {
         if (NULL == hpx::get_runtime_ptr())
             return 0;
 
-        return get_runtime().get_agas_client().get_num_localities();
+        return get_runtime().get_agas_client().get_num_localities(ec);
     }
 
-    boost::uint32_t get_num_localities(components::component_type type)
+    boost::uint32_t get_num_localities(components::component_type type,
+        error_code& ec)
     {
         if (NULL == hpx::get_runtime_ptr())
             return 0;
 
-        return get_runtime().get_agas_client().get_num_localities(type);
+        return get_runtime().get_agas_client().get_num_localities(type, ec);
+    }
+
+    lcos::future<boost::uint32_t> get_num_localities_async()
+    {
+        if (NULL == hpx::get_runtime_ptr())
+            return lcos::make_future<boost::uint32_t>(0);
+
+        return get_runtime().get_agas_client().get_num_localities_async();
+    }
+
+    lcos::future<boost::uint32_t> get_num_localities_async(
+        components::component_type type)
+    {
+        if (NULL == hpx::get_runtime_ptr())
+            return lcos::make_future<boost::uint32_t>(0);
+
+        return get_runtime().get_agas_client().get_num_localities_async(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -562,6 +600,16 @@ namespace hpx
     boost::uint64_t get_system_uptime()
     {
         return runtime::get_system_uptime();
+    }
+
+    util::runtime_configuration const& get_config()
+    {
+        return get_runtime().get_config();
+    }
+
+    hpx::util::io_service_pool* get_thread_pool(char const* name)
+    {
+        return get_runtime().get_thread_pool(name);
     }
 }
 

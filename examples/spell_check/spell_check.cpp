@@ -106,7 +106,7 @@ int hpx_main()
         string path = __FILE__;
         string wordlist_path;
         string remove = "spell_check.cpp";
-        for (int i = 0; i < path.length() - remove.length(); i++)
+        for (string::size_type i = 0; i < path.length() - remove.length(); i++)
         {
             wordlist_path.push_back(path[i]);
             if (path[i] == '\\')
@@ -126,7 +126,7 @@ int hpx_main()
             while (fin.good())
             {
                 getline(fin, temp);
-                for (int i = 0; i < temp.length(); i++)
+                for (string::size_type i = 0; i < temp.length(); i++)
                 temp[i] = tolower(temp[i]);
                 words.push_back(temp);
                 wordcount++;
@@ -147,11 +147,11 @@ int hpx_main()
         {
             vector<string> temp;
             boost::split(temp, word, boost::is_any_of("\n\t -"));
-            for (int i = 0; i < temp.size(); i++)
+            for (string::size_type i = 0; i < temp.size(); i++)
             {
                 bool isContraction = false;
                 string holder;
-                for (int j = 0; j < temp[i].size(); j++)
+                for (string::size_type j = 0; j < temp[i].size(); j++)
                 {
                     //a size check to avoid errors
                     if (temp[i].size() - j - 1 == 2)
@@ -183,7 +183,7 @@ int hpx_main()
             vector<search_action> sAct;//[sizeX * sizeY];
             vector<future<string>> wordRun;
             wordRun.reserve(strs.size());
-            for (int i = 0; i < strs.size(); ++i)
+            for (string::size_type i = 0; i < strs.size(); ++i)
             {
                 string& single = strs[i]; 
                 int start = 0;
@@ -195,7 +195,7 @@ int hpx_main()
             }
             wait_all(wordRun);
             cout << "Search completed in " << t.elapsed() << "s.\n";
-            for (int i = 0; i < strs.size(); i++)
+            for (string::size_type i = 0; i < strs.size(); i++)
             {
                 cout << "Word number " << i + 1 << ":\n";
                 if (contraction[i])
