@@ -359,7 +359,7 @@ namespace hpx {
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     private:
-        void init_tss(char const* context, std::size_t num);
+        void init_tss(char const* context, std::size_t num, char const* postfix);
         void deinit_tss();
 
     private:
@@ -368,7 +368,6 @@ namespace hpx {
         int result_;
         util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
-        util::io_service_pool parcel_pool_;
         util::io_service_pool timer_pool_;
         boost::shared_ptr<parcelset::parcelport> parcel_port_;
         scheduling_policy_type scheduler_;

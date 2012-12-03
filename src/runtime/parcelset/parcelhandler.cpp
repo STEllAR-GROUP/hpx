@@ -33,6 +33,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/format.hpp>
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -41,8 +42,11 @@ namespace hpx { namespace parcelset
     std::string get_connection_type_name(connection_type t)
     {
         switch(t) {
-        case connection_tcpip: 
+        case connection_tcpip:
             return "tcpip";
+
+        case connection_shmem:
+          return "shmem";
 
         case connection_portals4:
             return "portals4";
@@ -85,10 +89,7 @@ namespace hpx { namespace parcelset
         wfp.wait();          // wait for the parcel to be sent
     }
 
-    void parcelhandler::parcel_sink(parcelport& pp,
-        boost::shared_ptr<std::vector<char> > parcel_data,
-        threads::thread_priority priority,
-        performance_counters::parcels::data_point const& receive_data)
+    void parcelhandler::parcel_sink(parcel const& p)
     {
         // wait for thread-manager to become active
         while (tm_->status() & starting)
@@ -103,108 +104,18 @@ namespace hpx { namespace parcelset
             LPT_(debug) << "parcel_sink: dropping late parcel";
             return;
         }
-        else
-        {
-            // create a new thread which decodes and handles the parcel
-            threads::thread_init_data data(
-                boost::bind(&parcelhandler::decode_parcel, this,
-                    boost::ref(pp), parcel_data, receive_data),
-                "decode_parcel", 0, priority);
-            tm_->register_thread(data);
-        }
-    }
 
-    threads::thread_state_enum parcelhandler::decode_parcel(
-        parcelport& pp, boost::shared_ptr<std::vector<char> > parcel_data,
-        performance_counters::parcels::data_point receive_data)
-    {
-        // protect from un-handled exceptions bubbling up into thread manager
-        try {
-            try {
-                // mark start of serialization
-                util::high_resolution_timer timer;
-                boost::int64_t overall_add_parcel_time = 0;
-
-                {
-                    // De-serialize the parcel data
-                    util::portable_binary_iarchive archive(*parcel_data,
-                        boost::archive::no_header);
-
-                    std::size_t parcel_count = 0;
-                    std::size_t arg_size = 0;
-
-                    archive >> parcel_count;
-                    for(std::size_t i = 0; i < parcel_count; ++i)
-                    {
-                        // de-serialize parcel and add it to incoming parcel queue
-                        parcel p;
-                        archive >> p;
-
-                        // make sure this parcel ended up on the right locality
-                        BOOST_ASSERT(p.get_destination_locality() == here());
-
-                        // incoming argument's size
-                        arg_size += hpx::traits::type_size<parcel>::call(p);
-
-                        // be sure not to measure add_parcel as serialization time
-                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
-                        parcels_->add_parcel(p);
-                        overall_add_parcel_time += timer.elapsed_nanoseconds() -
-                            add_parcel_time;
-                    }
-
-                    // complete received data with parcel count
-                    receive_data.num_parcels_ = parcel_count;
-                    receive_data.type_bytes_ = arg_size;
-                }
-
-                // store the time required for serialization
-                receive_data.serialization_time_ = timer.elapsed_nanoseconds() -
-                    overall_add_parcel_time;
-
-                pp.add_received_data(receive_data);
-            }
-            catch (hpx::exception const& e) {
-                LPT_(error)
-                    << "decode_parcel: caught hpx::exception: "
-                    << e.what();
-                hpx::report_error(boost::current_exception());
-            }
-            catch (boost::system::system_error const& e) {
-                LPT_(error)
-                    << "decode_parcel: caught boost::system::error: "
-                    << e.what();
-                hpx::report_error(boost::current_exception());
-            }
-            catch (boost::exception const&) {
-                LPT_(error)
-                    << "decode_parcel: caught boost::exception.";
-                hpx::report_error(boost::current_exception());
-            }
-            catch (std::exception const& e) {
-                // We have to repackage all exceptions thrown by the
-                // serialization library as otherwise we will loose the
-                // e.what() description of the problem, due to slicing.
-                boost::throw_exception(boost::enable_error_info(
-                    hpx::exception(serialization_error, e.what())));
-            }
-        }
-        catch (...) {
-            // Prevent exceptions from boiling up into the thread-manager.
-            LPT_(error)
-                << "decode_parcel: caught unknown exception.";
-            hpx::report_error(boost::current_exception());
-        }
-
-        return threads::terminated;
+        parcels_->add_parcel(p);
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
             boost::shared_ptr<parcelport> pp, threads::threadmanager_base* tm,
             parcelhandler_queue_base* policy)
-      : resolver_(resolver)
-      , tm_(tm)
-      , parcels_(policy)
+      : resolver_(resolver),
+        pports_(connection_last),
+        tm_(tm),
+        parcels_(policy),
+        use_alternative_parcelports_(false)
     {
         BOOST_ASSERT(parcels_);
 
@@ -214,16 +125,14 @@ namespace hpx { namespace parcelset
 
         parcels_->set_parcelhandler(this);
 
-        attach_parcelport(pp);
+        attach_parcelport(pp, false);
     }
 
     // find and return the specified parcelport
     parcelport* parcelhandler::find_parcelport(connection_type type,
         error_code& ec) const
     {
-        std::map<connection_type, boost::shared_ptr<parcelport> >::const_iterator it =
-            pports_.find(type);
-        if (it == pports_.end()) {
+        if (!pports_[type]) {
             HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport",
                 "cannot find parcelport for connection type " +
                     get_connection_type_name(type));
@@ -233,29 +142,31 @@ namespace hpx { namespace parcelset
         if (&ec != &throws)
             ec = make_success_code();
 
-        return (*it).second.get();
+        return pports_[type].get();
     }
 
-    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> pp)
+    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> pp,
+        bool run)
     {
         // register our callback function with the parcelport
-        pp->register_event_handler(
-            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3, _4)
-        );
+        pp->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
 
-        // add the new parcelport to the list of parcelports we care about
-        pports_.insert(std::make_pair(pp->get_type(), pp));
+        // start the parcelport's thread pool
+        if (run) pp->run(false);
+
+        // add the new parcelport to the list of parcel-ports we care about
+        pports_[pp->get_type()] = pp;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Make sure the specified locality is not held by any 
+    /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(naming::locality const& loc)
     {
         parcelport* pp = find_parcelport(loc.get_type());
         if (!pp) {
-            HPX_THROW_EXCEPTION(network_error, 
-                "parcelhandler::remove_from_connection_cache", 
+            HPX_THROW_EXCEPTION(network_error,
+                "parcelhandler::remove_from_connection_cache",
                 "cannot find parcelport for connection type " +
                     get_connection_type_name(loc.get_type()));
             return;
@@ -266,13 +177,10 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::stop(bool blocking)
     {
-        typedef
-            std::map<connection_type, boost::shared_ptr<parcelport> >::iterator
-        iterator_type;
-
-        iterator_type end = pports_.end();
-        for (iterator_type it = pports_.begin(); it != end; ++it)
-            (*it).second->stop(blocking);
+        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        {
+            if (pp) pp->stop(blocking);
+        }
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
@@ -304,6 +212,68 @@ namespace hpx { namespace parcelset
         if (ec || !result) return false;
 
         return !locality_ids.empty();
+    }
+
+    connection_type parcelhandler::find_appropriate_connection_type(
+        naming::locality dest)
+    {
+        if (dest.get_type() == connection_tcpip) {
+            // if destination is on the same network node, use shared memory
+            // otherwise fall back to tcp
+            if (use_alternative_parcelports_ && dest.get_address() == here().get_address())
+            {
+                if (pports_[connection_shmem])
+                    return connection_shmem;
+            }
+            return connection_tcpip;
+        }
+
+        return dest.get_type();
+    }
+
+    // this function  will be called right after pre_main
+    void parcelhandler::set_resolved_localities(std::vector<naming::locality> const& l)
+    {
+        // we use the provided information to decide what types of parcel-ports
+        // are needed
+
+        // if there is just one locality, we need no additional network at all
+        if (1 == l.size())
+            return;
+
+        // if there are more localities sharing the same network node, we need
+        // to instantiate the shmem parcel-port
+        std::size_t here_count = 0;
+        std::string here(here().get_address());
+        BOOST_FOREACH(naming::locality const& t, l)
+        {
+            if (t.get_address() == here)
+                ++here_count;
+        }
+
+        if (here_count > 1) {
+            util::io_service_pool* pool =
+                pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
+            BOOST_ASSERT(0 != pool);
+
+            attach_parcelport(parcelport::create(
+                connection_shmem, hpx::get_config(),
+                pool->get_on_start_thread(), pool->get_on_stop_thread()));
+        }
+    }
+
+    /// Return the reference to an existing io_service
+    util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
+    {
+        util::io_service_pool* result = 0;
+        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        {
+            if (pp) {
+                result = pp->get_thread_pool(name);
+                if (result) return result;
+            }
+        }
+        return result;
     }
 
     void parcelhandler::put_parcel(parcel& p, write_handler_type f)
@@ -338,9 +308,22 @@ namespace hpx { namespace parcelset
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
 
+        // determine which parcelport to use for sending this parcel
+        connection_type t = find_appropriate_connection_type(addrs[0].locality_);
+
         // send the parcel using the parcelport corresponding to the
         // locality type of the destination
-        find_parcelport(addrs[0].get_connection_type())->put_parcel(p, f);
+        find_parcelport(t)->put_parcel(p, f);
+    }
+
+    std::size_t parcelhandler::get_outgoing_queue_length() const
+    {
+        std::size_t parcel_count = 0;
+        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        {
+            if (pp) parcel_count += pp->get_pending_parcels_count();
+        }
+        return parcel_count;
     }
 
     ///////////////////////////////////////////////////////////////////////////

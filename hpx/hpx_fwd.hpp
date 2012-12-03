@@ -98,27 +98,26 @@ namespace hpx
         enum connection_type
         {
             connection_unknown = -1,
-            connection_tcpip = 1,
-            connection_portals4 = 2
+            connection_tcpip = 0,
+            connection_shmem = 1,
+            connection_portals4 = 2,
+            connection_last
         };
+
         HPX_API_EXPORT std::string get_connection_type_name(connection_type);
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
-        class parcelport_connection;
         class HPX_API_EXPORT parcelhandler;
 
         namespace server
         {
             class parcelport_queue;
-            class parcelport_server_connection;
-
             struct parcelhandler_queue_base;
 
             namespace policies
             {
                 struct global_parcelhandler_queue;
-
                 typedef global_parcelhandler_queue parcelhandler_queue;
             }
         }
@@ -578,8 +577,9 @@ namespace hpx
     /// \namespace util
     namespace util
     {
-        class HPX_API_EXPORT section;
-        class runtime_configuration;
+        class HPX_EXPORT section;
+        class HPX_EXPORT runtime_configuration;
+        class HPX_EXPORT io_service_pool;
 
         /// \brief Expand INI variables in a string
         HPX_API_EXPORT std::string expand(std::string const& expand);
@@ -623,6 +623,12 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT util::runtime_configuration const& get_config();
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace

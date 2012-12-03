@@ -27,11 +27,17 @@
 
 #include <hpx/config/export_definitions.hpp>
 
+#if !defined(BOOST_WINDOWS)
+#  define HPX_EXPORT_THREAD_SPECIFIC_PTR HPX_EXPORT
+#else
+#  define HPX_EXPORT_THREAD_SPECIFIC_PTR
+#endif
+
 namespace hpx { namespace util
 {
 
 template <typename T, typename Tag>
-struct HPX_EXPORT thread_specific_ptr
+struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
 {
     typedef T element_type;
 
@@ -102,7 +108,7 @@ namespace hpx { namespace util
     }
 
 template <typename T, typename Tag>
-struct HPX_EXPORT thread_specific_ptr
+struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
 {
     typedef T element_type;
 
@@ -175,7 +181,7 @@ namespace hpx { namespace util
 {
 
 template <typename T, typename Tag>
-struct HPX_EXPORT thread_specific_ptr
+struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
 {
     typedef typename boost::thread_specific_ptr<T>::element_type element_type;
 

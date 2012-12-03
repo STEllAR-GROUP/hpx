@@ -50,9 +50,9 @@ addressing_service::addressing_service(
         gva_cache_.reserve(ini_.get_agas_local_cache_size());
 
     if (service_type == service_mode_bootstrap)
-        launch_bootstrap(pp, ini_);
+        launch_bootstrap(ini_);
     else
-        launch_hosted(pp, ini_);
+        launch_hosted();
 } // }}}
 
 naming::locality const& addressing_service::get_here() const
@@ -67,8 +67,7 @@ naming::locality const& addressing_service::get_here() const
 }
 
 void addressing_service::launch_bootstrap(
-    parcelset::parcelport& pp
-  , util::runtime_configuration const& ini_
+    util::runtime_configuration const& ini_
     )
 { // {{{
     bootstrap = boost::make_shared<bootstrap_data_type>();
@@ -135,10 +134,7 @@ void addressing_service::launch_bootstrap(
     state_.store(running);
 } // }}}
 
-void addressing_service::launch_hosted(
-    parcelset::parcelport& pp
-  , util::runtime_configuration const& ini_
-    )
+void addressing_service::launch_hosted()
 { // {{{
     hosted = boost::make_shared<hosted_data_type>();
 
@@ -451,6 +447,15 @@ bool addressing_service::get_localities(
         return false;
     }
 } // }}}
+
+lcos::future<std::vector<naming::locality> > 
+    addressing_service::get_resolved_localities_async()
+{ // {{{ get_locality_ids implementation
+    naming::id_type const target = bootstrap_primary_namespace_id();
+    request req(primary_ns_resolved_localities);
+    return stubs::primary_namespace::service_async<
+        std::vector<naming::locality> >(target, req);
+} //}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint32_t addressing_service::get_num_localities(

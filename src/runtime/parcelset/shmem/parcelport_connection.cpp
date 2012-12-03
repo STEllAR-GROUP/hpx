@@ -6,8 +6,7 @@
 #include <stdexcept>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
@@ -17,39 +16,28 @@
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace tcp
+namespace hpx { namespace parcelset { namespace shmem
 {
-    parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
-            naming::locality const& locality_id,
-            util::connection_cache<parcelport_connection, naming::locality>& cache,
-            performance_counters::parcels::gatherer& parcels_sent)
-      : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-        connection_cache_(cache), parcels_sent_(parcels_sent), 
-        archive_flags_(boost::archive::no_header)
+    parcelport_connection::parcelport_connection(
+            boost::asio::io_service& io_service,
+            naming::locality const& here, naming::locality const& there,
+//             util::connection_cache<parcelport_connection, naming::locality>& cache,
+            performance_counters::parcels::gatherer& parcels_sent,
+            std::size_t connection_count)
+      : window_(io_service), there_(there),
+        /*connection_cache_(cache), */
+        parcels_sent_(parcels_sent)
     {
-#ifdef BOOST_BIG_ENDIAN
-        std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
-#else
-        std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
-#endif
-        if (endian_out == "little")
-            archive_flags_ |= util::endian_little;
-        else if (endian_out == "big")
-            archive_flags_ |= util::endian_big;
-        else {
-            BOOST_ASSERT(endian_out =="little" || endian_out == "big");
-        }
+        std::string fullname(here.get_address() + "." +
+            boost::lexical_cast<std::string>(here.get_port()) + "." +
+            boost::lexical_cast<std::string>(connection_count));
+
+        window_.set_option(data_window::bound_to(fullname));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
-        // we choose the highest priority of all parcels for this message
-        threads::thread_priority priority = threads::thread_priority_default;
-
-        // collect argument sizes from parcels
-        std::size_t arg_size = 0;
-
 #if defined(HPX_DEBUG)
         BOOST_FOREACH(parcel const& p, pv)
         {
@@ -58,26 +46,30 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 #endif
 
+        // collect argument sizes from parcels
+        std::size_t arg_size = 0;
+
         // guard against serialization errors
         try {
-            // clear and preallocate out_buffer_
-            out_buffer_.clear();
-
             BOOST_FOREACH(parcel const & p, pv)
             {
                 arg_size += traits::get_type_size(p);
-                priority = (std::max)(p.get_thread_priority(), priority);
             }
 
-            out_buffer_.reserve(arg_size*2);
+            // generate the name for this data_buffer
+            std::string data_buffer_name(pv[0].get_parcel_id().to_string());
+
+            // clear and preallocate out_buffer_
+            out_buffer_ = data_buffer(data_buffer_name.c_str(), 
+                (arg_size * 12) / 10 + 1024);
 
             // mark start of serialization
             util::high_resolution_timer timer;
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(out_buffer_,
-                    archive_flags_);
+                util::portable_binary_oarchive archive(
+                    out_buffer_.get_buffer(), boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;
@@ -96,7 +88,7 @@ namespace hpx { namespace parcelset { namespace tcp
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
+                "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::archive::archive_exception: %s") % e.what()));
@@ -104,7 +96,7 @@ namespace hpx { namespace parcelset { namespace tcp
         }
         catch (boost::system::system_error const& e) {
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
+                "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::system::system_error: %d (%s)") %
@@ -113,15 +105,12 @@ namespace hpx { namespace parcelset { namespace tcp
         }
         catch (std::exception const& e) {
             HPX_RETHROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
+                "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "std::exception: %s") % e.what()));
             return;
         }
-
-        out_priority_ = boost::integer::ulittle8_t(priority);
-        out_size_ = out_buffer_.size();
 
         send_data_.num_parcels_ = pv.size();
         send_data_.bytes_ = out_buffer_.size();

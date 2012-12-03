@@ -1,40 +1,34 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2007 Richard D Guidry Jr
-//  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011 Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_TCP_PARCELPORT_NOV_25_2012_1016AM)
-#define HPX_PARCELSET_TCP_PARCELPORT_NOV_25_2012_1016AM
+#if !defined(HPX_PARCELSET_SHMEM_PARCELPORT_NOV_25_2012_0425PM)
+#define HPX_PARCELSET_SHMEM_PARCELPORT_NOV_25_2012_0425PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/server/tcp/parcelport_server_connection.hpp>
-#include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/shmem/data_window.hpp>
+#include <hpx/runtime/parcelset/shmem/acceptor.hpp>
+#include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
+#include <hpx/runtime/parcelset/server/shmem/parcelport_server_connection.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/asio/ip/tcp.hpp>
 
 #include <set>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace tcp
+namespace hpx { namespace parcelset { namespace shmem
 {
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
-    /// to receive parcels.
+    /// to receive parcels. This parcelport manages connections over shared
+    /// memory.
     class HPX_EXPORT parcelport : public parcelset::parcelport
     {
     public:
@@ -84,24 +78,16 @@ namespace hpx { namespace parcelset { namespace tcp
         /// \endcode
         void put_parcel(parcel const & p, write_handler_type f);
 
-        /// Send an early parcel through the TCP parcelport
-        ///
-        /// \param p        [in, out] A reference to the parcel to send. The
-        ///                 parcel \a p will be modified in place, as it will
-        ///                 get set the resolved destination address and parcel
-        ///                 id (if not already set).
-        void send_early_parcel(parcel& p);
+        /// Cache specific functionality
+        void remove_from_connection_cache(naming::locality const& loc)
+        {
+//             connection_cache_.clear(loc);
+        }
 
         /// Retrieve the type of the locality represented by this parcelport
         connection_type get_type() const
         {
-            return connection_tcpip;
-        }
-
-        /// Cache specific functionality
-        void remove_from_connection_cache(naming::locality const& loc)
-        {
-            connection_cache_.clear(loc);
+            return connection_shmem;
         }
 
         /// Return the thread pool if the name matches
@@ -110,12 +96,14 @@ namespace hpx { namespace parcelset { namespace tcp
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
-            server::tcp::parcelport_connection_ptr);
+            server::shmem::parcelport_connection_ptr);
         void handle_read_completion(boost::system::error_code const& e,
-            server::tcp::parcelport_connection_ptr);
+            server::shmem::parcelport_connection_ptr);
 
         /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(naming::locality const& prefix,
+        void send_pending_parcels_trampoline(
+            boost::system::error_code const& ec,
+            naming::locality const& prefix,
             parcelport_connection_ptr client_connection);
         void send_pending_parcels(parcelport_connection_ptr client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
@@ -128,13 +116,14 @@ namespace hpx { namespace parcelset { namespace tcp
         util::io_service_pool io_service_pool_;
 
         /// Acceptor used to listen for incoming connections.
-        boost::asio::ip::tcp::acceptor* acceptor_;
+        acceptor* acceptor_;
+        std::size_t connection_count_;
 
         /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
+//         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
         /// The list of accepted connections
-        typedef std::set<server::tcp::parcelport_connection_ptr> accepted_connections_set;
+        typedef std::set<server::shmem::parcelport_connection_ptr> accepted_connections_set;
         accepted_connections_set accepted_connections_;
     };
 }}}

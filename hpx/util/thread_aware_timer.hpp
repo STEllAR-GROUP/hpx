@@ -7,9 +7,9 @@
 #define HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/io_service_pool.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/chrono/chrono.hpp>
@@ -84,8 +84,7 @@ namespace hpx { namespace util
             hpx::lcos::local::promise<boost::uint64_t> p;
 
             // Get a reference to the Timer specific HPX io_service object ...
-            hpx::util::io_service_pool* pool =
-                hpx::get_runtime().get_thread_pool("timer_pool");
+            hpx::util::io_service_pool* pool = hpx::get_thread_pool("timer_pool");
 
             // ... and schedule the handler to run on the first of its OS-threads.
             pool->get_io_service(0).post(hpx::util::bind(&sample_time, boost::ref(p)));
