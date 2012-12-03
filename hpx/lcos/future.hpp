@@ -43,7 +43,6 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-    public:
         typedef lcos::detail::future_data_base<Result> future_data_type;
 
         explicit future(future_data_type* p)
@@ -68,6 +67,7 @@ namespace hpx { namespace lcos
 
         friend class hpx::thread;
 
+    public:
         typedef Result result_type;
 
         future()
@@ -243,7 +243,6 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-    public:
         typedef lcos::detail::future_data_base<void> future_data_type;
 
         explicit future(future_data_type* p)
@@ -279,6 +278,7 @@ namespace hpx { namespace lcos
             future_data_ = p;
         }
 
+    public:
         typedef void result_type;
 
         future()
