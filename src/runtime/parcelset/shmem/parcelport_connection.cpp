@@ -22,12 +22,17 @@ namespace hpx { namespace parcelset { namespace shmem
             boost::asio::io_service& io_service,
             naming::locality const& here, naming::locality const& there,
 //             util::connection_cache<parcelport_connection, naming::locality>& cache,
-            performance_counters::parcels::gatherer& parcels_sent)
+            performance_counters::parcels::gatherer& parcels_sent,
+            std::size_t connection_count)
       : window_(io_service), there_(there),
         /*connection_cache_(cache), */
         parcels_sent_(parcels_sent)
     {
-        window_.set_option(data_window::bound_to(full_endpoint_name(here)));
+        std::string fullname(here.get_address() + "." +
+            boost::lexical_cast<std::string>(here.get_port()) + "." +
+            boost::lexical_cast<std::string>(connection_count));
+
+        window_.set_option(data_window::bound_to(fullname));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -55,7 +60,8 @@ namespace hpx { namespace parcelset { namespace shmem
             std::string data_buffer_name(pv[0].get_parcel_id().to_string());
 
             // clear and preallocate out_buffer_
-            out_buffer_ = data_buffer(data_buffer_name.c_str(), (arg_size * 12) / 10);
+            out_buffer_ = data_buffer(data_buffer_name.c_str(), 
+                (arg_size * 12) / 10 + 1024);
 
             // mark start of serialization
             util::high_resolution_timer timer;

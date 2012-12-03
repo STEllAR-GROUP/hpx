@@ -209,7 +209,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
     /// Handle completion of a read operation.
     void parcelport::handle_read_completion(boost::system::error_code const& e,
-        server::tcp::parcelport_connection_ptr)
+        server::tcp::parcelport_connection_ptr c)
     {
         if (e && e != boost::asio::error::operation_aborted
               && e != boost::asio::error::eof)
@@ -218,6 +218,12 @@ namespace hpx { namespace parcelset { namespace tcp
                 << "handle read operation completion: error: "
                 << e.message();
         }
+
+        // remove this connection from the list of known connections
+        util::spinlock::scoped_lock l(mtx_);
+        accepted_connections_set::iterator it = accepted_connections_.find(c);
+        if (it != accepted_connections_.end())
+            accepted_connections_.erase(c);
     }
 
     ///////////////////////////////////////////////////////////////////////////

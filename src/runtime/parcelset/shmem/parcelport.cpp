@@ -55,7 +55,7 @@ namespace hpx { namespace parcelset { namespace shmem
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
-        acceptor_(NULL) //,
+        acceptor_(NULL), connection_count_(0) //,
 //         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
     }
@@ -104,6 +104,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     boost::lexical_cast<std::string>(ep.port()));
 
                 acceptor_->set_option(acceptor::msg_num(10));
+                acceptor_->set_option(acceptor::manage(true));
                 acceptor_->bind(fullname);
                 acceptor_->open();
 
@@ -132,36 +133,34 @@ namespace hpx { namespace parcelset { namespace shmem
 
     void parcelport::stop(bool blocking)
     {
+        // now it's safe to take everything down
+//       connection_cache_.clear();
+        {
+            // cancel all pending read operations, close those sockets
+            util::spinlock::scoped_lock l(mtx_);
+            BOOST_FOREACH(server::shmem::parcelport_connection_ptr c,
+                accepted_connections_)
+            {
+                boost::system::error_code ec;
+                c->window().shutdown(ec); // shut down connection
+                c->window().close(ec);    // close the data window to give it back to the OS
+            }
+            accepted_connections_.clear();
+        }
+
+        // cancel all pending accept operations
+        if (NULL != acceptor_)
+        {
+            boost::system::error_code ec;
+            acceptor_->close(ec);
+            delete acceptor_;
+            acceptor_ = NULL;
+        }
+
         // make sure no more work is pending, wait for service pool to get empty
         io_service_pool_.stop();
         if (blocking) {
             io_service_pool_.join();
-
-            // now it's safe to take everything down
-//             connection_cache_.clear();
-
-            {
-                // cancel all pending read operations, close those sockets
-                util::spinlock::scoped_lock l(mtx_);
-                BOOST_FOREACH(server::shmem::parcelport_connection_ptr c,
-                    accepted_connections_)
-                {
-                    boost::system::error_code ec;
-                    c->window().shutdown(ec); // shut down connection
-                    c->window().close(ec);    // close the data window to give it back to the OS
-                }
-                accepted_connections_.clear();
-            }
-
-            // cancel all pending accept operations
-            if (NULL != acceptor_)
-            {
-                boost::system::error_code ec;
-                acceptor_->close(ec);
-                delete acceptor_;
-                acceptor_ = NULL;
-            }
-
             io_service_pool_.clear();
         }
     }
@@ -193,19 +192,30 @@ namespace hpx { namespace parcelset { namespace shmem
             c->async_read(boost::bind(&parcelport::handle_read_completion, 
                 this, boost::asio::placeholders::error, c));
         }
+        else {
+            // remove this connection from the list of known connections
+            util::spinlock::scoped_lock l(mtx_);
+            accepted_connections_.erase(conn);
+        }
     }
 
     /// Handle completion of a read operation.
     void parcelport::handle_read_completion(boost::system::error_code const& e,
-        server::shmem::parcelport_connection_ptr)
+        server::shmem::parcelport_connection_ptr c)
     {
-        if (e && e != boost::asio::error::operation_aborted
-              && e != boost::asio::error::eof)
+        if (!e) return;
+
+        if (e != boost::asio::error::operation_aborted && 
+            e != boost::asio::error::eof)
         {
             LPT_(error)
                 << "handle read operation completion: error: "
                 << e.message();
         }
+
+        // remove this connection from the list of known connections
+        util::spinlock::scoped_lock l(mtx_);
+        accepted_connections_.erase(c);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -250,11 +260,15 @@ namespace hpx { namespace parcelset { namespace shmem
         {
             // ... or re-add the connection to the cache
             BOOST_ASSERT(locality_id == client_connection->destination());
+            client_connection->window().shutdown();
+            client_connection->window().close();
+
 //             connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 
     void parcelport::send_pending_parcels_trampoline(
+        boost::system::error_code const& ec,
         naming::locality const& locality_id,
         parcelport_connection_ptr client_connection)
     {
@@ -272,7 +286,7 @@ namespace hpx { namespace parcelset { namespace shmem
             std::swap(handlers, it->second.second);
         }
 
-        if (!parcels.empty() && !handlers.empty())
+        if (!ec && !parcels.empty() && !handlers.empty())
         {
             // Create a new thread which sends parcels that might still be
             // pending.
@@ -286,6 +300,9 @@ namespace hpx { namespace parcelset { namespace shmem
             // Give this connection back to the cache as it's not needed
             // anymore.
             BOOST_ASSERT(locality_id == client_connection->destination());
+            client_connection->window().shutdown();
+            client_connection->window().close();
+
 //             connection_cache_.reclaim(locality_id, client_connection);
         }
     }
@@ -317,7 +334,7 @@ namespace hpx { namespace parcelset { namespace shmem
         client_connection->async_write(
             detail::call_for_each(handlers),
             boost::bind(&parcelport::send_pending_parcels_trampoline, this,
-                ::_1, ::_2));
+                boost::asio::placeholders::error, ::_2, ::_3));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -359,7 +376,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
                 io_service_pool_.get_io_service(), here_, l,
-                /*connection_cache_, */parcels_sent_));
+                /*connection_cache_, */parcels_sent_, ++connection_count_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;

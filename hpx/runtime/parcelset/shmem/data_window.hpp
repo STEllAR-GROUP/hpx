@@ -30,17 +30,16 @@ namespace hpx { namespace parcelset { namespace shmem
     //
     struct basic_data_window_options
     {
-        struct msg_num
+        template <typename T>
+        struct option
         {
-            msg_num(std::size_t num) : val_(num) {}
-            std::size_t val_;
+            option(T const& num) : val_(num) {}
+            T val_;
         };
 
-        struct bound_to
-        {
-            bound_to(std::string here) : val_(here) {}
-            std::string val_;
-        };
+        typedef option<std::size_t> msg_num;
+        typedef option<std::string> bound_to;
+        typedef option<bool> manage;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -420,7 +419,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         template <typename Handler>
-        void async_connect(implementation_type &impl, std::string const& there, 
+        void async_connect(implementation_type &impl, std::string const& there,
             Handler handler)
         {
             this->get_io_service().post(
@@ -514,7 +513,10 @@ namespace hpx { namespace parcelset { namespace shmem
     {
     public:
         data_window_impl()
-          : msg_num_(1), aborted_(false), executing_operation_(false)
+          : msg_num_(1), aborted_(false),
+            executing_operation_(false),
+            close_operation_(false),
+            manage_lifetime_(false)
         {}
 
         ~data_window_impl()
@@ -524,8 +526,8 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
     protected:
-        boost::shared_ptr<boost::interprocess::message_queue> 
-        open_helper(bool open_queue_only, std::string const& name, 
+        boost::shared_ptr<boost::interprocess::message_queue>
+        open_helper(bool open_queue_only, std::string const& name,
             boost::system::error_code &ec)
         {
             try {
@@ -533,17 +535,17 @@ namespace hpx { namespace parcelset { namespace shmem
 
                 if (!open_queue_only) {
                     using namespace boost::interprocess;
-                    message_queue::remove(name.c_str());
+                    if (manage_lifetime_)
+                        message_queue::remove(name.c_str());
                     return boost::make_shared<message_queue>(
-                        create_only, name.c_str(), msg_num_, sizeof(message));
+                        open_or_create, name.c_str(), msg_num_, sizeof(message));
                 }
                 else {
                     using namespace boost::interprocess;
                     return boost::make_shared<message_queue>(
                         open_only, name.c_str());
                 }
-                if (&ec != &boost::system::throws)
-                    ec = boost::system::error_code();
+                HPX_SHMEM_RESET_EC(ec);
             }
             catch(boost::interprocess::interprocess_exception const& e) {
                 HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
@@ -551,16 +553,16 @@ namespace hpx { namespace parcelset { namespace shmem
             return boost::shared_ptr<boost::interprocess::message_queue>();
         }
 
-        void open(bool open_only, std::string const& here, 
-            boost::system::error_code &ec)
+        void open(bool open_only, std::string const& read_name,
+            std::string const& write_name, boost::system::error_code &ec)
         {
             if (read_mq_ || write_mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
             }
             else {
-                read_mq_ = open_helper(open_only, there_, ec);
+                read_mq_ = open_helper(open_only, read_name, ec);
                 if (!ec) {
-                    write_mq_ = open_helper(open_only, here, ec);
+                    write_mq_ = open_helper(open_only, write_name, ec);
                 }
                 else {
                     boost::system::error_code ec1;
@@ -572,13 +574,7 @@ namespace hpx { namespace parcelset { namespace shmem
     public:
         void open(boost::system::error_code &ec)
         {
-            std::string::size_type end = there_.find_last_of(".");
-            BOOST_ASSERT(end != std::string::npos);
-            std::string::size_type begin = there_.find_last_of(".", end-1);
-            BOOST_ASSERT(begin != std::string::npos);
-
-            std::string portstr(there_.substr(begin, end-begin));
-            open(true, here_ + portstr, ec);
+            open(true, there_ + ".write", there_ + ".read", ec);
         }
 
         void bind(std::string const& endpoint, boost::system::error_code &ec)
@@ -594,14 +590,24 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void close(boost::system::error_code &ec)
         {
+            close_operation_ = true;
+            BOOST_SCOPE_EXIT(&close_operation_) {
+                close_operation_ = false;
+            } BOOST_SCOPE_EXIT_END
+
+            // wait for pending operations to return
+            destroy();
+
             // close does nothing if the data window was already closed
             if (read_mq_) {
                 read_mq_.reset();
-                boost::interprocess::message_queue::remove(there_.c_str());
+                if (manage_lifetime_)
+                    boost::interprocess::message_queue::remove(there_.c_str());
             }
             if (write_mq_) {
                 write_mq_.reset();
-                boost::interprocess::message_queue::remove(here_.c_str());
+                if (manage_lifetime_)
+                    boost::interprocess::message_queue::remove(here_.c_str());
             }
             HPX_SHMEM_RESET_EC(ec);
         }
@@ -614,8 +620,12 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void destroy()
         {
-            // cancel operation
             aborted_ = true;
+            BOOST_SCOPE_EXIT(&aborted_) {
+                aborted_ = false;
+            } BOOST_SCOPE_EXIT_END
+
+            // cancel operation
             while (executing_operation_)
                 ;
         }
@@ -630,13 +640,14 @@ namespace hpx { namespace parcelset { namespace shmem
                 there_ = there + here_.substr(here_.find_last_of("."));
 
                 // create/open endpoint
-                open(false, here_ + portstr, ec);
+                std::string here(here_ + portstr);
+                open(false, here + ".read", here + ".write", ec);
                 if (!ec) {
                     // send connect command to corresponding acceptor
                     std::string acceptor_name(there + ".acceptor");
                     boost::interprocess::message_queue mq(
                         boost::interprocess::open_only, acceptor_name.c_str());
-                    send_command(mq, message::connect, (here_ + portstr).c_str(), ec);
+                    send_command(mq, message::connect, here.c_str(), ec);
                 }
             }
         }
@@ -644,7 +655,7 @@ namespace hpx { namespace parcelset { namespace shmem
         // read, write, and acknowledge operations
         std::size_t try_read(data_buffer& data, boost::system::error_code &ec)
         {
-            if (!read_mq_) {
+            if (close_operation_ || !read_mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
             else {
@@ -656,6 +667,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     if (!ec) {
                         if (msg.command_ == message::shutdown) {
                             close(ec);
+                            HPX_SHMEM_THROWS_IF(ec, boost::asio::error::eof);
                         }
                         else if (msg.command_ != message::data) {
                             HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
@@ -676,7 +688,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         std::size_t write(data_buffer const& data, boost::system::error_code &ec)
         {
-            if (!write_mq_) {
+            if (close_operation_ || !write_mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
             else {
@@ -688,7 +700,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         bool try_read_ack(boost::system::error_code &ec)
         {
-            if (!read_mq_) {
+            if (close_operation_ || !read_mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
             else {
@@ -700,6 +712,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     if (!ec) {
                         if (msg.command_ == message::shutdown) {
                             close(ec);
+                            HPX_SHMEM_THROWS_IF(ec, boost::asio::error::eof);
                         }
                         else if (msg.command_ != message::acknowledge) {
                             HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
@@ -718,7 +731,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void write_ack(boost::system::error_code &ec)
         {
-            if (!write_mq_) {
+            if (close_operation_ || !write_mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
             else {
@@ -751,10 +764,22 @@ namespace hpx { namespace parcelset { namespace shmem
             }
         }
 
+        void set_option(basic_data_window_options::manage opt,
+            boost::system::error_code &ec)
+        {
+            if (read_mq_ || write_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::already_connected);
+            }
+            else {
+                manage_lifetime_ = opt.val_;
+                HPX_SHMEM_RESET_EC(ec);
+            }
+        }
+
         basic_data_window_options::bound_to get_option(
             boost::system::error_code &ec)
         {
-            if (!read_mq_ || !write_mq_) {
+            if (close_operation_ || !read_mq_ || !write_mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
                 return basic_data_window_options::bound_to("");
             }
@@ -787,7 +812,7 @@ namespace hpx { namespace parcelset { namespace shmem
             return true;
         }
 
-        void send_command(boost::interprocess::message_queue& mq, 
+        void send_command(boost::interprocess::message_queue& mq,
             message::commands cmd, char const* data,
             boost::system::error_code &ec)
         {
@@ -829,6 +854,8 @@ namespace hpx { namespace parcelset { namespace shmem
         boost::shared_ptr<boost::interprocess::message_queue> write_mq_;
         bool aborted_;
         bool executing_operation_;
+        bool close_operation_;
+        bool manage_lifetime_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

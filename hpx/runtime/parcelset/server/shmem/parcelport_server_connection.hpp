@@ -108,19 +108,24 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
                 boost::get<0>(handler)(e);
 
                 // now send acknowledgment message
-                void (parcelport_connection::*f)(boost::tuple<Handler>)
+                void (parcelport_connection::*f)(boost::system::error_code const&, 
+                          boost::tuple<Handler>)
                     = &parcelport_connection::handle_write_ack<Handler>;
 
                 window_.async_write_ack(
-                    boost::bind(f, shared_from_this(), handler));
+                    boost::bind(f, shared_from_this(), 
+                        boost::asio::placeholders::error, handler));
             }
         }
 
         template <typename Handler>
-        void handle_write_ack(boost::tuple<Handler> handler)
+        void handle_write_ack(boost::system::error_code const& e,
+            boost::tuple<Handler> handler)
         {
-            // Issue a read operation to handle the next parcel.
-            async_read(boost::get<0>(handler));
+            if (!e) {
+                // Issue a read operation to handle the next parcel.
+                async_read(boost::get<0>(handler));
+            }
         }
 
     private:

@@ -41,7 +41,8 @@ namespace hpx { namespace parcelset { namespace shmem
         parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& here, naming::locality const& there,
 //             util::connection_cache<parcelport_connection, naming::locality>& cache,
-            performance_counters::parcels::gatherer& parcels_sent);
+            performance_counters::parcels::gatherer& parcels_sent,
+            std::size_t connection_count);
 
         ~parcelport_connection()
         {
@@ -102,14 +103,17 @@ namespace hpx { namespace parcelset { namespace shmem
             parcels_sent_.add_data(send_data_);
 
             // now handle the acknowledgment byte which is sent by the receiver
-            void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
+            void (parcelport_connection::*f)(boost::system::error_code const&,
+                      boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
 
-            window_.async_read_ack(boost::bind(f, shared_from_this(), handler));
+            window_.async_read_ack(boost::bind(f, shared_from_this(), 
+                boost::asio::placeholders::error, handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void handle_read_ack(boost::tuple<Handler, ParcelPostprocess> handler)
+        void handle_read_ack(boost::system::error_code const& e,
+            boost::tuple<Handler, ParcelPostprocess> handler)
         {
             // now we can give this connection back to the cache
             out_buffer_.close();
@@ -122,7 +126,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
-            boost::get<1>(handler)(there_, shared_from_this());
+            boost::get<1>(handler)(e, there_, shared_from_this());
         }
 
     private:
@@ -145,13 +149,6 @@ namespace hpx { namespace parcelset { namespace shmem
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline std::string full_endpoint_name(hpx::naming::locality const& l)
-    {
-        return l.get_address() + "." +
-            boost::lexical_cast<std::string>(l.get_port());
-    }
 }}}
 
 #endif

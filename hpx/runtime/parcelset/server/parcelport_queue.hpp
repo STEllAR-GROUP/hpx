@@ -35,8 +35,6 @@ namespace hpx { namespace parcelset { namespace server
         typedef void callback_type(parcel const&);
         HPX_STD_FUNCTION<callback_type> notify_;
     };
-
-///////////////////////////////////////////////////////////////////////////////
 }}}
 
 #endif

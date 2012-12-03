@@ -101,7 +101,9 @@ namespace hpx { namespace parcelset { namespace shmem
             server::shmem::parcelport_connection_ptr);
 
         /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(naming::locality const& prefix,
+        void send_pending_parcels_trampoline(
+            boost::system::error_code const& ec,
+            naming::locality const& prefix,
             parcelport_connection_ptr client_connection);
         void send_pending_parcels(parcelport_connection_ptr client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
@@ -115,6 +117,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         /// Acceptor used to listen for incoming connections.
         acceptor* acceptor_;
+        std::size_t connection_count_;
 
         /// The connection cache for sending connections
 //         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
