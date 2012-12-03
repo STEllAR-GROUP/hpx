@@ -204,23 +204,31 @@ namespace hpx { namespace lcos { namespace local
         template <typename T>
         void set_value(BOOST_FWD_REF(T) result)
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<Result>::set_value<T>",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<Result>();
+
             task_->set_data(boost::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<Result>::set_exception",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<Result>();
+
             task_->set_exception(e);
         }
 
@@ -333,23 +341,31 @@ namespace hpx { namespace lcos { namespace local
 
         void set_value()
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<void>::set_value",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<void>();
+
             task_->set_data(util::unused);
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<void>::set_exception",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<void>();
+
             task_->set_exception(e);
         }
 
