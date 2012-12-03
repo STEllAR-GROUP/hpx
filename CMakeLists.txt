@@ -207,7 +207,8 @@ endif()
 # C++
 hpx_include(GCCVersion)
 
-if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+               AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
   hpx_option(HPX_IGNORE_GCC_VERSION BOOL
