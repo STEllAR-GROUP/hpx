@@ -428,7 +428,8 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         // synchronous and asynchronous read/write/read_ack/write_ack
-        std::size_t read(data_buffer& data, boost::system::error_code &ec)
+        std::size_t read(implementation_type &impl, data_buffer& data, 
+            boost::system::error_code &ec)
         {
             std::size_t size;
             while (0 == (size = impl->try_read(data, ec)) && !ec)
@@ -436,18 +437,19 @@ namespace hpx { namespace parcelset { namespace shmem
             return size;
         }
 
-        std::size_t write(data_buffer const& data, boost::system::error_code &ec)
+        std::size_t write(implementation_type &impl, data_buffer const& data, 
+            boost::system::error_code &ec)
         {
             return impl->write(data, ec);
         }
 
-        void read_ack(boost::system::error_code &ec)
+        void read_ack(implementation_type &impl, boost::system::error_code &ec)
         {
             while (!impl->try_read_ack(ec) && !ec)
                 /* just wait for operation to succeed */;
         }
 
-        void write_ack(boost::system::error_code &ec)
+        void write_ack(implementation_type &impl, boost::system::error_code &ec)
         {
             impl->write_ack(ec);
         }
