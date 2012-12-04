@@ -33,6 +33,21 @@ namespace hpx
 {
     namespace detail
     {
+        inline void move_fifo(boost::lockfree::fifo<std::size_t>& src,
+            boost::atomic<std::size_t>& src_count,
+            boost::lockfree::fifo<std::size_t>& dest,
+            boost::atomic<std::size_t>& dest_count)
+        {
+            std::size_t new_value = 0;
+            std::size_t count = src_count.exchange(new_value);
+
+            std::size_t tmp;
+            while(src.dequeue(tmp))
+                dest.enqueue(tmp);
+
+            dest_count.store(count);
+        }
+
         template <typename T>
         struct when_n
         {
@@ -41,10 +56,10 @@ namespace hpx
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
-                mutex_type::scoped_lock l(mtx_);
-                if (ready_.size() != needed_count_) {
-                    ready_.push_back(idx);
-                    if (ready_.size() == needed_count_)
+                std::size_t current_count = count_.fetch_add(1);
+                if (current_count != needed_count_) {
+                    ready_.enqueue(idx);
+                    if (current_count + 1 == needed_count_)
                     {
                         // reactivate waiting thread only if it's not us
                         if (id != threads::get_self().get_thread_id())
@@ -54,85 +69,79 @@ namespace hpx
             }
 
         public:
-            typedef lcos::local::spinlock mutex_type;
-
             typedef std::vector<lcos::future<T> > argument_type;
             typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
                 result_type;
 
             when_n(argument_type const& lazy_values, std::size_t n)
               : lazy_values_(lazy_values),
+                ready_(lazy_values_.size()),
+                count_(0),
                 needed_count_(n)
             {}
 
             when_n(BOOST_RV_REF(argument_type) lazy_values, std::size_t n)
               : lazy_values_(boost::move(lazy_values)),
+                ready_(lazy_values_.size()),
+                count_(0),
                 needed_count_(n)
             {}
 
             when_n(BOOST_RV_REF(when_n) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
-              ready_(boost::move(rhs.ready_)),
-                needed_count_(rhs.needed_count_),
-                mtx_(boost::move(rhs.mtx_))
+                ready_(lazy_values_.size()),
+                needed_count_(rhs.needed_count_)
             {
+                move_fifo(rhs.ready_, rhs.count_, ready_, count_);
                 rhs.needed_count_ = 0;
             }
 
             when_n& operator= (BOOST_RV_REF(when_n) rhs)
             {
                 if (this != &rhs) {
-                    mutex_type::scoped_lock l1(mtx_);
-                    mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
-                    ready_ = boost::move(rhs.ready_);
+
+                    move_fifo(rhs.ready_, rhs.count_, ready_, count_);
+
                     needed_count_ = rhs.needed_count_;
                     rhs.needed_count_ = 0;
-                    mtx_ = boost::move(rhs.mtx_);
                 }
                 return *this;
             }
 
             result_type operator()()
             {
-                mutex_type::scoped_lock l(mtx_);
-                ready_.clear();
-
+                // set callback functions to executed when future is ready
+                threads::thread_id_type id = threads::get_self().get_thread_id();
+                for (std::size_t i = 0; i != lazy_values_.size(); ++i)
                 {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-
-                    // set callback functions to executed when future is ready
-                    threads::thread_id_type id = threads::get_self().get_thread_id();
-                    for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    {
-                        lazy_values_[i].then(
-                            util::bind(&when_n::on_future_ready, this, i, id)
-                        );
-                    }
+                    lazy_values_[i].then(
+                        util::bind(&when_n::on_future_ready, this, i, id)
+                    );
                 }
 
                 // if all of the requested futures are already set, our
                 // callback above has already been called, otherwise we suspend
                 // ourselves
-                if (ready_.size() != needed_count_)
+                if (count_.load() < needed_count_)
                 {
                     // wait for any of the futures to return to become ready
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended);
                 }
 
                 // all futures should be ready
-                BOOST_ASSERT(ready_.size() == needed_count_);
+                BOOST_ASSERT(count_.load() >= needed_count_);
 
                 result_type result;
                 result.reserve(needed_count_);
-                for (std::size_t i = 0; i < needed_count_; ++i) {
+
+                std::size_t idx;
+                while (ready_.dequeue(idx)) {
                     result.push_back(HPX_STD_MAKE_TUPLE(
-                        static_cast<int>(ready_[i]), lazy_values_[ready_[i]]));
+                        static_cast<int>(idx), lazy_values_[idx]));
                 }
 
                 // reset all pending callback functions
-                l.unlock();
                 for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     lazy_values_[i].then();
 
@@ -140,9 +149,9 @@ namespace hpx
             }
 
             std::vector<lcos::future<T> > lazy_values_;
-            std::vector<std::size_t> ready_;
+            boost::lockfree::fifo<std::size_t> ready_;
+            boost::atomic<std::size_t> count_;
             std::size_t needed_count_;
-            mutable mutex_type mtx_;
         };
     }
 

@@ -207,7 +207,8 @@ endif()
 # C++
 hpx_include(GCCVersion)
 
-if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+               AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
   hpx_option(HPX_IGNORE_GCC_VERSION BOOL
@@ -270,6 +271,16 @@ if(NOT HPX_NO_INSTALL)
     CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
   hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
+endif()
+
+################################################################################
+# Decide whether to use shared memory based parcelport (starting with Boost V1.52)
+################################################################################
+if(${BOOST_MINOR_VERSION} GREATER 51)
+  hpx_option(HPX_USE_SHMEM_PARCELPORT BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
+  if(HPX_USE_SHMEM_PARCELPORT)
+    add_definitions(-DHPX_USE_SHMEM_PARCELPORT)
+  endif()
 endif()
 
 ################################################################################
@@ -1324,15 +1335,25 @@ endif()
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
                ${output_dir}/lib/pkgconfig/hpx_application.pc
                @ONLY)
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+               @ONLY)
 
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
                ${output_dir}/lib/pkgconfig/hpx_component.pc
+               @ONLY)
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
                @ONLY)
 
 if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
           DESTINATION lib/pkgconfig)
   install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+          DESTINATION lib/pkgconfig)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+          DESTINATION lib/pkgconfig)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
           DESTINATION lib/pkgconfig)
 endif()
 

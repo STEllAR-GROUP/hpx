@@ -250,14 +250,14 @@ namespace hpx { namespace applier
         return hpx::get_locality();
     }
 
-    naming::gid_type const& applier::get_raw_locality() const
+    naming::gid_type const& applier::get_raw_locality(error_code& ec) const
     {
-        return hpx::naming::get_agas_client().local_locality();
+        return hpx::naming::get_agas_client().local_locality(ec);
     }
 
-    boost::uint32_t applier::get_locality_id() const
+    boost::uint32_t applier::get_locality_id(error_code& ec) const
     {
-        return naming::get_locality_id_from_gid(get_raw_locality());
+        return naming::get_locality_id_from_gid(get_raw_locality(ec));
     }
 
     bool applier::get_raw_remote_localities(std::vector<naming::gid_type>& prefixes,
@@ -286,10 +286,23 @@ namespace hpx { namespace applier
     }
 
     bool applier::get_localities(std::vector<naming::id_type>& prefixes,
-        components::component_type type) const
+        error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, type))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
+            return false;
+
+        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+            prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
+
+        return true;
+    }
+
+    bool applier::get_localities(std::vector<naming::id_type>& prefixes,
+        components::component_type type, error_code& ec) const
+    {
+        std::vector<naming::gid_type> raw_prefixes;
+        if (!parcel_handler_.get_raw_localities(raw_prefixes, type, ec))
             return false;
 
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
@@ -328,10 +341,10 @@ namespace hpx { namespace applier
     }
 
     // The function \a get_locality_id returns the id of this locality
-    boost::uint32_t get_locality_id()
+    boost::uint32_t get_locality_id(error_code& ec)
     {
         applier** appl = applier::applier_.get();
-        return appl ? (*appl)->get_locality_id() : naming::invalid_locality_id;
+        return appl ? (*appl)->get_locality_id(ec) : naming::invalid_locality_id;
     }
 }}
 

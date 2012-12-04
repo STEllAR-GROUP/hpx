@@ -34,6 +34,8 @@ namespace hpx { namespace lcos
         {
             template <typename ContResult> struct continuation_base;
         }
+
+        template <typename T> struct channel;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +45,6 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-    public:
         typedef lcos::detail::future_data_base<Result> future_data_type;
 
         explicit future(future_data_type* p)
@@ -62,12 +63,17 @@ namespace hpx { namespace lcos
         friend class local::packaged_continuation;
         template <typename ContResult>
         friend struct local::detail::continuation_base;
+
+        template <typename T>
+        friend struct local::channel;
+
         template <typename Result_, typename RemoteResult_>
         friend class promise;
         friend struct detail::future_data<Result>;
 
         friend class hpx::thread;
 
+    public:
         typedef Result result_type;
 
         future()
@@ -243,7 +249,6 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-    public:
         typedef lcos::detail::future_data_base<void> future_data_type;
 
         explicit future(future_data_type* p)
@@ -257,10 +262,14 @@ namespace hpx { namespace lcos
         friend class local::promise<void>;
         friend class local::packaged_task<void()>;
         friend class local::futures_factory<void()>;
+
         template <typename ContResult, typename Result_>
         friend class local::packaged_continuation;
         template <typename ContResult>
         friend struct local::detail::continuation_base;
+
+        template <typename T>
+        friend struct local::channel;
 
         friend class promise<void, util::unused_type>;
         friend struct detail::future_data<void>;
@@ -279,6 +288,7 @@ namespace hpx { namespace lcos
             future_data_ = p;
         }
 
+    public:
         typedef void result_type;
 
         future()

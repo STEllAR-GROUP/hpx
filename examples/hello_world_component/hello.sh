@@ -8,7 +8,7 @@
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
 
 # Compile the library
-c++ -o libhpx_component_hello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
 
 # Create the directory where we want to install the library
 mkdir -p ~/my_hpx_libs
@@ -20,7 +20,7 @@ if [ ! -r ~/.hpx.ini ]
 then
 cat > ~/.hpx.ini <<EOF
 [hpx]
-ini_path = $[hpx.ini_default_path]:${HOME}/my_hpx_libs
+ini_path = $[hpx.ini_path]:${HOME}/my_hpx_libs
 EOF
 fi
 

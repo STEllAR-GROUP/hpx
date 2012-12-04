@@ -54,7 +54,11 @@ namespace hpx { namespace util
             if (NULL != file_suffix)
                 inipath /= hpx::util::create_path(file_suffix);
 
-            return handle_ini_file(ini, inipath.string());
+            if (handle_ini_file(ini, inipath.string())) {
+                LBT_(info) << "loaded configuration (${" << env_var << "}): "
+                           << inipath.string();
+                return true;
+            }
         }
         return false;
     }
@@ -71,24 +75,47 @@ namespace hpx { namespace util
         // fall back: use compile time prefix
         std::string ini_path(ini.get_entry("hpx.master_ini_path"));
         bool result = handle_ini_file (ini, ini_path + "/hpx.ini");
+        if (result) {
+            LBT_(info) << "loaded configuration: " << ini_path << "/hpx.ini";
+        }
 
         // look in the current directory first
         std::string cwd = fs::current_path().string() + "/.hpx.ini";
-        result = handle_ini_file (ini, cwd) || result;
+        {
+            bool result2 = handle_ini_file (ini, cwd);
+            if (result2) {
+                LBT_(info) << "loaded configuration: " << cwd;
+            }
+            result = result2 || result;
+        }
 
         // look for master ini in the HPX_INI environment
         result = handle_ini_file_env (ini, "HPX_INI") || result;
 
         // afterwards in the standard locations
 #if !defined(BOOST_WINDOWS)   // /etc/hpx.ini doesn't make sense for Windows
-        result = handle_ini_file(ini, "/etc/hpx.ini") || result;
+        {
+            bool result2 = handle_ini_file(ini, "/etc/hpx.ini");
+            if (result2) {
+                LBT_(info) << "loaded configuration: " << "/etc/hpx.ini";
+            }
+            result = result2 || result;
+        }
 #endif
 //      FIXME: is this really redundant?
 //         result = handle_ini_file_env(ini, "HPX_LOCATION", "/share/hpx/hpx.ini") || result;
 
         result = handle_ini_file_env(ini, "HOME", "/.hpx.ini") || result;
         result =  handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
-        return handle_ini_file(ini, hpx_ini_file) || result;
+
+        if (!hpx_ini_file.empty()) {
+            bool result2 = handle_ini_file(ini, hpx_ini_file);
+            if (result2) {
+                LBT_(info) << "loaded configuration: " << hpx_ini_file;
+            }
+            return result || result2;
+        }
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -131,8 +158,10 @@ namespace hpx { namespace util
                     try {
 #if BOOST_FILESYSTEM_VERSION == 3
                         ini.merge ((*dir).path().string());
+                        LBT_(info) << "loaded configuration: " << (*dir).path().string();
 #else
                         ini.merge ((*dir).string());
+                        LBT_(info) << "loaded configuration: " << (*dir).string();
 #endif
                     }
                     catch (hpx::exception const& /*e*/) {

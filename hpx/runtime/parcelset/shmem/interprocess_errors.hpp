@@ -42,9 +42,13 @@ namespace hpx { namespace parcelset { namespace shmem
              "size_error",
              "corrupted_error",
              "not_such_file_or_directory",
-             "invalid_argument",
-             "timeout_when_locking_error",
-             "timeout_when_waiting_error"
+             "invalid_argument"
+#if BOOST_VERSION >= 104800
+           , "timeout_when_locking_error"
+#if BOOST_VERSION >= 104900
+           , "timeout_when_waiting_error"
+#endif
+#endif
         };
 
         class interprocess_category : public boost::system::error_category
@@ -60,8 +64,16 @@ namespace hpx { namespace parcelset { namespace shmem
                 using namespace boost::interprocess;
 
                 // make sure our assumption about error codes is reasonably correct
+#if BOOST_VERSION < 104800
+                BOOST_STATIC_ASSERT(sizeof(error_names)/sizeof(error_names[0]) ==
+                    invalid_argument+1);
+#elif BOOST_VERSION < 104900
+                BOOST_STATIC_ASSERT(sizeof(error_names)/sizeof(error_names[0]) ==
+                    timeout_when_locking_error+1);
+#else
                 BOOST_STATIC_ASSERT(sizeof(error_names)/sizeof(error_names[0]) ==
                     timeout_when_waiting_error+1);
+#endif
 
                 if (value >= no_error && value <= timeout_when_waiting_error)
                     return std::string("Shmem(") + error_names[value] + ")";

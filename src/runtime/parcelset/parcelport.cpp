@@ -1,11 +1,12 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//
+//  Copyright (c) 2007-2012 Hartmut Kaiser//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
-#include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#if defined(HPX_USE_SHMEM_PARCELPORT)
+#  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#endif
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/exception.hpp>
@@ -26,8 +27,23 @@ namespace hpx { namespace parcelset
                 cfg, on_start_thread, on_stop_thread);
 
         case connection_shmem:
-            return boost::make_shared<parcelset::shmem::parcelport>(
-                cfg, on_start_thread, on_stop_thread);
+            {
+#if defined(HPX_USE_SHMEM_PARCELPORT)
+                // Create shmem based parcelport only if allowed by the 
+                // configuration info.
+                std::string enable_shmem = 
+                    cfg.get_entry("hpx.parcel.enable_shmem_parcelport", "0");
+
+                if (boost::lexical_cast<int>(enable_shmem)) 
+                {
+                    return boost::make_shared<parcelset::shmem::parcelport>(
+                        cfg, on_start_thread, on_stop_thread);
+                }
+#endif
+                HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
+                    "unsupported connection type 'connection_shmem'");
+            }
+            break;
 
         case connection_portals4:
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",

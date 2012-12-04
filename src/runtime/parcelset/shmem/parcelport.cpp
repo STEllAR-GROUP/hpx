@@ -1,9 +1,10 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//
+//  Copyright (c) 2007-2012 Hartmut Kaiser//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_USE_SHMEM_PARCELPORT)
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -231,8 +232,8 @@ namespace hpx { namespace parcelset { namespace shmem
             util::spinlock::scoped_lock l(mtx_);
 
             mapped_type& e = pending_parcels_[locality_id];
-            pending_parcels_[locality_id].first.push_back(p);
-            pending_parcels_[locality_id].second.push_back(f);
+            e.first.push_back(p);
+            e.second.push_back(f);
         }
 
         parcelport_connection_ptr client_connection = get_connection(locality_id);
@@ -520,3 +521,5 @@ namespace hpx { namespace parcelset { namespace shmem
         }
     }
 }}}
+
+#endif

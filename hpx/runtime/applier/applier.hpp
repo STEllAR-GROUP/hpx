@@ -72,14 +72,14 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
-        naming::gid_type const& get_raw_locality() const;
+        naming::gid_type const& get_raw_locality(error_code& ec = throws) const;
 
         /// \brief Allow access to the id of the locality this applier
         ///        instance is associated with.
         ///
         /// This function returns a reference to the id of the locality this
         /// applier instance is associated with.
-        boost::uint32_t get_locality_id() const;
+        boost::uint32_t get_locality_id(error_code& ec = throws) const;
 
         /// \brief Return list of localities of all remote localities
         ///        registered with the AGAS service for a specific component
@@ -123,7 +123,9 @@ namespace hpx { namespace applier
             components::component_type type = components::component_invalid) const;
 
         bool get_localities(std::vector<naming::id_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            error_code& ec = throws) const;
+        bool get_localities(std::vector<naming::id_type>& locality_ids,
+            components::component_type type, error_code& ec = throws) const;
 
         /// By convention the runtime_support has a gid identical to the prefix
         /// of the locality the runtime_support is responsible for
