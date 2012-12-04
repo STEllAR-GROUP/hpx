@@ -216,6 +216,7 @@ namespace hpx { namespace parcelset
     connection_type parcelhandler::find_appropriate_connection_type(
         naming::locality dest)
     {
+#if defined(HPX_USE_SHMEM_PARCELPORT)
         if (dest.get_type() == connection_tcpip) {
             // if destination is on the same network node, use shared memory
             // otherwise fall back to tcp
@@ -226,7 +227,7 @@ namespace hpx { namespace parcelset
             }
             return connection_tcpip;
         }
-
+#endif
         return dest.get_type();
     }
 
@@ -234,6 +235,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::set_resolved_localities(
         std::vector<naming::locality> const& localities)
     {
+#if defined(HPX_USE_SHMEM_PARCELPORT)
         std::string enable_shmem = 
             get_config_entry("hpx.parcel.enable_shmem_parcelport", "0");
 
@@ -248,10 +250,10 @@ namespace hpx { namespace parcelset
             // if there are more localities sharing the same network node, we need
             // to instantiate the shmem parcel-port
             std::size_t here_count = 0;
-            std::string here(here().get_address());
+            std::string here_(here().get_address());
             BOOST_FOREACH(naming::locality const& t, localities)
             {
-                if (t.get_address() == here)
+                if (t.get_address() == here_)
                     ++here_count;
             }
 
@@ -265,6 +267,7 @@ namespace hpx { namespace parcelset
                     pool->get_on_start_thread(), pool->get_on_stop_thread()));
             }
         }
+#endif
     }
 
     /// Return the reference to an existing io_service

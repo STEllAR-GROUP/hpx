@@ -5,7 +5,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
-#include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#if defined(HPX_USE_SHMEM_PARCELPORT)
+#  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#endif
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/exception.hpp>
@@ -27,6 +29,7 @@ namespace hpx { namespace parcelset
 
         case connection_shmem:
             {
+#if defined(HPX_USE_SHMEM_PARCELPORT)
                 // Create shmem based parcelport only if allowed by the 
                 // configuration info.
                 std::string enable_shmem = 
@@ -37,7 +40,7 @@ namespace hpx { namespace parcelset
                     return boost::make_shared<parcelset::shmem::parcelport>(
                         cfg, on_start_thread, on_stop_thread);
                 }
-
+#endif
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                     "unsupported connection type 'connection_shmem'");
             }

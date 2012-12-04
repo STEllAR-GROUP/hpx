@@ -274,6 +274,16 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 ################################################################################
+# Decide whether to use shared memory based parcelport (starting with Boost V1.52)
+################################################################################
+if(${BOOST_MINOR_VERSION} GREATER 51)
+  hpx_option(HPX_USE_SHMEM_PARCELPORT BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
+  if(HPX_USE_SHMEM_PARCELPORT)
+    add_definitions(-DHPX_USE_SHMEM_PARCELPORT)
+  endif()
+endif()
+
+################################################################################
 # Logging configuration
 ################################################################################
 hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)

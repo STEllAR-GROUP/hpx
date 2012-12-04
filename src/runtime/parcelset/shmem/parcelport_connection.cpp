@@ -3,9 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <stdexcept>
-
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_USE_SHMEM_PARCELPORT)
 #include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -14,6 +14,8 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
 #include <boost/format.hpp>
+
+#include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace shmem
@@ -118,3 +120,4 @@ namespace hpx { namespace parcelset { namespace shmem
     }
 }}}
 
+#endif
