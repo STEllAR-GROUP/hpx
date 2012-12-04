@@ -19,6 +19,7 @@ set(subdirs
     dataflow
     distributed_test
     embarrassingly_parallel
+    fft
     fortran_threadsafe
     gtcx
     gravity
