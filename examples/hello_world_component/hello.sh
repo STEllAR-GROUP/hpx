@@ -20,7 +20,7 @@ if [ ! -r ~/.hpx.ini ]
 then
 cat > ~/.hpx.ini <<EOF
 [hpx]
-ini_path = $[hpx.ini_path]:${HOME}/my_hpx_libs
+ini_path = \$[hpx.ini_path]:${HOME}/my_hpx_libs
 EOF
 fi
 
