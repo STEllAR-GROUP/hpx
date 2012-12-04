@@ -22,7 +22,7 @@ struct HPX_COMPONENT_EXPORT hello_world
     void invoke();
 
     typedef hpx::actions::action0<
-        hello_world, 0, &hello_world::invoke
+        hello_world, &hello_world::invoke
     > invoke_action;
 };
 
