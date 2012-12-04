@@ -288,11 +288,18 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
+    $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -liostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
            the [^-o] flag.]
+
+[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the 
+      pkg-config names have to be different. Instead of `hpz_application` or 
+      `hpx_component` you will have to use `hpx_application_debug` or 
+      `hpx_component_debug`. Moreover, all referenced HPX components need to 
+      have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
+      to specify `-liostreamsd`.]
 
 To test the program, type:
 
@@ -342,7 +349,7 @@ build the component library. (where [^$HPX_LOCATION] is the
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o libhpx_component_hello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+    $ c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
 ``
 
 Now pick a directory in which to install your hpx component libraries. For
@@ -350,8 +357,15 @@ this example, we'll choose a directory named ''my_hpx_libs''.
 
 ``
     $ mkdir ~/my_hpx_libs
-    $ mv libhpx_component_hello_world.so ~/my_hpx_libs
+    $ mv libhello_world.so ~/my_hpx_libs
 ``
+
+[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the 
+      pkg-config names have to be different. Instead of `hpz_application` or 
+      `hpx_component` you will have to use `hpx_application_debug` or 
+      `hpx_component_debug`. Moreover, all referenced HPX components need to 
+      have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
+      to specify `-liostreamsd`.]
 
 In the ~/my_hpx_libs directory you need to create an ini file inside that directory which matches
 the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
@@ -363,14 +377,15 @@ the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
     path = ${HOME}/my_hpx_libs
 ``
 
-[note For additional details about ini file configuration and __hpx__, see [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
+[note For additional details about ini file configuration and __hpx__, see 
+      [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 
 In addition, you'll need this in your home directory:
 
 [*.hpx.ini]
 ``
     [hpx]
-    ini_path = $[hpx.ini_default_path]:${HOME}/my_hpx_libs
+    ini_path = $[hpx.ini_path]:${HOME}/my_hpx_libs
 ``
 
 Now, to build the application that uses this component (hello_world_client.cpp),
@@ -378,7 +393,7 @@ we do:
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -lhpx_component_hello_world
+    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -lhello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
