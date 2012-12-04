@@ -12,7 +12,7 @@ c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs h
 
 # Create the directory where we want to install the library
 mkdir -p ~/my_hpx_libs
-mv libhello_worldd.so ~/my_hpx_libs
+mv libhello_world.so ~/my_hpx_libs
 
 # If we don't have a .hpx.ini yet, create one and tell it about
 # our private hpx library directory
