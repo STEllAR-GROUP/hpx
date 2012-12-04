@@ -1335,15 +1335,25 @@ endif()
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
                ${output_dir}/lib/pkgconfig/hpx_application.pc
                @ONLY)
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+               @ONLY)
 
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
                ${output_dir}/lib/pkgconfig/hpx_component.pc
+               @ONLY)
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
                @ONLY)
 
 if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
           DESTINATION lib/pkgconfig)
   install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+          DESTINATION lib/pkgconfig)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+          DESTINATION lib/pkgconfig)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
           DESTINATION lib/pkgconfig)
 endif()
 
