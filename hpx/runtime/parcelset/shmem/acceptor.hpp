@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser//
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -69,15 +70,15 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         // synchronous and asynchronous accept
-        template <typename Service>
-        void accept(basic_data_window<Service>& window,
+        template <typename Service_>
+        void accept(basic_data_window<Service_>& window,
             boost::system::error_code &ec = boost::system::throws)
         {
             return this->service.accept(this->implementation, window, ec);
         }
 
-        template <typename Service, typename Handler>
-        void async_accept(basic_data_window<Service>& window, Handler handler)
+        template <typename Service_, typename Handler>
+        void async_accept(basic_data_window<Service_>& window, Handler handler)
         {
             this->service.async_accept(this->implementation, window, handler);
         }
