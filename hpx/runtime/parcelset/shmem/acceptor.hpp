@@ -20,6 +20,7 @@
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/scope_exit.hpp>
+#include <boost/atomic.hpp>
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 
@@ -279,15 +280,15 @@ namespace hpx { namespace parcelset { namespace shmem
                 return;
             }
 
-            close_operation_ = true;
+            close_operation_.store(true);
             BOOST_SCOPE_EXIT(&close_operation_) {
-                close_operation_ = false;
+                close_operation_.store(false);
             } BOOST_SCOPE_EXIT_END
 
 //             std::cout << "acceptor: " << endpoint_ << ": close" << std::endl;
 
             // wait for pending operations to return
-            while (executing_operation_)
+            while (executing_operation_.load())
                 ;
 
             if (mq_) {
@@ -302,22 +303,22 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void destroy()
         {
-            aborted_ = true;
+            aborted_.store(true);
             BOOST_SCOPE_EXIT(&aborted_) {
-                aborted_ = false;
+                aborted_.store(false);
             } BOOST_SCOPE_EXIT_END
 
 //             std::cout << "acceptor: " << endpoint_ << ": destroy" << std::endl;
 
             // cancel operation
-            while (executing_operation_)
+            while (executing_operation_.load())
                 ;
         }
 
         template <typename Service>
         bool try_accept(basic_data_window<Service>& window, boost::system::error_code &ec)
         {
-            if (close_operation_ || !mq_) {
+            if (close_operation_.load() || !mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
             }
             else {
@@ -376,12 +377,12 @@ namespace hpx { namespace parcelset { namespace shmem
     protected:
         bool try_receive_command(message& msg, boost::system::error_code &ec)
         {
-            executing_operation_ = true;
+            ++executing_operation_;
             BOOST_SCOPE_EXIT(&executing_operation_) {
-                executing_operation_ = false;
+                --executing_operation_;
             } BOOST_SCOPE_EXIT_END
 
-            if (close_operation_ || !mq_) {
+            if (close_operation_.load() || !mq_) {
                 HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
                 return false;
             }
@@ -394,8 +395,8 @@ namespace hpx { namespace parcelset { namespace shmem
                 if (!mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
                     boost::get_system_time() + boost::posix_time::milliseconds(1)))
                 {
-                    if (aborted_ || close_operation_) {
-                        aborted_ = false;
+                    if (aborted_.load() || close_operation_.load()) {
+                        aborted_.store(false);
                         HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
                     }
                     return false;
@@ -403,7 +404,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 return true;
             }
             catch (boost::interprocess::interprocess_exception const& e) {
-                aborted_ = false;
+                aborted_.store(false);
                 HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
             }
             return false;
@@ -413,9 +414,9 @@ namespace hpx { namespace parcelset { namespace shmem
         std::size_t msg_num_;
         std::string endpoint_;
         boost::shared_ptr<boost::interprocess::message_queue> mq_;
-        bool aborted_;
-        bool executing_operation_;
-        bool close_operation_;
+        boost::atomic<boost::uint16_t> executing_operation_;
+        boost::atomic<bool> aborted_;
+        boost::atomic<bool> close_operation_;
         bool manage_lifetime_;
     };
 
