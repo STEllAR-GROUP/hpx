@@ -284,7 +284,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 close_operation_ = false;
             } BOOST_SCOPE_EXIT_END
 
-            std::cout << "acceptor: " << endpoint_ << ": close" << std::endl;
+//             std::cout << "acceptor: " << endpoint_ << ": close" << std::endl;
 
             // wait for pending operations to return
             while (executing_operation_)
@@ -307,7 +307,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 aborted_ = false;
             } BOOST_SCOPE_EXIT_END
 
-            std::cout << "acceptor: " << endpoint_ << ": destroy" << std::endl;
+//             std::cout << "acceptor: " << endpoint_ << ": destroy" << std::endl;
 
             // cancel operation
             while (executing_operation_)

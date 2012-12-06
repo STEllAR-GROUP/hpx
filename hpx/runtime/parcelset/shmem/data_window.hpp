@@ -515,7 +515,7 @@ namespace hpx { namespace parcelset { namespace shmem
     {
     public:
         data_window_impl()
-          : msg_num_(1), aborted_(false),
+          : msg_num_(10), aborted_(false),
             executing_operation_(false),
             close_operation_(false),
             manage_lifetime_(false)
@@ -539,6 +539,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     using namespace boost::interprocess;
                     if (manage_lifetime_)
                         message_queue::remove(name.c_str());
+
                     return boost::make_shared<message_queue>(
                         open_or_create, name.c_str(), msg_num_, sizeof(message));
                 }
@@ -601,7 +602,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 close_operation_ = false;
             } BOOST_SCOPE_EXIT_END
 
-            std::cout << "data_window: " << here_ << "/" << there_ << ": close" << std::endl;
+//             std::cout << "data_window: " << here_ << "/" << there_ << ": close" << std::endl;
 
             // wait for pending operations to exit
             while (executing_operation_)
@@ -610,13 +611,17 @@ namespace hpx { namespace parcelset { namespace shmem
             // close does nothing if the data window was already closed
             if (read_mq_) {
                 read_mq_.reset();
-                if (manage_lifetime_)
-                    boost::interprocess::message_queue::remove(there_.c_str());
+                if (manage_lifetime_) {
+                    boost::interprocess::message_queue::remove(
+                        (there_ + ".write").c_str());
+                }
             }
             if (write_mq_) {
                 write_mq_.reset();
-                if (manage_lifetime_)
-                    boost::interprocess::message_queue::remove(here_.c_str());
+                if (manage_lifetime_) {
+                    boost::interprocess::message_queue::remove(
+                        (there_ + ".read").c_str());
+                }
             }
             HPX_SHMEM_RESET_EC(ec);
         }
@@ -624,7 +629,7 @@ namespace hpx { namespace parcelset { namespace shmem
         void shutdown(boost::system::error_code &ec)
         {
             if (write_mq_) {
-                std::cout << "data_window: " << here_ <<  "/" << there_ << ": shutdown" << std::endl;
+//                 std::cout << "data_window: " << here_ <<  "/" << there_ << ": shutdown" << std::endl;
                 send_command(*write_mq_, message::shutdown, 0, ec);
             }
         }
@@ -636,7 +641,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 aborted_ = false;
             } BOOST_SCOPE_EXIT_END
 
-            std::cout << "data_window: " << here_ <<  "/" << there_ << ": destroy" << std::endl;
+//             std::cout << "data_window: " << here_ <<  "/" << there_ << ": destroy" << std::endl;
 
             // cancel operation
             while (executing_operation_)
