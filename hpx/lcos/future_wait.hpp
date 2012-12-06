@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 #include <vector>
 
@@ -48,6 +49,40 @@ namespace hpx { namespace lcos
         return 1;
     }
 
+    namespace detail
+    {
+        template <typename F>
+        struct wrap_callback
+        {
+            typedef void result_type;
+
+            wrap_callback(F const& f, std::size_t seqnum, std::size_t& success_count)
+              : f_(f), seqnum_(seqnum), success_count_(success_count)
+            {}
+
+            template <typename T>
+            void operator()(lcos::future<T> f) const
+            {
+                if (f.has_value()) {
+                    f_(seqnum_, f.get());
+                    ++success_count_;
+                }
+            }
+
+            void operator()(lcos::future<void> f) const
+            {
+                if (f.has_value()) {
+                    f_(seqnum_);
+                    ++success_count_;
+                }
+            }
+
+            F const& f_;
+            std::size_t seqnum_;
+            std::size_t& success_count_;
+        };
+    }
+
     // This overload of wait() will make sure that the passed function will be
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
@@ -56,35 +91,25 @@ namespace hpx { namespace lcos
     wait (std::vector<lcos::future<T1> > const& lazy_values, F const& f,
         boost::int32_t suspend_for = 10)
     {
-        boost::dynamic_bitset<> handled(lazy_values.size());
-        std::size_t handled_count = 0;
-        while (handled_count < lazy_values.size()) {
+        // attach a special function to all futures
+        std::vector<lcos::future<void> > then_futures;
+        std::size_t seqnum = 0;
+        std::size_t success_count = 0;
 
-            bool suspended = false;
-            for (std::size_t i = 0; i < lazy_values.size(); ++i) {
-
-                // loop over all lazy_values, executing the next as soon as its
-                // value becomes available
-                if (!handled[i] && lazy_values[i].is_ready()) {
-                    // get the value from the future, invoke the function
-                    f(i, lazy_values[i].get());
-
-                    handled[i] = true;
-                    ++handled_count;
-
-                    // give thread-manager a chance to look for more work while
-                    // waiting
-                    this_thread::suspend();
-                    suspended = true;
-                }
-            }
-
-            // suspend after one full loop over all values, 10ms should be fine
-            // (default parameter)
-            if (!suspended)
-                this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
+        BOOST_FOREACH(lcos::future<T1> lv, lazy_values)
+        {
+            then_futures.push_back(lv.then(
+                detail::wrap_callback<F>(f, ++seqnum, success_count)));
         }
-        return handled.count();
+
+        // and wait for all of the functions to be called
+        wait_all(then_futures);
+
+        // reset the attached completion handlers
+        BOOST_FOREACH(lcos::future<T1> lv, lazy_values)
+            lv.then();
+
+        return success_count;
     }
 
     template <typename F>
@@ -92,36 +117,25 @@ namespace hpx { namespace lcos
     wait (std::vector<lcos::future<void> > const& lazy_values, F const& f,
         boost::int32_t suspend_for = 10)
     {
-        boost::dynamic_bitset<> handled(lazy_values.size());
-        std::size_t handled_count = 0;
-        while (handled_count < lazy_values.size()) {
+        // attach a special function to all futures
+        std::vector<lcos::future<void> > then_futures;
+        std::size_t seqnum = 0;
+        std::size_t success_count = 0;
 
-            bool suspended = false;
-            for (std::size_t i = 0; i < lazy_values.size(); ++i) {
-
-                // loop over all lazy_values, executing the next as soon as its
-                // value becomes available
-                if (!handled[i] && lazy_values[i].is_ready()) {
-                    // get the value from the future, invoke the function
-                    lazy_values[i].get();
-                    f(i);
-
-                    handled[i] = true;
-                    ++handled_count;
-
-                    // give thread-manager a chance to look for more work while
-                    // waiting
-                    this_thread::suspend();
-                    suspended = true;
-                }
-            }
-
-            // suspend after one full loop over all values, 10ms should be fine
-            // (default parameter)
-            if (!suspended)
-                this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
+        BOOST_FOREACH(lcos::future<void> lv, lazy_values)
+        {
+            then_futures.push_back(lv.then(
+                detail::wrap_callback<F>(f, ++seqnum, success_count)));
         }
-        return handled.count();
+
+        // and wait for all of the functions to be called
+        wait_all(then_futures);
+
+        // reset the attached completion handlers
+        BOOST_FOREACH(lcos::future<void> lv, lazy_values)
+            lv.then();
+
+        return success_count;
     }
 
     ///////////////////////////////////////////////////////////////////////////
