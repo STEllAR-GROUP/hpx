@@ -112,9 +112,9 @@ namespace hpx { namespace util
             {
                 shared_lock_type guard(mtx_);
 
-                size = heap_list_.size();
-                if (size)
+                if (!heap_list_.empty())
                 {
+                    size = heap_list_.size();
                     for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
                     {
                         if ((*it)->alloc(&p, count))
@@ -147,17 +147,10 @@ namespace hpx { namespace util
                 // Acquire exclusive access.
                 unique_lock_type ul(mtx_);
 
-                iterator itnew = heap_list_.insert(heap_list_.begin(),
-                    typename list_type::value_type(new heap_type
-                        (class_name_.c_str(), heap_count_ + 1, heap_step)));
+                heap_list_.push_front(typename list_type::value_type(
+                    new heap_type(class_name_.c_str(), heap_count_ + 1, heap_step)));
 
-                if (HPX_UNLIKELY(itnew == heap_list_.end()))
-                {
-                    HPX_THROW_EXCEPTION(out_of_memory,
-                        name() + "::alloc",
-                        "new heap could not be added");
-                }
-
+                iterator itnew = heap_list_.begin();
                 bool result = (*itnew)->alloc(&p, count);
 
                 if (HPX_UNLIKELY(!result || NULL == p))
@@ -178,7 +171,7 @@ namespace hpx { namespace util
                         "%1%::alloc: creating new heap[%2%], size is now %3%")
                         % name()
                         % heap_count_
-                        % heap_list_.size());
+                        % size);
                 did_create = true;
             }
 
