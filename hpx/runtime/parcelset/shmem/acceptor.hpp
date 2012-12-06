@@ -117,8 +117,8 @@ namespace hpx { namespace parcelset { namespace shmem
                 if (impl)
                 {
                     boost::system::error_code ec;
-                    while (!impl->try_accept(window_, ec) && !ec)
-                        io_service_.poll_one();   // try to do other stuff
+                    while (!ec && !impl->try_accept(window_, ec) && !ec)
+                        io_service_.poll_one(ec);   // try to do other stuff
 
                     io_service_.post(
                         boost::asio::detail::bind_handler(handler_, ec));
@@ -279,8 +279,11 @@ namespace hpx { namespace parcelset { namespace shmem
                 close_operation_ = false;
             } BOOST_SCOPE_EXIT_END
 
+            std::cout << "acceptor: " << endpoint_ << ": close" << std::endl;
+
             // wait for pending operations to return
-            destroy();
+            while (executing_operation_)
+                ;
 
             if (mq_) {
                 mq_.reset();
@@ -298,6 +301,8 @@ namespace hpx { namespace parcelset { namespace shmem
             BOOST_SCOPE_EXIT(&aborted_) {
                 aborted_ = false;
             } BOOST_SCOPE_EXIT_END
+
+            std::cout << "acceptor: " << endpoint_ << ": destroy" << std::endl;
 
             // cancel operation
             while (executing_operation_)
@@ -379,7 +384,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 if (!mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
                     boost::get_system_time() + boost::posix_time::milliseconds(1)))
                 {
-                    if (aborted_) {
+                    if (aborted_ || close_operation_) {
                         aborted_ = false;
                         HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
                     }

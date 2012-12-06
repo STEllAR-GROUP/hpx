@@ -365,6 +365,12 @@ set_property(TARGET hpx APPEND
   "BOOST_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
+if(HPX_USE_SHMEM_PARCELPORT)
+  set_property(TARGET hpx APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "BOOST_INTERPROCESS_ENABLE_TIMEOUT_WHEN_LOCKING")
+endif()
+
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx lib/hpx)
 endif()
