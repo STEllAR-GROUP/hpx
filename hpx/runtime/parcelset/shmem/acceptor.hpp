@@ -274,6 +274,11 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void close(boost::system::error_code &ec)
         {
+            if (!mq_) {
+                HPX_SHMEM_RESET_EC(ec);
+                return;
+            }
+
             close_operation_ = true;
             BOOST_SCOPE_EXIT(&close_operation_) {
                 close_operation_ = false;
@@ -376,6 +381,11 @@ namespace hpx { namespace parcelset { namespace shmem
                 executing_operation_ = false;
             } BOOST_SCOPE_EXIT_END
 
+            if (close_operation_ || !mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+                return false;
+            }
+
             try {
                 HPX_SHMEM_RESET_EC(ec);
 
@@ -390,11 +400,13 @@ namespace hpx { namespace parcelset { namespace shmem
                     }
                     return false;
                 }
+                return true;
             }
             catch (boost::interprocess::interprocess_exception const& e) {
+                aborted_ = false;
                 HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
             }
-            return true;
+            return false;
         }
 
     private:

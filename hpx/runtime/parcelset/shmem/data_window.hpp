@@ -547,7 +547,6 @@ namespace hpx { namespace parcelset { namespace shmem
                     return boost::make_shared<message_queue>(
                         open_only, name.c_str());
                 }
-                HPX_SHMEM_RESET_EC(ec);
             }
             catch(boost::interprocess::interprocess_exception const& e) {
                 HPX_SHMEM_THROWS_IF(ec, make_error_code(e.get_error_code()));
@@ -592,6 +591,11 @@ namespace hpx { namespace parcelset { namespace shmem
 
         void close(boost::system::error_code &ec)
         {
+            if (!read_mq_ && !write_mq_) {
+                HPX_SHMEM_RESET_EC(ec);
+                return;
+            }
+
             close_operation_ = true;
             BOOST_SCOPE_EXIT(&close_operation_) {
                 close_operation_ = false;
@@ -805,6 +809,11 @@ namespace hpx { namespace parcelset { namespace shmem
                 executing_operation_ = false;
             } BOOST_SCOPE_EXIT_END
 
+            if (close_operation_ || !read_mq_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+                return false;
+            }
+
             HPX_SHMEM_RESET_EC(ec);
 
             boost::interprocess::message_queue::size_type recvd_size;
@@ -830,15 +839,20 @@ namespace hpx { namespace parcelset { namespace shmem
                 executing_operation_ = false;
             } BOOST_SCOPE_EXIT_END
 
+            if (close_operation_) {
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::not_connected);
+                return;
+            }
+
             try {
+                HPX_SHMEM_RESET_EC(ec);
+
                 message msg;
                 msg.command_ = cmd;
                 if (data) {
                     std::strncpy(msg.data_, data, sizeof(msg.data_));
                     msg.data_[sizeof(msg.data_)-1] = '\0';
                 }
-
-                HPX_SHMEM_RESET_EC(ec);
 
                 while(!mq.timed_send(&msg, sizeof(msg), 0,
                     boost::get_system_time() + boost::posix_time::milliseconds(1)))
