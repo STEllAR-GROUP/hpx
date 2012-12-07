@@ -18,8 +18,6 @@
 #include <hpx/util/connection_cache.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/cache/lower_bound_local_cache.hpp>
-#include <boost/cache/entries/lru_entry.hpp>
 
 #include <set>
 
