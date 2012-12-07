@@ -227,7 +227,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     if (0 == (size = impl->try_read(data_, ec)) && !ec) {
                         // repost this handler
                         io_service_.post(boost::bind(
-                            &read_operation::call, shared_from_this()));
+                            &read_operation::call, this->shared_from_this()));
                     }
                     else {
                         // successfully read next message

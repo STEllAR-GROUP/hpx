@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     if (!impl->try_accept(window_, ec) && !ec) {
                         // repost this function
                         io_service_.post(boost::bind(
-                            &accept_operation::call, shared_from_this()));
+                            &accept_operation::call, this->shared_from_this()));
                     }
                     else {
                         io_service_.post(
