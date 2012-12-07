@@ -81,7 +81,7 @@ namespace hpx { namespace parcelset { namespace shmem
         /// Cache specific functionality
         void remove_from_connection_cache(naming::locality const& loc)
         {
-//             connection_cache_.clear(loc);
+            connection_cache_.clear(loc);
         }
 
         /// Retrieve the type of the locality represented by this parcelport
@@ -120,7 +120,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::size_t connection_count_;
 
         /// The connection cache for sending connections
-//         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
+        util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
         /// The list of accepted connections
         typedef std::set<server::shmem::parcelport_connection_ptr> accepted_connections_set;

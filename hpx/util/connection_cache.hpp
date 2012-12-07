@@ -58,6 +58,7 @@ namespace hpx { namespace util
           : max_connections_(max_connections < 2 ? 2 : max_connections)
           , max_connections_per_locality_(max_connections_per_locality)
           , connections_(0)
+          , shutting_down_(false)
         {
             if (max_connections_per_locality_ > max_connections_)
             {
@@ -66,6 +67,11 @@ namespace hpx { namespace util
                     "the maximum number of connections per locality cannot "
                     "excede the overall maximum number of connections");
             }
+        }
+
+        void shutdown()
+        {
+            shutting_down_ = true;
         }
 
         /// Try to get a connection to \a l from the cache.
@@ -224,23 +230,26 @@ namespace hpx { namespace util
             // Search for an entry for this key.
             typename cache_type::iterator const ct = cache_.find(l);
 
-            // Key should already exist in the cache. FIXME: This should
-            // probably throw as could easily be triggered by caller error.
-            BOOST_ASSERT(ct != cache_.end());
+            if (ct != cache_.end()) {
+                // Update LRU meta data.
+                key_tracker_.splice(
+                    key_tracker_.end()
+                  , key_tracker_
+                  , boost::get<2>(ct->second)
+                    );
 
-            // Update LRU meta data.
-            key_tracker_.splice(
-                key_tracker_.end()
-              , key_tracker_
-              , boost::get<2>(ct->second)
-                );
+                // Add the connection to the entry.
+                boost::get<0>(ct->second).push_back(conn);
 
-            // Add the connection to the entry.
-            boost::get<0>(ct->second).push_back(conn);
-
-            // FIXME: Again, this should probably throw instead of asserting,
-            // as invariants could be invalidated here due to caller error.
-            check_invariants();
+                // FIXME: Again, this should probably throw instead of asserting,
+                // as invariants could be invalidated here due to caller error.
+                check_invariants();
+            }
+            else {
+                // Key should already exist in the cache. FIXME: This should
+                // probably throw as could easily be triggered by caller error.
+                BOOST_ASSERT(shutting_down_);
+            }
         }
 
         /// Returns true if the overall connection count is equal to or larger
@@ -419,6 +428,7 @@ namespace hpx { namespace util
         key_tracker_type key_tracker_;
         cache_type cache_;
         size_type connections_;
+        bool shutting_down_;
     };
 }}
 

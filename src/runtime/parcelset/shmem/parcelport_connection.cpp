@@ -27,7 +27,6 @@ namespace hpx { namespace parcelset { namespace shmem
             performance_counters::parcels::gatherer& parcels_sent,
             std::size_t connection_count)
       : window_(io_service), there_(there),
-        /*connection_cache_(cache), */
         parcels_sent_(parcels_sent)
     {
         std::string fullname(here.get_address() + "." +

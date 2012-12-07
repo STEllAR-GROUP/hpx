@@ -45,7 +45,6 @@ namespace hpx { namespace parcelset { namespace tcp
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 naming::locality const& locality_id,
-                util::connection_cache<parcelport_connection, naming::locality>& cache,
                 performance_counters::parcels::gatherer& parcels_sent);
 
         ~parcelport_connection()
@@ -157,9 +156,6 @@ namespace hpx { namespace parcelset { namespace tcp
 
         /// the other (receiving) end of this connection
         naming::locality there_;
-
-        /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection, naming::locality>& connection_cache_;
 
         /// Counters and their data containers.
         util::high_resolution_timer timer_;

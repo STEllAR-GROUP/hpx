@@ -57,15 +57,15 @@ namespace hpx { namespace parcelset { namespace shmem
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
-        acceptor_(NULL), connection_count_(0) //,
-//         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
+        acceptor_(NULL), connection_count_(0),
+        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
     }
 
     parcelport::~parcelport()
     {
         // make sure all existing connections get destroyed first
-//         connection_cache_.clear();
+        connection_cache_.clear();
         if (NULL != acceptor_) {
             boost::system::error_code ec;
             acceptor_->close(ec);
@@ -85,20 +85,20 @@ namespace hpx { namespace parcelset { namespace shmem
         io_service_pool_.run(false);    // start pool
 
         if (NULL == acceptor_)
-            acceptor_ = new acceptor(io_service_pool_.get_io_service());
+            acceptor_ = new acceptor(io_service_pool_.get_io_service(0));
 
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
         naming::locality::iterator_type end = accept_end(here_);
         for (naming::locality::iterator_type it =
-                accept_begin(here_, io_service_pool_.get_io_service());
+                accept_begin(here_, io_service_pool_.get_io_service(0));
              it != end; ++it, ++tried)
         {
             try {
                 server::shmem::parcelport_connection_ptr conn(
                     new server::shmem::parcelport_connection(
-                        io_service_pool_.get_io_service(), here(), *this));
+                        io_service_pool_.get_io_service(1), here(), *this));
 
                 boost::asio::ip::tcp::endpoint ep = *it;
 
@@ -136,7 +136,8 @@ namespace hpx { namespace parcelset { namespace shmem
     void parcelport::stop(bool blocking)
     {
         // now it's safe to take everything down
-//       connection_cache_.clear();
+        connection_cache_.shutdown();
+
         {
             // cancel all pending read operations, close those sockets
             util::spinlock::scoped_lock l(mtx_);
@@ -149,6 +150,8 @@ namespace hpx { namespace parcelset { namespace shmem
             }
             accepted_connections_.clear();
         }
+
+        connection_cache_.clear();
 
         // cancel all pending accept operations
         if (NULL != acceptor_)
@@ -177,7 +180,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::shmem::parcelport_connection(
-                io_service_pool_.get_io_service(), here(), *this));
+                io_service_pool_.get_io_service(1), here(), *this));
 
             acceptor_->async_accept(conn->window(),
                 boost::bind(&parcelport::handle_accept, this,
@@ -262,10 +265,10 @@ namespace hpx { namespace parcelset { namespace shmem
         {
             // ... or re-add the connection to the cache
             BOOST_ASSERT(locality_id == client_connection->destination());
-            client_connection->window().shutdown();
-            client_connection->window().close();
+//             client_connection->window().shutdown();
+//             client_connection->window().close();
 
-//             connection_cache_.reclaim(locality_id, client_connection);
+            connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 
@@ -302,10 +305,10 @@ namespace hpx { namespace parcelset { namespace shmem
             // Give this connection back to the cache as it's not needed
             // anymore.
             BOOST_ASSERT(locality_id == client_connection->destination());
-            client_connection->window().shutdown();
-            client_connection->window().close();
+//             client_connection->window().shutdown();
+//             client_connection->window().close();
 
-//             connection_cache_.reclaim(locality_id, client_connection);
+            connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 
@@ -314,19 +317,6 @@ namespace hpx { namespace parcelset { namespace shmem
         std::vector<parcel> const & parcels,
         std::vector<write_handler_type> const & handlers)
     {
-// #if defined(HPX_DEBUG)
-//         // verify the connection points to the right destination
-//         BOOST_FOREACH(parcel const& p, parcels)
-//         {
-//             naming::locality const parcel_locality_id = p.get_destination_locality();
-//             BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-//             BOOST_ASSERT(parcel_locality_id.get_address() ==
-//                 client_connection->socket().remote_endpoint().address().to_string());
-//             BOOST_ASSERT(parcel_locality_id.get_port() ==
-//                 client_connection->socket().remote_endpoint().port());
-//         }
-// #endif
-
         // store parcels in connection
         // The parcel gets serialized inside set_parcel, no
         // need to keep the original parcel alive after this call returned.
@@ -345,31 +335,31 @@ namespace hpx { namespace parcelset { namespace shmem
     {
         parcelport_connection_ptr client_connection;
 
-//         bool got_cache_space = false;
-// 
-//         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-//         {
-//             // Get a connection or reserve space for a new connection.
-//             if (connection_cache_.get_or_reserve(l, client_connection))
-//             {
-//                 got_cache_space = true;
-//                 break;
-//             }
-// 
-//             // Wait for a really short amount of time (usually 100 ms).
-//             boost::this_thread::sleep(boost::get_system_time() +
-//                 boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-//         }
-// 
-//         // If we didn't get a connection or permission to create one (which is
-//         // unlikely), bail.
-//         if (!got_cache_space)
-//         {
-//             HPX_THROW_EXCEPTION(network_error,
-//                 "shmem::parcelport::get_connection",
-//                 "timed out while trying to find room in the connection cache");
-//             return client_connection;
-//         }
+        bool got_cache_space = false;
+
+        for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
+        {
+            // Get a connection or reserve space for a new connection.
+            if (connection_cache_.get_or_reserve(l, client_connection))
+            {
+                got_cache_space = true;
+                break;
+            }
+
+            // Wait for a really short amount of time (usually 100 ms).
+            boost::this_thread::sleep(boost::get_system_time() +
+                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+        }
+
+        // If we didn't get a connection or permission to create one (which is
+        // unlikely), bail.
+        if (!got_cache_space)
+        {
+            HPX_THROW_EXCEPTION(network_error,
+                "shmem::parcelport::get_connection",
+                "timed out while trying to find room in the connection cache");
+            return client_connection;
+        }
 
         // Check if we need to create the new connection.
         if (!client_connection)
@@ -377,8 +367,8 @@ namespace hpx { namespace parcelset { namespace shmem
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(), here_, l,
-                /*connection_cache_, */parcels_sent_, ++connection_count_));
+                io_service_pool_.get_io_service(1), here_, l,
+                parcels_sent_, ++connection_count_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;
@@ -387,7 +377,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 try {
                     naming::locality::iterator_type end = connect_end(l);
                     for (naming::locality::iterator_type it =
-                            connect_begin(l, io_service_pool_.get_io_service());
+                            connect_begin(l, io_service_pool_.get_io_service(0));
                          it != end; ++it)
                     {
                         boost::asio::ip::tcp::endpoint const& ep = *it;
@@ -426,15 +416,6 @@ namespace hpx { namespace parcelset { namespace shmem
                 return client_connection;
             }
         }
-
-// #if defined(HPX_DEBUG)
-//         BOOST_ASSERT(l == client_connection->destination());
-// 
-//         std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
-//         boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
-//         BOOST_ASSERT(l.get_address() == connection_addr);
-//         BOOST_ASSERT(l.get_port() == connection_port);
-// #endif
 
         return client_connection;
     }

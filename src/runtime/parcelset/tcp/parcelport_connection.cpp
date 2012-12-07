@@ -21,10 +21,9 @@ namespace hpx { namespace parcelset { namespace tcp
 {
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
-            util::connection_cache<parcelport_connection, naming::locality>& cache,
             performance_counters::parcels::gatherer& parcels_sent)
       : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-        connection_cache_(cache), parcels_sent_(parcels_sent), 
+        parcels_sent_(parcels_sent), 
         archive_flags_(boost::archive::no_header)
     {
 #ifdef BOOST_BIG_ENDIAN

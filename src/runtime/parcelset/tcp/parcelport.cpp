@@ -145,7 +145,7 @@ namespace hpx { namespace parcelset { namespace tcp
             io_service_pool_.join();
 
             // now it's safe to take everything down
-            connection_cache_.clear();
+            connection_cache_.shutdown();
 
             {
                 // cancel all pending read operations, close those sockets
@@ -159,6 +159,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 }
                 accepted_connections_.clear();
             }
+
+            connection_cache_.clear();
 
             // cancel all pending accept operations
             if (NULL != acceptor_)
@@ -396,8 +398,7 @@ namespace hpx { namespace parcelset { namespace tcp
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(), l,
-                connection_cache_, parcels_sent_));
+                io_service_pool_.get_io_service(), l, parcels_sent_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;

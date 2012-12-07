@@ -118,11 +118,16 @@ namespace hpx { namespace parcelset { namespace shmem
                 if (impl)
                 {
                     boost::system::error_code ec;
-                    while (!ec && !impl->try_accept(window_, ec) && !ec)
-                        io_service_.poll_one(ec);   // try to do other stuff
-
-                    io_service_.post(
-                        boost::asio::detail::bind_handler(handler_, ec));
+                    if (!impl->try_accept(window_, ec) && !ec) {
+                        // repost this function
+                        io_service_.post(detail::accept_operation<
+                            Service, Handler, Implementation>(
+                                impl, io_service_, window_, handler_));
+                    }
+                    else {
+                        io_service_.post(
+                            boost::asio::detail::bind_handler(handler_, ec));
+                    }
                 }
                 else
                 {
@@ -235,10 +240,8 @@ namespace hpx { namespace parcelset { namespace shmem
 
         ~acceptor_impl()
         {
-            if (mq_) {
-                mq_.reset();
-                boost::interprocess::message_queue::remove(endpoint_.c_str());
-            }
+            boost::system::error_code ec;
+            close(ec);
         }
 
         void open(bool open_queue_only, boost::system::error_code &ec)
@@ -387,21 +390,18 @@ namespace hpx { namespace parcelset { namespace shmem
                 return false;
             }
 
-            try {
-                HPX_SHMEM_RESET_EC(ec);
+            if (aborted_.load()) {
+                aborted_.store(false);
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
+                return false;
+            }
 
+            HPX_SHMEM_RESET_EC(ec);
+
+            try {
                 boost::interprocess::message_queue::size_type recvd_size;
                 unsigned int priority;
-                if (!mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
-                    boost::get_system_time() + boost::posix_time::milliseconds(1)))
-                {
-                    if (aborted_.load() || close_operation_.load()) {
-                        aborted_.store(false);
-                        HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
-                    }
-                    return false;
-                }
-                return true;
+                return mq_->try_receive(&msg, sizeof(msg), recvd_size, priority);
             }
             catch (boost::interprocess::interprocess_exception const& e) {
                 aborted_.store(false);

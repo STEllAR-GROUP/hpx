@@ -222,11 +222,17 @@ namespace hpx { namespace parcelset { namespace shmem
                     boost::system::error_code ec;
 
                     std::size_t size = 0;
-                    while (!ec && 0 == (size = impl->try_read(data_, ec)) && !ec)
-                        io_service_.poll_one(ec);   // try to do other stuff
-
-                    io_service_.post(boost::asio::detail::bind_handler(
-                        handler_, ec, size));
+                    if (0 == (size = impl->try_read(data_, ec)) && !ec) {
+                        // repost this handler
+                        io_service_.post(detail::read_operation<
+                            Handler, Implementation>(
+                                impl, io_service_, data_, handler_));
+                    }
+                    else {
+                        // successfully read next message
+                        io_service_.post(boost::asio::detail::bind_handler(
+                            handler_, ec, size));
+                    }
                 }
                 else
                 {
@@ -242,6 +248,51 @@ namespace hpx { namespace parcelset { namespace shmem
             Handler handler_;
         };
 
+        template <typename Handler, typename Implementation>
+        class read_ack_operation
+        {
+            typedef boost::shared_ptr<Implementation> implementation_type;
+
+        public:
+            read_ack_operation(implementation_type &impl,
+                  boost::asio::io_service &io_service, Handler handler)
+              : impl_(impl),
+                io_service_(io_service),
+                handler_(handler)
+            {}
+
+            void operator()() const
+            {
+                implementation_type impl = impl_.lock();
+                if (impl)
+                {
+                    boost::system::error_code ec;
+                    if (!impl->try_read_ack(ec) && !ec) {
+                        // repost this handler
+                        io_service_.post(detail::read_ack_operation<
+                            Handler, Implementation>(
+                                impl, io_service_, handler_));
+                    }
+                    else {
+                        // successfully read next message
+                        io_service_.post(boost::asio::detail::bind_handler(
+                            handler_, ec));
+                    }
+                }
+                else
+                {
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted));
+                }
+            }
+
+        private:
+            boost::weak_ptr<Implementation> impl_;
+            boost::asio::io_service &io_service_;
+            Handler handler_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Handler, typename Implementation>
         class write_operation
         {
@@ -301,44 +352,6 @@ namespace hpx { namespace parcelset { namespace shmem
                 {
                     boost::system::error_code ec;
                     impl->write_ack(ec);
-                    io_service_.post(boost::asio::detail::bind_handler(
-                        handler_, ec));
-                }
-                else
-                {
-                    io_service_.post(boost::asio::detail::bind_handler(
-                        handler_, boost::asio::error::operation_aborted));
-                }
-            }
-
-        private:
-            boost::weak_ptr<Implementation> impl_;
-            boost::asio::io_service &io_service_;
-            Handler handler_;
-        };
-
-        template <typename Handler, typename Implementation>
-        class read_ack_operation
-        {
-            typedef boost::shared_ptr<Implementation> implementation_type;
-
-        public:
-            read_ack_operation(implementation_type &impl,
-                  boost::asio::io_service &io_service, Handler handler)
-              : impl_(impl),
-                io_service_(io_service),
-                handler_(handler)
-            {}
-
-            void operator()() const
-            {
-                implementation_type impl = impl_.lock();
-                if (impl)
-                {
-                    boost::system::error_code ec;
-                    while (!ec && !impl->try_read_ack(ec) && !ec)
-                        io_service_.poll_one(ec);   // try to do other stuff
-
                     io_service_.post(boost::asio::detail::bind_handler(
                         handler_, ec));
                 }
@@ -525,6 +538,7 @@ namespace hpx { namespace parcelset { namespace shmem
         ~data_window_impl()
         {
             boost::system::error_code ec;
+            shutdown(ec);
             close(ec);
         }
 
@@ -820,21 +834,18 @@ namespace hpx { namespace parcelset { namespace shmem
                 return false;
             }
 
-            try {
-                HPX_SHMEM_RESET_EC(ec);
+            if (aborted_.load()) {
+                aborted_.store(false);
+                HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
+                return false;
+            }
 
+            HPX_SHMEM_RESET_EC(ec);
+
+            try {
                 boost::interprocess::message_queue::size_type recvd_size;
                 unsigned int priority;
-                if (!read_mq_->timed_receive(&msg, sizeof(msg), recvd_size, priority,
-                    boost::get_system_time() + boost::posix_time::milliseconds(1)))
-                {
-                    if (aborted_.load() || close_operation_.load()) {
-                        aborted_.store(false);
-                        HPX_SHMEM_THROWS_IF(ec, boost::asio::error::connection_aborted);
-                    }
-                    return false;
-                }
-                return true;
+                return read_mq_->try_receive(&msg, sizeof(msg), recvd_size, priority);
             }
             catch (boost::interprocess::interprocess_exception const& e) {
                 aborted_.store(false);
@@ -857,9 +868,9 @@ namespace hpx { namespace parcelset { namespace shmem
                 return;
             }
 
-            try {
-                HPX_SHMEM_RESET_EC(ec);
+            HPX_SHMEM_RESET_EC(ec);
 
+            try {
                 message msg;
                 msg.command_ = cmd;
                 if (data) {
@@ -867,7 +878,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     msg.data_[sizeof(msg.data_)-1] = '\0';
                 }
 
-                while(!mq.timed_send(&msg, sizeof(msg), 0,
+                while (!mq.timed_send(&msg, sizeof(msg), 0,
                     boost::get_system_time() + boost::posix_time::milliseconds(1)))
                 {
                     if (aborted_.load() || close_operation_.load()) {

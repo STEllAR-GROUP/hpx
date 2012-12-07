@@ -140,9 +140,6 @@ namespace hpx { namespace parcelset { namespace shmem
         /// the other (receiving) end of this connection
         naming::locality there_;
 
-        /// The connection cache for sending connections
-//         util::connection_cache<parcelport_connection, naming::locality>& connection_cache_;
-
         /// Counters and their data containers.
         util::high_resolution_timer timer_;
         performance_counters::parcels::data_point send_data_;
