@@ -41,13 +41,18 @@
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
 #if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility push(default)
+#  pragma GCC visibility push(default)
 #endif
 
 #if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
-#define HPX_SERIALIZATION_EXPORT
+#  define HPX_SERIALIZATION_EXPORT
 #else
-#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#  define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#endif
+
+#if defined(BOOST_MSVC)
+#  include <intrin.h>
+#  pragma intrinsic(memcpy memset)
 #endif
 
 namespace hpx { namespace util

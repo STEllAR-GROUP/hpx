@@ -531,7 +531,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template <class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
         {
             util::serialize_sequence(ar, arguments_);
 

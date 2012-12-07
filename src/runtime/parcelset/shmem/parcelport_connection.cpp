@@ -14,6 +14,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <stdexcept>
 
@@ -23,11 +24,11 @@ namespace hpx { namespace parcelset { namespace shmem
     parcelport_connection::parcelport_connection(
             boost::asio::io_service& io_service,
             naming::locality const& here, naming::locality const& there,
-//             util::connection_cache<parcelport_connection, naming::locality>& cache,
+            data_buffer_cache& cache,
             performance_counters::parcels::gatherer& parcels_sent,
             std::size_t connection_count)
       : window_(io_service), there_(there),
-        parcels_sent_(parcels_sent)
+        parcels_sent_(parcels_sent), cache_(cache)
     {
         std::string fullname(here.get_address() + "." +
             boost::lexical_cast<std::string>(here.get_port()) + "." +
@@ -60,9 +61,9 @@ namespace hpx { namespace parcelset { namespace shmem
             // generate the name for this data_buffer
             std::string data_buffer_name(pv[0].get_parcel_id().to_string());
 
-            // clear and preallocate out_buffer_
-            out_buffer_ = data_buffer(data_buffer_name.c_str(), 
-                (arg_size * 12) / 10 + 1024);
+            // clear and preallocate out_buffer_ ( or fetch from cache)
+            out_buffer_ = get_data_buffer((arg_size * 12) / 10 + 1024,
+                data_buffer_name);
 
             // mark start of serialization
             util::high_resolution_timer timer;

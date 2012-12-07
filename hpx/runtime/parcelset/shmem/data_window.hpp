@@ -200,7 +200,9 @@ namespace hpx { namespace parcelset { namespace shmem
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Handler, typename Implementation>
-        class read_operation
+        class read_operation 
+          : public boost::enable_shared_from_this<
+                read_operation<Handler, Implementation> >
         {
             typedef boost::shared_ptr<Implementation> implementation_type;
 
@@ -214,7 +216,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 handler_(handler)
             {}
 
-            void operator()() const
+            void call() const
             {
                 implementation_type impl = impl_.lock();
                 if (impl)
@@ -224,9 +226,8 @@ namespace hpx { namespace parcelset { namespace shmem
                     std::size_t size = 0;
                     if (0 == (size = impl->try_read(data_, ec)) && !ec) {
                         // repost this handler
-                        io_service_.post(detail::read_operation<
-                            Handler, Implementation>(
-                                impl, io_service_, data_, handler_));
+                        io_service_.post(boost::bind(
+                            &read_operation::call, shared_from_this()));
                     }
                     else {
                         // successfully read next message
@@ -472,9 +473,13 @@ namespace hpx { namespace parcelset { namespace shmem
         void async_read(implementation_type &impl, data_buffer& data,
             Handler handler)
         {
-            this->get_io_service().post(
-                detail::read_operation<Handler, Implementation>(
+            typedef detail::read_operation<Handler, Implementation> operation_type;
+
+            boost::shared_ptr<operation_type> op(
+                boost::make_shared<operation_type>(
                     impl, this->get_io_service(), data, handler));
+
+            this->get_io_service().post(boost::bind(&operation_type::call, op));
         }
 
         template <typename Handler>

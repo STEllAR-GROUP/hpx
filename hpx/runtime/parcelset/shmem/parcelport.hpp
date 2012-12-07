@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/shmem/data_buffer_cache.hpp>
 #include <hpx/runtime/parcelset/shmem/data_window.hpp>
 #include <hpx/runtime/parcelset/shmem/acceptor.hpp>
 #include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
@@ -17,6 +18,8 @@
 #include <hpx/util/connection_cache.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/cache/lower_bound_local_cache.hpp>
+#include <boost/cache/entries/lru_entry.hpp>
 
 #include <set>
 
@@ -38,7 +41,7 @@ namespace hpx { namespace parcelset { namespace shmem
         ///                 [in] The pool of networking threads to use to serve
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
-        parcelport(util::runtime_configuration const& ini, 
+        parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
@@ -121,6 +124,9 @@ namespace hpx { namespace parcelset { namespace shmem
 
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
+
+        /// The cache holding data_buffers
+        data_buffer_cache data_buffer_cache_;
 
         /// The list of accepted connections
         typedef std::set<server::shmem::parcelport_connection_ptr> accepted_connections_set;

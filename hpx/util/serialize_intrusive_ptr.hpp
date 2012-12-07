@@ -6,6 +6,8 @@
 #if !defined(HPX_UTIL_SERIALIZE_INTRUSIVE_PTR_FEB_20_2012_1137AM)
 #define HPX_UTIL_SERIALIZE_INTRUSIVE_PTR_FEB_20_2012_1137AM
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/config.hpp>
 #include <boost/intrusive_ptr.hpp>
 
@@ -23,7 +25,7 @@
 namespace boost { namespace serialization
 {
     template <typename Archive, typename T>
-    inline void save(Archive& ar, boost::intrusive_ptr<T> const& t,
+    BOOST_FORCEINLINE void save(Archive& ar, boost::intrusive_ptr<T> const& t,
         unsigned int const)
     {
         // The most common cause of trapping here would be serializing
@@ -35,7 +37,7 @@ namespace boost { namespace serialization
     }
 
     template <typename Archive, typename T>
-    inline void load(Archive& ar, boost::intrusive_ptr<T>& t,
+    BOOST_FORCEINLINE void load(Archive& ar, boost::intrusive_ptr<T>& t,
         const unsigned int)
     {
         // The most common cause of trapping here would be serializing
@@ -48,7 +50,7 @@ namespace boost { namespace serialization
     }
 
     template <typename Archive, typename T>
-    inline void serialize(Archive& ar, boost::intrusive_ptr<T>& t,
+    BOOST_FORCEINLINE void serialize(Archive& ar, boost::intrusive_ptr<T>& t,
         unsigned int const version)
     {
         // correct intrusive_ptr serialization depends upon object tracking

@@ -2,6 +2,12 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// Part of the code below has been taken directly from Boost.Container. The 
+// original copyright is:
+//
+// (C) Copyright Ion Gaztanaga 2008-2012. 
+
 
 #if !defined(HPX_PARCELSET_SHMEM_DATA_BUFFER_NOV_25_2012_0854PM)
 #define HPX_PARCELSET_SHMEM_DATA_BUFFER_NOV_25_2012_0854PM
@@ -19,6 +25,117 @@
 #include <boost/make_shared.hpp>
 
 #include <string>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parcelset { namespace shmem
+{
+#if defined(BOOST_WINDOWS)
+    typedef boost::interprocess::allocator<
+        char, boost::interprocess::managed_windows_shared_memory::segment_manager
+    > shmem_allocator_type;
+#else
+    typedef boost::interprocess::allocator<
+        char, boost::interprocess::managed_shared_memory::segment_manager
+    > shmem_allocator_type;
+#endif
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost { namespace container { namespace container_detail 
+{
+    // This class template will adapt default construction insertions to 
+    // advanced_insert_aux_int
+    //
+    // We provide the specialization for 'char' to implement proper 
+    // uninitialized expansion of the vectors we use below.
+    template <>
+    struct default_construct_aux_proxy<hpx::parcelset::shmem::shmem_allocator_type, char*>
+      : public advanced_insert_aux_int<char*>
+    {
+        typedef hpx::parcelset::shmem::shmem_allocator_type allocator_type;
+        typedef char* iterator_type;
+
+        typedef ::boost::container::allocator_traits<allocator_type> alloc_traits;
+        typedef allocator_traits<allocator_type>::size_type size_type;
+        typedef allocator_traits<allocator_type>::value_type value_type;
+        typedef advanced_insert_aux_int<iterator_type>::difference_type difference_type;
+
+        default_construct_aux_proxy(allocator_type &a, size_type count)
+          : a_(a), count_(count)
+        {}
+
+        virtual ~default_construct_aux_proxy()
+        {}
+
+        virtual void copy_remaining_to(iterator_type)
+        {
+            // This should never be called with any count
+            BOOST_ASSERT(this->count_ == 0);
+        }
+
+        virtual void uninitialized_copy_remaining_to(iterator_type p)
+        {
+            this->priv_uninitialized_copy(p, this->count_);
+        }
+
+        virtual void uninitialized_copy_some_and_update(iterator_type pos, 
+            difference_type division_count, bool first_n)
+        {
+            size_type new_count;
+            if(first_n) {
+                new_count = division_count;
+            }
+            else {
+                BOOST_ASSERT(difference_type(this->count_)>= division_count);
+                new_count = this->count_ - division_count;
+            }
+            this->priv_uninitialized_copy(pos, new_count);
+        }
+
+        virtual void copy_some_and_update(iterator_type, 
+            difference_type division_count, bool first_n)
+        {
+            BOOST_ASSERT(this->count_ == 0);
+            size_type new_count;
+            if(first_n) {
+                new_count = division_count;
+            }
+            else {
+                BOOST_ASSERT(difference_type(this->count_) >= division_count);
+                new_count = this->count_ - division_count;
+            }
+            //This function should never called with a count different to zero
+            BOOST_ASSERT(new_count == 0);
+            (void)new_count;
+        }
+
+    private:
+        void priv_uninitialized_copy(iterator_type p, const size_type n)
+        {
+            BOOST_ASSERT(n <= this->count_);
+
+            // We leave memory uninitialized here, which is what should have 
+            // happened for 'char' in the first place.
+//             iterator_type orig_p = p;
+//             size_type i = 0;
+//             try {
+//                 for(; i < n; ++i, ++p){
+//                     alloc_traits::construct(this->a_, container_detail::to_raw_pointer(&*p));
+//                 }
+//             }
+//             catch(...) {
+//                 while(i--) {
+//                     alloc_traits::destroy(this->a_, container_detail::to_raw_pointer(&*orig_p++));
+//                 }
+//                 throw;
+//             }
+            this->count_ -= n;
+        }
+
+        allocator_type &a_;
+        size_type count_;
+    };
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace shmem
@@ -56,19 +173,8 @@ namespace hpx { namespace parcelset { namespace shmem
     ///////////////////////////////////////////////////////////////////////////
     class data_buffer
     {
-#if defined(BOOST_WINDOWS)
-        typedef boost::interprocess::allocator<
-            char, boost::interprocess::managed_windows_shared_memory::segment_manager
-        > shmen_allocator_type;
-#else
-        typedef boost::interprocess::allocator<
-            char, boost::interprocess::managed_shared_memory::segment_manager
-        > shmen_allocator_type;
-#endif
-
         typedef boost::interprocess::vector<
-            char, shmen_allocator_type
-        > data_buffer_type;
+            char, shmem_allocator_type> data_buffer_type;
 
         struct data : public data_buffer_base
         {
@@ -95,9 +201,9 @@ namespace hpx { namespace parcelset { namespace shmem
 
             void close()
             {
-                buffer_ = 0;
                 if (created_)
                     segment_.destroy<data_buffer_type>("data");
+                buffer_ = 0;
             }
 
             data_buffer_type& get_buffer()
@@ -105,9 +211,19 @@ namespace hpx { namespace parcelset { namespace shmem
                 return *buffer_;
             }
 
-            std::size_t size() const
+            std::size_t segment_size() const
             {
                 return segment_.get_size();
+            }
+
+            std::size_t size() const
+            {
+                return buffer_->size();
+            }
+
+            void resize(std::size_t size) const
+            {
+                return buffer_->resize(size);
             }
 
         private:
@@ -116,7 +232,7 @@ namespace hpx { namespace parcelset { namespace shmem
 #else
             boost::interprocess::managed_shared_memory segment_;
 #endif
-            shmen_allocator_type allocator_;
+            shmem_allocator_type allocator_;
             data_buffer_type* buffer_;
         };
 
@@ -151,14 +267,29 @@ namespace hpx { namespace parcelset { namespace shmem
             return data_->get_buffer();
         }
 
+        std::size_t segment_size() const
+        {
+            return data_->segment_size();
+        }
+
         std::size_t size() const
         {
             return data_->size();
         }
 
+        void resize(std::size_t size) const
+        {
+            return data_->resize(size);
+        }
+
         char const* get_segment_name() const
         {
             return data_->get_segment_name();
+        }
+
+        void reset()
+        {
+            data_.reset();
         }
 
     private:

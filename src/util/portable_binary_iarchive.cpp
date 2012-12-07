@@ -43,6 +43,11 @@
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 
+#if defined(BOOST_MSVC)
+#  include <intrin.h>
+#  pragma intrinsic(memcpy memset)
+#endif
+
 namespace hpx { namespace util
 {
 

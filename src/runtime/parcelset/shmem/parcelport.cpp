@@ -58,7 +58,8 @@ namespace hpx { namespace parcelset { namespace shmem
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
         acceptor_(NULL), connection_count_(0),
-        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
+        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc()),
+        data_buffer_cache_(ini.get_max_connections() * 4)
     {
     }
 
@@ -152,6 +153,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         connection_cache_.clear();
+        data_buffer_cache_.clear();
 
         // cancel all pending accept operations
         if (NULL != acceptor_)
@@ -368,7 +370,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
                 io_service_pool_.get_io_service(1), here_, l,
-                parcels_sent_, ++connection_count_));
+                data_buffer_cache_, parcels_sent_, ++connection_count_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;

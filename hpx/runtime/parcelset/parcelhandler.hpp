@@ -11,6 +11,7 @@
 #include <boost/bind.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -198,7 +199,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        void put_parcel(parcel& p)
+        BOOST_FORCEINLINE void put_parcel(parcel& p)
         {
             put_parcel(p, &parcelhandler::default_write_handler);
         }

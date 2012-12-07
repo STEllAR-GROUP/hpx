@@ -98,7 +98,9 @@ namespace hpx { namespace parcelset { namespace shmem
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Service, typename Handler, typename Implementation>
-        class accept_operation
+        class accept_operation 
+          : public boost::enable_shared_from_this<
+                accept_operation<Service, typename Handler, typename Implementation> >
         {
             typedef boost::shared_ptr<Implementation> implementation_type;
 
@@ -112,7 +114,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 handler_(handler)
             {}
 
-            void operator()() const
+            void call() const
             {
                 implementation_type impl = impl_.lock();
                 if (impl)
@@ -120,9 +122,8 @@ namespace hpx { namespace parcelset { namespace shmem
                     boost::system::error_code ec;
                     if (!impl->try_accept(window_, ec) && !ec) {
                         // repost this function
-                        io_service_.post(detail::accept_operation<
-                            Service, Handler, Implementation>(
-                                impl, io_service_, window_, handler_));
+                        io_service_.post(boost::bind(
+                            &accept_operation::call, shared_from_this()));
                     }
                     else {
                         io_service_.post(
@@ -206,9 +207,14 @@ namespace hpx { namespace parcelset { namespace shmem
         void async_accept(implementation_type &impl,
             basic_data_window<Service>& window, Handler handler)
         {
-            this->get_io_service().post(
-                detail::accept_operation<Service, Handler, Implementation>(
+            typedef detail::accept_operation<Service, Handler, Implementation>
+                operation_type;
+
+            boost::shared_ptr<operation_type> op(
+                boost::make_shared<operation_type>(
                     impl, this->get_io_service(), window, handler));
+
+            this->get_io_service().post(boost::bind(&operation_type::call, op));
         }
 
         template <typename Opt>

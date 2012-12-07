@@ -11,7 +11,7 @@
 
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/runtime/parcelset/shmem/data_window.hpp>
-#include <hpx/runtime/parcelset/shmem/data_buffer.hpp>
+#include <hpx/runtime/parcelset/shmem/data_buffer_cache.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -41,7 +41,7 @@ namespace hpx { namespace parcelset { namespace shmem
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& here, naming::locality const& there,
-//             util::connection_cache<parcelport_connection, naming::locality>& cache,
+            data_buffer_cache& cache,
             performance_counters::parcels::gatherer& parcels_sent,
             std::size_t connection_count);
 
@@ -117,7 +117,7 @@ namespace hpx { namespace parcelset { namespace shmem
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
             // now we can give this connection back to the cache
-            out_buffer_.close();
+            reclaim_data_buffer(out_buffer_);
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -128,6 +128,23 @@ namespace hpx { namespace parcelset { namespace shmem
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
+        }
+
+    protected:
+        data_buffer get_data_buffer(std::size_t size, std::string const& name)
+        {
+            data_buffer buffer;
+            if (cache_.get(size, buffer))
+                return buffer;
+
+            return data_buffer(name.c_str(), size);
+        }
+
+        void reclaim_data_buffer(data_buffer& buffer)
+        {
+            cache_.add(buffer.size(), buffer);
+            buffer.resize(0);
+            buffer.reset();
         }
 
     private:
@@ -144,6 +161,9 @@ namespace hpx { namespace parcelset { namespace shmem
         util::high_resolution_timer timer_;
         performance_counters::parcels::data_point send_data_;
         performance_counters::parcels::gatherer& parcels_sent_;
+
+        // data buffer cache
+        data_buffer_cache& cache_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
