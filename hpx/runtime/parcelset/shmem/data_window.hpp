@@ -446,7 +446,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::size_t read(implementation_type &impl, data_buffer& data, 
             boost::system::error_code &ec)
         {
-            std::size_t size 0;
+            std::size_t size = 0;
             while (0 == (size = impl->try_read(data, ec)) && !ec)
                 /* just wait for operation to succeed */;
             return size;
@@ -534,8 +534,9 @@ namespace hpx { namespace parcelset { namespace shmem
     {
     public:
         data_window_impl()
-          : msg_num_(10), aborted_(false),
+          : msg_num_(10), 
             executing_operation_(0),
+            aborted_(false),
             close_operation_(false),
             manage_lifetime_(false)
         {}

@@ -100,7 +100,7 @@ namespace hpx { namespace parcelset { namespace shmem
         template <typename Service, typename Handler, typename Implementation>
         class accept_operation 
           : public boost::enable_shared_from_this<
-                accept_operation<Service, typename Handler, typename Implementation> >
+                accept_operation<Service, Handler, Implementation> >
         {
             typedef boost::shared_ptr<Implementation> implementation_type;
 
@@ -238,8 +238,9 @@ namespace hpx { namespace parcelset { namespace shmem
     {
     public:
         acceptor_impl()
-          : msg_num_(1), aborted_(false),
+          : msg_num_(1), 
             executing_operation_(false),
+            aborted_(false),
             close_operation_(false),
             manage_lifetime_(false)
         {}
