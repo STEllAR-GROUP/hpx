@@ -31,15 +31,23 @@ namespace hpx { namespace lcos
     {
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            boost::intrusive_ptr<future_data_base<Result> > const&);
+            boost::intrusive_ptr<detail::future_data_base<Result> > const&);
 
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<future_data_base<Result> >));
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >));
 
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            future_data_base<Result>* p);
+            detail::future_data_base<Result>* p);
+
+        template <typename Result>
+        inline detail::future_data_base<Result>*
+            get_future_data(lcos::future<Result>&);
+
+        template <typename Result>
+        inline detail:: future_data_base<Result> const*
+            get_future_data(lcos::future<Result> const&);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -49,16 +57,23 @@ namespace hpx { namespace lcos
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            boost::intrusive_ptr<future_data_base<Result_> > const&);
+            boost::intrusive_ptr<detail::future_data_base<Result_> > const&);
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<future_data_base<Result_> >));
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result_> >));
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            future_data_base<Result_>* p);
+            detail::future_data_base<Result_>* p);
 
+        template <typename Result_>
+        friend detail::future_data_base<Result_>*
+            detail::get_future_data(lcos::future<Result_>&);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_> const*
+            detail::get_future_data(lcos::future<Result_> const&);
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
@@ -253,15 +268,23 @@ namespace hpx { namespace lcos
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            boost::intrusive_ptr<future_data_base<Result_> > const&);
+            boost::intrusive_ptr<detail::future_data_base<Result_> > const&);
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<future_data_base<Result_> >));
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result_> >));
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            future_data_base<Result_>* p);
+            detail::future_data_base<Result_>*);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_>*
+            detail::get_future_data(lcos::future<Result_>&);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_> const*
+            detail::get_future_data(lcos::future<Result_> const&);
 
         // make_future uses the dummy argument constructor below
         friend future<void> make_future();
@@ -443,23 +466,37 @@ namespace hpx { namespace lcos
     {
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            boost::intrusive_ptr<future_data_base<Result> > const& p)
+            boost::intrusive_ptr<detail::future_data_base<Result> > const& p)
         {
             return lcos::future<Result>(p);
         }
 
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<future_data_base<Result> >) p)
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >) p)
         {
             return lcos::future<Result>(boost::move(p));
         }
 
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            future_data_base<Result>* p)
+            detail::future_data_base<Result>* p)
         {
             return lcos::future<Result>(p);
+        }
+
+        template <typename Result>
+        inline detail::future_data_base<Result>*
+            get_future_data(lcos::future<Result>& f)
+        {
+            return f.future_data_.get();
+        }
+
+        template <typename Result>
+        inline detail::future_data_base<Result> const*
+            get_future_data(lcos::future<Result> const& f)
+        {
+            return f.future_data_.get();
         }
     }
 

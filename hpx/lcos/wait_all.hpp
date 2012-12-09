@@ -82,6 +82,8 @@ namespace hpx
 
             result_type operator()()
             {
+                using lcos::detail::get_future_data;
+
                 ready_count_.store(0);
 
                 {
@@ -89,9 +91,8 @@ namespace hpx
                     threads::thread_id_type id = threads::get_self().get_thread_id();
                     for (std::size_t i = 0; i != lazy_values_.size(); ++i)
                     {
-                        lazy_values_[i].then(
-                            util::bind(&when_all::on_future_ready, this, id)
-                        );
+                        get_future_data(lazy_values_[i])->set_on_completed(
+                            util::bind(&when_all::on_future_ready, this, id));
                     }
                 }
 
@@ -108,8 +109,8 @@ namespace hpx
                 BOOST_ASSERT(ready_count_ == lazy_values_.size());
 
                 // reset all pending callback functions
-                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    lazy_values_[i].then();
+                for (std::size_t i = 0; i < lazy_values_.size(); ++i) 
+                    get_future_data(lazy_values_[i])->reset_on_completed();
 
                 return lazy_values_;
             }

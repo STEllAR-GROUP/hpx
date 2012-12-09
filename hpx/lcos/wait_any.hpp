@@ -89,6 +89,8 @@ namespace hpx
 
             result_type operator()()
             {
+                using lcos::detail::get_future_data;
+
                 index_.store(index_error);
 
                 {
@@ -96,9 +98,8 @@ namespace hpx
                     threads::thread_id_type id = threads::get_self().get_thread_id();
                     for (std::size_t i = 0; i != lazy_values_.size(); ++i)
                     {
-                        lazy_values_[i].then(
-                            util::bind(&when_any::on_future_ready, this, i, id)
-                        );
+                        get_future_data(lazy_values_[i])->set_on_completed(
+                            util::bind(&when_any::on_future_ready, this, i, id));
                     }
                 }
 
@@ -114,7 +115,7 @@ namespace hpx
 
                 // reset all pending callback functions
                 for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    lazy_values_[i].then();
+                    get_future_data(lazy_values_[i])->reset_on_completed();
 
                 return result_type(static_cast<int>(index_), lazy_values_[index_]);
             }
@@ -140,8 +141,9 @@ namespace hpx
 
                 result_type operator()(std::size_t i, lcos::future<T> f) const
                 {
-                    f.then(util::bind(&when_any_tuple::on_future_ready,
-                        outer_, i++, id_));
+                    lcos::detail::get_future_data(f)->set_on_completed(
+                        util::bind(&when_any_tuple::on_future_ready,
+                            outer_, i++, id_));
                     return i;
                 };
 
@@ -156,7 +158,7 @@ namespace hpx
 
                 result_type operator()(lcos::future<T> f) const
                 {
-                    f.then();
+                    lcos::detail::get_future_data(f)->reset_on_completed();
                 };
             };
 

@@ -28,14 +28,11 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::find_here;
-
 using hpx::naming::id_type;
 
-using hpx::actions::plain_result_action0;
-
-using hpx::lcos::future;
+using hpx::future;
 using hpx::async;
-using hpx::lcos::wait;
+using hpx::wait_all;
 
 using hpx::util::high_resolution_timer;
 
@@ -53,6 +50,7 @@ double null_function()
     double d = 0.;
     for (boost::uint64_t i = 0; i < num_iterations; ++i)
         d += 1. / (2. * i + 1.);
+    global_scratch += d;
     return d;
 }
 
@@ -71,7 +69,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
 
-    wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+    wait_all(futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -100,7 +98,7 @@ void measure_function_futures(boost::uint64_t count, bool csv)
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(&null_function));
 
-    wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+    wait_all(futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
