@@ -16,6 +16,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -467,7 +468,7 @@ namespace hpx { namespace lcos
             &cont_impl_type::run<Result>;
         future_data_->set_on_completed(util::bind(cb, p, *this));
 
-        return lcos::detail::make_future_from_data<result_type>(p);
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
     }
 
     template <typename F>
@@ -488,7 +489,7 @@ namespace hpx { namespace lcos
             &cont_impl_type::run<void>;
         future_data_->set_on_completed(util::bind(cb, p, *this));
 
-        return lcos::detail::make_future_from_data<result_type>(p);
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
     }
 }}
 
