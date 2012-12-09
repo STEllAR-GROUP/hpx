@@ -521,7 +521,7 @@ namespace detail
             future_base_type this_(this);
             applier::register_thread_plain(
                 HPX_STD_BIND(&task_base::run_impl, this_),
-                "task_base::apply");
+                "task_base::apply", threads::pending, false);
         }
 
     private:

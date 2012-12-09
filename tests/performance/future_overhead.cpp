@@ -97,13 +97,8 @@ void measure_function_futures(boost::uint64_t count, bool csv)
     // start the clock
     high_resolution_timer walltime;
 
-    for (boost::uint64_t i = 0; i < count; ++i) {
+    for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(&null_function));
-
-        // allow to work on created threads
-        if (0 == (i % 1000))
-            hpx::this_thread::suspend();
-    }
 
     wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
 
