@@ -28,7 +28,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 {
     // this global (urghhh) variable is used to control whether guard pages 
     // will be used or not
-    extern bool use_guard_pages;
+    bool use_guard_pages = true;
 }}}}}
 #endif
 
@@ -656,7 +656,8 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.stacks");
             if (NULL != sec) {
                 std::string entry = sec->get_entry("use_guard_pages", "1");
-                use_guard_pages = (string_entry != "0") ? true : false;
+                coroutines::detail::posix::use_guard_pages = 
+                    (entry != "0") ? true : false;
             }
         }
     }
