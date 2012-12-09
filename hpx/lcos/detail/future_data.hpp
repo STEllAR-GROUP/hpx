@@ -287,7 +287,8 @@ namespace detail
         void set_data(BOOST_FWD_REF(T) result)
         {
             // this future instance coincidentally keeps us alive
-            lcos::future<Result> f(this);
+            lcos::future<Result> f =
+                lcos::detail::make_future_from_data<Result>(this);
 
             // set the received result, reset error status
             try {
@@ -335,7 +336,8 @@ namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // this future instance coincidentally keeps us alive
-            lcos::future<Result> f(this);
+            lcos::future<Result> f =
+                lcos::detail::make_future_from_data<Result>(this);
 
             // store the error code
             if (set_on_completed_) {
@@ -415,7 +417,8 @@ namespace detail
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             // this future coincidentally instance keeps us alive
-            lcos::future<Result> f(this);
+            lcos::future<Result> f = 
+                lcos::detail::make_future_from_data<Result>(this);
 
             completed_callback_type retval = boost::move(on_completed_);
             set_on_completed_ = !data_sink.empty();

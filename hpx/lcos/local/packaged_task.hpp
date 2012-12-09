@@ -192,7 +192,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(task_);
+            return lcos::detail::make_future_from_data<Result>(task_);
         }
 
 //         template <typename F>
@@ -330,7 +330,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<void>(task_);
+            return lcos::detail::make_future_from_data<void>(task_);
         }
 
 //         template <typename F>
@@ -495,7 +495,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(task_);
+            return lcos::detail::make_future_from_data<Result>(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT
@@ -620,7 +620,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(task_);
+            return lcos::detail::make_future_from_data<Result>(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT

@@ -384,7 +384,7 @@ namespace hpx { namespace lcos
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(impl_->get());
+            return lcos::detail::make_future_from_data<Result>(impl_->get());
         }
 
         ///
@@ -501,7 +501,7 @@ namespace hpx { namespace lcos
             }
 
             future_obtained_ = true;
-            return lcos::future<void>(impl_->get());
+            return lcos::detail::make_future_from_data<void>(impl_->get());
         }
 
         void set_value()

@@ -105,7 +105,7 @@ struct channel
     hpx::future<T> get_future()
     {
         BOOST_ASSERT(data_);
-        return hpx::future<T>(data_);
+        return lcos::detail::make_future_from_data<T>(data_);
     }
 
     void post(BOOST_RV_REF(T) result)
@@ -129,7 +129,7 @@ struct channel
     then_async(BOOST_FWD_REF(F) f)
     {
         BOOST_ASSERT(data_);
-        return hpx::future<T>(data_).then
+        return lcos::detail::make_future_from_data<T>(data_).then
             (boost::forward<completed_callback_type>(f));
     }
 
@@ -225,7 +225,7 @@ struct channel<void>
     hpx::future<void> get_future()
     {
         BOOST_ASSERT(data_);
-        return hpx::future<void>(data_);
+        return lcos::detail::make_future_from_data<void>(data_);
     }
 
     void post()
@@ -243,7 +243,7 @@ struct channel<void>
     then_async(BOOST_FWD_REF(F) f)
     {
         BOOST_ASSERT(data_);
-        return hpx::future<void>(data_).then
+        return lcos::detail::make_future_from_data<void>(data_).then
             (boost::forward<completed_callback_type>(f));
     }
 

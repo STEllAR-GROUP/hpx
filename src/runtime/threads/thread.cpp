@@ -316,7 +316,7 @@ namespace hpx
             return lcos::future<void>();
         }
 
-        return lcos::future<void>(base);
+        return lcos::detail::make_future_from_data<void>(base);
     }
 
     ///////////////////////////////////////////////////////////////////////////
