@@ -465,7 +465,7 @@ namespace hpx { namespace lcos
         // bind an on_completed handler to this future which will invoke the
         // continuation
         void (cont_impl_type::*cb)(lcos::future<Result> const&) =
-            &cont_impl_type::run<Result>;
+            &cont_impl_type::template run<Result>;
         future_data_->set_on_completed(util::bind(cb, p, *this));
 
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));
@@ -486,7 +486,7 @@ namespace hpx { namespace lcos
         // bind an on_completed handler to this future which will invoke the
         // continuation
         void (cont_impl_type::*cb)(lcos::future<void> const&) =
-            &cont_impl_type::run<void>;
+            &cont_impl_type::template run<void>;
         future_data_->set_on_completed(util::bind(cb, p, *this));
 
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));

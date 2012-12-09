@@ -15,6 +15,7 @@
 #include <hpx/util/value_or_error.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
+#include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -41,6 +42,29 @@ namespace local { template <typename T> struct channel; }
 
 namespace detail
 {
+    template <typename Result> struct future_data_base;
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    inline lcos::future<Result> make_future_from_data(
+        boost::intrusive_ptr<detail::future_data_base<Result> > const&);
+
+    template <typename Result>
+    inline lcos::future<Result> make_future_from_data(
+        BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >));
+
+    template <typename Result>
+    inline lcos::future<Result> make_future_from_data(
+        detail::future_data_base<Result>* p);
+
+    template <typename Result>
+    inline detail::future_data_base<Result>*
+        get_future_data(lcos::future<Result>&);
+
+    template <typename Result>
+    inline detail:: future_data_base<Result> const*
+        get_future_data(lcos::future<Result> const&);
+
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
 

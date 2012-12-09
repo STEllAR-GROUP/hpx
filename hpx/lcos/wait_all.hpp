@@ -51,10 +51,10 @@ namespace hpx
             template <typename Index>
             void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::false_)
             {
-                if (lazy_values_[i].has_value()) {
+                if (this->base_type::lazy_values_[i].has_value()) {
                     if (success_counter_)
                         ++*success_counter_;
-                    f_(i, lazy_values_[i].get());       // invoke callback function
+                    f_(i, this->base_type::lazy_values_[i].get());  // invoke callback function
                 }
                 this->base_type::on_future_ready(id);   // keep track of ready futures
             }
@@ -62,7 +62,7 @@ namespace hpx
             template <typename Index>
             void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::true_)
             {
-                if (lazy_values_[i].has_value()) {
+                if (this->base_type::lazy_values_[i].has_value()) {
                     if (success_counter_)
                         ++*success_counter_;
                     f_(i);                              // invoke callback function
@@ -117,33 +117,34 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
-                ready_count_.store(0);
+                this->base_type::ready_count_.store(0);
 
                 // set callback functions to executed when future is ready
                 threads::thread_id_type id = threads::get_self().get_thread_id();
-                for (std::size_t i = 0; i != lazy_values_.size(); ++i)
+                for (std::size_t i = 0; i != this->base_type::lazy_values_.size(); ++i)
                 {
-                    get_future_data(lazy_values_[i])->set_on_completed(
+                    get_future_data(this->base_type::lazy_values_[i])->set_on_completed(
                         util::bind(&when_all::on_future_ready, this, i, id));
                 }
 
                 // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
                 // ourselves.
-                if (ready_count_ != lazy_values_.size())
+                if (this->base_type::ready_count_ != this->base_type::lazy_values_.size())
                 {
                     // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
                 // all futures should be ready
-                BOOST_ASSERT(ready_count_ == lazy_values_.size());
+                BOOST_ASSERT(this->base_type::ready_count_ == 
+                    this->base_type::lazy_values_.size());
 
                 // reset all pending callback functions
-                for (std::size_t i = 0; i < lazy_values_.size(); ++i) 
-                    get_future_data(lazy_values_[i])->reset_on_completed();
+                for (std::size_t i = 0; i < this->base_type::lazy_values_.size(); ++i) 
+                    get_future_data(this->base_type::lazy_values_[i])->reset_on_completed();
 
-                return lazy_values_;
+                return this->base_type::lazy_values_;
             }
 
             F f_;

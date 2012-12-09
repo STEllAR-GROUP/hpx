@@ -23,34 +23,6 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    // forward declaration only
-    template <typename Result> class future;
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename Result>
-        inline lcos::future<Result> make_future_from_data(
-            boost::intrusive_ptr<detail::future_data_base<Result> > const&);
-
-        template <typename Result>
-        inline lcos::future<Result> make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >));
-
-        template <typename Result>
-        inline lcos::future<Result> make_future_from_data(
-            detail::future_data_base<Result>* p);
-
-        template <typename Result>
-        inline detail::future_data_base<Result>*
-            get_future_data(lcos::future<Result>&);
-
-        template <typename Result>
-        inline detail:: future_data_base<Result> const*
-            get_future_data(lcos::future<Result> const&);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
     {
