@@ -33,12 +33,131 @@ namespace hpx
 {
     namespace detail
     {
+        //////////////////////////////////////////////////////////////////////
+        template <typename T, typename F = void>
+        struct when_all;
+
+        //////////////////////////////////////////////////////////////////////
+        // This version has an additional callback to be invoked for each 
+        // future when it gets ready.
+        template <typename T, typename F>
+        struct when_all : when_all<T, void>
+        {
+        private:
+            typedef when_all<T, void> base_type;
+
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
+
+            template <typename Index>
+            void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::false_)
+            {
+                if (lazy_values_[i].has_value()) {
+                    if (success_counter_)
+                        ++*success_counter_;
+                    f_(i, lazy_values_[i].get());       // invoke callback function
+                }
+                this->base_type::on_future_ready(id);   // keep track of ready futures
+            }
+
+            template <typename Index>
+            void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::true_)
+            {
+                if (lazy_values_[i].has_value()) {
+                    if (success_counter_)
+                        ++*success_counter_;
+                    f_(i);                              // invoke callback function
+                }
+                this->base_type::on_future_ready(id);   // keep track of ready futures
+            }
+
+            void on_future_ready(std::size_t i, threads::thread_id_type id)
+            {
+                on_future_ready_(i, id, boost::is_same<void, T>());
+            }
+
+        public:
+            typedef std::vector<lcos::future<T> > argument_type;
+            typedef std::vector<lcos::future<T> > result_type;
+
+            template <typename F_>
+            when_all(argument_type const& lazy_values, BOOST_FWD_REF(F_) f,
+                    boost::atomic<std::size_t>* success_counter)
+              : base_type(lazy_values), 
+                f_(boost::forward<F>(f)),
+                success_counter_(success_counter)
+            {}
+
+            template <typename F_>
+            when_all(BOOST_RV_REF(argument_type) lazy_values, BOOST_FWD_REF(F_) f,
+                    boost::atomic<std::size_t>* success_counter)
+              : base_type(boost::move(lazy_values)), 
+                f_(boost::forward<F>(f)),
+                success_counter_(success_counter)
+            {}
+
+            when_all(BOOST_RV_REF(when_all) rhs)
+              : base_type(boost::move(rhs.lazy_values_)), 
+                f_(boost::move(rhs.f_)),
+                success_counter_(rhs.success_counter_)
+            {
+                rhs.success_counter_ = 0;
+            }
+
+            when_all& operator= (BOOST_RV_REF(when_all) rhs)
+            {
+                if (this != &rhs) {
+                    this->base_type::operator=(boost::move(rhs));
+                    f_ = boost::move(rhs.f_);
+                    success_counter_ = rhs.success_counter_;
+                    rhs.success_counter_ = 0;
+                }
+                return *this;
+            }
+
+            result_type operator()()
+            {
+                using lcos::detail::get_future_data;
+                ready_count_.store(0);
+
+                // set callback functions to executed when future is ready
+                threads::thread_id_type id = threads::get_self().get_thread_id();
+                for (std::size_t i = 0; i != lazy_values_.size(); ++i)
+                {
+                    get_future_data(lazy_values_[i])->set_on_completed(
+                        util::bind(&when_all::on_future_ready, this, i, id));
+                }
+
+                // If all of the requested futures are already set then our
+                // callback above has already been called, otherwise we suspend
+                // ourselves.
+                if (ready_count_ != lazy_values_.size())
+                {
+                    // wait for all of the futures to return to become ready
+                    this_thread::suspend(threads::suspended);
+                }
+
+                // all futures should be ready
+                BOOST_ASSERT(ready_count_ == lazy_values_.size());
+
+                // reset all pending callback functions
+                for (std::size_t i = 0; i < lazy_values_.size(); ++i) 
+                    get_future_data(lazy_values_[i])->reset_on_completed();
+
+                return lazy_values_;
+            }
+
+            F f_;
+            boost::atomic<std::size_t>* success_counter_;
+        };
+
+        //////////////////////////////////////////////////////////////////////
         template <typename T>
-        struct when_all
+        struct when_all<T, void>
         {
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
 
+        protected:
             void on_future_ready(threads::thread_id_type id)
             {
                 if (ready_count_.fetch_add(1) + 1 == lazy_values_.size())
@@ -86,14 +205,12 @@ namespace hpx
 
                 ready_count_.store(0);
 
+                // set callback functions to executed when future is ready
+                threads::thread_id_type id = threads::get_self().get_thread_id();
+                for (std::size_t i = 0; i != lazy_values_.size(); ++i)
                 {
-                    // set callback functions to executed when future is ready
-                    threads::thread_id_type id = threads::get_self().get_thread_id();
-                    for (std::size_t i = 0; i != lazy_values_.size(); ++i)
-                    {
-                        get_future_data(lazy_values_[i])->set_on_completed(
-                            util::bind(&when_all::on_future_ready, this, id));
-                    }
+                    get_future_data(lazy_values_[i])->set_on_completed(
+                        util::bind(&when_all::on_future_ready, this, id));
                 }
 
                 // If all of the requested futures are already set then our

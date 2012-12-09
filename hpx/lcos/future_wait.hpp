@@ -15,9 +15,11 @@
 
 #include <vector>
 
+#include <boost/atomic.hpp>
 #include <boost/foreach.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/move/move.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -49,93 +51,52 @@ namespace hpx { namespace lcos
         return 1;
     }
 
-    namespace detail
-    {
-        template <typename F>
-        struct wrap_callback
-        {
-            typedef void result_type;
-
-            wrap_callback(F const& f, std::size_t seqnum, std::size_t& success_count)
-              : f_(f), seqnum_(seqnum), success_count_(success_count)
-            {}
-
-            template <typename T>
-            void operator()(lcos::future<T> f) const
-            {
-                if (f.has_value()) {
-                    f_(seqnum_, f.get());
-                    ++success_count_;
-                }
-            }
-
-            void operator()(lcos::future<void> f) const
-            {
-                if (f.has_value()) {
-                    f_(seqnum_);
-                    ++success_count_;
-                }
-            }
-
-            F const& f_;
-            std::size_t seqnum_;
-            std::size_t& success_count_;
-        };
-    }
-
+    //////////////////////////////////////////////////////////////////////////
     // This overload of wait() will make sure that the passed function will be
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
     template <typename T1, typename F>
     inline std::size_t
-    wait (std::vector<lcos::future<T1> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<T1> > const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
-        // attach a special function to all futures
-        std::vector<lcos::future<void> > then_futures;
-        std::size_t seqnum = 0;
-        std::size_t success_count = 0;
+        typedef std::vector<lcos::future<T1> > return_type;
 
-        BOOST_FOREACH(lcos::future<T1> lv, lazy_values)
-        {
-            then_futures.push_back(lv.then(
-                detail::wrap_callback<F>(f, ++seqnum, success_count)));
-        }
+        if (lazy_values.empty())
+            return 0;
 
-        // and wait for all of the functions to be called
-        wait_all(then_futures);
+        boost::atomic<std::size_t> success_counter(0);
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                hpx::detail::when_all<T1, F>(
+                    lazy_values, boost::forward<F>(f), &success_counter));
 
-        // reset the attached completion handlers
-        BOOST_FOREACH(lcos::future<T1> lv, lazy_values)
-            lv.then();
+        p.apply();
+        p.get_future().get();
 
-        return success_count;
+        return success_counter.load();
     }
 
     template <typename F>
     inline std::size_t
-    wait (std::vector<lcos::future<void> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<void> > const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
-        // attach a special function to all futures
-        std::vector<lcos::future<void> > then_futures;
-        std::size_t seqnum = 0;
-        std::size_t success_count = 0;
+        typedef std::vector<lcos::future<void> > return_type;
 
-        BOOST_FOREACH(lcos::future<void> lv, lazy_values)
-        {
-            then_futures.push_back(lv.then(
-                detail::wrap_callback<F>(f, ++seqnum, success_count)));
-        }
+        if (lazy_values.empty())
+            return 0;
 
-        // and wait for all of the functions to be called
-        wait_all(then_futures);
+        boost::atomic<std::size_t> success_counter(0);
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                hpx::detail::when_all<void, F>(
+                    lazy_values, boost::forward<F>(f), &success_counter));
 
-        // reset the attached completion handlers
-        BOOST_FOREACH(lcos::future<void> lv, lazy_values)
-            lv.then();
+        p.apply();
+        p.get_future().get();
 
-        return success_count;
+        return success_counter.load();
     }
 
     ///////////////////////////////////////////////////////////////////////////
