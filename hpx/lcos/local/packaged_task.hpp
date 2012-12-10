@@ -500,7 +500,7 @@ namespace hpx { namespace lcos { namespace local
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return task_;
+            return task_.get();
         }
 
     protected:
