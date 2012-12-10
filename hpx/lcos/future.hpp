@@ -177,7 +177,7 @@ namespace hpx { namespace lcos
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return future_data_.get();
+            return future_data_.get() ? true : false;
         }
 
         // continuation support
@@ -377,7 +377,7 @@ namespace hpx { namespace lcos
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return future_data_.get();
+            return future_data_.get() ? true : false;
         }
 
         // continuation support

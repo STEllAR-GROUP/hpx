@@ -371,7 +371,7 @@ namespace hpx { namespace lcos { namespace local
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return task_.get();
+            return task_.get() ? true : false;
         }
 
         bool is_ready() const
