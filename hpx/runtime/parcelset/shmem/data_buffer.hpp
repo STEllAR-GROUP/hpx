@@ -23,6 +23,7 @@
 #endif
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/assert.hpp>
 
 #include <string>
 
@@ -43,6 +44,7 @@ namespace hpx { namespace parcelset { namespace shmem
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace container { namespace container_detail 
 {
+#if BOOST_VERSION < 105300
     // This class template will adapt default construction insertions to 
     // advanced_insert_aux_int
     //
@@ -135,6 +137,52 @@ namespace boost { namespace container { namespace container_detail
         allocator_type &a_;
         size_type count_;
     };
+#else
+    template <>
+    struct insert_default_constructed_n_proxy<
+        hpx::parcelset::shmem::shmem_allocator_type, char*>
+    {
+        typedef hpx::parcelset::shmem::shmem_allocator_type allocator_type;
+        typedef char* iterator_type;
+
+        typedef ::boost::container::allocator_traits<allocator_type> alloc_traits;
+        typedef allocator_traits<allocator_type>::size_type size_type;
+        typedef allocator_traits<allocator_type>::value_type value_type;
+
+
+        explicit insert_default_constructed_n_proxy(allocator_type &a)
+          : a_(a)
+        {}
+
+        void uninitialized_copy_n_and_update(iterator_type p, size_type n)
+        {
+            // We leave memory uninitialized here, which is what should have 
+            // happened for 'char' in the first place.
+//             Iterator orig_p = p;
+//             size_type n_left = n;
+//             BOOST_TRY{
+//                for(; n_left--; ++p){
+//                   alloc_traits::construct(this->a_, container_detail::to_raw_pointer(&*p));
+//                }
+//             }
+//             BOOST_CATCH(...){
+//                for(; orig_p != p; ++orig_p){
+//                   alloc_traits::destroy(this->a_, container_detail::to_raw_pointer(&*orig_p++));
+//                }
+//                BOOST_RETHROW
+//             }
+//             BOOST_CATCH_END
+        }
+
+        void copy_n_and_update(iterator_type, size_type)
+        {
+            BOOST_ASSERT(false);
+        }
+
+    private:
+        allocator_type &a_;
+    };
+#endif
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
