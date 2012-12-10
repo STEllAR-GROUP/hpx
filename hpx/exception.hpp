@@ -156,12 +156,12 @@ namespace hpx
         class hpx_category : public boost::system::error_category
         {
         public:
-            const char* name() const BOOST_SYSTEM_NOEXCEPT
+            const char* name() const BOOST_NOEXCEPT
             {
                 return "HPX";
             }
 
-            std::string message(int value) const BOOST_SYSTEM_NOEXCEPT
+            std::string message(int value) const BOOST_NOEXCEPT
             {
                 if (value >= success && value < last_error)
                     return std::string("HPX(") + error_names[value] + ")";
@@ -176,12 +176,12 @@ namespace hpx
         class hpx_category_rethrow : public boost::system::error_category
         {
         public:
-            const char* name() const BOOST_SYSTEM_NOEXCEPT 
+            const char* name() const BOOST_NOEXCEPT 
             {
                 return "";
             }
 
-            std::string message(int) const BOOST_SYSTEM_NOEXCEPT
+            std::string message(int) const BOOST_NOEXCEPT
             {
                 return "";
             }
