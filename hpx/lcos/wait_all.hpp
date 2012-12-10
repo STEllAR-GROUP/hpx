@@ -147,7 +147,7 @@ namespace hpx
                 return this->base_type::lazy_values_;
             }
 
-            F f_;
+            typename std::remove_reference<F>::type f_;
             boost::atomic<std::size_t>* success_counter_;
         };
 
