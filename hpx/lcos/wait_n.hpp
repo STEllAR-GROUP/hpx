@@ -111,11 +111,12 @@ namespace hpx
 
             result_type operator()()
             {
+                using lcos::detail::get_future_data;
+
                 // set callback functions to executed when future is ready
                 threads::thread_id_type id = threads::get_self().get_thread_id();
                 for (std::size_t i = 0; i != lazy_values_.size(); ++i)
                 {
-                    using lcos::detail::get_future_data;
                     get_future_data(lazy_values_[i])->set_on_completed(
                         util::bind(&when_n::on_future_ready, this, i, id));
                 }
