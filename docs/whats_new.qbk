@@ -11,12 +11,12 @@
 [section:hpx_0_9_5 __hpx__ V0.9.5]
 
 We have had roughly 1000 commits since the last release and we have closed
-approximately 130 tickets (bugs, feature requests, etc.).
+over 130 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
 This release is continuing along the lines of code and API consolidation, and
-overall usability inprovements. We dedicated much attention to performance and 
+overall usability inprovements. We dedicated much attention to performance and
 we were able to significantly improve the threading and networking subsystems.
 
 [heading Bug Fixes (Closed Tickets)]
@@ -25,15 +25,27 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #622 - Add an HPX_ALWAYS_ASSERT macro
+* #621 - New INI section for stack sizes
+* #618 - pkg_config support does not work with a HPX debug build
+* #617 - hpx/external/logging/boost/logging/detail/cache_before_init.hpp:139:67:
+         error: 'get_thread_id' was not declared in this scope
+* #616 - Change wait_xxx not to use locking
 * #615 - Revert visibility 'fix' (fb0b6b8245dad1127b0c25ebafd9386b3945cca9)
+* #614 - Fix Dataflow linker error
 * #613 - find_here should throw an exception on failure
 * #612 - Thread phase doesn't show up in debug mode
+* #611 - Make stack guard pages configurable at runtime (initialization time)
 * #610 - Co-Locate Components
 * #609 - future_overhead
 * #608 - `--hpx:list-counter-infos` problem
 * #607 - Update Boost.Context based backend for coroutines
+* #606 - 1d_wave_equation is not working
+* #605 - Any C++ function that has serializable arguments and a serializable
+         return type should be remotable
 * #604 - Connecting localities isn't working anymore
 * #603 - Do not verify any ini entries read from a file
+* #602 - Rename argument_size to type_size/ added implementation to get parcel size
 * #599 - Enable locality specific command line options
 * #598 - Need an API that accesses the performance counter reporting the
          system uptime
