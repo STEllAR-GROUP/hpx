@@ -40,12 +40,26 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // Run one branch of the Fibonacci calculation on this thread, while the
     // other branch is scheduled in a separate thread.
     hpx::lcos::future<boost::uint64_t> n1 =
-        hpx::async<fibonacci_action>(locality_id, n - 1);
+        hpx::async<fibonacci_action>(locality_id, n-1);
     boost::uint64_t n2 = fibonacci(n-2);
 
-    return n1.get() + n2;   // wait for the Futures to return their values
+    return n1.get() + n2;   // wait for the Future to return its values
 }
 //]
+
+boost::uint64_t fibonacci_direct(boost::uint64_t n)
+{
+    if (n < 2)
+        return n;
+
+    // Run one branch of the Fibonacci calculation on this thread, while the
+    // other branch is scheduled in a separate thread.
+    hpx::lcos::future<boost::uint64_t> n1 = 
+        hpx::async(&fibonacci_direct, n-1);
+    boost::uint64_t n2 = fibonacci(n-2);
+
+    return n1.get() + n2;   // wait for the Future to return its values
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //[fib_hpx_main
@@ -66,7 +80,17 @@ int hpx_main(boost::program_options::variables_map& vm)
         // wait for future f to return value
         boost::uint64_t r = f.get();
 
-        char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci(%1%) == %2%, elapsed time: %3% [s]\n";
+        std::cout << (boost::format(fmt) % n % r % t.elapsed());
+    }
+
+    {
+        // Keep track of the time required to execute.
+        hpx::util::high_resolution_timer t;
+
+        boost::uint64_t r = fibonacci_direct(n);;
+
+        char const* fmt = "fibonacci_direct(%1%) == %2%, elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
     }
 
