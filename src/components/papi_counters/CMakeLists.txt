@@ -13,6 +13,8 @@ add_hpx_library_headers(papi_counters
 add_hpx_library_sources(papi_counters
   GLOB_RECURSE GLOBS "*.cpp")
 
+include_directories(${PAPI_INCLUDE_DIR})
+
 add_hpx_component(papi_counters
   SOURCES ${papi_counters_SOURCES}
   HEADERS ${papi_counters_HEADERS}
