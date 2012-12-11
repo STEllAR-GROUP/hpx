@@ -66,7 +66,7 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, 
-        typename Freelist = caching_freelist_t, typename Alloc = std::allocator<void> >
+        typename Freelist = caching_freelist_t, typename Alloc = std::allocator<T> >
     class fifo;
 
     template <typename T, typename Alloc>
