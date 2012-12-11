@@ -6,9 +6,12 @@
 
 set(tests
     async_callback_non_deduced_context
+    wait_callback
    )
 
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(wait_callback_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
