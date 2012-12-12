@@ -20,24 +20,33 @@ using hpx::init;
 using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
+// x to the p power
 template <typename T>
-inline double sign(T a)
+inline T sign(T a)
 {
     if (a > 0) 
-        return 1.;
+        return 1;
     else if (a < 0) 
-        return -1.;
+        return -1;
     else 
-        return 0.;
+        return 0;
 }
 
-// x to the p power
 template <typename T>
 T ipow(T x, T p)
 {
     T i = 1;
     for (T j = 1; j < p; j++) i *= x;
     return i;
+}
+
+template <typename T>
+inline bool compare_real(T x, T y, T epsilon)
+{
+    if ((x + epsilon >= y) && (x - epsilon <= y))
+        return true;
+    else
+        return false;
 }
 
 double null_function(
@@ -47,12 +56,22 @@ double null_function(
 {
     boost::random::mt19937_64 prng(seed);
 
-    boost::random::uniform_real_distribution<double> v(0., 1.);
-    boost::random::uniform_smallint<boost::int8_t> s(-1, 1);
+    boost::random::uniform_real_distribution<double> v(0, 1.);
+    boost::random::uniform_smallint<boost::uint8_t> s(0, 1);
 
     double d = 0.;
+
     for (boost::uint64_t i = 0; i < delay_iterations; ++i)
-        d += sign(s(prng)) * ((v(prng) + 1.) / (v(prng) + 1.));
+    {
+        double v0 = v(prng);
+        double v1 = v(prng);
+
+        if (compare_real(v1, 0.0, 1e-10))
+            v1 = 1e-10; 
+
+        d += (s(prng) ? 1.0 : -1.0) * (v0 / v1);
+    }
+
     return d;
 }
 
@@ -85,7 +104,7 @@ double null_tree(
     std::vector<hpx::future<double> > futures;
     futures.reserve(children);
 
-    boost::uint64_t p = ipow(children, depth);
+    boost::uint64_t p = seed + ipow(depth, children);
 
     for (boost::uint64_t j = 0; j < children; ++j)
     {
