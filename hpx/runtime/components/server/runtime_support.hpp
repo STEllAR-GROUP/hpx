@@ -371,9 +371,13 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_startup_functions_action,
     call_startup_functions_action)
+HPX_ACTION_USES_LARGE_STACK(
+    hpx::components::server::runtime_support::call_startup_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
     call_shutdown_functions_action)
+HPX_ACTION_USES_LARGE_STACK(
+    hpx::components::server::runtime_support::call_shutdown_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::free_component_action,
     free_component_action)
