@@ -222,6 +222,10 @@ bool pre_main(runtime_mode mode)
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
+        // Tear down the third stage barrier.
+        if (agas_client.is_bootstrap())
+            agas::unregister_name(third_barrier);
+
         rt.set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(4th stage) pre_main: ran startup functions";
@@ -233,9 +237,9 @@ bool pre_main(runtime_mode mode)
         fourth_stage.wait();
         LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
 
-        // Tear down the second stage barrier.
+        // Tear down the fourth stage barrier.
         if (agas_client.is_bootstrap())
-            agas::unregister_name(third_barrier);
+            agas::unregister_name(fourth_barrier);
     }
 
     // Enable logging. Even if we terminate at this point we will see all
