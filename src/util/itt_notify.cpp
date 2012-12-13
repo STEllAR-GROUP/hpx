@@ -37,11 +37,6 @@ bool use_ittnotify_api = false;
     }                                                                         \
     /**/
 
-#define HPX_INTERNAL_ITT_THREAD_SET_NAME(name)                                \
-    if (use_ittnotify_api && __itt_thread_set_name_ptr)                       \
-        __itt_thread_set_name_ptr(name)                                       \
-    /**/
-
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_STACK_CREATE()                                       \
     (use_ittnotify_api && __itt_stack_caller_create_ptr) ?                    \
@@ -93,7 +88,7 @@ bool use_ittnotify_api = false;
     /**/
 #define HPX_INTERNAL_ITT_THREAD_IGNORE()                                      \
     if (use_ittnotify_api && __itt_thread_ignore_ptr)                         \
-        __itt_thread_ignore_ptr(); \
+        __itt_thread_ignore_ptr();                                            \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,7 +215,7 @@ void itt_thread_set_name(char const* name)
 
 void itt_thread_ignore()
 {
-    HPX_ITT_THREAD_IGNORE();
+    HPX_INTERNAL_ITT_THREAD_IGNORE();
 }
 
 #endif // HPX_USE_ITT
