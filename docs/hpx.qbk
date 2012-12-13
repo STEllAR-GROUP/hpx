@@ -148,7 +148,8 @@
    generated docs, which may cause unwanted effects.]
 [template hpx_cmdline[str][link hpx.manual.init.commandline [str]]]
 
-[template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
+[/ [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>'''] ]
+[template hpx_link[url txt]     '''<ulink url=./"'''[url]'''">'''[txt]'''</ulink>'''] ]
 
 [/  fig[ref title label]
     Image element with a title.
