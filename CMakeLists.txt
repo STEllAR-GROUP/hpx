@@ -1089,13 +1089,6 @@ if(HPX_BUILD_RUNTIME)
   add_subdirectory(runtime)
 endif()
 
-hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
-
-if(HPX_BUILD_TOOLS)
-  add_hpx_pseudo_target(tools)
-  add_subdirectory(tools)
-endif()
-
 if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
