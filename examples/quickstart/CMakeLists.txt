@@ -9,7 +9,6 @@ set(example_programs
     component_in_executable
     component_inheritance
     error_handling
-    event_synchronization 
     factorial
     fibonacci
     fibonacci_one
@@ -34,7 +33,6 @@ endif()
 
 set(component_in_executable_FLAGS DEPENDENCIES iostreams_component)
 set(component_ctors_FLAGS DEPENDENCIES iostreams_component)
-set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)
