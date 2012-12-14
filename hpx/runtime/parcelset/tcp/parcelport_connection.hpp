@@ -127,16 +127,18 @@ namespace hpx { namespace parcelset { namespace tcp
             socket_.set_option(quickack);
 #endif
 
-            void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
+            void (parcelport_connection::*f)(boost::system::error_code const&, 
+                      boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
 
             boost::asio::async_read(socket_, 
                 boost::asio::buffer(&ack_, sizeof(ack_)),
-                boost::bind(f, shared_from_this(), handler));
+                boost::bind(f, shared_from_this(), ::_1, handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void handle_read_ack(boost::tuple<Handler, ParcelPostprocess> handler) 
+        void handle_read_ack(boost::system::error_code const& e, 
+            boost::tuple<Handler, ParcelPostprocess> handler) 
         {
             // Call post-processing handler, which will send remaining pending 
             // parcels. Pass along the connection so it can be reused if more 

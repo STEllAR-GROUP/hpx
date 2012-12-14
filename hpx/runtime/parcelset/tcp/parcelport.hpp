@@ -121,7 +121,8 @@ namespace hpx { namespace parcelset { namespace tcp
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
         /// \brief Retrieve a new connection
-        parcelport_connection_ptr get_connection(naming::locality const& l);
+        parcelport_connection_ptr get_connection(naming::locality const& l,
+            error_code& ec = throws);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.

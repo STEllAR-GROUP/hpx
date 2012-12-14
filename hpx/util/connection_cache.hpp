@@ -389,25 +389,24 @@ namespace hpx { namespace util
                 if (boost::get<0>(ct->second).empty())
                 {
                     // Remove the key if its connection count is zero.
-                    if (0 == boost::get<1>(ct->second))
-                    {
+                    if (0 == boost::get<1>(ct->second)) {
                         cache_.erase(ct);
                         key_tracker_.erase(kt);
                         kt = key_tracker_.begin();
                     }
-
-                    else
+                    else {
                         // REVIEW: Should we reorder key_tracker_ to speed up
                         // the eviction?
                         ++kt;
+                    }
 
                     // If we've gone through key_tracker_ and haven't found
-                    // anything evictable, then all the entries must be checked
-                    // out.
+                    // anything evictable, then all the entries must be 
+                    // currently checked out.
                     if (key_tracker_.end() == kt)
                         return false;
-                    else
-                        continue;
+
+                    continue;
                 }
 
                 // Remove the oldest connection.

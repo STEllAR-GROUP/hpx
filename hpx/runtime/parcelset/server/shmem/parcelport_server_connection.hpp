@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset { namespace shmem
     class parcelport;
 
     void decode_message(parcelport&,
-        parcelset::shmem::data_buffer const& buffer,
+        parcelset::shmem::data_buffer buffer,
         performance_counters::parcels::data_point receive_data);
 }}}
 
@@ -78,7 +78,7 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
                     boost::tuple<Handler>)
                 = &parcelport_connection::handle_read_data<Handler>;
 
-            in_buffer_.close();
+            in_buffer_.reset();
 
             window_.async_read(in_buffer_,
                 boost::bind(f, shared_from_this(),
@@ -100,20 +100,25 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
                 receive_data_.time_ = timer_.elapsed_nanoseconds() -
                     receive_data_.time_;
 
-                // add parcel data to incoming parcel queue
-                decode_message(parcelport_, in_buffer_, receive_data_);
-
-                // Inform caller that data has been received ok.
-                boost::get<0>(handler)(e);
-
                 // now send acknowledgment message
                 void (parcelport_connection::*f)(boost::system::error_code const&, 
                           boost::tuple<Handler>)
                     = &parcelport_connection::handle_write_ack<Handler>;
 
+                // hold on to received data to avoid data races
+                parcelset::shmem::data_buffer data(in_buffer_);
+                performance_counters::parcels::data_point receive_data = 
+                    receive_data_;
+
                 window_.async_write_ack(
                     boost::bind(f, shared_from_this(), 
                         boost::asio::placeholders::error, handler));
+
+                // add parcel data to incoming parcel queue
+                decode_message(parcelport_, data, receive_data);
+
+                // Inform caller that data has been received ok.
+                boost::get<0>(handler)(e);
             }
         }
 

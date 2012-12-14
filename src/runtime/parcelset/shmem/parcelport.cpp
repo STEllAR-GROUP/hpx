@@ -218,11 +218,11 @@ namespace hpx { namespace parcelset { namespace shmem
             LPT_(error)
                 << "handle read operation completion: error: "
                 << e.message();
-        }
 
-        // remove this connection from the list of known connections
-        util::spinlock::scoped_lock l(mtx_);
-        accepted_connections_.erase(c);
+            // remove this connection from the list of known connections
+            util::spinlock::scoped_lock l(mtx_);
+            accepted_connections_.erase(c);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -232,6 +232,7 @@ namespace hpx { namespace parcelset { namespace shmem
         typedef pending_parcels_map::mapped_type mapped_type;
 
         naming::locality locality_id = p.get_destination_locality();
+        naming::gid_type parcel_id = p.get_parcel_id();
 
         // enqueue the incoming parcel ...
         {
@@ -242,7 +243,33 @@ namespace hpx { namespace parcelset { namespace shmem
             e.second.push_back(f);
         }
 
-        parcelport_connection_ptr client_connection = get_connection(locality_id);
+        error_code ec;
+        parcelport_connection_ptr client_connection = 
+            get_connection(locality_id, ec);
+
+        if (!client_connection)
+        {
+            // If there was an error, we might be safe if there are no parcels
+            // to be sent anymore (some other thread already picked them up)
+            // or if there are parcels, but the parcel we were about to sent
+            // has been already processed.
+            util::spinlock::scoped_lock l(mtx_);
+
+            iterator it = pending_parcels_.find(locality_id);
+            if (it != pending_parcels_.end())
+            {
+                BOOST_FOREACH(parcel const& pp, it->second.first)
+                {
+                    if (pp.get_parcel_id() == parcel_id)
+                    {
+                        // our parcel is still here, bailing out
+                        throw hpx::detail::access_exception(ec);
+                    }
+                }
+            }
+            return;
+        }
+
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
 
@@ -307,8 +334,6 @@ namespace hpx { namespace parcelset { namespace shmem
             // Give this connection back to the cache as it's not needed
             // anymore.
             BOOST_ASSERT(locality_id == client_connection->destination());
-//             client_connection->window().shutdown();
-//             client_connection->window().close();
 
             connection_cache_.reclaim(locality_id, client_connection);
         }
@@ -333,7 +358,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
     ///////////////////////////////////////////////////////////////////////////
     parcelport_connection_ptr parcelport::get_connection(
-        naming::locality const& l)
+        naming::locality const& l, error_code& ec)
     {
         parcelport_connection_ptr client_connection;
 
@@ -357,7 +382,7 @@ namespace hpx { namespace parcelset { namespace shmem
         // unlikely), bail.
         if (!got_cache_space)
         {
-            HPX_THROW_EXCEPTION(network_error,
+            HPX_THROWS_IF(ec, network_error,
                 "shmem::parcelport::get_connection",
                 "timed out while trying to find room in the connection cache");
             return client_connection;
@@ -400,7 +425,10 @@ namespace hpx { namespace parcelset { namespace shmem
                             HPX_NETWORK_RETRIES_SLEEP));
                 }
                 catch (boost::system::system_error const& e) {
-                    HPX_THROW_EXCEPTION(network_error,
+                    client_connection->window().close();
+                    client_connection.reset();
+
+                    HPX_THROWS_IF(ec, network_error,
                         "shmem::parcelport::get_connection", e.what());
                     return client_connection;
                 }
@@ -408,11 +436,12 @@ namespace hpx { namespace parcelset { namespace shmem
 
             if (error) {
                 client_connection->window().close();
+                client_connection.reset();
 
                 hpx::util::osstream strm;
                 strm << error.message() << " (while trying to connect to: "
                      << l << ")";
-                HPX_THROW_EXCEPTION(network_error,
+                HPX_THROWS_IF(ec, network_error,
                     "shmem::parcelport::get_connection",
                     hpx::util::osstream_get_string(strm));
                 return client_connection;
@@ -424,7 +453,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
     ///////////////////////////////////////////////////////////////////////////
     void decode_message(parcelport& pp,
-        parcelset::shmem::data_buffer const& parcel_data,
+        parcelset::shmem::data_buffer parcel_data,
         performance_counters::parcels::data_point receive_data)
     {
         // protect from un-handled exceptions bubbling up 

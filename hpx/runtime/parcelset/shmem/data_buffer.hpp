@@ -298,14 +298,6 @@ namespace hpx { namespace parcelset { namespace shmem
         {
         }
 
-        void close(boost::system::error_code &ec = boost::system::throws)
-        {
-            if (data_) {
-                data_->close();
-                data_.reset();
-            }
-        }
-
         data_buffer_type& get_buffer()
         {
             return data_->get_buffer();
