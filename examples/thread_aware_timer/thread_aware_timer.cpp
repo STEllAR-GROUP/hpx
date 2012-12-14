@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
 
-#define NUMTESTS 10000000
+#define NUMTESTS 100000
 
 int main(int argc, char* argv[])
 {
