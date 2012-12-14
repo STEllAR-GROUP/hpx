@@ -1111,24 +1111,24 @@ if(NOT HPX_NO_INSTALL)
     PATTERN "CTestFiles" EXCLUDE)
 
   install( # install all hpx source files
-    DIRECTORY src
-    DESTINATION share/hpx-${HPX_VERSION}/doc/html/src/hpx
+    DIRECTORY src/
+    DESTINATION share/hpx-${HPX_VERSION}/doc/html/src/hpx/src
     COMPONENT core
     PATTERN ".git" EXCLUDE
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
 
   install( # install all hpx examples source files
-    DIRECTORY examples
-    DESTINATION share/hpx-${HPX_VERSION}/doc/html/src/hpx
+    DIRECTORY examples/
+    DESTINATION share/hpx-${HPX_VERSION}/doc/html/src/hpx/examples
     COMPONENT core
     PATTERN ".git" EXCLUDE
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
 
   install( # install all hpx examples source files
-    DIRECTORY tests
-    DESTINATION share/hpx-${HPX_VERSION}/doc/html/src/hpx
+    DIRECTORY tests/
+    DESTINATION share/hpx-${HPX_VERSION}/doc/html/src/hpx/tests
     COMPONENT core
     PATTERN ".git" EXCLUDE
     PATTERN "CMakeFiles" EXCLUDE

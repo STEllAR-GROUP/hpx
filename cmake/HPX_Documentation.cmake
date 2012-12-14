@@ -149,7 +149,7 @@ else()
           "--output-file=${name}.xml"
           "${git_commit_option}"
           "${doxygen_option}"
-          "-D__hpx_source_dir__=src/"
+          "-D__hpx_source_dir__=src/hpx"
           "-D__hpx_binary_dir__=${CMAKE_BINARY_DIR}"
           "-D__hpx_docs_dir__=${CMAKE_CURRENT_BINARY_DIR}"
           ${${name}_QUICKBOOK_ARGS}
