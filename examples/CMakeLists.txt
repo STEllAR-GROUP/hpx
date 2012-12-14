@@ -12,6 +12,7 @@ set(subdirs
     bfs
     cancelable_action
     gtcx
+    nbody
     nqueen
     performance_counters
     quickstart
