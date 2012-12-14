@@ -144,7 +144,7 @@ int hpx_main(
             ; ++i) 
         {
             d += act(here, 0, children, 1, max_depth, delay_iterations); 
-            std::cout << (boost::format("%016u : %f\n") % i % d) << std::flush;
+            //std::cout << (boost::format("%016u : %f\n") % i % d) << std::flush;
         }
     }
 
