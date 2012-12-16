@@ -284,7 +284,7 @@ system and application performance.
           for the application using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the overall lengtrh of all queues for the given worker 
+        [Returns the overall length of all queues for the given worker 
          thread(s) on the given locality.]
     ]
     [   [`/threads/count/stack-unbinds`]
