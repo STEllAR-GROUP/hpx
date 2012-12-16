@@ -284,8 +284,26 @@ namespace hpx { namespace parcelset
         return result;
     }
 
+    void parcelhandler::rethrow_exception()
+    {
+        boost::exception_ptr exception;
+        {
+            // store last error for now only
+            mutex_type::scoped_lock l(mtx_);
+            boost::swap(exception, exception_);
+        }
+
+        if (exception) {
+            // report any pending exception
+            boost::rethrow_exception(exception);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::put_parcel(parcel& p, write_handler_type f)
     {
+        rethrow_exception();
+
         // properly initialize parcel
         init_parcel(p);
 
@@ -332,6 +350,19 @@ namespace hpx { namespace parcelset
             if (pp) parcel_count += pp->get_pending_parcels_count();
         }
         return parcel_count;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // default callback for put_parcel
+    void parcelhandler::default_write_handler(
+        boost::system::error_code const& ec, std::size_t)
+    {
+        if (ec) {
+            // store last error for now only
+            mutex_type::scoped_lock l(mtx_);
+            exception_ = hpx::detail::get_exception(hpx::exception(ec), 
+                "parcelhandler::default_write_handler", __FILE__, __LINE__);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

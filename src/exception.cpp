@@ -269,6 +269,12 @@ namespace hpx { namespace detail
         std::abort();
     }
 
+    void report_exception_and_terminate(hpx::exception const& e)
+    {
+        std::cerr << hpx::diagnostic_information(e) << std::endl;
+        std::abort();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     boost::exception_ptr access_exception(error_code const& e)
     {

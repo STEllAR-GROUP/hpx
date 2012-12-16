@@ -21,6 +21,7 @@
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -34,8 +35,9 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
-        static void default_write_handler(boost::system::error_code const&,
-            std::size_t /*size*/) {}
+        // default callback for put_parcel
+        void default_write_handler(boost::system::error_code const&,
+            std::size_t /*size*/);
 
         void parcel_sink(parcel const& p);
 
@@ -57,6 +59,11 @@ namespace hpx { namespace parcelset
         // find and return the specified parcelport
         parcelport* find_parcelport(connection_type type,
             error_code& ec = throws) const;
+
+        // exception handling
+        typedef util::spinlock mutex_type;
+
+        void rethrow_exception();
 
     public:
         typedef parcelport::read_handler_type read_handler_type;
@@ -201,7 +208,10 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         BOOST_FORCEINLINE void put_parcel(parcel& p)
         {
-            put_parcel(p, &parcelhandler::default_write_handler);
+            using HPX_STD_PLACEHOLDERS::_1;
+            using HPX_STD_PLACEHOLDERS::_2;
+            put_parcel(p, HPX_STD_BIND(&parcelhandler::default_write_handler,
+                this, _1, _2));
         }
 
         /// The function \a get_parcel returns the next available parcel
@@ -222,6 +232,7 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p)
         {
+            rethrow_exception();
             return parcels_->get_parcel(p);
         }
 
@@ -244,6 +255,7 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
         {
+            rethrow_exception();
             return parcels_->get_parcel(p, parcel_id);
         }
 
@@ -366,8 +378,12 @@ namespace hpx { namespace parcelset
         /// queue of incoming parcels
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
 
+        /// Anyexception thrown earlier on one of the ASIO threads is stored here
+        mutex_type mtx_;
+        boost::exception_ptr exception_;
+
         /// Allow to use alternative parcel-ports (this is enabled only after
-        /// the runtime systems of all localities are guaranteed to have 
+        /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
         bool use_alternative_parcelports_;
     };

@@ -301,6 +301,7 @@ namespace hpx { namespace parcelset { namespace tcp
     }
 
     void parcelport::send_pending_parcels_trampoline(
+        boost::system::error_code const& ec,
         naming::locality const& locality_id,
         parcelport_connection_ptr client_connection)
     {
@@ -362,27 +363,59 @@ namespace hpx { namespace parcelset { namespace tcp
         client_connection->async_write(
             detail::call_for_each(handlers),
             boost::bind(&parcelport::send_pending_parcels_trampoline, this,
-                ::_1, ::_2));
+                boost::asio::placeholders::error, ::_2, ::_3));
     }
 
-    void early_write_handler(boost::system::error_code const& e, std::size_t size)
+    void early_write_handler(boost::system::error_code const& ec, 
+        std::size_t size)
     {
-        // no-op
+        if (ec) {
+            // all errors during early parcel handling are fatal
+            try {
+                HPX_THROW_EXCEPTION(network_error, "early_write_handler", 
+                    "error while handling early parcel: " +
+                        ec.message() + "(" + 
+                        boost::lexical_cast<std::string>(ec.value())+ ")");
+            }
+            catch (hpx::exception const& e) {
+                hpx::detail::report_exception_and_terminate(e);
+            }
+            return;
+        }
     }
 
-    void early_pending_parcel_handler(naming::locality const&,
-        parcelport_connection_ptr const&)
+    void early_pending_parcel_handler(boost::system::error_code const& ec,
+        naming::locality const&, parcelport_connection_ptr const&)
     {
-        // no-op
+        if (ec) {
+            // all errors during early parcel handling are fatal
+            try {
+                HPX_THROW_EXCEPTION(network_error, "early_write_handler", 
+                    "error while handling early parcel: " +
+                        ec.message() + "(" + 
+                        boost::lexical_cast<std::string>(ec.value())+ ")");
+            }
+            catch (hpx::exception const& e) {
+                hpx::detail::report_exception_and_terminate(e);
+            }
+            return;
+        }
     }
 
     void parcelport::send_early_parcel(parcel& p)
     {
         naming::locality const& l = p.get_destination_locality();
-        parcelport_connection_ptr client_connection = get_connection(l);
+        error_code ec;
+        parcelport_connection_ptr client_connection = get_connection(l, ec);
 
-        BOOST_ASSERT(client_connection);
+        if (ec) {
+            // all errors during early parcel handling are fatal
+            hpx::detail::report_exception_and_terminate(
+                hpx::detail::access_exception(ec));
+            return;
+        }
 
+        BOOST_ASSERT(client_connection );
         client_connection->set_parcel(p);
         client_connection->async_write(early_write_handler, early_pending_parcel_handler);
     }
@@ -403,8 +436,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 break;
             }
 
-            // Wait for a really short amount of time (usually 100 ms).
-            this_thread::suspend(HPX_NETWORK_RETRIES_SLEEP);
+            // Wait for a really short amount of time.
+            this_thread::suspend();
         }
 
         // If we didn't get a connection or permission to create one (which is
@@ -444,7 +477,9 @@ namespace hpx { namespace parcelset { namespace tcp
                         break;
 
                     // wait for a really short amount of time (usually 100 ms)
-                    this_thread::suspend(HPX_NETWORK_RETRIES_SLEEP);
+                    boost::this_thread::sleep(boost::get_system_time() +
+                        boost::posix_time::milliseconds(
+                            HPX_NETWORK_RETRIES_SLEEP));
                 }
                 catch (boost::system::system_error const& e) {
                     client_connection->socket().close();

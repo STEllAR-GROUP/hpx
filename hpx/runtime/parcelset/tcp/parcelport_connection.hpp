@@ -143,7 +143,7 @@ namespace hpx { namespace parcelset { namespace tcp
             // Call post-processing handler, which will send remaining pending 
             // parcels. Pass along the connection so it can be reused if more 
             // parcels have to be sent.
-            boost::get<1>(handler)(there_, shared_from_this());
+            boost::get<1>(handler)(e, there_, shared_from_this());
         }
 
     private:

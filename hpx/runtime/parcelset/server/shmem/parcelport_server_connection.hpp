@@ -94,6 +94,9 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
         {
             if (e) {
                 boost::get<0>(handler)(e);
+
+                // Issue a read operation to read the next parcel.
+                async_read(boost::get<0>(handler));
             }
             else {
                 // complete data point and pass it along
@@ -126,10 +129,8 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
         void handle_write_ack(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
-            if (!e) {
-                // Issue a read operation to handle the next parcel.
-                async_read(boost::get<0>(handler));
-            }
+            // Issue a read operation to handle the next parcel.
+            async_read(boost::get<0>(handler));
         }
 
     private:

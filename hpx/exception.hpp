@@ -815,6 +815,7 @@ namespace hpx
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
         HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_terminate(hpx::exception const&);
     }
     /// \endcond
 

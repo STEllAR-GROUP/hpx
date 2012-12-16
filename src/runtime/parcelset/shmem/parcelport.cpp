@@ -294,9 +294,6 @@ namespace hpx { namespace parcelset { namespace shmem
         {
             // ... or re-add the connection to the cache
             BOOST_ASSERT(locality_id == client_connection->destination());
-//             client_connection->window().shutdown();
-//             client_connection->window().close();
-
             connection_cache_.reclaim(locality_id, client_connection);
         }
     }
@@ -334,7 +331,6 @@ namespace hpx { namespace parcelset { namespace shmem
             // Give this connection back to the cache as it's not needed
             // anymore.
             BOOST_ASSERT(locality_id == client_connection->destination());
-
             connection_cache_.reclaim(locality_id, client_connection);
         }
     }
@@ -373,9 +369,8 @@ namespace hpx { namespace parcelset { namespace shmem
                 break;
             }
 
-            // Wait for a really short amount of time (usually 100 ms).
-            boost::this_thread::sleep(boost::get_system_time() +
-                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            // Wait for a really short amount of time.
+            this_thread::suspend();
         }
 
         // If we didn't get a connection or permission to create one (which is
@@ -420,9 +415,7 @@ namespace hpx { namespace parcelset { namespace shmem
                         break;
 
                     // wait for a really short amount of time (usually 100 ms)
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    this_thread::suspend(HPX_NETWORK_RETRIES_SLEEP);
                 }
                 catch (boost::system::system_error const& e) {
                     client_connection->window().close();
