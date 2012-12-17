@@ -112,7 +112,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0)
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb)
+                actions::action_priority<Action>(), boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ));
         }
     }}
@@ -326,7 +326,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb)
+                actions::action_priority<Action>(), boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
     }}
@@ -540,7 +540,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb)
+                actions::action_priority<Action>(), boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
     }}
@@ -754,7 +754,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb)
+                actions::action_priority<Action>(), boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
     }}
@@ -968,7 +968,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb)
+                actions::action_priority<Action>(), boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
     }}

@@ -162,7 +162,7 @@ namespace hpx
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb)
+                actions::action_priority<Action>(), boost::forward<Callback>(cb),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }}
