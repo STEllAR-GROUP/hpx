@@ -1296,6 +1296,7 @@ list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
 set(external_rpath "")
 set(external_link_directories "")
 set(external_libraries "")
+set(external_libraries_name "")
 set(external_link_flags "")
 set(external_include_directories "")
 set(external_include_flags "")
@@ -1309,6 +1310,11 @@ endforeach()
 
 set(external_libraries
   ${BOOST_FOUND_LIBRARIES})
+
+foreach(lib ${external_libraries})
+  get_filename_component(lib ${lib} NAME_WE)
+  set(external_libraries_name "${external_libraries_name} -l${lib}")
+endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
   string(REPLACE " " "\\ " directory ${directory})

@@ -11,6 +11,6 @@ includedir=${exec_prefix}/include
 Name: hpx_application
 Description: High Performance ParalleX (application configuration) - debug build
 Version: @HPX_VERSION@
-Libs: -Wl,-rpath,@external_rpath@ @CMAKE_CXX_FLAGS@ @external_link_flags@ -lhpxd -lhpx_initd
+Libs: -Wl,-rpath,@external_rpath@ @CMAKE_CXX_FLAGS@ @external_link_flags@ -lhpxd -lhpx_initd @external_libraries_name@
 Cflags: @CMAKE_CXX_FLAGS@ @external_definitions@ @external_include_flags@ -DHPX_APPLICATION_EXPORTS -DBOOST_ENABLE_ASSERT_HANDLER
 
