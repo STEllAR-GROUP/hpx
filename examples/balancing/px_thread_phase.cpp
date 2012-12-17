@@ -11,7 +11,8 @@
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
-#include <boost/lockfree/fifo.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using boost::lockfree::fifo;
