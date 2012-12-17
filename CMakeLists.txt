@@ -438,9 +438,9 @@ endif()
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
 
-if(HPX_NATIVE_TLS)
+if(HPX_HAVE_NATIVE_TLS)
   hpx_info("tls" "Native TLS is enabled.")
   add_definitions(-DHPX_HAVE_NATIVE_TLS)
 endif()
