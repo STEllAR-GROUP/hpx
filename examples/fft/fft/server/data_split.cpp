@@ -18,7 +18,7 @@ namespace fft { namespace server
     using hpx::lcos::dataflow;
     using hpx::lcos::dataflow_base;
 
-    typedef fft::server::distribute::fetch_remote_action action_type;
+    typedef fft::server::distribute::fetch_remote_action fetch_remote_action_type;
     typedef std::pair<hpx::naming::id_type, std::size_t> pair_type;
     typedef server::fourier_xform::r2ditfft_action r2ditfft_action_type;
     typedef server::fourier_xform::r2ditfft_args_action r2ditfft_args_action_type;  
@@ -75,19 +75,21 @@ namespace fft { namespace server
     {
         distribute::complex_vec x;                                                       
         distribute::complex_vec::iterator itr; 
-        std::size_t fft_size = default_size;
+        std::size_t fft_size; //= default_size;
 
         std::ifstream fin(data_filename);                                          
         if(fin.is_open())                                                          
         {                                                                          
             if(!fin.eof())                                                           
-            {                                                                        
-                fft::complex_type temp(0,0);                                         
-                for(std::size_t i = 0; i < fft_size; ++i)                            
-                {                                                                    
+            {   
+                while(!fin.eof())
+                {
+                    fft::complex_type temp(0,0);
                     fin >> temp.re >> temp.im;                                       
-                    x.push_back(temp);                                               
-                }                                                                    
+                    x.push_back(temp);
+                }
+                fft_size = x.size() - 1;
+                x.resize(fft_size);
                 std::cout << " Read from file complete!! Size of read array:" <<         
                     x.size() << std::endl;                                               
             }                                                                        
@@ -148,11 +150,12 @@ namespace fft { namespace server
     
     void distribute::dist_transform()
     {   
-        int my_cardinality, my_prev_cardinality;
+        std::size_t my_cardinality, my_prev_cardinality;
         std::size_t my_remote_cardinality
-            , total_components = data_.num_localities_ * data_.num_workers_
-            , level = 1, level_previous = 1;
-            //, active_components = data_.num_localities_ * data_.num_workers_;
+            , total_components = data_.num_localities_ * data_.num_workers_;
+            
+        level_ = level_previous_ = 1;
+        data_.current_level_ = level_;
 
         hpx::naming::id_type remote_gid;
 
@@ -170,40 +173,38 @@ namespace fft { namespace server
 
         result_vec_.resize(0);
         complex_vec temp;
-        while(level <= total_components)
+        while(level_ <= total_components)
         {
-            if(level == 1)
+            if(level_ == 1)
             {      
                 hpx::lcos::future<complex_vec> result_vec = 
                     fft::stubs::fourier_xform::r2ditfft_async(fft_gid_get, local_vec_);    
-                //local_vec_ = fft::stubs::fourier_xform::r2ditfft_async(
-                    //fft_gid_get, local_vec_);
                 result_vec_ = result_vec.get();
                 local_vec_ = result_vec_;
 
                 //if(my_cardinality != 0)
-                my_cardinality = my_cardinality - level;
+                my_cardinality = my_cardinality >> 1;
                 if(my_cardinality < 0)
                     my_cardinality = 0;
 
                 // update data_level for next level
-                level = level << 1;
-                data_.current_level_ = level;
+                level_ = level_ << 1;
+                data_.current_level_ = level_;
             }
             else
             {   
                 if(my_prev_cardinality%2 == 0 && data_.valid_ == true)
                 {
                     result_vec_.resize(0);
-
-                    my_remote_cardinality = data_.comp_cardinality_ + level_previous;
+                    my_remote_cardinality = data_.comp_cardinality_ + level_previous_;
                     BOOST_FOREACH(comp_rank_pair_type p, data_.comp_rank_vec_)
                     {
                         if(my_remote_cardinality == p.second)
                             remote_gid = p.first;                                
                     }
                     hpx::lcos::future<complex_vec> remote_data = 
-                            hpx::async<fetch_remote_action>(remote_gid);
+                            hpx::async<fetch_remote_action_type>(
+                                remote_gid, this->level_previous_);
                           
                     remote_vec_ = remote_data.get();
                             
@@ -218,15 +219,17 @@ namespace fft { namespace server
                     local_vec_ = result_vec_;
                     //data_.comp_gid);
                     my_prev_cardinality = my_cardinality;
-                    my_cardinality = my_cardinality - level;
+                    my_cardinality = my_cardinality >> 1;
                     if(my_cardinality < 0)
                         my_cardinality = 0;
-                    level = level << 1;
-                    level_previous = level_previous << 1;
+
+                    level_previous_ = level_;
+                    level_ = level_ << 1;                    
                 }
                 else
                 {
-                    level = level << 1;
+                    data_.valid_ = false;
+                    level_ = level_ << 1;
                 }
             }
         }
@@ -348,19 +351,29 @@ namespace fft { namespace server
     }
 
     //use stubs?
-    distribute::complex_vec distribute::fetch_remote()
+    distribute::complex_vec distribute::fetch_remote(std::size_t remote_prev_level)
     {
-        while(result_vec_.size() == 0 )
+        while((result_vec_.size() == 0) && (remote_prev_level != get_prev_level()))
         {
             hpx::this_thread::suspend(boost::posix_time::microseconds(50));
         }
-        data_.valid_ = false;
+        //data_.valid_ = false;
         return this->local_vec_;
+    }
+
+    std::size_t distribute::get_prev_level()
+    {
+        return this->level_previous_;
     }
 
     distribute::complex_vec distribute::dataflow_fetch_remote()
     {
         data_.valid_ = false;
+        return this->local_vec_;
+    }
+
+    distribute::complex_vec distribute::get_result()
+    {
         return this->local_vec_;
     }
 
@@ -427,5 +440,8 @@ HPX_REGISTER_ACTION(fft::server::distribute::fetch_remote_action,
 HPX_REGISTER_ACTION(
     fft::server::distribute::dataflow_fetch_remote_action
     , fft_distribute_dataflow_fetch_remote_action);
+HPX_REGISTER_ACTION(
+    fft::server::distribute::get_result_action
+    , fft_distribute_get_result_action);
 HPX_REGISTER_ACTION(fft::server::distribute::remote_xform_action,
     fft_distribute_remote_xform_action);

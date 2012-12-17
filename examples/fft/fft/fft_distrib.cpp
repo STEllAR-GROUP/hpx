@@ -137,8 +137,8 @@ namespace fft
             transform_action_type;
         typedef fft::server::distribute::dist_transform_dataflow_action
             transform_dataflow_action_type;
-        typedef fft::server::distribute::fetch_remote_action 
-            fetch_remote_action_type;
+        typedef fft::server::distribute::get_result_action 
+            get_result_action_type;
         typedef fft::server::distribute::dataflow_fetch_remote_action 
             dflow_fetch_remote_action_type;
         
@@ -173,7 +173,7 @@ namespace fft
         if(!use_dataflow_)
         {
             final_result = 
-                hpx::async<fetch_remote_action_type>(get_local_comp_id());
+                hpx::async<get_result_action_type>(get_local_comp_id());
         }
         else
         {
