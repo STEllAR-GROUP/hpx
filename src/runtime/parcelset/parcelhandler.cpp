@@ -236,7 +236,7 @@ namespace hpx { namespace parcelset
         std::vector<naming::locality> const& localities)
     {
 #if defined(HPX_USE_SHMEM_PARCELPORT)
-        std::string enable_shmem = 
+        std::string enable_shmem =
             get_config_entry("hpx.parcel.enable_shmem_parcelport", "0");
 
         if (boost::lexical_cast<int>(enable_shmem)) {
@@ -358,10 +358,13 @@ namespace hpx { namespace parcelset
         boost::system::error_code const& ec, std::size_t)
     {
         if (ec) {
+            boost::exception_ptr exception =
+                hpx::detail::get_exception(hpx::exception(ec),
+                    "parcelhandler::default_write_handler", __FILE__, __LINE__);
+
             // store last error for now only
             mutex_type::scoped_lock l(mtx_);
-            exception_ = hpx::detail::get_exception(hpx::exception(ec), 
-                "parcelhandler::default_write_handler", __FILE__, __LINE__);
+            exception_ = exception;
         }
     }
 

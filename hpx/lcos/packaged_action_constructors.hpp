@@ -47,8 +47,12 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
+        using HPX_STD_PLACEHOLDERS::_1;
+        using HPX_STD_PLACEHOLDERS::_2;
+
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c<action_type>(this->get_gid(), gid,
+        hpx::apply_c_cb<action_type>(this->get_gid(), gid,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -56,8 +60,12 @@
     void apply_p(naming::id_type const& gid,
         threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
+        using HPX_STD_PLACEHOLDERS::_1;
+        using HPX_STD_PLACEHOLDERS::_2;
+
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c_p<action_type>(this->get_gid(), gid, priority,
+        hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
