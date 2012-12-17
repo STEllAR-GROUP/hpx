@@ -19,6 +19,29 @@ This release is continuing along the lines of code and API consolidation, and
 overall usability inprovements. We dedicated much attention to performance and
 we were able to significantly improve the threading and networking subsystems.
 
+We successfully ported HPX to the Android platform. HPX applications now not
+only can run on mobile devices, but we support heterogeneous applications running
+across architecture boundaries. At the Supercomputing Conference 2012 we
+demonstrated connecting Android tablets to simulations running on a Linux cluster.
+The Android tablet was used to query performance counters from the Linux simulation
+and to steer its parameters.
+
+We made a special effort to make HPX usable in highly concurrent use cases. Many
+of the HPX API functions which possibly take longer than 100 microseconds to
+execute now can be invoked asynchronously. We added uniform support for composing
+futures which simplifies to write asynchronous code. HPX actions (function objects
+encapsulating possibly concurrent remote function invocations) are now well
+integrated with all other API facilities such like `hpx::bind`.
+
+All of the API has been aligned as much as possible with established paradigms.
+HPX now mirrors many of the facilities as defined in the C++11 Standard, such
+as `hpx::thread`, `hpx::function`, `hpx::future`, etc.
+
+This is the first release of HPX we perform after the move to __stellar_hpx_github__.
+This step has enabled a wider participation from the community and further encourages
+us in our decision to release HPX as a true open source library (HPX is licensed
+under the very liberal __boost_license__).
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release. This is by
