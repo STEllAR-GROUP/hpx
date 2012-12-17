@@ -59,6 +59,8 @@ namespace fft {namespace server{
         T this_identity(T init_value);
 
         complex_vec remote_xform(std::size_t dlevel);
+        void remote_vec_update(std::size_t remote_level, 
+            dataflow_base<complex_vec> dremote_vec);
 
         HPX_DEFINE_COMPONENT_ACTION(distribute, init_config, init_config_action);
         HPX_DEFINE_COMPONENT_ACTION(distribute, split_init_data,
@@ -75,6 +77,8 @@ namespace fft {namespace server{
         HPX_DEFINE_COMPONENT_ACTION(distribute, dsend_remote, dsend_remote_action);
         //HPX_DEFINE_COMPONENT_ACTION(distribute, this_identity, dflow_init_action);
         HPX_DEFINE_COMPONENT_ACTION(distribute, remote_xform, remote_xform_action);
+        HPX_DEFINE_COMPONENT_ACTION(distribute, remote_vec_update, remote_vec_update_action);
+        
 
         template <typename T>
         struct dflow_init_action
@@ -92,6 +96,7 @@ namespace fft {namespace server{
         complex_vec remote_vec_;
         hpx::lcos::dataflow_base<complex_vec> dlocal_vec_, dresult_vec_, dremote_vec_;
         std::size_t level_, level_previous_;
+        std::size_t fft_size_;
     };
 }}
 
@@ -118,6 +123,8 @@ HPX_REGISTER_ACTION_DECLARATION(
 //    fft_distribute_dsend_remote_action);
 HPX_REGISTER_ACTION_DECLARATION(fft::server::distribute::remote_xform_action,
     fft_distribute_remote_xform_action);
+HPX_REGISTER_ACTION_DECLARATION(fft::server::distribute::remote_vec_update_action,
+    fft_distribute_remote_vec_update_action);
 HPX_REGISTER_ACTION_DECLARATION(fft::server::distribute::dist_transform_action,
     fft_distribute_dist_transform_action);
 HPX_REGISTER_ACTION_DECLARATION(

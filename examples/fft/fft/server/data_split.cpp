@@ -75,7 +75,7 @@ namespace fft { namespace server
     {
         distribute::complex_vec x;                                                       
         distribute::complex_vec::iterator itr; 
-        std::size_t fft_size;
+        //std::size_t fft_size;
 
         std::ifstream fin(data_filename);                                          
         if(fin.is_open())                                                          
@@ -86,8 +86,8 @@ namespace fft { namespace server
                 fin >> temp.re >> temp.im;                                       
                 x.push_back(temp);                                               
             }
-            fft_size = x.size() - 1;
-            x.resize(fft_size);
+            fft_size_ = x.size() - 1;
+            x.resize(fft_size_);
             std::cout << " Read from file complete!! Size of read array:" <<         
                 x.size() << std::endl;                                               
                                                                                     
@@ -163,7 +163,8 @@ namespace fft { namespace server
         hpx::naming::id_type this_prefix = hpx::find_here();
         
         hpx::lcos::future<hpx::naming::id_type> fft_gid = 
-        hpx::components::stubs::runtime_support::create_component_async<fft::server::fourier_xform>(this_prefix);
+            hpx::components::stubs::runtime_support::create_component_async<
+                fft::server::fourier_xform>(this_prefix);
 
         hpx::naming::id_type fft_gid_get = fft_gid.get();
         my_cardinality = my_prev_cardinality = data_.comp_cardinality_;
@@ -263,13 +264,13 @@ namespace fft { namespace server
         {
             if(level_ == 1)
             {
-                if(my_cardinality%2 == 0)
-                {   
+                //if(my_cardinality%2 == 0)
+                //{   
                     dlocal_vec_ = dataflow<r2ditfft_action_type>(fft_gid_get, dlocal_vec_);
                     
-                    if(total_components > 1)
+                    if(my_cardinality%2 != 0)
                     {
-                        my_remote_cardinality = data_.comp_cardinality_ + level_;
+                        my_remote_cardinality = data_.comp_cardinality_ - level_;
                         // BOOST_ASSERT
                         BOOST_FOREACH(comp_rank_pair_type p, data_.comp_rank_vec_)
                         {
@@ -277,10 +278,14 @@ namespace fft { namespace server
                                 remote_gid = p.first;                                
                         }
 
-                        dataflow_base<std::size_t> dlevel = 
-                            dataflow<fft::server::distribute::dflow_init_action<
-                                std::size_t> >(here, level_);
-                        dremote_vec_ = dataflow<remote_action>(remote_gid, dlevel);
+                        //dataflow_base<std::size_t> dlevel = 
+                        //    dataflow<fft::server::distribute::dflow_init_action<
+                        //        std::size_t> >(here, level_);
+                        //dremote_vec_ = dataflow<remote_action>(remote_gid, dlevel);
+                        
+                        //remote_vec_update
+                        hpx::async<remote_vec_update_action>(remote_gid, level_
+                            , dlocal_vec_);
                     }
                                                        
                     my_cardinality = my_cardinality >> 1;
@@ -288,23 +293,29 @@ namespace fft { namespace server
                     // update data_level for next level
                     level_ = level_ << 1; 
                     data_.current_level_ = level_;
-                }
-                else
-                {   
-                    my_cardinality = my_cardinality >> 1;
-                    level_ = level_ << 1;
-                    data_.current_level_ = level_;
-                    data_.valid_ = false;
-                }
+                //}
+                //else
+                //{   
+                //    my_cardinality = my_cardinality >> 1;
+                //    level_ = level_ << 1;
+                //    data_.current_level_ = level_;
+                //    data_.valid_ = false;
+                //}
             }
             else
             {   
-                if(my_cardinality%2 == 0 && data_.valid_ == true)
+                if(my_prev_cardinality%2 == 0 && data_.valid_ == true)
                 {
+                    while(dlocal_vec_.get_future().get().size() !=
+                        dremote_vec_.get_future().get().size())
+                    {
+                        hpx::this_thread::suspend(boost::posix_time::microseconds(50));
+                    }
+                        
                     dlocal_vec_ = dataflow<r2ditfft_args_action_type>(
                         fft_gid_get, dlocal_vec_, dremote_vec_);
                     
-                    if(level_ != total_components)
+                    if(my_cardinality%2 != 0)
                     {
                         my_remote_cardinality = data_.comp_cardinality_ + level_;
                         // BOOST_ASSERT
@@ -313,10 +324,15 @@ namespace fft { namespace server
                             if(my_remote_cardinality == p.second)
                                 remote_gid = p.first;                                
                         }
-                        dataflow_base<std::size_t> dlevel = 
-                            dataflow<fft::server::distribute::dflow_init_action<
-                            std::size_t> >(here, level_);
-                        dremote_vec_ = dataflow<remote_action>(remote_gid, dlevel);
+                        //dataflow_base<std::size_t> dlevel = 
+                        //    dataflow<fft::server::distribute::dflow_init_action<
+                        //    std::size_t> >(here, level_);
+                        //dremote_vec_ = dataflow<remote_action>(remote_gid, dlevel);
+                        
+                        //remote_vec_update
+                        //also send current level
+                        hpx::async<remote_vec_update_action>(remote_gid, level_
+                            , dlocal_vec_);
                     }
                     
                     my_prev_cardinality = my_cardinality;
@@ -337,11 +353,12 @@ namespace fft { namespace server
         
         if(data_.comp_cardinality_ == 0)
         {
-            //while(local_vec_.size() != 1024)
-            //{
-                local_vec_ = dlocal_vec_.get_future().get();
-                //hpx::this_thread::suspend(boost::posix_time::microseconds(50));
-            //}
+            while(this->fft_size_ != dlocal_vec_.get_future().get().size())
+            {
+                //local_vec_ = dlocal_vec_.get_future().get();
+                hpx::this_thread::suspend(boost::posix_time::microseconds(50));
+            }
+            local_vec_ = dlocal_vec_.get_future().get();            
         }
     }
 
@@ -370,6 +387,14 @@ namespace fft { namespace server
     {
         return this->local_vec_;
     }
+    
+   void distribute::remote_vec_update(std::size_t remote_level, dataflow_base<
+        distribute::complex_vec> dremote_vec)
+    {
+        std::cout << "This level:"<< data_.current_level_ << ", remote level:" 
+            << remote_level << std::endl;
+        this->dremote_vec_ = dremote_vec;
+    } 
 
    complex_vec distribute::remote_xform(std::size_t remote_level)
     {
@@ -438,3 +463,5 @@ HPX_REGISTER_ACTION(fft::server::distribute::get_result_action
     , fft_distribute_get_result_action);
 HPX_REGISTER_ACTION(fft::server::distribute::remote_xform_action,
     fft_distribute_remote_xform_action);
+HPX_REGISTER_ACTION(fft::server::distribute::remote_vec_update_action,
+    fft_distribute_remote_vec_update_action);
