@@ -35,7 +35,7 @@ public:
 int main()
 {
   timer<system_clock> t1;
-  timer<monotonic_clock> t2;
+  timer<steady_clock> t2;
   timer<high_resolution_clock> t3;
 
   std::cout << "Strike any key: ";
@@ -44,7 +44,7 @@ int main()
   std::cout << std::fixed << std::setprecision(9);
   std::cout << "system_clock-----------: "
             << t1.seconds() << " seconds\n";
-  std::cout << "monotonic_clock--------: "
+  std::cout << "steady_clock--------: "
             << t2.seconds() << " seconds\n";
   std::cout << "high_resolution_clock--: "
             << t3.seconds() << " seconds\n";
@@ -54,10 +54,10 @@ int main()
 
   std::cout << "\nsystem_clock latency-----------: " << (d5 - d4).count() << std::endl;
 
-  monotonic_clock::time_point d6 = monotonic_clock::now();
-  monotonic_clock::time_point d7 = monotonic_clock::now();
+  steady_clock::time_point d6 = steady_clock::now();
+  steady_clock::time_point d7 = steady_clock::now();
 
-  std::cout << "monotonic_clock latency--------: " << (d7 - d6).count() << std::endl;
+  std::cout << "steady_clock latency--------: " << (d7 - d6).count() << std::endl;
 
   high_resolution_clock::time_point d8 = high_resolution_clock::now();
   high_resolution_clock::time_point d9 = high_resolution_clock::now();

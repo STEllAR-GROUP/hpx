@@ -104,7 +104,7 @@ set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 # Boost Chrono sources (as long as this library is not in Boost)
 if(HPX_INTERNAL_CHRONO)
   add_hpx_library_sources(hpx_external
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp"
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/*.cpp"
     APPEND)
 endif()
 

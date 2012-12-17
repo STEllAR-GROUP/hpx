@@ -21,7 +21,7 @@ time2_demo contained this comment:
                    Peter Dimov,
                    Jeff Garland,
                    Terry Golubiewski,
-                   Daniel Krogler,
+                   Daniel Krugler,
                    Anthony Williams.
 */
 
@@ -30,11 +30,13 @@ time2_demo contained this comment:
 #include <boost/chrono/chrono.hpp>
 #include <boost/type_traits.hpp>
 
+#include <cassert>
+#include <climits>
 #include <iostream>
+#include <ostream>
+#include <stdexcept>
 
 #include <windows.h>
-#undef min
-#undef max
 
 namespace
 {
@@ -64,7 +66,6 @@ namespace
 ///////////// simulated thread interface /////////////////
 //////////////////////////////////////////////////////////
 
-#include <iostream>
 
 namespace std {
 
@@ -380,7 +381,6 @@ compute_distance(Speed v0, Time t, Acceleration a)
 
 } // User1
 
-#include <iostream>
 
 // Exercise example type-safe physics function and show interoperation
 // of custom time durations (User1::seconds) and standard time durations (std::hours).
@@ -427,9 +427,6 @@ void testUser1()
 // (like IEEE floating point) but otherwise obeys signed integral arithmetic.
 // This class is subsequently used as the rep in boost::chrono::duration to demonstrate a
 // duration class that does not silently ignore overflow.
-#include <ostream>
-#include <stdexcept>
-#include <climits>
 
 namespace User2
 {
@@ -805,15 +802,14 @@ struct duration_values<User2::saturate<I> >
     typedef User2::saturate<I> Rep;
 public:
     static Rep zero() {return Rep(0);}
-    static Rep max()  {return Rep(Rep::pos_inf-1);}
-    static Rep min()  {return -max();}
+    static Rep max BOOST_PREVENT_MACRO_SUBSTITUTION ()  {return Rep(Rep::pos_inf-1);}
+    static Rep min BOOST_PREVENT_MACRO_SUBSTITUTION ()  {return -(max) ();}
 };
 
 }  // namespace chrono
 
 }  // namespace boost
 
-#include <iostream>
 
 void testUser2()
 {
@@ -1141,8 +1137,6 @@ void test()
 
 // miscellaneous tests and demos:
 
-#include <cassert>
-#include <iostream>
 
 using namespace boost::chrono;
 
@@ -1210,7 +1204,7 @@ void inspect_duration(boost::chrono::duration<Rep, Period> d, const std::string&
         boost::chrono::duration<double> dsec = d;
         std::cout << "The precision is " << dsec.count() << " seconds.\n";
     }
-    d = Duration(std::numeric_limits<Rep>::max());
+    d = Duration((std::numeric_limits<Rep>::max)());
     using namespace boost::chrono;
     using namespace std;
     typedef duration<double, boost::ratio_multiply<boost::ratio<24*3652425,10000>, hours::period>::type> Years;
@@ -1331,19 +1325,19 @@ void test_system_clock()
     cout << "system_clock resolution estimate: " << nanoseconds(stop-start).count() << " nanoseconds\n";
 }
 
-void test_monotonic_clock()
+void test_steady_clock()
 {
-    cout << "monotonic_clock test" << endl;
-    monotonic_clock::duration delay = milliseconds(5);
-    monotonic_clock::time_point start = monotonic_clock::now();
-    while (monotonic_clock::now() - start <= delay)
+    cout << "steady_clock test" << endl;
+    steady_clock::duration delay = milliseconds(5);
+    steady_clock::time_point start = steady_clock::now();
+    while (steady_clock::now() - start <= delay)
         ;
-    monotonic_clock::time_point stop = monotonic_clock::now();
-    monotonic_clock::duration elapsed = stop - start;
+    steady_clock::time_point stop = steady_clock::now();
+    steady_clock::duration elapsed = stop - start;
     cout << "paused " << nanoseconds(elapsed).count() << " nanoseconds\n";
-    start = monotonic_clock::now();
-    stop = monotonic_clock::now();
-    cout << "monotonic_clock resolution estimate: " << nanoseconds(stop-start).count() << " nanoseconds\n";
+    start = steady_clock::now();
+    stop = steady_clock::now();
+    cout << "steady_clock resolution estimate: " << nanoseconds(stop-start).count() << " nanoseconds\n";
 }
 
 void test_hi_resolution_clock()
@@ -1366,12 +1360,12 @@ void test_hi_resolution_clock()
 //    cout << "mixed clock test" << endl;
 //    high_resolution_clock::time_point hstart = high_resolution_clock::now();
 //    cout << "Add 5 milliseconds to a high_resolution_clock::time_point\n";
-//    monotonic_clock::time_point mend = hstart + milliseconds(5);
+//    steady_clock::time_point mend = hstart + milliseconds(5);
 //    bool b = hstart == mend;
 //    system_clock::time_point sstart = system_clock::now();
-//    std::cout << "Subtracting system_clock::time_point from monotonic_clock::time_point doesn't compile\n";
+//    std::cout << "Subtracting system_clock::time_point from steady_clock::time_point doesn't compile\n";
 ////  mend - sstart; // doesn't compile
-//    cout << "subtract high_resolution_clock::time_point from monotonic_clock::time_point"
+//    cout << "subtract high_resolution_clock::time_point from steady_clock::time_point"
 //            " and add that to a system_clock::time_point\n";
 //    system_clock::time_point send = sstart + duration_cast<system_clock::duration>(mend - hstart);
 //    cout << "subtract two system_clock::time_point's and output that in microseconds:\n";
@@ -1473,7 +1467,7 @@ template <class Clock, class Duration1, class Duration2>
 inline
 typename boost::common_type<time_point<Clock, Duration1>,
                      time_point<Clock, Duration2> >::type
-min(time_point<Clock, Duration1> t1, time_point<Clock, Duration2> t2)
+min BOOST_PREVENT_MACRO_SUBSTITUTION (time_point<Clock, Duration1> t1, time_point<Clock, Duration2> t2)
 {
     return t2 < t1 ? t2 : t1;
 }
@@ -1487,7 +1481,7 @@ void test_min()
     typedef boost::common_type<T1, T2>::type T3;
     /*auto*/ T1 t1 = system_clock::now() + seconds(3);
     /*auto*/ T2 t2 = system_clock::now() + nanoseconds(3);
-    /*auto*/ T3 t3 = min(t1, t2);
+    /*auto*/ T3 t3 = (min)(t1, t2);
     print_duration(cout, t1 - t3);
     print_duration(cout, t2 - t3);
 }
@@ -1496,8 +1490,8 @@ void explore_limits()
 {
     typedef duration<long long, boost::ratio_multiply<boost::ratio<24*3652425,10000>,
       hours::period>::type> Years;
-    monotonic_clock::time_point t1( Years(250));
-    monotonic_clock::time_point t2(-Years(250));
+    steady_clock::time_point t1( Years(250));
+    steady_clock::time_point t2(-Years(250));
     // nanosecond resolution is likely to overflow.  "up cast" to microseconds.
     //   The "up cast" trades precision for range.
     microseconds d = time_point_cast<microseconds>(t1) - time_point_cast<microseconds>(t2);
@@ -1615,12 +1609,12 @@ void cycle_count_delay()
 
 void test_special_values()
 {
-    std::cout << "duration<unsigned>::min().count()  = " << duration<unsigned>::min().count() << '\n';
+    std::cout << "duration<unsigned>::min().count()  = " << (duration<unsigned>::min)().count() << '\n';
     std::cout << "duration<unsigned>::zero().count() = " << duration<unsigned>::zero().count() << '\n';
-    std::cout << "duration<unsigned>::max().count()  = " << duration<unsigned>::max().count() << '\n';
-    std::cout << "duration<int>::min().count()       = " << duration<int>::min().count() << '\n';
+    std::cout << "duration<unsigned>::max().count()  = " << (duration<unsigned>::max)().count() << '\n';
+    std::cout << "duration<int>::min().count()       = " << (duration<int>::min)().count() << '\n';
     std::cout << "duration<int>::zero().count()      = " << duration<int>::zero().count() << '\n';
-    std::cout << "duration<int>::max().count()       = " << duration<int>::max().count() << '\n';
+    std::cout << "duration<int>::max().count()       = " << (duration<int>::max)().count() << '\n';
 }
 
 int main()
@@ -1636,7 +1630,7 @@ int main()
     test_milliseconds();
     test_with_xtime();
     test_system_clock();
-    test_monotonic_clock();
+    test_steady_clock();
     test_hi_resolution_clock();
     //test_mixed_clock();
     timeval_demo::test_xtime_clock();
@@ -1645,10 +1639,8 @@ int main()
     test_duration_division();
     I_dont_like_the_default_duration_behavior::test();
     test_min();
-#if BOOST_VARIADIC_COMMON_TYPE
     inspect_duration(common_type<duration<double>, hours, microseconds>::type(),
                     "common_type<duration<double>, hours, microseconds>::type");
-#endif
     explore_limits();
     manipulate_clock_object(system_clock());
     duration<double, boost::milli> d = milliseconds(3) * 2.5;
