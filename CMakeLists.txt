@@ -419,6 +419,9 @@ if(MSVC)
   endif()
 endif()
 
+################################################################################
+# Enable integration with Intel Amplifier and Inspector tools
+################################################################################
 hpx_option(HPX_USE_ITTNOTIFY BOOL "Bind to Intel Amplifier Tool (default: OFF)" OFF ADVANCED)
 
 if(HPX_USE_ITTNOTIFY)
