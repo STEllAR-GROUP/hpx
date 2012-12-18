@@ -330,23 +330,21 @@ namespace detail
                     result_type, naked_type
                 > get_remote_result_type;
 
-                // store the value
+                completed_callback_type on_completed;
                 {
-                    // lock only when needed
                     typename mutex_type::scoped_lock l(this->mtx_);
-                    if (!on_completed_.empty()) {
-                        data_.set(boost::move(get_remote_result_type::call(
-                            boost::forward<T>(result))));
-
-                        // invoke the callback (continuation) function
-                        on_completed_(f);
-                        on_completed_.clear();
-                        return;
-                    }
+                    on_completed = boost::move(on_completed_);
                 }
 
+                // store the value
                 data_.set(boost::move(get_remote_result_type::call(
                       boost::forward<T>(result))));
+
+                if (!on_completed.empty()) {
+                    // invoke the callback (continuation) function
+                    on_completed(f);
+                    on_completed.clear();
+                }
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -361,19 +359,20 @@ namespace detail
             lcos::future<Result> f =
                 lcos::detail::make_future_from_data<Result>(this);
 
-            // store the error code
+            completed_callback_type on_completed;
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
-                if (!on_completed_.empty()) {
-                    data_.set(e);
-
-                    // invoke the callback (continuation) function
-                    on_completed_(f);
-                    on_completed_.clear();
-                    return;
-                }
+                on_completed = boost::move(on_completed_);
             }
+            
+            // store the error code
             data_.set(e);
+            if (!on_completed.empty()) {
+                // invoke the callback (continuation) function
+                on_completed(f);
+                on_completed.clear();
+                return;
+            }
         }
 
         void set_error(error e, char const* f, char const* msg)
