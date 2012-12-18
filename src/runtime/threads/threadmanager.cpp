@@ -1461,7 +1461,7 @@ namespace hpx { namespace threads
               counts_creator,
               &locality_allocator_counter_discoverer,
               ""
-            },
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
@@ -1472,8 +1472,9 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
     {
-        util::itt::stack_context ctx;        // helper for itt support
-        util::itt::mark_context mark("threadmanager");
+//         util::itt::stack_context ctx;        // helper for itt support
+//         util::itt::mark_context mark(get_thread_name());
+        util::itt::itt_domain domain(get_thread_name()->data());
 
         manage_active_thread_count count(thread_count_);
 
@@ -1535,8 +1536,10 @@ namespace hpx { namespace threads
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-                                util::itt::undo_mark_context cmark(mark);  // itt support
-                                util::itt::caller_context cctx(ctx);
+//                                 util::itt::undo_mark_context cmark(mark);  // itt support
+//                                 util::itt::caller_context cctx(ctx);
+
+                                util::itt::itt_task task(domain, thrd->get_description());
 
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.

@@ -58,8 +58,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   // typesafe argument and result type pointers.
   template<typename CoroutineType, typename ContextImpl,
       template <typename> class Heap>
-  class coroutine_impl:
-    public context_base<ContextImpl>
+  class coroutine_impl
+    : public context_base<ContextImpl>
   {
   public:
     template <typename DerivedType, typename ResultType>
@@ -73,17 +73,15 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
     typedef typename coroutine_type::result_type result_type;
     typedef typename coroutine_type::result_slot_type result_slot_type;
-    typedef void* thread_id_type;
 
     typedef boost::intrusive_ptr<type> pointer;
 
     template <typename DerivedType>
     coroutine_impl(DerivedType *this_, thread_id_type id,
             std::ptrdiff_t stack_size)
-      : context_base_(*this_, stack_size),
+      : context_base_(*this_, stack_size, id),
         m_arg(0),
-        m_result(0),
-        m_thread_id(id)
+        m_result(0)
     {}
 
     template <typename Functor>
@@ -166,11 +164,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       this->wake_up();
     }
 
-    thread_id_type get_thread_id() const
-    {
-        return m_thread_id;
-    }
-
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
     std::size_t get_thread_phase() const
     {
@@ -190,13 +183,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     HPX_COROUTINE_EXPORT static void init_self();
     HPX_COROUTINE_EXPORT static void reset_self();
 
-  protected:
-    void rebind(thread_id_type id)
-    {
-        m_thread_id = id;
-        this->context_base_::rebind();
-    }
-
 #if defined(HPX_GENERIC_COROUTINES)
   protected:
     boost::optional<result_slot_type> m_result_last;
@@ -210,8 +196,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     arg0_type* m_arg;
     result_type** m_result;
 #endif
-
-    thread_id_type m_thread_id;
   };
 
   // the TLS holds a pointer to the self instance as stored on the stack
@@ -288,7 +272,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         BOOST_ASSERT(!m_fun);   // functor should have been reset by now
     }
 
-    void operator()() 
+    void operator()()
     {
       typedef typename super_type::context_exit_status
         context_exit_status;
@@ -326,22 +310,22 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
           // return value to other side of the fence
           this->bind_result(&this->m_result_last);
 #endif
-        } 
+        }
         catch (exit_exception const&) {
           status = super_type::ctx_exited_exit;
           tinfo = boost::current_exception();
           this->reset();            // reset functor
-        } 
+        }
         catch (boost::exception const&) {
           status = super_type::ctx_exited_abnormally;
           tinfo = boost::current_exception();
           this->reset();
-        } 
+        }
         catch (std::exception const&) {
           status = super_type::ctx_exited_abnormally;
           tinfo = boost::current_exception();
           this->reset();
-        } 
+        }
         catch (...) {
           status = super_type::ctx_exited_abnormally;
           tinfo = boost::current_exception();
@@ -547,7 +531,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       }
 
 #if defined(_DEBUG)
-      wrapper_type::heap_type const* heaps = 
+      wrapper_type::heap_type const* heaps =
           wrapper_type::get_first_heap_address(stack_size);
 #endif
 
@@ -570,7 +554,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(_DEBUG)
       typedef coroutine_impl_wrapper<
           functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
-      wrapper_type::heap_type const* heaps = 
+      wrapper_type::heap_type const* heaps =
           wrapper_type::get_first_heap_address(p->get_stacksize());
 #endif
       // always hand the stack back to the matching heap

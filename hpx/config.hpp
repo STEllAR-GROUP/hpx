@@ -250,6 +250,11 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_USE_ITTNOTIFY)
+#  define HPX_USE_ITTNOTIFY 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
 #if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #  if defined(HPX_DEBUG)
@@ -393,11 +398,6 @@
 #  if !defined(HPX_EMULATE_SWAP_CONTEXT)
 #    define HPX_EMULATE_SWAP_CONTEXT 0
 #  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_USE_ITTNOTIFY)
-#  define HPX_USE_ITTNOTIFY 0
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,8 @@
 
 struct ___itt_caller;
 struct __itt_frame_t;
+struct ___itt_string_handle;
+struct ___itt_domain;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ITT_SYNC_CREATE(obj, type, name)  itt_sync_create(obj, type, name)
@@ -37,6 +39,12 @@ struct __itt_frame_t;
 
 #define HPX_ITT_THREAD_SET_NAME(name)         itt_thread_set_name(name)
 #define HPX_ITT_THREAD_IGNORE()               itt_thread_ignore()
+
+#define HPX_ITT_TASK_BEGIN(domain, name)      itt_task_begin(domain, name)
+#define HPX_ITT_TASK_END(domain)              itt_task_end(domain)
+
+#define HPX_ITT_DOMAIN_CREATE(name)           itt_domain_create(name)
+#define HPX_ITT_TASK_HANDLE_CREATE(name)      itt_task_handle_create(name)
 
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
@@ -70,6 +78,12 @@ HPX_EXPORT void itt_mark(int mark, char const*);
 
 HPX_EXPORT void itt_thread_set_name(char const*);
 HPX_EXPORT void itt_thread_ignore();
+
+HPX_EXPORT void itt_task_begin(___itt_domain const*, ___itt_string_handle*);
+HPX_EXPORT void itt_task_end(___itt_domain const*);
+
+HPX_EXPORT ___itt_domain* itt_domain_create(char const*);
+HPX_EXPORT ___itt_string_handle* itt_task_handle_create(char const*);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
@@ -168,6 +182,32 @@ namespace hpx { namespace util { namespace itt
 
         mark_context& mark_;
     };
+
+    //////////////////////////////////////////////////////////////////////////
+    struct itt_domain
+    {
+        itt_domain(char const* name)
+          : domain_(HPX_ITT_DOMAIN_CREATE(name))
+        {}
+
+        ___itt_domain* domain_;
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    struct itt_task
+    {
+        itt_task(itt_domain const& domain, char const* name)
+          : domain_(domain)
+        {
+            HPX_ITT_TASK_BEGIN(domain_.domain_, HPX_ITT_TASK_HANDLE_CREATE(name));
+        }
+        ~itt_task()
+        {
+            HPX_ITT_TASK_END(domain_.domain_);
+        }
+
+        itt_domain const& domain_;
+    };
 }}}
 
 #else
@@ -198,45 +238,56 @@ inline void itt_mark(int, char const*) {}
 inline void itt_thread_set_name(char const*) {}
 inline void itt_thread_ignore() {}
 
+inline void itt_task_begin(___itt_domain const*, ___itt_string_handle*) {}
+inline void itt_task_end(___itt_domain const*) {}
+
+inline ___itt_domain* itt_domain_create(char const*) { return 0; }
+inline ___itt_string_handle* itt_task_handle_create(char const*) { return 0; }
+
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
 {
     struct stack_context
     {
-        stack_context() {}
-        ~stack_context() {}
     };
 
     struct caller_context
     {
         caller_context(stack_context&) {}
-        ~caller_context() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
         frame_context(char const*) {}
-        ~frame_context() {}
     };
 
     struct undo_frame_context
     {
         undo_frame_context(frame_context&) {}
-        ~undo_frame_context() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
         mark_context(char const*) {}
-        ~mark_context() {}
     };
 
     struct undo_mark_context
     {
         undo_mark_context(mark_context&) {}
-        ~undo_mark_context() {}
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    struct itt_domain
+    {
+        itt_domain(char const*) {}
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    struct itt_task
+    {
+        itt_task(itt_domain const&, char const*) {}
     };
 }}}
 

@@ -91,6 +91,25 @@ bool use_ittnotify_api = false;
         __itt_thread_ignore_ptr();                                            \
     /**/
 
+#define HPX_INTERNAL_ITT_TASK_BEGIN(domain, name)                             \
+    if (use_ittnotify_api && __itt_task_begin_ptr)                            \
+        __itt_task_begin_ptr(domain, __itt_null, __itt_null, name);           \
+    /**/
+#define HPX_INTERNAL_ITT_TASK_END(domain)                                     \
+    if (use_ittnotify_api && __itt_task_end_ptr)                              \
+        __itt_task_end_ptr(domain);                                           \
+    /**/
+
+#define HPX_INTERNAL_ITT_DOMAIN_CREATE(name)                                  \
+    (use_ittnotify_api && __itt_domain_create_ptr) ?                          \
+        __itt_domain_create_ptr(name) : 0                                     \
+    /**/
+
+#define HPX_INTERNAL_ITT_STRING_HANDLE_CREATE(name)                           \
+    (use_ittnotify_api && __itt_string_handle_create_ptr) ?                   \
+        __itt_string_handle_create_ptr(name) : 0                              \
+    /**/
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_MSVC) \
     || defined(__BORLANDC__) \
@@ -216,6 +235,27 @@ void itt_thread_set_name(char const* name)
 void itt_thread_ignore()
 {
     HPX_INTERNAL_ITT_THREAD_IGNORE();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void itt_task_begin(___itt_domain const* domain, ___itt_string_handle* name)
+{
+    HPX_INTERNAL_ITT_TASK_BEGIN(domain, name);
+}
+
+void itt_task_end(___itt_domain const* domain)
+{
+    HPX_INTERNAL_ITT_TASK_END(domain);
+}
+
+___itt_domain* itt_domain_create(char const* name)
+{
+    return HPX_INTERNAL_ITT_DOMAIN_CREATE(name);
+}
+
+___itt_string_handle* itt_task_handle_create(char const* name)
+{
+    return HPX_INTERNAL_ITT_STRING_HANDLE_CREATE(name);
 }
 
 #endif // HPX_USE_ITTNOTIFY
