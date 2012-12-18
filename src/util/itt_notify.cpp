@@ -18,8 +18,8 @@ bool use_ittnotify_api = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_SYNC_CREATE(obj, type, name)                         \
-    if (use_ittnotify_api && __itt_sync_createA_ptr) {                        \
-        __itt_sync_createA_ptr(                                               \
+    if (use_ittnotify_api && __itt_sync_create_ptr) {                         \
+        __itt_sync_create_ptr(                                                \
             const_cast<void*>(static_cast<volatile void*>(obj)),              \
                 type, name, __itt_attr_mutex);                                \
     }                                                                         \
@@ -31,8 +31,8 @@ bool use_ittnotify_api = false;
     }                                                                         \
     /**/
 #define HPX_INTERNAL_ITT_SYNC_RENAME(obj, name)                               \
-    if (use_ittnotify_api && __itt_sync_renameA_ptr) {                        \
-        __itt_sync_renameA_ptr(                                               \
+    if (use_ittnotify_api && __itt_sync_rename_ptr) {                         \
+        __itt_sync_rename_ptr(                                                \
             const_cast<void*>(static_cast<volatile void*>(obj)), name);       \
     }                                                                         \
     /**/
