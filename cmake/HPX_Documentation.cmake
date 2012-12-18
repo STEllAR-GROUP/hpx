@@ -323,7 +323,7 @@ else()
       add_custom_command(OUTPUT ${name}.xml
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
-#                "--stringparam" "boost.doxygen.header.stripped_prefix" ${hpx_SOURCE_DIR}
+                "--stringparam" "boost.doxygen.header.stripped_prefix" ${hpx_SOURCE_DIR}
 #                "--stringparam" "boost.doxygen.header.added_prefix" "file:///${CMAKE_INSTALL_PREFIX}/include/"
                 "--xinclude" "-o" ${name}.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
@@ -335,7 +335,7 @@ else()
       add_custom_command(OUTPUT ${name}.xml
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
-#                "--stringparam" "boost.doxygen.header.stripped_prefix" ${hpx_SOURCE_DIR}
+                "--stringparam" "boost.doxygen.header.stripped_prefix" ${hpx_SOURCE_DIR}
 #                "--stringparam" "boost.doxygen.header.added_prefix" "file://${CMAKE_INSTALL_PREFIX}/include/"
                 "--xinclude" "-o" ${name}.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
