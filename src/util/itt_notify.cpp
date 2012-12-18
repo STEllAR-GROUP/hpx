@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/itt_notify.hpp>
 
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
 
 #include <ittnotify.h>
 #include <legacy/ittnotify.h>
@@ -218,5 +218,5 @@ void itt_thread_ignore()
     HPX_INTERNAL_ITT_THREAD_IGNORE();
 }
 
-#endif // HPX_USE_ITT
+#endif // HPX_USE_ITTNOTIFY
 

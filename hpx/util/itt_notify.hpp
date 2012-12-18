@@ -41,7 +41,7 @@ struct __itt_frame_t;
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
 extern bool use_ittnotify_api;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,6 +240,6 @@ namespace hpx { namespace util { namespace itt
     };
 }}}
 
-#endif // HPX_USE_ITT
+#endif // HPX_USE_ITTNOTIFY
 
 #endif
