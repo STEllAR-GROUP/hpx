@@ -13,14 +13,15 @@ find_package(HPX_OpenMP)
 
 set(benchmarks
     boost_tls_overhead
-    native_tls_overhead
-    hpx_tls_overhead
+    coroutines_call_overhead
     delay_baseline
+    function_object_wrapper_overhead
+    hpx_tls_overhead
     hpx_homogeneous_task_spawn
     hpx_heterogeneous_task_spawn
+    native_tls_overhead
     print_heterogeneous_payloads
     sizeof
-    function_object_wrapper_overhead
    )
 
 if(MSVC)
@@ -97,6 +98,9 @@ if(NOT MSVC)
 endif()
 
 set(boost_tls_overhead_FLAGS NOLIBS
+    DEPENDENCIES ${boost_library_dependencies})
+
+set(coroutines_call_overhead_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(native_tls_overhead_FLAGS NOLIBS
