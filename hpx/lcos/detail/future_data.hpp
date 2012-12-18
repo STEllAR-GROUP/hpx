@@ -234,11 +234,10 @@ namespace detail
         friend struct local::channel;
 
     protected:
-        future_data() : set_on_completed_(false) {}
+        future_data() {}
 
         future_data(completed_callback_type const& data_sink)
-          : on_completed_(data_sink), set_on_completed_(!data_sink.empty())
-        {}
+          : on_completed_(data_sink) {}
 
     public:
         static result_type handle_error(data_type const& d, error_code &ec)
@@ -332,7 +331,7 @@ namespace detail
                 > get_remote_result_type;
 
                 // store the value
-                if (set_on_completed_) {
+                {
                     // lock only when needed
                     typename mutex_type::scoped_lock l(this->mtx_);
                     if (!on_completed_.empty()) {
@@ -340,7 +339,6 @@ namespace detail
                             boost::forward<T>(result))));
 
                         // invoke the callback (continuation) function
-                        set_on_completed_ = false;
                         on_completed_(f);
                         on_completed_.clear();
                         return;
@@ -364,13 +362,12 @@ namespace detail
                 lcos::detail::make_future_from_data<Result>(this);
 
             // store the error code
-            if (set_on_completed_) {
+            {
                 typename mutex_type::scoped_lock l(this->mtx_);
                 if (!on_completed_.empty()) {
                     data_.set(e);
 
                     // invoke the callback (continuation) function
-                    set_on_completed_ = false;
                     on_completed_(f);
                     on_completed_.clear();
                     return;
@@ -433,7 +430,6 @@ namespace detail
         set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            set_on_completed_ = !data_sink.empty();
             return boost::move(set_on_completed_locked(boost::move(data_sink)));
         }
 
@@ -444,16 +440,16 @@ namespace detail
             lcos::future<Result> f = 
                 lcos::detail::make_future_from_data<Result>(this);
 
-            completed_callback_type retval = boost::move(on_completed_);
-            set_on_completed_ = !data_sink.empty();
-            on_completed_ = boost::move(data_sink);
-            if (!on_completed_.empty() && this->is_ready()) 
+            if (!data_sink.empty() && this->is_ready()) 
             {
                 // invoke the callback (continuation) function
-                set_on_completed_ = false;
-                on_completed_(f);
-                on_completed_.clear();
+                data_sink(f);
             }
+
+            completed_callback_type retval = boost::move(on_completed_);
+
+            on_completed_.clear();
+            on_completed_ = boost::move(data_sink);
             return retval;
         }
 
@@ -462,7 +458,6 @@ namespace detail
             completed_callback_type data_sink;
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
-                set_on_completed_ = false;
                 std::swap(on_completed_, data_sink);
             }
         }
@@ -470,7 +465,6 @@ namespace detail
     private:
         detail::full_empty<data_type> data_;
         completed_callback_type on_completed_;
-        bool set_on_completed_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
