@@ -114,7 +114,8 @@ double null_tree(
 
     null_function(seed, delay_iterations);
 
-    hpx::wait(futures, [&] (std::size_t, double r) { d += r; });
+    for (boost::uint64_t j = 0; j < futures.size(); ++j)
+        d += futures[j].get();
 
     return d;
 }
@@ -133,18 +134,22 @@ int hpx_main(
         boost::uint64_t delay_iterations
             = vm["delay-iterations"].as<boost::uint64_t>();
 
+        bool verbose = vm.count("verbose");
+
         hpx::id_type const here = hpx::find_here();
 
         double d = 0.;
-
-        null_tree_action act;
 
         for ( boost::uint64_t i = 0
             ; ((test_runs == 0) ? true : (i < test_runs))
             ; ++i) 
         {
-            d += act(here, 0, children, 1, max_depth, delay_iterations); 
-            //std::cout << (boost::format("%016u : %f\n") % i % d) << std::flush;
+            d += hpx::async<null_tree_action>
+                (here, 0, children, 1, max_depth, delay_iterations).get(); 
+
+            if (verbose)
+                std::cout << (boost::format("%016u : %f\n") % i % d)
+                          << std::flush;
         }
     }
 
@@ -165,12 +170,15 @@ int main(
         , value<boost::uint64_t>()->default_value(10000)
         , "number of times to repeat the test (0 == infinite)")
 
+        ( "verbose"
+        , "print state every iteration")
+
         ( "children"
         , value<boost::uint64_t>()->default_value(8)
         , "number of children each node has")
 
         ( "depth"
-        , value<boost::uint64_t>()->default_value(2)
+        , value<boost::uint64_t>()->default_value(3)
         , "depth of the tree structure")
 
         ( "delay-iterations"
