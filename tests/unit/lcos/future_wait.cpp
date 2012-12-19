@@ -39,10 +39,10 @@ using hpx::naming::id_type;
 struct callback
 {
   private:
-    mutable std::size_t calls_;
+    mutable std::size_t * calls_;
 
   public:
-    callback() : calls_(0) {} 
+    callback(std::size_t & calls) : calls_(&calls) {} 
 
     template <
         typename T
@@ -52,24 +52,24 @@ struct callback
       , T const& 
         ) const
     {
-        ++calls_;
+        ++(*calls_);
     }
 
     void operator()(
         std::size_t 
         ) const
     {
-        ++calls_;
+        ++(*calls_);
     }
 
     std::size_t count() const
     {
-        return calls_;
+        return *calls_;
     }
 
     void reset()
     {
-        calls_ = 0;
+        *calls_ = 0;
     } 
 };
 
@@ -104,7 +104,8 @@ int hpx_main(
     )
 {
     {
-        callback cb;
+        std::size_t count = 0;
+        callback cb(count);
 
         ///////////////////////////////////////////////////////////////////////
         HPX_SANITY_EQ(0U, cb.count());
