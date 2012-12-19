@@ -256,6 +256,9 @@ namespace fft { namespace server
         hpx::naming::id_type fft_gid_get = fft_gid.get();
         my_cardinality = my_prev_cardinality = data_.comp_cardinality_;
         std::size_t num_components = data_.num_localities_;
+        remote_vec_.reserve(0);
+        dremote_vec_ = dataflow<fft::server::distribute::dflow_init_action<
+                            complex_vec> >(here, remote_vec_);
 
         dlocal_vec_ = dataflow<fft::server::distribute::dflow_init_action<
                             complex_vec> >(here, local_vec_);
@@ -264,25 +267,17 @@ namespace fft { namespace server
         {
             if(level_ == 1)
             {
-                //if(my_cardinality%2 == 0)
-                //{   
                     dlocal_vec_ = dataflow<r2ditfft_action_type>(fft_gid_get, dlocal_vec_);
                     
                     if(my_cardinality%2 != 0)
                     {
                         my_remote_cardinality = data_.comp_cardinality_ - level_;
-                        // BOOST_ASSERT
+                        // BOOST_ASSERT?
                         BOOST_FOREACH(comp_rank_pair_type p, data_.comp_rank_vec_)
                         {
                             if(my_remote_cardinality == p.second)
                                 remote_gid = p.first;                                
                         }
-
-                        //dataflow_base<std::size_t> dlevel = 
-                        //    dataflow<fft::server::distribute::dflow_init_action<
-                        //        std::size_t> >(here, level_);
-                        //dremote_vec_ = dataflow<remote_action>(remote_gid, dlevel);
-                        
                         //remote_vec_update
                         hpx::async<remote_vec_update_action>(remote_gid, level_
                             , dlocal_vec_);
@@ -292,15 +287,7 @@ namespace fft { namespace server
                     
                     // update data_level for next level
                     level_ = level_ << 1; 
-                    data_.current_level_ = level_;
-                //}
-                //else
-                //{   
-                //    my_cardinality = my_cardinality >> 1;
-                //    level_ = level_ << 1;
-                //    data_.current_level_ = level_;
-                //    data_.valid_ = false;
-                //}
+                    data_.current_level_ = level_;                
             }
             else
             {   
@@ -324,10 +311,6 @@ namespace fft { namespace server
                             if(my_remote_cardinality == p.second)
                                 remote_gid = p.first;                                
                         }
-                        //dataflow_base<std::size_t> dlevel = 
-                        //    dataflow<fft::server::distribute::dflow_init_action<
-                        //    std::size_t> >(here, level_);
-                        //dremote_vec_ = dataflow<remote_action>(remote_gid, dlevel);
                         
                         //remote_vec_update
                         //also send current level
