@@ -73,6 +73,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
     typedef typename coroutine_type::result_type result_type;
     typedef typename coroutine_type::result_slot_type result_slot_type;
+    typedef typename context_base_::thread_id_type thread_id_type;
 
     typedef boost::intrusive_ptr<type> pointer;
 
