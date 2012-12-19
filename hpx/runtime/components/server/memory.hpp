@@ -130,20 +130,5 @@ HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load16_action, 
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load32_action, load32_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load64_action, load64_action)
 
-///////////////////////////////////////////////////////////////////////////////
-// make sure all needed action::get_action_name() functions get defined
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    boost::uint8_t,
-    uint8_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    boost::uint16_t,
-    uint16_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    boost::uint32_t,
-    uint32_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    boost::uint64_t,
-    uint64_t)
-
 #endif
 
