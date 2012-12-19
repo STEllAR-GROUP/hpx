@@ -110,7 +110,7 @@ namespace hpx {
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcelset::parcelport::create(
             parcelset::connection_tcpip, ini_,
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2),
             boost::bind(&runtime_impl::deinit_tss, This()))),
         scheduler_(init),
         notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1, ::_2),
