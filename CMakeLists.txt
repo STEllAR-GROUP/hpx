@@ -140,7 +140,7 @@ if(HPX_INTERNAL_MOVE)
   add_definitions(-DHPX_INTERNAL_MOVE)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
-if(${BOOST_MINOR_VERSION} LESS 54)    # Boost V1.54 is an optimistic assumtion
+if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
@@ -196,8 +196,6 @@ add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 # disable usage of std::atomics in lockfree
 if(${BOOST_MINOR_VERSION} LESS 53)
   add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
-#else()
-#  add_definitions(-DBOOST_LOCKFREE_NO_HDR_ATOMIC)
 endif()
 
 ################################################################################
@@ -1202,7 +1200,7 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
-  if(${BOOST_MINOR_VERSION} LESS 54)
+  if(${BOOST_MINOR_VERSION} LESS 53)
     # install Boost.Atomic library for older Boost versions only
     install(
       DIRECTORY external/atomic/boost
