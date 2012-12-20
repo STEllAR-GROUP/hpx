@@ -110,7 +110,7 @@ namespace hpx { namespace util
             std::size_t size = 0;
             value_type* p = NULL;
             {
-                shared_lock_type guard(mtx_);
+                upgrade_lock_type guard(mtx_);
 
                 if (!heap_list_.empty())
                 {
@@ -119,6 +119,7 @@ namespace hpx { namespace util
                     {
                         if ((*it)->alloc(&p, count))
                         {
+                            upgraded_lock_type ull(guard);
                             // Allocation succeeded, update statistics.
                             alloc_count_ += count;
 
@@ -171,7 +172,7 @@ namespace hpx { namespace util
                         "%1%::alloc: creating new heap[%2%], size is now %3%")
                         % name()
                         % heap_count_
-                        % size);
+                        % heap_list_.size());
                 did_create = true;
             }
 
@@ -244,13 +245,14 @@ namespace hpx { namespace util
             if (reschedule(p, count, reschedule_pred()))
                 return;
 
-            shared_lock_type guard(mtx_);
+            upgrade_lock_type guard(mtx_);
 
             // Find the heap which allocated this pointer.
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
                 if ((*it)->did_alloc(p))
                 {
+                    upgraded_lock_type ull(guard);
                     (*it)->free(p, count);
                     free_count_ += count;
                     return;
