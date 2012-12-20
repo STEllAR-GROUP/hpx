@@ -354,7 +354,7 @@ inline void itt_task_end(___itt_domain const*) {}
 inline ___itt_domain* itt_domain_create(char const*) { return 0; }
 inline ___itt_string_handle* itt_task_handle_create(char const*) { return 0; }
 
-inline ___itt_id* itt_make_id(void*, unsigned long) {}
+inline ___itt_id* itt_make_id(void*, unsigned long) { return 0; }
 inline void itt_id_create(___itt_domain const*, ___itt_id*) {}
 inline void itt_id_destroy(___itt_id*) {}
 
