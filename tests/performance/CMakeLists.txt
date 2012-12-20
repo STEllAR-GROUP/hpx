@@ -100,9 +100,6 @@ endif()
 set(boost_tls_overhead_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
-set(coroutines_call_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies})
-
 set(native_tls_overhead_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
