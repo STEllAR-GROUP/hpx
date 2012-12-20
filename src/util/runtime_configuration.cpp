@@ -28,7 +28,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 {
     // this global (urghhh) variable is used to control whether guard pages 
     // will be used or not
-    bool use_guard_pages = true;
+    HPX_EXPORT bool use_guard_pages = true;
 }}}}}
 #endif
 
