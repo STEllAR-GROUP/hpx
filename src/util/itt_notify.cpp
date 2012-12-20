@@ -112,8 +112,8 @@ bool use_ittnotify_api = false;
     /**/
 
 #define HPX_INTERNAL_ITT_ID_CREATE(domain, id)                                \
-    (use_ittnotify_api && __itt_id_create_ptr) ?                              \
-        __itt_id_create_ptr(domain, id) : 0                                   \
+    if (use_ittnotify_api && __itt_id_create_ptr)                             \
+        __itt_id_create_ptr(domain, id);                                      \
     /**/
 #define HPX_INTERNAL_ITT_ID_DESTROY(id) delete id
 
