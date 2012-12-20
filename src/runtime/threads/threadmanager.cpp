@@ -1473,8 +1473,9 @@ namespace hpx { namespace threads
         tfunc_impl(std::size_t num_thread)
     {
         util::itt::stack_context ctx;        // helper for itt support
-//         util::itt::mark_context mark(get_thread_name());
-        util::itt::itt_domain domain(get_thread_name()->data());
+        util::itt::domain domain(get_thread_name()->data());
+//         util::itt::id threadid(domain, this);
+        util::itt::frame_context fctx(domain);
 
         manage_active_thread_count count(thread_count_);
 
@@ -1537,9 +1538,9 @@ namespace hpx { namespace threads
                             // store the returned state in the thread
                             {
 #if defined(HPX_USE_ITTNOTIFY)
-//                                 util::itt::undo_mark_context cmark(mark);  // itt support
                                 util::itt::caller_context cctx(ctx);
-                                util::itt::itt_task task(domain, thrd->get_description());
+                                util::itt::undo_frame_context undoframe(fctx);
+                                util::itt::task task(domain, thrd->get_description());
 #endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.

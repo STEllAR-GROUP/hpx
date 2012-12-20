@@ -15,7 +15,7 @@
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     void* thread_data::operator new(std::size_t size, thread_pool& pool)
@@ -26,7 +26,7 @@ namespace hpx { namespace threads
         if (0 == ret)
             HPX_THROW_EXCEPTION(out_of_memory,
                 "thread_data::operator new",
-                "could not allocate memory for thread_data");  
+                "could not allocate memory for thread_data");
         return ret;
     }
 
@@ -155,7 +155,7 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_id() : 
+            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_id() :
             threads::invalid_thread_id;
     }
 
@@ -163,7 +163,7 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_phase() : 
+            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_phase() :
             0;
     }
 
