@@ -18,7 +18,6 @@
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
-#include <boost/thread/shared_mutex.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -251,12 +250,12 @@ namespace hpx { namespace threads
             thread_state& prev_state, thread_state& new_tagged_state)
         {
             thread_state tmp = prev_state;
+
             new_tagged_state = thread_state(newstate, prev_state.get_tag() + 1);
             if (current_state_.compare_exchange_strong(tmp, new_tagged_state))
-            {
-                prev_state = tmp;
                 return true;
-            }
+
+            prev_state = tmp;
             return false;
         }
 

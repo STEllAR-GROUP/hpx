@@ -382,91 +382,103 @@ namespace hpx { namespace threads
             return thread_state(terminated);     // this thread has already been terminated
         }
 
-        // action depends on the current state
-        thread_state previous_state = thrd->get_state();
-        thread_state_enum previous_state_val = previous_state;
+        thread_state previous_state;
+        do {
+            // action depends on the current state
+            previous_state = thrd->get_state();
+            thread_state_enum previous_state_val = previous_state;
 
-        // nothing to do here if the state doesn't change
-        if (new_state == previous_state_val) {
-            LTM_(warning) << "set_state: old thread state is the same as new "
-                           "thread state, aborting state change, thread("
-                        << id << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+            // nothing to do here if the state doesn't change
+            if (new_state == previous_state_val) {
+                LTM_(warning) << "set_state: old thread state is the same as new "
+                               "thread state, aborting state change, thread("
+                            << id << "), description("
+                            << thrd->get_description() << "), new state("
+                            << get_thread_state_name(new_state) << ")";
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
 
-            return thread_state(new_state);
-        }
+                return thread_state(new_state);
+            }
 
-        // the thread to set the state for is currently running, so we
-        // schedule another thread to execute the pending set_state
-        if (active == previous_state_val)
-        {
-            // schedule a new thread to set the state
-            LTM_(warning)
-                << "set_state: thread is currently active, scheduling "
-                    "new thread, thread(" << id << "), description("
-                << thrd->get_description() << "), new state("
-                << get_thread_state_name(new_state) << ")";
+            // the thread to set the state for is currently running, so we
+            // schedule another thread to execute the pending set_state
+            if (active == previous_state_val) {
+                // schedule a new thread to set the state
+                LTM_(warning)
+                    << "set_state: thread is currently active, scheduling "
+                        "new thread, thread(" << id << "), description("
+                    << thrd->get_description() << "), new state("
+                    << get_thread_state_name(new_state) << ")";
 
-            thread_init_data data(
-                boost::bind(&threadmanager_impl::set_active_state, this,
-                    id, new_state, new_state_ex, priority, previous_state),
-                "set state for active thread", 0, priority);
-            register_work(data);
+                thread_init_data data(
+                    boost::bind(&threadmanager_impl::set_active_state, this,
+                        id, new_state, new_state_ex, priority, previous_state),
+                    "set state for active thread", 0, priority);
+                register_work(data);
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
 
-            return previous_state;     // done
-        }
-        else if (terminated == previous_state_val) {
-            LTM_(warning)
-                << "set_state: thread is terminated, aborting state "
-                    "change, thread(" << id << "), description("
-                << thrd->get_description() << "), new state("
-                << get_thread_state_name(new_state) << ")";
+                return previous_state;     // done
+            }
+            else if (terminated == previous_state_val) {
+                LTM_(warning)
+                    << "set_state: thread is terminated, aborting state "
+                        "change, thread(" << id << "), description("
+                    << thrd->get_description() << "), new state("
+                    << get_thread_state_name(new_state) << ")";
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
 
-            // If the thread has been terminated while this set_state was
-            // pending nothing has to be done anymore.
-            return previous_state;
-        }
-        else if (pending == previous_state_val && suspended == new_state) {
-            // we do not allow explicit resetting of a state to suspended
-            // without the thread being executed.
-            hpx::util::osstream strm;
-            strm << "set_state: invalid new state, can't demote a pending thread, "
-                 << ", thread(" << id << "), description("
-                 << thrd->get_description() << "), new state("
-                 << get_thread_state_name(new_state) << ")";
+                // If the thread has been terminated while this set_state was
+                // pending nothing has to be done anymore.
+                return previous_state;
+            }
+            else if (pending == previous_state_val && suspended == new_state) {
+                // we do not allow explicit resetting of a state to suspended
+                // without the thread being executed.
+                hpx::util::osstream strm;
+                strm << "set_state: invalid new state, can't demote a pending thread, "
+                     << "thread(" << id << "), description("
+                     << thrd->get_description() << "), new state("
+                     << get_thread_state_name(new_state) << ")";
 
-            LTM_(fatal) << hpx::util::osstream_get_string(strm);
+                LTM_(fatal) << hpx::util::osstream_get_string(strm);
 
-            HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
-                hpx::util::osstream_get_string(strm));
-            return thread_state(unknown);
-        }
+                HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
+                    hpx::util::osstream_get_string(strm));
+                return thread_state(unknown);
+            }
 
-        // If the previous state was pending we are supposed to remove the
-        // thread from the queue. But in order to avoid linearly looking
-        // through the queue we defer this to the thread function, which
-        // at some point will ignore this thread by simply skipping it
-        // (if it's not pending anymore).
+            // If the previous state was pending we are supposed to remove the
+            // thread from the queue. But in order to avoid linearly looking
+            // through the queue we defer this to the thread function, which
+            // at some point will ignore this thread by simply skipping it
+            // (if it's not pending anymore).
 
-        LTM_(info) << "set_state: thread(" << id << "), "
-                      "description(" << thrd->get_description() << "), "
-                      "new state(" << get_thread_state_name(new_state) << "), "
-                      "old state(" << get_thread_state_name(previous_state)
-                   << ")";
+            LTM_(info) << "set_state: thread(" << id << "), "
+                          "description(" << thrd->get_description() << "), "
+                          "new state(" << get_thread_state_name(new_state) << "), "
+                          "old state(" << get_thread_state_name(previous_state_val)
+                       << ")";
 
-        // So all what we do here is to set the new state.
-        thrd->set_state_ex(new_state_ex);
-        thrd->set_state(new_state);
+            // So all what we do here is to set the new state.
+            if (thrd->restore_state(new_state, previous_state)) {
+                thrd->set_state_ex(new_state_ex);
+                break;
+            }
+
+            // state has changed since we fetched it from the thread, retry
+            LTM_(error) << "set_state: state has been changed since it was fetched, "
+                          "retrying, thread(" << id << "), "
+                          "description(" << thrd->get_description() << "), "
+                          "new state(" << get_thread_state_name(new_state) << "), "
+                          "old state(" << get_thread_state_name(previous_state_val)
+                       << ")";
+        } while (true);
 
         if (new_state == pending) {
             // REVIEW: Passing a specific target thread may interfere with the
