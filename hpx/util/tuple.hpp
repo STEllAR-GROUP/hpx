@@ -45,13 +45,13 @@ namespace hpx { namespace util
         struct env_value_type
         {
             typedef T type;
-        }
+        };
 
         template <typename T>
         struct env_value_type<T const>
         {
             typedef T const type;
-        }
+        };
 
         template <typename T>
         struct env_value_type<T &>

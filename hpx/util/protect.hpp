@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail
           : f_(f)
         {}
 
-        explicit protected_bind(BOOST_FWD_REF(F) f)
+        explicit protected_bind(BOOST_RV_REF(F) f)
           : f_(boost::move(f))
         {}
 

@@ -322,8 +322,8 @@ namespace detail
                         "data has already been set for this future");
                 }
 
-               typedef typename boost::remove_const<
-                    typename hpx::util::detail::remove_reference<T>::type
+               typedef typename hpx::util::detail::remove_reference<
+                    typename boost::remove_const<T>::type
                 >::type naked_type;
 
                 typedef traits::get_remote_result<
