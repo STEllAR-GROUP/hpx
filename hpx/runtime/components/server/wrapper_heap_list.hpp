@@ -15,12 +15,11 @@ namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template <typename Heap, typename SharedMutex =
-        lcos::local::detail::shared_mutex<lcos::local::spinlock> >
-    class wrapper_heap_list 
-      : public util::one_size_heap_list<Heap, SharedMutex>
+    template <typename Heap, typename Mutex = lcos::local::spinlock>
+    class wrapper_heap_list
+      : public util::one_size_heap_list<Heap, Mutex>
     {
-        typedef util::one_size_heap_list<Heap, SharedMutex> base_type;
+        typedef util::one_size_heap_list<Heap, Mutex> base_type;
 
     public:
         wrapper_heap_list(component_type type)
@@ -30,7 +29,7 @@ namespace hpx { namespace components { namespace detail
         ///
         naming::gid_type get_gid(void* p)
         {
-            typename base_type::shared_lock_type guard(this->mtx_);
+            typename base_type::unique_lock_type guard(this->mtx_);
 
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();
@@ -46,7 +45,7 @@ namespace hpx { namespace components { namespace detail
             naming::gid_type const& lower
           , naming::gid_type const& upper)
         {
-            typename base_type::shared_lock_type guard(this->mtx_);
+            typename base_type::unique_lock_type guard(this->mtx_);
             id_range_.set_range(lower, upper);
         }
 

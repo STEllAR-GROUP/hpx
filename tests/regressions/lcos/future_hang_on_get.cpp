@@ -134,7 +134,7 @@ int hpx_main(
         boost::uint64_t delay_iterations
             = vm["delay-iterations"].as<boost::uint64_t>();
 
-        bool verbose = vm.count("verbose");
+        bool verbose = vm.count("verbose") != 0;
 
         hpx::id_type const here = hpx::find_here();
 

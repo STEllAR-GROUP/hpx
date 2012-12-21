@@ -28,8 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    template <typename Heap, typename SharedMutex =
-        lcos::local::detail::shared_mutex<lcos::local::spinlock> >
+    template <typename Heap, typename Mutex = lcos::local::spinlock>
     class one_size_heap_list
     {
     public:
@@ -48,12 +47,9 @@ namespace hpx { namespace util
             heap_size = heap_type::heap_size    // size of the object
         };
 
-        typedef SharedMutex mutex_type;
+        typedef Mutex mutex_type;
 
-        typedef boost::shared_lock<mutex_type> shared_lock_type;
-        typedef boost::upgrade_lock<mutex_type> upgrade_lock_type;
-        typedef boost::upgrade_to_unique_lock<mutex_type> upgraded_lock_type;
-        typedef boost::unique_lock<mutex_type> unique_lock_type;
+        typedef typename mutex_type::scoped_lock unique_lock_type;
 
         explicit one_size_heap_list(char const* class_name = "")
             : class_name_(class_name)
@@ -100,6 +96,8 @@ namespace hpx { namespace util
         // operations
         value_type* alloc(std::size_t count = 1)
         {
+            unique_lock_type guard(mtx_);
+
             if (HPX_UNLIKELY(0 == count))
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -110,8 +108,6 @@ namespace hpx { namespace util
             std::size_t size = 0;
             value_type* p = NULL;
             {
-                upgrade_lock_type guard(mtx_);
-
                 if (!heap_list_.empty())
                 {
                     size = heap_list_.size();
@@ -119,7 +115,6 @@ namespace hpx { namespace util
                     {
                         if ((*it)->alloc(&p, count))
                         {
-                            upgraded_lock_type ull(guard);
                             // Allocation succeeded, update statistics.
                             alloc_count_ += count;
 
@@ -145,9 +140,6 @@ namespace hpx { namespace util
             // Create new heap.
             bool did_create = false;
             {
-                // Acquire exclusive access.
-                unique_lock_type ul(mtx_);
-
                 heap_list_.push_front(typename list_type::value_type(
                     new heap_type(class_name_.c_str(), heap_count_ + 1, heap_step)));
 
@@ -179,6 +171,8 @@ namespace hpx { namespace util
             if (did_create)
                 return p;
 
+            guard.unlock();
+
             // Try again, we just got a new heap, so we should be good.
             return alloc(count);
         }
@@ -196,9 +190,7 @@ namespace hpx { namespace util
                     name() + "::add_heap", "encountered NULL heap");
             }
 
-            // Acquire exclusive access.
             unique_lock_type ul(mtx_);
-
             p->heap_count_ = heap_count_;
 
             iterator it = heap_list_.insert(heap_list_.begin(),
@@ -215,8 +207,8 @@ namespace hpx { namespace util
             ++heap_count_;
         }
 
-        // need to reschedule if not using boost::shared_mutex
-        bool reschedule(void* p, std::size_t count, boost::mpl::false_)
+        // need to reschedule if not using boost::mutex
+        bool reschedule(void* p, std::size_t count)
         {
             if (0 == threads::get_self_ptr())
             {
@@ -228,31 +220,23 @@ namespace hpx { namespace util
             return false;
         }
 
-        bool reschedule(void* p, std::size_t count, boost::mpl::true_)
-        {
-            return false;
-        }
-
         void free(void* p, std::size_t count = 1)
         {
+            unique_lock_type ul(mtx_);
+
             if (NULL == p || !threads::threadmanager_is(running))
                 return;
 
             // if this is called from outside a HPX thread we need to
             // re-schedule the request
-            typedef boost::is_same<boost::shared_mutex, SharedMutex>
-                reschedule_pred;
-            if (reschedule(p, count, reschedule_pred()))
+            if (reschedule(p, count))
                 return;
-
-            upgrade_lock_type guard(mtx_);
 
             // Find the heap which allocated this pointer.
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
                 if ((*it)->did_alloc(p))
                 {
-                    upgraded_lock_type ull(guard);
                     (*it)->free(p, count);
                     free_count_ += count;
                     return;
@@ -268,7 +252,7 @@ namespace hpx { namespace util
 
         bool did_alloc(void* p) const
         {
-            shared_lock_type guard(mtx_);
+            unique_lock_type ul(mtx_);
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
                 if ((*it)->did_alloc(p))
