@@ -5,7 +5,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(__x86_64__)
+#if !(defined(__x86_64__) || defined(__amd64__))
 #error This file is for x86 CPUs only.
 #endif
 
