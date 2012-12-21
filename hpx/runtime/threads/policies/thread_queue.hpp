@@ -89,6 +89,14 @@ namespace hpx { namespace threads { namespace policies
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <bool Global> struct condition;
+
+        template <> struct condition<false> {};
+        template <> struct condition<true> : boost::condition {};
+    }
+
     template <bool Global>
     class thread_queue
     {
@@ -556,12 +564,7 @@ namespace hpx { namespace threads { namespace policies
     private:
         mutable mutex_type mtx_;            ///< mutex protecting the members
 
-        template <bool Global_> struct condition;
-
-        template <> struct condition<false> {};
-        template <> struct condition<true> : boost::condition {};
-
-        condition<Global> cond_;             ///< used to trigger some action
+        policies::detail::condition<Global> cond_;  ///< used to trigger some action
 
         thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
         work_items_type work_items_;        ///< list of active work items
