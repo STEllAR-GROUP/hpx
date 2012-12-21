@@ -11,7 +11,7 @@
 [section:hpx_0_9_5 __hpx__ V0.9.5]
 
 We have had roughly 1000 commits since the last release and we have closed
-over 130 tickets (bugs, feature requests, etc.).
+over 140 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
@@ -48,6 +48,10 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #637 - --copy-dt-needed-entries breaks with gold
+* #635 - Boost V1.53 will add Boost.Lockfree and Boost.Atomic
+* #631 - FFT application throws error in parcellayer
+* #625 - Port coroutines context switch benchmark
 * #622 - Add an HPX_ALWAYS_ASSERT macro
 * #621 - New INI section for stack sizes
 * #618 - pkg_config support does not work with a HPX debug build
