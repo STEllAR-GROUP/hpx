@@ -257,7 +257,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef coroutine_impl<CoroutineType, ContextImpl, Heap> super_type;
     typedef typename super_type::thread_id_type thread_id_type;
 
-    typedef typename boost::remove_reference<
+    typedef typename hpx::util::detail::remove_reference<
         typename boost::remove_const<FunctorType>::type
     >::type functor_type;
 
@@ -430,7 +430,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void reset()
     {
         this->reset_stack();
-        m_fun = FunctorType();    // just reset the bound function
+        m_fun.clear();    // just reset the bound function
     }
 
     template <typename Functor>
@@ -514,7 +514,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   coroutine_impl<CoroutineType, ContextImpl, Heap>::
       create(BOOST_FWD_REF(Functor) f, thread_id_type id, std::ptrdiff_t stack_size)
   {
-      typedef typename boost::remove_reference<
+      typedef typename hpx::util::detail::remove_reference<
           typename boost::remove_const<Functor>::type
       >::type functor_type;
 
