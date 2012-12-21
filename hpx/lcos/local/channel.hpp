@@ -237,9 +237,7 @@ struct channel<void>
     }
 
     template <typename F>
-    hpx::future<
-        typename boost::result_of<F(hpx::future<void>)
-    >::type>
+    hpx::future<typename boost::result_of<F(hpx::future<void>)>::type>
     then_async(BOOST_FWD_REF(F) f)
     {
         BOOST_ASSERT(data_);
