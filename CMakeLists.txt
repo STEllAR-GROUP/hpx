@@ -350,6 +350,24 @@ else()
   add_definitions(-DHPX_VERIFY_LOCKS=0)
 endif()
 
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  hpx_option(HPX_THREAD_DEBUG_INFO BOOL "Enable thread debugging information (default: ON)" ON ADVANCED)
+else()
+  hpx_option(HPX_THREAD_DEBUG_INFO BOOL "Enable thread debugging information (default: OFF)" OFF ADVANCED)
+endif()
+
+if(HPX_THREAD_DEBUG_INFO)
+  add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=1)
+  add_definitions(-DHPX_THREAD_MAINTAIN_PHASE_INFORMATION=1)
+  add_definitions(-DHPX_THREAD_MAINTAIN_DESCRIPTION=1)
+  add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=1)
+else()
+  add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=0)
+  add_definitions(-DHPX_THREAD_MAINTAIN_PHASE_INFORMATION=0)
+  add_definitions(-DHPX_THREAD_MAINTAIN_DESCRIPTION=0)
+  add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=0)
+endif()
+
 if(NOT MSVC)
   hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
   if(HPX_THREAD_GUARD_PAGE)
@@ -358,7 +376,7 @@ if(NOT MSVC)
     add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
   endif()
 endif()
-
+  
 ################################################################################
 # PAPI event counters
 ################################################################################
