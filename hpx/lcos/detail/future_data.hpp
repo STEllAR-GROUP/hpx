@@ -459,11 +459,8 @@ namespace detail
 
         void reset_on_completed()
         {
-            completed_callback_type data_sink;
-            {
-                typename mutex_type::scoped_lock l(this->mtx_);
-                std::swap(on_completed_, data_sink);
-            }
+            typename mutex_type::scoped_lock l(this->mtx_);
+            on_completed_.clear();
         }
 
     private:
