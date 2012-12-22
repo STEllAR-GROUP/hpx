@@ -133,7 +133,7 @@ namespace hpx { namespace threads
     //        here.
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        cleanup_terminated(bool delete_all = false)
+        cleanup_terminated(bool delete_all)
     {
         mutex_type::scoped_lock lk(mtx_);
         return scheduler_.cleanup_terminated(delete_all);
