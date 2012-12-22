@@ -102,6 +102,13 @@ struct channel
         return boost::move(tmp);
     }
 
+    T move(hpx::error_code& ec = hpx::throws) const
+    {
+        BOOST_ASSERT(data_);
+        T tmp = data_->move_data(ec);
+        return boost::move(tmp);
+    }
+
     hpx::future<T> get_future()
     {
         BOOST_ASSERT(data_);
@@ -220,6 +227,12 @@ struct channel<void>
     {
         BOOST_ASSERT(data_);
         hpx::util::unused_type tmp = data_->get_data(ec);
+    }
+
+    void move(hpx::error_code& ec = hpx::throws) const
+    {
+        BOOST_ASSERT(data_);
+        hpx::util::unused_type tmp = data_->move_data(ec);
     }
 
     hpx::future<void> get_future()
