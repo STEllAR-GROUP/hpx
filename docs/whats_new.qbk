@@ -48,11 +48,15 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #644 - Terminated threads are not always properly cleaned up
+* #640 - future_data<T>::set_on_completed_ used without locks
+* #638 - hpx build with intel compilers fails on linux
 * #637 - --copy-dt-needed-entries breaks with gold
 * #635 - Boost V1.53 will add Boost.Lockfree and Boost.Atomic
 * #631 - FFT application throws error in parcellayer
+* #629 - Waiting on futures hangs
+* #628 - Add an HPX_ALWAYS_ASSERT macro
 * #625 - Port coroutines context switch benchmark
-* #622 - Add an HPX_ALWAYS_ASSERT macro
 * #621 - New INI section for stack sizes
 * #618 - pkg_config support does not work with a HPX debug build
 * #617 - hpx/external/logging/boost/logging/detail/cache_before_init.hpp:139:67:
