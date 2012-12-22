@@ -56,15 +56,12 @@ namespace hpx
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
-                std::size_t current_count = count_.fetch_add(1);
-                if (current_count != needed_count_) {
-                    ready_.enqueue(idx);
-                    if (current_count + 1 == needed_count_)
-                    {
-                        // reactivate waiting thread only if it's not us
-                        if (id != threads::get_self().get_thread_id())
-                            threads::set_thread_state(id, threads::pending);
-                    }
+                ready_.enqueue(idx);
+                if (count_.fetch_add(1) + 1 == needed_count_)
+                {
+                    // reactivate waiting thread only if it's not us
+                    if (id != threads::get_self_id())
+                        threads::set_thread_state(id, threads::pending);
                 }
             }
 
@@ -114,8 +111,9 @@ namespace hpx
                 using lcos::detail::get_future_data;
 
                 // set callback functions to executed when future is ready
-                threads::thread_id_type id = threads::get_self().get_thread_id();
-                for (std::size_t i = 0; i != lazy_values_.size(); ++i)
+                std::size_t size = lazy_values_.size();
+                threads::thread_id_type id = threads::get_self_id();
+                for (std::size_t i = 0; i != size; ++i)
                 {
                     get_future_data(lazy_values_[i])->set_on_completed(
                         util::bind(&when_n::on_future_ready, this, i, id));
@@ -143,7 +141,7 @@ namespace hpx
                 }
 
                 // reset all pending callback functions
-                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                for (std::size_t i = 0; i < size; ++i)
                     get_future_data(lazy_values_[i])->reset_on_completed();
 
                 return result;

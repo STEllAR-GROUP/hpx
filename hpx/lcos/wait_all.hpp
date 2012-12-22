@@ -120,8 +120,9 @@ namespace hpx
                 this->base_type::ready_count_.store(0);
 
                 // set callback functions to executed when future is ready
-                threads::thread_id_type id = threads::get_self().get_thread_id();
-                for (std::size_t i = 0; i != this->base_type::lazy_values_.size(); ++i)
+                std::size_t size = this->base_type::lazy_values_.size();
+                threads::thread_id_type id = threads::get_self_id();
+                for (std::size_t i = 0; i != size; ++i)
                 {
                     get_future_data(this->base_type::lazy_values_[i])->set_on_completed(
                         util::bind(&when_all::on_future_ready, this, i, id));
@@ -130,18 +131,17 @@ namespace hpx
                 // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
                 // ourselves.
-                if (this->base_type::ready_count_ != this->base_type::lazy_values_.size())
+                if (this->base_type::ready_count_ < size)
                 {
                     // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
                 // all futures should be ready
-                BOOST_ASSERT(this->base_type::ready_count_ == 
-                    this->base_type::lazy_values_.size());
+                BOOST_ASSERT(this->base_type::ready_count_ == size);
 
                 // reset all pending callback functions
-                for (std::size_t i = 0; i < this->base_type::lazy_values_.size(); ++i) 
+                for (std::size_t i = 0; i < size; ++i) 
                     get_future_data(this->base_type::lazy_values_[i])->reset_on_completed();
 
                 return this->base_type::lazy_values_;
@@ -164,7 +164,7 @@ namespace hpx
                 if (ready_count_.fetch_add(1) + 1 == lazy_values_.size())
                 {
                     // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self().get_thread_id())
+                    if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
                 }
             }
@@ -207,8 +207,9 @@ namespace hpx
                 ready_count_.store(0);
 
                 // set callback functions to executed when future is ready
-                threads::thread_id_type id = threads::get_self().get_thread_id();
-                for (std::size_t i = 0; i != lazy_values_.size(); ++i)
+                std::size_t size = lazy_values_.size();
+                threads::thread_id_type id = threads::get_self_id();
+                for (std::size_t i = 0; i != size; ++i)
                 {
                     get_future_data(lazy_values_[i])->set_on_completed(
                         util::bind(&when_all::on_future_ready, this, id));
@@ -217,17 +218,17 @@ namespace hpx
                 // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
                 // ourselves.
-                if (ready_count_ != lazy_values_.size())
+                if (ready_count_ < size)
                 {
                     // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
                 // all futures should be ready
-                BOOST_ASSERT(ready_count_ == lazy_values_.size());
+                BOOST_ASSERT(ready_count_ == size);
 
                 // reset all pending callback functions
-                for (std::size_t i = 0; i < lazy_values_.size(); ++i) 
+                for (std::size_t i = 0; i < size; ++i) 
                     get_future_data(lazy_values_[i])->reset_on_completed();
 
                 return lazy_values_;

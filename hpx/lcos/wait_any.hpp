@@ -53,7 +53,7 @@ namespace hpx
                 if (index_.compare_exchange_strong(index_not_initialized, idx)) 
                 {
                     // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self().get_thread_id())
+                    if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
                 }
             }
@@ -93,17 +93,19 @@ namespace hpx
 
                 index_.store(index_error);
 
+                std::size_t size = lazy_values_.size();
+
                 {
                     // set callback functions to execute when future is ready
-                    threads::thread_id_type id = threads::get_self().get_thread_id();
-                    for (std::size_t i = 0; i != lazy_values_.size(); ++i)
+                    threads::thread_id_type id = threads::get_self_id();
+                    for (std::size_t i = 0; i != size; ++i)
                     {
                         get_future_data(lazy_values_[i])->set_on_completed(
                             util::bind(&when_any::on_future_ready, this, i, id));
                     }
                 }
 
-                // if one of the futures is already set, our callback above has
+                // If one of the futures is already set, our callback above has
                 // already been called, otherwise we suspend ourselves
                 if (index_.load() == index_error)
                 {
@@ -114,7 +116,7 @@ namespace hpx
                 BOOST_ASSERT(index_.load() != index_error);       // that should not happen
 
                 // reset all pending callback functions
-                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                for (std::size_t i = 0; i < size; ++i)
                     get_future_data(lazy_values_[i])->reset_on_completed();
 
                 return result_type(static_cast<int>(index_), lazy_values_[index_]);
