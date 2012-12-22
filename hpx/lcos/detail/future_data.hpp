@@ -108,7 +108,7 @@ namespace detail
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
-        typedef HPX_STD_FUNCTION<void(lcos::future<Result>)> 
+        typedef HPX_STD_FUNCTION<void(lcos::future<Result>)>
             completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
@@ -315,13 +315,6 @@ namespace detail
 
             // set the received result, reset error status
             try {
-                // check weather the data already has been set
-                if (!data_.is_empty()) {
-                    HPX_THROW_EXCEPTION(future_already_satisfied,
-                        "packaged_task::set_data<Result>",
-                        "data has already been set for this future");
-                }
-
                typedef typename hpx::util::detail::remove_reference<
                     typename boost::remove_const<T>::type
                 >::type naked_type;
@@ -333,18 +326,24 @@ namespace detail
                 completed_callback_type on_completed;
                 {
                     typename mutex_type::scoped_lock l(this->mtx_);
+
+                    // check whether the data already has been set
+                    if (!data_.is_empty()) {
+                        HPX_THROW_EXCEPTION(future_already_satisfied,
+                            "packaged_task::set_data<Result>",
+                            "data has already been set for this future");
+                    }
+
                     on_completed = boost::move(on_completed_);
+
+                    // store the value
+                    data_.set(boost::move(get_remote_result_type::call(
+                          boost::forward<T>(result))));
                 }
 
-                // store the value
-                data_.set(boost::move(get_remote_result_type::call(
-                      boost::forward<T>(result))));
-
-                if (!on_completed.empty()) {
-                    // invoke the callback (continuation) function
+                // invoke the callback (continuation) function
+                if (!on_completed.empty())
                     on_completed(f);
-                    on_completed.clear();
-                }
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -362,17 +361,23 @@ namespace detail
             completed_callback_type on_completed;
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
+
+                // check whether the data already has been set
+                if (!data_.is_empty()) {
+                    HPX_THROW_EXCEPTION(future_already_satisfied,
+                        "packaged_task::set_data<Result>",
+                        "data has already been set for this future");
+                }
+
                 on_completed = boost::move(on_completed_);
+
+                // store the error code
+                data_.set(e);
             }
-            
-            // store the error code
-            data_.set(e);
-            if (!on_completed.empty()) {
-                // invoke the callback (continuation) function
+
+            // invoke the callback (continuation) function
+            if (!on_completed.empty())
                 on_completed(f);
-                on_completed.clear();
-                return;
-            }
         }
 
         void set_error(error e, char const* f, char const* msg)
@@ -436,19 +441,19 @@ namespace detail
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             // this future coincidentally instance keeps us alive
-            lcos::future<Result> f = 
+            lcos::future<Result> f =
                 lcos::detail::make_future_from_data<Result>(this);
-
-            if (!data_sink.empty() && this->is_ready()) 
-            {
-                // invoke the callback (continuation) function
-                data_sink(f);
-            }
 
             completed_callback_type retval = boost::move(on_completed_);
 
-            on_completed_.clear();
-            on_completed_ = boost::move(data_sink);
+            if (!data_sink.empty() && this->is_ready()) {
+                // invoke the callback (continuation) function right away
+                data_sink(f);
+            }
+            else {
+                on_completed_ = boost::move(data_sink);
+            }
+
             return retval;
         }
 

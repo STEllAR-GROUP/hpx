@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -24,11 +24,11 @@ using hpx::finalize;
 template <typename T>
 inline T sign(T a)
 {
-    if (a > 0) 
+    if (a > 0)
         return 1;
-    else if (a < 0) 
+    else if (a < 0)
         return -1;
-    else 
+    else
         return 0;
 }
 
@@ -67,7 +67,7 @@ double null_function(
         double v1 = v(prng);
 
         if (compare_real(v1, 0.0, 1e-10))
-            v1 = 1e-10; 
+            v1 = 1e-10;
 
         d += (s(prng) ? 1.0 : -1.0) * (v0 / v1);
     }
@@ -92,7 +92,7 @@ double null_tree(
   , boost::uint64_t depth
   , boost::uint64_t max_depth
   , boost::uint64_t delay_iterations
-    ) 
+    )
 {
     if (depth == max_depth)
         return null_function(seed, delay_iterations);
@@ -109,7 +109,7 @@ double null_tree(
     for (boost::uint64_t j = 0; j < children; ++j)
     {
         futures.push_back(hpx::async<null_tree_action>
-            (here, j + p, children, depth + 1, max_depth, delay_iterations)); 
+            (here, j + p, children, depth + 1, max_depth, delay_iterations));
     }
 
     null_function(seed, delay_iterations);
@@ -133,18 +133,18 @@ int hpx_main(
         boost::uint64_t delay_iterations
             = vm["delay-iterations"].as<boost::uint64_t>();
 
-        bool verbose = vm.count("verbose");
+        bool verbose = vm.count("verbose") != 0;
 
         hpx::id_type const here = hpx::find_here();
 
         double d = 0.;
 
+        null_tree_action null_act;
         for ( boost::uint64_t i = 0
             ; ((test_runs == 0) ? true : (i < test_runs))
-            ; ++i) 
+            ; ++i)
         {
-            d += hpx::async<null_tree_action>
-                (here, 0, children, 1, max_depth, delay_iterations).get(); 
+            d += null_act(here, 0, children, 1, max_depth, delay_iterations);
 
             if (verbose)
                 std::cout << (boost::format("%016u : %f\n") % i % d)
