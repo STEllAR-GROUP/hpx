@@ -195,7 +195,8 @@ namespace hpx { namespace util
         // given variables_map
         bool read_config_file_options(std::string const &filename,
             boost::program_options::options_description const &desc,
-            boost::program_options::variables_map &vm, bool may_fail = false)
+            boost::program_options::variables_map &vm, 
+            util::section const& rtcfg, std::size_t node, bool may_fail = false)
         {
             std::ifstream ifs(filename.c_str());
             if (!ifs.is_open()) {
@@ -238,7 +239,10 @@ namespace hpx { namespace util
                 using namespace boost::program_options::command_line_style;
 
                 store(command_line_parser(options)
-                    .options(desc).style(unix_style).run(), vm);
+                    .options(desc)
+                    .style(unix_style)
+                    .extra_parser(detail::option_parser(rtcfg, node))
+                    .run(), vm);
                 notify(vm);
             }
             return true;
@@ -249,7 +253,8 @@ namespace hpx { namespace util
         // file for all files in a certain project.
         void handle_generic_config_options(std::string appname,
             boost::program_options::variables_map& vm,
-            boost::program_options::options_description const& desc_cfgfile)
+            boost::program_options::options_description const& desc_cfgfile,
+            util::section const& ini, std::size_t node)
         {
             if (appname.empty())
                 return;
@@ -261,7 +266,7 @@ namespace hpx { namespace util
             // walk up the hierarchy, trying to find a file appname.cfg
             while (!dir.empty()) {
                 boost::filesystem::path filename = dir / (appname + ".cfg");
-                if (read_config_file_options(filename.string(), desc_cfgfile, vm, true))
+                if (read_config_file_options(filename.string(), desc_cfgfile, vm, ini, node, true))
                     break;    // break on the first options file found
 
                 dir = dir.parent_path();    // chop off last directory part
@@ -270,7 +275,8 @@ namespace hpx { namespace util
 
         // handle all --options-config found on the command line
         void handle_config_options(boost::program_options::variables_map& vm,
-            boost::program_options::options_description const& desc_cfgfile)
+            boost::program_options::options_description const& desc_cfgfile,
+            util::section const& ini, std::size_t node)
         {
             using boost::program_options::options_description;
             if (vm.count("hpx:options-file")) {
@@ -279,7 +285,7 @@ namespace hpx { namespace util
                 BOOST_FOREACH(std::string const& cfg_file, cfg_files)
                 {
                     // parse a single config file and store the results
-                    read_config_file_options(cfg_file, desc_cfgfile, vm);
+                    read_config_file_options(cfg_file, desc_cfgfile, vm, ini, node);
                 }
             }
         }
@@ -526,8 +532,8 @@ namespace hpx { namespace util
                 .add(counter_options).add(config_options)
                 .add(debugging_options).add(hidden_options);
 
-            detail::handle_generic_config_options(argv[0], vm, desc_cfgfile);
-            detail::handle_config_options(vm, desc_cfgfile);
+            detail::handle_generic_config_options(argv[0], vm, desc_cfgfile, rtcfg, node);
+            detail::handle_config_options(vm, desc_cfgfile, rtcfg, node);
 
             // print help screen
             if (visible && vm.count("hpx:help")) {
