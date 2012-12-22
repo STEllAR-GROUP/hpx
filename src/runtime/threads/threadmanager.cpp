@@ -133,10 +133,10 @@ namespace hpx { namespace threads
     //        here.
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        cleanup_terminated()
+        cleanup_terminated(bool delete_all = false)
     {
         mutex_type::scoped_lock lk(mtx_);
-        return scheduler_.cleanup_terminated();
+        return scheduler_.cleanup_terminated(delete_all);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1596,7 +1596,8 @@ namespace hpx { namespace threads
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
                         // schedule other work
-                        scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count);
+                        scheduler_.wait_or_add_new(num_thread, 
+                            state_.load() == running, idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -1633,13 +1634,20 @@ namespace hpx { namespace threads
 
             // if nothing else has to be done either wait or terminate
             else {
-                busy_loop_count = 0;
-                if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
+                if (scheduler_.wait_or_add_new(num_thread, 
+                        state_.load() == running, idle_loop_count))
                 {
                     // if we need to terminate, unregister the counter first
                     count.exit();
                     break;
                 }
+            }
+
+            // Clean up all terminated threads for all thread queues once in a 
+            // while.
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX) {
+                busy_loop_count = 0;
+                scheduler_.cleanup_terminated(true);
             }
         }
 

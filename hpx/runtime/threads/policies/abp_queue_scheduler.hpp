@@ -136,11 +136,11 @@ struct abp_queue_scheduler : boost::noncopyable
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool cleanup_terminated()
+    bool cleanup_terminated(bool delete_all = false)
     {
         bool empty = true;
         for (std::size_t i = 0; i < queues_.size(); ++i)
-            empty = queues_[i]->cleanup_terminated() && empty;
+            empty = queues_[i]->cleanup_terminated(delete_all) && empty;
         return empty;
     }
 

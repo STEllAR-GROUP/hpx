@@ -67,7 +67,7 @@ namespace hpx { namespace threads
         //        have been terminated but which are still held in the queue
         //        of terminated threads. Some schedulers might not do anything
         //        here.
-        virtual bool cleanup_terminated() = 0;
+        virtual bool cleanup_terminated(bool delete_all = false) = 0;
 
         /// The get_phase function is part of the thread related API. It
         /// queries the phase of one of the threads known to the threadmanager

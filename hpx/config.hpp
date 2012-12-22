@@ -414,6 +414,15 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Count number of terminated threads before forcefully cleaning up all of 
+// them. Note: terminated threads are cleaned up either when this number is 
+// reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
+// reached, which will clean up the terminated threads for _all_ thread queues.
+#if !defined(HPX_MAX_TERMINATED_THREADS)
+#  define HPX_MAX_TERMINATED_THREADS 1000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WRAPPER_HEAP_STEP)
 #  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif

@@ -548,7 +548,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // get rid of all terminated threads
-        tm.cleanup_terminated();
+        tm.cleanup_terminated(true);
     }
 
     void runtime_support::stop(double timeout,

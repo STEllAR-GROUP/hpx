@@ -234,7 +234,7 @@ namespace hpx { namespace threads
         //        have been terminated but which are still held in the queue
         //        of terminated threads. Some schedulers might not do anything
         //        here.
-        bool cleanup_terminated();
+        bool cleanup_terminated(bool delete_all = false);
 
         /// \brief Return the number of OS threads running in this thread-manager
         ///

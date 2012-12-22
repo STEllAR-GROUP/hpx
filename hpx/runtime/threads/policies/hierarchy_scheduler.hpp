@@ -242,7 +242,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated()
+        bool cleanup_terminated(bool delete_all = false)
         {
             BOOST_ASSERT(tree.size());
             bool empty = true;
@@ -250,7 +250,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 for(size_type j = 0; j < tree[i].size(); ++j)
                 {
-                    empty = tree[i][j]->cleanup_terminated() && empty;
+                    empty = tree[i][j]->cleanup_terminated(delete_all) && empty;
                 }
             }
             return empty;

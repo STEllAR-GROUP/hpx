@@ -239,10 +239,10 @@ struct thread_deque
         return thread_map_.empty();
     }
   public:
-    bool cleanup_terminated()
+    bool cleanup_terminated(bool delete_all = false)
     {
         mutex_type::scoped_lock lk(mtx_);
-        return cleanup_terminated_locked();
+        return cleanup_terminated_locked(delete_all);
     }
 
     // The maximum number of active threads this thread manager should

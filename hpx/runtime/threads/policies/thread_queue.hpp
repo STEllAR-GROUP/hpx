@@ -472,10 +472,8 @@ namespace hpx { namespace threads { namespace policies
                 terminated_items_.enqueue(id);
 
                 boost::int64_t count = ++terminated_items_count_;
-                if (busy_count > HPX_BUSY_LOOP_COUNT_MAX ||
-                    count > HPX_BUSY_LOOP_COUNT_MAX / 10)
+                if (count > HPX_MAX_TERMINATED_THREADS)
                 {
-                    busy_count = 0;
                     cleanup_terminated(true);   // clean up all terminated threads
                 }
                 return true;
