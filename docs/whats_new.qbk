@@ -48,6 +48,7 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #645 - Command line aliases don't work in @files
 * #644 - Terminated threads are not always properly cleaned up
 * #640 - future_data<T>::set_on_completed_ used without locks
 * #638 - hpx build with intel compilers fails on linux
