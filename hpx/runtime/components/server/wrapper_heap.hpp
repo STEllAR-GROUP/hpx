@@ -100,6 +100,7 @@ namespace hpx { namespace components { namespace detail
             heap_alloc_function_("wrapper_heap::alloc", class_name),
             heap_free_function_("wrapper_heap::free", class_name)
         {
+            (void)count;
             util::itt::heap_internal_access hia; (void)hia;
 
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
