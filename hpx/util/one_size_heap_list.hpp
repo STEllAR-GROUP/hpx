@@ -110,8 +110,9 @@ namespace hpx { namespace util
             {
                 if (!heap_list_.empty())
                 {
+                    std::size_t heap_count = 0;
                     size = heap_list_.size();
-                    for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
+                    for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it, ++heap_count)
                     {
                         if ((*it)->alloc(&p, count))
                         {
@@ -124,13 +125,19 @@ namespace hpx { namespace util
                             return p;
                         }
 
+#if defined(HPX_DEBUG)
+                        std::size_t hc = (*it)->heap_count_;
+#else
+                        std::size_t hc = heap_count;
+#endif
+
                         LOSH_(info)
                             << (boost::format(
                                 "%1%::alloc: failed to allocate from heap[%2%] "
                                 "(heap[%2%] has allocated %3% objects and has "
                                 "space for %4% more objects)")
                                 % name()
-                                % (*it)->heap_count_
+                                % hc
                                 % (*it)->size()
                                 % (*it)->free_size());
                     }
