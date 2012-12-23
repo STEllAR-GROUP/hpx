@@ -101,6 +101,7 @@ struct foo_struct_coro
     }
 
     bool operator!() const { return true; }
+    void clear() {}
 };
 
 template <typename F>
