@@ -412,9 +412,9 @@ hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCE
 ################################################################################
 # Backtrace configuration
 ################################################################################
-hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON ADVANCED)
+hpx_option(HPX_HAVE_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON ADVANCED)
 
-if(HPX_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+if(HPX_HAVE_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_info("stacktraces" "Stack traces are enabled.")
   add_definitions(-DHPX_HAVE_STACKTRACES)
 endif()
@@ -620,7 +620,7 @@ if(MSVC)
   ##############################################################################
   # Stacktraces
   ##############################################################################
-  if(HPX_STACKTRACES)
+  if(HPX_HAVE_STACKTRACES)
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dbghelp)
   endif()
 

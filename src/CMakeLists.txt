@@ -109,7 +109,7 @@ if(HPX_INTERNAL_CHRONO)
 endif()
 
 # Add Boost.Backtrace sources if stack traces are enabled
-if(HPX_STACKTRACES)
+if(HPX_HAVE_STACKTRACES)
   add_hpx_library_sources(hpx_external
     GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp"
     APPEND)
