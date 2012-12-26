@@ -16,13 +16,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-/*
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/block_profiler.hpp>
-#include <hpx/util/spinlock.hpp>
-*/
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/backtrace.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -190,6 +185,22 @@ namespace hpx { namespace threads
 
         virtual char const* get_lco_description(thread_id_type id) const = 0;
         virtual char const* set_lco_description(thread_id_type id, char const* desc = 0) = 0;
+
+        /// The function get_thread_backtrace is part of the thread related API
+        /// allows to query the currently stored thread back trace (which is 
+        /// captured during thread suspension).
+        ///
+        /// \param id         [in] The thread id of the thread being queried.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        ///
+        /// \returns          This function returns the currently captured stack
+        ///                   back trace of the thread referenced by the \a id 
+        ///                   parameter. If the thread is not known to the 
+        ///                   thread-manager the return value will be the zero.
+        virtual util::backtrace const* get_backtrace(thread_id_type id) const = 0;
+        virtual util::backtrace const* set_backtrace(thread_id_type id, util::backtrace const* bt = 0) = 0;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds

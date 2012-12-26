@@ -15,9 +15,7 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/util/stringstream.hpp>
-#if defined(HPX_HAVE_STACKTRACES)
-  #include <boost/backtrace.hpp>
-#endif
+#include <hpx/util/backtrace.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <process.h>
@@ -36,11 +34,7 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     std::string backtrace()
     {
-#if defined(HPX_HAVE_STACKTRACES)
-        return boost::trace();
-#else
-        return "";
-#endif
+        return util::trace();
     }
 
     ///////////////////////////////////////////////////////////////////////////

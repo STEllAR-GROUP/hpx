@@ -579,6 +579,40 @@ namespace hpx { namespace threads
         return NULL;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_backtrace(thread_id_type id) const
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::get_backtrace",
+                "NULL thread id encountered");
+            return NULL;
+        }
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->get_backtrace() : 0;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_backtrace(thread_id_type id, util::backtrace const* bt)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_backtrace",
+                "NULL thread id encountered");
+            return NULL;
+        }
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->set_backtrace(bt) : 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_interruption_enabled(thread_id_type id, error_code& ec)

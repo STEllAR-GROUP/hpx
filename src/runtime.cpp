@@ -16,13 +16,10 @@
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/backtrace.hpp>
 
 #include <iostream>
 #include <vector>
-
-#if defined(HPX_HAVE_STACKTRACES)
-#include <boost/backtrace.hpp>
-#endif
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
 #include <io.h>
@@ -37,9 +34,9 @@ namespace hpx
 {
     void handle_termination(char const* reason)
     {
-        std::cerr 
+        std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::detail::backtrace() << "\n"
+            << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
             << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
             << full_build_string();           // add full build information
@@ -88,9 +85,9 @@ namespace hpx
     HPX_EXPORT void termination_handler(int signum)
     {
         char* reason = strsignal(signum);
-        std::cerr 
+        std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::detail::backtrace() << "\n"
+            << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
             << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
             << full_build_string();           // add full build information
@@ -121,7 +118,7 @@ namespace hpx
         sigemptyset(&new_action.sa_mask);
         new_action.sa_flags = 0;
 
-        sigaction(SIGINT, &new_action, NULL);  // Interrupted 
+        sigaction(SIGINT, &new_action, NULL);  // Interrupted
         sigaction(SIGBUS, &new_action, NULL);  // Bus error
         sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
         sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
@@ -428,7 +425,7 @@ namespace hpx
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 
-        if (ec || locality_ids.empty()) 
+        if (ec || locality_ids.empty())
             return naming::invalid_id;
 
         // chose first locality to host the object

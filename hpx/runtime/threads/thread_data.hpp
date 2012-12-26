@@ -15,7 +15,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/assert.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
@@ -27,12 +26,15 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/util/backtrace.hpp>
 
 #include <stack>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads 
@@ -154,6 +156,9 @@ namespace hpx { namespace threads
 #endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             marked_state_(unknown),
+#endif
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+            backtrace_(0),
 #endif
             pool_(&pool),
             requested_interrupt_(false),
@@ -336,24 +341,24 @@ namespace hpx { namespace threads
 
         std::size_t get_thread_phase() const
         {
-#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
-            return coroutine_.get_thread_phase();
-#else
+#if HPX_THREAD_MAINTAIN_PHASE_INFORMATION == 0
             return 0;
+#else
+            return coroutine_.get_thread_phase();
 #endif
         }
 
         /// Return the id of the component this thread is running in
         naming::address::address_type get_component_id() const
         {
-#if !HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS == 0
             return 0;
 #else
             return component_id_;
 #endif
         }
 
-#if !HPX_THREAD_MAINTAIN_DESCRIPTION
+#if HPX_THREAD_MAINTAIN_DESCRIPTION == 0
         char const* get_description() const
         {
             return "<unknown>";
@@ -397,7 +402,7 @@ namespace hpx { namespace threads
         }
 #endif
 
-#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE == 0
         /// Return the locality of the parent thread
         boost::uint32_t get_parent_locality_id() const
         {
@@ -443,6 +448,41 @@ namespace hpx { namespace threads
         thread_state get_marked_state() const
         {
             return marked_state_;
+        }
+#endif
+
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION == 0
+        util::backtrace const* get_backtrace() const
+        {
+            return 0;
+        }
+        util::backtrace const* set_backtrace(util::backtrace const*)
+        {
+            return 0;
+        }
+#else
+        util::backtrace const* get_backtrace() const
+        {
+            mutex_type::scoped_lock l(this);
+            return backtrace_;
+        }
+        util::backtrace const* set_backtrace(util::backtrace const* value)
+        {
+            mutex_type::scoped_lock l(this);
+
+            util::backtrace const* bt = backtrace_;
+            backtrace_ = value;
+            return bt;
+        }
+
+        // Generate full backtrace for captured stack
+        std::string backtrace()
+        {
+            mutex_type::scoped_lock l(this);
+            std::string bt;
+            if (0 != backtrace_)
+                bt = backtrace_->trace();
+            return bt;
         }
 #endif
 
@@ -542,6 +582,10 @@ namespace hpx { namespace threads
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         mutable thread_state marked_state_;
+#endif
+
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+        util::backtrace const* backtrace_;
 #endif
 
         ///////////////////////////////////////////////////////////////////////
