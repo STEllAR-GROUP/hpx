@@ -110,7 +110,7 @@ set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
       future_overhead
       spinlock_overhead1

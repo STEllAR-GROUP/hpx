@@ -329,9 +329,9 @@ endif()
 ################################################################################
 # C++11 configuration
 ################################################################################
-hpx_option(HPX_CXX11 BOOL "Use C++11 support, if available (default: ON)" ON ADVANCED)
+hpx_option(HPX_HAVE_CXX11 BOOL "Use C++11 support, if available (default: ON)" ON ADVANCED)
 
-if(HPX_CXX11)
+if(HPX_HAVE_CXX11)
   add_definitions(-DHPX_HAVE_CXX11)
 endif()
 
@@ -368,15 +368,16 @@ else()
   add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=0)
 endif()
 
-if(NOT MSVC)
-  hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
-  if(HPX_THREAD_GUARD_PAGE)
-    add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
-  else()
-    add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
-  endif()
+hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
+
+if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+  hpx_option(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING "Thread stack back trace depth being captured on suspension (default: 5)" "5" ADVANCED)
+  add_definitions(-DHPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION=1)
+  add_definitions(-DHPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH=${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+else()
+  add_definitions(-DHPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION=0)
 endif()
-  
+
 ################################################################################
 # PAPI event counters
 ################################################################################
@@ -413,7 +414,7 @@ hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCE
 ################################################################################
 hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON ADVANCED)
 
-if(HPX_STACKTRACES)
+if(HPX_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_info("stacktraces" "Stack traces are enabled.")
   add_definitions(-DHPX_HAVE_STACKTRACES)
 endif()
@@ -489,13 +490,13 @@ if(MSVC)
   add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
   foreach(language CXX C Fortran)
     set(CMAKE_${language}_FLAGS_DEBUG
-        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG") 
+        "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG")
     set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
-        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS") 
+        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
     set(CMAKE_${language}_FLAGS_MINSIZEREL
-        "${CMAKE_${language}_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE ASSERTS") 
+        "${CMAKE_${language}_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE ASSERTS")
     set(CMAKE_${language}_FLAGS_RELEASE
-        "${CMAKE_${language}_FLAGS_RELEASE} -DNDEBUG -DBOOST_DISABLE_ASSERTS") 
+        "${CMAKE_${language}_FLAGS_RELEASE} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   endforeach()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
@@ -626,30 +627,30 @@ if(MSVC)
   ##############################################################################
   # C++11
   ##############################################################################
-  if(HPX_CXX11)
+  if(HPX_HAVE_CXX11)
     # C++11 support
-    hpx_option(HPX_CXX11_RVALUE_REFERENCES BOOL "Compiler supports C++11 rvalue references (default: ON)." ON ADVANCED)
-    if(HPX_CXX11_RVALUE_REFERENCES)
+    hpx_option(HPX_HAVE_CXX11_RVALUE_REFERENCES BOOL "Compiler supports C++11 rvalue references (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_RVALUE_REFERENCES)
       add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
     endif()
 
-    hpx_option(HPX_CXX11_LAMBDAS BOOL "Compiler supports C++11 lambda functions (default: ON)." ON ADVANCED)
-    if(HPX_CXX11_LAMBDAS)
+    hpx_option(HPX_HAVE_CXX11_LAMBDAS BOOL "Compiler supports C++11 lambda functions (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_LAMBDAS)
       add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
     endif()
 
-    hpx_option(HPX_CXX11_AUTO BOOL "Compiler supports C++11 auto keyword (default: ON)." ON ADVANCED)
-    if(HPX_CXX11_AUTO)
+    hpx_option(HPX_HAVE_CXX11_AUTO BOOL "Compiler supports C++11 auto keyword (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_AUTO)
       add_definitions(-DHPX_HAVE_CXX11_AUTO)
     endif()
 
-    hpx_option(HPX_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
-    if(HPX_CXX11_DECLTYPE)
+    hpx_option(HPX_HAVE_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_DECLTYPE)
       add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)
     endif()
 
-    hpx_option(HPX_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
-    if(HPX_CXX11_UNIQUE_PTR)
+    hpx_option(HPX_HAVE_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_UNIQUE_PTR)
       add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
       add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
     endif()
@@ -776,43 +777,43 @@ else()
   ##############################################################################
   # C++11
   ##############################################################################
-  if(HPX_CXX11)
+  if(HPX_HAVE_CXX11)
     # Turn on C++11 support
     hpx_use_flag_if_available(-std=c++0x)
 
-    hpx_check_for_cxx11_rvalue_references(HPX_CXX11_RVALUE_REFERENCES
+    hpx_check_for_cxx11_rvalue_references(HPX_HAVE_CXX11_RVALUE_REFERENCES
       DEFINITIONS HPX_HAVE_CXX11_RVALUE_REFERENCES)
 
-    hpx_check_for_cxx11_variadic_templates(HPX_CXX11_VARIADIC_TEMPLATES
+    hpx_check_for_cxx11_variadic_templates(HPX_HAVE_CXX11_VARIADIC_TEMPLATES
       DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
 
-    hpx_check_for_cxx11_lambdas(HPX_CXX11_LAMBDAS
+    hpx_check_for_cxx11_lambdas(HPX_HAVE_CXX11_LAMBDAS
       DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
 
-    hpx_check_for_cxx11_auto(HPX_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
+    hpx_check_for_cxx11_auto(HPX_HAVE_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
 
-    hpx_check_for_cxx11_decltype(HPX_CXX11_DECLTYPE DEFINITIONS HPX_HAVE_CXX11_DECLTYPE)
+    hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE DEFINITIONS HPX_HAVE_CXX11_DECLTYPE)
 
-    hpx_check_for_cxx11_std_unique_ptr(HPX_CXX11_STD_UNIQUE_PTR
+    hpx_check_for_cxx11_std_unique_ptr(HPX_HAVE_CXX11_STD_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
                   BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
 
     if(NOT HPX_UTIL_TUPLE)
-      hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
+      hpx_check_for_cxx11_std_tuple(HPX_HAVE_CXX11_STD_TUPLE
         DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
     else()
       hpx_info("C++11" "HPX_UTIL_TUPLE is enabled: even if std::tuple is available it will not be used.")
     endif()
 
     if(NOT HPX_UTIL_BIND)
-      hpx_check_for_cxx11_std_bind(HPX_CXX11_STD_BIND
+      hpx_check_for_cxx11_std_bind(HPX_HAVE_CXX11_STD_BIND
         DEFINITIONS HPX_HAVE_CXX11_STD_BIND)
     else()
       hpx_info("C++11" "HPX_UTIL_BIND is enabled: even if std::bind is available it will not be used.")
     endif()
 
     if(NOT HPX_UTIL_FUNCTION)
-      hpx_check_for_cxx11_std_function(HPX_CXX11_STD_FUNCTION
+      hpx_check_for_cxx11_std_function(HPX_HAVE_CXX11_STD_FUNCTION
         DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
     else()
       hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even if std::function is available it will not be used.")
@@ -857,7 +858,7 @@ else()
   if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
     hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
   endif()
-  
+
   # Check if our libraries have unresolved symbols
   #hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
 
@@ -893,11 +894,11 @@ else()
       if(NOT HPX_${language}_FLAG_MARCH_NATIVE)
         set(HPX_${language}_FLAG_MARCH_NATIVE OFF)
       endif()
-  
+
       if(NOT HPX_${language}_FLAG_MCX16)
         set(HPX_${language}_FLAG_MCX16 OFF)
       endif()
-  
+
       if(NOT HPX_${language}_FLAG_MCX16)
         set(HPX_${language}_FLAG_MCX16 OFF)
       endif()
@@ -1028,7 +1029,7 @@ else()
       endif()
     endif()
 
-    if(JEMALLOC_FOUND OR TCMALLOC_FOUND)    
+    if(JEMALLOC_FOUND OR TCMALLOC_FOUND)
       hpx_use_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
       hpx_use_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
       hpx_use_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)

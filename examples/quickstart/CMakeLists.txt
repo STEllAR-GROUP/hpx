@@ -26,7 +26,7 @@ set(example_programs
     wait_composition
    )
 
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
       1d_wave_equation
