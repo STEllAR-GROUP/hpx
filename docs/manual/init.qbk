@@ -1,5 +1,5 @@
 [/=============================================================================
-    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2007-2013 Hartmut Kaiser
     Copyright (C) 2011-2012 Bryce Adelstein-Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1025,6 +1025,7 @@ this command line options will be applied to, all other localities will simply
 ignore the option. For instance, the following PBS script passes the option
 [hpx_cmdline `--hpx:pu-offset=4`] to the locality `'1'` only.
 
+[teletype]
 ```
     #!/bin/bash
     #
@@ -1035,6 +1036,7 @@ ignore the option. For instance, the following PBS script passes the option
 
     __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:1:pu-offset=4]`` ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
 ```
+[c++]
 
 [endsect] [/ Command Line Handling]
 

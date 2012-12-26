@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2007-2013 Hartmut Kaiser
     Copyright (C) 2012 Bryce Adelstein-Lelbach and Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.9.5]
-    [copyright 2011 2012 The STE||AR Group, Louisiana State University]
+    [copyright 2011 2012 2013 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
         accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
@@ -56,6 +56,7 @@
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 [def __boost_downloads__        [@http://www.boost.org/users/download/ Boost Downloads]]
 [def __boost_license__          [@http://www.boost.org/LICENSE_1_0.txt Boost Software License]]
+[def __boost_wave__             [@http://www.boost.org/doc/libs/release/libs/wave/doc/wave_driver.html Boost Wave]]
 
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
@@ -200,6 +201,7 @@ QuickBook can be found in the collection of __boost_tools__.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:manual Manual]
 
+[include manual/cmake.qbk]
 [include manual/init.qbk]
 [include manual/applications.qbk]
 [include manual/names.qbk]

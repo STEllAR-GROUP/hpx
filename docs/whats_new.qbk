@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2007-2013 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,6 +48,7 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #650 - command line no error message when using -hpx:(anything)
 * #645 - Command line aliases don't work in @files
 * #644 - Terminated threads are not always properly cleaned up
 * #640 - future_data<T>::set_on_completed_ used without locks
