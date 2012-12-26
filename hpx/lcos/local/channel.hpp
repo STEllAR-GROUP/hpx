@@ -133,18 +133,11 @@ struct channel
 
     template <typename F>
     hpx::future<typename boost::result_of<F(hpx::future<T>)>::type>
-    then_async(BOOST_FWD_REF(F) f)
+    then(BOOST_FWD_REF(F) f)
     {
         BOOST_ASSERT(data_);
         return lcos::detail::make_future_from_data<T>(data_).then
             (boost::forward<completed_callback_type>(f));
-    }
-
-    template <typename F>
-    void then_push(BOOST_FWD_REF(F) f)
-    {
-        BOOST_ASSERT(data_);
-        data_->set_on_completed(boost::forward<completed_callback_type>(f));
     }
 
     bool ready() const
@@ -251,18 +244,11 @@ struct channel<void>
 
     template <typename F>
     hpx::future<typename boost::result_of<F(hpx::future<void>)>::type>
-    then_async(BOOST_FWD_REF(F) f)
+    then(BOOST_FWD_REF(F) f)
     {
         BOOST_ASSERT(data_);
         return lcos::detail::make_future_from_data<void>(data_).then
             (boost::forward<completed_callback_type>(f));
-    }
-
-    template <typename F>
-    void then_push(BOOST_FWD_REF(F) f)
-    {
-        BOOST_ASSERT(data_);
-        data_->set_on_completed(boost::forward<completed_callback_type>(f));
     }
 
     bool ready() const
