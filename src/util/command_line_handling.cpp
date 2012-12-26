@@ -496,7 +496,7 @@ namespace hpx { namespace util
                 std::cout << help << std::endl;
                 return true;
             }
-            else {
+            else if (0 == std::string("full").find(help_option)) {
                 // defer printing help until after dynamic part has been
                 // acquired
                 hpx::util::osstream strm;
@@ -504,6 +504,11 @@ namespace hpx { namespace util
                 ini_config_ += "hpx.cmd_line_help!=" +
                     detail::encode_string(strm.str());
                 ini_config_ += "hpx.cmd_line_help_option!=" + help_option;
+            }
+            else {
+                throw std::logic_error(boost::str(boost::format(
+                    "Invalid argument for option --hpx:help: '%1%', allowed values: "
+                    "'minimal' (default) and 'full'") % help_option));
             }
         }
         return false;
