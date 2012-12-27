@@ -56,7 +56,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_EXPORT(name, BaseType, ActualType, actualname, classname)\
-    extern "C" BOOST_PLUGIN_EXPORT_API std::map<std::string, boost::any>&     \
+    extern "C" BOOST_PLUGIN_EXPORT_API std::map<std::string, boost::any> *    \
                BOOST_PLUGIN_API BOOST_PLUGIN_LIST_NAME(name, classname)();    \
                                                                               \
     namespace {                                                               \
@@ -67,7 +67,7 @@
                 boost::plugin::abstract_factory<BaseType>* w = &cf;           \
                 std::string actname(BOOST_PP_STRINGIZE(actualname));          \
                 boost::algorithm::to_lower(actname);                          \
-                BOOST_PLUGIN_LIST_NAME(name, classname)().insert(             \
+                BOOST_PLUGIN_LIST_NAME(name, classname)()->insert(            \
                     std::make_pair(actname, w));                              \
             }                                                                 \
         } BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, actualname, classname);   \
@@ -76,11 +76,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_EXPORT_LIST(name, classname)                             \
-    extern "C" BOOST_PLUGIN_EXPORT_API std::map<std::string, boost::any>&     \
+    extern "C" BOOST_PLUGIN_EXPORT_API std::map<std::string, boost::any> *    \
         BOOST_PLUGIN_API BOOST_PLUGIN_LIST_NAME(name, classname)()            \
     {                                                                         \
         static std::map<std::string, boost::any> r;                           \
-        return r;                                                             \
+        return &r;                                                            \
     }                                                                         \
     extern "C" BOOST_PLUGIN_EXPORT_API                                        \
         void BOOST_PLUGIN_FORCE_LOAD_NAME(name, classname)()                  \
