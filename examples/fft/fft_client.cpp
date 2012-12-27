@@ -56,7 +56,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     {
         typedef std::vector<fft::complex_type> complex_vec;
 
-        
+        hpx::util::high_resolution_timer timer;
         std::ofstream fout("output_r2ditfft_real.txt");
 
         //hpx::lcos::future<complex_vec> result_vec;
@@ -71,10 +71,20 @@ int hpx_main(boost::program_options::variables_map& vm)
         /// instantiate and initialize. 
         distrib_obj.instantiate();
         distrib_obj.read_split_data();
+		
+		std::cout << "Component Creation and File read-split:" << timer.elapsed()
+			<< " [s]" << std::endl;
+		timer.restart();
         final = distrib_obj.transform();
         //complex_vec final = result_vec.get();
+		std::cout << "FFT transform:" << timer.elapsed()
+			<< " [s]" << std::endl;
+		timer.restart();
 
         write_to_file_real(fout, final);
+		std::cout << "Final file output:" << timer.elapsed()
+			<< " [s]" << std::endl;
+		
 
         std::cout << "Finished fft." << std::endl;
         
