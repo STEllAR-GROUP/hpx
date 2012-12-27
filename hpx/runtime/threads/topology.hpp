@@ -23,12 +23,18 @@ struct topology
 {
     virtual ~topology() {}
 
-    virtual std::size_t get_numa_node_number(std::size_t num_thread, error_code& ec = throws) const = 0;
-    virtual std::size_t get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual std::size_t get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual void set_thread_affinity(boost::thread& t, std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual void set_thread_affinity(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual std::size_t get_thread_affinity_mask_from_lva(naming::address::address_type, error_code& ec = throws) const = 0;
+    virtual std::size_t get_numa_node_number(std::size_t num_thread, 
+        error_code& ec = throws) const = 0;
+    virtual std::size_t get_numa_node_affinity_mask(std::size_t num_thread, 
+        bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual std::size_t get_thread_affinity_mask(std::size_t num_thread, 
+        bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual void set_thread_affinity_mask(boost::thread& t, 
+        std::size_t mask, error_code& ec = throws) const = 0;
+    virtual void set_thread_affinity_mask(std::size_t mask, 
+        error_code& ec = throws) const = 0;
+    virtual std::size_t get_thread_affinity_mask_from_lva(
+        naming::address::address_type, error_code& ec = throws) const = 0;
 };
 
 inline std::size_t least_significant_bit(boost::uint64_t mask)

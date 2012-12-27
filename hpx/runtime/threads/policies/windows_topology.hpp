@@ -127,31 +127,27 @@ struct windows_topology : topology
         return 0;
     } // }}}
 
-    void set_thread_affinity(
+    void set_thread_affinity_mask(
         boost::thread& thrd
-      , std::size_t num_thread
-      , bool numa_sensitive
+      , std::size_t mask
       , error_code& ec = throws
         ) const
     { // {{{
-        std::size_t mask = get_thread_affinity_mask(num_thread, numa_sensitive);
-
         if (!SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask)))
         {
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::windows_topology::set_thread_affinity_mask"
               , boost::str(boost::format(
                     "failed to set thread %1% affinity mask")
-                    % num_thread));
+                    % mask));
         }
 
         else if (&ec != &throws)
             ec = make_success_code();
     } // }}}
 
-    void set_thread_affinity(
-        std::size_t num_thread
-      , bool numa_sensitive
+    void set_thread_affinity_mask(
+        std::size_t mask
       , error_code& ec = throws
         ) const
     {

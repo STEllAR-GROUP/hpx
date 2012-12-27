@@ -61,10 +61,9 @@ struct linux_topology : topology
         return 0;
     }
 
-    void set_thread_affinity(
+    void set_thread_affinity_mask(
         boost::thread& thrd
-      , std::size_t num_thread
-      , bool numa_sensitive
+      , std::size_t mask
       , error_code& ec = throws
         ) const
     {
@@ -77,30 +76,31 @@ struct linux_topology : topology
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
-    void set_thread_affinity(
-        std::size_t num_thread
-      , bool numa_sensitive
+    void set_thread_affinity_mask(
+        std::size_t mask
       , error_code& ec = throws
         ) const
     {
+        std::size_t num_thread = least_significant_bit_set(mask);
+
         cpu_set_t cpu;
 
         CPU_ZERO(&cpu);
 
         CPU_SET(num_thread % hardware_concurrency(), &cpu);
 
-        #if defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
-            if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
-                sleep(0); // Allow the OS to pick up the change.
-        #else
-            if (0 == sched_setaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))
-                sleep(0); // Allow the OS to pick up the change.
-        #endif
+#if defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
+        if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
+            sleep(0); // Allow the OS to pick up the change.
+#else
+        if (0 == sched_setaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))
+            sleep(0); // Allow the OS to pick up the change.
+#endif
 
         else
         {
             HPX_THROWS_IF(ec, kernel_error
-              , "hpx::threads::set_thread_affinity"
+              , "hpx::threads::set_thread_affinity_mask"
               , "failed to set thread affinity");
         }
 

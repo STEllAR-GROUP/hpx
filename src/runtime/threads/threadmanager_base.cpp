@@ -52,8 +52,8 @@ namespace hpx { namespace threads
     std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
-        std::size_t thread_num
-            = threadmanager_base::get_worker_thread_num(&numa_sensitive);
+        std::size_t thread_num = 
+            threadmanager_base::get_worker_thread_num(&numa_sensitive);
         return get_topology().get_numa_node_number(
             get_thread_manager().get_pu_num(thread_num));
     }

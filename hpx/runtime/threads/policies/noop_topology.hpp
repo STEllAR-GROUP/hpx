@@ -53,10 +53,9 @@ struct noop_topology : topology
         return 0;
     }
 
-    void set_thread_affinity(
+    void set_thread_affinity_mask(
         boost::thread& thrd
-      , std::size_t num_thread
-      , bool numa_sensitive
+      , std::size_t mask
       , error_code& ec = throws
         ) const
     {
@@ -64,9 +63,8 @@ struct noop_topology : topology
             ec = make_success_code();
     }
 
-    void set_thread_affinity(
-        std::size_t num_thread
-      , bool numa_sensitive
+    void set_thread_affinity_mask(
+        std::size_t mask
       , error_code& ec = throws
         ) const
     {

@@ -473,10 +473,18 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         void register_counter_types();
 
-        /// Return number of the processing unit the given thread is running on
+        /// Return of of the numbers of the processing unit the given thread 
+        /// is allowed to run on
         std::size_t get_pu_num(std::size_t num_thread)
         {
             return scheduler_.get_pu_num(num_thread);
+        }
+
+        /// Return the mask for processing units the given thread is allowed 
+        /// to run on.
+        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread)
+        {
+            return scheduler_.get_pu_mask(topology, num_thread);
         }
 
     private:

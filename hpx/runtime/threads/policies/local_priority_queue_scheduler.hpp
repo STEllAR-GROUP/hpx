@@ -156,6 +156,12 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
+        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        {
+            return topology.get_thread_affinity_mask(
+                affinity_data_.get_pu_num(num_thread), numa_sensitive_);
+        }
+
         std::size_t get_pu_num(std::size_t num_thread) const
         {
             return affinity_data_.get_pu_num(num_thread);
@@ -433,10 +439,10 @@ namespace hpx { namespace threads { namespace policies
             // steal work items: first try to steal from other cores in
             // the same NUMA node
             std::size_t num_pu = get_pu_num(num_thread);
-            boost::uint64_t core_mask
-                = topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
-            boost::uint64_t node_mask
-                = topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
+            boost::uint64_t core_mask = 
+                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
+            boost::uint64_t node_mask = 
+                topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
 
             if (core_mask && node_mask) {
                 boost::uint64_t m = 0x01LL;

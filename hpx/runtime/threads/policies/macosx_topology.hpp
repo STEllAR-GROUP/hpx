@@ -61,10 +61,9 @@ struct macosx_topology : topology
         return 0;
     }
 
-    void set_thread_affinity(
+    void set_thread_affinity_mask(
         boost::thread& thrd
-      , std::size_t num_thread
-      , bool numa_sensitive
+      , std::size_t mask
       , error_code& ec = throws
         ) const
     {
@@ -72,48 +71,49 @@ struct macosx_topology : topology
             ec = make_success_code();
     }
 
-    void set_thread_affinity(
-        std::size_t num_thread
-      , bool numa_sensitive
+    void set_thread_affinity_mask(
+        std::size_t mask
       , error_code& ec = throws
         ) const
     {
-        #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
-            thread_extended_policy_data_t epolicy;
-            epolicy.timeshare = FALSE;
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
+        std::size_t num_thread = least_significant_bit_set(mask);
 
-            kern_return_t ret = thread_policy_set(mach_thread_self(),
-                THREAD_EXTENDED_POLICY, (thread_policy_t) &epolicy,
-                THREAD_EXTENDED_POLICY_COUNT);
+        thread_extended_policy_data_t epolicy;
+        epolicy.timeshare = FALSE;
 
-            if (ret != KERN_SUCCESS)
-                HPX_THROWS_IF(ec, kernel_error,
-                    "hpx::threads::set_thread_affinity"
-                  , "failed to set thread affinity");
+        kern_return_t ret = thread_policy_set(mach_thread_self(),
+            THREAD_EXTENDED_POLICY, (thread_policy_t) &epolicy,
+            THREAD_EXTENDED_POLICY_COUNT);
 
-            if (ec)
-                return;
+        if (ret != KERN_SUCCESS)
+            HPX_THROWS_IF(ec, kernel_error,
+                "hpx::threads::set_thread_affinity_mask"
+              , "failed to set thread affinity");
 
-            thread_affinity_policy_data_t policy;
-            policy.affinity_tag = num_thread + 1;   // 1...N
+        if (ec)
+            return;
 
-            ret = thread_policy_set(mach_thread_self(),
-                THREAD_AFFINITY_POLICY, (thread_policy_t) &policy,
-                THREAD_AFFINITY_POLICY_COUNT);
+        thread_affinity_policy_data_t policy;
+        policy.affinity_tag = num_thread + 1;   // 1...N
 
-            if (ret != KERN_SUCCESS)
-                HPX_THROWS_IF(ec, kernel_error,
-                    "hpx::threads::set_thread_affinity"
-                  , "failed to set thread affinity");
+        ret = thread_policy_set(mach_thread_self(),
+            THREAD_AFFINITY_POLICY, (thread_policy_t) &policy,
+            THREAD_AFFINITY_POLICY_COUNT);
 
-            if (ec)
-                return;
-            else if (&ec != &throws)
-                ec = make_success_code();
-        #else
-            if (&ec != &throws)
-                ec = make_success_code();
-        #endif
+        if (ret != KERN_SUCCESS)
+            HPX_THROWS_IF(ec, kernel_error,
+                "hpx::threads::set_thread_affinity_mask"
+              , "failed to set thread affinity");
+
+        if (ec)
+            return;
+        else if (&ec != &throws)
+            ec = make_success_code();
+#else
+        if (&ec != &throws)
+            ec = make_success_code();
+#endif
     }
 
     std::size_t get_thread_affinity_mask_from_lva(

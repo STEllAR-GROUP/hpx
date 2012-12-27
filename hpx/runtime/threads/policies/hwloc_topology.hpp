@@ -150,10 +150,9 @@ struct hwloc_topology : topology
         }
     } // }}}
 
-    void set_thread_affinity(
+    void set_thread_affinity_mask(
         boost::thread&
-      , std::size_t //num_thread
-      , bool //numa_sensitive
+      , std::size_t //mask
       , error_code& ec = throws
         ) const
     {
@@ -161,17 +160,14 @@ struct hwloc_topology : topology
             ec = make_success_code();
     }
 
-    void set_thread_affinity(
-        std::size_t num_thread
-      , bool numa_sensitive
+    void set_thread_affinity_mask(
+        std::size_t mask
       , error_code& ec = throws
         ) const
     { // {{{
         // Figure out how many cores are available.
         // Now set the affinity to the required PU.
 
-        std::size_t mask
-            = get_thread_affinity_mask(num_thread, numa_sensitive);
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
 // #if HPX_DEBUG
@@ -198,7 +194,7 @@ struct hwloc_topology : topology
 //
 //         hwloc_bitmap_only(cpuset, static_cast<unsigned int>(idx));
 
-        hwloc_bitmap_singlify(cpuset);
+//         hwloc_bitmap_singlify(cpuset);
         {
             scoped_lock lk(topo_mtx);
             if (hwloc_set_cpubind(topo, cpuset,
@@ -212,8 +208,8 @@ struct hwloc_topology : topology
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::hwloc_topology::set_thread_affinity_mask"
                       , boost::str(boost::format(
-                            "failed to set thread %1% affinity mask")
-                            % num_thread));
+                            "failed to set thread %x affinity mask")
+                            % mask));
 
                     if (ec)
                         return;
