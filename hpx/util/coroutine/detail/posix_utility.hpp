@@ -57,6 +57,8 @@
  */
 namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix {
 
+HPX_EXPORT extern bool use_guard_pages;
+
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 
   inline
@@ -80,11 +82,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
     }
 
 #if HPX_THREAD_GUARD_PAGE
-    // Add a guard page.
-    ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
+    if (use_guard_pages) {
+        // Add a guard page.
+        ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
 
-    void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE / sizeof(void*));
-    return static_cast<void*>(stack);
+        void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE / sizeof(void*));
+        return static_cast<void*>(stack);
+    }
+    return real_stack;
 #else
     return real_stack;
 #endif
@@ -119,8 +124,13 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
   inline
   void free_stack(void* stack, std::size_t size) {
 #if HPX_THREAD_GUARD_PAGE
-    void** real_stack = static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
-    ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
+    if (use_guard_pages) {
+        void** real_stack = static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
+        ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
+    }
+    else {
+        ::munmap(stack, size);
+    }
 #else
     ::munmap(stack, size);
 #endif

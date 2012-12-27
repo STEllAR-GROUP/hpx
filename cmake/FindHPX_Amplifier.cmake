@@ -7,9 +7,17 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-hpx_find_package(AMPLIFIER
-  LIBRARIES libittnotify.lib
-  LIBRARY_PATHS lib64 
-  HEADERS ittnotify.h 
-  HEADER_PATHS include)
+if(MSVC)
+  hpx_find_package(AMPLIFIER
+    LIBRARIES libittnotify.lib
+    LIBRARY_PATHS lib64 
+    HEADERS ittnotify.h 
+    HEADER_PATHS include)
+else()
+  hpx_find_package(AMPLIFIER
+    LIBRARIES libittnotify.a
+    LIBRARY_PATHS lib64 
+    HEADERS ittnotify.h 
+    HEADER_PATHS include)
+endif()
 

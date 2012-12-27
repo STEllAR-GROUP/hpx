@@ -31,6 +31,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/integer.hpp>
 #include <boost/integer_traits.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/mpl/placeholders.hpp>
@@ -39,19 +41,49 @@
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
 #if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility push(default)
+#  pragma GCC visibility push(default)
 #endif
 
 #if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
-#define HPX_SERIALIZATION_EXPORT
+#  define HPX_SERIALIZATION_EXPORT
 #else
-#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#  define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#endif
+
+#if defined(BOOST_MSVC)
+#  include <intrin.h>
+#  pragma intrinsic(memcpy)
+#  pragma intrinsic(memset)
 #endif
 
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        struct erase_container_type
+        {
+            virtual ~erase_container_type() {}
+            virtual std::size_t size() = 0;
+            virtual void resize(std::size_t) = 0;
+            virtual char& operator[](std::size_t) = 0;
+        };
+
+        template <typename Container>
+        struct container_type : erase_container_type
+        {
+            container_type(Container& cont) : cont_(cont) {}
+            ~container_type() {}
+
+            std::size_t size() { return cont_.size(); }
+            void resize(std::size_t size) { cont_.resize(size); }
+            char& operator[](std::size_t index) { return cont_[index]; }
+
+            Container& cont_;
+        };
+    }
+
     /////////////////////////////////////////////////////////////////////
-    // class basic_binary_oprimitive - binary output of primitives to a 
+    // class basic_binary_oprimitive - binary output of primitives to a
     // character buffer
     template <typename Archive>
     class HPX_SERIALIZATION_EXPORT basic_binary_oprimitive
@@ -59,11 +91,11 @@ namespace hpx { namespace util
     protected:
         void save_binary(const void *address, std::size_t count)
         {
-            std::size_t size = buffer_.size();
-            if (count != 0) 
+            std::size_t size = buffer_->size();
+            if (count != 0)
             {
-                buffer_.resize(size + count);
-                std::memcpy(&buffer_[size], address, count);
+                buffer_->resize(size + count);
+                std::memcpy(&buffer_->operator [](size), address, count);
             }
         }
 
@@ -74,8 +106,8 @@ namespace hpx { namespace util
     public:
 #endif
 
-        // this is the outbut buffer
-        std::vector<char>& buffer_;
+        // this is the output buffer
+        boost::shared_ptr<detail::erase_container_type> buffer_;
 
         // return a pointer to the most derived class
         Archive* This()
@@ -117,8 +149,9 @@ namespace hpx { namespace util
 
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
-        basic_binary_oprimitive(std::vector<char>& buffer, unsigned flags = 0)
-          : buffer_(buffer)
+        template <typename Container>
+        basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
+          : buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
         {
             init(flags);
         }
@@ -132,16 +165,16 @@ namespace hpx { namespace util
         {
 #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
             template <typename T>
-            struct apply 
+            struct apply
             {
-                typedef typename 
-                    boost::serialization::is_bitwise_serializable<T>::type 
+                typedef typename
+                    boost::serialization::is_bitwise_serializable<T>::type
                 type;
             };
 #else
             template <typename T>
-            struct apply 
-              : public boost::serialization::is_bitwise_serializable<T> 
+            struct apply
+              : public boost::serialization::is_bitwise_serializable<T>
             {};
 #endif
         };

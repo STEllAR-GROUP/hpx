@@ -49,18 +49,18 @@ typedef components::detail::heap_factory<
 
 // TODO: Make assertions exceptions
 void early_parcel_sink(
-    boost::shared_ptr<std::vector<char> > parcel_data
+    parcelset::parcel const& p
     )
 { // {{{
     // De-serialize the parcel data
-    util::portable_binary_iarchive archive(*parcel_data, boost::archive::no_header);
-
-    std::size_t parcel_count = 0;
-    archive >> parcel_count;
-    for(std::size_t i = 0; i < parcel_count; ++i)
-    {
-        parcelset::parcel p;
-        archive >> p;
+//     util::portable_binary_iarchive archive(*parcel_data, boost::archive::no_header);
+// 
+//     std::size_t parcel_count = 0;
+//     archive >> parcel_count;
+//     for(std::size_t i = 0; i < parcel_count; ++i)
+//     {
+//         parcelset::parcel p;
+//         archive >> p;
 
         // decode the action-type in the parcel
         actions::action_type act = p.get_action();
@@ -82,7 +82,7 @@ void early_parcel_sink(
                       << std::endl;
             std::abort();
         }
-    }
+//     }
 } // }}}
 
 struct registration_header
@@ -583,7 +583,7 @@ big_boot_barrier::big_boot_barrier(
              : 1)
   , thunks(16)
 {
-    pp_.register_event_handler(boost::bind(&early_parcel_sink, _2));
+    pp_.register_event_handler(&early_parcel_sink);
 }
 
 void big_boot_barrier::apply(

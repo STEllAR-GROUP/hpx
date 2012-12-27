@@ -41,12 +41,11 @@ namespace hpx { namespace lcos { namespace detail
             read_enqueued_(0), read_dequeued_(0), set_full_(0)
         {}
 
-        boost::int64_t constructed_;
-        boost::int64_t destructed_;
-        boost::int64_t read_enqueued_;
-        boost::int64_t read_dequeued_;
-        boost::int64_t set_full_;
-        lcos::local::spinlock mtx_;
+        boost::atomic_int64_t constructed_;
+        boost::atomic_int64_t destructed_;
+        boost::atomic_int64_t read_enqueued_;
+        boost::atomic_int64_t read_dequeued_;
+        boost::atomic_int64_t set_full_;
     };
     HPX_EXPORT extern full_empty_counter_data full_empty_counter_data_;
 
@@ -138,7 +137,6 @@ namespace hpx { namespace lcos { namespace detail
         full_empty_entry()
           : data_(), state_(empty)
         {
-            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
@@ -146,7 +144,6 @@ namespace hpx { namespace lcos { namespace detail
         explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
           : data_(boost::forward<T0>(t0)), state_(empty)
         {
-            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
@@ -159,7 +156,6 @@ namespace hpx { namespace lcos { namespace detail
                 log_non_empty_queue("read_queue", read_queue_);
             }
 
-            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.destructed_;
         }
 
@@ -214,10 +210,7 @@ namespace hpx { namespace lcos { namespace detail
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
-                {
-                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
-                    ++full_empty_counter_data_.read_enqueued_;
-                }
+                ++full_empty_counter_data_.read_enqueued_;
 
                 reset_queue_entry r(f, read_queue_);
 
@@ -228,10 +221,7 @@ namespace hpx { namespace lcos { namespace detail
                         "full_empty_entry::enqueue_full_full");
                 }
 
-                {
-                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
-                    ++full_empty_counter_data_.read_dequeued_;
-                }
+                ++full_empty_counter_data_.read_dequeued_;
             }
 
             // copy the data to the destination
@@ -260,10 +250,7 @@ namespace hpx { namespace lcos { namespace detail
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
-                {
-                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
-                    ++full_empty_counter_data_.read_enqueued_;
-                }
+                ++full_empty_counter_data_.read_enqueued_;
 
                 reset_queue_entry r(f, read_queue_);
 
@@ -274,10 +261,7 @@ namespace hpx { namespace lcos { namespace detail
                         "full_empty_entry::enqueue_full_full");
                 }
 
-                {
-                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
-                    ++full_empty_counter_data_.read_dequeued_;
-                }
+                ++full_empty_counter_data_.read_dequeued_;
             }
 
             if (&ec != &throws)
@@ -515,7 +499,6 @@ namespace hpx { namespace lcos { namespace detail
                     threads::wait_timeout, threads::thread_priority_normal, ec);
                 if (ec) return false;
 
-                lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
                 ++full_empty_counter_data_.set_full_;
             }
 

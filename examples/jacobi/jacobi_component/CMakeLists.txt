@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
 
   set(jacobi_component_FLAGS
       DEPENDENCIES iostreams_component

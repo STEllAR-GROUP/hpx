@@ -1,13 +1,13 @@
-//  run_timer_example2.cpp  --------------------------------------------------//
+//  run_timer_example.cpp  ---------------------------------------------------//
 
-//  Copyright Beman Dawes 2006
+//  Copyright Beman Dawes 2006, 2008
 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0.
+//  See http://www.boost.org/LICENSE_1_0.txt
 
-//  See http://www.boost.org/libs/system for documentation.
+//  See http://www.boost.org/libs/chrono for documentation.
 
-#include <boost/system/timer.hpp>
+#include <boost/chrono/process_times.hpp>
 #include <cmath>
 
 int main( int argc, char * argv[] )
@@ -15,9 +15,9 @@ int main( int argc, char * argv[] )
   const char * format = argc > 1 ? argv[1] : "%t cpu seconds\n";
   int          places = argc > 2 ? std::atoi( argv[2] ) : 2;
 
-  boost::system::run_timer t( format, places );
+  boost::chrono::run_timer t( format, places );
 
-  for ( long i = 0; i < 10000000; ++i )
+  for ( long i = 0; i < 10000; ++i )
     std::sqrt( 123.456L ); // burn some time
 
   return 0;

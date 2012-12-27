@@ -116,6 +116,15 @@ response primary_namespace::service(
                 counter_data_.increment_localities_count();
                 return localities(req, ec);
             }
+        case primary_ns_resolved_localities:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.resolved_localities_.time_
+                );
+                counter_data_.increment_resolved_localities_count();
+                return resolved_localities(req, ec);
+            }
         case primary_ns_num_localities:
             {
                 update_time_on_exit update(
@@ -1272,6 +1281,40 @@ response primary_namespace::localities(
     return response(primary_ns_localities, p);
 } // }}}
 
+response primary_namespace::resolved_localities(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ localities implementation
+    using boost::fusion::at_c;
+
+    mutex_type::scoped_lock l(mutex_);
+
+    std::vector<naming::locality> localities;
+
+    partition_table_type::const_iterator it = partitions_.begin()
+                                       , end = partitions_.end();
+
+    for (; it != end; ++it) {
+        boost::fusion::vector2<naming::gid_type, gva> r = 
+            resolve_gid_locked(
+                naming::get_gid_from_locality_id(at_c<0>(it->second)), ec);
+
+        if (ec) return response();
+
+        localities.push_back(at_c<1>(r).endpoint);
+    }
+
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::resolved_localities, localities(%1%)")
+        % localities.size());
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(primary_ns_resolved_localities, localities);
+} // }}}
+
 boost::fusion::vector2<naming::gid_type, gva>
 primary_namespace::resolve_gid_locked(
     naming::gid_type const& gid
@@ -1479,6 +1522,9 @@ response primary_namespace::statistics_counter(
         case primary_ns_localities:
             get_data_func = boost::bind(&cd::get_localities_count, &counter_data_);
             break;
+        case primary_ns_resolved_localities:
+            get_data_func = boost::bind(&cd::get_resolved_localities_count, &counter_data_);
+            break;
         case primary_ns_num_localities:
             get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_);
             break;
@@ -1520,6 +1566,9 @@ response primary_namespace::statistics_counter(
             break;
         case primary_ns_localities:
             get_data_func = boost::bind(&cd::get_localities_time, &counter_data_);
+            break;
+        case primary_ns_resolved_localities:
+            get_data_func = boost::bind(&cd::get_resolved_localities_time, &counter_data_);
             break;
         case primary_ns_num_localities:
             get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_);
@@ -1619,6 +1668,12 @@ boost::int64_t primary_namespace::counter_data::get_num_threads_count() const
     return num_localities_.count_;
 }
 
+boost::int64_t primary_namespace::counter_data::get_resolved_localities_count() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolved_localities_.count_;
+}
+
 // access execution time counters
 boost::int64_t primary_namespace::counter_data::get_allocate_time() const
 {
@@ -1686,6 +1741,12 @@ boost::int64_t primary_namespace::counter_data::get_num_threads_time() const
     return num_localities_.time_;
 }
 
+boost::int64_t primary_namespace::counter_data::get_resolved_localities_time() const
+{
+    mutex_type::scoped_lock l(mtx_);
+    return resolved_localities_.time_;
+}
+
 // increment counter values
 void primary_namespace::counter_data::increment_allocate_count()
 {
@@ -1751,6 +1812,12 @@ void primary_namespace::counter_data::increment_num_threads_count()
 {
     mutex_type::scoped_lock l(mtx_);
     ++num_localities_.count_;
+}
+
+void primary_namespace::counter_data::increment_resolved_localities_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++resolved_localities_.count_;
 }
 
 }}}

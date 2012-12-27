@@ -28,12 +28,9 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::find_here;
-
 using hpx::naming::id_type;
 
-using hpx::actions::plain_result_action0;
-
-using hpx::lcos::future;
+using hpx::future;
 using hpx::async;
 using hpx::lcos::wait;
 
@@ -58,6 +55,65 @@ double null_function()
 
 HPX_PLAIN_ACTION(null_function, null_action)
 
+void measure_action_futures(boost::uint64_t count, bool csv)
+{
+    const id_type here = find_here();
+
+    std::vector<future<double> > futures;
+    futures.reserve(count);
+
+    // start the clock
+    high_resolution_timer walltime;
+
+    for (boost::uint64_t i = 0; i < count; ++i)
+        futures.push_back(async<null_action>(here));
+
+    wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+
+    if (csv)
+        cout << ( boost::format("%1%,%2%\n")
+                % count
+                % duration)
+              << flush;
+    else
+        cout << ( boost::format("invoked %1% futures (actions) in %2% seconds\n")
+                % count
+                % duration)
+              << flush;
+}
+
+void measure_function_futures(boost::uint64_t count, bool csv)
+{
+    std::vector<future<double> > futures;
+
+    futures.reserve(count);
+
+    // start the clock
+    high_resolution_timer walltime;
+
+    for (boost::uint64_t i = 0; i < count; ++i)
+        futures.push_back(async(&null_function));
+
+    wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+
+    if (csv)
+        cout << ( boost::format("%1%,%2%\n")
+                % count
+                % duration)
+              << flush;
+    else
+        cout << ( boost::format("invoked %1% futures (functions) in %2% seconds\n")
+                % count
+                % duration)
+              << flush;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -68,36 +124,11 @@ int hpx_main(
 
         const boost::uint64_t count = vm["futures"].as<boost::uint64_t>();
 
-        const id_type here = find_here();
-
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        std::vector<future<double> > futures;
-
-        futures.reserve(count);
-
-        // start the clock
-        high_resolution_timer walltime;
-
-        for (boost::uint64_t i = 0; i < count; ++i)
-            futures.push_back(async<null_action>(here));
-
-        wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
-
-        // stop the clock
-        const double duration = walltime.elapsed();
-
-        if (vm.count("csv"))
-            cout << ( boost::format("%1%,%2%\n")
-                    % count
-                    % duration)
-                 << flush;
-        else
-            cout << ( boost::format("invoked %1% futures in %2% seconds\n")
-                    % count
-                    % duration)
-                 << flush;
+        measure_action_futures(count, vm.count("csv") != 0);
+        measure_function_futures(count, vm.count("csv") != 0);
     }
 
     finalize();

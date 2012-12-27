@@ -12,12 +12,10 @@
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <vector>
@@ -28,32 +26,150 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/iterate.hpp>
 
+#include <boost/atomic.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     namespace detail
     {
+        //////////////////////////////////////////////////////////////////////
+        template <typename T, typename F = void>
+        struct when_all;
+
+        //////////////////////////////////////////////////////////////////////
+        // This version has an additional callback to be invoked for each 
+        // future when it gets ready.
+        template <typename T, typename F>
+        struct when_all : when_all<T, void>
+        {
+        private:
+            typedef when_all<T, void> base_type;
+
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
+
+            template <typename Index>
+            void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::false_)
+            {
+                if (this->base_type::lazy_values_[i].has_value()) {
+                    if (success_counter_)
+                        ++*success_counter_;
+                    f_(i, this->base_type::lazy_values_[i].get());  // invoke callback function
+                }
+                this->base_type::on_future_ready(id);   // keep track of ready futures
+            }
+
+            template <typename Index>
+            void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::true_)
+            {
+                if (this->base_type::lazy_values_[i].has_value()) {
+                    if (success_counter_)
+                        ++*success_counter_;
+                    f_(i);                              // invoke callback function
+                }
+                this->base_type::on_future_ready(id);   // keep track of ready futures
+            }
+
+            void on_future_ready(std::size_t i, threads::thread_id_type id)
+            {
+                on_future_ready_(i, id, boost::is_same<void, T>());
+            }
+
+        public:
+            typedef std::vector<lcos::future<T> > argument_type;
+            typedef std::vector<lcos::future<T> > result_type;
+
+            template <typename F_>
+            when_all(argument_type const& lazy_values, BOOST_FWD_REF(F_) f,
+                    boost::atomic<std::size_t>* success_counter)
+              : base_type(lazy_values), 
+                f_(boost::forward<F>(f)),
+                success_counter_(success_counter)
+            {}
+
+            template <typename F_>
+            when_all(BOOST_RV_REF(argument_type) lazy_values, BOOST_FWD_REF(F_) f,
+                    boost::atomic<std::size_t>* success_counter)
+              : base_type(boost::move(lazy_values)), 
+                f_(boost::forward<F>(f)),
+                success_counter_(success_counter)
+            {}
+
+            when_all(BOOST_RV_REF(when_all) rhs)
+              : base_type(boost::move(rhs.lazy_values_)), 
+                f_(boost::move(rhs.f_)),
+                success_counter_(rhs.success_counter_)
+            {
+                rhs.success_counter_ = 0;
+            }
+
+            when_all& operator= (BOOST_RV_REF(when_all) rhs)
+            {
+                if (this != &rhs) {
+                    this->base_type::operator=(boost::move(rhs));
+                    f_ = boost::move(rhs.f_);
+                    success_counter_ = rhs.success_counter_;
+                    rhs.success_counter_ = 0;
+                }
+                return *this;
+            }
+
+            result_type operator()()
+            {
+                using lcos::detail::get_future_data;
+                this->base_type::ready_count_.store(0);
+
+                // set callback functions to executed when future is ready
+                std::size_t size = this->base_type::lazy_values_.size();
+                threads::thread_id_type id = threads::get_self_id();
+                for (std::size_t i = 0; i != size; ++i)
+                {
+                    get_future_data(this->base_type::lazy_values_[i])->set_on_completed(
+                        util::bind(&when_all::on_future_ready, this, i, id));
+                }
+
+                // If all of the requested futures are already set then our
+                // callback above has already been called, otherwise we suspend
+                // ourselves.
+                if (this->base_type::ready_count_ < size)
+                {
+                    // wait for all of the futures to return to become ready
+                    this_thread::suspend(threads::suspended);
+                }
+
+                // all futures should be ready
+                BOOST_ASSERT(this->base_type::ready_count_ == size);
+
+                // reset all pending callback functions
+                for (std::size_t i = 0; i < size; ++i) 
+                    get_future_data(this->base_type::lazy_values_[i])->reset_on_completed();
+
+                return this->base_type::lazy_values_;
+            }
+
+            typename std::remove_reference<F>::type f_;
+            boost::atomic<std::size_t>* success_counter_;
+        };
+
+        //////////////////////////////////////////////////////////////////////
         template <typename T>
-        struct when_all
+        struct when_all<T, void>
         {
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
 
+        protected:
             void on_future_ready(threads::thread_id_type id)
             {
-                mutex_type::scoped_lock l(mtx_);
-                if (ready_count_ != lazy_values_.size() &&
-                    ++ready_count_ == lazy_values_.size())
+                if (ready_count_.fetch_add(1) + 1 == lazy_values_.size())
                 {
                     // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self().get_thread_id())
+                    if (id != threads::get_self_id())
                         threads::set_thread_state(id, threads::pending);
                 }
             }
 
         public:
-            typedef lcos::local::spinlock mutex_type;
-
             typedef std::vector<lcos::future<T> > argument_type;
             typedef std::vector<lcos::future<T> > result_type;
 
@@ -69,67 +185,57 @@ namespace hpx
 
             when_all(BOOST_RV_REF(when_all) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
-                ready_count_(rhs.ready_count_),
-                mtx_(boost::move(rhs.mtx_))
+                ready_count_(rhs.ready_count_.load())
             {
-                rhs.ready_count_ = 0;
+                rhs.ready_count_.store(0);
             }
 
             when_all& operator= (BOOST_RV_REF(when_all) rhs)
             {
                 if (this != &rhs) {
-                    mutex_type::scoped_lock l1(mtx_);
-                    mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     ready_count_ = rhs.ready_count_;
                     rhs.ready_count_ = 0;
-                    mtx_ = boost::move(rhs.mtx_);
                 }
                 return *this;
             }
 
             result_type operator()()
             {
-                mutex_type::scoped_lock l(mtx_);
-                ready_count_ = 0;
+                using lcos::detail::get_future_data;
 
+                ready_count_.store(0);
+
+                // set callback functions to executed when future is ready
+                std::size_t size = lazy_values_.size();
+                threads::thread_id_type id = threads::get_self_id();
+                for (std::size_t i = 0; i != size; ++i)
                 {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-
-                    // set callback functions to executed when future is ready
-                    threads::thread_id_type id = threads::get_self().get_thread_id();
-                    for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    {
-                        lazy_values_[i].then(
-                            util::bind(&when_all::on_future_ready, this, id)
-                        );
-                    }
+                    get_future_data(lazy_values_[i])->set_on_completed(
+                        util::bind(&when_all::on_future_ready, this, id));
                 }
 
-                // if all of the requested futures are already set, our
+                // If all of the requested futures are already set then our
                 // callback above has already been called, otherwise we suspend
-                // ourselves
-                if (ready_count_ != lazy_values_.size())
+                // ourselves.
+                if (ready_count_ < size)
                 {
-                    // wait for any of the futures to return to become ready
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    // wait for all of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
                 // all futures should be ready
-                BOOST_ASSERT(ready_count_ == lazy_values_.size());
+                BOOST_ASSERT(ready_count_ == size);
 
                 // reset all pending callback functions
-                l.unlock();
-                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                    lazy_values_[i].then();
+                for (std::size_t i = 0; i < size; ++i) 
+                    get_future_data(lazy_values_[i])->reset_on_completed();
 
                 return lazy_values_;
             }
 
             std::vector<lcos::future<T> > lazy_values_;
-            std::size_t ready_count_;
-            mutable mutex_type mtx_;
+            boost::atomic<std::size_t> ready_count_;
         };
     }
 

@@ -74,23 +74,23 @@ const char* fourth_barrier = "/barrier(agas#0)/fourth_stage";
 inline void register_counter_types()
 {
      naming::get_agas_client().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered AGAS client-side "
+     LBT_(info) << "(2nd stage) pre_main: registered AGAS client-side "
                    "performance counter types";
 
      get_runtime().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered runtime performance "
+     LBT_(info) << "(2nd stage) pre_main: registered runtime performance "
                    "counter types";
 
      threads::get_thread_manager().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered thread-manager performance "
+     LBT_(info) << "(2nd stage) pre_main: registered thread-manager performance "
                    "counter types";
 
      applier::get_applier().get_parcel_handler().register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered parcelset performance "
+     LBT_(info) << "(2nd stage) pre_main: registered parcelset performance "
                    "counter types";
 
      hpx::lcos::detail::register_counter_types();
-     LBT_(info) << "(3rd stage) pre_main: registered full_empty_entry "
+     LBT_(info) << "(2nd stage) pre_main: registered full_empty_entry "
                    "performance counter types";
 }
 
@@ -102,7 +102,8 @@ bool pre_main(runtime_mode mode)
     using components::stubs::runtime_support;
 
     naming::resolver_client& agas_client = naming::get_agas_client();
-    util::runtime_configuration const& cfg = get_runtime().get_config();
+    runtime& rt = get_runtime();
+    util::runtime_configuration const& cfg = rt.get_config();
 
     bool exit_requested = false;
 
@@ -127,11 +128,11 @@ bool pre_main(runtime_mode mode)
 
         register_counter_types();
 
-        get_runtime().set_state(runtime::state_pre_startup);
+        rt.set_state(runtime::state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
-        get_runtime().set_state(runtime::state_startup);
+        rt.set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }
@@ -175,6 +176,12 @@ bool pre_main(runtime_mode mode)
             third_stage = create_barrier(num_localities, third_barrier);
             fourth_stage = create_barrier(num_localities, fourth_barrier);
 
+            if (num_localities > 1) {
+                // retrieve list of resolved localities 
+                rt.get_parcel_handler().set_resolved_localities(
+                    agas_client.get_resolved_localities());
+            }
+
             LBT_(info) << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
         }
 
@@ -184,6 +191,10 @@ bool pre_main(runtime_mode mode)
             second_stage = find_barrier(second_barrier);
             third_stage = find_barrier(third_barrier);
             fourth_stage = find_barrier(fourth_barrier);
+
+            // retrieve list of resolved localities 
+            rt.get_parcel_handler().set_resolved_localities(
+                agas_client.get_resolved_localities());
 
             LBT_(info) << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
         }
@@ -203,14 +214,19 @@ bool pre_main(runtime_mode mode)
         if (agas_client.is_bootstrap())
             agas::unregister_name(second_barrier);
 
-        get_runtime().set_state(runtime::state_pre_startup);
+        rt.set_state(runtime::state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
         // Third stage separates pre-startup and startup function phase.
         third_stage.wait();
+        LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
-        get_runtime().set_state(runtime::state_startup);
+        // Tear down the third stage barrier.
+        if (agas_client.is_bootstrap())
+            agas::unregister_name(third_barrier);
+
+        rt.set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(4th stage) pre_main: ran startup functions";
 
@@ -221,9 +237,9 @@ bool pre_main(runtime_mode mode)
         fourth_stage.wait();
         LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
 
-        // Tear down the second stage barrier.
+        // Tear down the fourth stage barrier.
         if (agas_client.is_bootstrap())
-            agas::unregister_name(third_barrier);
+            agas::unregister_name(fourth_barrier);
     }
 
     // Enable logging. Even if we terminate at this point we will see all

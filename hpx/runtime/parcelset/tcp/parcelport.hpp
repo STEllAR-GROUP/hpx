@@ -44,8 +44,9 @@ namespace hpx { namespace parcelset { namespace tcp
         ///                 [in] The pool of networking threads to use to serve
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
-        parcelport(util::io_service_pool& io_service_pool,
-            util::runtime_configuration const& ini);
+        parcelport(util::runtime_configuration const& ini, 
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
         ~parcelport();
 
@@ -91,36 +92,10 @@ namespace hpx { namespace parcelset { namespace tcp
         ///                 id (if not already set).
         void send_early_parcel(parcel& p);
 
-        /// Register an event handler to be called whenever a parcel has been
-        /// received.
-        ///
-        /// \param sink     [in] A function object to be invoked whenever a
-        ///                 parcel has been received by the parcelport. The
-        ///                 signature of this function object is expected to be:
-        ///
-        /// \code
-        ///      void handler(hpx::parcelset::parcelport& pp,
-        ///                   boost::shared_ptr<std::vector<char> > const& data,
-        ///                   hpx::threads::thread_priority priority);
-        /// \endcode
-        ///
-        ///                 where \a pp is a reference to the parcelport this
-        ///                 function object instance is invoked by, and \a dest
-        ///                 is the local destination address of the parcel.
-        template <typename F>
-        void register_event_handler(F sink)
+        /// Retrieve the type of the locality represented by this parcelport
+        connection_type get_type() const
         {
-            parcels_.register_event_handler(sink);
-        }
-
-        /// \brief Allow access to the locality this parcelport is associated
-        /// with.
-        ///
-        /// This accessor returns a reference to the locality this parcelport
-        /// is associated with.
-        naming::locality const& here() const
-        {
-            return here_;
+            return connection_tcpip;
         }
 
         /// Cache specific functionality
@@ -129,31 +104,31 @@ namespace hpx { namespace parcelset { namespace tcp
             connection_cache_.clear(loc);
         }
 
-        /// Retrieve the type of the locality represented by this parcelport
-        connection_type get_type() const
-        {
-            return here_.get_type();
-        }
+        /// Return the thread pool if the name matches
+        util::io_service_pool* get_thread_pool(char const* name);
 
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
-            server::parcelport_connection_ptr);
+            server::tcp::parcelport_connection_ptr);
         void handle_read_completion(boost::system::error_code const& e,
-            server::parcelport_connection_ptr);
+            server::tcp::parcelport_connection_ptr);
 
         /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(naming::locality const& prefix,
+        void send_pending_parcels_trampoline(
+            boost::system::error_code const& ec,
+            naming::locality const& prefix, 
             parcelport_connection_ptr client_connection);
         void send_pending_parcels(parcelport_connection_ptr client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
         /// \brief Retrieve a new connection
-        parcelport_connection_ptr get_connection(naming::locality const& l);
+        parcelport_connection_ptr get_connection(naming::locality const& l,
+            error_code& ec = throws);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
-        util::io_service_pool& io_service_pool_;
+        util::io_service_pool io_service_pool_;
 
         /// Acceptor used to listen for incoming connections.
         boost::asio::ip::tcp::acceptor* acceptor_;
@@ -162,7 +137,7 @@ namespace hpx { namespace parcelset { namespace tcp
         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
         /// The list of accepted connections
-        typedef std::set<server::parcelport_connection_ptr> accepted_connections_set;
+        typedef std::set<server::tcp::parcelport_connection_ptr> accepted_connections_set;
         accepted_connections_set accepted_connections_;
     };
 }}}

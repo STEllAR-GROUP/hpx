@@ -67,12 +67,12 @@ struct HPX_EXPORT sed_transform
 
     operator safe_bool<sed_transform>::result_type() const
     {
-        return safe_bool<sed_transform>()(command_);
+        return safe_bool<sed_transform>()(command_.get() ? true : false);
     }
 
     bool operator!() const
     {
-        return !command_;
+        return !command_.get();
     }
 };
 

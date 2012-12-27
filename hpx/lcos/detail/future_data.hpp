@@ -15,6 +15,7 @@
 #include <hpx/util/value_or_error.hpp>
 #include <hpx/util/unlock_lock.hpp>
 
+#include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -34,8 +35,36 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail
+namespace hpx { namespace lcos
 {
+
+namespace local { template <typename T> struct channel; }
+
+namespace detail
+{
+    template <typename Result> struct future_data_base;
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    inline lcos::future<Result> make_future_from_data(
+        boost::intrusive_ptr<detail::future_data_base<Result> > const&);
+
+    template <typename Result>
+    inline lcos::future<Result> make_future_from_data(
+        BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >));
+
+    template <typename Result>
+    inline lcos::future<Result> make_future_from_data(
+        detail::future_data_base<Result>* p);
+
+    template <typename Result>
+    inline detail::future_data_base<Result>*
+        get_future_data(lcos::future<Result>&);
+
+    template <typename Result>
+    inline detail:: future_data_base<Result> const*
+        get_future_data(lcos::future<Result> const&);
+
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
 
@@ -79,7 +108,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
-        typedef HPX_STD_FUNCTION<void(lcos::future<Result>)> 
+        typedef HPX_STD_FUNCTION<void(lcos::future<Result>)>
             completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
@@ -201,13 +230,16 @@ namespace hpx { namespace lcos { namespace detail
 
         friend class lcos::future<Result>;
 
-    public:
-        future_data() : set_on_completed_(false) {}
+        template <typename T>
+        friend struct local::channel;
+
+    protected:
+        future_data() {}
 
         future_data(completed_callback_type const& data_sink)
-          : on_completed_(data_sink), set_on_completed_(!data_sink.empty())
-        {}
+          : on_completed_(data_sink) {}
 
+    public:
         static result_type handle_error(data_type const& d, error_code &ec)
         {
             // an error has been reported in the meantime, throw or set
@@ -278,43 +310,40 @@ namespace hpx { namespace lcos { namespace detail
         void set_data(BOOST_FWD_REF(T) result)
         {
             // this future instance coincidentally keeps us alive
-            lcos::future<Result> f(this);
+            lcos::future<Result> f =
+                lcos::detail::make_future_from_data<Result>(this);
 
             // set the received result, reset error status
             try {
-                // check weather the data already has been set
-                if (!data_.is_empty()) {
-                    HPX_THROW_EXCEPTION(future_already_satisfied,
-                        "packaged_task::set_data<Result>",
-                        "data has already been set for this future");
-                }
-
-               typedef typename boost::remove_const<
-                    typename hpx::util::detail::remove_reference<T>::type
+               typedef typename hpx::util::detail::remove_reference<
+                    typename boost::remove_const<T>::type
                 >::type naked_type;
 
                 typedef traits::get_remote_result<
                     result_type, naked_type
                 > get_remote_result_type;
 
-                // store the value
-                if (set_on_completed_) {
-                    // lock only when needed
+                completed_callback_type on_completed;
+                {
                     typename mutex_type::scoped_lock l(this->mtx_);
-                    if (!on_completed_.empty()) {
-                        data_.set(boost::move(get_remote_result_type::call(
-                            boost::forward<T>(result))));
 
-                        // invoke the callback (continuation) function
-                        set_on_completed_ = false;
-                        on_completed_(f);
-                        on_completed_.clear();
-                        return;
+                    // check whether the data already has been set
+                    if (!data_.is_empty()) {
+                        HPX_THROW_EXCEPTION(future_already_satisfied,
+                            "packaged_task::set_data<Result>",
+                            "data has already been set for this future");
                     }
+
+                    on_completed = boost::move(on_completed_);
+
+                    // store the value
+                    data_.set(boost::move(get_remote_result_type::call(
+                          boost::forward<T>(result))));
                 }
 
-                data_.set(boost::move(get_remote_result_type::call(
-                      boost::forward<T>(result))));
+                // invoke the callback (continuation) function
+                if (!on_completed.empty())
+                    on_completed(f);
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -326,22 +355,29 @@ namespace hpx { namespace lcos { namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // this future instance coincidentally keeps us alive
-            lcos::future<Result> f(this);
+            lcos::future<Result> f =
+                lcos::detail::make_future_from_data<Result>(this);
 
-            // store the error code
-            if (set_on_completed_) {
+            completed_callback_type on_completed;
+            {
                 typename mutex_type::scoped_lock l(this->mtx_);
-                if (!on_completed_.empty()) {
-                    data_.set(e);
 
-                    // invoke the callback (continuation) function
-                    set_on_completed_ = false;
-                    on_completed_(f);
-                    on_completed_.clear();
-                    return;
+                // check whether the data already has been set
+                if (!data_.is_empty()) {
+                    HPX_THROW_EXCEPTION(future_already_satisfied,
+                        "packaged_task::set_data<Result>",
+                        "data has already been set for this future");
                 }
+
+                on_completed = boost::move(on_completed_);
+
+                // store the error code
+                data_.set(e);
             }
-            data_.set(e);
+
+            // invoke the callback (continuation) function
+            if (!on_completed.empty())
+                on_completed(f);
         }
 
         void set_error(error e, char const* f, char const* msg)
@@ -398,7 +434,6 @@ namespace hpx { namespace lcos { namespace detail
         set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            set_on_completed_ = !data_sink.empty();
             return boost::move(set_on_completed_locked(boost::move(data_sink)));
         }
 
@@ -406,35 +441,31 @@ namespace hpx { namespace lcos { namespace detail
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             // this future coincidentally instance keeps us alive
-            lcos::future<Result> f(this);
+            lcos::future<Result> f =
+                lcos::detail::make_future_from_data<Result>(this);
 
             completed_callback_type retval = boost::move(on_completed_);
-            set_on_completed_ = !data_sink.empty();
-            on_completed_ = boost::move(data_sink);
-            if (!on_completed_.empty() && this->is_ready()) 
-            {
-                // invoke the callback (continuation) function
-                set_on_completed_ = false;
-                on_completed_(f);
-                on_completed_.clear();
+
+            if (!data_sink.empty() && this->is_ready()) {
+                // invoke the callback (continuation) function right away
+                data_sink(f);
             }
+            else {
+                on_completed_ = boost::move(data_sink);
+            }
+
             return retval;
         }
 
         void reset_on_completed()
         {
-            completed_callback_type data_sink;
-            {
-                typename mutex_type::scoped_lock l(this->mtx_);
-                set_on_completed_ = false;
-                std::swap(on_completed_, data_sink);
-            }
+            typename mutex_type::scoped_lock l(this->mtx_);
+            on_completed_.clear();
         }
 
     private:
         detail::full_empty<data_type> data_;
         completed_callback_type on_completed_;
-        bool set_on_completed_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -509,7 +540,7 @@ namespace hpx { namespace lcos { namespace detail
             future_base_type this_(this);
             applier::register_thread_plain(
                 HPX_STD_BIND(&task_base::run_impl, this_),
-                "task_base::apply");
+                "task_base::apply", threads::pending, false);
         }
 
     private:

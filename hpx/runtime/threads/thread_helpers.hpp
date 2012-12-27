@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/backtrace.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
@@ -129,6 +130,25 @@ namespace hpx { namespace threads
         error_code& ec = throws);
     HPX_API_EXPORT char const* set_thread_lco_description(thread_id_type id,
         char const* desc = 0, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// The function get_thread_backtrace is part of the thread related API
+    /// allows to query the currently stored thread back trace (which is 
+    /// captured during thread suspension).
+    ///
+    /// \param id         [in] The thread id of the thread being queried.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \returns          This function returns the currently captured stack
+    ///                   back trace of the thread referenced by the \a id 
+    ///                   parameter. If the thread is not known to the 
+    ///                   thread-manager the return value will be the zero.
+    HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
+        thread_id_type id, error_code& ec = throws);
+    HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
+        thread_id_type id, util::backtrace const* bt = 0, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API. It

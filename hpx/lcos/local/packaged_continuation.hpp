@@ -16,6 +16,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -65,7 +66,8 @@ namespace hpx { namespace lcos { namespace detail
         result_type get(error_code& ec = throws)
         {
             if (!started_) {
-                lcos::future<ContResult> f(this);
+                lcos::future<ContResult> f =
+                    lcos::detail::make_future_from_data<ContResult>(this);
                 run(f, ec);
             }
             return boost::move(this->get_data(ec));
@@ -75,7 +77,8 @@ namespace hpx { namespace lcos { namespace detail
         result_type move(error_code& ec = throws)
         {
             if (!started_) {
-                lcos::future<ContResult> f(this);
+                lcos::future<ContResult> f =
+                    lcos::detail::make_future_from_data<ContResult>(this);
                 run(f, ec);
             }
             return boost::move(this->move_data(ec));
@@ -102,6 +105,23 @@ namespace hpx { namespace lcos { namespace detail
 
             if (&ec != &throws)
                 ec = make_success_code();
+        }
+
+        template <typename Result>
+        void run (lcos::future<Result> const& f)
+        {
+            {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                if (started_) {
+                    HPX_THROW_EXCEPTION(task_already_started,
+                        "continuation_base::run",
+                        "this task has already been started");
+                    return;
+                }
+                started_ = true;
+            }
+
+            run_impl<Result>(f);
         }
 
         template <typename Result>
@@ -290,132 +310,144 @@ namespace hpx { namespace lcos { namespace local
         };
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult, typename Result>
-    class packaged_continuation
-    {
-    protected:
-        typedef lcos::detail::continuation_base<ContResult> cont_impl_type;
-
-    private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(packaged_continuation)
-
-    public:
-        // construction and destruction
-        packaged_continuation() : future_obtained_(false) {}
-
-        template <typename F>
-        explicit packaged_continuation(BOOST_FWD_REF(F) f)
-          : cont_(new detail::continuation_object<
-                      ContResult, Result, F>(boost::forward<F>(f))),
-            future_obtained_(false)
-        {}
-
-        ~packaged_continuation()
-        {
-            if (cont_)
-                cont_->deleting_owner();
-        }
-
-        // Assignment
-        packaged_continuation(BOOST_RV_REF(packaged_continuation) rhs)
-          : cont_(rhs.cont_),
-            future_obtained_(rhs.future_obtained_)
-        {
-            rhs.cont_.reset();
-            rhs.future_obtained_ = false;
-        }
-
-        packaged_continuation& operator=(BOOST_RV_REF(packaged_continuation) rhs)
-        {
-            cont_ = rhs.cont_;
-            future_obtained_ = rhs.future_obtained_;
-            rhs.cont_.reset();
-            rhs.future_obtained_ = false;
-            return *this;
-        }
-
-        void swap(packaged_continuation& other)
-        {
-            cont_.swap(other.cont_);
-            std::swap(future_obtained_, other.future_obtained_);
-        }
-
-        // Result retrieval
-        lcos::future<ContResult> get_future(error_code& ec = throws)
-        {
-            if (!cont_) {
-                HPX_THROWS_IF(ec, task_moved,
-                    "packaged_continuation<ContResult>::get_future",
-                    "task invalid (has it been moved?)");
-                return lcos::future<ContResult>();
-            }
-            if (future_obtained_) {
-                HPX_THROWS_IF(ec, future_already_retrieved,
-                    "packaged_continuation<ContResult>::get_future",
-                    "future already has been retrieved from this promise");
-                return lcos::future<ContResult>();
-            }
-
-            future_obtained_ = true;
-            return lcos::future<ContResult>(cont_);
-        }
-
-        // synchronous execution
-        void operator()(lcos::future<Result> f, error_code& ec = throws)
-        {
-            if (!cont_) {
-                HPX_THROWS_IF(ec, task_moved,
-                    "packaged_continuation::operator()",
-                    "task invalid (has it been moved?)");
-                return;
-            }
-            cont_->run(f, ec);
-        }
-
-        // asynchronous execution
-        void async(lcos::future<Result> f, error_code& ec = throws)
-        {
-            if (!cont_) {
-                HPX_THROWS_IF(ec, task_moved,
-                    "packaged_continuation::async()",
-                    "task invalid (has it been moved?)");
-                return;
-            }
-            cont_->async(f, ec);
-        }
-
+//     ///////////////////////////////////////////////////////////////////////////
+//     template <typename ContResult, typename Result>
+//     class packaged_continuation
+//     {
+//     protected:
+//         typedef lcos::detail::continuation_base<ContResult> cont_impl_type;
+//
+//     private:
+//         BOOST_MOVABLE_BUT_NOT_COPYABLE(packaged_continuation)
+//
+//     public:
+//         // construction and destruction
+//         packaged_continuation() : future_obtained_(false) {}
+//
 //         template <typename F>
-//         void set_wait_callback(F f)
+//         explicit packaged_continuation(BOOST_FWD_REF(F) f)
+//           : cont_(new detail::continuation_object<
+//                       ContResult, Result, F>(boost::forward<F>(f))),
+//             future_obtained_(false)
+//         {}
+//
+//         ~packaged_continuation()
 //         {
-//             task_->set_wait_callback(f, this);
+//             if (cont_)
+//                 cont_->deleting_owner();
 //         }
-
-        template <typename T>
-        void set_value(BOOST_FWD_REF(T) result)
-        {
-            cont_->set_data(boost::forward<T>(result));
-        }
-
-        void set_exception(boost::exception_ptr const& e)
-        {
-            cont_->set_exception(e);
-        }
-
-        void on_value_ready(lcos::future<Result> const& f)
-        {
-            (*this)(f);   // pass this future on to the continuation
-        }
-
-    private:
-        boost::intrusive_ptr<cont_impl_type> cont_;
-        bool future_obtained_;
-    };
+//
+//         // Assignment
+//         packaged_continuation(BOOST_RV_REF(packaged_continuation) rhs)
+//           : cont_(rhs.cont_),
+//             future_obtained_(rhs.future_obtained_)
+//         {
+//             rhs.cont_.reset();
+//             rhs.future_obtained_ = false;
+//         }
+//
+//         packaged_continuation& operator=(BOOST_RV_REF(packaged_continuation) rhs)
+//         {
+//             cont_ = rhs.cont_;
+//             future_obtained_ = rhs.future_obtained_;
+//             rhs.cont_.reset();
+//             rhs.future_obtained_ = false;
+//             return *this;
+//         }
+//
+//         void swap(packaged_continuation& other)
+//         {
+//             cont_.swap(other.cont_);
+//             std::swap(future_obtained_, other.future_obtained_);
+//         }
+//
+//         // Result retrieval
+//         lcos::future<ContResult> get_future(error_code& ec = throws)
+//         {
+//             if (!cont_) {
+//                 HPX_THROWS_IF(ec, task_moved,
+//                     "packaged_continuation<ContResult>::get_future",
+//                     "task invalid (has it been moved?)");
+//                 return lcos::future<ContResult>();
+//             }
+//             if (future_obtained_) {
+//                 HPX_THROWS_IF(ec, future_already_retrieved,
+//                     "packaged_continuation<ContResult>::get_future",
+//                     "future already has been retrieved from this promise");
+//                 return lcos::future<ContResult>();
+//             }
+//
+//             future_obtained_ = true;
+//             return lcos::future<ContResult>(cont_);
+//         }
+//
+//         // synchronous execution
+//         void operator()(lcos::future<Result> f, error_code& ec = throws)
+//         {
+//             if (!cont_) {
+//                 HPX_THROWS_IF(ec, task_moved,
+//                     "packaged_continuation::operator()",
+//                     "task invalid (has it been moved?)");
+//                 return;
+//             }
+//             cont_->run(f, ec);
+//         }
+//
+//         // asynchronous execution
+//         void async(lcos::future<Result> f, error_code& ec = throws)
+//         {
+//             if (!cont_) {
+//                 HPX_THROWS_IF(ec, task_moved,
+//                     "packaged_continuation::async()",
+//                     "task invalid (has it been moved?)");
+//                 return;
+//             }
+//             cont_->async(f, ec);
+//         }
+//
+// //         template <typename F>
+// //         void set_wait_callback(F f)
+// //         {
+// //             task_->set_wait_callback(f, this);
+// //         }
+//
+//         template <typename T>
+//         void set_value(BOOST_FWD_REF(T) result)
+//         {
+//             cont_->set_data(boost::forward<T>(result));
+//         }
+//
+//         void set_exception(boost::exception_ptr const& e)
+//         {
+//             cont_->set_exception(e);
+//         }
+//
+//         void on_value_ready(lcos::future<Result> const& f)
+//         {
+//             (*this)(f);   // pass this future on to the continuation
+//         }
+//
+//     private:
+//         boost::intrusive_ptr<cont_impl_type> cont_;
+//         bool future_obtained_;
+//     };
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
+    namespace detail
+    {
+        template <typename ContResult, typename Result, typename F>
+        inline lcos::detail::continuation_base<ContResult>*
+        make_continuation_base(BOOST_FWD_REF(F) f)
+        {
+            using lcos::local::detail::continuation_object;
+            return new continuation_object<ContResult, Result, F>(
+                boost::forward<F>(f));
+        }
+    }
+
     // attach a local continuation to this future instance
     template <typename Result>
     template <typename F>
@@ -425,19 +457,18 @@ namespace hpx { namespace lcos
         typedef typename boost::result_of<F(future)>::type result_type;
 
         // create continuation
-        typedef local::packaged_continuation<result_type, Result> cont_type;
+        typedef lcos::detail::continuation_base<result_type> cont_impl_type;
+        boost::intrusive_ptr<cont_impl_type> p(
+            detail::make_continuation_base<result_type, Result>(
+                util::bind(boost::forward<F>(f), util::placeholders::_1)));
 
-        boost::shared_ptr<cont_type> p(
-            boost::make_shared<cont_type>(
-                util::bind(boost::forward<F>(f), util::placeholders::_1)
-            )
-        );
-
-        // bind a on_completed handler to this future which will invoke the
+        // bind an on_completed handler to this future which will invoke the
         // continuation
-        future_data_->set_on_completed(util::bind(&cont_type::on_value_ready, p, *this));
+        void (cont_impl_type::*cb)(lcos::future<Result> const&) =
+            &cont_impl_type::template run<Result>;
+        future_data_->set_on_completed(util::bind(cb, p, *this));
 
-        return p->get_future();
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
     }
 
     template <typename F>
@@ -447,19 +478,18 @@ namespace hpx { namespace lcos
         typedef typename boost::result_of<F(future)>::type result_type;
 
         // create continuation
-        typedef local::packaged_continuation<result_type, void> cont_type;
+        typedef lcos::detail::continuation_base<result_type> cont_impl_type;
+        boost::intrusive_ptr<cont_impl_type> p(
+            detail::make_continuation_base<result_type, void>(
+                util::bind(boost::forward<F>(f), util::placeholders::_1)));
 
-        boost::shared_ptr<cont_type> p(
-            boost::make_shared<cont_type>(
-                util::bind(boost::forward<F>(f), util::placeholders::_1)
-            )
-        );
-
-        // bind a on_completed handler to this future which will invoke the
+        // bind an on_completed handler to this future which will invoke the
         // continuation
-        future_data_->set_on_completed(util::bind(&cont_type::on_value_ready, p, *this));
+        void (cont_impl_type::*cb)(lcos::future<void> const&) =
+            &cont_impl_type::template run<void>;
+        future_data_->set_on_completed(util::bind(cb, p, *this));
 
-        return p->get_future();
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
     }
 }}
 

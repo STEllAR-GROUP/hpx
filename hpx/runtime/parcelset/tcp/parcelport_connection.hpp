@@ -11,7 +11,6 @@
 #include <sstream>
 #include <vector>
 
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -46,7 +45,6 @@ namespace hpx { namespace parcelset { namespace tcp
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 naming::locality const& locality_id,
-                util::connection_cache<parcelport_connection, naming::locality>& cache,
                 performance_counters::parcels::gatherer& parcels_sent);
 
         ~parcelport_connection()
@@ -90,7 +88,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
-                    boost::asio::placeholders::error, _2,
+                    boost::asio::placeholders::error, ::_2,
                     boost::make_tuple(handler, parcel_postprocess)));
         }
 
@@ -129,21 +127,23 @@ namespace hpx { namespace parcelset { namespace tcp
             socket_.set_option(quickack);
 #endif
 
-            void (parcelport_connection::*f)(boost::tuple<Handler, ParcelPostprocess>)
+            void (parcelport_connection::*f)(boost::system::error_code const&, 
+                      boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
 
             boost::asio::async_read(socket_, 
                 boost::asio::buffer(&ack_, sizeof(ack_)),
-                boost::bind(f, shared_from_this(), handler));
+                boost::bind(f, shared_from_this(), ::_1, handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void handle_read_ack(boost::tuple<Handler, ParcelPostprocess> handler) 
+        void handle_read_ack(boost::system::error_code const& e, 
+            boost::tuple<Handler, ParcelPostprocess> handler) 
         {
             // Call post-processing handler, which will send remaining pending 
             // parcels. Pass along the connection so it can be reused if more 
             // parcels have to be sent.
-            boost::get<1>(handler)(there_, shared_from_this());
+            boost::get<1>(handler)(e, there_, shared_from_this());
         }
 
     private:
@@ -158,9 +158,6 @@ namespace hpx { namespace parcelset { namespace tcp
 
         /// the other (receiving) end of this connection
         naming::locality there_;
-
-        /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection, naming::locality>& connection_cache_;
 
         /// Counters and their data containers.
         util::high_resolution_timer timer_;

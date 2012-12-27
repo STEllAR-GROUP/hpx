@@ -11,12 +11,15 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 #include <vector>
 
+#include <boost/atomic.hpp>
 #include <boost/foreach.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/move/move.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -48,80 +51,52 @@ namespace hpx { namespace lcos
         return 1;
     }
 
+    //////////////////////////////////////////////////////////////////////////
     // This overload of wait() will make sure that the passed function will be
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
     template <typename T1, typename F>
     inline std::size_t
-    wait (std::vector<lcos::future<T1> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<T1> > const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
-        boost::dynamic_bitset<> handled(lazy_values.size());
-        std::size_t handled_count = 0;
-        while (handled_count < lazy_values.size()) {
+        typedef std::vector<lcos::future<T1> > return_type;
 
-            bool suspended = false;
-            for (std::size_t i = 0; i < lazy_values.size(); ++i) {
+        if (lazy_values.empty())
+            return 0;
 
-                // loop over all lazy_values, executing the next as soon as its
-                // value becomes available
-                if (!handled[i] && lazy_values[i].is_ready()) {
-                    // get the value from the future, invoke the function
-                    f(i, lazy_values[i].get());
+        boost::atomic<std::size_t> success_counter(0);
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                hpx::detail::when_all<T1, F>(
+                    lazy_values, boost::forward<F>(f), &success_counter));
 
-                    handled[i] = true;
-                    ++handled_count;
+        p.apply();
+        p.get_future().get();
 
-                    // give thread-manager a chance to look for more work while
-                    // waiting
-                    this_thread::suspend();
-                    suspended = true;
-                }
-            }
-
-            // suspend after one full loop over all values, 10ms should be fine
-            // (default parameter)
-            if (!suspended)
-                this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
-        }
-        return handled.count();
+        return success_counter.load();
     }
 
     template <typename F>
     inline std::size_t
-    wait (std::vector<lcos::future<void> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<void> > const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
-        boost::dynamic_bitset<> handled(lazy_values.size());
-        std::size_t handled_count = 0;
-        while (handled_count < lazy_values.size()) {
+        typedef std::vector<lcos::future<void> > return_type;
 
-            bool suspended = false;
-            for (std::size_t i = 0; i < lazy_values.size(); ++i) {
+        if (lazy_values.empty())
+            return 0;
 
-                // loop over all lazy_values, executing the next as soon as its
-                // value becomes available
-                if (!handled[i] && lazy_values[i].is_ready()) {
-                    // get the value from the future, invoke the function
-                    lazy_values[i].get();
-                    f(i);
+        boost::atomic<std::size_t> success_counter(0);
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                hpx::detail::when_all<void, F>(
+                    lazy_values, boost::forward<F>(f), &success_counter));
 
-                    handled[i] = true;
-                    ++handled_count;
+        p.apply();
+        p.get_future().get();
 
-                    // give thread-manager a chance to look for more work while
-                    // waiting
-                    this_thread::suspend();
-                    suspended = true;
-                }
-            }
-
-            // suspend after one full loop over all values, 10ms should be fine
-            // (default parameter)
-            if (!suspended)
-                this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
-        }
-        return handled.count();
+        return success_counter.load();
     }
 
     ///////////////////////////////////////////////////////////////////////////

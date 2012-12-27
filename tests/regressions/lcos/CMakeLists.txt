@@ -6,9 +6,19 @@
 
 set(tests
     async_callback_non_deduced_context
+    future_hang_on_get
    )
 
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(future_hang_on_get_PARAMETERS THREADS_PER_LOCALITY 4)
+
+if(HPX_HAVE_CXX11_LAMBDAS)
+  set(future_hang_on_wait_with_callback_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(tests
+    ${tests}
+    future_hang_on_wait_with_callback)
+endif()
 
 foreach(test ${tests})
   set(sources

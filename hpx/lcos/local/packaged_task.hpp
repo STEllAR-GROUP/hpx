@@ -192,7 +192,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(task_);
+            return lcos::detail::make_future_from_data<Result>(task_);
         }
 
 //         template <typename F>
@@ -204,23 +204,31 @@ namespace hpx { namespace lcos { namespace local
         template <typename T>
         void set_value(BOOST_FWD_REF(T) result)
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<Result>::set_value<T>",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<Result>();
+
             task_->set_data(boost::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<Result>::set_exception",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<Result>();
+
             task_->set_exception(e);
         }
 
@@ -322,7 +330,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<void>(task_);
+            return lcos::detail::make_future_from_data<void>(task_);
         }
 
 //         template <typename F>
@@ -333,29 +341,37 @@ namespace hpx { namespace lcos { namespace local
 
         void set_value()
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<void>::set_value",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<void>();
+
             task_->set_data(util::unused);
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            if (!task_) {
+            if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<void>::set_exception",
                     "promise invalid (has it been moved?)");
                 return;
             }
+
+            if (!task_)
+                task_ = new detail::future_object<void>();
+
             task_->set_exception(e);
         }
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return task_;
+            return task_.get() ? true : false;
         }
 
         bool is_ready() const
@@ -479,12 +495,12 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(task_);
+            return lcos::detail::make_future_from_data<Result>(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return task_;
+            return task_.get();
         }
 
     protected:
@@ -604,7 +620,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             future_obtained_ = true;
-            return lcos::future<Result>(task_);
+            return lcos::detail::make_future_from_data<Result>(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT

@@ -584,13 +584,16 @@ namespace hpx { namespace actions
     typedef typename HPX_MAKE_COMPONENT_ACTION_TPL(component, func)::type name\
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_TPL(component, func, name)          \
-    typedef HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, func)::type name   \
+    typedef typename                                                          \
+        HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, func)::type name       \
     /**/
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_TPL(component, func, name)         \
-    typedef HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name  \
+    typedef typename                                                          \
+        HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name      \
     /**/
 #define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(component, func, name)   \
-    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name \
+    typedef typename                                                          \
+        HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name\
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////

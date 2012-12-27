@@ -50,12 +50,12 @@ namespace hpx { namespace lcos { namespace local
             if (k < 4)
             {
             }
-            if(k < 16)
-            {
 #if defined(BOOST_SMT_PAUSE)
+            else if(k < 16)
+            {
                 BOOST_SMT_PAUSE
-#endif
             }
+#endif
             else if(k < 32 || k & 1)
             {
                 if(hpx::threads::get_self_ptr())

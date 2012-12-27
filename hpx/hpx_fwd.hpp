@@ -98,27 +98,26 @@ namespace hpx
         enum connection_type
         {
             connection_unknown = -1,
-            connection_tcpip = 1,
-            connection_portals4 = 2
+            connection_tcpip = 0,
+            connection_shmem = 1,
+            connection_portals4 = 2,
+            connection_last
         };
+
         HPX_API_EXPORT std::string get_connection_type_name(connection_type);
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
-        class parcelport_connection;
         class HPX_API_EXPORT parcelhandler;
 
         namespace server
         {
             class parcelport_queue;
-            class parcelport_server_connection;
-
             struct parcelhandler_queue_base;
 
             namespace policies
             {
                 struct global_parcelhandler_queue;
-
                 typedef global_parcelhandler_queue parcelhandler_queue;
             }
         }
@@ -578,8 +577,9 @@ namespace hpx
     /// \namespace util
     namespace util
     {
-        class HPX_API_EXPORT section;
-        class runtime_configuration;
+        class HPX_EXPORT section;
+        class HPX_EXPORT runtime_configuration;
+        class HPX_EXPORT io_service_pool;
 
         /// \brief Expand INI variables in a string
         HPX_API_EXPORT std::string expand(std::string const& expand);
@@ -625,6 +625,12 @@ namespace hpx
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT util::runtime_configuration const& get_config();
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(char const* name);
+
+    ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
@@ -653,7 +659,7 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
-    HPX_API_EXPORT naming::id_type find_here();
+    HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities
@@ -673,7 +679,8 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities
@@ -702,7 +709,7 @@ namespace hpx
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
-        components::component_type type);
+        components::component_type type, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing an arbitrary locality which
@@ -731,7 +738,8 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
-    HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
+    HPX_API_EXPORT naming::id_type find_locality(components::component_type type,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered
@@ -937,6 +945,8 @@ namespace hpx
         error_code& ec = throws);
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
         naming::id_type id);
+
+    HPX_EXPORT void set_error_handlers();
 }
 
 #include <hpx/lcos/async_fwd.hpp>

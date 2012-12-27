@@ -40,6 +40,7 @@ if(NOT MSVC)
 endif()
 
 set(HPX_LIBRARY_DIR @external_link_directories@ CACHE STRING "HPX library directories")
+set(HPX_LIBRARIES   @external_libraries@ CACHE STRING "HPX libraries")
 set(HPX_INCLUDE_DIR @external_include_directories@ CACHE STRING "HPX include directories")
 
 @boost_library_info@

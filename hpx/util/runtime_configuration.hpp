@@ -21,7 +21,7 @@ namespace hpx { namespace util
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
     // more convenient way
-    class HPX_API_EXPORT runtime_configuration : public section
+    class HPX_EXPORT runtime_configuration : public section
     {
         std::string hpx_ini_file;
         std::vector<std::string> cmdline_ini_defs;
@@ -112,6 +112,10 @@ namespace hpx { namespace util
         std::ptrdiff_t init_medium_stack_size() const;
         std::ptrdiff_t init_large_stack_size() const;
         std::ptrdiff_t init_huge_stack_size() const;
+
+#if defined(__linux) || defined(linux) || defined(__linux__)
+        void init_use_stack_guard_pages() const;
+#endif
 
         void pre_initialize_ini();
         void post_initialize_ini(std::string const& hpx_ini_file,

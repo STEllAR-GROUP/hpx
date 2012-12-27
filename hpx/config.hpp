@@ -250,6 +250,11 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_USE_ITTNOTIFY)
+#  define HPX_USE_ITTNOTIFY 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
 #if !defined(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #  if defined(HPX_DEBUG)
@@ -299,8 +304,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable guard pages.
-#if !defined(HPX_THREAD_GUARD_PAGE)
-#  define HPX_THREAD_GUARD_PAGE 1
+#if defined(__linux) || defined(linux) || defined(__linux__)
+#  if !defined(HPX_THREAD_GUARD_PAGE)
+#    define HPX_THREAD_GUARD_PAGE 1
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default we do not maintain stack back-traces on suspension. This is a
+/// pure debugging aid to be able to see in the debugger where a suspended
+/// thread got stuck.
+#if !defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
+#  define HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 0
+#elif !defined(HPX_HAVE_STACKTRACES)
+#  error HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION reqires HPX_HAVE_STACKTRACES to be defined!
+#endif
+
+/// By default we capture only 5 levels of stack back trace on suspension
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION && \
+    !defined(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)
+#  define HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH 5
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -396,11 +419,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_USE_ITT)
-#  define HPX_USE_ITT 0
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Count number of empty (no PX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
 #  define HPX_IDLE_LOOP_COUNT_MAX 20000
@@ -411,6 +429,15 @@
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
 #  define HPX_BUSY_LOOP_COUNT_MAX 20000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Count number of terminated threads before forcefully cleaning up all of
+// them. Note: terminated threads are cleaned up either when this number is
+// reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
+// reached, which will clean up the terminated threads for _all_ thread queues.
+#if !defined(HPX_MAX_TERMINATED_THREADS)
+#  define HPX_MAX_TERMINATED_THREADS 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

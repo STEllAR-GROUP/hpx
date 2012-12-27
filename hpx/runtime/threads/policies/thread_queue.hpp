@@ -89,6 +89,14 @@ namespace hpx { namespace threads { namespace policies
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <bool Global> struct condition;
+
+        template <> struct condition<false> {};
+        template <> struct condition<true> : boost::condition {};
+    }
+
     template <bool Global>
     class thread_queue
     {
@@ -464,10 +472,8 @@ namespace hpx { namespace threads { namespace policies
                 terminated_items_.enqueue(id);
 
                 boost::int64_t count = ++terminated_items_count_;
-                if (busy_count > HPX_BUSY_LOOP_COUNT_MAX ||
-                    count > HPX_BUSY_LOOP_COUNT_MAX / 10)
+                if (count > HPX_MAX_TERMINATED_THREADS)
                 {
-                    busy_count = 0;
                     cleanup_terminated(true);   // clean up all terminated threads
                 }
                 return true;
@@ -525,11 +531,7 @@ namespace hpx { namespace threads { namespace policies
         /// This function gets called by the threadmanager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idleing OS threads
-        void do_some_work()
-        {
-            if (Global)
-                cond_.notify_all();
-        }
+        inline void do_some_work();
 
         ///////////////////////////////////////////////////////////////////////
         bool dump_suspended_threads(std::size_t num_thread
@@ -559,7 +561,8 @@ namespace hpx { namespace threads { namespace policies
 
     private:
         mutable mutex_type mtx_;            ///< mutex protecting the members
-        boost::condition cond_;             ///< used to trigger some action
+
+        policies::detail::condition<Global> cond_;  ///< used to trigger some action
 
         thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
         work_items_type work_items_;        ///< list of active work items
@@ -576,6 +579,20 @@ namespace hpx { namespace threads { namespace policies
 
         util::block_profiler<add_new_tag> add_new_logger_;
     };
+
+    /// This function gets called by the threadmanager whenever new work
+    /// has been added, allowing the scheduler to reactivate one or more of
+    /// possibly idleing OS threads
+    template <>
+    inline void thread_queue<false>::do_some_work()
+    {
+    }
+
+    template <>
+    inline void thread_queue<true>::do_some_work()
+    {
+        cond_.notify_all();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <>

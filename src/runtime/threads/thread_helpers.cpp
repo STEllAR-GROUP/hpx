@@ -12,6 +12,9 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/register_locks.hpp>
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#include <hpx/util/backtrace.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -255,7 +258,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_thread_description",
                 "global applier object is not accessible");
-            return NULL; 
+            return NULL;
         }
 
         if (&ec != &throws)
@@ -272,7 +275,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::set_thread_description",
                 "global applier object is not accessible");
-            return NULL; 
+            return NULL;
         }
 
         if (&ec != &throws)
@@ -289,7 +292,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_thread_lco_description",
                 "global applier object is not accessible");
-            return NULL; 
+            return NULL;
         }
 
         if (&ec != &throws)
@@ -313,6 +316,41 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         return app->get_thread_manager().set_lco_description(id, desc);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    util::backtrace const* get_thread_backtrace(thread_id_type id, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::get_thread_backtrace",
+                "global applier object is not accessible");
+            return NULL;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return app->get_thread_manager().get_backtrace(id);
+    }
+    util::backtrace const* set_thread_backtrace(thread_id_type id,
+        util::backtrace const* bt, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::set_thread_backtrace",
+                "global applier object is not accessible");
+            return NULL;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return app->get_thread_manager().set_backtrace(id, bt);
     }
 }}
 
@@ -339,6 +377,27 @@ namespace hpx { namespace this_thread
             char const* old_desc_;
             error_code& ec_;
         };
+
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+        struct reset_backtrace
+        {
+            reset_backtrace(threads::thread_id_type id, error_code& ec)
+              : id_(id),
+                backtrace_(new boost::backtrace(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)),
+                ec_(ec)
+            {
+                threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
+            }
+            ~reset_backtrace()
+            {
+                threads::set_thread_backtrace(id_, 0, ec_);
+            }
+
+            threads::thread_id_type id_;
+            boost::scoped_ptr<boost::backtrace> backtrace_;
+            error_code& ec_;
+        };
+#endif
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -364,6 +423,10 @@ namespace hpx { namespace this_thread
 
             // suspend the HPX-thread
             detail::reset_lco_description desc(id, description, ec);
+
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+            detail::reset_backtrace bt(id, ec);
+#endif
             statex = self.yield(state);
         }
 
@@ -407,6 +470,10 @@ namespace hpx { namespace this_thread
 
             // suspend the HPX-thread
             detail::reset_lco_description desc(id, description, ec);
+
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+            detail::reset_backtrace bt(id, ec);
+#endif
             statex = self.yield(threads::suspended);
         }
 
@@ -451,6 +518,10 @@ namespace hpx { namespace this_thread
 
             // suspend the HPX-thread
             detail::reset_lco_description desc(id, description, ec);
+
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+            detail::reset_backtrace bt(id, ec);
+#endif
             statex = self.yield(threads::suspended);
         }
 

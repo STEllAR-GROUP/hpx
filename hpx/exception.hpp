@@ -156,12 +156,12 @@ namespace hpx
         class hpx_category : public boost::system::error_category
         {
         public:
-            const char* name() const
+            const char* name() const BOOST_NOEXCEPT
             {
                 return "HPX";
             }
 
-            std::string message(int value) const
+            std::string message(int value) const BOOST_NOEXCEPT
             {
                 if (value >= success && value < last_error)
                     return std::string("HPX(") + error_names[value] + ")";
@@ -176,12 +176,12 @@ namespace hpx
         class hpx_category_rethrow : public boost::system::error_category
         {
         public:
-            const char* name() const
+            const char* name() const BOOST_NOEXCEPT 
             {
                 return "";
             }
 
-            std::string message(int) const
+            std::string message(int) const BOOST_NOEXCEPT
             {
                 return "";
             }
@@ -224,7 +224,7 @@ namespace hpx
     };
 
     /// \cond NOINTERNAL
-    inline boost::system::error_category const& 
+    inline boost::system::error_category const&
     get_lightweight_hpx_category()
     {
         static detail::lightweight_hpx_category instance;
@@ -251,7 +251,6 @@ namespace hpx
     inline boost::system::error_code
     make_system_error_code(error e, throwmode mode = plain)
     {
-        
         return boost::system::error_code(
             static_cast<int>(e), get_hpx_category(mode));
     }
@@ -332,7 +331,7 @@ namespace hpx
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        inline error_code(error e, char const* func, char const* file, 
+        inline error_code(error e, char const* func, char const* file,
             long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -464,7 +463,7 @@ namespace hpx
         return error_code(e, mode);
     }
     inline error_code
-    make_error_code(error e, char const* func, char const* file, long line, 
+    make_error_code(error e, char const* func, char const* file, long line,
         throwmode mode = plain)
     {
         return error_code(e, func, file, line, mode);
@@ -495,7 +494,7 @@ namespace hpx
     {
         return error_code(e, msg, func, file, line, mode);
     }
-    inline error_code 
+    inline error_code
     make_error_code(boost::exception_ptr e)
     {
         return error_code(e);
@@ -816,6 +815,7 @@ namespace hpx
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
         HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_terminate(hpx::exception const&);
     }
     /// \endcond
 
@@ -834,7 +834,7 @@ namespace hpx
     /// \param e    The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception or 
+    ///             of the following types: \a hpx::exception or
     ///             \a hpx::error_code.
     ///
     /// \returns    The formatted string holding all of the available
@@ -902,7 +902,7 @@ namespace hpx
     /// \brief Return the locality id where the exception was thrown.
     ///
     /// The function \a hpx::get_error can be used to extract the
-    /// diagnostic information element representing the error value code as 
+    /// diagnostic information element representing the error value code as
     /// stored in the given exception instance.
     ///
     /// \param e    The parameter \p e will be inspected for all diagnostic
@@ -1236,9 +1236,9 @@ namespace hpx
         }
     }
 
-    inline error_code::error_code(boost::exception_ptr e) 
+    inline error_code::error_code(boost::exception_ptr e)
       : boost::system::error_code(make_system_error_code(get_error(e), rethrow)),
-        exception_(e) 
+        exception_(e)
     {}
 
     ///////////////////////////////////////////////////////////////////////////

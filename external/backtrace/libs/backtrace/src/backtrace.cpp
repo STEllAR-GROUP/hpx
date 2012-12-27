@@ -129,8 +129,11 @@ namespace boost {
 
         BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
+        #if _WIN32_WINNT < 0x0600
+            // for Windows XP/Windows Server 2003
             if(n>=63)
                 n=62;
+        #endif
             return RtlCaptureStackBackTrace(ULONG(0),ULONG(n),array,NULL);
         }
 

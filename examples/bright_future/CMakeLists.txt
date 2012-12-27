@@ -16,7 +16,7 @@ set(bright_future_programs
         vector_root_finder
    )
 
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
   set(bright_future_programs ${bright_future_programs}
         gs_hpx_distributed
         dataflow_overhead
@@ -85,7 +85,7 @@ endif()
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
   set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
   set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component dataflow_component iostreams_component)
   set(gs_hpx_distributed_FLAGS DEPENDENCIES gs_hpx_component dataflow_component iostreams_component)
@@ -125,7 +125,7 @@ foreach(bright_future_program ${bright_future_programs})
                               ${bright_future_program}_exe)
 endforeach()
 
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
   set_target_properties(gs_single_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
 
   if(OPENMP_FOUND)

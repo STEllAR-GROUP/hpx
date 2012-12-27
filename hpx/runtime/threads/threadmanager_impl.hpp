@@ -234,7 +234,7 @@ namespace hpx { namespace threads
         //        have been terminated but which are still held in the queue
         //        of terminated threads. Some schedulers might not do anything
         //        here.
-        bool cleanup_terminated();
+        bool cleanup_terminated(bool delete_all = false);
 
         /// \brief Return the number of OS threads running in this thread-manager
         ///
@@ -366,6 +366,22 @@ namespace hpx { namespace threads
 
         char const* get_lco_description(thread_id_type id) const;
         char const* set_lco_description(thread_id_type id, char const* desc = 0);
+
+        /// The function get_thread_backtrace is part of the thread related API
+        /// allows to query the currently stored thread back trace (which is 
+        /// captured during thread suspension).
+        ///
+        /// \param id         [in] The thread id of the thread being queried.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        ///
+        /// \returns          This function returns the currently captured stack
+        ///                   back trace of the thread referenced by the \a id 
+        ///                   parameter. If the thread is not known to the 
+        ///                   thread-manager the return value will be the zero.
+        util::backtrace const* get_backtrace(thread_id_type id) const;
+        util::backtrace const* set_backtrace(thread_id_type id, util::backtrace const* bt = 0);
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         /// The get_thread_data function is part of the thread related

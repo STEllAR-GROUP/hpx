@@ -37,6 +37,12 @@
 #include <boost/detail/endian.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#if defined(BOOST_MSVC)
+#  include <intrin.h>
+#  pragma intrinsic(memcpy)
+#  pragma intrinsic(memset)
+#endif
+
 namespace hpx { namespace util
 {
 

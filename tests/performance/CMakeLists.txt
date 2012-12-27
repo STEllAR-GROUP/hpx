@@ -3,16 +3,25 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+################################################################################
+# find dependencies
+################################################################################
+find_package(HPX_Qthreads)
+find_package(HPX_TBB)
+find_package(HPX_SWARM)
+find_package(HPX_OpenMP)
+
 set(benchmarks
     boost_tls_overhead
-    native_tls_overhead
-    hpx_tls_overhead
+    coroutines_call_overhead
     delay_baseline
+    function_object_wrapper_overhead
+    hpx_tls_overhead
     hpx_homogeneous_task_spawn
     hpx_heterogeneous_task_spawn
+    native_tls_overhead
     print_heterogeneous_payloads
     sizeof
-    function_object_wrapper_overhead
    )
 
 if(MSVC)
@@ -30,14 +39,6 @@ if(OPENMP_FOUND)
   set(openmp_homogeneous_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies})
 endif()
-
-################################################################################
-# find dependencies
-################################################################################
-find_package(HPX_Qthreads)
-find_package(HPX_TBB)
-find_package(HPX_SWARM)
-find_package(HPX_OpenMP)
 
 if(UNIX)
   # GCC 4.7 chokes on Qthreads headers.
@@ -109,7 +110,7 @@ set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
-if(HPX_CXX11_LAMBDAS)
+if(HPX_HAVE_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
       future_overhead
       spinlock_overhead1

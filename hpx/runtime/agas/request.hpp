@@ -490,6 +490,7 @@ struct request
         >
         // 0xc
         // primary_ns_localities
+        // primary_ns_resolved_localities
       , boost::fusion::vector0<
         >
     > data_type;

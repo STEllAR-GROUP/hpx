@@ -80,7 +80,7 @@ namespace hpx { namespace util
         }
 
         value_or_error(BOOST_RV_REF(value_or_error) rhs)
-          : has_value_(rhs.which_)
+          : has_value_(rhs.has_value_)
         {
             if (rhs.stores_value()) {
                 construct_value(rhs.move_value());

@@ -44,13 +44,19 @@
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
 #if !defined(BOOST_WINDOWS)
-  #pragma GCC visibility push(default)
+#  pragma GCC visibility push(default)
 #endif
 
 #if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
-#define HPX_SERIALIZATION_EXPORT
+#  define HPX_SERIALIZATION_EXPORT
 #else
-#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#  define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#endif
+
+#if defined(BOOST_MSVC)
+#  include <intrin.h>
+#  pragma intrinsic(memcpy)
+#  pragma intrinsic(memset)
 #endif
 
 namespace hpx { namespace util
@@ -64,7 +70,7 @@ namespace hpx { namespace util
     protected:
         void load_binary(void* address, std::size_t count)
         {
-            if (current_+count > buffer_.size())
+            if (current_+count > size_)
             {
                 BOOST_THROW_EXCEPTION(
                     boost::archive::archive_exception(
@@ -87,7 +93,8 @@ namespace hpx { namespace util
     public:
 #endif
 
-        std::vector<char> const& buffer_;
+        char const* buffer_;
+        std::size_t size_;
         std::size_t current_;
 
         // return a pointer to the most derived class
@@ -147,9 +154,9 @@ namespace hpx { namespace util
 
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
-        basic_binary_iprimitive(std::vector<char> const& buffer,
-                unsigned flags = 0)
-          : buffer_(buffer), current_(0)
+        template <typename Vector>
+        basic_binary_iprimitive(Vector const& buffer, unsigned flags = 0)
+          : buffer_(buffer.data()), size_(buffer.size()),current_(0)
         {
             init(flags);
         }

@@ -7,11 +7,11 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/local/barrier.hpp>
+#include <hpx/util/lockfree/fifo.hpp>
 
 #include <map>
 
 #include <boost/foreach.hpp>
-#include <boost/lockfree/fifo.hpp>
 
 using boost::lockfree::fifo;
 

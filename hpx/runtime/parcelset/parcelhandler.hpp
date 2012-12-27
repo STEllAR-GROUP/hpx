@@ -11,6 +11,7 @@
 #include <boost/bind.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -20,6 +21,7 @@
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -33,13 +35,11 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
-        static void default_write_handler(boost::system::error_code const&,
-            std::size_t /*size*/) {}
+        // default callback for put_parcel
+        void default_write_handler(boost::system::error_code const&,
+            std::size_t /*size*/);
 
-        void parcel_sink(parcelport& pp,
-            boost::shared_ptr<std::vector<char> > parcel_data,
-            threads::thread_priority priority,
-            performance_counters::parcels::data_point const& receive_data);
+        void parcel_sink(parcel const& p);
 
         threads::thread_state_enum decode_parcel(
             parcelport& pp, boost::shared_ptr<std::vector<char> > parcel_data,
@@ -60,6 +60,11 @@ namespace hpx { namespace parcelset
         parcelport* find_parcelport(connection_type type,
             error_code& ec = throws) const;
 
+        // exception handling
+        typedef util::spinlock mutex_type;
+
+        void rethrow_exception();
+
     public:
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
@@ -75,7 +80,7 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(naming::resolver_client& resolver, 
+        parcelhandler(naming::resolver_client& resolver,
             boost::shared_ptr<parcelport> pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
@@ -84,7 +89,7 @@ namespace hpx { namespace parcelset
         }
 
         /// \brief Attach the given parcel port to this handler
-        void attach_parcelport(boost::shared_ptr<parcelport> pp);
+        void attach_parcelport(boost::shared_ptr<parcelport> pp, bool run = true);
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
@@ -103,7 +108,7 @@ namespace hpx { namespace parcelset
         /// the parcelhandler has been initialized with (see parcelhandler
         /// constructors). This is the same \a parcelport instance this
         /// parcelhandler has been initialized with.
-        parcelport& get_parcelport()
+        parcelport& get_parcelport() const
         {
             return *find_parcelport(connection_tcpip);
         }
@@ -152,7 +157,7 @@ namespace hpx { namespace parcelset
         ///          locality known by AGAS
         ///          (!prefixes.empty()).
         bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type, error_code& ec = throws) const;
 
         /// A parcel is submitted for transport at the source locality site to
         /// the parcel set of the locality with the put-parcel command
@@ -201,8 +206,13 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        void put_parcel(parcel& p)
-        { put_parcel(p, &parcelhandler::default_write_handler); }
+        BOOST_FORCEINLINE void put_parcel(parcel& p)
+        {
+            using HPX_STD_PLACEHOLDERS::_1;
+            using HPX_STD_PLACEHOLDERS::_2;
+            put_parcel(p, HPX_STD_BIND(&parcelhandler::default_write_handler,
+                this, _1, _2));
+        }
 
         /// The function \a get_parcel returns the next available parcel
         ///
@@ -222,6 +232,7 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p)
         {
+            rethrow_exception();
             return parcels_->get_parcel(p);
         }
 
@@ -244,6 +255,7 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
         {
+            rethrow_exception();
             return parcels_->get_parcel(p, parcel_id);
         }
 
@@ -325,9 +337,20 @@ namespace hpx { namespace parcelset
         /// parcel-handler instance.
         void register_counter_types(connection_type pp_type = connection_tcpip);
 
-        /// \brief Make sure the specified locality is not held by any 
+        /// \brief Make sure the specified locality is not held by any
         /// connection caches anymore
         void remove_from_connection_cache(naming::locality const& loc);
+
+        /// \brief set list of resolved localities
+        void set_resolved_localities(std::vector<naming::locality> const& l);
+
+        void enable_alternative_parcelports()
+        {
+            use_alternative_parcelports_ = true;
+        }
+
+        /// Return the reference to an existing io_service
+        util::io_service_pool* get_thread_pool(char const* name);
 
     protected:
         std::size_t get_incoming_queue_length() const
@@ -335,10 +358,9 @@ namespace hpx { namespace parcelset
             return parcels_->get_queue_length();
         }
 
-        std::size_t get_outgoing_queue_length() const
-        {
-            return find_parcelport(connection_tcpip)->get_pending_parcels_count();
-        }
+        std::size_t get_outgoing_queue_length() const;
+
+        connection_type find_appropriate_connection_type(naming::locality dest);
 
     private:
         /// The AGAS client
@@ -348,15 +370,23 @@ namespace hpx { namespace parcelset
         naming::gid_type locality_;
 
         /// the parcelport this handler is associated with
-        std::map<connection_type, boost::shared_ptr<parcelport> > pports_;
+        std::vector<boost::shared_ptr<parcelport> > pports_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
 
-        ///
+        /// queue of incoming parcels
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
-    };
 
+        /// Anyexception thrown earlier on one of the ASIO threads is stored here
+        mutex_type mtx_;
+        boost::exception_ptr exception_;
+
+        /// Allow to use alternative parcel-ports (this is enabled only after
+        /// the runtime systems of all localities are guaranteed to have
+        /// reached a certain state).
+        bool use_alternative_parcelports_;
+    };
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

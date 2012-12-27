@@ -25,6 +25,12 @@
 
 #include <memory>   // for placement new
 
+#if !defined(BOOST_WINDOWS)
+#  define HPX_EXPORT_REINITIALIZABLE_STATIC HPX_EXPORT
+#else
+#  define HPX_EXPORT_REINITIALIZABLE_STATIC
+#endif
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -38,11 +44,12 @@ namespace hpx { namespace util
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
-    //  In addition this type registers global construction and destruction 
-    //  functions used by the HPX runtime system to reinitialize the held data 
+    //  In addition this type registers global construction and destruction
+    //  functions used by the HPX runtime system to reinitialize the held data
     //  structures.
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct reinitializable_static : boost::noncopyable
+    struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
+      : boost::noncopyable
     {
     public:
         typedef T value_type;
@@ -97,7 +104,7 @@ namespace hpx { namespace util
         reinitializable_static(U const& val)
         {
             boost::call_once(constructed_,
-                boost::bind(&reinitializable_static::value_constructor<U>, 
+                boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
 
@@ -138,11 +145,11 @@ namespace hpx { namespace util
     };
 
     template <typename T, typename Tag, std::size_t N>
-    typename reinitializable_static<T, Tag, N>::storage_type 
+    typename reinitializable_static<T, Tag, N>::storage_type
         reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    boost::once_flag reinitializable_static<T, Tag, N>::constructed_ = 
+    boost::once_flag reinitializable_static<T, Tag, N>::constructed_ =
         BOOST_ONCE_INIT;
 }}
 

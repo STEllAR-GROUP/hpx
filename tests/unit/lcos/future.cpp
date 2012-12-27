@@ -1,4 +1,4 @@
-// Copyright (C) 2012 Hartmut Kaiser
+//  Copyright (C) 2012 Hartmut Kaiser
 //  (C) Copyright 2008-10 Anthony Williams
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
@@ -988,7 +988,6 @@ void test_wait_for_either_of_four_futures_4()
 
 void test_wait_for_either_of_five_futures_1_from_list()
 {
-    unsigned const count = 10;
     std::vector<hpx::lcos::future<int> > futures;
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
@@ -1027,7 +1026,6 @@ void test_wait_for_either_of_five_futures_1_from_list()
 
 void test_wait_for_either_of_five_futures_1_from_list_iterators()
 {
-    unsigned const count = 10;
     std::vector<hpx::lcos::future<int> > futures;
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);

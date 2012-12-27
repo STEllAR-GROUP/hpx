@@ -133,10 +133,10 @@ namespace hpx { namespace threads
     //        here.
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        cleanup_terminated()
+        cleanup_terminated(bool delete_all)
     {
         mutex_type::scoped_lock lk(mtx_);
-        return scheduler_.cleanup_terminated();
+        return scheduler_.cleanup_terminated(delete_all);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -382,91 +382,103 @@ namespace hpx { namespace threads
             return thread_state(terminated);     // this thread has already been terminated
         }
 
-        // action depends on the current state
-        thread_state previous_state = thrd->get_state();
-        thread_state_enum previous_state_val = previous_state;
+        thread_state previous_state;
+        do {
+            // action depends on the current state
+            previous_state = thrd->get_state();
+            thread_state_enum previous_state_val = previous_state;
 
-        // nothing to do here if the state doesn't change
-        if (new_state == previous_state_val) {
-            LTM_(warning) << "set_state: old thread state is the same as new "
-                           "thread state, aborting state change, thread("
-                        << id << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+            // nothing to do here if the state doesn't change
+            if (new_state == previous_state_val) {
+                LTM_(warning) << "set_state: old thread state is the same as new "
+                               "thread state, aborting state change, thread("
+                            << id << "), description("
+                            << thrd->get_description() << "), new state("
+                            << get_thread_state_name(new_state) << ")";
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
 
-            return thread_state(new_state);
-        }
+                return thread_state(new_state);
+            }
 
-        // the thread to set the state for is currently running, so we
-        // schedule another thread to execute the pending set_state
-        if (active == previous_state_val)
-        {
-            // schedule a new thread to set the state
-            LTM_(warning)
-                << "set_state: thread is currently active, scheduling "
-                    "new thread, thread(" << id << "), description("
-                << thrd->get_description() << "), new state("
-                << get_thread_state_name(new_state) << ")";
+            // the thread to set the state for is currently running, so we
+            // schedule another thread to execute the pending set_state
+            if (active == previous_state_val) {
+                // schedule a new thread to set the state
+                LTM_(warning)
+                    << "set_state: thread is currently active, scheduling "
+                        "new thread, thread(" << id << "), description("
+                    << thrd->get_description() << "), new state("
+                    << get_thread_state_name(new_state) << ")";
 
-            thread_init_data data(
-                boost::bind(&threadmanager_impl::set_active_state, this,
-                    id, new_state, new_state_ex, priority, previous_state),
-                "set state for active thread", 0, priority);
-            register_work(data);
+                thread_init_data data(
+                    boost::bind(&threadmanager_impl::set_active_state, this,
+                        id, new_state, new_state_ex, priority, previous_state),
+                    "set state for active thread", 0, priority);
+                register_work(data);
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
 
-            return previous_state;     // done
-        }
-        else if (terminated == previous_state_val) {
-            LTM_(warning)
-                << "set_state: thread is terminated, aborting state "
-                    "change, thread(" << id << "), description("
-                << thrd->get_description() << "), new state("
-                << get_thread_state_name(new_state) << ")";
+                return previous_state;     // done
+            }
+            else if (terminated == previous_state_val) {
+                LTM_(warning)
+                    << "set_state: thread is terminated, aborting state "
+                        "change, thread(" << id << "), description("
+                    << thrd->get_description() << "), new state("
+                    << get_thread_state_name(new_state) << ")";
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
 
-            // If the thread has been terminated while this set_state was
-            // pending nothing has to be done anymore.
-            return previous_state;
-        }
-        else if (pending == previous_state_val && suspended == new_state) {
-            // we do not allow explicit resetting of a state to suspended
-            // without the thread being executed.
-            hpx::util::osstream strm;
-            strm << "set_state: invalid new state, can't demote a pending thread, "
-                 << ", thread(" << id << "), description("
-                 << thrd->get_description() << "), new state("
-                 << get_thread_state_name(new_state) << ")";
+                // If the thread has been terminated while this set_state was
+                // pending nothing has to be done anymore.
+                return previous_state;
+            }
+            else if (pending == previous_state_val && suspended == new_state) {
+                // we do not allow explicit resetting of a state to suspended
+                // without the thread being executed.
+                hpx::util::osstream strm;
+                strm << "set_state: invalid new state, can't demote a pending thread, "
+                     << "thread(" << id << "), description("
+                     << thrd->get_description() << "), new state("
+                     << get_thread_state_name(new_state) << ")";
 
-            LTM_(fatal) << hpx::util::osstream_get_string(strm);
+                LTM_(fatal) << hpx::util::osstream_get_string(strm);
 
-            HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
-                hpx::util::osstream_get_string(strm));
-            return thread_state(unknown);
-        }
+                HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
+                    hpx::util::osstream_get_string(strm));
+                return thread_state(unknown);
+            }
 
-        // If the previous state was pending we are supposed to remove the
-        // thread from the queue. But in order to avoid linearly looking
-        // through the queue we defer this to the thread function, which
-        // at some point will ignore this thread by simply skipping it
-        // (if it's not pending anymore).
+            // If the previous state was pending we are supposed to remove the
+            // thread from the queue. But in order to avoid linearly looking
+            // through the queue we defer this to the thread function, which
+            // at some point will ignore this thread by simply skipping it
+            // (if it's not pending anymore).
 
-        LTM_(info) << "set_state: thread(" << id << "), "
-                      "description(" << thrd->get_description() << "), "
-                      "new state(" << get_thread_state_name(new_state) << "), "
-                      "old state(" << get_thread_state_name(previous_state)
-                   << ")";
+            LTM_(info) << "set_state: thread(" << id << "), "
+                          "description(" << thrd->get_description() << "), "
+                          "new state(" << get_thread_state_name(new_state) << "), "
+                          "old state(" << get_thread_state_name(previous_state_val)
+                       << ")";
 
-        // So all what we do here is to set the new state.
-        thrd->set_state_ex(new_state_ex);
-        thrd->set_state(new_state);
+            // So all what we do here is to set the new state.
+            if (thrd->restore_state(new_state, previous_state)) {
+                thrd->set_state_ex(new_state_ex);
+                break;
+            }
+
+            // state has changed since we fetched it from the thread, retry
+            LTM_(error) << "set_state: state has been changed since it was fetched, "
+                          "retrying, thread(" << id << "), "
+                          "description(" << thrd->get_description() << "), "
+                          "new state(" << get_thread_state_name(new_state) << "), "
+                          "old state(" << get_thread_state_name(previous_state_val)
+                       << ")";
+        } while (true);
 
         if (new_state == pending) {
             // REVIEW: Passing a specific target thread may interfere with the
@@ -567,6 +579,40 @@ namespace hpx { namespace threads
         return NULL;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_backtrace(thread_id_type id) const
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::get_backtrace",
+                "NULL thread id encountered");
+            return NULL;
+        }
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->get_backtrace() : 0;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_backtrace(thread_id_type id, util::backtrace const* bt)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_backtrace",
+                "NULL thread id encountered");
+            return NULL;
+        }
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->set_backtrace(bt) : 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_interruption_enabled(thread_id_type id, error_code& ec)
@@ -1461,7 +1507,7 @@ namespace hpx { namespace threads
               counts_creator,
               &locality_allocator_counter_discoverer,
               ""
-            },
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
@@ -1473,7 +1519,9 @@ namespace hpx { namespace threads
         tfunc_impl(std::size_t num_thread)
     {
         util::itt::stack_context ctx;        // helper for itt support
-        util::itt::mark_context mark("threadmanager");
+        util::itt::domain domain(get_thread_name()->data());
+//         util::itt::id threadid(domain, this);
+        util::itt::frame_context fctx(domain);
 
         manage_active_thread_count count(thread_count_);
 
@@ -1535,9 +1583,11 @@ namespace hpx { namespace threads
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-                                util::itt::undo_mark_context cmark(mark);  // itt support
+#if defined(HPX_USE_ITTNOTIFY)
                                 util::itt::caller_context cctx(ctx);
-
+                                util::itt::undo_frame_context undoframe(fctx);
+                                util::itt::task task(domain, thrd->get_description());
+#endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
                                 boost::uint64_t timestamp = util::hardware::timestamp();
@@ -1580,7 +1630,8 @@ namespace hpx { namespace threads
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
                         // schedule other work
-                        scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count);
+                        scheduler_.wait_or_add_new(num_thread, 
+                            state_.load() == running, idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -1617,13 +1668,20 @@ namespace hpx { namespace threads
 
             // if nothing else has to be done either wait or terminate
             else {
-                busy_loop_count = 0;
-                if (scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count))
+                if (scheduler_.wait_or_add_new(num_thread, 
+                        state_.load() == running, idle_loop_count))
                 {
                     // if we need to terminate, unregister the counter first
                     count.exit();
                     break;
                 }
+            }
+
+            // Clean up all terminated threads for all thread queues once in a 
+            // while.
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX) {
+                busy_loop_count = 0;
+                scheduler_.cleanup_terminated(true);
             }
         }
 

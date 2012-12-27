@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2007-2013 Hartmut Kaiser
     Copyright (C) 2011 Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -211,11 +211,14 @@ detail in the sections __unix_installation__ and __windows_installation__.
 ``
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag to
-  your make invocation, where N is the number of nodes on your machine plus one.
+  your make invocation, where N is the number of parallel processes __hpx__ gets compiled with.
 
 ``
-    $ gmake -j17
+    $ gmake -j4
 ``
+
+[caution Compiling and linking __hpx__ needs a considerable amount of memory. It is advisable that
+    approximately 2 GB of memory per parallel process is available.]
 
 * To complete the build and install __hpx__:
 
@@ -288,11 +291,18 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
+    $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -liostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
            the [^-o] flag.]
+
+[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the 
+      pkg-config names have to be different. Instead of `hpz_application` or 
+      `hpx_component` you will have to use `hpx_application_debug` or 
+      `hpx_component_debug`. Moreover, all referenced HPX components need to 
+      have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
+      to specify `-liostreamsd`.]
 
 To test the program, type:
 
@@ -342,7 +352,7 @@ build the component library. (where [^$HPX_LOCATION] is the
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o libhpx_component_hello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+    $ c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
 ``
 
 Now pick a directory in which to install your hpx component libraries. For
@@ -350,8 +360,15 @@ this example, we'll choose a directory named ''my_hpx_libs''.
 
 ``
     $ mkdir ~/my_hpx_libs
-    $ mv libhpx_component_hello_world.so ~/my_hpx_libs
+    $ mv libhello_world.so ~/my_hpx_libs
 ``
+
+[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the 
+      pkg-config names have to be different. Instead of `hpz_application` or 
+      `hpx_component` you will have to use `hpx_application_debug` or 
+      `hpx_component_debug`. Moreover, all referenced HPX components need to 
+      have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
+      to specify `-liostreamsd`.]
 
 In the ~/my_hpx_libs directory you need to create an ini file inside that directory which matches
 the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
@@ -363,14 +380,15 @@ the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
     path = ${HOME}/my_hpx_libs
 ``
 
-[note For additional details about ini file configuration and __hpx__, see [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
+[note For additional details about ini file configuration and __hpx__, see 
+      [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 
 In addition, you'll need this in your home directory:
 
 [*.hpx.ini]
 ``
     [hpx]
-    ini_path = $[hpx.ini_default_path]:${HOME}/my_hpx_libs
+    ini_path = $[hpx.ini_path]:${HOME}/my_hpx_libs
 ``
 
 Now, to build the application that uses this component (hello_world_client.cpp),
@@ -378,7 +396,7 @@ we do:
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -lhpx_component_hello_world
+    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -lhello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
@@ -398,8 +416,9 @@ which should print [^Hello HPX World!] and exit.
 [endsect] [/ How to Build __hpx__ Components with pkg-config]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:existing_apps Integrating __hpx__ into existing applications]
+[section:existing_apps How to Use __hpx__ with CMake]
 
+[/
 Having your application work with __hpx__ is unfortunately not as simple as just
 linking against it. However it can be rather straightforward or rather complex
 based on the type of application that is trying to be integrated. The complexity
@@ -435,7 +454,21 @@ The next stumbling block to integrating __hpx__ is having it actually link
 against your program. If your application uses a CMake build system, you can
 set the CMake Module Path to the path where __hpx__ has the `FindHPX.cmake`
 module. Here is a code snippet demonstrating this.
+/]
 
+In Addition to the pkg-config support discussed on the previous pages, __hpx__
+comes with full CMake support. In order to integrate __hpx__ into your existing,
+or new CMakeLists.txt you can include `FindHPX.cmake`. Following is the Hello
+World component example using CMake instead of pkg-config.
+
+Let's revisit what we have. We have three files which compose our example
+application:
+
+* `hello_world_component.hpp`
+* `hello_world_component.cpp`
+* `hello_world_client.hpp`
+
+The basic structure to include __hpx__ into your CMakeLists.txt is shown here:
 [teletype]
 ``
     # Require a recent version of cmake
@@ -456,7 +489,7 @@ module. Here is a code snippet demonstrating this.
 ``
 
 This cmake script assumes that the location of the HPX installation is set 
-as the value of HPX_ROOT whic is best done by passing it on the command line 
+as the value of HPX_ROOT which is best done by passing it on the command line 
 while invoking cmake:
 
 ``
@@ -466,31 +499,80 @@ while invoking cmake:
 Alternatively, if you wish to require HPX for your project, replace the
 `find_package(HPX)` line with `find_package(HPX REQUIRED)`.
 
-Now to actually build the application you should have a code snippet similar
-to this in your CMakeLists.txt file:
+The last two lines in the snippet above sets the appropriate include and link
+directories.
+
+In order to add the __hpx__ component we use the `add_hpx_component` macro and
+add it to the `CMakeLists.txt` file:
 
 ``
     # build your application using HPX
-    add_hpx_executable(your_app
+    add_hpx_component(hello_world_component
         ESSENTIAL
-        SOURCES ${your_app_SRCS})
+        SOURCES hello_world_component.cpp
+        HEADERS hello_world_component.hpp
+        COMPONENT_DEPENDENCIES iostreams)
 ``
 
-[c++]
+The available options to `add_hpx_component` are:
+
+* `SOURCES`: The source files for that component
+* `HEADERS`: The header files for that component
+* `DEPENDENCIES`: Other libraries or targets this component depends on
+* `COMPONENT_DEPENDENCIES`: The components this component depends on
+* `COMPILE_FLAGS`: Additional compiler flags
+* `LINK_FLAGS`: Additional linker flags
+[/ `INI`:
+* `FOLDER`: Add the headers and source files to this Source Group folder
+* `SOURCE_ROOT`:
+* `HEADER_ROOT`:
+* `SOURCE_GLOB`:
+* `HEADER_GLOB`:
+* `OUTPUT_SUFFIX`:
+* `INSTALL_SUFFIX`:
+]
+* `ESSENTIAL`: Build this component as part of the `all` target
+[/
+* `LANGUAGE`:
+]
+
+After adding the component, the way you add the executable is as follows:
+
+``
+    # build your application using HPX
+    add_hpx_executable(hello_world
+        ESSENTIAL
+        SOURCES hello_world_client.cpp
+        COMPONENT_DEPENDENCIES hello_world_component)
+``
 
 When you configure your application, all you need to do is set the
-HPX_ROOT variable to point to the installation of __hpx__! Now all you
+HPX_ROOT variable to point to the installation of __hpx__!
+[/
+Now all you
 have to do is type `make` and the application should build using the __hpx__
 installation you specified.
+]
 
+[note
+    `FindHPX.cmake` makes adjustments various cmake internal settings such as
+    compiler and linker flags. This is needed to ensure maximal compatibility
+    between your application and the __hpx__ version you are using.
+    The `add_hpx_executable` and `add_hpx_component` additionally add the proper
+    libraries to link against.
+]
+
+[c++]
 If you do not use CMake, you can still build against __hpx__ but you should refer
 to the section on __pkg_config__.
 
+[/
 Those two things, the serialization and actually integrating with __hpx__,
 are the biggest stumbling blocks that you should encountered when trying to
 integrate your application with __hpx__. For an idea on how to integrate __hpx__
 constructs into your application, you should take a look at some of the examples
 that __hpx__ includes.
+]
 
 [endsect] [/ Integrating __hpx__ into existing applications]
 

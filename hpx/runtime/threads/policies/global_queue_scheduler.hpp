@@ -76,9 +76,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated()
+        bool cleanup_terminated(bool delete_all = false)
         {
-            return queue_.cleanup_terminated();
+            return queue_.cleanup_terminated(delete_all);
         }
 
         ///////////////////////////////////////////////////////////////////////

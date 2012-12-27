@@ -7,6 +7,7 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config/forceinline.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -16,58 +17,55 @@
 #include <boost/utility/result_of.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/function_types/result_type.hpp>
-# include <boost/detail/iterator.hpp>
+#include <boost/detail/iterator.hpp>
+#include <boost/move/move.hpp>
 
 namespace hpx { namespace lcos
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace local
-    {
-        template <typename Result> class promise;
-        template <typename Func> class packaged_task;
-        template <typename Func> class futures_factory;
-
-        template <typename ContResult, typename Result>
-        class packaged_continuation;
-
-        namespace detail
-        {
-            template <typename ContResult> struct continuation_base;
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
     {
     private:
+        template <typename Result_>
+        friend lcos::future<Result_> detail::make_future_from_data(
+            boost::intrusive_ptr<detail::future_data_base<Result_> > const&);
+
+        template <typename Result_>
+        friend lcos::future<Result_> detail::make_future_from_data(
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result_> >));
+
+        template <typename Result_>
+        friend lcos::future<Result_> detail::make_future_from_data(
+            detail::future_data_base<Result_>* p);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_>*
+            detail::get_future_data(lcos::future<Result_>&);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_> const*
+            detail::get_future_data(lcos::future<Result_> const&);
+
+    private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-    public:
         typedef lcos::detail::future_data_base<Result> future_data_type;
 
         explicit future(future_data_type* p)
           : future_data_(p)
         {}
 
-        explicit future(boost::intrusive_ptr<future_data_type> p)
+        explicit future(boost::intrusive_ptr<future_data_type> const& p)
           : future_data_(p)
         {}
 
-        friend class local::promise<Result>;
-        friend class local::packaged_task<Result()>;
-        friend class local::futures_factory<Result()>;
+        explicit future(BOOST_RV_REF(boost::intrusive_ptr<future_data_type>) p)
+        {
+            future_data_.swap(p);
+        }
 
-        template <typename ContResult, typename Result_>
-        friend class local::packaged_continuation;
-        template <typename ContResult>
-        friend struct local::detail::continuation_base;
-        template <typename Result_, typename RemoteResult_>
-        friend class promise;
-        friend struct detail::future_data<Result>;
-
-        friend class hpx::thread;
-
+    public:
         typedef Result result_type;
 
         future()
@@ -82,26 +80,25 @@ namespace hpx { namespace lcos
         }
 
         future(BOOST_RV_REF(future) other)
-          : future_data_(other.future_data_)
         {
-            other.future_data_.reset();
+            future_data_.swap(other.future_data_);
         }
 
         // extension: init from given value, set future to ready right away
         explicit future(Result const& init)
         {
             typedef lcos::detail::future_data<Result> impl_type;
-            boost::intrusive_ptr<future_data_type> p = new impl_type();
+            boost::intrusive_ptr<future_data_type> p(new impl_type());
             static_cast<impl_type*>(p.get())->set_data(init);
-            future_data_ = p;
+            future_data_.swap(p);
         }
 
         explicit future(BOOST_RV_REF(Result) init)
         {
             typedef lcos::detail::future_data<Result> impl_type;
-            boost::intrusive_ptr<future_data_type> p = new impl_type();
+            boost::intrusive_ptr<future_data_type> p(new impl_type());
             static_cast<impl_type*>(p.get())->set_data(boost::move(init));
-            future_data_ = p;
+            future_data_.swap(p);
         }
 
         // assignment
@@ -115,7 +112,7 @@ namespace hpx { namespace lcos
         future& operator=(BOOST_RV_REF(future) other)
         {
             if (this != &other) {
-                future_data_ = boost::move(other.future_data_);
+                future_data_.swap(other.future_data_);
                 other.future_data_.reset();
             }
             return *this;
@@ -180,7 +177,7 @@ namespace hpx { namespace lcos
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return future_data_;
+            return future_data_.get() ? true : false;
         }
 
         // continuation support
@@ -241,44 +238,57 @@ namespace hpx { namespace lcos
     class future<void>
     {
     private:
+        template <typename Result_>
+        friend lcos::future<Result_> detail::make_future_from_data(
+            boost::intrusive_ptr<detail::future_data_base<Result_> > const&);
+
+        template <typename Result_>
+        friend lcos::future<Result_> detail::make_future_from_data(
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result_> >));
+
+        template <typename Result_>
+        friend lcos::future<Result_> detail::make_future_from_data(
+            detail::future_data_base<Result_>*);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_>*
+            detail::get_future_data(lcos::future<Result_>&);
+
+        template <typename Result_>
+        friend detail::future_data_base<Result_> const*
+            detail::get_future_data(lcos::future<Result_> const&);
+
+        // make_future uses the dummy argument constructor below
+        friend future<void> make_future();
+
+    private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-    public:
         typedef lcos::detail::future_data_base<void> future_data_type;
 
         explicit future(future_data_type* p)
           : future_data_(p)
         {}
 
-        explicit future(boost::intrusive_ptr<future_data_type> p)
+        explicit future(boost::intrusive_ptr<future_data_type> const& p)
           : future_data_(p)
         {}
 
-        friend class local::promise<void>;
-        friend class local::packaged_task<void()>;
-        friend class local::futures_factory<void()>;
-        template <typename ContResult, typename Result_>
-        friend class local::packaged_continuation;
-        template <typename ContResult>
-        friend struct local::detail::continuation_base;
-
-        friend class promise<void, util::unused_type>;
-        friend struct detail::future_data<void>;
-
-        friend class hpx::thread;
-
-        // make_future uses the dummy argument constructor below
-        friend future<void> make_future();
+        explicit future(BOOST_RV_REF(boost::intrusive_ptr<future_data_type>) p)
+        {
+            future_data_.swap(p);
+        }
 
         explicit future(int)
         {
-            boost::intrusive_ptr<future_data_type> p =
-                new lcos::detail::future_data<void>();
+            boost::intrusive_ptr<future_data_type> p(
+                new lcos::detail::future_data<void>());
             static_cast<lcos::detail::future_data<void> *>(p.get())->
                 set_data(util::unused);
-            future_data_ = p;
+            future_data_.swap(p);
         }
 
+    public:
         typedef void result_type;
 
         future()
@@ -293,9 +303,8 @@ namespace hpx { namespace lcos
         }
 
         future(BOOST_RV_REF(future) other)
-          : future_data_(other.future_data_)
         {
-            other.future_data_.reset();
+            future_data_.swap(other.future_data_);
         }
 
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
@@ -309,7 +318,7 @@ namespace hpx { namespace lcos
         {
             if (this != &other)
             {
-                future_data_ = boost::move(other.future_data_);
+                future_data_.swap(other.future_data_);
                 other.future_data_.reset();
             }
             return *this;
@@ -368,7 +377,7 @@ namespace hpx { namespace lcos
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return future_data_;
+            return future_data_.get() ? true : false;
         }
 
         // continuation support
@@ -422,6 +431,45 @@ namespace hpx { namespace lcos
     inline future<void> make_future()
     {
         return future<void>(1);   // dummy argument
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename Result>
+        inline lcos::future<Result> make_future_from_data(
+            boost::intrusive_ptr<detail::future_data_base<Result> > const& p)
+        {
+            return lcos::future<Result>(p);
+        }
+
+        template <typename Result>
+        inline lcos::future<Result> make_future_from_data(
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >) p)
+        {
+            return lcos::future<Result>(boost::move(p));
+        }
+
+        template <typename Result>
+        inline lcos::future<Result> make_future_from_data(
+            detail::future_data_base<Result>* p)
+        {
+            return lcos::future<Result>(p);
+        }
+
+        template <typename Result>
+        inline detail::future_data_base<Result>*
+            get_future_data(lcos::future<Result>& f)
+        {
+            return f.future_data_.get();
+        }
+
+        template <typename Result>
+        inline detail::future_data_base<Result> const*
+            get_future_data(lcos::future<Result> const& f)
+        {
+            return f.future_data_.get();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@
 
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -31,9 +31,9 @@ namespace hpx { namespace lcos { namespace local
 
             state_data state;
             mutex_type state_change;
-            lcos::local::detail::counting_semaphore<mutex_type> shared_cond;
-            lcos::local::detail::counting_semaphore<mutex_type> exclusive_cond;
-            lcos::local::detail::counting_semaphore<mutex_type> upgrade_cond;
+            lcos::local::detail::counting_semaphore<no_mutex> shared_cond;
+            lcos::local::detail::counting_semaphore<no_mutex> exclusive_cond;
+            lcos::local::detail::counting_semaphore<no_mutex> upgrade_cond;
 
             void release_waiters()
             {
@@ -54,8 +54,7 @@ namespace hpx { namespace lcos { namespace local
 
                 while (state.exclusive || state.exclusive_waiting_blocked)
                 {
-                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(lk);
-                    shared_cond.wait();
+                    shared_cond.wait_locked(1, lk);
                 }
 
                 ++state.shared_count;
@@ -106,8 +105,7 @@ namespace hpx { namespace lcos { namespace local
                 while (state.shared_count || state.exclusive)
                 {
                     state.exclusive_waiting_blocked = true;
-                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(lk);
-                    exclusive_cond.wait();
+                    exclusive_cond.wait_locked(1, lk);
                 }
 
                 state.exclusive = true;
@@ -141,8 +139,7 @@ namespace hpx { namespace lcos { namespace local
 
                 while (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
                 {
-                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(lk);
-                    shared_cond.wait();
+                    shared_cond.wait_locked(1, lk);
                 }
 
                 ++state.shared_count;
@@ -179,13 +176,12 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_upgrade_and_lock()
             {
-                lcos::local::mutex::scoped_lock lk(state_change);
+                typename mutex_type::scoped_lock lk(state_change);
                 --state.shared_count;
 
                 while (state.shared_count)
                 {
-                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(lk);
-                    upgrade_cond.wait();
+                    upgrade_cond.wait_locked(1, lk);
                 }
 
                 state.upgrade = false;
@@ -209,6 +205,21 @@ namespace hpx { namespace lcos { namespace local
                 ++state.shared_count;
                 state.exclusive_waiting_blocked = false;
                 release_waiters();
+            }
+
+            void try_unlock_shared_and_lock()
+            {
+                typename mutex_type::scoped_lock lk(state_change);
+                if(    !state.exclusive
+                    && !state.exclusive_waiting_blocked
+                    && !state.upgrade
+                    && state.shared_count == 1)
+                {
+                    state.shared_count=0;
+                    state.exclusive = true;
+                    return true;
+                }
+                return false;
             }
 
             void unlock_upgrade_and_lock_shared()

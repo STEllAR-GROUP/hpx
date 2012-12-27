@@ -196,8 +196,8 @@ namespace hpx { namespace lcos { namespace local
                 return count;
             }
 
-        private:
-            void wait_locked(boost::int64_t count, typename mutex_type::scoped_lock& l)
+            template <typename Lock>
+            void wait_locked(boost::int64_t count, Lock& l)
             {
                 while (value_ < count)
                 {
@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace local
                     reset_queue_entry r(e, queue_);
 
                     {
-                        util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                        util::unlock_the_lock<Lock> ul(l);
                         this_thread::suspend(threads::suspended,
                             "lcos::counting_semaphore::wait");
                     }
@@ -220,30 +220,15 @@ namespace hpx { namespace lcos { namespace local
                 value_ -= count;
             }
 
-            void signal_locked(boost::int64_t count, typename mutex_type::scoped_lock& l)
+        private:
+            template <typename Lock>
+            void signal_locked(boost::int64_t count, Lock& l)
             {
                 value_ += count;
                 if (value_ >= 0)
                 {
                     // release all threads, they will figure out between themselves
                     // which one gets released from wait above
-#if BOOST_VERSION < 103600
-                    // slist::swap has a bug in Boost 1.35.0
-                    while (!queue_.empty())
-                    {
-                        threads::thread_id_type id = queue_.front().id_;
-                        if (HPX_UNLIKELY(!id))
-                        {
-                            HPX_THROW_EXCEPTION(null_thread_id,
-                                "lcos::counting_semaphore::signal_locked",
-                                "NULL thread id encountered");
-                        }
-                        queue_.front().id_ = 0;
-                        queue_.pop_front();
-                        threads::set_thread_lco_description(id);
-                        threads::set_thread_state(id, threads::pending);
-                    }
-#else
                     // swap the list
                     queue_type queue;
                     queue.swap(queue_);
@@ -264,10 +249,10 @@ namespace hpx { namespace lcos { namespace local
                         threads::set_thread_lco_description(id);
                         threads::set_thread_state(id, threads::pending);
                     }
-#endif
                 }
             }
 
+        private:
             mutex_type mtx_;
             boost::int64_t value_;
             queue_type queue_;

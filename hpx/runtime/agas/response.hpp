@@ -32,7 +32,7 @@
 #include <numeric>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 9
+#define HPX_AGAS_RESPONSE_SUBTYPES 10
 
 namespace hpx { namespace agas
 {
@@ -172,6 +172,18 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
+    response(
+        namespace_action_code type_
+      , std::vector<naming::locality> const& localities_
+      , error status_ = success
+        )
+      : mc(type_)
+      , status(status_)
+      , data(boost::fusion::make_vector(localities_))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     response(
@@ -220,6 +232,13 @@ struct response
         ) const
     {
         return get_data<subtype_prefixes, 0>(ec);
+    }
+
+    std::vector<naming::locality> get_resolved_localities(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_resolved_localities, 0>(ec);
     }
 
     boost::uint32_t get_num_localities(
@@ -338,6 +357,7 @@ struct response
       , subtype_prefix              = 0x6
       , subtype_void                = 0x7
       , subtype_string              = 0x8
+      , subtype_resolved_localities = 0x9
       // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
     };
 
@@ -401,6 +421,11 @@ struct response
         // component_ns_get_component_typename
       , boost::fusion::vector1<
             std::string   // component typename
+        >
+        // 0x9
+        // primary_ns_esolved_localities
+      , boost::fusion::vector1<
+            std::vector<naming::locality>
         >
     > data_type;
 
@@ -625,6 +650,17 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
         HPX_THROW_EXCEPTION(bad_parameter, 
             "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call", 
             "unexpected action code in result conversion");
+    }
+};
+
+template <>
+struct get_remote_result<std::vector<naming::locality>, agas::response>
+{
+    static std::vector<naming::locality> call(
+        agas::response const& rep
+        )
+    {
+        return rep.get_resolved_localities();
     }
 };
 

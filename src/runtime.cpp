@@ -16,13 +16,10 @@
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
+#include <hpx/util/backtrace.hpp>
 
 #include <iostream>
 #include <vector>
-
-#if defined(HPX_HAVE_STACKTRACES)
-#include <boost/backtrace.hpp>
-#endif
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
 #include <io.h>
@@ -37,9 +34,9 @@ namespace hpx
 {
     void handle_termination(char const* reason)
     {
-        std::cerr 
+        std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::detail::backtrace() << "\n"
+            << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
             << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
             << full_build_string();           // add full build information
@@ -88,9 +85,9 @@ namespace hpx
     HPX_EXPORT void termination_handler(int signum)
     {
         char* reason = strsignal(signum);
-        std::cerr 
+        std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::detail::backtrace() << "\n"
+            << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
             << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
             << full_build_string();           // add full build information
@@ -121,7 +118,7 @@ namespace hpx
         sigemptyset(&new_action.sa_mask);
         new_action.sa_flags = 0;
 
-        sigaction(SIGINT, &new_action, NULL);  // Interrupted 
+        sigaction(SIGINT, &new_action, NULL);  // Interrupted
         sigaction(SIGBUS, &new_action, NULL);  // Bus error
         sigaction(SIGFPE, &new_action, NULL);  // Floating point exception
         sigaction(SIGILL, &new_action, NULL);  // Illegal instruction
@@ -356,29 +353,45 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
-    naming::id_type find_here()
+    naming::id_type find_here(error_code& ec)
     {
         if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
+                "the runtime system is not available at this time");
             return naming::invalid_id;
+        }
 
-        return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
+        return naming::id_type(hpx::applier::get_applier().get_raw_locality(ec),
             naming::id_type::unmanaged);
     }
 
     std::vector<naming::id_type>
-    find_all_localities(components::component_type type)
+    find_all_localities(components::component_type type, error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_localities(locality_ids, type);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_localities(locality_ids, type, ec);
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_all_localities()
+    std::vector<naming::id_type> find_all_localities(error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_localities(locality_ids);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_localities(locality_ids, ec);
         return locality_ids;
     }
 
@@ -400,15 +413,19 @@ namespace hpx
     }
 
     // find a locality supporting the given component
-    naming::id_type find_locality(components::component_type type)
+    naming::id_type find_locality(components::component_type type, error_code& ec)
     {
         if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_locality",
+                "the runtime system is not available at this time");
             return naming::invalid_id;
+        }
 
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids, type);
+        hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 
-        if (locality_ids.empty()) 
+        if (ec || locality_ids.empty())
             return naming::invalid_id;
 
         // chose first locality to host the object
@@ -580,6 +597,16 @@ namespace hpx
     boost::uint64_t get_system_uptime()
     {
         return runtime::get_system_uptime();
+    }
+
+    util::runtime_configuration const& get_config()
+    {
+        return get_runtime().get_config();
+    }
+
+    hpx::util::io_service_pool* get_thread_pool(char const* name)
+    {
+        return get_runtime().get_thread_pool(name);
     }
 }
 

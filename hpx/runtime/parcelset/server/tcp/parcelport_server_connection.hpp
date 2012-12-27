@@ -8,13 +8,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM)
-#define HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM
+#if !defined(HPX_PARCELSET_SERVER_TCP_PARCELPORT_CONNECTION_MAR_26_2008_1221PM)
+#define HPX_PARCELSET_SERVER_TCP_PARCELPORT_CONNECTION_MAR_26_2008_1221PM
 
 #include <sstream>
 #include <vector>
 
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -29,13 +28,22 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
-#include <boost/iostreams/stream.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace server
+namespace hpx { namespace parcelset { namespace tcp
+{
+    // forward declaration only
+    class parcelport;
+
+    void decode_message(parcelport&,
+        boost::shared_ptr<std::vector<char> > buffer,
+        performance_counters::parcels::data_point receive_data);
+}}}
+
+namespace hpx { namespace parcelset { namespace server { namespace tcp
 {
     /// Represents a single parcelport_connection from a client.
     class parcelport_connection
@@ -45,9 +53,9 @@ namespace hpx { namespace parcelset { namespace server
     public:
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                parcelport_queue& handler)
+                parcelset::tcp::parcelport& parcelport)
           : socket_(io_service), in_priority_(0), in_size_(0),
-            in_buffer_(), parcels_(handler)
+            in_buffer_(), parcelport_(parcelport)
         {}
 
         ~parcelport_connection()
@@ -109,6 +117,9 @@ namespace hpx { namespace parcelset { namespace server
         {
             if (e) {
                 boost::get<0>(handler)(e);
+
+                // Issue a read operation to read the next parcel.
+                async_read(boost::get<0>(handler));
             }
             else {
                 // Determine the length of the serialized data.
@@ -127,8 +138,8 @@ namespace hpx { namespace parcelset { namespace server
                 socket_.set_option(quickack);
 #endif
 
-                boost::asio::async_read(socket_, 
-                    boost::asio::buffer(*in_buffer_.get()),
+                boost::asio::async_read(socket_,
+                    boost::asio::buffer(*in_buffer_),
                     boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
@@ -141,34 +152,46 @@ namespace hpx { namespace parcelset { namespace server
         {
             if (e) {
                 boost::get<0>(handler)(e);
+
+                // Issue a read operation to read the next parcel.
+                async_read(boost::get<0>(handler));
             }
             else {
                 // complete data point and pass it along
-                receive_data_.time_ = timer_.elapsed_nanoseconds() - 
+                receive_data_.time_ = timer_.elapsed_nanoseconds() -
                     receive_data_.time_;
 
+                // now send acknowledgment byte
+                void (parcelport_connection::*f)(boost::system::error_code const&,
+                        boost::tuple<Handler>)
+                    = &parcelport_connection::handle_write_ack<Handler>;
+
+                // hold on to received data to avoid data races
+                boost::shared_ptr<std::vector<char> > data(in_buffer_);
+                performance_counters::parcels::data_point receive_data = 
+                    receive_data_;
+
+                ack_ = true;
+                boost::asio::async_write(socket_,
+                    boost::asio::buffer(&ack_, sizeof(ack_)),
+                    boost::bind(f, shared_from_this(), 
+                        boost::asio::placeholders::error, handler));
+
                 // add parcel data to incoming parcel queue
-                boost::integer::ulittle8_t::value_type priority = in_priority_;
-                parcels_.add_parcel(in_buffer_,
-                    static_cast<threads::thread_priority>(priority),
-                    receive_data_);
+                decode_message(parcelport_, data, receive_data);
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
-
-                // now send acknowledgement byte
-                ack_ = true;
-                boost::asio::async_write(socket_, 
-                    boost::asio::buffer(&ack_, sizeof(ack_)),
-                    boost::bind(&parcelport_connection::handle_write_ack, 
-                        shared_from_this()));
-
-                // Issue a read operation to read the parcel priority.
-                async_read(boost::get<0>(handler));
             }
         }
 
-        void handle_write_ack() {}
+        template <typename Handler>
+        void handle_write_ack(boost::system::error_code const& e,
+            boost::tuple<Handler> handler)
+        {
+            // Issue a read operation to read the next parcel.
+            async_read(boost::get<0>(handler));
+        }
 
     private:
         /// Socket for the parcelport_connection.
@@ -181,7 +204,7 @@ namespace hpx { namespace parcelset { namespace server
         bool ack_;
 
         /// The handler used to process the incoming request.
-        parcelport_queue& parcels_;
+        parcelset::tcp::parcelport& parcelport_;
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;
@@ -191,14 +214,12 @@ namespace hpx { namespace parcelset { namespace server
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
 
     // this makes sure we can store our connections in a set
-    inline bool operator<(server::parcelport_connection_ptr const& lhs, 
-        server::parcelport_connection_ptr const& rhs)
+    inline bool operator<(server::tcp::parcelport_connection_ptr const& lhs,
+        server::tcp::parcelport_connection_ptr const& rhs)
     {
         return lhs.get() < rhs.get();
     }
-
-///////////////////////////////////////////////////////////////////////////////
-}}}
+}}}}
 
 #endif
 

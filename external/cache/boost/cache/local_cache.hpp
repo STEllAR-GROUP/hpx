@@ -18,30 +18,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace cache
 {
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // The UpdatePolicy Concept expects to get passed references to
-        // instances of the Entry type. But our internal data structures hold
-        // a pointer to the stored entry only. We use the \a adapt function
-        // object to wrap any user supplied UpdatePolicy, dereferencing the
-        // pointers.
-        template <typename Func, typename Iterator>
-        struct adapt : std::binary_function<Iterator, Iterator, bool>
-        {
-            adapt(Func f)
-              : f_(f)
-            {}
-
-            bool operator()(Iterator const& lhs, Iterator const& rhs) const
-            {
-                return f_((*lhs).second, (*rhs).second);
-            }
-
-            Func f_;    // user supplied UpdatePolicy
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \class local_cache local_cache.hpp boost/cache/local_cache.hpp
     ///
@@ -89,6 +65,27 @@ namespace boost { namespace cache
     >
     class local_cache : boost::noncopyable
     {
+        ///////////////////////////////////////////////////////////////////////
+        // The UpdatePolicy Concept expects to get passed references to
+        // instances of the Entry type. But our internal data structures hold
+        // a pointer to the stored entry only. We use the \a adapt function
+        // object to wrap any user supplied UpdatePolicy, dereferencing the
+        // pointers.
+        template <typename Func, typename Iterator>
+        struct adapt : std::binary_function<Iterator, Iterator, bool>
+        {
+            adapt(Func f)
+              : f_(f)
+            {}
+
+            bool operator()(Iterator const& lhs, Iterator const& rhs) const
+            {
+                return f_((*lhs).second, (*rhs).second);
+            }
+
+            Func f_;    // user supplied UpdatePolicy
+        };
+
     public:
         typedef Key key_type;
         typedef Entry entry_type;
@@ -108,7 +105,7 @@ namespace boost { namespace cache
         typedef std::deque<iterator> heap_type;
         typedef typename heap_type::iterator heap_iterator;
 
-        typedef detail::adapt<UpdatePolicy, iterator> adapted_update_policy_type;
+        typedef adapt<UpdatePolicy, iterator> adapted_update_policy_type;
 
     public:
         ///////////////////////////////////////////////////////////////////////

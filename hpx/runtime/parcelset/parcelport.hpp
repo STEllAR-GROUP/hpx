@@ -55,7 +55,7 @@ namespace hpx { namespace parcelset
 
         /// Construct the parcelport on the given locality.
         parcelport(naming::locality here)
-          : parcels_(This()), here_(here)
+          : parcels_(), here_(here)
         {
         }
 
@@ -106,6 +106,15 @@ namespace hpx { namespace parcelset
 
         /// Cache specific functionality
         virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
+
+        /// Retrieve the type of the locality represented by this parcelport
+        virtual connection_type get_type() const = 0;
+
+        /// Return the thread pool if the name matches
+        virtual util::io_service_pool* get_thread_pool(char const* name)
+        {
+            return 0;     // by default no thread pool is used
+        }
 
         /// Register an event handler to be called whenever a parcel has been
         /// received.
@@ -223,18 +232,23 @@ namespace hpx { namespace parcelset
             return pending_parcels_.size();
         }
 
+        void add_received_parcel(parcel const& p)
+        {
+            // do some work (notify event handlers)
+            parcels_.add_parcel(p);
+        }
+
         /// Update performance counter data
-        void add_received_data(
-            performance_counters::parcels::data_point const& data)
+        void add_received_data(performance_counters::parcels::data_point const& data)
         {
             parcels_received_.add_data(data);
         }
 
-        /// Retrieve the type of the locality represented by this parcelport
-        connection_type get_type() const
-        {
-            return here_.get_type();
-        }
+        /// Create a new instance of a parcelport
+        static boost::shared_ptr<parcelport> create(connection_type type,
+            util::runtime_configuration const& cfg,
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
     protected:
         /// mutex for all of the member data

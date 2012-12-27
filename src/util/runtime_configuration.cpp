@@ -23,6 +23,16 @@
 #include <boost/spirit/include/qi_sequence.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(__linux) || defined(linux) || defined(__linux__)
+namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix 
+{
+    // this global (urghhh) variable is used to control whether guard pages 
+    // will be used or not
+    HPX_EXPORT bool use_guard_pages = true;
+}}}}}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     // pre-initialize entries with compile time based values
@@ -49,24 +59,29 @@ namespace hpx { namespace util
             "component_path = $[hpx.location]/lib/hpx"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
-            "small_stack_size = ${HPX_SMALL_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
-            "medium_stack_size = ${HPX_MEDIUM_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE) "}",
-            "large_stack_size = ${HPX_LARGE_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
-            "huge_stack_size = ${HPX_HUGE_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
             "localities = 1",
             "runtime_mode = console",
+
+            "[hpx.stacks]",
+            "small_size = ${HPX_SMALL_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
+            "medium_size = ${HPX_MEDIUM_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE) "}",
+            "large_size = ${HPX_LARGE_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
+            "huge_size = ${HPX_HUGE_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
+#if defined(__linux) || defined(linux) || defined(__linux__)
+            "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
+#endif
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
@@ -89,6 +104,7 @@ namespace hpx { namespace util
 #else
             "endian_out=${HPX_ENDIAN_OUT:little}",
 #endif
+            "enable_shmem_parcelport=${HPX_ENABLE_SHMEM_PARCELPORT:0}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -240,15 +256,20 @@ namespace hpx { namespace util
         pre_initialize_ini();
 
         // set global config options
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
         BOOST_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
         huge_stacksize = init_huge_stack_size();
+
+#if defined(__linux) || defined(linux) || defined(__linux__)
+        init_use_stack_guard_pages();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -267,13 +288,19 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
+        BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
         huge_stacksize = init_huge_stack_size();
+
+#if defined(__linux) || defined(linux) || defined(__linux__)
+        init_use_stack_guard_pages();
+#endif
     }
 
     void runtime_configuration::reconfigure(
@@ -291,13 +318,19 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
+        BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
         huge_stacksize = init_huge_stack_size();
+
+#if defined(__linux) || defined(linux) || defined(__linux__)
+        init_use_stack_guard_pages();
+#endif
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -528,7 +561,7 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_itt_notify_mode() const
     {
-#if HPX_USE_ITT != 0
+#if HPX_USE_ITTNOTIFY != 0
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -602,7 +635,7 @@ namespace hpx { namespace util
         std::ptrdiff_t defaultvalue) const
     {
         if (has_section("hpx")) {
-            util::section const* sec = get_section("hpx");
+            util::section const* sec = get_section("hpx.stacks");
             if (NULL != sec) {
                 std::string entry = sec->get_entry(entryname, defaultvaluestr);
                 std::ptrdiff_t val = defaultvalue;
@@ -616,27 +649,41 @@ namespace hpx { namespace util
         return defaultvalue;
     }
 
+#if defined(__linux) || defined(linux) || defined(__linux__)
+    void runtime_configuration::init_use_stack_guard_pages() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx.stacks");
+            if (NULL != sec) {
+                std::string entry = sec->get_entry("use_guard_pages", "1");
+                coroutines::detail::posix::use_guard_pages = 
+                    (entry != "0") ? true : false;
+            }
+        }
+    }
+#endif
+
     std::ptrdiff_t runtime_configuration::init_small_stack_size() const
     {
-        return init_stack_size("small_stack_size",
+        return init_stack_size("small_size",
             BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_medium_stack_size() const
     {
-        return init_stack_size("medium_stack_size",
+        return init_stack_size("medium_size",
             BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_large_stack_size() const
     {
-        return init_stack_size("large_stack_size",
+        return init_stack_size("large_size",
             BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_huge_stack_size() const
     {
-        return init_stack_size("huge_stack_size",
+        return init_stack_size("huge_size",
             BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
     }
 

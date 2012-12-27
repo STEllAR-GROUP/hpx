@@ -97,10 +97,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef context_base<context_impl> type;
     typedef boost::intrusive_ptr<type> pointer;
     typedef void deleter_type(type const*, deleter_mode);
+    typedef void* thread_id_type;
 
-    template<typename Derived>
-        context_base(Derived& derived,
-                     std::ptrdiff_t stack_size) 
+    template <typename Derived>
+    context_base(Derived& derived, std::ptrdiff_t stack_size, thread_id_type id)
       : context_impl(derived, stack_size),
         m_caller(),
         m_counter(0),
@@ -118,7 +118,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         m_thread_data(0),
 #endif
-        m_type_info()
+        m_type_info(),
+        m_thread_id(id)
     {}
 
     friend
@@ -201,6 +202,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return ready();
     }
 #endif
+
+    thread_id_type get_thread_id() const
+    {
+        return m_thread_id;
+    }
 
     /*
      * Wake up a waiting context.
@@ -456,7 +462,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       ctx_exited_abnormally // process exited uncleanly.
     };
 
-    void rebind()
+    void rebind(thread_id_type id)
     {
 #if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
       BOOST_ASSERT(exited() && 0 == m_wait_counter && !pending());
@@ -464,6 +470,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       BOOST_ASSERT(exited() && !pending());
 #endif
 
+      m_thread_id = id;
       m_state = ctx_ready;
       m_exit_state = ctx_exit_not_requested;
       m_exit_status = ctx_not_exited;
@@ -496,8 +503,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   protected:
 
     // Nothrow.
-    void do_yield() throw() {
-      swap_context(*this, m_caller, detail::yield_hint());
+    void do_yield() throw()
+    {
+        swap_context(*this, m_caller, detail::yield_hint());
     }
 
     // Nothrow.
@@ -543,6 +551,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     // This is used to generate a meaningful exception trace.
     boost::exception_ptr m_type_info;
+    thread_id_type m_thread_id;
   };
 
   // initialize static allocation counter

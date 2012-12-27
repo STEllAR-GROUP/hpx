@@ -23,6 +23,11 @@ appropriate partition corresponding to the locality holding the required part
 of the tables. The client side object exposes a simple API for easy
 programmability.
 
+This code is based on the work of Christian Ott and O'Connor, authors of the
+original |sheneos_tables|_. You can get the original code here:::
+
+    svn checkout --username anon --password anon svn://stellarcollapse.org/projects/EOSdriver
+
 Options
 -------
 
@@ -66,3 +71,4 @@ Example Run
 .. |hdf5| replace:: HDF5 
 .. _hdf5: http://www.hdfgroup.org/HDF5
  
+

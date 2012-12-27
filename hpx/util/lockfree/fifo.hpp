@@ -9,7 +9,8 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
-#if BOOST_VERSION >= 105200
+// use released library Boost.Lockfree starting V1.53.0
+#if BOOST_VERSION >= 105300
 #include <boost/lockfree/policies.hpp>
 #include <boost/lockfree/queue.hpp>
 
@@ -65,7 +66,7 @@ namespace boost { namespace lockfree
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, 
-        typename Freelist = caching_freelist_t, typename Alloc = std::allocator<void> >
+        typename Freelist = caching_freelist_t, typename Alloc = std::allocator<T> >
     class fifo;
 
     template <typename T, typename Alloc>

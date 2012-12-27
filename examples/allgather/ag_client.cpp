@@ -166,7 +166,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << " Number of components: " << np << std::endl;
 
         test_allgather(np);
-        test_allgather_and_gate(np);
+        //test_allgather_and_gate(np);
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
     } // Ensure things go out of scope before hpx::finalize is called.

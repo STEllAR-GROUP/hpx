@@ -16,8 +16,6 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/lockfree/fifo.hpp>
-
 #include <hpx/components/dataflow/dataflow.hpp>
 #include <hpx/components/dataflow/async_dataflow_wait.hpp>
 
