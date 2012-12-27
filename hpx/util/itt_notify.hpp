@@ -438,6 +438,7 @@ namespace hpx { namespace util { namespace itt
 
     struct heap_internal_access
     {
+        ~heap_internal_access() {};
     };
 }}}
 
