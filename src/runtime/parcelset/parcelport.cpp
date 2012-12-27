@@ -33,7 +33,7 @@ namespace hpx { namespace parcelset
                 // Create shmem based parcelport only if allowed by the 
                 // configuration info.
                 std::string enable_shmem = 
-                    cfg.get_entry("hpx.parcel.enable_shmem_parcelport", "0");
+                    cfg.get_entry("hpx.parcel.use_shmem_parcelport", "0");
 
                 if (boost::lexical_cast<int>(enable_shmem)) 
                 {
