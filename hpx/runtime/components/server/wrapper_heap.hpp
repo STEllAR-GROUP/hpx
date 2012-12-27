@@ -89,8 +89,15 @@ namespace hpx { namespace components { namespace detail
         };
 
     public:
-        explicit wrapper_heap(char const* class_name,
-                std::size_t, std::size_t step = static_cast<std::size_t>(-1))
+        explicit wrapper_heap(
+            char const* class_name,
+#if defined(HPX_DEBUG)
+            std::size_t count,
+#else
+            std::size_t,
+#endif
+            std::size_t step = static_cast<std::size_t>(-1)
+        )
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid),
             class_name_(class_name),
