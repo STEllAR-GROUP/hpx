@@ -181,12 +181,17 @@ namespace fft { namespace server
                 result_vec_ = result_vec.get();
                 local_vec_ = result_vec_;
 
+                //std::cout << "My Cardinality:" << data_.comp_cardinality_ 
+                //    << ", my level:" << level_ << ", current cardinality:" << 
+                //    my_cardinality << std::endl;
+
                 //if(my_cardinality != 0)
-                my_cardinality = my_cardinality >> 1;
+                my_cardinality = my_cardinality >> 1;                
 
                 // update data_level for next level
                 level_ = level_ << 1;
                 data_.current_level_ = level_;
+                
             }
             else
             {   
@@ -217,9 +222,13 @@ namespace fft { namespace server
                     result_vec_ = result_vec.get();
                     local_vec_ = result_vec_;
                     //data_.comp_gid);
+
+                    //std::cout << "My Cardinality:" << data_.comp_cardinality_ 
+                    //    << ", my level:" << level_ << ", current cardinality:" << 
+                    //    my_cardinality << std::endl;
+
                     my_prev_cardinality = my_cardinality;
                     my_cardinality = my_cardinality >> 1;
-                    
                     level_previous_ = level_;
                     level_ = level_ << 1;
                 }
@@ -268,6 +277,9 @@ namespace fft { namespace server
             if(level_ == 1)
             {
                     dlocal_vec_ = dataflow<r2ditfft_action_type>(fft_gid_get, dlocal_vec_);
+                    //std::cout << "My cardinality:" << my_cardinality <<", and size of" << 
+                    //    ", computed dlocal_vec_: "<< dlocal_vec_.get_future().get().size()
+                    //    << std::endl;
                     
                     if(my_cardinality%2 != 0)
                     {
@@ -336,11 +348,11 @@ namespace fft { namespace server
         
         if(data_.comp_cardinality_ == 0)
         {
-            while(this->fft_size_ != dlocal_vec_.get_future().get().size())
-            {
+            //while(this->fft_size_ != dlocal_vec_.get_future().get().size())
+            //{
                 //local_vec_ = dlocal_vec_.get_future().get();
-                hpx::this_thread::suspend(boost::posix_time::microseconds(50));
-            }
+            //    hpx::this_thread::suspend(boost::posix_time::microseconds(50));
+            //}
             local_vec_ = dlocal_vec_.get_future().get();            
         }
     }
@@ -348,7 +360,11 @@ namespace fft { namespace server
     //use stubs?
     distribute::complex_vec distribute::fetch_remote(std::size_t remote_prev_level)
     {
-        while(result_vec_.size() == 0 && (remote_prev_level != get_prev_level()))
+
+        //std::cout << "remote prev level:" << remote_prev_level << ", this_prev_level:" 
+        //    << get_prev_level() << ", my_cardinality:" << data_.comp_cardinality_ 
+        //    << std::endl;
+        while(this->result_vec_.size() == 0 || (remote_prev_level != get_prev_level()))
         {
             hpx::this_thread::suspend(boost::posix_time::microseconds(50));
         }
@@ -376,6 +392,9 @@ namespace fft { namespace server
     {
         std::cout << "This level:"<< data_.current_level_ << ", remote level:" 
             << remote_level << std::endl;
+        std::cout << "Comp cardinality:" << this->data_.comp_cardinality_ <<
+            ", and size of remote vector received:" << 
+            dremote_vec.get_future().get().size() << std::endl;
         this->dremote_vec_ = dremote_vec;
     } 
 
