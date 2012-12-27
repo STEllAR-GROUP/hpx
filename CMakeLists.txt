@@ -129,7 +129,11 @@ endif()
 
 # Decide whether to use Boost.Context for coroutine implementation
 if(${BOOST_MINOR_VERSION} GREATER 50)
-  hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+  if (APPLE)
+    hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: ON)." ON ADVANCED)
+  else()
+    hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+  endif()
 endif()
 
 ################################################################################
