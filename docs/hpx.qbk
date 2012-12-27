@@ -119,7 +119,6 @@
 [def __unix_installation__      [link hpx.tutorial.getting_started.unix_installation How to Install __hpx__ on Unix Variants]]
 [def __windows_installation__   [link hpx.tutorial.getting_started.windows_installation How to Install __hpx__ on Windows]]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
-[def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
@@ -146,6 +145,13 @@
 [def __action_type_definition__ [link hpx.manual.applying_actions.action_type_definition Action Type Definition]]
 [def __action_invocation__      [link hpx.manual.applying_actions.action_invocation Action Invocation]]
 [def __action_error_handling__  [link hpx.manual.applying_actions.action_error_handling Action Error Handling ]]
+
+[def __cmake_hpx__              [link hpx.manual.cmake Building __hpx__ with CMake]]
+[def __cmake_quick_start__      [link hpx.manual.cmake.quick_start Quick Start]]
+[def __cmake_basic_usage__      [link hpx.manual.cmake.basic_usage Basic CMake Usage]]
+[def __cmake_options__          [link hpx.manual.cmake.options Options and Variables]]
+[def __cmake_doc_tools__        [link hpx.manual.cmake.doc_tools Setting up the HPX Documentation Tool Chain]]
+[def __pkg_config__             [link hpx.manual.cmake.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
 [/ Do not add any whitespace between [str]and the template body, it ends upin the
    generated docs, which may cause unwanted effects.]
