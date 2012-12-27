@@ -57,7 +57,7 @@ namespace hpx { namespace parcelset
             ar << action_;
 
             // If we have a continuation, serialize it.
-            bool has_continuations = continuation_;
+            bool has_continuations = static_cast<bool>(continuation_);
             ar << has_continuations;
             if (has_continuations) {
                 actions::continuation const* c = continuation_.get();
