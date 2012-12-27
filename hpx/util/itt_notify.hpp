@@ -373,71 +373,85 @@ namespace hpx { namespace util { namespace itt
 {
     struct stack_context
     {
+        stack_context() {}
+        ~stack_context() {}
     };
 
     struct caller_context
     {
         caller_context(stack_context&) {}
+        ~caller_context() {}
     };
 
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
         domain(char const*) {}
+        ~domain() {}
     };
 
     struct id
     {
         id (domain const& domain, void* addr, unsigned long extra = 0) {}
+        ~id() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
         frame_context(domain const&, id* = 0) {}
+        ~frame_context() {}
     };
 
     struct undo_frame_context
     {
         undo_frame_context(frame_context const&) {}
+        ~undo_frame_context() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
         mark_context(char const*) {}
+        ~mark_context() {}
     };
 
     struct undo_mark_context
     {
         undo_mark_context(mark_context const&) {}
+        ~undo_mark_context() {}
     };
 
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
         task(domain const&, char const*) {}
+        ~task() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct heap_function
     {
         heap_function(char const*, char const*) {}
+        ~heap_function() {}
     };
 
     struct heap_allocate
     {
         template <typename T>
         heap_allocate(heap_function& heap_function, T**, std::size_t, int) {}
+        ~heap_allocate() {}
     };
 
     struct heap_free
     {
         heap_free(heap_function& heap_function, void*) {}
+        ~heap_free() {}
     };
 
     struct heap_internal_access
     {
+        heap_internal_access() {}
         ~heap_internal_access() {}
     };
 }}}
