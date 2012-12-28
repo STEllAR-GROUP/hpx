@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2012 Thomas Heller
 //
@@ -37,7 +37,17 @@ struct linux_topology : topology
         return std::size_t(-1);
     }
 
-    std::size_t get_numa_node_affinity_mask(
+    mask_type get_machine_affinity_mask(
+        error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return 0;
+    }
+
+    mask_type get_numa_node_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -49,7 +59,19 @@ struct linux_topology : topology
         return 0;
     }
 
-    std::size_t get_thread_affinity_mask(
+    mask_type get_core_affinity_mask(
+        std::size_t thread_num
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return 0;
+    }
+
+    mask_type get_thread_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -63,7 +85,7 @@ struct linux_topology : topology
 
     void set_thread_affinity_mask(
         boost::thread& thrd
-      , std::size_t mask
+      , mask_type mask
       , error_code& ec = throws
         ) const
     {
@@ -77,11 +99,15 @@ struct linux_topology : topology
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
     void set_thread_affinity_mask(
-        std::size_t mask
+        mask_type mask
       , error_code& ec = throws
         ) const
     {
         std::size_t num_thread = least_significant_bit_set(mask);
+        if (num_thread == std::size_t(-1))
+            num_thread = 0;
+        else if (num_thread != 0)
+            --num_thread;
 
         cpu_set_t cpu;
 
@@ -114,7 +140,7 @@ struct linux_topology : topology
 #pragma GCC diagnostic pop
 #endif
 
-    std::size_t get_thread_affinity_mask_from_lva(
+    mask_type get_thread_affinity_mask_from_lva(
         naming::address::address_type lva
       , error_code& ec = throws
         ) const

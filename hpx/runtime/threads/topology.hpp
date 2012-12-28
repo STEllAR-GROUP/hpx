@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2012 Thomas Heller
 //
@@ -19,25 +19,31 @@
 namespace hpx { namespace threads
 {
 
+typedef boost::uint64_t mask_type;
+
 struct topology
 {
     virtual ~topology() {}
 
     virtual std::size_t get_numa_node_number(std::size_t num_thread, 
         error_code& ec = throws) const = 0;
-    virtual std::size_t get_numa_node_affinity_mask(std::size_t num_thread, 
+    virtual mask_type get_machine_affinity_mask(
+        error_code& ec = throws) const = 0;
+    virtual mask_type get_numa_node_affinity_mask(std::size_t num_thread, 
         bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual std::size_t get_thread_affinity_mask(std::size_t num_thread, 
+    virtual mask_type get_core_affinity_mask(std::size_t num_thread, 
+        bool numa_sensitive, error_code& ec = throws) const = 0;
+    virtual mask_type get_thread_affinity_mask(std::size_t num_thread, 
         bool numa_sensitive, error_code& ec = throws) const = 0;
     virtual void set_thread_affinity_mask(boost::thread& t, 
-        std::size_t mask, error_code& ec = throws) const = 0;
-    virtual void set_thread_affinity_mask(std::size_t mask, 
+        mask_type mask, error_code& ec = throws) const = 0;
+    virtual void set_thread_affinity_mask(mask_type mask, 
         error_code& ec = throws) const = 0;
-    virtual std::size_t get_thread_affinity_mask_from_lva(
+    virtual mask_type get_thread_affinity_mask_from_lva(
         naming::address::address_type, error_code& ec = throws) const = 0;
 };
 
-inline std::size_t least_significant_bit(boost::uint64_t mask)
+inline std::size_t least_significant_bit(mask_type mask)
 {
     if (mask) {
         int c = 0;    // Will count mask's trailing zero bits.
@@ -52,7 +58,7 @@ inline std::size_t least_significant_bit(boost::uint64_t mask)
     return std::size_t(1);
 }
 
-inline std::size_t least_significant_bit_set(boost::uint64_t mask)
+inline std::size_t least_significant_bit_set(mask_type mask)
 {
     if (mask) {
         std::size_t c = 0;    // Will count mask's trailing zero bits.

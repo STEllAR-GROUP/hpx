@@ -435,7 +435,8 @@ namespace hpx
         void ensure_hwloc_compatibility(
             boost::program_options::variables_map const& vm)
         {
-#if defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
+            // pu control is available for HWLOC and Windows only
             if (vm.count("hpx:pu-offset")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:pu-offset, valid for --hpx:queuing=priority_local only.");
@@ -443,6 +444,13 @@ namespace hpx
             if (vm.count("hpx:pu-step")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:pu-step, valid for --hpx:queuing=priority_local only.");
+            }
+#endif
+#if defined(HPX_HAVE_HWLOC)
+            // affinity control is available for HWLOC only
+            if (vm.count("hpx:affinity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hpx:affinity, valid for --hpx:queuing=priority_local only.");
             }
 #endif
         }
@@ -572,6 +580,7 @@ namespace hpx
 
             std::size_t pu_offset = 0;
             std::size_t pu_step = 1;
+            std::string affinity("pu");
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
             if (cfg.vm_.count("hpx:pu-offset")) {
                 pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
@@ -591,12 +600,26 @@ namespace hpx
                 }
             }
 #endif
+#if defined(HPX_HAVE_HWLOC)
+            if (cfg.vm_.count("hpx:affinity")) {
+                affinity = cfg.vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity) &&
+                    0 != std::string("core").find(affinity) &&
+                    0 != std::string("numa").find(affinity) &&
+                    0 != std::string("machine").find(affinity)) 
+                {
+                    throw std::logic_error("Invalid command line option "
+                        "--hpx:affinity, value must be one of: pu, core, numa, "
+                        "or machine.");
+                }
+            }
+#endif
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000, 
-                numa_sensitive, pu_offset, pu_step);
+                numa_sensitive, pu_offset, pu_step, affinity);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;

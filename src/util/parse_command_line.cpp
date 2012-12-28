@@ -408,6 +408,11 @@ namespace hpx { namespace util
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1)")
 #endif
+#if defined(HPX_HAVE_HWLOC)
+                ("hpx:affinity", value<std::string>(),
+                  "the affinity domain the OS threads will be confined to, "
+                  "possible values: pu, core, numa, machine (default: pu)")
+#endif
                 ("hpx:threads", value<std::string>(),
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
