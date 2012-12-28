@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2012 Louisiana State University
+.. Copyright (c) 2007-2013 Louisiana State University
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,14 +46,15 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.0) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx_0.9.0/docs/index.html>`_.
-Additionally, we regularily upload the current status of the documentation
-(which is being worked on as we speak)
-`here <http://stellar.cct.lsu.edu/files/hpx_master/docs/index.html>`_.
+The documentation for the latest release of HPX (currently V0.9.5) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx_0.9.5/html/index.html>`_.
+
+.. Additionally, we regularily upload the current status of the documentation
+   (which is being worked on as we speak)
+   `here <http://stellar.cct.lsu.edu/files/hpx_master/docs/index.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.0) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V0.9.5) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
@@ -62,7 +63,7 @@ While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
 In any case, if you happen to run into problems we very much encourage and appreciate
-any problem reports through the `issue tracker for this Github project
+any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
 ********************
@@ -81,7 +82,7 @@ Linux
 
 1) Clone the master HPX git repository (or a stable tag)::
 
-    $ git clone https://github.com/STEllAR-GROUP/hpx.git
+    $ git clone git://github.com/STEllAR-GROUP/hpx.git
 
 2) Create a build directory. HPX requires an out-of-tree build. This means you
    will be unable to run CMake in the HPX source directory::
@@ -112,7 +113,7 @@ Windows
    TortoiseGIT, or the git client that Cygwin provides. The git repository can
    be found at::
 
-    https://github.com/STEllAR-GROUP/hpx.git
+    git://github.com/STEllAR-GROUP/hpx.git
 
 2) Create a build folder. HPX requires an out-of-tree-build. This means that you
    will be unable to run CMake in the HPX source folder.
