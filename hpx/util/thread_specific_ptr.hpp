@@ -61,7 +61,7 @@ struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
         T* new_value = 0
         )
     {
-        if (0 != ptr_)
+        if (0 != ptr_) //-V809
             delete ptr_;
 
         ptr_ = new_value;

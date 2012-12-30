@@ -76,11 +76,12 @@ namespace hpx
 
     std::string build_string()
     {
-        return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d), Git: %s") %
-            HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
-            HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
-            (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
-            HPX_GIT_COMMIT);
+        return boost::str(
+            boost::format("V%d.%d.%d%s (AGAS: V%d.%d), Git: %s") % //-V609
+                HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
+                HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
+                (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
+                HPX_GIT_COMMIT);
     }
 
     std::string boost_version()

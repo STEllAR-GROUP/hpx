@@ -234,8 +234,8 @@ struct hwloc_topology : topology
 //         hwloc_bitmap_free(cpuset_cmp);
 // #endif
 
-        hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
-        hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
+        hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF); //-V112
+        hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF); //-V112
 
 //         std::size_t idx = 0;
 //         for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
@@ -318,10 +318,7 @@ struct hwloc_topology : topology
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
-                {
-                    std::size_t numa_node = obj->logical_index;
-                    return numa_node;
-                }
+                    return static_cast<std::size_t>(obj->logical_index);
                 obj = obj->parent;
             }
         }
@@ -346,10 +343,7 @@ struct hwloc_topology : topology
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_CORE) == 0)
-                {
-                    std::size_t core = obj->logical_index;
-                    return core;
-                }
+                    return static_cast<std::size_t>(obj->logical_index);
                 obj = obj->parent;
             }
         }

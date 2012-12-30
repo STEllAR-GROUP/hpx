@@ -45,11 +45,12 @@ namespace hpx
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any)
 
-            enum { index_error = std::size_t(-1) };
+            enum { index_error = -1 };
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
-                std::size_t index_not_initialized = index_error;
+                std::size_t index_not_initialized = 
+                    static_cast<std::size_t>(index_error);
                 if (index_.compare_exchange_strong(index_not_initialized, idx)) 
                 {
                     // reactivate waiting thread only if it's not us
@@ -63,18 +64,20 @@ namespace hpx
             typedef std::vector<lcos::future<T> > argument_type;
 
             when_any(argument_type const& lazy_values)
-              : lazy_values_(lazy_values), index_(index_error)
+              : lazy_values_(lazy_values), 
+                index_(static_cast<std::size_t>(index_error))
             {}
 
             when_any(BOOST_RV_REF(argument_type) lazy_values)
-              : lazy_values_(boost::move(lazy_values)), index_(index_error)
+              : lazy_values_(boost::move(lazy_values)), 
+                index_(static_cast<std::size_t>(index_error))
             {}
 
             when_any(BOOST_RV_REF(when_any) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 index_(rhs.index_.load())
             {
-                rhs.index_.store(index_error);
+                rhs.index_.store(static_cast<std::size_t>(index_error));
             }
 
             when_any& operator= (BOOST_RV_REF(when_any) rhs)
@@ -82,7 +85,7 @@ namespace hpx
                 if (this != &rhs) {
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     index_ = rhs.index_;
-                    rhs.index_.store(index_error);
+                    rhs.index_.store(static_cast<std::size_t>(index_error));
                 }
                 return *this;
             }
@@ -91,7 +94,7 @@ namespace hpx
             {
                 using lcos::detail::get_future_data;
 
-                index_.store(index_error);
+                index_.store(static_cast<std::size_t>(index_error));
 
                 std::size_t size = lazy_values_.size();
 
@@ -107,13 +110,13 @@ namespace hpx
 
                 // If one of the futures is already set, our callback above has
                 // already been called, otherwise we suspend ourselves
-                if (index_.load() == index_error)
+                if (index_.load() == static_cast<std::size_t>(index_error))
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
-                BOOST_ASSERT(index_.load() != index_error);       // that should not happen
+                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));       // that should not happen
 
                 // reset all pending callback functions
                 for (std::size_t i = 0; i < size; ++i)
@@ -164,11 +167,12 @@ namespace hpx
                 };
             };
 
-            enum { index_error = std::size_t(-1) };
+            enum { index_error = -1 };
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
-                std::size_t index_not_initialized = index_error;
+                std::size_t index_not_initialized = 
+                    static_cast<std::size_t>(index_error);
                 if (index_.compare_exchange_strong(index_not_initialized, idx)) 
                 {
                     // reactivate waiting thread only if it's not us
@@ -219,18 +223,20 @@ namespace hpx
             typedef Tuple argument_type;
 
             when_any_tuple(argument_type const& lazy_values)
-              : lazy_values_(lazy_values), index_(index_error)
+              : lazy_values_(lazy_values), 
+                index_(static_cast<std::size_t>(index_error))
             {}
 
             when_any_tuple(BOOST_RV_REF(argument_type) lazy_values)
-              : lazy_values_(boost::move(lazy_values)), index_(index_error)
+              : lazy_values_(boost::move(lazy_values)), 
+                index_(static_cast<std::size_t>(index_error))
             {}
 
             when_any_tuple(BOOST_RV_REF(when_any_tuple) rhs)
               : lazy_values_(boost::move(rhs.lazy_values_)),
                 index_(rhs.index_.load())
             {
-                rhs.index_.store(index_error);
+                rhs.index_.store(static_cast<std::size_t>(index_error));
             }
 
             when_any_tuple& operator= (BOOST_RV_REF(when_any_tuple) rhs)
@@ -238,7 +244,7 @@ namespace hpx
                 if (this != &rhs) {
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     index_ = rhs.index_;
-                    rhs.index_ = index_error;
+                    rhs.index_.store(static_cast<std::size_t>(index_error));
                 }
                 return *this;
             }
@@ -246,7 +252,7 @@ namespace hpx
         public:
             result_type operator()()
             {
-                index_.store(index_error);
+                index_.store(static_cast<std::size_t>(index_error));
 
                 // set callback functions to execute when future is ready
                 boost::fusion::accumulate(lazy_values_, std::size_t(0),
@@ -254,13 +260,13 @@ namespace hpx
 
                 // If one of the futures is already set then our callback above 
                 // has already been called, otherwise we suspend ourselves.
-                if (index_.load() == index_error)
+                if (index_.load() == static_cast<std::size_t>(index_error))
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
-                BOOST_ASSERT(index_.load() != index_error);       // that should not happen
+                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));       // that should not happen
 
                 // reset all pending callback functions
                 boost::fusion::for_each(lazy_values_, reset_when());

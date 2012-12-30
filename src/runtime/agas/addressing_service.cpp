@@ -809,6 +809,12 @@ bool addressing_service::get_id_range(
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
+            if (0 == f) {
+                HPX_THROWS_IF(ec, invalid_status, 
+                    "addressing_service::get_id_range", 
+                    "could not check out future object instance during bootstrap");
+                return false;
+            }
 
             // execute the action (synchronously)
             f->apply(bootstrap_primary_namespace_id(), req);
@@ -895,6 +901,12 @@ bool addressing_service::bind_range(
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
+            if (0 == f) {
+                HPX_THROWS_IF(ec, invalid_status, 
+                    "addressing_service::bind_range", 
+                    "could not check out future object instance during bootstrap");
+                return false;
+            }
 
             // execute the action (synchronously)
             f->apply(bootstrap_primary_namespace_id(), req);
@@ -973,9 +985,11 @@ bool addressing_service::unbind_range(
         //mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
         //gva_erase_policy ep(lower_id, count);
         //hosted->gva_cache_.erase(ep);
-        addr.locality_ = rep.get_gva().endpoint;
-        addr.type_ = rep.get_gva().type;
-        addr.address_ = rep.get_gva().lva();
+
+        gva& gaddr = rep.get_gva();
+        addr.locality_ = gaddr.endpoint;
+        addr.type_ = gaddr.type;
+        addr.address_ = gaddr.lva();
 
         return true;
     }
@@ -1791,7 +1805,7 @@ bool check_for_collisions(
     )
 {
     return (new_key.get_gid() == old_key.get_gid())
-        && (old_key.get_count() == old_key.get_count());
+        && (new_key.get_count() == old_key.get_count());
 }
 
 void addressing_service::update_cache_entry(

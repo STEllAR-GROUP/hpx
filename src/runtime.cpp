@@ -190,7 +190,9 @@ namespace hpx
             BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
-            runtime::uptime_.reset(new boost::uint64_t (util::high_resolution_clock::now()));
+            runtime::uptime_.reset(new boost::uint64_t);
+            *runtime::uptime_.get() = util::high_resolution_clock::now();
+
             threads::coroutine_type::impl_type::init_self();
         }
     }

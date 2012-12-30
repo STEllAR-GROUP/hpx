@@ -412,7 +412,7 @@ namespace hpx { namespace util
                 logformat = "|\\n";
 
             agas_logger()->writer().add_destination("console",
-                console(lvl, destination_agas));
+                console(lvl, destination_agas)); //-V106
             agas_logger()->writer().write(logformat, logdest);
             agas_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             agas_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -467,7 +467,7 @@ namespace hpx { namespace util
                 logformat = "|\\n";
 
             timing_logger()->writer().add_destination("console",
-                console(lvl, destination_timing));
+                console(lvl, destination_timing)); //-V106
             timing_logger()->writer().write(logformat, logdest);
             timing_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             timing_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -524,7 +524,7 @@ namespace hpx { namespace util
 
         if (boost::logging::level::disable_all != lvl) {
             hpx_logger()->writer().add_destination("console",
-                console(lvl, destination_hpx));
+                console(lvl, destination_hpx)); //-V106
             hpx_logger()->writer().write(logformat, logdest);
             hpx_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_logger()->writer().replace_formatter("locality", locality_prefix());
@@ -539,7 +539,7 @@ namespace hpx { namespace util
 
             // errors are logged to the given destination and to cerr
             hpx_error_logger()->writer().add_destination("console",
-                console(lvl, destination_hpx));
+                console(lvl, destination_hpx)); //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
                 hpx_error_logger()->writer().write(logformat, logdest + " cerr");
@@ -559,7 +559,7 @@ namespace hpx { namespace util
             // errors are always logged to cerr
             if (!isconsole) {
                 hpx_error_logger()->writer().add_destination("console",
-                    console(lvl, destination_hpx));
+                    console(lvl, destination_hpx)); //-V106
                 hpx_error_logger()->writer().write(logformat, "console");
             }
             else {
@@ -624,7 +624,7 @@ namespace hpx { namespace util
                 logformat = "|\\n";
 
             app_logger()->writer().add_destination("console",
-                console(lvl, destination_app));
+                console(lvl, destination_app)); //-V106
             app_logger()->writer().write(logformat, logdest);
             app_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             app_logger()->writer().replace_formatter("locality", locality_prefix());

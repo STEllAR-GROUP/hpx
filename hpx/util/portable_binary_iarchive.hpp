@@ -75,7 +75,7 @@ public:
     virtual const char *what() const throw()
     {
         const char *msg = "programmer error";
-        switch(code){
+        switch (static_cast<exception_code>(code)) {
         case incompatible_integer_size:
             msg = "integer cannot be represented";
         default:
@@ -212,7 +212,7 @@ protected:
         if (l > static_cast<boost::int64_t>((std::numeric_limits<unsigned int>::max)())) {
             BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
         }
-        t = boost::serialization::collection_size_type(static_cast<unsigned int>(l));
+        t = boost::serialization::collection_size_type(static_cast<unsigned int>(l)); //-V106
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING

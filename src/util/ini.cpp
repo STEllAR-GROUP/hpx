@@ -244,7 +244,7 @@ void section::parse (std::string const& sourcename,
         if (boost::regex_match(line, what, regex_qualified_entry))
         {
             // found a entry line
-            if (4 != what.size())
+            if (4 != what.size()) //-V112
             {
                 line_msg("Cannot parse key/value in: ", sourcename, linenum, line);
             }

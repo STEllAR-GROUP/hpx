@@ -165,7 +165,7 @@ struct deque: private boost::noncopyable
     anchor anchor_;
     pool pool_;
 
-    BOOST_STATIC_CONSTANT(int,
+    BOOST_STATIC_CONSTANT(int, //-V103
         padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor));
     char padding[padding_size];
 

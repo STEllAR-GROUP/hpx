@@ -320,8 +320,9 @@ response primary_namespace::allocate(
         // Check for overflow.
         if (upper.get_msb() != lower.get_msb())
         {
-            // Check for address space exhaustion
-            if (HPX_UNLIKELY((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFF))
+            // Check for address space exhaustion (we currently use 80 bis of 
+            // the gid for the actual id)
+            if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
             {
                 HPX_THROWS_IF(ec, internal_server_error
                   , "primary_namespace::allocate"
@@ -1738,7 +1739,7 @@ boost::int64_t primary_namespace::counter_data::get_num_localities_time() const
 boost::int64_t primary_namespace::counter_data::get_num_threads_time() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_localities_.time_;
+    return num_threads_.time_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_resolved_localities_time() const
@@ -1811,7 +1812,7 @@ void primary_namespace::counter_data::increment_num_localities_count()
 void primary_namespace::counter_data::increment_num_threads_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++num_localities_.count_;
+    ++num_threads_.count_;
 }
 
 void primary_namespace::counter_data::increment_resolved_localities_count()

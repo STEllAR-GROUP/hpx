@@ -76,7 +76,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
     util::io_service_pool* parcelport::get_thread_pool(char const* name)
     {
-        if (std::strcmp(name, io_service_pool_.get_name()))
+        if (0 == std::strcmp(name, io_service_pool_.get_name()))
             return &io_service_pool_;
         return 0;
     }

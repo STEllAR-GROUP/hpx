@@ -112,10 +112,10 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
-            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step)
-                step_ = heap_step;
+            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step) //-V104
+                step_ = heap_step; //-V101
             else
-                step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
+                step_ = ((step_ + heap_step - 1)/heap_step)*heap_step; //-V104
 
             if (!init_pool())
                 throw std::bad_alloc();
@@ -325,13 +325,13 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(size_ == 0);
             BOOST_ASSERT(first_free_ == NULL);
 
-            std::size_t s = step_ * heap_size;
+            std::size_t s = step_ * heap_size; //-V104
             pool_ = static_cast<storage_type*>(Allocator::alloc(s));
             if (NULL == pool_)
                 return false;
 
             first_free_ = pool_;
-            size_ = s / heap_size;
+            size_ = s / heap_size; //-V104
             free_size_ = size_;
 
             LOSH_(info)

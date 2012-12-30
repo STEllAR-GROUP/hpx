@@ -630,7 +630,6 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     std::string embed_in_quotes(std::string const& s)
     {
-        std::string result;
         char quote = (s.find_first_of("\"") != std::string::npos) ? '\'' : '\"';
 
         if (s.find_first_of("\t ") != std::string::npos)

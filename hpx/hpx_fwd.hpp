@@ -469,7 +469,7 @@ namespace hpx
             component_first_dynamic = component_last,
 
             // Force this enum type to be at least 32 bits.
-            component_upper_bound = 0x7fffffffL
+            component_upper_bound = 0x7fffffffL //-V112
         };
 
         ///////////////////////////////////////////////////////////////////////

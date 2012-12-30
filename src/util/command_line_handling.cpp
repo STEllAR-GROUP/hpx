@@ -192,7 +192,7 @@ namespace hpx { namespace util
             std::size_t threads = 0;
 
             if ("all" == threads_str)
-                threads = thread::hardware_concurrency();
+                threads = thread::hardware_concurrency(); //-V101
             else
                 threads = boost::lexical_cast<std::size_t>(threads_str);
 
@@ -445,7 +445,7 @@ namespace hpx { namespace util
         for (int i = 0; i < argc; ++i)
         {
             // quote only if it contains whitespace
-            std::string arg(argv[i]);
+            std::string arg(argv[i]); //-V108
             cmd_line += detail::enquote(arg);
 
             if ((i + 1) != argc)

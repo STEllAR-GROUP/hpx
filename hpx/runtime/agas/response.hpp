@@ -262,7 +262,7 @@ struct response
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_prefixes, 0>(ec);
+        return get_data<subtype_num_threads, 0>(ec);
     }
 
     components::component_type get_component_type(
@@ -330,7 +330,7 @@ struct response
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_gid, 0>(ec);
+        return get_data<subtype_statistics_counter, 0>(ec);
     }
 
     namespace_action_code get_action_code() const
@@ -353,7 +353,9 @@ struct response
       , subtype_gva                 = 0x2
       , subtype_ctype               = 0x3
       , subtype_prefixes            = 0x4
+      , subtype_num_threads         = 0x4
       , subtype_gid                 = 0x5
+      , subtype_statistics_counter  = 0x5
       , subtype_prefix              = 0x6
       , subtype_void                = 0x7
       , subtype_string              = 0x8

@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace local
         ///////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
         {
-            if (k < 4)
+            if (k < 4) //-V112
             {
             }
 #if defined(BOOST_SMT_PAUSE)
@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SMT_PAUSE
             }
 #endif
-            else if(k < 32 || k & 1)
+            else if(k < 32 || k & 1) //-V112
             {
                 if(hpx::threads::get_self_ptr())
                 {

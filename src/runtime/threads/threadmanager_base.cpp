@@ -19,8 +19,14 @@ namespace hpx { namespace threads
     void threadmanager_base::init_tss(std::size_t thread_num, bool numa_sensitive)
     {
         BOOST_ASSERT(NULL == threadmanager_base::thread_num_.get());    // shouldn't be initialized yet
-        threadmanager_base::thread_num_.reset(
-            new std::size_t(thread_num | (std::size_t(0x1) << 31)));
+        threadmanager_base::thread_num_.reset(new std::size_t);
+        if (numa_sensitive) {
+            *threadmanager_base::thread_num_.get() = 
+                thread_num | (std::size_t(0x1) << 31);
+        }
+        else {
+            *threadmanager_base::thread_num_.get() = thread_num;
+        }
     }
 
     void threadmanager_base::deinit_tss()

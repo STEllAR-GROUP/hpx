@@ -815,7 +815,7 @@ namespace hpx { namespace threads
         }
 
         bool oldvalue = false;
-        if (triggered->compare_exchange_strong(oldvalue, true))
+        if (triggered->compare_exchange_strong(oldvalue, true)) //-V601
         {
             // timer has not been canceled yet, trigger the requested set_state
             set_state(id, newstate, newstate_ex, priority);
@@ -873,7 +873,7 @@ namespace hpx { namespace threads
         thread_state_ex_enum statex = self.yield(suspended);
 
         if (wait_timeout != statex &&
-            triggered->compare_exchange_strong(oldvalue, true))
+            triggered->compare_exchange_strong(oldvalue, true)) //-V601
         {
             // wake_timer_thread has not been executed yet, cancel timer
             t.cancel();

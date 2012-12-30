@@ -40,17 +40,17 @@ namespace hpx { namespace util
     {
         boost::uint32_t tix = it->second;
         thread_map_.erase(it);
-        if (tix >= thread_info_.size()) return false;
-        thread_info_[tix].cleanup_ = boost::ref(null_cb);
-        return thread_info_[tix].cleanup_(tix);
+        if (tix >= thread_info_.size()) return false; //-V104
+        thread_info_[tix].cleanup_ = boost::ref(null_cb); //-V108
+        return thread_info_[tix].cleanup_(tix); //-V108
     }
 
     thread_mapper::~thread_mapper()
     {
         mutex_type::scoped_lock m(mtx_);
 
-        for (boost::uint32_t i = 0; i < thread_info_.size(); i++)
-            thread_info_[i].cleanup_(i);
+        for (boost::uint32_t i = 0; i < thread_info_.size(); i++) //-V104
+            thread_info_[i].cleanup_(i); //-V108
     }
 
     boost::uint32_t thread_mapper::register_thread(char const *l)
@@ -90,8 +90,8 @@ namespace hpx { namespace util
     {
         mutex_type::scoped_lock m(mtx_);
 
-        if (tix >= thread_info_.size()) return false;
-        thread_info_[tix].cleanup_ = cb;
+        if (tix >= thread_info_.size()) return false; //-V104
+        thread_info_[tix].cleanup_ = cb; //-V108
         return true;
     }
 
@@ -99,8 +99,8 @@ namespace hpx { namespace util
     {
         mutex_type::scoped_lock m(mtx_);
 
-        if (tix >= thread_info_.size()) return false;
-        thread_info_[tix].cleanup_ = boost::ref(null_cb);
+        if (tix >= thread_info_.size()) return false; //-V104
+        thread_info_[tix].cleanup_ = boost::ref(null_cb); //-V108
         return true;
     }
 
@@ -108,7 +108,7 @@ namespace hpx { namespace util
     {
         mutex_type::scoped_lock m(mtx_);
 
-        return (tix < thread_info_.size())? thread_info_[tix].tid_: invalid_tid;
+        return (tix < thread_info_.size())? thread_info_[tix].tid_: invalid_tid; //-V104 //-V108
     }
 
     std::string const& thread_mapper::get_thread_label(boost::uint32_t tix) const

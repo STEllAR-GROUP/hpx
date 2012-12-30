@@ -383,15 +383,16 @@ namespace hpx { namespace performance_counters
     {
         counter_value(boost::int64_t value = 0, boost::int64_t scaling = 1,
                 bool scale_inverse = false)
-          : status_(status_new_data), time_(),
-            value_(value), scaling_(scaling), scale_inverse_(scale_inverse)
+          : time_(), count_(0), value_(value), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
         {}
 
-        counter_status status_;     ///< The status of the counter value
         boost::uint64_t time_;      ///< The local time when data was collected
         boost::uint64_t count_;     ///< The invocation counter for the data
         boost::int64_t value_;      ///< The current counter value
         boost::int64_t scaling_;    ///< The scaling of the current counter value
+        counter_status status_;     ///< The status of the counter value
         bool scale_inverse_;        ///< If true, value_ needs to be deleted by
                                     ///< scaling_, otherwise it has to be
                                     ///< multiplied.

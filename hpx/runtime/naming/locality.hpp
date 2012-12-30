@@ -182,7 +182,7 @@ namespace hpx { namespace naming
     locality::iterator_type connect_begin(locality const& loc,
         boost::asio::io_service& io_service);
 
-    inline locality::iterator_type connect_end(locality const&)
+    inline locality::iterator_type connect_end(locality const&) //-V524
     {
         return locality::iterator_type();
     }
