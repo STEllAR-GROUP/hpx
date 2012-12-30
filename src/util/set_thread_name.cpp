@@ -9,7 +9,8 @@
 #include <boost/config.hpp>
 
 #if defined(BOOST_MSVC)
-#include <windows.h>
+
+#include <hpx/util/set_thread_name.hpp>
 
 namespace hpx { namespace util
 {
@@ -42,13 +43,6 @@ namespace hpx { namespace util
         {
         }
     }
-}}
-
-#else
-
-namespace hpx { namespace util
-{
-    void set_thread_name(char const* threadName, DWORD dwThreadID) {}
 }}
 
 #endif
