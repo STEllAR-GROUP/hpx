@@ -20,6 +20,7 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/set_thread_name.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -489,6 +490,9 @@ namespace hpx {
 
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
+
+        // set thread name as shown in Visual Studio
+        util::set_thread_name(name);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -565,7 +569,7 @@ namespace hpx {
             return parcel_handler_.get_thread_pool(name);
         if (0 == std::strncmp(name, "timer", 5))
             return &timer_pool_;
-        if (0 == std::strncmp(name, "main", 4))
+        if (0 == std::strncmp(name, "main", 4)) //-V112
             return &main_pool_;
 
         return 0;
