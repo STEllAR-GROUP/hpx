@@ -986,7 +986,7 @@ bool addressing_service::unbind_range(
         //gva_erase_policy ep(lower_id, count);
         //hosted->gva_cache_.erase(ep);
 
-        gva& gaddr = rep.get_gva();
+        gva const& gaddr = rep.get_gva();
         addr.locality_ = gaddr.endpoint;
         addr.type_ = gaddr.type;
         addr.address_ = gaddr.lva();
