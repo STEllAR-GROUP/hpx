@@ -282,6 +282,12 @@ namespace hpx {
             cond.notify_all();
         }
 
+        // register this thread with any possibly active Intel tool
+        HPX_ITT_THREAD_SET_NAME("main-thread#wait_helper");
+
+        // set thread name as shown in Visual Studio
+        util::set_thread_name("main-thread#wait_helper");
+
         // wait for termination
         runtime_support_.wait();
 
