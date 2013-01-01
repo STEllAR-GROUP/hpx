@@ -268,29 +268,48 @@ in a different location you can specify its base directory by appending `_ROOT`
 to the variable name as listed below. For instance, to configure a custom
 directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
 
-[variablelist Additional Tools and Libraries
-    [[`BOOST:PATH`]
+[variablelist Additional Tools and Libraries used by __hpx__
+    [[`BOOST_ROOT:PATH`]
+     [Specifies where to look for the __boost__ installation to be used for 
+      compiling __hpx__. Set this if CMake is not able to locate a suitable 
+      version of __boost__. The directory specified here can be either the
+      root of a installed Boost distribution or the directory where you 
+      unpacked and built __boost__ without installing it (with staged 
+      libraries).]
+    ]
+    [[`HWLOC_ROOT:PATH`]
+     [Specifies where to look for the __hwloc__ library. While it is not 
+      necessary to compile __hpx__ with HWLOC, we strongly suggest you do so.
+      HWLOC provides platform independent support for extracting information
+      about the used hardware architecture (number of cores, number of NUMA
+      domains, hyperthreading, etc.). __hpx__ utilizes this information if
+      available.]
+    ]
+    [[`PAPI_ROOT:PATH`]
+     [Specifies where to look for the __papi__ library. The PAPI library is
+      need to compile a special component exposing PAPI hardware events and 
+      counters as __hpx__ performance counters. This is not available on 
+      the Windows platform.]
+    ]
+    [[`BOOSTWAVE_ROOT:PATH`]
+     [Specifies where to look for a built __boost_wave__ binary. Set this if 
+      you want to recreate the preprocessed header files used by __hpx__. 
+      Normally this will not be necessary, unless you modified the sources 
+      those preprocessed headers depend on.]
+    ]
+    [[`AMPLIFIER_ROOT:PATH`]
      []
     ]
-    [[`BOOSTWAVE:PATH`]
+]
+
+[variablelist Additional Tools and Libraries Required by some of the Examples
+    [[`HDF5_ROOT:PATH`]
      []
     ]
-    [[`HDF5:PATH`]
+    [[`MPI_ROOT:PATH`]
      []
     ]
-    [[`HWLOC:PATH`]
-     []
-    ]
-    [[`MPI:PATH`]
-     []
-    ]
-    [[`MPIEXEC:PATH`]
-     []
-    ]
-    [[`PAPI:PATH`]
-     []
-    ]
-    [[`AMPLIFIER:PATH`]
+    [[`MPIEXEC_ROOT:PATH`]
      []
     ]
 ]

@@ -77,7 +77,7 @@
 [def __libunwind__              [@http://www.nongnu.org/libunwind libunwind]]
 [def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5) Libraries]]
 [def __lorene__                 [@http://www.lorene.obspm.fr LORENE]]
-[def __papi__                   [@http://icl.cs.utk.edu/papi/ Performance Application Programming Interface]]
+[def __papi__                   [@http://icl.cs.utk.edu/papi/ Performance Application Programming Interface (PAPI)]]
 [def __lapack__                 [@http://math-atlas.sourceforge.net/ Linear Algebra PACKage (LAPACK)]]
 [def __blas__                   [@http://math-atlas.sourceforge.net/ Basic Linear Algebra Subroutines 3 (BLAS)]]
 [def __gsl__                    [@http://www.gnu.org/software/gsl/ GNU Scientific Library (GSL)]]
