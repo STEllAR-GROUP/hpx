@@ -1054,7 +1054,7 @@ namespace hpx { namespace threads
         scheduler_.on_start_thread(num_thread);
 
         {
-            LTM_(info) << "tfunc(" << num_thread << "): start";
+            LTM_(info) << "tfunc(" << num_thread << "): starting OS thread";
             try {
                 try {
                     tfunc_impl(num_thread);
@@ -1086,8 +1086,8 @@ namespace hpx { namespace threads
                 return;
             }
 
-            LTM_(info) << "tfunc(" << num_thread << "): end, executed "
-                       << executed_threads_[num_thread] << " HPX threads";
+            LTM_(info) << "tfunc(" << num_thread << "): ending OS thread, "
+                "executed " << executed_threads_[num_thread] << " HPX threads";
         }
 
         notifier_.on_stop_thread(num_thread);
@@ -1733,7 +1733,7 @@ namespace hpx { namespace threads
                 std::size_t mask = get_pu_mask(topology_, thread_num);
 
                 LTM_(info) << "run: create OS thread " << thread_num
-                    << "): will run on one processing unit within this mask: "
+                    << ": will run on one processing unit within this mask: "
                     << std::hex << "0x" << mask;
 
                 // create a new thread
