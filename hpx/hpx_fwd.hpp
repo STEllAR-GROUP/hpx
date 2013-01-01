@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -945,8 +945,6 @@ namespace hpx
         error_code& ec = throws);
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
         naming::id_type id);
-
-    HPX_EXPORT void set_error_handlers();
 }
 
 #include <hpx/lcos/async_fwd.hpp>
