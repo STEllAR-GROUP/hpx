@@ -7,7 +7,7 @@
 # We have to compile the Fortran sources into a separate static library as
 # cmake does not support generating mixed C++/Fortran modules for MSVC.
 if(MSVC)
-  set(CMAKE_Fortran_FLAGS "-DDOUBLE_PRECISION ${CMAKE_Fortran_FLAGS}")
+  set(CMAKE_Fortran_FLAGS "-fdefault-real-8 ${CMAKE_Fortran_FLAGS}")
   add_hpx_library(nekbone_hpx_fortran
     AUTOGLOB
     STATIC
@@ -15,9 +15,10 @@ if(MSVC)
     HEADER_GLOB ""
     FOLDER "Examples/Applications/GTCX")
 else()
+  set(CMAKE_Fortran_FLAGS "-fdefault-real-8 ${CMAKE_Fortran_FLAGS}")
   add_hpx_library(nekbone_hpx_fortran
     AUTOGLOB
-    SOURCE_GLOB "*.F90" "*.f90" "*.f" "*.cpp"
+    SOURCE_GLOB "*.F90" "*.f90" "*.f" "*.cpp" "*.c"
     HEADER_GLOB ""
     FOLDER "Examples/Applications/GTCX")
 endif()
