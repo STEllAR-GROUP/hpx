@@ -48,7 +48,8 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
-* #650 - command line no error message when using -hpx:(anything)
+* #651 - Add fine-grained control for thread pinning
+* #650 - Command line no error message when using -hpx:(anything)
 * #645 - Command line aliases don't work in @files
 * #644 - Terminated threads are not always properly cleaned up
 * #640 - future_data<T>::set_on_completed_ used without locks
