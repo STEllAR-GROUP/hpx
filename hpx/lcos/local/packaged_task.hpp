@@ -117,6 +117,7 @@ namespace hpx { namespace lcos { namespace local
 
     private:
         BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
+        typedef lcos::local::spinlock mutex_type;
 
     public:
         // construction and destruction
@@ -126,6 +127,7 @@ namespace hpx { namespace lcos { namespace local
 
         ~promise()
         {
+            typename mutex_type::scoped_lock l(mtx_);
             if (task_)
             {
                 if (task_->is_ready() && !future_obtained_)
@@ -140,16 +142,20 @@ namespace hpx { namespace lcos { namespace local
 
         // Assignment
         promise(BOOST_RV_REF(promise) rhs)
-          : task_(boost::move(rhs.task_)),
-            future_obtained_(rhs.future_obtained_)
+          : future_obtained_(false)
         {
-            rhs.task_.reset();
+            typename mutex_type::scoped_lock l(rhs.mtx_);
+            task_ = boost::move(rhs.task_);
+            future_obtained_ = rhs.future_obtained_;
             rhs.future_obtained_ = false;
+            rhs.task_.reset();
         }
 
         promise& operator=(BOOST_RV_REF(promise) rhs)
         {
             if (this != &rhs) {
+                typename mutex_type::scoped_lock l(rhs.mtx_);
+
                 if (task_)
                 {
                     if (task_->is_ready() && !future_obtained_)
@@ -163,25 +169,20 @@ namespace hpx { namespace lcos { namespace local
 
                 task_ = boost::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
-
-                rhs.task_.reset();
                 rhs.future_obtained_ = false;
+                rhs.task_.reset();
             }
             return *this;
-        }
-
-        void swap(promise& other)
-        {
-            task_.swap(other.task_);
-            std::swap(future_obtained_, other.future_obtained_);
         }
 
         // Result retrieval
         lcos::future<Result> get_future(error_code& ec = throws)
         {
+            typename mutex_type::scoped_lock l(mtx_);
+
             if (!task_) {
-                task_ = new detail::future_object<Result>();
                 future_obtained_ = false;
+                task_ = new detail::future_object<Result>();
             }
 
             if (future_obtained_) {
@@ -195,15 +196,11 @@ namespace hpx { namespace lcos { namespace local
             return lcos::detail::make_future_from_data<Result>(task_);
         }
 
-//         template <typename F>
-//         void set_wait_callback(F f)
-//         {
-//             task_->set_wait_callback(f, this);
-//         }
-
         template <typename T>
         void set_value(BOOST_FWD_REF(T) result)
         {
+            typename mutex_type::scoped_lock l(mtx_);
+
             if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<Result>::set_value<T>",
@@ -219,6 +216,8 @@ namespace hpx { namespace lcos { namespace local
 
         void set_exception(boost::exception_ptr const& e)
         {
+            typename mutex_type::scoped_lock l(mtx_);
+
             if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<Result>::set_exception",
@@ -234,27 +233,32 @@ namespace hpx { namespace lcos { namespace local
 
         bool valid() const BOOST_NOEXCEPT
         {
-            return task_;
+            typename mutex_type::scoped_lock l(mtx_);
+            return task_.get() ? true : false;
         }
 
         bool is_ready() const
         {
+            typename mutex_type::scoped_lock l(mtx_);
             return task_->is_ready();
         }
 
     protected:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
+        mutable mutex_type mtx_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
     class promise<void>
     {
-    private:
+    protected:
         typedef lcos::detail::future_data<void> task_impl_type;
 
+    private:
         BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
+        typedef lcos::local::spinlock mutex_type;
 
     public:
         // construction and destruction
@@ -264,6 +268,8 @@ namespace hpx { namespace lcos { namespace local
 
         ~promise()
         {
+            mutex_type::scoped_lock l(mtx_);
+
             if (task_)
             {
                 if (task_->is_ready() && !future_obtained_)
@@ -278,16 +284,21 @@ namespace hpx { namespace lcos { namespace local
 
         // Assignment
         promise(BOOST_RV_REF(promise) rhs)
-          : task_(rhs.task_),
-            future_obtained_(rhs.future_obtained_)
+          : future_obtained_(false)
         {
-            rhs.task_.reset();
+            mutex_type::scoped_lock l(rhs.mtx_);
+
+            task_ = boost::move(rhs.task_);
+            future_obtained_ = rhs.future_obtained_;
             rhs.future_obtained_ = false;
+            rhs.task_.reset();
         }
 
         promise& operator=(BOOST_RV_REF(promise) rhs)
         {
             if (this != &rhs) {
+                mutex_type::scoped_lock l(rhs.mtx_);
+
                 if (task_)
                 {
                     if (task_->is_ready() && !future_obtained_)
@@ -302,21 +313,17 @@ namespace hpx { namespace lcos { namespace local
                 task_ = rhs.task_;
                 future_obtained_ = rhs.future_obtained_;
 
-                rhs.task_.reset();
                 rhs.future_obtained_ = false;
+                rhs.task_.reset();
             }
             return *this;
-        }
-
-        void swap(promise& other)
-        {
-            task_.swap(other.task_);
-            std::swap(future_obtained_, other.future_obtained_);
         }
 
         // Result retrieval
         lcos::future<void> get_future(error_code& ec = throws)
         {
+            mutex_type::scoped_lock l(mtx_);
+
             if (!task_) {
                 task_ = new detail::future_object<void>();
                 future_obtained_ = false;
@@ -333,14 +340,10 @@ namespace hpx { namespace lcos { namespace local
             return lcos::detail::make_future_from_data<void>(task_);
         }
 
-//         template <typename F>
-//         void set_wait_callback(F f)
-//         {
-//             task_->set_wait_callback(f, this);
-//         }
-
         void set_value()
         {
+            mutex_type::scoped_lock l(mtx_);
+
             if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<void>::set_value",
@@ -356,6 +359,8 @@ namespace hpx { namespace lcos { namespace local
 
         void set_exception(boost::exception_ptr const& e)
         {
+            mutex_type::scoped_lock l(mtx_);
+
             if (!task_ && future_obtained_) {
                 HPX_THROW_EXCEPTION(task_moved,
                     "promise<void>::set_exception",
@@ -371,17 +376,20 @@ namespace hpx { namespace lcos { namespace local
 
         bool valid() const BOOST_NOEXCEPT
         {
+            mutex_type::scoped_lock l(mtx_);
             return task_.get() ? true : false;
         }
 
         bool is_ready() const
         {
+            mutex_type::scoped_lock l(mtx_);
             return task_->is_ready();
         }
 
     private:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
+        mutable mutex_type mtx_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -470,12 +478,6 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
             task_->run();
-        }
-
-        void swap(packaged_task& other)
-        {
-            task_.swap(other.task_);
-            std::swap(future_obtained_, other.future_obtained_);
         }
 
         // Result retrieval
@@ -595,12 +597,6 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
             task_->apply();
-        }
-
-        void swap(futures_factory& other)
-        {
-            task_.swap(other.task_);
-            std::swap(future_obtained_, other.future_obtained_);
         }
 
         // Result retrieval
