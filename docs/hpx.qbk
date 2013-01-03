@@ -52,6 +52,7 @@
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
+[def __boost_quickbook__        [@http://www.boost.org/doc/libs/release/doc/html/quickbook.html Quickbook]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 [def __boost_downloads__        [@http://www.boost.org/users/download/ Boost Downloads]]
@@ -61,6 +62,8 @@
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
+
+[def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
@@ -75,7 +78,7 @@
 [def __visual_cxx__             [@http://msdn.microsoft.com/en-us/visualc/default.aspx Visual C++]]
 [def __jemalloc__               [@http://www.canonware.com/jemalloc jemalloc]]
 [def __libunwind__              [@http://www.nongnu.org/libunwind libunwind]]
-[def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5) Libraries]]
+[def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5)]]
 [def __lorene__                 [@http://www.lorene.obspm.fr LORENE]]
 [def __papi__                   [@http://icl.cs.utk.edu/papi/ Performance Application Programming Interface (PAPI)]]
 [def __lapack__                 [@http://math-atlas.sourceforge.net/ Linear Algebra PACKage (LAPACK)]]
@@ -189,8 +192,8 @@ a list of people working in this group and participating in writing this
 documentation see __people__.
 
 This documentation is automatically generated for __hpx__ __version__ (from Git
-commit: __hpx_git_commit__) by the Boost QuickBook documentation tool.
-QuickBook can be found in the collection of __boost_tools__.
+commit: __hpx_git_commit__) by the Boost __boost_quickbook__ documentation tool.
+__boost_quickbook__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
