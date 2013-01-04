@@ -130,6 +130,5 @@ c N/A
 
       call crystal_setup(cr_h,np)
 
-      print*,' TEST in iniproc '
-
+      return
       end subroutine iniproc

@@ -31,3 +31,7 @@ HPX_REGISTER_ACTION(
     nekbone_partition_type::wrapped_type::loop_action,
     nekbone_partition_loop_action);
 
+HPX_REGISTER_ACTION(
+    nekbone_partition_type::wrapped_type::set_int_params_action,
+    nekbone_partition_set_int_params_action);
+
