@@ -10,6 +10,14 @@
 
 #include <boost/config.hpp>
 
+#include <hpx/config/export_definitions.hpp>
+
+#if !defined(BOOST_WINDOWS)
+#  define HPX_EXPORT_THREAD_SPECIFIC_PTR HPX_EXPORT
+#else
+#  define HPX_EXPORT_THREAD_SPECIFIC_PTR
+#endif
+
 // native implementation
 #if defined(HPX_HAVE_NATIVE_TLS)
 
@@ -24,14 +32,6 @@
 #endif
 
 #include <boost/assert.hpp>
-
-#include <hpx/config/export_definitions.hpp>
-
-#if !defined(BOOST_WINDOWS)
-#  define HPX_EXPORT_THREAD_SPECIFIC_PTR HPX_EXPORT
-#else
-#  define HPX_EXPORT_THREAD_SPECIFIC_PTR
-#endif
 
 namespace hpx { namespace util
 {
