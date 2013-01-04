@@ -94,7 +94,7 @@ Linux
 3) Invoke CMake from your build directory, pointing the CMake driver to the root
    of your HPX source tree::
 
-    $ cmake -DBOOST_ROOT=/your_boost_directory [other CMake variable definitions] /path/to/source/tree
+    $ cmake -DBOOST_ROOT=/your_boost_directory [other CMake variable definitions] /path/to/hpx/source/tree
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of nodes
@@ -105,6 +105,73 @@ Linux
 5) To complete the build and install HPX::
 
     $ gmake install
+
+Mac OSX
+-------
+
+1) Install a recent version of LLVM and Clang.
+   In order to build hpx you will need a fairly recent version of Clang
+   (at least version 3.2 of Clang and LLVM). For more instructions please 
+   see http://clang.llvm.org/get_started.html.
+
+   If you're using Homebrew, `brew install llvm --with-clang` will do the trick
+   and install Clang V3.2 into `/usr/local/bin`.
+
+2) Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++ 
+   standard library. You need to use the trunk version; what's currently bundled
+   with XCode or OS X aren't quite there yet. You can follow the steps in
+   http://libcxx.llvm.org/ if you choose, but here's briefly how it could be built::
+
+      cd /path/to
+      git clone http://llvm.org/git/libcxx.git
+      cd libcxx/lib
+      CXX=clang++-3.2 CC=clang-3.2 TRIPLE=-apple- ./buildit
+
+   The library is then found in `/path/to/libcxx/include` and
+   `/path/to/libcxx/lib`, respectively.
+
+3) Build (and install) a recent version of Boost, using Clang and libc++::
+   To build Boost with Clang and make it link to libc++ as standard library,
+   you'll need to set up the following in your Boost `~/user-config.jam`
+   file::
+
+      # user-config.jam (put this file into your home directory)
+      # ...
+      # Clang 3.2
+      using clang
+        : 3.2
+        : "/usr/local/bin/clang++"
+        : <cxxflags>"-std=c++11 -stdlib=libc++ -isystem /path/to/libcxx/include"
+          <linkflags>"-stdlib=libc++ -L/path/to/libcxx/lib"
+        ;
+
+   You can then use this as your build command::
+
+      b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang-3.2 install -j5
+
+4) Clone the master HPX git repository (or a stable tag)::
+
+    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+
+5) Build HPX, finally::
+
+      $ cd hpx
+      $ mkdir my_hpx_build
+      $ cd my_hpx_build
+
+   To build with Clang 3.2, execute::
+
+      $ cmake /path/to/hpx/source/tree \
+           -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
+           -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.3 \
+           -DBOOST_ROOT=/your_boost_directory \
+           -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
+           -DLINK_FLAGS="-L /path/to/libcxx/lib"
+      $ make -j5
+
+6) To complete the build and install HPX::
+
+    $ make install
 
 Windows
 -------
@@ -128,7 +195,7 @@ Windows
    located as BOOST_ROOT.
 
 5) Press the "Configure" button. A window will pop up asking you which compilers
-   to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is 
+   to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is
    supported as well).
 
 6) If the "Generate" button is not clickable, press "Configure" again. Repeat
