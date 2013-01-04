@@ -129,7 +129,11 @@ endif()
 
 # Decide whether to use Boost.Context for coroutine implementation
 if(${BOOST_MINOR_VERSION} GREATER 50)
-  hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+  if (APPLE)
+    hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: ON)." ON ADVANCED)
+  else()
+    hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+  endif()
 endif()
 
 ################################################################################
@@ -458,7 +462,11 @@ endif()
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+if(APPLE)
+  hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: OFF)" OFF ADVANCED)
+else()
+  hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+endif()
 
 if(HPX_HAVE_NATIVE_TLS)
   hpx_info("tls" "Native TLS is enabled.")
@@ -774,6 +782,11 @@ else()
     hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
 
+  if(APPLE)
+    hpx_use_flag_if_available(-stdlib=libc++ LANGUAGES CXX)
+    hpx_use_flag_if_available(-ftemplate-depth=256 LANGUAGES CXX)
+  endif()
+
   ##############################################################################
   # C++11
   ##############################################################################
@@ -971,7 +984,11 @@ else()
   ##############################################################################
   # System libraries
   ##############################################################################
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl rt)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl)
+
+  if(NOT APPLE)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} rt)
+  endif()
 
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)

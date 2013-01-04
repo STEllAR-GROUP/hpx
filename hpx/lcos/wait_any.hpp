@@ -468,9 +468,9 @@ namespace hpx
             BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_TYPE, _)
         > argument_type;
 
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _))));
+                argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _)))));
 
         p.apply();
         return p.get_future();

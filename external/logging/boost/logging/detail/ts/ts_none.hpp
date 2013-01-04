@@ -31,6 +31,7 @@ namespace threading {
 
     struct no_lock {
         no_lock(no_mutex &) {}
+        ~no_lock() {}
     };
 
     struct no_mutex {
