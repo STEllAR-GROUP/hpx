@@ -50,7 +50,10 @@ macro(add_hpx_config_test name variable)
       OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name}
       FLAGS ${${name}_FLAGS})
 
-    if("${${name}_RESULT}" STREQUAL "0")
+    if(NOT "${${name}_HAS_UNUSED_ARGUMENT_WARNING}" STREQUAL "")
+      set(${variable} OFF CACHE STRING "${name} state.")
+      hpx_warn("config_test.${name}" "Test failed to compile without unused argument warnings with the ${${name}_LANGUAGE} compiler.")
+    elseif("${${name}_RESULT}" STREQUAL "0")
       set(test_result 0)
 
       execute_process(

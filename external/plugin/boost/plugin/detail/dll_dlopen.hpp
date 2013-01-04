@@ -24,7 +24,7 @@
 
 #include <boost/plugin/config.hpp>
 
-#if !defined(__ANDROID__) && !defined(ANDROID)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
 #include <link.h>
 #endif
 #include <dlfcn.h>
@@ -257,7 +257,7 @@ namespace boost { namespace plugin {
         }
 
     public:
-#if !defined(__ANDROID__) && !defined(ANDROID)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
         std::string get_directory() const
         {
             // now find the full path of the loaded library
