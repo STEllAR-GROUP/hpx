@@ -782,6 +782,11 @@ else()
     hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
 
+  if(APPLE)
+    hpx_use_flag_if_available(-stdlib=libc++ LANGUAGES CXX)
+    hpx_use_flag_if_available(-ftemplate-depth=256 LANGUAGES CXX)
+  endif()
+
   ##############################################################################
   # C++11
   ##############################################################################
