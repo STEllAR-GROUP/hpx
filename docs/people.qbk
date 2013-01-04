@@ -83,6 +83,12 @@ our tables below.
 
 [heading Acknowledgements]
 
+Thanks also to the following people who contributed directly or indirectly to 
+the project through discussions, pull requests, documentation patches, etc.
+
+* Pyry Jahkola, who contributed the Mac OS build system and build documentation
+  on how to build HPX using Clang and libc++.
+
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge Thomas Sterling, who was instrumental in the creation
 of ParalleX as well as the NSF, DOE, DARPA, and __cct__ who fund and support our
