@@ -19,9 +19,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0)));
+                argument_type(f0))));
         p.apply();
         return p.get_future();
     }
