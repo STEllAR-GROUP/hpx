@@ -120,6 +120,7 @@
 [/ Section link shortcuts]
 [def __boost_installation__     [link hpx.tutorial.getting_started.boost_installation Installing Boost Libraries]]
 [def __unix_installation__      [link hpx.tutorial.getting_started.unix_installation How to Install __hpx__ on Unix Variants]]
+[def __macos_installation__     [link hpx.tutorial.getting_started.macos_installation How to Install __hpx__ on Mac OS]]
 [def __windows_installation__   [link hpx.tutorial.getting_started.windows_installation How to Install __hpx__ on Windows]]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
 

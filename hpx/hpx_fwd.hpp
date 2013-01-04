@@ -650,12 +650,21 @@ namespace hpx
     /// The function \a find_here() can be used to retrieve the global id
     /// usable to refer to the current locality.
     ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
     /// \note     Generally, the id of a locality can be used for instance to
     ///           create new instances of components and to invoke plain actions
     ///           (global functions).
     ///
     /// \returns  The global id representing the locality this function has
     ///           been called on.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
@@ -671,12 +680,21 @@ namespace hpx
     /// The function \a find_all_localities() can be used to retrieve the
     /// global ids of all localities currently available to this application.
     ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
     /// \note     Generally, the id of a locality can be used for instance to
     ///           create new instances of components and to invoke plain actions
     ///           (global functions).
     ///
     /// \returns  The global ids representing the localities currently
     ///           available to this application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return an empty vector otherwise.
@@ -700,12 +718,20 @@ namespace hpx
     ///
     /// \param type  [in] The type of the components for which the function should
     ///           return the available localities.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
     ///
     /// \returns  The global ids representing the localities currently
     ///           available to this application which support the creation of
     ///           instances of the given component type. If no localities
     ///           supporting the given component type are currently available,
     ///           this function will return an empty vector.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return an empty vector otherwise.
@@ -719,8 +745,8 @@ namespace hpx
     ///        supports the given component type.
     ///
     /// The function \a find_locality() can be used to retrieve the
-    /// global id of an arbitrary localities currently available to this 
-    /// application which supports the creation of instances of the given 
+    /// global id of an arbitrary localities currently available to this
+    /// application which supports the creation of instances of the given
     /// component type.
     ///
     /// \note     Generally, the id of a locality can be used for instance to
@@ -729,12 +755,20 @@ namespace hpx
     ///
     /// \param type  [in] The type of the components for which the function should
     ///           return any available locality.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
     ///
     /// \returns  The global id representing an arbitrary locality currently
     ///           available to this application which supports the creation of
     ///           instances of the given component type. If no locality
     ///           supporting the given component type is currently available,
     ///           this function will return \a hpx::naming::invalid_id.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
@@ -754,6 +788,11 @@ namespace hpx
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
     /// \see      \a hpx::find_all_localities
     HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
     HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async();
@@ -767,9 +806,17 @@ namespace hpx
     ///
     /// \param t  The component type for which the number of connected
     ///           localities should be retrieved.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// \see      \a hpx::find_all_localities
     HPX_API_EXPORT boost::uint32_t get_num_localities(
@@ -896,22 +943,22 @@ namespace hpx
     ///
     /// This function returns the id of the current locality.
     ///
-    /// \param ec         [in,out] This represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
     ///
-    /// \note   The returned value is zero based and it's maximum value is
-    ///         smaller than the overall number of localities the current
-    ///         application is running on (as returned by
-    ///         \a get_num_localities()).
+    /// \note     The returned value is zero based and it's maximum value is
+    ///           smaller than the overall number of localities the current
+    ///           application is running on (as returned by
+    ///           \a get_num_localities()).
     ///
-    /// \note   This function needs to be executed on a HPX-thread. It will
-    ///         fail otherwise (it will return -1).
+    /// \note     This function needs to be executed on a HPX-thread. It will
+    ///           fail otherwise (it will return -1).
     ///
-    /// \note   As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///         function doesn't throw but returns the result code using the
-    ///         parameter \a ec. Otherwise it throws an instance of
-    ///         hpx::exception.
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -942,8 +989,17 @@ namespace hpx
     HPX_API_EXPORT boost::uint64_t get_system_uptime();
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the id of the locality where the object referenced by the 
+    /// \brief Return the id of the locality where the object referenced by the
     ///        given id is currently located on
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
         error_code& ec = throws);
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(

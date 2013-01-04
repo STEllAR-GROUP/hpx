@@ -235,7 +235,7 @@ and to the section __cmake_hpx__.
 [endsect] [/ How to Install __hpx__ on Unix Variants]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:unix_installation How to Install __hpx__ on MacOS]
+[section:macos_installation How to Install __hpx__ on MacOS]
 
 This section describes how to build__hpx__ for Mac OS X (with recent versions
 of Clang, libc++, and Boost).

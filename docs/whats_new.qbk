@@ -19,12 +19,16 @@ This release is continuing along the lines of code and API consolidation, and
 overall usability inprovements. We dedicated much attention to performance and
 we were able to significantly improve the threading and networking subsystems.
 
-We successfully ported HPX to the Android platform. HPX applications now not
+We successfully ported __hpx__ to the Android platform. __hpx__ applications now not
 only can run on mobile devices, but we support heterogeneous applications running
 across architecture boundaries. At the Supercomputing Conference 2012 we
 demonstrated connecting Android tablets to simulations running on a Linux cluster.
 The Android tablet was used to query performance counters from the Linux simulation
 and to steer its parameters.
+
+We successfully ported __hpx__ to Mac OSX (using the Clang compiler). Thanks to
+Pyry Jahkola for contributing the corresponding patches. Please see the section
+__macos_installation__ for more details.
 
 We made a special effort to make HPX usable in highly concurrent use cases. Many
 of the HPX API functions which possibly take longer than 100 microseconds to
