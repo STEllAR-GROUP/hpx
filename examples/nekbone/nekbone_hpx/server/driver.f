@@ -93,6 +93,78 @@ c       Weights
         real wxm1(lx1), wym1(ly1), wzm1(lz1), w3m1(lx1,ly1,lz1)      
 ccccccccccccccccccccccccccccccccccc
         end subroutine init_mesh
+        subroutine proxy_setupds( 
+     &     hpx_bti,gs_handle,
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid,
+c INPUT
+     &     xc,yc,zc,bc,ccurve,cbc,
+c PARALLEL
+     &     node,pid,np,nullpid,node0
+     &     nelgf,lglel,gllel,gllnid,nelgv,nelgt, 
+     &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
+     &     ifdblas,cr_h,gsh,gsh_fld,xxth,
+c nekmpi
+     &     mid,mp,nekcomm,nekgroup,nekreal)
+      use, intrinsic :: iso_c_binding, only : c_ptr
+      TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
+ccccccccccccccccccccccccccccccccccc
+c SIZE
+c     These numbers come from example1 
+      parameter (ldim=3)
+      parameter (lx1=10,ly1=lx1,lz1=lx1)
+      parameter (lxd=10,lyd=lxd,lzd=1)
+
+      parameter (lp = 2)
+      parameter (lelt=1)
+
+      parameter (lelg=lelt*lp)
+      parameter (lelx=lelg,lely=1,lelz=1)
+
+      parameter (ldimt=1,ldimt1=ldimt+1)
+
+c      common /dimn/ nelx,nely,nelz,nelt,nelg
+c     $            , nx1,ny1,nz1,ndim,nfield,nid
+      integer nelx,nely,nelz,nelt,nelg
+     &            , nx1,ny1,nz1,ndim,nfield,nid
+
+ccccccccccccccccccccccccccccccccccc
+c INPUT
+      real xc(8,lelt),yc(8,lelt),zc(8,lelt),
+     &       bc(5,6,lelt,0:ldimt1)
+      character*1     ccurve(12,lelt)
+      character*3     cbc(6,lelt,0:ldimt1)
+ccccccccccccccccccccccccccccccccccc
+c PARALLEL
+      integer node,pid,np,nullpid,node0
+c     Maximum number of elements (limited to 2**31/12, at least
+c      for now)
+      parameter(nelgt_max = 178956970)
+      integer nelgf(0:ldimt1)
+     &              ,lglel(lelt)
+     &              ,gllel(lelg)
+     &              ,gllnid(lelg)
+     &              ,nelgv,nelgt
+
+      integer*8      nvtot
+
+      logical ifgprnt
+      integer wdsize,isize,lsize,csize
+      logical ifdblas
+C
+C     crystal-router, gather-scatter, and xxt handles (xxt=csr grid
+C     solve)
+C
+      integer cr_h, gsh, gsh_fld(0:ldimt1), xxth(ldimt1)
+
+ccccccccccccccccccccccccccccccccccc
+c nekmpi
+      integer mid,mp,nekcomm,nekgroup,nekreal
+
+      integer gs_handle
+
+        end subroutine proxy_setupds 
       end interface ! }}}
 
       integer hpx_mype,hpx_numberpe
@@ -163,7 +235,7 @@ c     Weights
       real wxm1(lx1), wym1(ly1), wzm1(lz1), w3m1(lx1,ly1,lz1)      
 ccccccccccccccccccccccccccccccccccc
 c nekmpi
-      integer nid_,np_,nekcomm,nekgroup,nekreal
+      integer nid_,np_,mid,mp,nekcomm,nekgroup,nekreal
 
 c     local variables
       parameter (lxyz = lx1*ly1*lz1)
@@ -210,6 +282,23 @@ c PARALLEL
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c WZ
      &     zgm1,wxm1,wym1,wzm1,w3m1)
+
+      call proxy_setupds( 
+     &     hpx_bti,gsh,
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid,
+c INPUT
+     &     xc,yc,zc,bc,ccurve,cbc,
+c PARALLEL
+     &     node,pid,np,nullpid,node0
+     &     nelgf,lglel,gllel,gllnid,nelgv,nelgt, 
+     &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
+     &     ifdblas,cr_h,gsh,gsh_fld,xxth,
+c nekmpi
+     &     mid,mp,nekcomm,nekgroup,nekreal)
+
+        return
       end subroutine nekproxy ! }}}
 
       subroutine init_dim( ! {{{
@@ -425,3 +514,187 @@ c local variables
 
       return
       end subroutine cubic ! }}}
+
+      subroutine proxy_setupds( ! {{{
+     &     hpx_bti,gs_handle,
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid,
+c INPUT
+     &     xc,yc,zc,bc,ccurve,cbc,
+c PARALLEL
+     &     node,pid,np,nullpid,node0
+     &     nelgf,lglel,gllel,gllnid,nelgv,nelgt, 
+     &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
+     &     ifdblas,cr_h,gsh,gsh_fld,xxth,
+c nekmpi
+     &     mid,mp,nekcomm,nekgroup,nekreal)
+      use, intrinsic :: iso_c_binding, only : c_ptr
+      TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
+ccccccccccccccccccccccccccccccccccc
+c SIZE
+c     These numbers come from example1 
+      parameter (ldim=3)
+      parameter (lx1=10,ly1=lx1,lz1=lx1)
+      parameter (lxd=10,lyd=lxd,lzd=1)
+
+      parameter (lp = 2)
+      parameter (lelt=1)
+
+      parameter (lelg=lelt*lp)
+      parameter (lelx=lelg,lely=1,lelz=1)
+
+      parameter (ldimt=1,ldimt1=ldimt+1)
+
+c      common /dimn/ nelx,nely,nelz,nelt,nelg
+c     $            , nx1,ny1,nz1,ndim,nfield,nid
+      integer nelx,nely,nelz,nelt,nelg
+     &            , nx1,ny1,nz1,ndim,nfield,nid
+
+ccccccccccccccccccccccccccccccccccc
+c INPUT
+      real xc(8,lelt),yc(8,lelt),zc(8,lelt),
+     &       bc(5,6,lelt,0:ldimt1)
+      character*1     ccurve(12,lelt)
+      character*3     cbc(6,lelt,0:ldimt1)
+ccccccccccccccccccccccccccccccccccc
+c PARALLEL
+      integer node,pid,np,nullpid,node0
+c     Maximum number of elements (limited to 2**31/12, at least
+c      for now)
+      parameter(nelgt_max = 178956970)
+      integer nelgf(0:ldimt1)
+     &              ,lglel(lelt)
+     &              ,gllel(lelg)
+     &              ,gllnid(lelg)
+     &              ,nelgv,nelgt
+
+      integer*8      nvtot
+
+      logical ifgprnt
+      integer wdsize,isize,lsize,csize
+      logical ifdblas
+C
+C     crystal-router, gather-scatter, and xxt handles (xxt=csr grid
+C     solve)
+C
+      integer cr_h, gsh, gsh_fld(0:ldimt1), xxth(ldimt1)
+
+ccccccccccccccccccccccccccccccccccc
+c nekmpi
+      integer mid,mp,nekcomm,nekgroup,nekreal
+
+c other variables
+      integer gs_handle, dof
+      integer*8 glo_num(lx1*ly1*lz1*lelt)
+    
+c N/A
+      !t0 = dnekclock()
+  
+      call set_vert_box(glo_num, ! Set global-to-local map
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid,
+c PARALLEL
+     &     node,pid,np,nullpid,node0
+     &     nelgf,lglel,gllel,gllnid,nelgv,nelgt, 
+     &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
+     &     ifdblas,cr_h,gsh,gsh_fld,xxth)
+
+      return
+      end subroutine proxy_setupds ! }}}
+
+      subroutine set_vert_box( ! {{{
+     &     glo_num,
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid,
+c PARALLEL
+     &     node,pid,np,nullpid,node0
+     &     nelgf,lglel,gllel,gllnid,nelgv,nelgt, 
+     &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
+     &     ifdblas,cr_h,gsh,gsh_fld,xxth)
+
+ccccccccccccccccccccccccccccccccccc
+c SIZE
+c     These numbers come from example1 
+      parameter (ldim=3)
+      parameter (lx1=10,ly1=lx1,lz1=lx1)
+      parameter (lxd=10,lyd=lxd,lzd=1)
+
+      parameter (lp = 2)
+      parameter (lelt=1)
+
+      parameter (lelg=lelt*lp)
+      parameter (lelx=lelg,lely=1,lelz=1)
+
+      parameter (ldimt=1,ldimt1=ldimt+1)
+
+c      common /dimn/ nelx,nely,nelz,nelt,nelg
+c     $            , nx1,ny1,nz1,ndim,nfield,nid
+      integer nelx,nely,nelz,nelt,nelg
+     &            , nx1,ny1,nz1,ndim,nfield,nid
+
+ccccccccccccccccccccccccccccccccccc
+c PARALLEL
+      integer node,pid,np,nullpid,node0
+c     Maximum number of elements (limited to 2**31/12, at least
+c      for now)
+      parameter(nelgt_max = 178956970)
+      integer nelgf(0:ldimt1)
+     &              ,lglel(lelt)
+     &              ,gllel(lelg)
+     &              ,gllnid(lelg)
+     &              ,nelgv,nelgt
+
+      integer*8      nvtot
+
+      logical ifgprnt
+      integer wdsize,isize,lsize,csize
+      logical ifdblas
+C
+C     crystal-router, gather-scatter, and xxt handles (xxt=csr grid
+C     solve)
+C
+      integer cr_h, gsh, gsh_fld(0:ldimt1), xxth(ldimt1)
+
+c other variables
+      integer*8 glo_num(1),ii,kg,jg,ig ! The latter 3 for proper promotion
+
+      integer e,ex,ey,ez,eg
+
+      nn = nx1-1  ! nn := polynomial order
+
+      do e=1,nelt
+        eg = lglel(e)
+        call get_exyz(ex,ey,ez,eg,nelx,nely,nelz)
+        do k=0,nn
+        do j=0,nn
+        do i=0,nn
+           kg = nn*(ez-1) + k
+           jg = nn*(ey-1) + j
+           ig = nn*(ex-1) + i
+           ii = 1 + ig + jg*(nn*nelx+1) + kg*(nn*nelx+1)*(nn*nely+1)
+           ll = 1 + i + nx1*j + nx1*ny1*k + nx1*ny1*nz1*(e-1)
+           glo_num(ll) = ii
+        enddo
+        enddo
+        enddo
+      enddo
+
+      return
+      end subroutine set_vert_box ! }}}
+
+      subroutine get_exyz(ex,ey,ez,eg,nelx,nely,nelz) ! {{{
+      integer ex,ey,ez,eg
+
+      nelxy = nelx*nely
+
+      ez = 1 +  (eg-1)/nelxy
+      ey = mod1 (eg,nelxy)
+      ey = 1 +  (ey-1)/nelx
+      ex = mod1 (eg,nelx)
+
+      return
+      end ! }}}
+
