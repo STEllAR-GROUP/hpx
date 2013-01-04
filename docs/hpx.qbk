@@ -149,6 +149,8 @@
 [def __action_invocation__      [link hpx.manual.applying_actions.action_invocation Action Invocation]]
 [def __action_error_handling__  [link hpx.manual.applying_actions.action_error_handling Action Error Handling ]]
 
+[def __scheduling__             [link hpx.manual.schedulers __hpx__ Thread Scheduling Policies]]
+
 [def __cmake_hpx__              [link hpx.manual.cmake Building __hpx__ with CMake]]
 [def __cmake_quick_start__      [link hpx.manual.cmake.quick_start Quick Start]]
 [def __cmake_basic_usage__      [link hpx.manual.cmake.basic_usage Basic CMake Usage]]
@@ -220,6 +222,7 @@ __boost_quickbook__ can be found in the collection of __boost_tools__.
 [include manual/lcos.qbk]
 [include manual/exceptions.qbk]
 [include manual/performance_counters.qbk]
+[include manual/scheduling_policies.qbk]
 
 [endsect] [/ Manual]
 

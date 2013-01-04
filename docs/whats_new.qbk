@@ -48,6 +48,7 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* #653 - Make HPX build on OS X + Clang + libc++
 * #651 - Add fine-grained control for thread pinning
 * #650 - Command line no error message when using -hpx:(anything)
 * #645 - Command line aliases don't work in @files
@@ -169,6 +170,7 @@ HPX' releases so far.
 * #458 - Consolidate hpx::util::high_resolution_timer and
          hpx::util::high_resolution_clock
 * #457 - index out of bounds in allgather_and_gate on 4 cores or more
+* #448 - Make HPX compile with clang
 * #447 - 'make tests' should execute tests on local installation
 * #446 - Remove SVN-related code from the codebase
 * #444 - race condition in smp

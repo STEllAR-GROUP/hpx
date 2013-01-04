@@ -88,6 +88,8 @@ the project through discussions, pull requests, documentation patches, etc.
 
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
   on how to build HPX using Clang and libc++.
+* Patricia Grubel (New Mexico State University), who contributed the desciption 
+  of the different __hpx__ thread scheduler policies.
 
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge Thomas Sterling, who was instrumental in the creation

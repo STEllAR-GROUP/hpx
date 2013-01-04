@@ -228,6 +228,31 @@ along with a brief explanation.
     ]
 ]
 
+Here is a list of options controlling the scheduling policies available for
+all applications built with __hpx__. For more information about the 
+avalable scheduling policies see the section __scheduling__.
+
+[variablelist Enable HPX Scheduling Policies
+    [[`HPX_LOCAL_SCHEDULER:BOOL`]
+     [Enable local scheduling policy (default: `OFF`)]
+    ]
+    [[`HPX_GLOBAL_SCHEDULER:BOOL`]
+     [Enable global scheduling policy (default: `OFF`)]
+    ]
+    [[`HPX_ABP_SCHEDULER:BOOL`]
+     [Enable ABP scheduling policy (default: `OFF`)]
+    ]
+    [[`HPX_ABP_PRIORITY_SCHEDULER:BOOL`]
+     [Enable APB priority scheduling policy (default: `OFF`)]
+    ]
+    [[`HPX_HIERARCHY_SCHEDULER:BOOL`]
+     [Enable hierarchy scheduling policy (default: `OFF`)]
+    ]
+    [[`HPX_PERIODIC_PRIORITY_SCHEDULER:BOOL`]
+     [Enable periodic priority scheduling policy (default: `OFF`)]
+    ]
+]
+
 Here is a more complete list of CMake variables specific to __hpx__. These
 variables are used more seldom and are mainly useful for debugging purposes.
 
