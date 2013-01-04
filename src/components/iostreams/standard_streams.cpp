@@ -12,9 +12,11 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/util/static.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/components/iostreams/lazy_ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
@@ -71,16 +73,25 @@ namespace hpx { namespace iostreams
                     components::server::create_with_args<ostream_type>(
                         boost::ref(detail::get_outstream(Tag()))),
                     naming::id_type::managed);
+
+                // use async version to force the current thread to be suspended,
+                // which avoids deadlocks if executed with one OS-thread
+                lcos::future<bool> f = agas::register_name_async(cout_name, cout_id);
+                f.get();
+
                 client.reset(new lazy_ostream(cout_id));
-                agas::register_name(cout_name, cout_id);
             }
 
             else
             {
-                naming::gid_type gid;
-
                 // FIXME: Use an error code here?
-                if (!agas::resolve_name(cout_name, gid))
+
+                // use async version to force the current thread to be suspended,
+                // which avoids deadlocks if executed with one OS-thread
+                lcos::future<naming::id_type> f = agas::resolve_name_async(cout_name);
+                naming::id_type gid = f.get();
+
+                if (!gid)
                 {
                     error_code ec(lightweight);
                     naming::id_type console = agas::get_console_locality(ec);
@@ -93,8 +104,10 @@ namespace hpx { namespace iostreams
                     hpx::async<create_cout_action>(console).get();
 
                     // Try again
-                    bool r = agas::resolve_name(cout_name, gid, ec);
-                    if (HPX_UNLIKELY(ec || !r || !gid))
+                    f = agas::resolve_name_async(cout_name);
+                    gid = f.get(ec);
+
+                    if (HPX_UNLIKELY(ec || !gid))
                     {
                         HPX_THROW_EXCEPTION(service_unavailable,
                             "stream_raii::stream_raii",
@@ -102,17 +115,29 @@ namespace hpx { namespace iostreams
                     }
                 }
 
-                client.reset(new lazy_ostream(
-                    naming::id_type(gid, naming::id_type::managed)));
+                client.reset(new lazy_ostream(gid));
             }
         }
 
         boost::shared_ptr<lazy_ostream> client;
     };
 
+    // provide thread-safely initialized mutex
+    typedef lcos::local::spinlock mutex_type;
+    mutex_type& get_mutex()
+    {
+        util::static_<mutex_type> mtx_;
+        return mtx_.get();
+    }
+
     // return the singleton stream objects
     lazy_ostream& cout()
     {
+        // Protect using a HPX spinlock to avoid deadlocks inside boost::call_once
+        // which is used by util::reinitializable_static. This is a temporary hack
+        // to be used until we have a hpx::call_once.
+        mutex_type::scoped_lock l(get_mutex());
+
         util::reinitializable_static<stream_raii<raii_cout_tag>, raii_cout_tag> cout_(
             std::string("/locality(console)/output_stream(cout)"));
         return *cout_.get().client;
@@ -120,6 +145,11 @@ namespace hpx { namespace iostreams
 
     lazy_ostream& cerr()
     {
+        // Protect using a HPX spinlock to avoid deadlocks inside boost::call_once
+        // which is used by util::reinitializable_static. This is a temporary hack
+        // to be used until we have a hpx::call_once.
+        mutex_type::scoped_lock l(get_mutex());
+
         util::reinitializable_static<stream_raii<raii_cerr_tag>, raii_cerr_tag> cerr_(
             std::string("/locality(console)/output_stream(cerr)"));
         return *cerr_.get().client;
