@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support(util::section& ini, naming::gid_type const& prefix,
+        runtime_support(naming::gid_type const& prefix,
                 naming::resolver_client& agas_client, applier::applier& applier);
 
         ~runtime_support()
@@ -278,7 +278,6 @@ namespace hpx { namespace components { namespace server
 
         component_map_mutex_type cm_mtx_;
         component_map_type components_;
-        util::section& ini_;
 
         lcos::local::spinlock globals_mtx_;
         std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;

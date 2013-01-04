@@ -98,7 +98,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             util::runtime_configuration const& rtcfg,
             runtime_mode locality_mode, init_scheduler_type const& init)
-      : runtime(agas_client_, rtcfg),
+      : runtime(rtcfg),
         mode_(locality_mode), result_(0),
         main_pool_(1,
             boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2),
@@ -126,7 +126,7 @@ namespace hpx {
         applier_(parcel_handler_, *thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_locality(), agas_client_, applier_)
+        runtime_support_(parcel_handler_.get_locality(), agas_client_, applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);

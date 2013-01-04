@@ -161,8 +161,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration const& rtcfg)
+    runtime::runtime(util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         topology_(threads::create_topology()),
@@ -171,7 +170,7 @@ namespace hpx
         // initialize our TSS
         runtime::init_tss();
 
-        counters_.reset(new performance_counters::registry(agas_client));
+        counters_.reset(new performance_counters::registry());
     }
 
     ///////////////////////////////////////////////////////////////////////////

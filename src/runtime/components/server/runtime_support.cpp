@@ -107,10 +107,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support(util::section& ini,
+    runtime_support::runtime_support(
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             applier::applier& applier)
-      : stopped_(false), terminated_(false), ini_(ini)
+      : stopped_(false), terminated_(false)
     {
     }
 

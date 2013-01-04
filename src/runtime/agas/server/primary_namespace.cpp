@@ -1195,9 +1195,6 @@ void primary_namespace::kill_sync(
 { // {{{ kill_sync implementation
     using boost::fusion::at_c;
 
-    naming::gid_type const agas_prefix_
-        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
-
     std::list<lcos::promise<void> > futures;
 
     ///////////////////////////////////////////////////////////////////////////

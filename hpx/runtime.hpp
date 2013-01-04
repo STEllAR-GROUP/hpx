@@ -49,8 +49,7 @@ namespace hpx
             boost::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration const& rtcfg);
+        runtime(util::runtime_configuration const& rtcfg);
 
         virtual ~runtime()
         {

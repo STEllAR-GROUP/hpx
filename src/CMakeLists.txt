@@ -116,9 +116,11 @@ if(HPX_HAVE_STACKTRACES)
 endif()
 
 if(NOT MSVC)
-  add_hpx_library_sources(hpx_external
-    GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/coroutine/swapcontext.cpp"
-    APPEND)
+  if(NOT APPLE)
+    add_hpx_library_sources(hpx_external
+      GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/coroutine/swapcontext.cpp"
+      APPEND)
+  endif()
 else()
   if(HPX_EMULATE_SWAP_CONTEXT)
     set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")

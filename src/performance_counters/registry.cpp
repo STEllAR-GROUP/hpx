@@ -23,10 +23,6 @@
 namespace hpx { namespace performance_counters
 {
     ///////////////////////////////////////////////////////////////////////////
-    registry::registry(naming::resolver_client& agas_client)
-      : agas_client_(agas_client)
-    {}
-
     registry::counter_type_map_type::iterator
         registry::locate_counter_type(std::string const& type_name)
     {
