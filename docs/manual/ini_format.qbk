@@ -1,0 +1,78 @@
+[/=============================================================================
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:ini_format The __hpx__ INI File Format]
+
+All __hpx__ applications can be configured using a special file format which is
+similar to the well known __ini_file_format__. This is a structured text format
+allowing to group key/value pairs (properties) into sections. The basic element
+contained in an ini file is the property. Every property has a name and a
+value, delimited by an equals sign (`'='`). The name appears to the left of the
+equals sign:
+``
+    name=value
+``
+The value may contain equal signs as only the first `'='` character
+is interpreted as the delimiter between `name` and `value`. Whitespace before
+the name, after the value and immediately before and after the delimiting equal
+sign is ignored. Whitespace inside the value is retained.
+
+Properties may be grouped into arbitrarily named sections. The section name
+appears on a line by itself, in square brackets (`[` and `]`). All properties
+after the section declaration are associated with that section. There is no
+explicit "end of section" delimiter; sections end at the next section
+declaration, or the end of the file
+``
+    [section]
+``
+In __hpx__ sections can be nested. A nested section has a name composed of
+all section names it is embedded in. The section names are concatenated using
+a dot (`'.'`):
+``
+    [outer_section.inner_section]
+``
+Here `inner_section` is logically nested within `outer_section`.
+
+It is possible to use the full section name concatenated with the property
+name to refer to a particular property. For example in:
+``
+    [a.b.c]
+    d = e
+``
+the property value of `d` can be referred to as `a.b.c.d=e`.
+
+In __hpx__ ini files can contain comments. Hash signs (`'#'`) at the beginning
+of a line indicate a comment. All characters starting with the `'#'` until the
+end of line are ignored.
+
+If a property with the same name is reused inside a section, the second
+occurrence of this property name will override the first occurrence (discard the
+first value). Duplicate sections simply merge their properties together, as if
+they occurred contiguously.
+
+[teletype]
+In __hpx__ ini files, a property value `${FOO:default}` will use the environmental
+variable `FOO` to extract the actual value if it is set and `default` otherwise.
+No default has to be specified. Therefore `${FOO}` refers to the environmental
+variable `FOO`. If `FOO` is not set or empty the overall expression will evaluate
+to an empty string. A property value `$[section.key:default]` refers to the value
+held by the property `section.key` if it exists and `default` otherwise. No
+default has to be specified. Therefore `$[section.key]` refers to the property
+`section.key`. If the property `section.key` is not set or empty, the overall
+expression will evaluate to an empty string.
+
+[note Any property `$[section.key:default]` is evaluated whenever it is queried
+      and not when the configuration data is initialized. This allows for lazy
+      evaluation and relaxes initialization order of different sections. The
+      only exception are recursive property values, e.g. values referring to
+      the very key they are associated with. Those property values are evaluated
+      at initialization time to avoid infinite recursion.]
+[c++]
+
+[endsect] [/ The __hpx__ INI File Format]
+

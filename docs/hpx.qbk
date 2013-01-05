@@ -214,7 +214,16 @@ __boost_quickbook__ can be found in the collection of __boost_tools__.
 [section:manual Manual]
 
 [include manual/cmake.qbk]
-[include manual/init.qbk]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:init Launching __hpx__]
+
+[include manual/configuration.qbk]
+[include manual/logging.qbk]
+[include manual/commandline.qbk]
+
+[endsect] [/ Launching HPX]
+
 [include manual/applications.qbk]
 [include manual/names.qbk]
 [include manual/applying_actions.qbk]
