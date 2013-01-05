@@ -36,6 +36,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
