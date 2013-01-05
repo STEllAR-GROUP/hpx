@@ -7,7 +7,7 @@
  HPX
 *****
 
-HPX is a a general purpose C++ runtime system for parallel and distributed
+HPX is a general purpose C++ runtime system for parallel and distributed
 applications of any scale. Even if that's quite a mouthful, we mean every
 word of it!
 
