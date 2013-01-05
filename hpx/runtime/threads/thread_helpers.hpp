@@ -592,4 +592,18 @@ namespace hpx { namespace applier
         components::component_type type, std::size_t count = 1);
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads
+{
+    // Import all thread creation functions into this name space (we will
+    // deprecate the functions in namespace applier above at some point).
+    using applier::register_thread_plain;
+    using applier::register_thread;
+    using applier::register_thread_nullary;
+
+    using applier::register_work_plain;
+    using applier::register_work;
+    using applier::register_work_nullary;
+}}
+
 #endif
