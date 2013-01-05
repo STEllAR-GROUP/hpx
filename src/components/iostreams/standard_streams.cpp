@@ -16,7 +16,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/components/iostreams/lazy_ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/once.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
@@ -24,9 +24,9 @@ typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cerr>
     create_cerr_action;
 
-HPX_REGISTER_PLAIN_ACTION(create_cout_action, create_cout_action, 
+HPX_REGISTER_PLAIN_ACTION(create_cout_action, create_cout_action,
     hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION(create_cerr_action, create_cerr_action, 
+HPX_REGISTER_PLAIN_ACTION(create_cerr_action, create_cerr_action,
     hpx::components::factory_enabled)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,12 +36,12 @@ HPX_REGISTER_PLAIN_ACTION(create_cerr_action, create_cerr_action,
 namespace hpx { namespace iostreams
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Tag types to be used for the RAII wrappers below
-    struct raii_cout_tag {};
-    struct raii_cerr_tag {};
-
     namespace detail
     {
+        // Tag types to be used for the RAII wrappers below
+        struct raii_cout_tag {};
+        struct raii_cerr_tag {};
+
         std::ostream& get_outstream(raii_cout_tag)
         {
             return std::cout;
@@ -51,6 +51,9 @@ namespace hpx { namespace iostreams
         {
             return std::cerr;
         }
+
+        char const* const cout_name = "/locality(console)/output_stream(cout)";
+        char const* const cerr_name = "/locality(console)/output_stream(cerr)";
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -61,7 +64,7 @@ namespace hpx { namespace iostreams
     {
         typedef components::managed_component<server::output_stream> ostream_type;
 
-        stream_raii(std::string const& cout_name)
+        stream_raii(char const* cout_name)
         {
             LRT_(info) << "stream_raii::stream_raii: creating '"
                        << cout_name << "' stream object";
@@ -122,36 +125,26 @@ namespace hpx { namespace iostreams
         boost::shared_ptr<lazy_ostream> client;
     };
 
-    // provide thread-safely initialized mutex
-    typedef lcos::local::spinlock mutex_type;
-    mutex_type& get_mutex()
-    {
-        util::static_<mutex_type> mtx_;
-        return mtx_.get();
-    }
-
     // return the singleton stream objects
     lazy_ostream& cout()
     {
-        // Protect using a HPX spinlock to avoid deadlocks inside boost::call_once
-        // which is used by util::reinitializable_static. This is a temporary hack
-        // to be used until we have a hpx::call_once.
-        mutex_type::scoped_lock l(get_mutex());
+        typedef util::reinitializable_static<
+            stream_raii<detail::raii_cout_tag>, detail::raii_cout_tag, 
+            1, lcos::local::once_flag
+        > static_type;
 
-        util::reinitializable_static<stream_raii<raii_cout_tag>, raii_cout_tag> cout_(
-            std::string("/locality(console)/output_stream(cout)"));
+        static_type cout_(detail::cout_name);
         return *cout_.get().client;
     }
 
     lazy_ostream& cerr()
     {
-        // Protect using a HPX spinlock to avoid deadlocks inside boost::call_once
-        // which is used by util::reinitializable_static. This is a temporary hack
-        // to be used until we have a hpx::call_once.
-        mutex_type::scoped_lock l(get_mutex());
+        typedef util::reinitializable_static<
+            stream_raii<detail::raii_cerr_tag>, detail::raii_cerr_tag, 
+            1, lcos::local::once_flag
+        > static_type;
 
-        util::reinitializable_static<stream_raii<raii_cerr_tag>, raii_cerr_tag> cerr_(
-            std::string("/locality(console)/output_stream(cerr)"));
+        static_type cerr_(detail::cerr_name);
         return *cerr_.get().client;
     }
 
