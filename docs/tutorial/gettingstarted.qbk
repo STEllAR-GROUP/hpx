@@ -264,7 +264,7 @@ of Clang, libc++, and Boost).
 
     You need to use the trunk version; what's currently bundled with XCode or
     OS X aren't quite there yet. You can follow the steps in
-    http://libcxx.llvm.org/ if you choose, but here's briefly how I built it:
+    http://libcxx.llvm.org/ if you choose, but here's briefly how it can be built:
 ``
         cd /path/to
         git clone http://llvm.org/git/libcxx.git

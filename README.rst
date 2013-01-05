@@ -114,8 +114,8 @@ Mac OSX
    (at least version 3.2 of Clang and LLVM). For more instructions please 
    see http://clang.llvm.org/get_started.html.
 
-   If you're using Homebrew, `brew install llvm --with-clang` will do the trick
-   and install Clang V3.2 into `/usr/local/bin`.
+   If you're using Homebrew, ``brew install llvm --with-clang`` will do the trick
+   and install Clang V3.2 into ``/usr/local/bin``.
 
 2) Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++ 
    standard library. You need to use the trunk version; what's currently bundled
@@ -127,12 +127,12 @@ Mac OSX
       cd libcxx/lib
       CXX=clang++-3.2 CC=clang-3.2 TRIPLE=-apple- ./buildit
 
-   The library is then found in `/path/to/libcxx/include` and
-   `/path/to/libcxx/lib`, respectively.
+   The library is then found in ``/path/to/libcxx/include`` and
+   ``/path/to/libcxx/lib``, respectively.
 
 3) Build (and install) a recent version of Boost, using Clang and libc++::
    To build Boost with Clang and make it link to libc++ as standard library,
-   you'll need to set up the following in your Boost `~/user-config.jam`
+   you'll need to set up the following in your Boost ``~/user-config.jam``
    file::
 
       # user-config.jam (put this file into your home directory)
