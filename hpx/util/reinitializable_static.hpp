@@ -88,6 +88,8 @@ namespace hpx { namespace util
         typedef T value_type;
 
     private:
+        typedef util::detail::initialize_once<T, Tag, Once> base_type;
+
         static void default_construct()
         {
             for (std::size_t i = 0; i < N; ++i)
@@ -130,14 +132,15 @@ namespace hpx { namespace util
         reinitializable_static()
         {
             // rely on ADL to find the proper call_once
-            call_once(constructed_, &reinitializable_static::default_constructor);
+            call_once(this->base_type::constructed_, 
+                &reinitializable_static::default_constructor);
         }
 
         template <typename U>
         reinitializable_static(U const& val)
         {
             // rely on ADL to find the proper call_once
-            call_once(constructed_,
+            call_once(this->base_type::constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
