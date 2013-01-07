@@ -55,7 +55,7 @@ HPX' releases so far.
 * [issue 653] - Make HPX build on OS X + Clang + libc++
 * [issue 651] - Add fine-grained control for thread pinning
 * [issue 650] - Command line no error message when using -hpx:(anything)
-* [issue 645] - Command line aliases don't work in `@file`
+* [issue 645] - Command line aliases don't work in [teletype]`@file`[c++]
 * [issue 644] - Terminated threads are not always properly cleaned up
 * [issue 640] - `future_data<T>::set_on_completed_` used without locks
 * [issue 638] - hpx build with intel compilers fails on linux
