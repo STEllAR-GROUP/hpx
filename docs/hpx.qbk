@@ -52,7 +52,8 @@
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
-[def __boost_quickbook__        [@http://www.boost.org/doc/libs/release/doc/html/quickbook.html Quickbook]]
+[def __boost_quickbook__        [@http://www.boost.org/doc/libs/release/doc/html/quickbook.html QuickBook]]
+[def __boost_auto_index__       [@http://www.boost.org/doc/libs/release/tools/auto_index/doc/html/index.html AutoIndex]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 [def __boost_downloads__        [@http://www.boost.org/users/download/ Boost Downloads]]
@@ -187,6 +188,33 @@
     </figure>
 ''']
 
+[/ Indexing support]
+
+[template index[title]'''
+    <index>
+       <title>'''[title]'''</title>
+    </index>
+''']
+
+[template indexterm1 [primary]'''
+    <indexterm>
+        <primary>'''[primary]'''</primary>
+    </indexterm>
+''']
+[template indexterm2 [primary secondary]'''
+    <indexterm type="hpx_index">
+        <primary>'''[primary]'''</primary>
+        <secondary>'''[secondary]'''</secondary>
+    </indexterm>
+''']
+[template indexterm3 [primary secondary tertiary]'''
+    <indexterm type="hpx_index">
+        <primary>'''[primary]'''</primary>
+        <secondary>'''[secondary]'''</secondary>
+        <tertiary>'''[tertiary]'''</tertiary>
+    </indexterm>
+''']
+
 [/ CONTENT]
 
 The __stellar__ Group ([*S]ystems [*T]echnologies, [*E]mergent Para[*ll]elism,
@@ -235,6 +263,10 @@ __boost_quickbook__ can be found in the collection of __boost_tools__.
 [include manual/scheduling_policies.qbk]
 
 [endsect] [/ Manual]
+
+[? __use_auto_index__
+    [index Index]
+]
 
 [? __hpx_doxygen__ [xinclude __hpx_docs_dir__/hpx_autodoc.xml]]
 

@@ -19,10 +19,10 @@ project, it generates the files needed by your build tool (GNU make, Visual
 Studio, etc) for building __hpx__.
 
 If you are really anxious about getting a functional __hpx__ build, go to the
-__cmake_quick_start__ section. If you are a CMake novice, start on 
-__cmake_basic_usage__ and then go back to the __cmake_quick_start__ once you 
-know what you are doing. The __cmake_options__ section is a reference for 
-customizing your build. If you already have experience with CMake, this is the 
+__cmake_quick_start__ section. If you are a CMake novice, start on
+__cmake_basic_usage__ and then go back to the __cmake_quick_start__ once you
+know what you are doing. The __cmake_options__ section is a reference for
+customizing your build. If you already have experience with CMake, this is the
 recommended starting point.
 
 [endsect]
@@ -54,8 +54,8 @@ We use here the command-line, non-interactive __cmake__ interface.
 ``
 
 CMake will detect your development environment, perform a series of tests and
-will generate the files required for building __hpx__. CMake will use default 
-values for all build parameters. See the __cmake_options__ section for 
+will generate the files required for building __hpx__. CMake will use default
+values for all build parameters. See the __cmake_options__ section for
 fine-tuning your build.
 
 This can fail if CMake can't detect your toolset, or if it thinks that the
@@ -229,7 +229,7 @@ along with a brief explanation.
 ]
 
 Here is a list of options controlling the scheduling policies available for
-all applications built with __hpx__. For more information about the 
+all applications built with __hpx__. For more information about the
 avalable scheduling policies see the section __scheduling__.
 
 [variablelist Enable HPX Scheduling Policies
@@ -266,44 +266,44 @@ variables are used more seldom and are mainly useful for debugging purposes.
       (default: `5`).]
     ]
     [[`HPX_USE_ITT_NOTIFY:BOOL`]
-     [Sets whether __hpx__ supports integration with the diagnostic tools of 
+     [Sets whether __hpx__ supports integration with the diagnostic tools of
       the Intel Parallel Studio (Intel Amplifier and Intel Inspector). The default
-      value for this variable is `OFF`. Even if the variable is set to `ON` 
+      value for this variable is `OFF`. Even if the variable is set to `ON`
       you must separately enable integration with the Intel tools at runtime.
       This option is available only if the include files and libraries for
       one of the Intel tools canbe located (see CMake variable `AMPLIFIER`
       below).]
     ]
     [[`HPX_AUTOMATIC_PREPROCESSING:BOOL`]
-     [Sets whether the generated makefiles should allow to regenerate the 
-      partially preprocessed files that are part of __hpx__. The default value 
-      for this option is `OFF`. This option can be enabled only if the 
+     [Sets whether the generated makefiles should allow to regenerate the
+      partially preprocessed files that are part of __hpx__. The default value
+      for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]
     ]
 ]
 
-Here is a list of additional libraries and tools which are either optionally 
-supported by the build system or are optionally required for certain examples 
-or tests. These libraries and tools can be detected by the __hpx__ build 
+Here is a list of additional libraries and tools which are either optionally
+supported by the build system or are optionally required for certain examples
+or tests. These libraries and tools can be detected by the __hpx__ build
 system.
 
-Each of the tools or libraries listed here will be automatically detected if 
-they are installed in some standard location. If a tool or library is installed 
+Each of the tools or libraries listed here will be automatically detected if
+they are installed in some standard location. If a tool or library is installed
 in a different location you can specify its base directory by appending `_ROOT`
 to the variable name as listed below. For instance, to configure a custom
 directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
 
 [variablelist Additional Tools and Libraries used by __hpx__
     [[`BOOST_ROOT:PATH`]
-     [Specifies where to look for the __boost__ installation to be used for 
-      compiling __hpx__. Set this if CMake is not able to locate a suitable 
+     [Specifies where to look for the __boost__ installation to be used for
+      compiling __hpx__. Set this if CMake is not able to locate a suitable
       version of __boost__. The directory specified here can be either the
-      root of a installed Boost distribution or the directory where you 
-      unpacked and built __boost__ without installing it (with staged 
+      root of a installed Boost distribution or the directory where you
+      unpacked and built __boost__ without installing it (with staged
       libraries).]
     ]
     [[`HWLOC_ROOT:PATH`]
-     [Specifies where to look for the __hwloc__ library. While it is not 
+     [Specifies where to look for the __hwloc__ library. While it is not
       necessary to compile __hpx__ with HWLOC, we strongly suggest you do so.
       HWLOC provides platform independent support for extracting information
       about the used hardware architecture (number of cores, number of NUMA
@@ -312,23 +312,23 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
     ]
     [[`PAPI_ROOT:PATH`]
      [Specifies where to look for the __papi__ library. The PAPI library is
-      need to compile a special component exposing PAPI hardware events and 
-      counters as __hpx__ performance counters. This is not available on 
+      need to compile a special component exposing PAPI hardware events and
+      counters as __hpx__ performance counters. This is not available on
       the Windows platform.]
     ]
     [[`BOOSTWAVE_ROOT:PATH`]
-     [Specifies where to look for a built __boost_wave__ binary. Set this if 
-      you want to recreate the preprocessed header files used by __hpx__. 
-      Normally this will not be necessary, unless you modified the sources 
+     [Specifies where to look for a built __boost_wave__ binary. Set this if
+      you want to recreate the preprocessed header files used by __hpx__.
+      Normally this will not be necessary, unless you modified the sources
       those preprocessed headers depend on.]
     ]
     [[`AMPLIFIER_ROOT:PATH`]
-     [Specifies where to look for one of the tools of the Intel Parallel 
+     [Specifies where to look for one of the tools of the Intel Parallel
       Studio(tm) product, either Intel Amplifier(tm) or Intel Inspector(tm).
-      This should be set if the CMake variable `HPX_USE_ITT_NOTIFY` is set 
+      This should be set if the CMake variable `HPX_USE_ITT_NOTIFY` is set
       to `ON`. Enabling ITT support in __hpx__ will integrate any application
-      with the mentioned Intel tools, which customizes the generated 
-      information for your application and improves the generated 
+      with the mentioned Intel tools, which customizes the generated
+      information for your application and improves the generated
       diagnostics.]
     ]
 ]
@@ -351,9 +351,9 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:doc_tools Setting up the HPX Documentation Tool Chain]
 
-The documentation for __hpx__ is generated by the Boost __boost_quickbook__ 
-documentation toolchain. Setting up this toolchain requires to install several 
-tools and libraries. Generating the documentation is possible only if all of 
+The documentation for __hpx__ is generated by the Boost __boost_quickbook__
+documentation toolchain. Setting up this toolchain requires to install several
+tools and libraries. Generating the documentation is possible only if all of
 those are configured correctly.
 
 
@@ -361,10 +361,17 @@ those are configured correctly.
     [[`DOXYGEN_ROOT:PATH`]
      [Specifies where to look for the installation fo the __doxygen__ tool.]
     ]
-    [[`QUICKBOOK_ROOT:PATH`]
-     [Specifies where to look for the installation fo the __boost_quickbook__ 
-      tool. This tool usually needs to be built by hand. See the 
+    [[`BOOSTQUICKBOOK_ROOT:PATH`]
+     [Specifies where to look for the installation fo the __boost_quickbook__
+      tool. This tool usually needs to be built by hand. See the
       __boost_quickbook__ documentation for more details on how to do this.]
+    ]
+    [[`BOOSTAUTOINDEX_ROOT:PATH`]
+     [Specifies where to look for the installation fo the __boost_auto_index__
+      tool. This tool usually needs to be built by hand. See the
+      __boost_auto_index__ documentation for more details on how to do this.
+      The documentation can still be generated even if the __boost_auto_index__
+      tool cannot be found.]
     ]
     [[`XSLTPROC_ROOT:PATH`]
      [Specifies where to look for the installation of the libxslt package (and
@@ -372,13 +379,13 @@ those are configured correctly.
       to make this package available on your machine.]
     ]
     [[`DOCBOOK_DTD_ROOT:PATH`]
-     [Specifies where to look for the installation of the docbook-xml-4.2 
-      package. This usually needs to refer to the directory containing the 
+     [Specifies where to look for the installation of the docbook-xml-4.2
+      package. This usually needs to refer to the directory containing the
       file `docbook.cat`, which is part of this package.]
     ]
     [[`DOCBOOK_XSL_ROOT:PATH`]
-     [Specifies where to look for the installation of the docbook-xsl 
-      package. This usually needs to refer to the directory containing the 
+     [Specifies where to look for the installation of the docbook-xsl
+      package. This usually needs to refer to the directory containing the
       file `catalog.xml`, which is part of this package.]
     ]
 ]
@@ -412,10 +419,10 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
            the [^-o] flag.]
 
-[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the 
-      pkg-config names have to be different. Instead of `hpx_application` or 
-      `hpx_component` you will have to use `hpx_application_debug` or 
-      `hpx_component_debug`. Moreover, all referenced HPX components need to 
+[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the
+      pkg-config names have to be different. Instead of `hpx_application` or
+      `hpx_component` you will have to use `hpx_application_debug` or
+      `hpx_component_debug`. Moreover, all referenced HPX components need to
       have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
       to specify `-liostreamsd`.]
 
@@ -478,10 +485,10 @@ this example, we'll choose a directory named ''my_hpx_libs''.
     $ mv libhello_world.so ~/my_hpx_libs
 ``
 
-[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the 
-      pkg-config names have to be different. Instead of `hpx_application` or 
-      `hpx_component` you will have to use `hpx_application_debug` or 
-      `hpx_component_debug`. Moreover, all referenced HPX components need to 
+[note If HPX was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the
+      pkg-config names have to be different. Instead of `hpx_application` or
+      `hpx_component` you will have to use `hpx_application_debug` or
+      `hpx_component_debug`. Moreover, all referenced HPX components need to
       have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
       to specify `-liostreamsd`.]
 
@@ -495,7 +502,7 @@ the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
     path = ${HOME}/my_hpx_libs
 ``
 
-[note For additional details about ini file configuration and __hpx__, see 
+[note For additional details about ini file configuration and __hpx__, see
       [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
 
 In addition, you'll need this in your home directory:
@@ -603,8 +610,8 @@ The basic structure to include __hpx__ into your CMakeLists.txt is shown here:
     link_directories(${HPX_LIBRARY_DIR})
 ``
 
-This cmake script assumes that the location of the HPX installation is set 
-as the value of HPX_ROOT which is best done by passing it on the command line 
+This cmake script assumes that the location of the HPX installation is set
+as the value of HPX_ROOT which is best done by passing it on the command line
 while invoking cmake:
 
 ``
