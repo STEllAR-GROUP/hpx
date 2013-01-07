@@ -52,6 +52,7 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* [issue 654] - Integrate the Boost auto_index tool with documentation
 * [issue 653] - Make HPX build on OS X + Clang + libc++
 * [issue 651] - Add fine-grained control for thread pinning
 * [issue 650] - Command line no error message when using -hpx:(anything)
