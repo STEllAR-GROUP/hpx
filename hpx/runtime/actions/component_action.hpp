@@ -171,8 +171,8 @@ namespace hpx { namespace actions
     template <typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>
     struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::false_>
-      : result_action0<Component const, Result, 
-            F, Derived> 
+      : result_action0<Component const, Result,
+            F, Derived>
     {
         typedef result_action0<
             Component const, Result, F, Derived
@@ -220,7 +220,7 @@ namespace hpx { namespace actions
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::true_>
-      : direct_result_action0<Component, Result, 
+      : direct_result_action0<Component, Result,
             F, Derived>
     {
         typedef direct_result_action0<
@@ -242,7 +242,7 @@ namespace hpx { namespace actions
     //  zero parameter version, no result value
     template <typename Component, void (Component::*F)(), typename Derived>
     class base_action0
-      : public action<Component, util::unused_type, 
+      : public action<Component, util::unused_type,
             hpx::util::tuple0<>, Derived>
     {
     public:
@@ -338,7 +338,7 @@ namespace hpx { namespace actions
 
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::false_>
-      : action0<Component, F, Derived> 
+      : action0<Component, F, Derived>
     {
         typedef action0<
             Component, F, Derived
@@ -456,16 +456,26 @@ namespace hpx { namespace actions
 /// \note This macro should be used for non-const member functions only. Use
 /// the macro \a HPX_DEFINE_COMPONENT_CONST_ACTION for const member functions.
 ///
-/// \note The macro \a HPX_DEFINE_COMPONENT_ACTION can be used with 1 or 
-/// 2 arguments. The second argument is optional. The default value for the 
-/// second argument (the typename of the defined action) is derived from the 
-/// name of the function (as passed as the first argument) by appending '_action'.
-/// The second argument can be omitted only if the first argument with an 
-/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
+/// The first argument must provide the type name of the component the
+/// action is defined for.
+///
+/// The second argument must provide the member function name the action
+/// should wrap.
+///
+/// \note The macro \a HPX_DEFINE_COMPONENT_ACTION can be used with 2 or
+/// 3 arguments. The third argument is optional.
+///
+/// The default value for the third argument (the typename of the defined
+/// action) is derived from the name of the function (as passed as the second
+/// argument) by appending '_action'. The third argument can be omitted only
+/// if the first argument with an appended suffix '_action' resolves to a valid,
+/// unqualified C++ type name.
+///
 #define HPX_DEFINE_COMPONENT_ACTION(...)                                      \
     HPX_DEFINE_COMPONENT_ACTION_(__VA_ARGS__)                                 \
 /**/
 
+/// \cond NOINTERNAL
 #define HPX_DEFINE_COMPONENT_ACTION_(...)                                     \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_DEFINE_COMPONENT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)           \
@@ -478,6 +488,7 @@ namespace hpx { namespace actions
 #define HPX_DEFINE_COMPONENT_ACTION_3(component, func, action_type)           \
     typedef HPX_MAKE_COMPONENT_ACTION(component, func)::type action_type      \
     /**/
+/// \endcond
 
 /// \def HPX_DEFINE_COMPONENT_CONST_ACTION(component, func, action_type)
 ///
@@ -516,16 +527,26 @@ namespace hpx { namespace actions
 /// \note This macro should be used for const member functions only. Use
 /// the macro \a HPX_DEFINE_COMPONENT_ACTION for non-const member functions.
 ///
-/// \note The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used with 1 or 
-/// 2 arguments. The second argument is optional. The default value for the 
-/// second argument (the typename of the defined action) is derived from the 
-/// name of the function (as passed as the first argument) by appending '_action'.
-/// The second argument can be omitted only if the first argument with an 
-/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
+/// The first argument must provide the type name of the component the
+/// action is defined for.
+///
+/// The second argument must provide the member function name the action
+/// should wrap.
+///
+/// \note The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used with 2 or
+/// 3 arguments. The third argument is optional.
+///
+/// The default value for the third argument (the typename of the defined
+/// action) is derived from the name of the function (as passed as the second
+/// argument) by appending '_action'. The third argument can be omitted only
+/// if the first argument with an appended suffix '_action' resolves to a valid,
+/// unqualified C++ type name.
+///
 #define HPX_DEFINE_COMPONENT_CONST_ACTION(...)                                \
     HPX_DEFINE_COMPONENT_CONST_ACTION_(__VA_ARGS__)                           \
 /**/
 
+/// \cond NOINTERNAL
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_(...)                               \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_DEFINE_COMPONENT_CONST_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)     \
@@ -538,9 +559,9 @@ namespace hpx { namespace actions
 #define HPX_DEFINE_COMPONENT_CONST_ACTION_3(component, func, action_type)     \
     typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type action_type\
     /**/
+/// \endcond
 
 /// \cond NOINTERNAL
-
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION(...)                               \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_(__VA_ARGS__)                          \
 /**/

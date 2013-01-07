@@ -5,7 +5,127 @@
 
 #!debug ".*"
 
-!scan-path "../hpx" ".*\.hpp" true
+#!scan-path "../hpx" ".*\.hpp" true
 
+# hpx/hpx_fwd.hpp
+find_here                             "" "hpx\.find_here.*"
+find_all_localities                   "" "hpx\.find_all_localities.*"
+find_locality                         "" "hpx\.find_locality.*"
+get_num_localities                    "" "hpx\.get_num_localities.*"
+get_num_localities_async              "" "hpx\.get_num_localities_async.*"
+register_pre_startup_function         "" "hpx\.register_pre_startup_function.*"
+register_startup_function             "" "hpx\.register_startup_function.*"
+register_pre_shutdown_function        "" "hpx\.register_pre_shutdown_function.*"
+register_shutdown_function            "" "hpx\.register_shutdown_function.*"
+get_worker_thread_num                 "" "hpx\.get_worker_thread_num.*"
+get_locality_id                       "" "hpx\.get_locality_id.*"
+is_running                            "" "hpx\.is_running.*"
+get_thread_name                       "" "hpx\.get_thread_name.*"
+get_system_uptime                     "" "hpx\.get_system_uptime.*"
+get_colocation_id                     "" "hpx\.get_colocation_id.*"
+get_colocation_id_async               "" "hpx\.get_colocation_id_async.*"
 
+# hpx/exception.hpp
+HPX_THROW_EXCEPTION                   "" "HPX_THROW_EXCEPTION"
+HPX_THROWS_IF                         "" "HPX_THROWS_IF"
+
+error_code                            "" "hpx\.error_code"
+exception                             "" "hpx\.exception"
+
+error                                 "" "hpx\.error"
+success                               "" "hpx\.error"
+no_success                            "" "hpx\.error"
+not_implemented                       "" "hpx\.error"
+out_of_memory                         "" "hpx\.error"
+bad_action_code                       "" "hpx\.error"
+bad_component_type                    "" "hpx\.error"
+network_error                         "" "hpx\.error"
+version_too_new                       "" "hpx\.error"
+version_too_old                       "" "hpx\.error"
+version_unknown                       "" "hpx\.error"
+unknown_component_address             "" "hpx\.error"
+duplicate_component_address           "" "hpx\.error"
+invalid_status                        "" "hpx\.error"
+bad_parameter                         "" "hpx\.error"
+internal_server_error                 "" "hpx\.error"
+service_unavailable                   "" "hpx\.error"
+bad_request                           "" "hpx\.error"
+repeated_request                      "" "hpx\.error"
+lock_error                            "" "hpx\.error"
+duplicate_console                     "" "hpx\.error"
+no_registered_console                 "" "hpx\.error"
+startup_timed_out                     "" "hpx\.error"
+uninitialized_value                   "" "hpx\.error"
+bad_response_type                     "" "hpx\.error"
+deadlock                              "" "hpx\.error"
+assertion_failure                     "" "hpx\.error"
+null_thread_id                        "" "hpx\.error"
+invalid_data                          "" "hpx\.error"
+yield_aborted                         "" "hpx\.error"
+dynamic_link_failure                  "" "hpx\.error"
+commandline_option_error              "" "hpx\.error"
+serialization_error                   "" "hpx\.error"
+unhandled_exception                   "" "hpx\.error"
+kernel_error                          "" "hpx\.error"
+broken_task                           "" "hpx\.error"
+task_moved                            "" "hpx\.error"
+task_already_started                  "" "hpx\.error"
+future_already_retrieved              "" "hpx\.error"
+future_already_satisfied              "" "hpx\.error"
+future_does_not_support_cancellation  "" "hpx\.error"
+future_can_not_be_cancelled           "" "hpx\.error"
+future_uninitialized                  "" "hpx\.error"
+broken_promise                        "" "hpx\.error"
+thread_resource_error                 "" "hpx\.error"
+thread_interrupted                    "" "hpx\.error"
+thread_not_interruptable              "" "hpx\.error"
+duplicate_component_id                "" "hpx\.error"
+unknown_error                         "" "hpx\.error"
+
+throwmode                             "" "header\.hpx\.exception_hpp"
+throws                                "" "header\.hpx\.exception_hpp"
+
+make_error_code                       "" "header\.hpx\.exception_hpp"
+make_success_code                     "" "header\.hpx\.exception_hpp"
+
+diagnostic_information                "" "hpx\.diagnostic_information.*"
+get_locality_id                       "" "hpx\.get_locality_id.*"
+get_error                             "" "hpx\.get_error.*"
+get_host_name                         "" "hpx\.get_host_name.*"
+get_process_id                        "" "hpx\.get_process_id.*"
+get_function_name                     "" "hpx\.get_function_name.*"
+get_file_name                         "" "hpx\.get_file_name.*"
+get_line_number                       "" "hpx\.get_line_number.*"
+get_os_thread                         "" "hpx\.get_os_thread.*"
+get_thread_id                         "" "hpx\.get_thread_id.*"
+get_thread_description                "" "hpx\.get_thread_description.*"
+
+# hpx/hpx_finalize.hpp
+finalize                              "" "hpx\.finalize.*"
+terminate                             "" "hpx\.terminate.*"
+disconnect                            "" "hpx\.disconnect.*"
+stop                                  "" "hpx\.stop.*"
+
+# hpx/hpx_init.hpp
+init                                  "" "hpx\.init.*"
+
+# hpx/hpx_start.hpp
+start                                 "" "hpx\.start.*"
+
+# hpx/performance_counters/manage_counter_type.hpp
+install_counter_type                  "" "hpx\.performance_counters\.install_counter_type.*"
+
+# hpx/runtime/actions/action_support.hpp
+HPX_REGISTER_ACTION_DECLARATION           "" "HPX_REGISTER_ACTION_DECLARATION"
+HPX_REGISTER_ACTION_DECLARATION_TEMPLATE  "" "HPX_REGISTER_ACTION_DECLARATION_TEMPLATE"
+HPX_REGISTER_ACTION                       "" "HPX_REGISTER_ACTION"
+
+# hpx/runtime/actions/component_action.hpp
+HPX_DEFINE_COMPONENT_ACTION               "" "HPX_DEFINE_COMPONENT_ACTION"
+HPX_DEFINE_COMPONENT_CONST_ACTION         "" "HPX_DEFINE_COMPONENT_CONST_ACTION"
+
+# hpx/runtime/actions/plain_action.hpp
+HPX_REGISTER_PLAIN_ACTION                 "" "HPX_REGISTER_PLAIN_ACTION"
+HPX_DEFINE_PLAIN_ACTION                   "" "HPX_DEFINE_PLAIN_ACTION"
+HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"
 
