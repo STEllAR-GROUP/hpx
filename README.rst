@@ -114,8 +114,8 @@ Mac OSX
    (at least version 3.2 of Clang and LLVM). For more instructions please 
    see http://clang.llvm.org/get_started.html.
 
-   If you're using Homebrew, ``brew install llvm --with-clang`` will do the trick
-   and install Clang V3.2 into ``/usr/local/bin``.
+   If you're using Homebrew, ``brew install llvm --with-clang`` will do the trick.
+   This will install Clang V3.2 into ``/usr/local/bin``.
 
 2) Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++ 
    standard library. You need to use the trunk version; what's currently bundled
@@ -163,7 +163,7 @@ Mac OSX
 
       $ cmake /path/to/hpx/source/tree \
            -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
-           -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.3 \
+           -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.2 \
            -DBOOST_ROOT=/your_boost_directory \
            -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
            -DLINK_FLAGS="-L /path/to/libcxx/lib"
