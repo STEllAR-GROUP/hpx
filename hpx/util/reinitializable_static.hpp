@@ -269,7 +269,7 @@ namespace hpx { namespace util
 
     template <typename T, typename Tag, std::size_t N>
     lcos::local::once_flag reinitializable_static<
-            T, Tag, N, lcos::local::once_flag>::constructed_ = HPX_ONCE_INIT;
+            T, Tag, N, lcos::local::once_flag>::constructed_;
 }}
 
 #endif
