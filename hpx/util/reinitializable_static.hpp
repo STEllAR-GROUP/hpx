@@ -149,7 +149,7 @@ namespace hpx { namespace util
             boost::alignment_of<value_type>::value> storage_type;
 
         static storage_type data_[N];
-        static boost::once_flag  constructed_;
+        static boost::once_flag constructed_;
     };
 
     template <typename T, typename Tag, std::size_t N>
@@ -259,7 +259,7 @@ namespace hpx { namespace util
             boost::alignment_of<value_type>::value> storage_type;
 
         static storage_type data_[N];
-        static lcos::local::once_flag  constructed_;
+        static lcos::local::once_flag constructed_;
     };
 
     template <typename T, typename Tag, std::size_t N>

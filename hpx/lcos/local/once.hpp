@@ -13,6 +13,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
+#include <hpx/config/emulate_deleted.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/atomic.hpp>
@@ -21,11 +22,13 @@
 
 namespace hpx { namespace lcos { namespace local
 {
-    struct once_flag : boost::noncopyable
+    struct once_flag
     {
-        BOOST_CONSTEXPR once_flag() BOOST_NOEXCEPT
+        once_flag() BOOST_NOEXCEPT
           : status_(0)
         {}
+
+        HPX_NON_COPYABLE(once_flag)
 
     private:
         boost::atomic<long> status_;
