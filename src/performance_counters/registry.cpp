@@ -83,7 +83,7 @@ namespace hpx { namespace performance_counters
         }
 
         LPCS_(warning) << (
-            boost::format("failed to register counter type %s") %type_name);
+            boost::format("failed to register counter type %s") % type_name);
         return status_invalid_data;
     }
 
@@ -101,7 +101,7 @@ namespace hpx { namespace performance_counters
         counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                "unknown counter type");
+                boost::str(boost::format("unknown counter type: %s") % type_name));
             return status_counter_type_unknown;
         }
 
