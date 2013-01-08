@@ -81,17 +81,17 @@ namespace hpx
         broken_task = 34,                           ///< The task associated with this future object is not available anymore
         task_moved = 35,                            ///< The task associated with this future object has been moved
         task_already_started = 36,                  ///< The task associated with this future object has already been started
-        future_already_retrieved = 38,              ///< The future object has already been retrieved
-        future_already_satisfied = 39,              ///< The value for this future object has already been set
-        future_does_not_support_cancellation = 40,  ///< The future object does not support cancellation
-        future_can_not_be_cancelled = 41,           ///< The future can't be canceled at this time
-        future_uninitialized = 42,                  ///< The future object has not been initialized
-        broken_promise = 43,                        ///< The promise has been deleted
-        thread_resource_error = 44,                 ///<
-        thread_interrupted = 45,                    ///<
-        thread_not_interruptable = 46,              ///<
-        duplicate_component_id = 47,                ///< The component type has already been registered
-        unknown_error = 48,                         ///< An unknown error occurred
+        future_already_retrieved = 37,              ///< The future object has already been retrieved
+        future_already_satisfied = 38,              ///< The value for this future object has already been set
+        future_does_not_support_cancellation = 39,  ///< The future object does not support cancellation
+        future_can_not_be_cancelled = 40,           ///< The future can't be canceled at this time
+        future_uninitialized = 41,                  ///< The future object has not been initialized
+        broken_promise = 42,                        ///< The promise has been deleted
+        thread_resource_error = 43,                 ///<
+        thread_interrupted = 44,                    ///<
+        thread_not_interruptable = 45,              ///<
+        duplicate_component_id = 46,                ///< The component type has already been registered
+        unknown_error = 47,                         ///< An unknown error occurred
 
         /// \cond NOINTERNAL
         last_error,
@@ -102,55 +102,55 @@ namespace hpx
     /// \cond NOINTERNAL
     char const* const error_names[] =
     {
-        "success",
-        "no_success",
-        "not_implemented",
-        "out_of_memory",
-        "bad_action_code",
-        "bad_component_type",
-        "network_error",
-        "version_too_new",
-        "version_too_old",
-        "version_unknown",
-        "unknown_component_address",
-        "duplicate_component_address",
-        "invalid_status",
-        "bad_parameter",
-        "internal_server_error",
-        "service_unavailable",
-        "bad_request",
-        "repeated_request",
-        "lock_error",
-        "duplicate_console",
-        "no_registered_console",
-        "startup_timed_out",
-        "uninitialized_value",
-        "bad_response_type",
-        "deadlock",
-        "assertion_failure",
-        "null_thread_id",
-        "invalid_data",
-        "yield_aborted",
-        "dynamic_link_failure",
-        "commandline_option_error",
-        "serialization_error",
-        "unhandled_exception",
-        "kernel_error",
-        "broken_task",
-        "task_moved",
-        "task_already_started",
-        "future_already_retrieved",
-        "future_already_satisfied",
-        "future_does_not_support_cancellation",
-        "future_can_not_be_cancelled",
-        "future_uninitialized",
-        "broken_promise",
-        "thread_resource_error",
-        "thread_interrupted",
-        "thread_not_interruptable",
-        "duplicate_component_id",
-        "unknown_error"
-        ""
+        /*  0 */ "success",
+        /*  1 */ "no_success",
+        /*  2 */ "not_implemented",
+        /*  3 */ "out_of_memory",
+        /*  4 */ "bad_action_code",
+        /*  5 */ "bad_component_type",
+        /*  6 */ "network_error",
+        /*  7 */ "version_too_new",
+        /*  8 */ "version_too_old",
+        /*  9 */ "version_unknown",
+        /* 10 */ "unknown_component_address",
+        /* 11 */ "duplicate_component_address",
+        /* 12 */ "invalid_status",
+        /* 13 */ "bad_parameter",
+        /* 14 */ "internal_server_error",
+        /* 15 */ "service_unavailable",
+        /* 16 */ "bad_request",
+        /* 17 */ "repeated_request",
+        /* 18 */ "lock_error",
+        /* 19 */ "duplicate_console",
+        /* 20 */ "no_registered_console",
+        /* 21 */ "startup_timed_out",
+        /* 22 */ "uninitialized_value",
+        /* 23 */ "bad_response_type",
+        /* 24 */ "deadlock",
+        /* 25 */ "assertion_failure",
+        /* 26 */ "null_thread_id",
+        /* 27 */ "invalid_data",
+        /* 28 */ "yield_aborted",
+        /* 29 */ "dynamic_link_failure",
+        /* 30 */ "commandline_option_error",
+        /* 31 */ "serialization_error",
+        /* 32 */ "unhandled_exception",
+        /* 33 */ "kernel_error",
+        /* 34 */ "broken_task",
+        /* 35 */ "task_moved",
+        /* 36 */ "task_already_started",
+        /* 37 */ "future_already_retrieved",
+        /* 38 */ "future_already_satisfied",
+        /* 39 */ "future_does_not_support_cancellation",
+        /* 40 */ "future_can_not_be_cancelled",
+        /* 41 */ "future_uninitialized",
+        /* 42 */ "broken_promise",
+        /* 43 */ "thread_resource_error",
+        /* 44 */ "thread_interrupted",
+        /* 45 */ "thread_not_interruptable",
+        /* 46 */ "duplicate_component_id",
+        /* 47 */ "unknown_error"
+        /*    */ ""
     };
     /// \endcond
 
