@@ -309,7 +309,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                    "invalid counter name format");
+                boost::str(boost::format("invalid counter name format: %s") % name));
             return status_invalid_data;
         }
 
@@ -366,7 +366,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
-                    "invalid counter name format");
+                boost::str(boost::format("invalid counter name format: %s") % name));
             return status_invalid_data;
         }
 
@@ -642,13 +642,25 @@ namespace hpx { namespace performance_counters
             return true;
         }
 
+        inline bool is_thread_kind(std::string const& pattern)
+        {
+            return pattern.find("-thread#*") == pattern.size() - 9;
+        }
+
+        inline std::string get_thread_kind(std::string const& pattern)
+        {
+            BOOST_ASSERT(is_thread_kind(pattern));
+            return pattern.substr(0, pattern.find_last_of('-'));
+        }
+
         bool expand_counter_info_localities(
             counter_info& i, counter_path_elements& p,
             HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
         {
             bool expand_threads = false;
-            if (p.instancename_ == "worker-thread#*") {
-                p.instancename_ = "worker-thread";
+            if (is_thread_kind(p.instancename_))
+            {
+                p.instancename_ = get_thread_kind(p.instancename_) + "-thread";
                 expand_threads = true;
             }
 
@@ -690,10 +702,10 @@ namespace hpx { namespace performance_counters
             return detail::expand_counter_info_localities(i, p, f, ec);
         }
 
-        // now expand "worker-thread#*"
-        if (p.instancename_ == "worker-thread#*")
+        // now expand "<...>-thread#*"
+        if (detail::is_thread_kind(p.instancename_))
         {
-            p.instancename_ = "worker-thread";
+            p.instancename_ = detail::get_thread_kind(p.instancename_) + "-thread";
             return detail::expand_counter_info_threads(i, p, f, ec);
         }
 
