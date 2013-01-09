@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -419,12 +419,11 @@ namespace hpx { namespace performance_counters
                     return T();
                 }
 
-                T scale = static_cast<T>(scaling_);
                 // calculate and return the real counter value
                 if (scale_inverse_)
-                    return T(value_) / scale;
+                    return val / static_cast<T>(scaling_);
 
-                return T(value_) * scale;
+                return val * static_cast<T>(scaling_);
             }
             return val;
         }
