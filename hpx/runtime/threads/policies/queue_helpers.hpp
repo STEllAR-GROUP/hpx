@@ -65,7 +65,7 @@ namespace detail
                             << num_thread << ") is empty:";
                     }
                     else {
-                        LHPX_CONSOLE_(boost::logging::level::error)
+                        LHPX_CONSOLE_(hpx::util::logging::level::error)
                             << "  [TM] Listing suspended threads while queue ("
                             << num_thread << ") is empty:\n";
                     }
@@ -90,7 +90,7 @@ namespace detail
                                 << ": " << thrd->get_lco_description();
                 }
                 else {
-                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                    LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] "
                                 << "queue(" << num_thread << "): "
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)

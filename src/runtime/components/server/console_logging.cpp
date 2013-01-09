@@ -27,8 +27,8 @@
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <boost/logging/format/named_write_fwd.hpp>
-#include <boost/logging/format_fwd.hpp>
+#include <hpx/util/logging/format/named_write_fwd.hpp>
+#include <hpx/util/logging/format_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging

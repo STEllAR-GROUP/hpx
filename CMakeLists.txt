@@ -165,7 +165,6 @@ if(${BOOST_MINOR_VERSION} LESS 53)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
 if(${BOOST_MINOR_VERSION} LESS 49)
@@ -191,8 +190,8 @@ add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
 if(NOT MSVC)
   add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-add_definitions(-DBOOST_LOG_NO_TSS)
-add_definitions(-DBOOST_LOG_NO_TS)
+add_definitions(-DHPX_LOG_NO_TSS)
+add_definitions(-DHPX_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
@@ -1228,7 +1227,6 @@ if(NOT HPX_NO_INSTALL)
   install( # install external dependencies
     DIRECTORY external/cache/boost
               external/endian/boost
-              external/logging/boost
               external/plugin/boost
     DESTINATION include/hpx/external
     COMPONENT core

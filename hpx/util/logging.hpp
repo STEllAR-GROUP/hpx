@@ -11,10 +11,10 @@
 
 #if !defined(HPX_NO_LOGGING)
 
-#include <boost/logging/format/named_write.hpp>
-#include <boost/logging/format_fwd.hpp>
+#include <hpx/util/logging/format/named_write.hpp>
+#include <hpx/util/logging/format_fwd.hpp>
 
-BOOST_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
+HPX_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -23,76 +23,76 @@ namespace hpx { namespace util
     HPX_API_EXPORT std::string levelname(int level);
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef boost::logging::named_logger<>::type logger_type;
-    typedef boost::logging::level::holder filter_type;
+    typedef hpx::util::logging::named_logger<>::type logger_type;
+    typedef hpx::util::logging::level::holder filter_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(agas_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(agas_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(agas_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(agas_logger, logger_type)
 
     #define LAGAS_(lvl)                                                       \
-        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::agas_logger(),                  \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::agas_logger(),                    \
             hpx::util::agas_level(), lvl)                                     \
-        << hpx::util::levelname(::boost::logging::level::lvl) << " "          \
+        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " "      \
     /**/
 
     #define LAGAS_ENABLED(lvl)                                                \
-        hpx::util::agas_level()->is_enabled(::boost::logging::level::lvl)     \
+        hpx::util::agas_level()->is_enabled(::hpx::util::logging::level::lvl) \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(timing_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(timing_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(timing_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(timing_logger, logger_type)
 
     #define LTIM_(lvl)                                                        \
-        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::timing_logger(),                \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::timing_logger(),                  \
             hpx::util::timing_level(), lvl)                                   \
-        << hpx::util::levelname(::boost::logging::level::lvl) << " "          \
+        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " "      \
     /**/
 
     #define LTIM_ENABLED(lvl)                                                 \
-        hpx::util::timing_level()->is_enabled(::boost::logging::level::lvl)   \
+        hpx::util::timing_level()->is_enabled(::hpx::util::logging::level::lvl)\
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(hpx_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(hpx_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(hpx_logger, logger_type)
 
     #define LHPX_(lvl, cat)                                                   \
-        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::hpx_logger(),                   \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::hpx_logger(),                     \
             hpx::util::hpx_level(), lvl)                                      \
-        << hpx::util::levelname(::boost::logging::level::lvl)                 \
+        << hpx::util::levelname(::hpx::util::logging::level::lvl)             \
         << (cat)                                                              \
     /**/
 
     #define LHPX_ENABLED(lvl)                                                 \
-        hpx::util::hpx_level()->is_enabled(::boost::logging::level::lvl)      \
+        hpx::util::hpx_level()->is_enabled(::hpx::util::logging::level::lvl)  \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(app_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(app_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(app_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(app_logger, logger_type)
 
     #define LAPP_(lvl)                                                        \
-        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::app_logger(),                   \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::app_logger(),                     \
             hpx::util::app_level(), lvl)                                      \
-        << hpx::util::levelname(::boost::logging::level::lvl) << " "          \
+        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " "      \
     /**/
 
     #define LAPP_ENABLED(lvl)                                                 \
-        hpx::util::app_level()->is_enabled(::boost::logging::level::lvl)      \
+        hpx::util::app_level()->is_enabled(::hpx::util::logging::level::lvl)  \
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,
     // if enabled to 'normal' logging destination as well)
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_error_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(hpx_error_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(hpx_error_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(hpx_error_logger, logger_type)
 
     #define LFATAL_                                                           \
-        BOOST_LOG_USE_LOG_IF_LEVEL(hpx::util::hpx_error_logger(),             \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::hpx_error_logger(),               \
             hpx::util::hpx_error_level(), fatal)                              \
-        << hpx::util::levelname(::boost::logging::level::fatal)               \
+        << hpx::util::levelname(::hpx::util::logging::level::fatal)           \
         << (" [ERR] ")                                                        \
     /**/
 
@@ -113,53 +113,53 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef boost::logging::named_logger<>::type logger_type;
-    typedef boost::logging::level::holder filter_type;
+    typedef hpx::util::logging::named_logger<>::type logger_type;
+    typedef hpx::util::logging::level::holder filter_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(agas_console_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(agas_console_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(agas_console_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(agas_console_logger, logger_type)
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(timing_console_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(timing_console_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(timing_console_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(timing_console_logger, logger_type)
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(hpx_console_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(hpx_console_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(hpx_console_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(hpx_console_logger, logger_type)
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT BOOST_DECLARE_LOG_FILTER(app_console_level, filter_type)
-    HPX_EXPORT BOOST_DECLARE_LOG(app_console_logger, logger_type)
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(app_console_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(app_console_logger, logger_type)
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 #define LAGAS_CONSOLE_(lvl)                                                   \
-    BOOST_LOG_USE_LOG(hpx::util::agas_console_logger(),                       \
+    HPX_LOG_USE_LOG(hpx::util::agas_console_logger(),                         \
         read_msg().gather().out(),                                            \
         hpx::util::agas_console_level()->is_enabled(                          \
-            static_cast<boost::logging::level::type>(lvl)))                   \
+            static_cast<hpx::util::logging::level::type>(lvl)))               \
 /**/
 
 #define LTIM_CONSOLE_(lvl)                                                    \
-    BOOST_LOG_USE_LOG(hpx::util::timing_console_logger(),                     \
+    HPX_LOG_USE_LOG(hpx::util::timing_console_logger(),                       \
         read_msg().gather().out(),                                            \
         hpx::util::timing_console_level()->is_enabled(                        \
-            static_cast<boost::logging::level::type>(lvl)))                   \
+            static_cast<hpx::util::logging::level::type>(lvl)))               \
 /**/
 
 #define LHPX_CONSOLE_(lvl)                                                    \
-    BOOST_LOG_USE_LOG(hpx::util::hpx_console_logger(),                        \
+    HPX_LOG_USE_LOG(hpx::util::hpx_console_logger(),                          \
         read_msg().gather().out(),                                            \
         hpx::util::hpx_console_level()->is_enabled(                           \
-            static_cast<boost::logging::level::type>(lvl)))                   \
+            static_cast<hpx::util::logging::level::type>(lvl)))               \
 /**/
 
 #define LAPP_CONSOLE_(lvl)                                                    \
-    BOOST_LOG_USE_LOG(hpx::util::app_console_logger(),                        \
+    HPX_LOG_USE_LOG(hpx::util::app_console_logger(),                          \
         read_msg().gather().out(),                                            \
         hpx::util::app_console_level()->is_enabled(                           \
-            static_cast<boost::logging::level::type>(lvl)))                   \
+            static_cast<hpx::util::logging::level::type>(lvl)))               \
 /**/
 
 #else

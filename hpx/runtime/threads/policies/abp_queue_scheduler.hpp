@@ -283,7 +283,7 @@ struct abp_queue_scheduler : boost::noncopyable
                         << "no new work available, are we deadlocked?";
                 }
                 else {
-                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                    LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] "
                           << "queue(" << num_thread << "): "
                           << "no new work available, are we deadlocked?\n";
                 }
