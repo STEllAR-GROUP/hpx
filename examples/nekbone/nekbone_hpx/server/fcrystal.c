@@ -68,7 +68,7 @@
 #define ccrystal_free  PREFIXED_NAME(crystal_free)
 
 #define fcrystal_setup           \
-  FORTRAN_NAME(crystal_setup          ,CRYSTAL_SETUP          )
+  FORTRAN_NAME(fcrystal_setup          ,FCRYSTAL_SETUP          )
 #define fcrystal_ituple_sort     \
   FORTRAN_NAME(crystal_ituple_sort    ,CRYSTAL_ITUPLE_SORT    )
 #define fcrystal_tuple_sort      \
@@ -78,20 +78,20 @@
 #define fcrystal_tuple_transfer  \
   FORTRAN_NAME(crystal_tuple_transfer ,CRYSTAL_TUPLE_TRANSFER )
 #define fcrystal_free            \
-  FORTRAN_NAME(fcrystal_free           ,FCRYSTAL_FREE           )
+  FORTRAN_NAME(crystal_free           ,CRYSTAL_FREE           )
 
 static struct crystal **handle_array = 0;
 static int handle_max = 0;
 static int handle_n = 0;
 
-void fcrystal_setup(sint *handle, const sint *np)
+void fcrystal_setup(sint *handle, const MPI_Fint *comm, const sint *np,const sint *mid)
 {
   struct crystal *p;
   if(handle_n==handle_max)
     handle_max+=handle_max/2+1,
     handle_array=trealloc(struct crystal*,handle_array,handle_max);
   handle_array[handle_n]=p=tmalloc(struct crystal,1);
-  //comm_init_check(&p->comm, *comm, *np);
+  comm_init_check(&p->comm, *comm, *np,*mid);
   buffer_init(&p->data,1000);
   buffer_init(&p->work,1000);
   *handle = handle_n++;

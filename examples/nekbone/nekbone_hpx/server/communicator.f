@@ -128,7 +128,7 @@ c N/A
          WRITE(6,*) 'INTEGER wdsize      :',ISIZE
       endif
 
-      call crystal_setup(cr_h,np)
+      call fcrystal_setup(cr_h,nekcomm,np,nid)
 
       return
       end subroutine iniproc

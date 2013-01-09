@@ -235,7 +235,7 @@ c     Weights
       real wxm1(lx1), wym1(ly1), wzm1(lz1), w3m1(lx1,ly1,lz1)      
 ccccccccccccccccccccccccccccccccccc
 c nekmpi
-      integer nid_,np_,mid,mp,nekcomm,nekgroup,nekreal
+      integer nid_,np_,nekcomm,nekgroup,nekreal
 
 c     local variables
       parameter (lxyz = lx1*ly1*lz1)
@@ -296,7 +296,7 @@ c PARALLEL
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c nekmpi
-     &     mid,mp,nekcomm,nekgroup,nekreal)
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
 
         return
       end subroutine nekproxy ! }}}
@@ -600,6 +600,9 @@ c PARALLEL
      &     nelgf,lglel,gllel,gllnid,nelgv,nelgt, 
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth)
+
+      ntot      = nx1*ny1*nz1*nelt
+      call fgs_setup(gs_handle,glo_num,ntot,nekcomm,mp,mid) ! Initialize gather-scatter
 
       return
       end subroutine proxy_setupds ! }}}
