@@ -92,7 +92,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             typedef boost::function<void (get_plugins_list_type)> DeleterType;
 
-            std::string plugin_entry(HPX_PLUGIN_PREFIX_STR "_exported_plugins_list_");
+            std::string plugin_entry(
+                HPX_PLUGIN_SYMBOLS_PREFIX_STR "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
@@ -109,7 +110,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             typedef boost::function<void (get_plugins_list_type)> DeleterType;
 
-            std::string plugin_entry(HPX_PLUGIN_PREFIX_STR "_exported_plugins_list_");
+            std::string plugin_entry(
+                HPX_PLUGIN_SYMBOLS_PREFIX_STR "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 

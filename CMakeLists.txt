@@ -190,7 +190,7 @@ if(NOT MSVC)
 endif()
 add_definitions(-DHPX_LOG_NO_TSS)
 add_definitions(-DHPX_LOG_NO_TS)
-add_definitions(-DHPX_PLUGIN_PREFIX=hpx)
+add_definitions(-DHPX_PLUGIN_SYMBOLS_PREFIX=hpx)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 

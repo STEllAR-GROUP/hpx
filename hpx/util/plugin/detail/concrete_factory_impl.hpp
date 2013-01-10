@@ -17,7 +17,7 @@
 #include <hpx/util/plugin/config.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, PLUGIN_ARGUMENT_LIMIT,                                            \
+    (3, (3, HPX_PLUGIN_ARGUMENT_LIMIT,                                        \
     "hpx/util/plugin/detail/concrete_factory_impl.hpp"))
 #include BOOST_PP_ITERATE()
 
