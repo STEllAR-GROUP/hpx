@@ -43,7 +43,7 @@ If you want to make sure a feature is implemented sooner, drop me a note: http:/
                     also allow for extra syntax for the named_writer - {} - to be applied to a destination
                     this way, you can specify some extra formatters to be applied only to a specific destination
 
-- @c normal         on_dedicated_thead - remove dependency on hpx::util::thread
+- @c normal         on_dedicated_thead - remove dependency on boost::thread
 
 - @c normal         on_dedicated_thead - I should see it I use logger::always_accurate increases logging time as opposed to some caching strategy.
                     I'm asking this because even if we were to use a critical section on the base_type writer's operator(), this will

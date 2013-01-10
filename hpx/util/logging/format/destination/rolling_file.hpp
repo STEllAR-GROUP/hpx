@@ -78,12 +78,12 @@ namespace detail {
                 // many thanks to Martin Bauer
                 : m_name_prefix(name_prefix), m_flags(flags), m_cur_idx(0) {
 
-            namespace fs = hpx::util::filesystem;
+            namespace fs = boost::filesystem;
 #if BOOST_FILESYSTEM_VERSION == 2
             if ( fs::path::default_name_check_writable() ) {
                 // so that we don't get exceptions
 #if BOOST_VERSION >= 104400
-                fs::path::default_name_check( hpx::util::filesystem2::no_check);
+                fs::path::default_name_check( boost::filesystem2::no_check);
 #else
                 fs::path::default_name_check( fs::no_check);
 #endif
@@ -93,7 +93,7 @@ namespace detail {
         }
 
         void restart() {
-            namespace fs = hpx::util::filesystem;
+            namespace fs = boost::filesystem;
 
             if ( m_flags.initial_erase()) {
                 for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx)
@@ -132,7 +132,7 @@ namespace detail {
 
         void recreate_file() {
             // many thanks to Benjamin de Dardel!
-            namespace fs = hpx::util::filesystem;
+            namespace fs = boost::filesystem;
             m_out = boost::shared_ptr< std::basic_ofstream<char_type> >(new std::basic_ofstream<char_type>( file_name(m_cur_idx).c_str(),
                 m_flags.extra_flags() | std::ios_base::out | std::ios_base::app));
             if ( fs::file_size( file_name(m_cur_idx)) > m_flags.max_size_bytes()) {
