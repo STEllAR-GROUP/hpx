@@ -882,11 +882,11 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_startup_shutdown_functions(boost::plugin::dll& d)
+    bool runtime_support::load_startup_shutdown_functions(hpx::util::plugin::dll& d)
     {
         try {
             // get the factory, may fail
-            boost::plugin::plugin_factory<component_startup_shutdown_base> pf (d,
+            hpx::util::plugin::plugin_factory<component_startup_shutdown_base> pf (d,
                 "startup_shutdown");
 
             // create the startup_shutdown object
@@ -930,12 +930,12 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_commandline_options(boost::plugin::dll& d,
+    bool runtime_support::load_commandline_options(hpx::util::plugin::dll& d,
         boost::program_options::options_description& options)
     {
         try {
             // get the factory, may fail
-            boost::plugin::plugin_factory<component_commandline_base> pf (d,
+            hpx::util::plugin::plugin_factory<component_commandline_base> pf (d,
                 "commandline_options");
 
             // create the startup_shutdown object
@@ -977,7 +977,7 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
-            boost::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
 
             // initialize the factory instance using the preferences from the
             // ini files
@@ -992,7 +992,7 @@ namespace hpx { namespace components { namespace server
 
             if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0")) {
                 // get the factory
-                boost::plugin::plugin_factory<component_factory_base> pf (d,
+                hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
                     "factory");
 
                 // create the component factory object, if not disabled

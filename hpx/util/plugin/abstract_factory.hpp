@@ -3,16 +3,16 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_ABSTRACT_FACTORY_VP_2004_08_25
-#define BOOST_ABSTRACT_FACTORY_VP_2004_08_25
+#ifndef HPX_ABSTRACT_FACTORY_VP_2004_08_25
+#define HPX_ABSTRACT_FACTORY_VP_2004_08_25
 
 #include <boost/mpl/inherit_linearly.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <boost/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/virtual_constructors.hpp>
 
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     namespace detail
     {
@@ -59,7 +59,7 @@ namespace boost { namespace plugin {
     //  counts greater 2
     //
     ///////////////////////////////////////////////////////////////////////////
-    #include <boost/plugin/detail/abstract_factory_impl.hpp>
+    #include <hpx/util/plugin/detail/abstract_factory_impl.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     }   // namespace detail
@@ -76,6 +76,6 @@ namespace boost { namespace plugin {
     {
     };
 
-}}
+}}}
 
 #endif

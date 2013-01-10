@@ -3,8 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
-#define BOOST_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
+#ifndef HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
+#define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 
 #include <boost/config.hpp>
 #include <boost/mpl/list.hpp>
@@ -14,16 +14,16 @@
 #include <string>
 #include <map>
 
-#include <boost/plugin/config.hpp>
+#include <hpx/util/plugin/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     typedef std::map<std::string, boost::any> exported_plugins_type;
-    typedef exported_plugins_type& (BOOST_PLUGIN_API *get_plugins_list_type)();
-    typedef exported_plugins_type& (BOOST_PLUGIN_API get_plugins_list_np)();
-    typedef shared_ptr<get_plugins_list_np> dll_handle;
+    typedef exported_plugins_type& (HPX_PLUGIN_API *get_plugins_list_type)();
+    typedef exported_plugins_type& (HPX_PLUGIN_API get_plugins_list_np)();
+    typedef boost::shared_ptr<get_plugins_list_np> dll_handle;
 
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin>
@@ -33,6 +33,6 @@ namespace boost { namespace plugin {
     };
 
 ///////////////////////////////////////////////////////////////////////////////
-}}  // namespace boost::plugin
+}}}  // namespace hpx::util::plugin
 
 #endif

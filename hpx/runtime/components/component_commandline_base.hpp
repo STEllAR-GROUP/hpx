@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 
-#include <boost/plugin.hpp>
-#include <boost/plugin/export_plugin.hpp>
+#include <hpx/util/plugin.hpp>
+#include <hpx/util/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/program_options/options_description.hpp>
 
@@ -40,20 +40,20 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_COMMANDLINE_REGISTRY is used to register the given
-/// component factory with Boost.Plugin. This macro has to be used for each of
+/// component factory with Hpx.Plugin. This macro has to be used for each of
 /// the components.
 #define HPX_REGISTER_COMMANDLINE_REGISTRY(RegistryType, componentname)        \
-        BOOST_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                \
+        HPX_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                  \
             hpx::components::component_commandline_base, RegistryType,        \
             componentname, commandline_options)                               \
     /**/
 
 /// The macro \a HPX_REGISTER_COMMANDLINE_OPTIONS is used to define the
-/// required Boost.Plugin entry point for the command line option registry.
+/// required Hpx.Plugin entry point for the command line option registry.
 /// This macro has to be used in not more than one compilation unit of a
 /// component module.
 #define HPX_REGISTER_COMMANDLINE_OPTIONS()                                    \
-        BOOST_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, commandline_options)      \
+        HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, commandline_options)        \
     /**/
 
 #endif

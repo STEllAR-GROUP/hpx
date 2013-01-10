@@ -17,7 +17,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/plugin.hpp>
+#include <hpx/util/plugin.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/comma_if.hpp>
@@ -51,12 +51,12 @@ namespace hpx { namespace components { namespace server
 
             component_factory(
                   boost::shared_ptr<component_factory_base> const& f,
-                  boost::plugin::dll const& d, bool enabled)
+                  hpx::util::plugin::dll const& d, bool enabled)
               : first(f), second(d), isenabled(enabled)
             {};
 
             boost::shared_ptr<component_factory_base> first;
-            boost::plugin::dll second;
+            hpx::util::plugin::dll second;
             bool isenabled;
         };
         typedef component_factory component_factory_type;
@@ -265,8 +265,8 @@ namespace hpx { namespace components { namespace server
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
-        bool load_startup_shutdown_functions(boost::plugin::dll& d);
-        bool load_commandline_options(boost::plugin::dll& d,
+        bool load_startup_shutdown_functions(hpx::util::plugin::dll& d);
+        bool load_commandline_options(hpx::util::plugin::dll& d,
             boost::program_options::options_description& options);
 
     private:

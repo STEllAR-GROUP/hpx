@@ -165,7 +165,6 @@ if(${BOOST_MINOR_VERSION} LESS 53)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
 if(${BOOST_MINOR_VERSION} LESS 49)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
@@ -192,8 +191,8 @@ if(NOT MSVC)
 endif()
 add_definitions(-DHPX_LOG_NO_TSS)
 add_definitions(-DHPX_LOG_NO_TS)
+add_definitions(-DHPX_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
-add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
@@ -888,7 +887,7 @@ else()
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
-          add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
+          add_definitions(-DHPX_PLUGIN_GCC_HAVE_VISIBILITY)
           hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
         endif()
       endif()
@@ -1227,7 +1226,6 @@ if(NOT HPX_NO_INSTALL)
   install( # install external dependencies
     DIRECTORY external/cache/boost
               external/endian/boost
-              external/plugin/boost
     DESTINATION include/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"

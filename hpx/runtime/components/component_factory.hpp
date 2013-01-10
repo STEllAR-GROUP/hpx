@@ -212,7 +212,7 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal component factory with
-/// Boost.Plugin.
+/// Hpx.Plugin.
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(...)                           \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_(__VA_ARGS__)                      \
 /**/

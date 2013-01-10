@@ -10,9 +10,9 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/util/plugin.hpp>
+#include <hpx/util/plugin/export_plugin.hpp>
 
-#include <boost/plugin.hpp>
-#include <boost/plugin/export_plugin.hpp>
 #include <boost/mpl/list.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,16 +101,15 @@ namespace hpx { namespace components
         ///         which are currently alive.
         virtual long instance_count() const = 0;
     };
-
 }}
 
-namespace boost { namespace plugin
+namespace hpx { namespace util { namespace plugin
 {
     ///////////////////////////////////////////////////////////////////////////
     // The following specialization of the virtual_constructors template
     // defines the argument list for the constructor of the concrete component
     // factory (derived from the component_factory_base above). This magic is needed
-    // because we use boost::plugin for the creation of instances of derived
+    // because we use hpx::plugin for the creation of instances of derived
     // types using the component_factory_base virtual base class only (essentially
     // implementing a virtual constructor).
     //
@@ -120,32 +119,34 @@ namespace boost { namespace plugin
     //     class my_factory : public component_factory_base
     //     {
     //     public:
-    //         my_factory (hpx::util::section const*, hpx::util::section const*)
+    //         my_factory (hpx::util::section const*, hpx::util::section const*, bool)
     //         {}
     //     };
     //
-    template<>
+    template <>
     struct virtual_constructors<hpx::components::component_factory_base>
     {
-        typedef mpl::list<
-            mpl::list<hpx::util::section const*, hpx::util::section const*, bool>
+        typedef boost::mpl::list<
+            boost::mpl::list<
+                hpx::util::section const*, hpx::util::section const*, bool
+            >
         > type;
     };
-}}
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with
-/// Boost.Plugin. This macro has to be used for each of the component factories.
+/// Hpx.Plugin. This macro has to be used for each of the component factories.
 #define HPX_REGISTER_COMPONENT_FACTORY(FactoryType, componentname)            \
-        BOOST_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                \
+        HPX_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                  \
             hpx::components::component_factory_base, FactoryType,             \
             componentname, factory)                                           \
     /**/
 
-/// This macro is used to define the required Boost.Plugin entry points. This
+/// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
-        BOOST_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, factory)                  \
+        HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, factory)                    \
         HPX_REGISTER_REGISTRY_MODULE()                                        \
     /**/
 

@@ -74,7 +74,7 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal component registry with
-/// Boost.Plugin.
+/// Hpx.Plugin.
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(...)                          \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_(__VA_ARGS__)                 \

@@ -1,11 +1,11 @@
 // Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2012 Hartmut Kaiser
+// Copyright (c) 2005-2013 Hartmut Kaiser
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PLUGIN_FACTORY_VP_2004_08_25
-#define BOOST_PLUGIN_FACTORY_VP_2004_08_25
+#ifndef HPX_PLUGIN_FACTORY_VP_2004_08_25
+#define HPX_PLUGIN_FACTORY_VP_2004_08_25
 
 #include <utility>
 #include <stdexcept>
@@ -16,13 +16,14 @@
 #include <boost/any.hpp>
 #include <boost/function.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
 
-#include <boost/plugin/virtual_constructors.hpp>
-#include <boost/plugin/abstract_factory.hpp>
-#include <boost/plugin/dll.hpp>
-#include <boost/plugin/export_plugin.hpp>
+#include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/abstract_factory.hpp>
+#include <hpx/util/plugin/dll.hpp>
+#include <hpx/util/plugin/export_plugin.hpp>
 
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -32,7 +33,7 @@ namespace boost { namespace plugin {
         get_abstract_factory_static(get_plugins_list_type f, DeleterType d,
             std::string const &class_name, std::string const& libname = "")
         {
-            typedef typename remove_pointer<get_plugins_list_type>::type PointedType;
+            typedef typename boost::remove_pointer<get_plugins_list_type>::type PointedType;
 
             exported_plugins_type& e = f();
             std::string clsname(class_name);
@@ -44,15 +45,15 @@ namespace boost { namespace plugin {
                     boost::unsafe_any_cast<abstract_factory<BasePlugin> *>(&(*it).second);
 
                 if (!xw) {
-                    throw std::logic_error("Boost.Plugin: Can't cast to the right factory type\n");
+                    throw std::logic_error("Hpx.Plugin: Can't cast to the right factory type\n");
                 }
 
                 abstract_factory<BasePlugin> *w = *xw;
                 return make_pair(w, boost::shared_ptr<PointedType>(f, d));
             }
             else {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Class '" << class_name
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Class '" << class_name
                     << "' was not found";
 
                 if (!libname.empty())
@@ -80,7 +81,7 @@ namespace boost { namespace plugin {
                     str << " No classes exist.";
                 }
 
-                throw std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str));
+                throw std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str));
             }
         }
 
@@ -91,7 +92,7 @@ namespace boost { namespace plugin {
         {
             typedef boost::function<void (get_plugins_list_type)> DeleterType;
 
-            std::string plugin_entry(BOOST_PLUGIN_PREFIX_STR "_exported_plugins_list_");
+            std::string plugin_entry(HPX_PLUGIN_PREFIX_STR "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
@@ -108,7 +109,7 @@ namespace boost { namespace plugin {
         {
             typedef boost::function<void (get_plugins_list_type)> DeleterType;
 
-            std::string plugin_entry(BOOST_PLUGIN_PREFIX_STR "_exported_plugins_list_");
+            std::string plugin_entry(HPX_PLUGIN_PREFIX_STR "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
@@ -247,7 +248,7 @@ namespace boost { namespace plugin {
 //  counts greater 2
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include <boost/plugin/detail/plugin_factory_impl.hpp>
+#include <hpx/util/plugin/detail/plugin_factory_impl.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     template<class BasePlugin>
@@ -283,6 +284,6 @@ namespace boost { namespace plugin {
     };
 
 ///////////////////////////////////////////////////////////////////////////////
-}}  // namespace boost::plugin
+}}}  // namespace hpx::util::plugin
 
 #endif

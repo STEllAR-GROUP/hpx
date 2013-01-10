@@ -19,7 +19,7 @@
 #endif
 
 #include <boost/cstdint.hpp>
-#include <boost/plugin/dll.hpp>
+#include <hpx/util/plugin/dll.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace hpx { namespace util
@@ -30,7 +30,7 @@ namespace hpx { namespace util
     {
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
         try {
-            boost::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
+            hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 
             using boost::filesystem::path;
 

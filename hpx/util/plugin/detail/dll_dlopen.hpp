@@ -1,11 +1,11 @@
 // Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2012 Hartmut Kaiser
+// Copyright (c) 2005-2013 Hartmut Kaiser
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DLL_DLOPEN_HPP_VP_2004_08_24
-#define BOOST_DLL_DLOPEN_HPP_VP_2004_08_24
+#ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
+#define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
 #include <string>
 #include <stdexcept>
@@ -22,7 +22,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <boost/plugin/config.hpp>
+#include <hpx/util/plugin/config.hpp>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
 #include <link.h>
@@ -30,8 +30,8 @@
 #include <dlfcn.h>
 #include <limits.h>
 
-#if !defined(BOOST_HAS_DLOPEN)
-#error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
+#if !defined(HPX_HAS_DLOPEN)
+#error "This file shouldn't be included directly, use the file hpx/util/plugin/dll.hpp only."
 #endif
 
 #if !defined(_WIN32)
@@ -54,7 +54,7 @@ typedef struct HINSTANCE__* HMODULE;
 #define MyGetProcAddress(x,y) dlsym   (x, y)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     namespace very_detail
     {
@@ -186,7 +186,7 @@ namespace boost { namespace plugin {
             boost::mutex::scoped_lock lock(mutex_instance());
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
-            typedef typename remove_pointer<SymbolType>::type PointedType;
+            typedef typename boost::remove_pointer<SymbolType>::type PointedType;
 
             // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll
@@ -196,12 +196,12 @@ namespace boost { namespace plugin {
             dlerror();              // Clear the error state.
             HMODULE handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
             if (!handle) {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '"
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "' (dlerror: " << dlerror() << ")";
 
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
 
 #if !defined(__AIX__)
@@ -215,18 +215,19 @@ namespace boost { namespace plugin {
             // Cast to the right type.
             dlerror();              // Clear the error state.
 
-            SymbolType address = very_detail::nasty_cast<SymbolType>(MyGetProcAddress(dll_handle, symbol_name.c_str()));
+            SymbolType address = very_detail::nasty_cast<SymbolType>(
+                MyGetProcAddress(dll_handle, symbol_name.c_str()));
             if (NULL == address)
             {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Unable to locate the exported symbol name '"
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
                     << symbol_name << "' in the shared library '"
                     << dll_name << "' (dlerror: " << dlerror () << ")";
 
                 dlerror();
                 MyFreeLibrary(handle);
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             return std::make_pair(address, free_dll<SymbolType>(handle));
         }
@@ -246,11 +247,11 @@ namespace boost { namespace plugin {
             dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
             // std::cout << "open\n";
             if (!dll_handle) {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '"
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "' (dlerror: " << dlerror() << ")";
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
 
             init_library(dll_handle);   // initialize library
@@ -263,12 +264,12 @@ namespace boost { namespace plugin {
             // now find the full path of the loaded library
             char directory[PATH_MAX];
             if (::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0) {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not extract path the shared "
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Could not extract path the shared "
                        "library '" << dll_name << "' has been loaded from "
                        "(dlerror: " << dlerror() << ")";
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             ::dlerror();                // Clear the error state.
             return directory;
@@ -312,7 +313,7 @@ namespace boost { namespace plugin {
     };
 
 ///////////////////////////////////////////////////////////////////////////////
-}}
+}}}
 
 #endif
 

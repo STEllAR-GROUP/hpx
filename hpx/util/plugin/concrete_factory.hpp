@@ -3,16 +3,16 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_CONCRETE_FACTORY_VP_2004_08_25
-#define BOOST_CONCRETE_FACTORY_VP_2004_08_25
+#ifndef HPX_CONCRETE_FACTORY_VP_2004_08_25
+#define HPX_CONCRETE_FACTORY_VP_2004_08_25
 
 #include <iostream>
 
-#include <boost/plugin/abstract_factory.hpp>
-#include <boost/plugin/detail/plugin_wrapper.hpp>
+#include <hpx/util/plugin/abstract_factory.hpp>
+#include <hpx/util/plugin/detail/plugin_wrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     namespace detail
     {
@@ -63,7 +63,7 @@ namespace boost { namespace plugin {
 //  counts greater 2
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include <boost/plugin/detail/concrete_factory_impl.hpp>
+#include <hpx/util/plugin/detail/concrete_factory_impl.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin, typename Concrete>
@@ -77,6 +77,6 @@ namespace boost { namespace plugin {
     {};
 
 ///////////////////////////////////////////////////////////////////////////////
-}}  // namespace boost::plugin
+}}}  // namespace hpx::util::plugin
 
 #endif

@@ -4,8 +4,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DLL_WINDOWS_HPP_HK_2005_11_06
-#define BOOST_DLL_WINDOWS_HPP_HK_2005_11_06
+#ifndef HPX_DLL_WINDOWS_HPP_HK_2005_11_06
+#define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
 
 #include <string>
 #include <stdexcept>
@@ -20,17 +20,17 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <boost/plugin/config.hpp>
+#include <hpx/util/plugin/config.hpp>
 
 #include <windows.h>
 #include <Shlwapi.h>
 
 #if !defined(BOOST_WINDOWS)
-#error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
+#error "This file shouldn't be included directly, use the file hpx/util/plugin/dll.hpp only."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     namespace detail
     {
@@ -113,7 +113,7 @@ namespace boost { namespace plugin {
         get(std::string const& symbol_name) const
         {
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
-            typedef typename remove_pointer<SymbolType>::type PointedType;
+            typedef typename boost::remove_pointer<SymbolType>::type PointedType;
 
             // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll
@@ -121,12 +121,12 @@ namespace boost { namespace plugin {
             // symbol.
             HMODULE handle = ::LoadLibrary(dll_name.c_str());
             if (!handle) {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '"
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "'";
 
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             BOOST_ASSERT(handle == dll_handle);
 
@@ -134,14 +134,14 @@ namespace boost { namespace plugin {
             SymbolType address = (SymbolType)GetProcAddress(dll_handle, symbol_name.c_str());
             if (NULL == address)
             {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Unable to locate the exported symbol name '"
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
                     << symbol_name << "' in the shared library '"
                     << dll_name << "'";
 
                 ::FreeLibrary(handle);
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
         }
@@ -163,12 +163,12 @@ namespace boost { namespace plugin {
 
             dll_handle = ::LoadLibrary(dll_name.c_str());
             if (!dll_handle) {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '"
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "'";
 
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
         }
 
@@ -179,11 +179,11 @@ namespace boost { namespace plugin {
             DWORD name_length =
                 GetModuleFileName(dll_handle, buffer, sizeof(buffer));
             if (name_length <= 0) {
-                BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not extract path the shared "
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Could not extract path the shared "
                        "library '" << dll_name << "' has been loaded from.";
                 boost::throw_exception(
-                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
 
             // extract the directory name
@@ -205,7 +205,7 @@ namespace boost { namespace plugin {
     };
 
 ///////////////////////////////////////////////////////////////////////////////
-}}
+}}}
 
 #endif
 

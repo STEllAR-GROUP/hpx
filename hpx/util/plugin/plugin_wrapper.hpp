@@ -3,15 +3,15 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PLUGIN_WRAPPER_VP_2004_08_25
-#define BOOST_PLUGIN_WRAPPER_VP_2004_08_25
+#ifndef HPX_PLUGIN_WRAPPER_VP_2004_08_25
+#define HPX_PLUGIN_WRAPPER_VP_2004_08_25
 
 #include <boost/mpl/list.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <iostream>
 
-namespace boost { namespace plugin {
+namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -65,6 +65,6 @@ namespace boost { namespace plugin {
         {}
     };
 
-}}
+}}}
 
 #endif
