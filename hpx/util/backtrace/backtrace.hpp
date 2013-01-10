@@ -7,8 +7,8 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_BACKTRACE_HPP
-#define BOOST_BACKTRACE_HPP
+#ifndef HPX_BACKTRACE_HPP
+#define HPX_BACKTRACE_HPP
 
 #include <boost/config.hpp>
 #include <string>
@@ -19,30 +19,30 @@
 //#ifdef BOOST_HAS_DECLSPEC // defined by boost.config
 // we need to import/export our code only if the user has specifically
 // asked for it by defining either BOOST_ALL_DYN_LINK if they want all boost
-// libraries to be dynamically linked, or BOOST_BACKTRACE_DYN_LINK
+// libraries to be dynamically linked, or HPX_BACKTRACE_DYN_LINK
 // if they want just this one to be dynamically linked:
-#if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_BACKTRACE_DYN_LINK)
+#if defined(BOOST_ALL_DYN_LINK) || defined(HPX_BACKTRACE_DYN_LINK)
 // export if this is our own source, otherwise import:
-#ifdef BOOST_BACKTRACE_SOURCE
-# define BOOST_BACKTRACE_DECL BOOST_SYMBOL_EXPORT
+#ifdef HPX_BACKTRACE_SOURCE
+# define HPX_BACKTRACE_DECL BOOST_SYMBOL_EXPORT
 #else
-# define BOOST_BACKTRACE_DECL BOOST_SYMBOL_IMPORT
-#endif  // BOOST_BACKTRACE_SOURCE
+# define HPX_BACKTRACE_DECL BOOST_SYMBOL_IMPORT
+#endif  // HPX_BACKTRACE_SOURCE
 #endif  // DYN_LINK
 //#endif  // BOOST_HAS_DECLSPEC
 //
-// if BOOST_BACKTRACE_DECL isn't defined yet define it now:
-#ifndef BOOST_BACKTRACE_DECL
-#define BOOST_BACKTRACE_DECL
+// if HPX_BACKTRACE_DECL isn't defined yet define it now:
+#ifndef HPX_BACKTRACE_DECL
+#define HPX_BACKTRACE_DECL
 #endif
 
-namespace boost {
+namespace hpx { namespace util {
 
     namespace stack_trace {
-        BOOST_BACKTRACE_DECL std::size_t trace(void **addresses,std::size_t size);
-        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &);
-        BOOST_BACKTRACE_DECL std::string get_symbol(void *address);
-        BOOST_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size);
+        HPX_BACKTRACE_DECL std::size_t trace(void **addresses,std::size_t size);
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &);
+        HPX_BACKTRACE_DECL std::string get_symbol(void *address);
+        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size);
     } // stack_trace
 
     class backtrace {
@@ -140,7 +140,7 @@ namespace boost {
     inline std::string trace()
     { return backtrace().trace(); }
 
-} // boost
+}} // hpx::util
 
 #endif
 

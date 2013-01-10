@@ -7,11 +7,17 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#define BOOST_BACKTRACE_SOURCE
+
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STACKTRACES)
+
+#define HPX_BACKTRACE_SOURCE
 
 #include <boost/config.hpp>
-#include <boost/backtrace.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <hpx/util/backtrace/backtrace.hpp>
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) && (!defined(__ANDROID__) || !defined(ANDROID))
 #define BOOST_HAVE_EXECINFO
@@ -54,7 +60,7 @@
 #endif
 
 
-namespace boost {
+namespace hpx { namespace util {
 
     namespace stack_trace {
         #if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND) && defined(BOOST_HAVE_EXECINFO)
@@ -105,7 +111,7 @@ namespace boost {
             return _URC_NO_REASON;
         }
 
-        BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
+        HPX_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
             trace_data d(array,n);
 
@@ -120,14 +126,14 @@ namespace boost {
         
         #elif defined(BOOST_HAVE_EXECINFO)
 
-        BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
+        HPX_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
             return :: backtrace(array,n);
         }
 
         #elif defined(BOOST_MSVC)
 
-        BOOST_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
+        HPX_BACKTRACE_DECL std::size_t trace(void **array,std::size_t n)
         {
         #if _WIN32_WINNT < 0x0600
             // for Windows XP/Windows Server 2003
@@ -139,7 +145,7 @@ namespace boost {
 
         #else
 
-        BOOST_BACKTRACE_DECL std::size_t trace(void ** /*array*/,std::size_t /*n*/)
+        HPX_BACKTRACE_DECL std::size_t trace(void ** /*array*/,std::size_t /*n*/)
         {
             return 0;
         }
@@ -148,7 +154,7 @@ namespace boost {
 
         #if defined(BOOST_HAVE_DLFCN) && defined(BOOST_HAVE_ABI_CXA_DEMANGLE)
 
-        BOOST_BACKTRACE_DECL std::string get_symbol(void *ptr)
+        HPX_BACKTRACE_DECL std::string get_symbol(void *ptr)
         {
             if(!ptr)
                 return std::string();
@@ -184,7 +190,7 @@ namespace boost {
            return res.str();
         }
 
-        BOOST_BACKTRACE_DECL std::string get_symbols(void *const *addresses,std::size_t size)
+        HPX_BACKTRACE_DECL std::string get_symbols(void *const *addresses,std::size_t size)
         {
             std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -196,7 +202,7 @@ namespace boost {
             }
             return res;
         }
-        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -209,7 +215,7 @@ namespace boost {
         }
 
         #elif defined(BOOST_HAVE_EXECINFO)
-        BOOST_BACKTRACE_DECL std::string get_symbol(void *address)
+        HPX_BACKTRACE_DECL std::string get_symbol(void *address)
         {
             char ** ptr = backtrace_symbols(&address,1);
             try {
@@ -226,7 +232,7 @@ namespace boost {
             }
         }
 
-        BOOST_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size)
+        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size)
         {
             char ** ptr = backtrace_symbols(address,size);
             try {
@@ -248,7 +254,7 @@ namespace boost {
         }
 
 
-        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             char ** ptr = backtrace_symbols(addresses,size);
             out << size << ((1==size)?" frame:":" frames:");
@@ -287,7 +293,7 @@ namespace boost {
             }
         }
 
-        BOOST_BACKTRACE_DECL std::string get_symbol(void *ptr)
+        HPX_BACKTRACE_DECL std::string get_symbol(void *ptr)
         {
             if(ptr==0)
                 return std::string();
@@ -316,7 +322,7 @@ namespace boost {
             return ss.str();
         }
 
-        BOOST_BACKTRACE_DECL std::string get_symbols(void *const *addresses,std::size_t size)
+        HPX_BACKTRACE_DECL std::string get_symbols(void *const *addresses,std::size_t size)
         {
             std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -328,7 +334,7 @@ namespace boost {
             }
             return res;
         }
-        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -342,7 +348,7 @@ namespace boost {
 
         #else
 
-        BOOST_BACKTRACE_DECL std::string get_symbol(void *ptr)
+        HPX_BACKTRACE_DECL std::string get_symbol(void *ptr)
         {
             if(!ptr)
                 return std::string();
@@ -352,7 +358,7 @@ namespace boost {
             return res.str();
         }
 
-        BOOST_BACKTRACE_DECL std::string get_symbols(void *const *ptrs,std::size_t size)
+        HPX_BACKTRACE_DECL std::string get_symbols(void *const *ptrs,std::size_t size)
         {
             if(!ptrs)
                 return std::string();
@@ -362,7 +368,7 @@ namespace boost {
             return res.str();
         }
 
-        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
             for(std::size_t i=0;i<size;i++) {
@@ -376,5 +382,7 @@ namespace boost {
 
     } // stack_trace
 
-} // boost
+}} // hpx::util
+
+#endif
 

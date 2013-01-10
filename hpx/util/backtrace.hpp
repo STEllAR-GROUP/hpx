@@ -9,14 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STACKTRACES)
-#include <boost/backtrace.hpp>
-
-namespace hpx { namespace util
-{
-    using boost::trace;
-    using boost::backtrace;
-}}
+#  include <hpx/util/backtrace/backtrace.hpp>
 #else
+
 namespace hpx { namespace util
 {
     inline std::string trace()
@@ -25,6 +20,7 @@ namespace hpx { namespace util
     }
     struct backtrace {};
 }}
+
 #endif
 
 #endif

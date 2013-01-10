@@ -85,7 +85,7 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
   EXCLUDE ".*_binary_.*archive[.]cpp"
   APPEND)
 add_hpx_library_sources(hpx
@@ -108,20 +108,7 @@ if(HPX_INTERNAL_CHRONO)
     APPEND)
 endif()
 
-# Add Boost.Backtrace sources if stack traces are enabled
-if(HPX_HAVE_STACKTRACES)
-  add_hpx_library_sources(hpx_external
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp"
-    APPEND)
-endif()
-
-if(NOT MSVC)
-  if(NOT APPLE)
-    add_hpx_library_sources(hpx_external
-      GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/coroutine/swapcontext.cpp"
-      APPEND)
-  endif()
-else()
+if(MSVC)
   if(HPX_EMULATE_SWAP_CONTEXT)
     set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
