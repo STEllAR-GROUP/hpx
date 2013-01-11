@@ -1354,6 +1354,7 @@ set(external_libraries
 
 foreach(lib ${external_libraries})
   get_filename_component(lib ${lib} NAME_WE)
+  string(REGEX REPLACE "^lib" "" lib ${lib})
   set(external_libraries_name "${external_libraries_name} -l${lib}")
 endforeach()
 
@@ -1399,29 +1400,39 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION share/${cmake_dir}/Modules)
 endif()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_application.pc
-               @ONLY)
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
-               @ONLY)
+if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_application.pc
+                   @ONLY)
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_component.pc
+                   @ONLY)
+endif()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_component.pc
-               @ONLY)
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
-               @ONLY)
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+                   @ONLY)
+
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
+                   @ONLY)
+endif()
 
 if(NOT HPX_NO_INSTALL)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
-          DESTINATION lib/pkgconfig)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
-          DESTINATION lib/pkgconfig)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
-          DESTINATION lib/pkgconfig)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
-          DESTINATION lib/pkgconfig)
+  if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
+            DESTINATION lib/pkgconfig)
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+            DESTINATION lib/pkgconfig)
+  endif()
+
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+            DESTINATION lib/pkgconfig)
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
+            DESTINATION lib/pkgconfig)
+  endif()
 endif()
 
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
