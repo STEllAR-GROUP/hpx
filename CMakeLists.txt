@@ -1250,7 +1250,7 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
-  if(${BOOST_MINOR_VERSION} LESS 52)
+  if(${BOOST_MINOR_VERSION} LESS 53)
     # install Boost.Lockfree library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
