@@ -79,7 +79,8 @@ namespace hpx { namespace threads
     threadmanager_impl<SchedulingPolicy, NotificationPolicy>::threadmanager_impl(
             util::io_service_pool& timer_pool,
             scheduling_policy_type& scheduler,
-            notification_policy_type& notifier)
+            notification_policy_type& notifier,
+            std::size_t num_threads)
       : startup_(NULL),
         thread_count_(0),
         state_(starting),
@@ -88,9 +89,11 @@ namespace hpx { namespace threads
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
-        notifier_(notifier)
+        notifier_(notifier),
+        used_processing_units_(0)
     {
-        //LTM_(debug) << "threadmanager_impl ctor";
+        for (std::size_t i = 0; i < num_threads; ++i)
+            used_processing_units_ |= scheduler_.get_pu_mask(get_topology(), i);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

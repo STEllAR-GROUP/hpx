@@ -62,6 +62,8 @@ HPX' releases so far.
 * [issue 659] - Move our logging library into a different namespace
 * [issue 658] - Dynamic performance counter types are broken
 * [issue 657] - HPX v0.9.5 (RC1) hello_world example segfaulting
+* [issue 656] - Define the affinity of parcel-pool, io-pool, and timer-pool
+                threads
 * [issue 654] - Integrate the Boost auto_index tool with documentation
 * [issue 653] - Make HPX build on OS X + Clang + libc++
 * [issue 651] - Add fine-grained control for thread pinning
@@ -93,11 +95,12 @@ HPX' releases so far.
 * [issue 608] - `--hpx:list-counter-infos` problem
 * [issue 607] - Update Boost.Context based backend for coroutines
 * [issue 606] - 1d_wave_equation is not working
-* [issue 605] - Any C++ function that has serializable arguments and a serializable
-                return type should be remotable
+* [issue 605] - Any C++ function that has serializable arguments and a
+                serializable return type should be remotable
 * [issue 604] - Connecting localities isn't working anymore
 * [issue 603] - Do not verify any ini entries read from a file
-* [issue 602] - Rename argument_size to type_size/ added implementation to get parcel size
+* [issue 602] - Rename argument_size to type_size/ added implementation to get
+                parcel size
 * [issue 599] - Enable locality specific command line options
 * [issue 598] - Need an API that accesses the performance counter reporting the
                 system uptime
@@ -121,8 +124,8 @@ HPX' releases so far.
 * [issue 576] - Exception incorrectly thrown when `--help` is used
 * [issue 575] - HPX(bad_component_type) with gcc 4.7.2 and boost 1.51
 * [issue 574] - `--hpx:connect` command line parameter not working correctly
-* [issue 571] - `hpx::wait()` (callback version) should pass the future to the callback
-                function
+* [issue 571] - `hpx::wait()` (callback version) should pass the future to the
+                callback function
 * [issue 570] - `hpx::wait` should operate on `boost::arrays` and `std::lists`
 * [issue 569] - Add a logging sink for Android
 * [issue 568] - 2-argument version of `HPX_DEFINE_COMPONENT_ACTION`
@@ -133,8 +136,8 @@ HPX' releases so far.
 * [issue 562] - All command line arguments swallowed by hpx
 * [issue 561] - Boost.Tuple is not move aware
 * [issue 558] - `boost::shared_ptr<>` style semantics/syntax for client classes
-* [issue 556] - Creation of partially preprocessed headers should be enabled for Boost
-                newer than V1.50
+* [issue 556] - Creation of partially preprocessed headers should be enabled for
+                Boost newer than V1.50
 * [issue 555] - `BOOST_FORCEINLINE` does not name a type
 * [issue 554] - Possible race condition in thread `get_id()`
 * [issue 552] - Move enable client_base
@@ -177,8 +180,8 @@ HPX' releases so far.
 * [issue 485] - Change distributing_factory and binpacking_factory to use bulk creation
 * [issue 484] - Change `HPX_DONT_USE_PREPROCESSED_FILES` to `HPX_USE_PREPROCESSED_FILES`
 * [issue 483] - Memory counter for Windows
-* [issue 479] - strange errors appear when requesting performance counters on multiple
-                nodes
+* [issue 479] - strange errors appear when requesting performance counters on
+                multiple nodes
 * [issue 477] - Create (global) timer for multi-threaded measurements
 * [issue 472] - Add partial preprocessing using Wave
 * [issue 471] - Segfault stack traces don't show up in release
@@ -208,14 +211,14 @@ HPX' releases so far.
 * [issue 394] - Remove code generating random port numbers for network
 * [issue 378] - ShenEOS scaling issues
 * [issue 354] - Create a coroutines wrapper for Boost.Context
-* [issue 349] - Commandline option `--localities=N/-lN` should be necessary only on AGAS
-                locality
+* [issue 349] - Commandline option `--localities=N/-lN` should be necessary
+                only on AGAS locality
 * [issue 317] - Implement network performance counters
 * [issue 310] - Duplicate logging entries
 * [issue 230] - Add compile time option to disable thread debugging info
 * [issue 170] - OSHL internal counters are incorrect
-* [issue 103] - Better diagnostics for multiple component/action registerations under
-                the same name
+* [issue 103] - Better diagnostics for multiple component/action registerations
+                under the same name
 * [issue 48]  - Support for Darwin (Xcode + Clang)
 * [issue 21]  - Build fails with GCC 4.6
 

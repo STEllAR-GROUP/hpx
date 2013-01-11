@@ -82,7 +82,8 @@ struct hwloc_topology : topology
 
     ~hwloc_topology()
     {
-        hwloc_topology_destroy(topo);
+        if (topo)
+            hwloc_topology_destroy(topo);
     }
 
     std::size_t get_numa_node_number(

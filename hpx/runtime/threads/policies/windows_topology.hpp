@@ -82,7 +82,12 @@ struct windows_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        // the machine mask is the bitor of all masks in the system
+        mask_type mask = 0;
+        for (std::size_t i = 0; i < num_of_cores; ++i)
+            mask |= numa_node_affinity_masks_[i];
+
+        return mask;
     }
 
     mask_type get_numa_node_affinity_mask(
@@ -326,9 +331,6 @@ struct windows_topology : topology
 
     std::vector<mask_type> numa_node_affinity_masks_;
     std::vector<mask_type> ns_numa_node_affinity_masks_;
-
-    std::vector<mask_type> core_affinity_masks_;
-    std::vector<mask_type> ns_core_affinity_masks_;
 
     std::vector<mask_type> thread_affinity_masks_;
     std::vector<mask_type> ns_thread_affinity_masks_;

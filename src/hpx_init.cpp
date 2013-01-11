@@ -466,34 +466,32 @@ namespace hpx
         int run(hpx::runtime& rt, hpx_main_type f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
-            shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            shutdown_function_type const& shutdown)
         {
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
             // Run this runtime instance using the given function f.
             if (0 != f)
-                return rt.run(boost::bind(f, vm), num_threads, num_localities);
+                return rt.run(boost::bind(f, vm));
 
             // Run this runtime instance without an hpx_main
-            return rt.run(num_threads, num_localities);
+            return rt.run();
         }
 
         int start(hpx::runtime& rt, hpx_main_type f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
-            shutdown_function_type const& shutdown, std::size_t num_threads,
-            std::size_t num_localities)
+            shutdown_function_type const& shutdown)
         {
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
             if (0 != f) {
                 // Run this runtime instance using the given function f.
-                return rt.start(boost::bind(f, vm), num_threads, num_localities);
+                return rt.start(boost::bind(f, vm));
             }
 
             // Run this runtime instance without an hpx_main
-            return rt.start(num_threads, num_localities);
+            return rt.start();
         }
 
 #if defined(HPX_GLOBAL_SCHEDULER)
@@ -515,16 +513,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<global_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -548,16 +545,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -631,16 +627,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -665,16 +660,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -714,16 +708,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -761,16 +754,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
@@ -809,16 +801,15 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown, cfg.num_threads_, cfg.num_localities_);
+                    shutdown);
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                shutdown, cfg.num_threads_, cfg.num_localities_);
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;

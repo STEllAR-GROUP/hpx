@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -97,28 +97,31 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             util::runtime_configuration const& rtcfg,
-            runtime_mode locality_mode, init_scheduler_type const& init)
+            runtime_mode locality_mode, 
+            std::size_t num_threads, init_scheduler_type const& init)
       : runtime(rtcfg),
-        mode_(locality_mode), result_(0),
+        mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
-            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2),
+            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcelset::parcelport::create(
             parcelset::connection_tcpip, ini_,
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()))),
         scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1, ::_2),
+        notifier_(
+            boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(new hpx::threads::threadmanager_impl<
-            SchedulingPolicy, NotificationPolicy>(timer_pool_, scheduler_, notifier_)),
+            SchedulingPolicy, NotificationPolicy>(
+                timer_pool_, scheduler_, notifier_, num_threads)),
         agas_client_(*parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
@@ -204,8 +207,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        HPX_STD_FUNCTION<hpx_main_function_type> const& func,
-        std::size_t num_threads, std::size_t num_localities, bool blocking)
+        HPX_STD_FUNCTION<hpx_main_function_type> const& func, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
         // needs to be called to avoid problems at system startup
@@ -220,8 +222,8 @@ namespace hpx {
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
         LBT_(info) << "(1st stage) runtime_impl::start: booting locality "
-                   << here() << " on " << num_threads << " OS-thread"
-                   << ((num_threads == 1) ? "" : "s");
+                   << here() << " on " << num_threads_ << " OS-thread"
+                   << ((num_threads_ == 1) ? "" : "s");
 
         // start runtime_support services
         runtime_support_.run();
@@ -234,7 +236,7 @@ namespace hpx {
                       "I/O service pool";
 
         // start the thread manager
-        thread_manager_->run(num_threads);
+        thread_manager_->run(num_threads_);
         LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
@@ -263,11 +265,10 @@ namespace hpx {
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        std::size_t num_threads, std::size_t num_localities, bool blocking)
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(bool blocking)
     {
         HPX_STD_FUNCTION<hpx_main_function_type> empty_main;
-        return start(empty_main, num_threads, num_localities, blocking);
+        return start(empty_main, blocking);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -426,11 +427,10 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        HPX_STD_FUNCTION<hpx_main_function_type> const& func,
-        std::size_t num_threads, std::size_t num_localities)
+        HPX_STD_FUNCTION<hpx_main_function_type> const& func)
     {
         // start the main thread function
-        start(func, num_threads, num_localities);
+        start(func);
 
         // now wait for everything to finish
         int result = wait();
@@ -442,11 +442,10 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        std::size_t num_threads, std::size_t num_localities)
+    int runtime_impl<SchedulingPolicy, NotificationPolicy>::run()
     {
         // start the main thread function
-        start(num_threads, num_localities);
+        start();
 
         // now wait for everything to finish
         int result = wait();
@@ -470,8 +469,16 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
-        char const* context, std::size_t num, char const* postfix)
+        char const* context, std::size_t num, char const* postfix, 
+        bool service_thread)
     {
+        // initialize our TSS
+        this->runtime::init_tss();
+
+        // initialize applier TSS
+        applier_.init_tss();
+
+        // set the thread's name
         BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
 
         std::string* fullname = new std::string(context);
@@ -485,12 +492,6 @@ namespace hpx {
         // initialize thread mapping for external libraries (i.e. PAPI)
         thread_support_.register_thread(name);
 
-        // initialize our TSS
-        this->runtime::init_tss();
-
-        // initialize applier TSS
-        applier_.init_tss();
-
         // initialize coroutines context switcher
         hpx::util::coroutines::thread_startup(name);
 
@@ -499,6 +500,16 @@ namespace hpx {
 
         // set thread name as shown in Visual Studio
         util::set_thread_name(name);
+
+        // if this is a service thread, set its service affinity
+        if (service_thread) {
+            threads::mask_type used_processing_units =
+                thread_manager_->get_used_processing_units();
+
+            this->topology_->set_thread_affinity_mask(
+                this->topology_->get_service_affinity_mask(
+                    used_processing_units));
+        }
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

@@ -61,7 +61,8 @@ namespace hpx { namespace threads
         ///
         threadmanager_impl(util::io_service_pool& timer_pool,
             scheduling_policy_type& scheduler,
-            notification_policy_type& notifier);
+            notification_policy_type& notifier, 
+            std::size_t num_threads);
         ~threadmanager_impl();
 
         /// The function \a register_work adds a new work item to the thread
@@ -475,18 +476,25 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         void register_counter_types();
 
-        /// Return of of the numbers of the processing unit the given thread 
+        /// Returns of the number of the processing units the given thread 
         /// is allowed to run on
-        std::size_t get_pu_num(std::size_t num_thread)
+        std::size_t get_pu_num(std::size_t num_thread) const
         {
             return scheduler_.get_pu_num(num_thread);
         }
 
         /// Return the mask for processing units the given thread is allowed 
         /// to run on.
-        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread)
+        mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
             return scheduler_.get_pu_mask(topology, num_thread);
+        }
+
+        // Returns the mask identifying all processing units used by this 
+        // thread manager.
+        mask_type get_used_processing_units() const
+        {
+            return used_processing_units_;
         }
 
     private:
@@ -521,6 +529,10 @@ namespace hpx { namespace threads
 
         // tfunc_impl timers
         std::vector<boost::uint64_t> exec_times, tfunc_times;
+
+        // Stores the mask identifying all processing units used by this 
+        // thread manager.
+        threads::mask_type used_processing_units_;
     };
 }}
 

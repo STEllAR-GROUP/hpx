@@ -374,13 +374,13 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         virtual void register_counter_types() = 0;
 
-        /// Return of of the numbers of the processing unit the given thread 
+        /// Returns of the number of the processing unit the given thread 
         /// is allowed to run on
-        virtual std::size_t get_pu_num(std::size_t) = 0;
+        virtual std::size_t get_pu_num(std::size_t) const = 0;
 
         /// Return the mask for processing units the given thread is allowed 
         /// to run on.
-        virtual std::size_t get_pu_mask(topology const&, std::size_t) = 0;
+        virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
 
         virtual boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1)) const = 0;
@@ -408,6 +408,10 @@ namespace hpx { namespace threads
         virtual std::size_t set_thread_data(thread_id_type id,
             std::size_t data, error_code& ec = throws) = 0;
 #endif
+
+        // Returns the mask identifying all processing units used by this 
+        // thread manager.
+        virtual mask_type get_used_processing_units() const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
