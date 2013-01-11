@@ -117,7 +117,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_phase(id);
     }
 
-    void interrupt_thread(thread_id_type id, error_code& ec)
+    void interrupt_thread(thread_id_type id, bool flag, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -127,7 +127,7 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return;
         }
-        app->get_thread_manager().interrupt(id, ec);
+        app->get_thread_manager().interrupt(id, flag, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -200,9 +200,9 @@ namespace hpx
     }
 
     // extensions
-    void thread::interrupt()
+    void thread::interrupt(bool flag)
     {
-        threads::interrupt_thread(native_handle());
+        threads::interrupt_thread(native_handle(), flag);
     }
 
     bool thread::interruption_requested() const
@@ -210,9 +210,9 @@ namespace hpx
         return threads::get_thread_interruption_requested(native_handle());
     }
 
-    void thread::interrupt(thread::id id)
+    void thread::interrupt(thread::id id, bool flag)
     {
-        threads::interrupt_thread(id.id_);
+        threads::interrupt_thread(id.id_, flag);
     }
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA

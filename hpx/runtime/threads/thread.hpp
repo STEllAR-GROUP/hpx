@@ -102,10 +102,10 @@ namespace hpx
         static unsigned hardware_concurrency() BOOST_NOEXCEPT;
 
         // extensions
-        void interrupt();
+        void interrupt(bool flag = true);
         bool interruption_requested() const;
 
-        static void interrupt(id);
+        static void interrupt(id, bool flag = true);
 
         lcos::future<void> get_future(error_code& ec = throws);
 

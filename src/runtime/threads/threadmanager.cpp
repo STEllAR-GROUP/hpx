@@ -673,7 +673,7 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        interrupt(thread_id_type id, error_code& ec)
+        interrupt(thread_id_type id, bool flag, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
@@ -688,7 +688,7 @@ namespace hpx { namespace threads
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd) {
-            thrd->interrupt();      // notify thread
+            thrd->interrupt(flag);      // notify thread
 
             // set thread state to pending, if the thread is currently active,
             // this will be rescheduled until it calls an interruption point

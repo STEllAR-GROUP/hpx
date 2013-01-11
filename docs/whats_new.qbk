@@ -41,8 +41,8 @@ All of the API has been aligned as much as possible with established paradigms.
 HPX now mirrors many of the facilities as defined in the C++11 Standard, such
 as `hpx::thread`, `hpx::function`, `hpx::future`, etc.
 
-A lot of work has been put into improving the documentation. Many of the API 
-functions are documented now, concepts are explained in detail, and examples 
+A lot of work has been put into improving the documentation. Many of the API
+functions are documented now, concepts are explained in detail, and examples
 are better described than before. The new [link hpx.index documentation index]
 enables finding information with lesser effort.
 
@@ -57,6 +57,9 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* [issue 662] - pkgconfig is building wrong
+* [issue 660] - Need uninterrupt function
+* [issue 659] - Move our logging library into a different namespace
 * [issue 658] - Dynamic performance counter types are broken
 * [issue 657] - HPX v0.9.5 (RC1) hello_world example segfaulting
 * [issue 654] - Integrate the Boost auto_index tool with documentation

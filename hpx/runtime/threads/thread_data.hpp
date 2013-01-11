@@ -531,16 +531,16 @@ namespace hpx { namespace threads
             return enable;
         }
 
-        void interrupt()
+        void interrupt(bool flag = true)
         {
             mutex_type::scoped_lock l(this);
-            if (!enabled_interrupt_) {
+            if (flag && !enabled_interrupt_) {
                 HPX_THROW_EXCEPTION(thread_not_interruptable,
                     "thread_data::interrupt",
                     "interrupts are disabled for this thread");
                 return;
             }
-            requested_interrupt_ = true;
+            requested_interrupt_ = flag;
         }
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
