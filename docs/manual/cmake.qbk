@@ -432,7 +432,7 @@ To test the program, type:
     $ ./hello_world
 ``
 
-which should print [^Hello HPX World!] and exit.
+which should print [^Hello World!] and exit.
 
 [endsect] [/ How to Build __hpx__ Applications with pkg-config]
 
