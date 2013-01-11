@@ -57,6 +57,7 @@ Here is a list of the important tickets we closed for this release. This is by
 far the longest list of newly implemented features and fixed issues for any of
 HPX' releases so far.
 
+* [issue 665] - Adding declaration num_of_cores
 * [issue 662] - pkgconfig is building wrong
 * [issue 660] - Need uninterrupt function
 * [issue 659] - Move our logging library into a different namespace
