@@ -403,15 +403,18 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
-                  "run on (default: 0)")
+                  "run on (default: 0), valid for "
+                  "--hpx:queuing=local and priority_local only")
                 ("hpx:pu-step", value<std::size_t>(),
                   "the step between used processing unit numbers for this "
-                  "instance of HPX (default: 1)")
+                  "instance of HPX (default: 1), valid for "
+                  "--hpx:queuing=local and priority_local only")
 #endif
 #if defined(HPX_HAVE_HWLOC)
                 ("hpx:affinity", value<std::string>(),
                   "the affinity domain the OS threads will be confined to, "
-                  "possible values: pu, core, numa, machine (default: pu)")
+                  "possible values: pu, core, numa, machine (default: pu), valid for "
+                  "--hpx:queuing=local and priority_local only")
 #endif
                 ("hpx:threads", value<std::string>(),
                  "the number of operating system threads to spawn for this HPX "
@@ -430,7 +433,7 @@ namespace hpx { namespace util
                   "--hpx:queuing=priority_local only")
                 ("hpx:numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
-                  "--hpx:queuing=priority_local only")
+                  "--hpx:queuing=local and priority_local only")
             ;
 
             options_description config_options("HPX configuration options");

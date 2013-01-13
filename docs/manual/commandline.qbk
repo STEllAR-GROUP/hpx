@@ -51,14 +51,17 @@ described in the table below:
     [[`--hpx:node arg`]         [number of the node this locality is run on
                                  (must be unique)]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
-                                 run on (default: 0)]]
+                                 run on (default: 0), valid for 
+                                 --hpx:queuing=local and priority_local only]]
     [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
-                                 instance of __hpx__ (default: 1)]]
+                                 instance of __hpx__ (default: 1), valid for 
+                                 --hpx:queuing=local and priority_local only]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
-                                 possible values: pu, core, numa, machine (default: pu)]]
+                                 possible values: pu, core, numa, machine (default: pu), valid for 
+                                 --hpx:queuing=local and priority_local only]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
                                  'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
                                  'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
@@ -69,7 +72,7 @@ described in the table below:
                                  number of OS threads), valid for
                                  --hpx:queuing=priority_local only]]
     [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
-                                 --hpx:queuing=priority_local only]]
+                                 --hpx:queuing=local and priority_local only]]
 
     [[[*__hpx__ configuration options]]]
     [[`--hpx:app-config arg`]   [load the specified application configuration

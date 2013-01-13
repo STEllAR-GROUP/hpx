@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
@@ -41,6 +42,7 @@ namespace hpx { namespace threads { namespace policies
 
     public:
         typedef boost::mpl::false_ has_periodic_maintenance;
+
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the maxcount per queue
@@ -49,39 +51,69 @@ namespace hpx { namespace threads { namespace policies
             init_parameter()
               : num_queues_(1),
                 max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(false)
+                pu_offset_(0),
+                pu_step_(1),
+                numa_sensitive_(false),
+                affinity_("pu")
             {}
 
             init_parameter(std::size_t num_queues,
                     std::size_t max_queue_thread_count = max_thread_count,
-                    bool numa_sensitive = false)
+                    bool numa_sensitive = false,
+                    std::size_t pu_offset = 0,
+                    std::size_t pu_step = 1,
+                    std::string const& affinity = "pu")
               : num_queues_(num_queues),
                 max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive)
+                pu_offset_(pu_offset), pu_step_(pu_step),
+                numa_sensitive_(numa_sensitive),
+                affinity_(affinity)
             {}
 
             init_parameter(std::pair<std::size_t, std::size_t> const& init,
                     bool numa_sensitive = false)
               : num_queues_(init.first),
                 max_queue_thread_count_(init.second),
-                numa_sensitive_(numa_sensitive)
+                pu_offset_(0),
+                pu_step_(1),
+                numa_sensitive_(numa_sensitive),
+                affinity_("pu")
             {}
 
             std::size_t num_queues_;
             std::size_t max_queue_thread_count_;
+            std::size_t pu_offset_;
+            std::size_t pu_step_;
             bool numa_sensitive_;
+            std::string affinity_;
         };
         typedef init_parameter init_parameter_type;
 
         local_queue_scheduler(init_parameter_type const& init)
           : queues_(init.num_queues_),
             curr_queue_(0),
+            affinity_data_(init.pu_offset_, init.pu_step_, init.affinity_),
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology())
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
                 queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
+        }
+
+        local_queue_scheduler(std::size_t num_queues,
+                std::size_t max_queue_thread_count = max_thread_count,
+                bool numa_sensitive = false, std::size_t pu_offset = 0,
+                std::size_t pu_step = 1, std::string const& affinity = "pu")
+          : queues_(num_queues),
+            curr_queue_(0),
+            affinity_data_(pu_offset, pu_step, affinity),
+            numa_sensitive_(numa_sensitive),
+            topology_(get_topology())
+        {
+            BOOST_ASSERT(num_queues != 0);
+            for (std::size_t i = 0; i < num_queues; ++i)
+                queues_[i] = new thread_queue<false>(max_queue_thread_count);
         }
 
         ~local_queue_scheduler()
@@ -94,12 +126,12 @@ namespace hpx { namespace threads { namespace policies
 
         std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
-            return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
+            return affinity_data_.get_pu_mask(topology, num_thread, numa_sensitive_);
         }
 
         std::size_t get_pu_num(std::size_t num_thread) const
         {
-            return num_thread;
+            return affinity_data_.get_pu_num(num_thread);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -170,7 +202,7 @@ namespace hpx { namespace threads { namespace policies
                 run_now, num_thread, ec);
         }
 
-        /// Return the next thread to be executed, return false if non is
+        /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
@@ -246,13 +278,13 @@ namespace hpx { namespace threads { namespace policies
             if (0 == added) {
                 // steal work items: first try to steal from other cores in the
                 // same numa node
-                boost::uint64_t core_mask
-                    = topology_.get_thread_affinity_mask(num_thread, numa_sensitive_);
-                boost::uint64_t node_mask
-                    = topology_.get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+                mask_type core_mask = topology_.get_thread_affinity_mask(
+                    num_thread, numa_sensitive_);
+                mask_type node_mask = topology_.get_numa_node_affinity_mask(
+                    num_thread, numa_sensitive_);
 
                 if (core_mask && node_mask) {
-                    boost::uint64_t m = 0x01LL;
+                    mask_type m = 0x01LL;
                     for (std::size_t i = 0; (0 == added) && i < queues_.size();
                          m <<= 1, ++i)
                     {
@@ -302,7 +334,7 @@ namespace hpx { namespace threads { namespace policies
             return result && 0 == added;
         }
 
-        /// This function gets called by the threadmanager whenever new work
+        /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
         void do_some_work(std::size_t num_thread)
@@ -332,8 +364,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
+        std::vector<thread_queue<false>*> queues_;   ///< this manages all the HPX threads
         boost::atomic<std::size_t> curr_queue_;
+        detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
     };
