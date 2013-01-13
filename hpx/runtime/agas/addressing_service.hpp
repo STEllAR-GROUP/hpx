@@ -234,7 +234,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
 
-    atomic_state state_;
+    boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
 
     naming::address primary_ns_addr_;

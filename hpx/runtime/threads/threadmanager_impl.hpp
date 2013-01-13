@@ -517,7 +517,7 @@ namespace hpx { namespace threads
         std::vector<boost::int64_t> executed_threads_;
         boost::atomic<long> thread_count_;
 
-        atomic_state state_;                ///< thread manager state
+        boost::atomic<hpx::state> state_;   ///< thread manager state
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
