@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/scheduling_loop.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -941,62 +942,6 @@ namespace hpx { namespace threads
         return register_thread(data, pending, true, ec);
     }
 
-    // helper class for switching thread state in and out during execution
-    class switch_status
-    {
-    public:
-        switch_status (thread_data* t, thread_state prev_state)
-          : thread_(t), prev_state_(prev_state),
-            need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
-        {}
-
-        ~switch_status ()
-        {
-            if (need_restore_state_)
-                store_state(prev_state_);
-        }
-
-        bool is_valid() const { return need_restore_state_; }
-
-        // allow to change the state the thread will be switched to after
-        // execution
-        thread_state operator=(thread_state_enum new_state)
-        {
-            return prev_state_ = thread_state(new_state, prev_state_.get_tag() + 1);
-        }
-
-        // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute this
-        // PX-thread in the meantime.
-        thread_state get_previous() const
-        {
-            return prev_state_;
-        }
-
-        // This restores the previous state, while making sure that the
-        // original state has not been changed since we started executing this
-        // thread. The function returns true if the state has been set, false
-        // otherwise.
-        bool store_state(thread_state& newstate)
-        {
-            disable_restore();
-            if (thread_->restore_state(prev_state_, orig_state_)) {
-                newstate = prev_state_;
-                return true;
-            }
-            return false;
-        }
-
-        // disable default handling in destructor
-        void disable_restore() { need_restore_state_ = false; }
-
-    private:
-        thread_data* thread_;
-        thread_state prev_state_;
-        thread_state orig_state_;
-        bool need_restore_state_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     // main function executed by all OS threads managed by this threadmanager_impl
     template <typename SP, typename NP>
@@ -1021,23 +966,15 @@ namespace hpx { namespace threads
     struct manage_active_thread_count
     {
         manage_active_thread_count(boost::atomic<long>& counter)
-          : has_exited_(false), counter_(counter)
+          : counter_(counter)
         {
             ++counter_;
         }
         ~manage_active_thread_count()
         {
-            if (!has_exited_)
-                --counter_;
-        }
-
-        void exit()
-        {
-            has_exited_ = true;
             --counter_;
         }
 
-        bool has_exited_;
         boost::atomic<long>& counter_;
     };
 
@@ -1095,36 +1032,6 @@ namespace hpx { namespace threads
 
         notifier_.on_stop_thread(num_thread);
         scheduler_.on_stop_thread(num_thread);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline void write_old_state_log(std::size_t num_thread, thread_data* thrd,
-        thread_state_enum state)
-    {
-        LTM_(debug) << "tfunc(" << num_thread << "): "
-                   << "thread(" << thrd->get_thread_id() << "), "
-                   << "description(" << thrd->get_description() << "), "
-                   << "old state(" << get_thread_state_name(state) << ")";
-    }
-
-    inline void write_new_state_log_debug(std::size_t num_thread, thread_data* thrd,
-        thread_state_enum state, char const* info)
-    {
-        LTM_(debug) << "tfunc(" << num_thread << "): "
-            << "thread(" << thrd->get_thread_id() << "), "
-            << "description(" << thrd->get_description() << "), "
-            << "new state(" << get_thread_state_name(state) << "), "
-            << info;
-    }
-    inline void write_new_state_log_warning(std::size_t num_thread, thread_data* thrd,
-        thread_state_enum state, char const* info)
-    {
-        // log this in any case
-        LTM_(warning) << "tfunc(" << num_thread << "): "
-            << "thread(" << thrd->get_thread_id() << "), "
-            << "description(" << thrd->get_description() << "), "
-            << "new state(" << get_thread_state_name(state) << "), "
-            << info;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1521,15 +1428,7 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc_impl(std::size_t num_thread)
     {
-        util::itt::stack_context ctx;        // helper for itt support
-        util::itt::domain domain(get_thread_name()->data());
-//         util::itt::id threadid(domain, this);
-        util::itt::frame_context fctx(domain);
-
         manage_active_thread_count count(thread_count_);
-
-        boost::int64_t idle_loop_count = 0;
-        boost::int64_t busy_loop_count = 0;
 
         // set affinity on Linux systems or when using HWLOC
         topology const& topology_ = get_topology();
@@ -1541,9 +1440,7 @@ namespace hpx { namespace threads
 
         error_code ec(lightweight);
         topology_.set_thread_affinity_mask(mask, ec);
-
-        if (ec)
-        {
+        if (ec) {
             LTM_(warning) << "run: setting thread affinity on OS thread "
                 << num_thread << " failed with: " << ec.get_message();
         }
@@ -1551,147 +1448,10 @@ namespace hpx { namespace threads
         // run the work queue
         hpx::util::coroutines::prepare_main_thread main_thread;
 
-        boost::int64_t& executed_threads = executed_threads_[num_thread];
-        boost::uint64_t& tfunc_time = tfunc_times[num_thread];
-        boost::uint64_t& exec_time = exec_times[num_thread];
-        boost::uint64_t overall_timestamp = util::hardware::timestamp();
-
-        start_periodic_maintenance<SchedulingPolicy>(
-            typename SchedulingPolicy::has_periodic_maintenance());
-
-        while (true) {
-            // Get the next PX thread from the queue
-            thread_data* thrd = NULL;
-            if (scheduler_.get_next_thread(num_thread,
-                    state_.load() == running, idle_loop_count, thrd))
-            {
-                idle_loop_count = 0;
-                ++busy_loop_count;
-
-                // Only pending PX threads will be executed.
-                // Any non-pending PX threads are leftovers from a set_state()
-                // call for a previously pending PX thread (see comments above).
-                thread_state state = thrd->get_state();
-                thread_state_enum state_val = state;
-
-                write_old_state_log(num_thread, thrd, state_val);
-
-                if (pending == state_val) {
-                    // switch the state of the thread to active and back to
-                    // what the thread reports as its return value
-
-                    {
-                        // tries to set state to active (only if state is still
-                        // the same as 'state')
-                        switch_status thrd_stat (thrd, state);
-                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending) {
-                            // thread returns new required state
-                            // store the returned state in the thread
-                            {
-#if defined(HPX_USE_ITTNOTIFY)
-                                util::itt::caller_context cctx(ctx);
-                                util::itt::undo_frame_context undoframe(fctx);
-                                util::itt::task task(domain, thrd->get_description());
-#endif
-                                // Record time elapsed in thread changing state
-                                // and add to aggregate execution time.
-                                boost::uint64_t timestamp = util::hardware::timestamp();
-                                thrd_stat = (*thrd)();
-                                exec_time += util::hardware::timestamp() - timestamp;
-                            }
-
-                            tfunc_time = util::hardware::timestamp() - overall_timestamp;
-                            ++executed_threads;
-                        }
-                        else {
-                            // some other worker-thread got in between and started
-                            // executing this PX-thread, we just continue with
-                            // the next one
-                            thrd_stat.disable_restore();
-                            write_new_state_log_warning(
-                                num_thread, thrd, state_val, "no execution");
-                            continue;
-                        }
-
-                        // store and retrieve the new state in the thread
-                        if (!thrd_stat.store_state(state)) {
-                            // some other worker-thread got in between and changed
-                            // the state of this thread, we just continue with
-                            // the next one
-                            write_new_state_log_warning(
-                                num_thread, thrd, state_val, "no state change");
-                            continue;
-                        }
-                        state_val = state;
-
-                        // any exception thrown from the thread will reset its
-                        // state at this point
-                    }
-
-                    write_new_state_log_debug(num_thread, thrd, state_val, "normal");
-
-                    // Re-add this work item to our list of work items if the PX
-                    // thread should be re-scheduled. If the PX thread is suspended
-                    // now we just keep it in the map of threads.
-                    if (state_val == pending) {
-                        // schedule other work
-                        scheduler_.wait_or_add_new(num_thread,
-                            state_.load() == running, idle_loop_count);
-
-                        // schedule this thread again, make sure it ends up at
-                        // the end of the queue
-                        // REVIEW: Passing a specific target thread may screw
-                        // with the round robin queuing.
-                        scheduler_.schedule_thread_last(thrd, num_thread);
-                        do_some_work(num_thread);
-                    }
-                }
-                else if (active == state_val) {
-                    LTM_(warning) << "tfunc(" << num_thread << "): "
-                        "thread(" << thrd->get_thread_id() << "), "
-                        "description(" << thrd->get_description() << "), "
-                        "rescheduling";
-
-                    // re-schedule thread, if it is still marked as active
-                    // this might happen, if some thread has been added to the
-                    // scheduler queue already but the state has not been reset
-                    // yet
-                    // REVIEW: Passing a specific target thread may screw
-                    // with the round robin queuing.
-                    scheduler_.schedule_thread(thrd, num_thread);
-                }
-
-                // Remove the mapping from thread_map_ if PX thread is depleted
-                // or terminated, this will delete the PX thread as all
-                // references go out of scope.
-                // REVIEW: what has to be done with depleted PX threads?
-                if (state_val == depleted || state_val == terminated)
-                    scheduler_.destroy_thread(thrd, busy_loop_count);
-
-                tfunc_time = util::hardware::timestamp() - overall_timestamp;
-            }
-
-            // if nothing else has to be done either wait or terminate
-            else {
-                if (scheduler_.wait_or_add_new(num_thread,
-                        state_.load() == running, idle_loop_count))
-                {
-                    // if we need to terminate, unregister the counter first
-                    count.exit();
-                    break;
-                }
-            }
-
-            // Clean up all terminated threads for all thread queues once in a
-            // while.
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX) {
-                busy_loop_count = 0;
-                scheduler_.cleanup_terminated(true);
-            }
-        }
-
-        // after tfunc loop broke, record total time elapsed
-        tfunc_time = util::hardware::timestamp() - overall_timestamp;
+        // run main scheduling loop until terminated
+        scheduling_loop(num_thread, scheduler_, state_,
+            executed_threads_[num_thread], tfunc_times[num_thread],
+            exec_times[num_thread]);
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist
@@ -1861,44 +1621,6 @@ namespace hpx { namespace threads
         double const percent =
             1. - (exec_time / tfunc_time);
         return boost::int64_t(1000. * percent);   // 0.1 percent
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    template <typename C>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        start_periodic_maintenance(boost::mpl::true_)
-    {
-        scheduler_.periodic_maintenance(state_.load() == running);
-
-        boost::posix_time::milliseconds expire(1000);
-        // create timer firing in correspondence with given time
-        boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
-
-        void (threadmanager_impl::*handler)(boost::mpl::true_)
-            = &threadmanager_impl::periodic_maintenance_handler<SchedulingPolicy>;
-
-        t.async_wait(boost::bind(handler, this, boost::mpl::true_()));
-    }
-
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    template <typename C>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        periodic_maintenance_handler(boost::mpl::true_)
-    {
-        scheduler_.periodic_maintenance(state_.load() == running);
-
-        if(state_.load() == running)
-        {
-            boost::posix_time::milliseconds expire(1000);
-            // create timer firing in correspondence with given time
-            boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
-
-            void (threadmanager_impl::*handler)(boost::mpl::true_)
-                = &threadmanager_impl::periodic_maintenance_handler<SchedulingPolicy>;
-
-            t.async_wait(boost::bind(handler, this, boost::mpl::true_()));
-        }
     }
 }}
 
