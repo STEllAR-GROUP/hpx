@@ -419,8 +419,8 @@ namespace hpx
                 rt.add_startup_function(dump_config(rt));
         }
 
-        // helper function testing option compatibility
-        void ensure_queuing_option_compatibility(
+        // helper functions testing option compatibility
+        void ensure_high_priority_compatibility(
             boost::program_options::variables_map const& vm)
         {
             if (vm.count("hpx:high-priority-threads")) {
@@ -428,15 +428,33 @@ namespace hpx
                     "--hpx:high-priority-threads, valid for "
                     "--hpx:queuing=priority_local only");
             }
+        }
+
+        void ensure_numa_sensitivity_compatibility(
+            boost::program_options::variables_map const& vm)
+        {
             if (vm.count("hpx:numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:numa-sensitive, valid for "
-                    "--hpx:queuing=priority_local or priority_abp only");
+                    "--hpx:queuing=local, priority_local, or priority_abp only");
             }
+        }
+
+        void ensure_hierarchy_arity_compatibility(
+            boost::program_options::variables_map const& vm)
+        {
             if (vm.count("hpx:hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
             }
+        }
+
+        void ensure_queuing_option_compatibility(
+            boost::program_options::variables_map const& vm)
+        {
+            ensure_high_priority_compatibility(vm);
+            ensure_numa_sensitivity_compatibility(vm);
+            ensure_hierarchy_arity_compatibility(vm);
         }
 
         void ensure_hwloc_compatibility(
@@ -535,12 +553,56 @@ namespace hpx
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
-            ensure_queuing_option_compatibility(cfg.vm_);
+            ensure_high_priority_compatibility(cfg.vm_);
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+
+            bool numa_sensitive = false;
+            if (cfg.vm_.count("hpx:numa-sensitive"))
+                numa_sensitive = true;
+
+            std::size_t pu_offset = 0;
+            std::size_t pu_step = 1;
+            std::string affinity("pu");
+#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
+            if (cfg.vm_.count("hpx:pu-offset")) {
+                pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
+                if (pu_offset >= hpx::threads::hardware_concurrency()) {
+                    throw std::logic_error("Invalid command line option "
+                        "--hpx:pu-offset, value must be smaller than number of "
+                        "available processing units.");
+                }
+            }
+
+            if (cfg.vm_.count("hpx:pu-step")) {
+                pu_step = cfg.vm_["hpx:pu-step"].as<std::size_t>();
+                if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency()) {
+                    throw std::logic_error("Invalid command line option "
+                        "--hpx:pu-step, value must be non-zero smaller than number of "
+                        "available processing units.");
+                }
+            }
+#endif
+#if defined(HPX_HAVE_HWLOC)
+            if (cfg.vm_.count("hpx:affinity")) {
+                affinity = cfg.vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity) &&
+                    0 != std::string("core").find(affinity) &&
+                    0 != std::string("numa").find(affinity) &&
+                    0 != std::string("machine").find(affinity))
+                {
+                    throw std::logic_error("Invalid command line option "
+                        "--hpx:affinity, value must be one of: pu, core, numa, "
+                        "or machine.");
+                }
+            }
+#endif
 
             // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler
                 local_queue_policy;
-            local_queue_policy::init_parameter_type init(cfg.num_threads_, 1000);
+            local_queue_policy::init_parameter_type init(
+                cfg.num_threads_, 1000, numa_sensitive, pu_offset, pu_step, 
+                affinity);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -567,19 +629,17 @@ namespace hpx
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+
             std::size_t num_high_priority_queues = cfg.num_threads_;
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
             }
+
             bool numa_sensitive = false;
             if (cfg.vm_.count("hpx:numa-sensitive"))
                 numa_sensitive = true;
-
-            if (cfg.vm_.count("hpx:hierarchy-arity")) {
-                throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
-            }
 
             std::size_t pu_offset = 0;
             std::size_t pu_step = 1;
@@ -683,20 +743,18 @@ namespace hpx
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+            ensure_hwloc_compatibility(cfg.vm_);
+
             std::size_t num_high_priority_queues = cfg.num_threads_;
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
             }
+
             bool numa_sensitive = false;
             if (cfg.vm_.count("hpx:numa-sensitive"))
                 numa_sensitive = true;
-            if (cfg.vm_.count("hpx:hierarchy-arity")) {
-                throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
-            }
-
-            ensure_hwloc_compatibility(cfg.vm_);
 
             // scheduling policy
             typedef hpx::threads::policies::abp_priority_queue_scheduler
@@ -731,17 +789,8 @@ namespace hpx
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
-            if (cfg.vm_.count("hpx:high-priority-threads")) {
-                throw std::logic_error("Invalid command line option "
-                    "--hpx:high-priority-threads, valid for "
-                    "--hpx:queuing=priority_local only.");
-            }
-            if (cfg.vm_.count("hpx:numa-sensitive")) {
-                throw std::logic_error("Invalid command line option "
-                    "--hpx:numa-sensitive, valid for "
-                    "--hpx:queuing=priority_local or priority_abp only");
-            }
-
+            ensure_high_priority_compatibility(cfg.vm_);
+            ensure_numa_sensitivity_compatibility(cfg.vm_);
             ensure_hwloc_compatibility(cfg.vm_);
 
             // scheduling policy
@@ -749,6 +798,7 @@ namespace hpx
             std::size_t arity = 2;
             if (cfg.vm_.count("hpx:hierarchy-arity"))
                 arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
+
             queue_policy::init_parameter_type init(cfg.num_threads_, arity, 1000);
 
             // Build and configure this runtime instance.
@@ -777,20 +827,18 @@ namespace hpx
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+            ensure_hwloc_compatibility(cfg.vm_);
+
             std::size_t num_high_priority_queues = cfg.num_threads_;
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
             }
+
             bool numa_sensitive = false;
             if (cfg.vm_.count("hpx:numa-sensitive"))
                 numa_sensitive = true;
-            if (cfg.vm_.count("hpx:hierarchy-arity")) {
-                throw std::logic_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for --hpx:queuing=hierarchy only.");
-            }
-
-            ensure_hwloc_compatibility(cfg.vm_);
 
             // scheduling policy
             typedef hpx::threads::policies::local_periodic_priority_scheduler
