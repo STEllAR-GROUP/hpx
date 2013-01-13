@@ -82,8 +82,8 @@ struct windows_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
+        // the machine mask is the bit-or of all masks in the system
         std::size_t const num_of_cores = hardware_concurrency();
-        // the machine mask is the bitor of all masks in the system
         mask_type mask = 0;
         for (std::size_t i = 0; i < num_of_cores; ++i)
             mask |= numa_node_affinity_masks_[i];
