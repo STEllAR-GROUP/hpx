@@ -40,7 +40,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     static inline threads::thread_state_enum thread_function_nullary(
-        HPX_STD_FUNCTION<void()> const& func)
+        HPX_STD_FUNCTION<void()> const& func,
+        boost::intrusive_ptr<thread_pool_executor>)
     {
         // execute the actual thread function
         func();
@@ -56,23 +57,29 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void thread_pool_executor::add(HPX_STD_FUNCTION<void()> f, char const* desc)
+    void thread_pool_executor::add(HPX_STD_FUNCTION<void()> f,
+        char const* desc, threads::thread_state_enum initial_state,
+        bool run_now)
     {
-        thread_init_data data(util::bind(
-            &thread_function_nullary, boost::move(f)), desc);
+        boost::intrusive_ptr<thread_pool_executor> this_(this);
+        thread_init_data data(util::bind(&thread_function_nullary, 
+            boost::move(f), this_), desc);
 
-        threads::detail::create_thread(scheduler_, data);
+        threads::detail::create_thread(scheduler_, data, initial_state, run_now);
     }
 
     // Like add(), except that if the attempt to add the function would
     // cause the caller to block in add, try_add would instead do
     // nothing and return false.
-    bool thread_pool_executor::try_add(HPX_STD_FUNCTION<void()> f, char const* desc)
+    bool thread_pool_executor::try_add(HPX_STD_FUNCTION<void()> f,
+        char const* desc, threads::thread_state_enum initial_state,
+        bool run_now)
     {
-        thread_init_data data(util::bind(
-            &thread_function_nullary, boost::move(f)), desc);
+        boost::intrusive_ptr<thread_pool_executor> this_(this);
+        thread_init_data data(util::bind(&thread_function_nullary, 
+            boost::move(f), this_), desc);
 
-        threads::detail::create_thread(scheduler_, data);
+        threads::detail::create_thread(scheduler_, data, initial_state, run_now);
         return true;      // this function will never block
     }
 
@@ -83,8 +90,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         boost::posix_time::ptime const& abs_time,
         HPX_STD_FUNCTION<void()> f, char const* desc)
     {
-        thread_init_data data(util::bind(
-            &thread_function_nullary, boost::move(f)), desc);
+        boost::intrusive_ptr<thread_pool_executor> this_(this);
+        thread_init_data data(util::bind(&thread_function_nullary, 
+            boost::move(f), this_), desc);
 
         thread_id_type id = threads::detail::create_thread(
             scheduler_, data, suspended);
@@ -101,8 +109,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         boost::posix_time::time_duration const& rel_time,
         HPX_STD_FUNCTION<void()> f, char const* desc)
     {
-        thread_init_data data(util::bind(
-            &thread_function_nullary, boost::move(f)), desc);
+        boost::intrusive_ptr<thread_pool_executor> this_(this);
+        thread_init_data data(util::bind(&thread_function_nullary, 
+            boost::move(f), this_), desc);
 
         thread_id_type id = threads::detail::create_thread(
             scheduler_, data, suspended);

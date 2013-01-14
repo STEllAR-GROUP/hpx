@@ -27,25 +27,27 @@ namespace hpx { namespace threads { namespace executors
             service_executor(char const* pool_name);
             ~service_executor();
 
-            /// Schedule the specified function for execution in this executor.
-            /// Depending on the subclass implementation, this may block in some
-            /// situations.
-            void add(HPX_STD_FUNCTION<void()> f, char const* description);
+            // Schedule the specified function for execution in this executor.
+            // Depending on the subclass implementation, this may block in some
+            // situations.
+            void add(HPX_STD_FUNCTION<void()> f, char const* description,
+                threads::thread_state_enum initial_state, bool run_now);
 
-            /// Like add(), except that if the attempt to add the function would
-            /// cause the caller to block in add, try_add would instead do
-            /// nothing and return false.
-            bool try_add(HPX_STD_FUNCTION<void()> f, char const* description);
+            // Like add(), except that if the attempt to add the function would
+            // cause the caller to block in add, try_add would instead do
+            // nothing and return false.
+            bool try_add(HPX_STD_FUNCTION<void()> f, char const* description,
+                threads::thread_state_enum initial_state, bool run_now);
 
-            /// Schedule given function for execution in this executor no sooner
-            /// than time abs_time. This call never blocks, and may violate
-            /// bounds on the executor's queue size.
+            // Schedule given function for execution in this executor no sooner
+            // than time abs_time. This call never blocks, and may violate
+            // bounds on the executor's queue size.
             void add_at(boost::posix_time::ptime const& abs_time,
                 HPX_STD_FUNCTION<void()> f, char const* description);
 
-            /// Schedule given function for execution in this executor no sooner
-            /// than time rel_time from now. This call never blocks, and may
-            /// violate bounds on the executor's queue size.
+            // Schedule given function for execution in this executor no sooner
+            // than time rel_time from now. This call never blocks, and may
+            // violate bounds on the executor's queue size.
             void add_after(boost::posix_time::time_duration const& rel_time,
                 HPX_STD_FUNCTION<void()> f, char const* description);
 

@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/safe_bool.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -30,31 +31,33 @@ namespace hpx { namespace threads
             executor_base() : count_(0) {}
             virtual ~executor_base() {}
 
-            /// Scheduling methods.
-            /// Schedule the specified function for execution in this executor.
-            /// Depending on the subclass implementation, this may block in some
-            /// situations.
-            virtual void add(HPX_STD_FUNCTION<void()> f, char const* desc) = 0;
+            // Scheduling methods.
+            // Schedule the specified function for execution in this executor.
+            // Depending on the subclass implementation, this may block in some
+            // situations.
+            virtual void add(HPX_STD_FUNCTION<void()> f, char const* desc,
+                threads::thread_state_enum initial_state, bool run_now) = 0;
 
-            /// Like add(), except that if the attempt to add the function would
-            /// cause the caller to block in add, try_add would instead do
-            /// nothing and return false.
-            virtual bool try_add(HPX_STD_FUNCTION<void()> f, char const* desc) = 0;
+            // Like add(), except that if the attempt to add the function would
+            // cause the caller to block in add, try_add would instead do
+            // nothing and return false.
+            virtual bool try_add(HPX_STD_FUNCTION<void()> f, char const* desc,
+                threads::thread_state_enum initial_state, bool run_now) = 0;
 
-            /// Schedule given function for execution in this executor no sooner
-            /// than time abs_time. This call never blocks, and may violate
-            /// bounds on the executor's queue size.
+            // Schedule given function for execution in this executor no sooner
+            // than time abs_time. This call never blocks, and may violate
+            // bounds on the executor's queue size.
             virtual void add_at(boost::posix_time::ptime const& abs_time,
                 HPX_STD_FUNCTION<void()> f, char const* desc) = 0;
 
-            /// Schedule given function for execution in this executor no sooner
-            /// than time rel_time from now. This call never blocks, and may
-            /// violate bounds on the executor's queue size.
+            // Schedule given function for execution in this executor no sooner
+            // than time rel_time from now. This call never blocks, and may
+            // violate bounds on the executor's queue size.
             virtual void add_after(
                 boost::posix_time::time_duration const& rel_time,
                 HPX_STD_FUNCTION<void()> f, char const* desc) = 0;
 
-            /// Return an estimate of the number of waiting closures.
+            // Return an estimate of the number of waiting closures.
             virtual std::size_t num_pending_tasks() const = 0;
 
         private:
@@ -90,6 +93,10 @@ namespace hpx { namespace threads
         }
 
     public:
+        executor()
+        {
+        }
+
         ~executor()
         {
         }
@@ -97,17 +104,21 @@ namespace hpx { namespace threads
         /// Schedule the specified function for execution in this executor.
         /// Depending on the subclass implementation, this may block in some
         /// situations.
-        void add(HPX_STD_FUNCTION<void()> f, char const* desc = 0)
+        void add(HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+            threads::thread_state_enum initial_state = threads::pending,
+            bool run_now = true)
         {
-            executor_data_->add(f, desc);
+            executor_data_->add(f, desc, initial_state, run_now);
         }
 
         /// Like add(), except that if the attempt to add the function would
         /// cause the caller to block in add, try_add would instead do
         /// nothing and return false.
-        bool try_add(HPX_STD_FUNCTION<void()> f, char const* desc = 0)
+        bool try_add(HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+            threads::thread_state_enum initial_state = threads::pending,
+            bool run_now = true)
         {
-            return executor_data_->try_add(f, desc);
+            return executor_data_->try_add(f, desc, initial_state, run_now);
         }
 
         /// Schedule given function for execution in this executor no sooner
@@ -147,6 +158,11 @@ namespace hpx { namespace threads
         std::size_t num_pending_tasks() const
         {
             return executor_data_->num_pending_tasks();
+        }
+
+        operator util::safe_bool<executor>::result_type() const
+        {
+            return util::safe_bool<executor>()(executor_data_.get() ? true : false);
         }
 
         /// Return a reference to the default executor for this process.

@@ -42,35 +42,41 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void service_executor::add(HPX_STD_FUNCTION<void()> f, char const* desc)
+    void service_executor::add(HPX_STD_FUNCTION<void()> f, char const* desc,
+        threads::thread_state_enum initial_state, bool run_now)
     {
         ++task_count_;
 
+        boost::intrusive_ptr<service_executor> this_(this);
         pool_->get_io_service().post(util::bind(
-            &service_executor::thread_wrapper, this, boost::move(f)));
+            &service_executor::thread_wrapper, this_, boost::move(f)));
     }
 
     // Like add(), except that if the attempt to add the function would
     // cause the caller to block in add, try_add would instead do
     // nothing and return false.
-    bool service_executor::try_add(HPX_STD_FUNCTION<void()> f, char const* desc)
+    bool service_executor::try_add(HPX_STD_FUNCTION<void()> f,
+        char const* desc, threads::thread_state_enum initial_state,
+        bool run_now)
     {
         ++task_count_;
 
+        boost::intrusive_ptr<service_executor> this_(this);
         pool_->get_io_service().post(util::bind(
-            &service_executor::thread_wrapper, this, boost::move(f)));
+            &service_executor::thread_wrapper, this_, boost::move(f)));
 
         return true;      // this function will never block
     }
 
     void service_executor::add_no_count(HPX_STD_FUNCTION<void()> f)
     {
+        boost::intrusive_ptr<service_executor> this_(this);
         pool_->get_io_service().post(util::bind(
-            &service_executor::thread_wrapper, this, boost::move(f)));
+            &service_executor::thread_wrapper, this_, boost::move(f)));
     }
 
     static void delayed_add(
-        boost::intrusive_ptr<service_executor> this_, 
+        boost::intrusive_ptr<service_executor> this_,
         HPX_STD_FUNCTION<void()> f,
         boost::shared_ptr<boost::asio::deadline_timer>)
     {
@@ -90,8 +96,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<boost::asio::deadline_timer>(
                 pool_->get_io_service(), abs_time));
 
-        t->async_wait(util::bind(&delayed_add,
-            boost::intrusive_ptr<service_executor>(this), boost::move(f), t));
+        boost::intrusive_ptr<service_executor> this_(this);
+        t->async_wait(util::bind(&delayed_add, this_, boost::move(f), t));
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -107,8 +113,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<boost::asio::deadline_timer>(
                 pool_->get_io_service(), rel_time));
 
-        t->async_wait(util::bind(&delayed_add,
-            boost::intrusive_ptr<service_executor>(this), boost::move(f), t));
+        boost::intrusive_ptr<service_executor> this_(this);
+        t->async_wait(util::bind(&delayed_add, this_, boost::move(f), t));
     }
 
     // Return an estimate of the number of waiting tasks.

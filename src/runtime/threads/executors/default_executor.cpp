@@ -13,18 +13,20 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Depending on the subclass implementation, this may block in some
     // situations.
     void default_executor::add(HPX_STD_FUNCTION<void()> f,
-        char const* description)
+        char const* desc, threads::thread_state_enum initial_state,
+        bool run_now)
     {
-        register_thread_nullary(boost::move(f), description);
+        register_thread_nullary(boost::move(f), desc, initial_state, run_now);
     }
 
     // Like add(), except that if the attempt to add the function would
     // cause the caller to block in add, try_add would instead do
     // nothing and return false.
     bool default_executor::try_add(HPX_STD_FUNCTION<void()> f,
-        char const* description)
+        char const* desc, threads::thread_state_enum initial_state,
+        bool run_now)
     {
-        register_thread_nullary(boost::move(f), description);
+        register_thread_nullary(boost::move(f), desc, initial_state, run_now);
         return true;      // this function will never block
     }
 
