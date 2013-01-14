@@ -48,7 +48,16 @@ namespace hpx
     ///           as well, it will disable any addition local wait time before
     ///           proceeding.
     ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
     /// \returns  This function will always return zero.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// This function will block and wait for all connected localities to exit
     /// before returning to the caller. It should be the last HPX-function
@@ -56,8 +65,13 @@ namespace hpx
     ///
     /// Using this function is an alternative to \a hpx::disconnect, these
     /// functions do not need to be called both.
-    HPX_EXPORT int finalize(double shutdown_timeout = -1.0,
-        double localwait = -1.0);
+    HPX_EXPORT int finalize(double shutdown_timeout,
+        double localwait = -1.0, error_code& ec = throws);
+
+    inline int finalize(error_code& ec = throws)
+    {
+        return finalize(-1.0, -1.0, ec);
+    }
 
     /// \brief Terminate any application non-gracefully.
     ///
@@ -101,14 +115,28 @@ namespace hpx
     ///           as well, it will disable any addition local wait time before
     ///           proceeding.
     ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
     /// \returns  This function will always return zero.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     ///
     /// This function will block and wait for this locality to finish executing
     /// before returning to the caller. It should be the last HPX-function
     /// called by any locality being disconnected.
     ///
-    HPX_EXPORT int disconnect(double shutdown_timeout = -1.0,
-        double localwait = -1.0);
+    HPX_EXPORT int disconnect(double shutdown_timeout,
+        double localwait = -1.0, error_code& ec = throws);
+
+    inline int disconnect(error_code& ec = throws)
+    {
+        return disconnect(-1.0, -1.0, ec);
+    }
 
     /// \brief Stop the runtime system
     ///
