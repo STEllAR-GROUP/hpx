@@ -1145,7 +1145,7 @@ void gs_unique(slong *id, uint n, const struct comm *comm)
 #define cgs_free  PREFIXED_NAME(gs_free )
 
 #define fgs_setup  FORTRAN_NAME(fgs_setup    ,FGS_SETUP    )
-#define fgs        FORTRAN_NAME(gs_op       ,GS_OP       )
+#define fgs        FORTRAN_NAME(fgs_op       ,FGS_OP       )
 #define fgs_vec    FORTRAN_NAME(gs_op_vec   ,GS_OP_VEC   )
 #define fgs_many   FORTRAN_NAME(gs_op_many  ,GS_OP_MANY  )
 #define fgs_fields FORTRAN_NAME(gs_op_fields,GS_OP_FIELDS)

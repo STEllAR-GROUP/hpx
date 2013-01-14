@@ -16,3 +16,11 @@ C
       MOD1 = MOD(II,N)+1
       return
       END
+
+c-----------------------------------------------------------------------
+      subroutine rone(a,n)
+      DIMENSION  A(1)
+      DO 100 I = 1, N
+ 100     A(I ) = 1.0
+      return
+      END
