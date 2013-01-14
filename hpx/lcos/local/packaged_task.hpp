@@ -498,7 +498,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // synchronous execution
-        void operator()() /*const*/
+        void operator()() const
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -510,7 +510,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // asynchronous execution
-        void apply() /*const*/
+        void apply() const
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -628,7 +628,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // synchronous execution
-        void operator()() /*const*/
+        void operator()() const
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -640,7 +640,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // asynchronous execution
-        void apply() /*const*/
+        void apply() const
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
