@@ -196,7 +196,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
-        return detail::set_thread_state(scheduler_, id, new_state, 
+        return detail::set_thread_state(scheduler_, id, new_state,
             new_state_ex, priority, get_worker_thread_num(), ec);
     }
 
@@ -499,96 +499,6 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This thread function is used by the at_timer thread below to trigger
-    /// the required action.
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        wake_timer_thread(thread_id_type id,
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority, thread_id_type timer_id,
-            boost::shared_ptr<boost::atomic<bool> > triggered)
-    {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::wake_timer_thread",
-                "NULL thread id encountered (id)");
-            return terminated;
-        }
-        if (HPX_UNLIKELY(!timer_id)) {
-            HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::wake_timer_thread",
-                "NULL thread id encountered (timer_id)");
-            return terminated;
-        }
-
-        bool oldvalue = false;
-        if (triggered->compare_exchange_strong(oldvalue, true)) //-V601
-        {
-            // timer has not been canceled yet, trigger the requested set_state
-            set_state(id, newstate, newstate_ex, priority);
-        }
-
-        // then re-activate the thread holding the deadline_timer
-        // REVIEW: Why do we ignore errors here?
-        error_code ec(lightweight);    // do not throw
-        set_state(timer_id, pending, wait_timeout, thread_priority_normal, ec);
-        return terminated;
-    }
-
-    /// This thread function initiates the required set_state action (on
-    /// behalf of one of the threadmanager_impl#set_state functions).
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    template <typename TimeType>
-    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        at_timer(TimeType const& expire, thread_id_type id,
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority)
-    {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::at_timer",
-                "NULL thread id encountered");
-            return terminated;
-        }
-
-        // create a new thread in suspended state, which will execute the
-        // requested set_state when timer fires and will re-awaken this thread,
-        // allowing the deadline_timer to go out of scope gracefully
-        thread_self& self = get_self();
-        thread_id_type self_id = self.get_thread_id();
-
-        boost::shared_ptr<boost::atomic<bool> > triggered(
-            boost::make_shared<boost::atomic<bool> >(false));
-
-        thread_init_data data(
-            boost::bind(&threadmanager_impl::wake_timer_thread, this, id,
-                newstate, newstate_ex, priority, self_id, triggered),
-            "wake_timer", 0, priority);
-        thread_id_type wake_id = register_thread(data, suspended, true);
-
-        // create timer firing in correspondence with given time
-        boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
-
-        // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id,
-            pending, wait_timeout, priority, boost::ref(throws)));
-
-        // this waits for the thread to be reactivated when the timer fired
-        // if it returns signaled the timer has been canceled, otherwise
-        // the timer fired and the wake_timer_thread above has been executed
-        bool oldvalue = false;
-        thread_state_ex_enum statex = self.yield(suspended);
-
-        if (wait_timeout != statex &&
-            triggered->compare_exchange_strong(oldvalue, true)) //-V601
-        {
-            // wake_timer_thread has not been executed yet, cancel timer
-            t.cancel();
-        }
-
-        return terminated;
-    }
-
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (at the given time)
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -597,24 +507,8 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROWS_IF(ec, null_thread_id,
-                "threadmanager_impl::set_state",
-                "NULL thread id encountered");
-            return 0;
-        }
-
-        // this creates a new thread which creates the timer and handles the
-        // requested actions
-        thread_state_enum (threadmanager_impl::*f)(time_type const&,
-                thread_id_type, thread_state_enum, thread_state_ex_enum,
-                thread_priority)
-            = &threadmanager_impl::template at_timer<time_type>;
-
-        thread_init_data data(
-            boost::bind(f, this, expire_at, id, newstate, newstate_ex, priority),
-            "at_timer (expire at)", 0, priority);
-        return register_thread(data, pending, true, ec);
+        return detail::set_thread_state_timed(scheduler_, expire_at, id,
+            newstate, newstate_ex, priority, get_worker_thread_num(), ec);
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -625,24 +519,8 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROWS_IF(ec, null_thread_id,
-                "threadmanager_impl::set_state",
-                "NULL thread id encountered");
-            return 0;
-        }
-
-        // this creates a new thread which creates the timer and handles the
-        // requested actions
-        thread_state_enum (threadmanager_impl::*f)(duration_type const&,
-                thread_id_type, thread_state_enum, thread_state_ex_enum,
-                thread_priority)
-            = &threadmanager_impl::template at_timer<duration_type>;
-
-        thread_init_data data(
-            boost::bind(f, this, from_now, id, newstate, newstate_ex, priority),
-            "at_timer (from now)", 0, priority);
-        return register_thread(data, pending, true, ec);
+        return detail::set_thread_state_timed(scheduler_, from_now, id,
+            newstate, newstate_ex, priority, get_worker_thread_num(), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

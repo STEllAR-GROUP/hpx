@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_executor.hpp>
 #include <hpx/util/register_locks.hpp>
 
@@ -59,6 +60,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         thread_init_data data(util::bind(
             &thread_function_nullary, boost::move(f)), desc);
+
         threads::detail::create_thread(scheduler_, data);
     }
 
@@ -69,8 +71,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         thread_init_data data(util::bind(
             &thread_function_nullary, boost::move(f)), desc);
-        threads::detail::create_thread(scheduler_, data);
 
+        threads::detail::create_thread(scheduler_, data);
         return true;      // this function will never block
     }
 
@@ -89,7 +91,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         BOOST_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // now schedule new thread for execution
-        set_thread_state(id, abs_time);
+        threads::detail::set_thread_state_timed(scheduler_, abs_time, id);
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -107,7 +109,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         BOOST_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // now schedule new thread for execution
-        set_thread_state(id, rel_time);
+        threads::detail::set_thread_state_timed(scheduler_, rel_time, id);
     }
 
     // Return an estimate of the number of waiting tasks.

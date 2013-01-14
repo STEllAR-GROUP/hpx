@@ -437,20 +437,6 @@ namespace hpx { namespace threads
         boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const;
 
     protected:
-        /// This thread function is used by the at_timer thread below to trigger
-        /// the required action.
-        thread_state_enum wake_timer_thread (thread_id_type id,
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority, thread_id_type timer_id,
-            boost::shared_ptr<boost::atomic<bool> > triggered);
-
-        /// This thread function initiates the required set_state action (on
-        /// behalf of one of the threadmanager#set_state functions).
-        template <typename TimeType>
-        thread_state_enum at_timer (TimeType const& expire, thread_id_type id,
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority);
-
         ///
         template <typename C>
         void start_periodic_maintenance(boost::mpl::true_);
