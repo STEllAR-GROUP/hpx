@@ -321,7 +321,7 @@ namespace hpx { namespace threads
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
         /// \param flag     [in] The flag encodes whether the thread should be 
-        ///                 interrupted (if it is \a true), or 'uninterrupted'\
+        ///                 interrupted (if it is \a true), or 'uninterrupted'
         ///                 (if it is \a false).
         /// \param ec       [in,out] this represents the error status on exit,
         ///                 if this is pre-initialized to \a hpx#throws
