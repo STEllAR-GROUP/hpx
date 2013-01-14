@@ -8,8 +8,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
@@ -181,6 +182,10 @@ namespace hpx { namespace lcos
         }
 
         // continuation support
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+        then(threads::executor sched, BOOST_FWD_REF(F) f);
+
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_FWD_REF(F) f);
@@ -381,6 +386,10 @@ namespace hpx { namespace lcos
         }
 
         // continuation support
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+        then(threads::executor sched, BOOST_FWD_REF(F) f);
+
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_FWD_REF(F) f);

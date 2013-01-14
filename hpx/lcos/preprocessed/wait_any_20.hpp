@@ -19,9 +19,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0)));
+                argument_type(f0))));
         p.apply();
         return p.get_future();
     }
@@ -51,9 +51,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1)));
+                argument_type(f0 , f1))));
         p.apply();
         return p.get_future();
     }
@@ -83,9 +83,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2)));
+                argument_type(f0 , f1 , f2))));
         p.apply();
         return p.get_future();
     }
@@ -115,9 +115,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3)));
+                argument_type(f0 , f1 , f2 , f3))));
         p.apply();
         return p.get_future();
     }
@@ -147,9 +147,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4)));
+                argument_type(f0 , f1 , f2 , f3 , f4))));
         p.apply();
         return p.get_future();
     }
@@ -179,9 +179,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5))));
         p.apply();
         return p.get_future();
     }
@@ -211,9 +211,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6))));
         p.apply();
         return p.get_future();
     }
@@ -243,9 +243,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7))));
         p.apply();
         return p.get_future();
     }
@@ -275,9 +275,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8))));
         p.apply();
         return p.get_future();
     }
@@ -307,9 +307,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9))));
         p.apply();
         return p.get_future();
     }
@@ -339,9 +339,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10))));
         p.apply();
         return p.get_future();
     }
@@ -371,9 +371,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11))));
         p.apply();
         return p.get_future();
     }
@@ -403,9 +403,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12))));
         p.apply();
         return p.get_future();
     }
@@ -435,9 +435,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13))));
         p.apply();
         return p.get_future();
     }
@@ -467,9 +467,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14))));
         p.apply();
         return p.get_future();
     }
@@ -499,9 +499,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15))));
         p.apply();
         return p.get_future();
     }
@@ -531,9 +531,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16))));
         p.apply();
         return p.get_future();
     }
@@ -563,9 +563,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17))));
         p.apply();
         return p.get_future();
     }
@@ -595,9 +595,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17 , f18)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17 , f18))));
         p.apply();
         return p.get_future();
     }
@@ -627,9 +627,9 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p(
+        lcos::local::futures_factory<return_type()> p((
             detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17 , f18 , f19)));
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14 , f15 , f16 , f17 , f18 , f19))));
         p.apply();
         return p.get_future();
     }

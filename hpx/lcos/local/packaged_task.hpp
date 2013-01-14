@@ -7,10 +7,10 @@
 #define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -54,6 +54,7 @@ namespace hpx { namespace lcos { namespace local
         struct task_object
           : lcos::detail::task_base<Result>
         {
+            typedef lcos::detail::task_base<Result> base_type;
             typedef typename lcos::detail::task_base<Result>::result_type
                 result_type;
 
@@ -65,6 +66,14 @@ namespace hpx { namespace lcos { namespace local
 
             task_object(BOOST_RV_REF(F) f)
               : f_(boost::move(f))
+            {}
+
+            task_object(threads::executor sched, F const& f)
+              : base_type(sched), f_(f)
+            {}
+
+            task_object(threads::executor sched, BOOST_RV_REF(F) f)
+              : base_type(sched), f_(boost::move(f))
             {}
 
             void do_run()
@@ -82,6 +91,7 @@ namespace hpx { namespace lcos { namespace local
         struct task_object<void, F>
           : lcos::detail::task_base<void>
         {
+            typedef lcos::detail::task_base<void> base_type;
             typedef typename lcos::detail::task_base<void>::result_type
                 result_type;
 
@@ -93,6 +103,14 @@ namespace hpx { namespace lcos { namespace local
 
             task_object(BOOST_RV_REF(F) f)
               : f_(boost::move(f))
+            {}
+
+            task_object(threads::executor sched, F const& f)
+              : base_type(sched), f_(f)
+            {}
+
+            task_object(threads::executor sched, BOOST_RV_REF(F) f)
+              : base_type(sched), f_(boost::move(f))
             {}
 
             void do_run()
@@ -413,6 +431,17 @@ namespace hpx { namespace lcos { namespace local
         packaged_task() {}
 
         template <typename F>
+        explicit packaged_task(threads::executor sched, BOOST_FWD_REF(F) f)
+          : task_(new detail::task_object<Result, F>(sched, boost::forward<F>(f))),
+            future_obtained_(false)
+        {}
+
+        explicit packaged_task(threads::executor sched, Result (*f)())
+          : task_(new detail::task_object<Result , Result (*)()>(sched, f)),
+            future_obtained_(false)
+        {}
+
+        template <typename F>
         explicit packaged_task(BOOST_FWD_REF(F) f)
           : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
             future_obtained_(false)
@@ -469,7 +498,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // synchronous execution
-        void operator()()
+        void operator()() /*const*/
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -478,6 +507,18 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
             task_->run();
+        }
+
+        // asynchronous execution
+        void apply() /*const*/
+        {
+            if (!task_) {
+                HPX_THROW_EXCEPTION(task_moved,
+                    "packaged_task<Result()>::apply()",
+                    "packaged_task invalid (has it been moved?)");
+                return;
+            }
+            task_->apply();
         }
 
         // Result retrieval
@@ -536,6 +577,17 @@ namespace hpx { namespace lcos { namespace local
         futures_factory() {}
 
         template <typename F>
+        explicit futures_factory(threads::executor sched, BOOST_FWD_REF(F) f)
+          : task_(new detail::task_object<Result, F>(boost::forward<F>(sched, f))),
+            future_obtained_(false)
+        {}
+
+        explicit futures_factory(threads::executor sched, Result (*f)())
+          : task_(new detail::task_object<Result , Result (*)()>(sched, f)),
+            future_obtained_(false)
+        {}
+
+        template <typename F>
         explicit futures_factory(BOOST_FWD_REF(F) f)
           : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
             future_obtained_(false)
@@ -576,7 +628,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // synchronous execution
-        void operator()()
+        void operator()() /*const*/
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -588,7 +640,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // asynchronous execution
-        void apply()
+        void apply() /*const*/
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,

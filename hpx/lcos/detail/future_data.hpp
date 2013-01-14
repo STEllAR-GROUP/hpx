@@ -10,6 +10,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
@@ -495,6 +496,10 @@ namespace detail
           : started_(false), id_(threads::invalid_thread_id)
         {}
 
+        task_base(threads::executor sched)
+          : started_(false), id_(threads::invalid_thread_id), sched_(sched)
+        {}
+
         // retrieving the value
         result_type get_data(error_code& ec = throws)
         {
@@ -530,7 +535,7 @@ namespace detail
         void run()
         {
             check_started();
-            this->do_run();
+            this->do_run();       // always on this thread
         }
 
         // run in a separate thread
@@ -538,9 +543,16 @@ namespace detail
         {
             check_started();
             future_base_type this_(this);
-            applier::register_thread_plain(
-                HPX_STD_BIND(&task_base::run_impl, this_),
-                "task_base::apply", threads::pending, false);
+
+            if (sched_) {
+                sched_.add(HPX_STD_BIND(&task_base::run_impl, this_),
+                    "task_base::apply", threads::pending, false);
+            }
+            else {
+                threads::register_thread_plain(
+                    HPX_STD_BIND(&task_base::run_impl, this_),
+                    "task_base::apply", threads::pending, false);
+            }
         }
 
     private:
@@ -640,6 +652,7 @@ namespace detail
     protected:
         bool started_;
         threads::thread_id_type id_;
+        threads::executor sched_;
     };
 }}}
 
