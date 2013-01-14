@@ -10,6 +10,9 @@
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
+
+#include <boost/atomic.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -17,7 +20,7 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        class service_executor
+        class HPX_EXPORT service_executor
           : public threads::detail::executor_base
         {
         public:
@@ -49,8 +52,15 @@ namespace hpx { namespace threads { namespace executors
             // Return an estimate of the number of waiting tasks.
             std::size_t num_pending_tasks() const;
 
+            // helper function
+            void add_no_count(HPX_STD_FUNCTION<void()> f);
+
         private:
+            void thread_wrapper(HPX_STD_FUNCTION<void()> const& f);
+
             util::io_service_pool* pool_;
+            boost::atomic<std::size_t> task_count_;
+            lcos::local::counting_semaphore shutdown_sem_;
         };
     }
 

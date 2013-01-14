@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -18,7 +19,7 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        class thread_pool_executor
+        class HPX_EXPORT thread_pool_executor
           : public threads::detail::executor_base
         {
         public:
@@ -62,9 +63,9 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct serial_executor : public executor
+    struct thread_pool_executor : public executor
     {
-        serial_executor(std::size_t num_queues = 1)
+        thread_pool_executor(std::size_t num_queues = 1)
           : executor(new detail::thread_pool_executor(num_queues))
         {}
     };
