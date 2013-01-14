@@ -132,3 +132,7 @@ c N/A
 
       return
       end subroutine iniproc
+
+      subroutine exitt
+        print*, 'EXIT'
+      end subroutine exitt
