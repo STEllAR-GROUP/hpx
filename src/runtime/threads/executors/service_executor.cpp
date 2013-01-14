@@ -5,7 +5,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/threads/scheduling_loop.hpp>
 #include <hpx/runtime/threads/executors/service_executor.hpp>
 #include <hpx/util/bind.hpp>
 

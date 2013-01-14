@@ -137,40 +137,40 @@ namespace hpx
         namespace policies
         {
 #if defined(HPX_GLOBAL_SCHEDULER)
-            class HPX_API_EXPORT global_queue_scheduler;
-#endif
-#if defined(HPX_LOCAL_SCHEDULER)
-            class HPX_API_EXPORT local_queue_scheduler;
+            class HPX_EXPORT global_queue_scheduler;
 #endif
 #if defined(HPX_ABP_SCHEDULER)
-            struct HPX_API_EXPORT abp_queue_scheduler;
+            struct HPX_EXPORT abp_queue_scheduler;
 #endif
 #if defined(HPX_ABP_PRIORITY_SCHEDULER)
-            class HPX_API_EXPORT abp_priority_queue_scheduler;
+            class HPX_EXPORT abp_priority_queue_scheduler;
 #endif
 
-            class HPX_API_EXPORT local_priority_queue_scheduler;
+            template <typename Mutex = boost::mutex>
+            class HPX_EXPORT local_queue_scheduler;
+
+            class HPX_EXPORT local_priority_queue_scheduler;
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
-            class HPX_API_EXPORT hierarchy_scheduler;
+            class HPX_EXPORT hierarchy_scheduler;
 #endif
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-            class HPX_API_EXPORT periodic_priority_scheduler;
+            class HPX_EXPORT periodic_priority_scheduler;
 #endif
 
-            class HPX_API_EXPORT callback_notifier;
+            class HPX_EXPORT callback_notifier;
 
             // define the default scheduler to use
             typedef local_priority_queue_scheduler queue_scheduler;
         }
 
-        struct HPX_API_EXPORT threadmanager_base;
-        class HPX_API_EXPORT thread_data;
+        struct HPX_EXPORT threadmanager_base;
+        class HPX_EXPORT thread_data;
 
         template <
             typename SchedulingPolicy,
             typename NotificationPolicy = threads::policies::callback_notifier>
-        class HPX_API_EXPORT threadmanager_impl;
+        class HPX_EXPORT threadmanager_impl;
 
         /// \enum thread_state_enum
         ///

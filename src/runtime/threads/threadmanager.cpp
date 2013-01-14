@@ -12,7 +12,10 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/scheduling_loop.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/runtime/threads/detail/create_work.hpp>
+#include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -152,7 +155,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
         // verify state
-        if (thread_count_ == 0 && state_.load() != running)
+        if (thread_count_ == 0 && state_ != running)
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -161,70 +164,7 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
-        // verify parameters
-        switch (initial_state) {
-        case pending:
-        case suspended:
-            break;
-
-        default:
-            {
-                hpx::util::osstream strm;
-                strm << "invalid initial state: "
-                     << get_thread_state_name(initial_state);
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "threadmanager_impl::register_thread",
-                    hpx::util::osstream_get_string(strm));
-                return invalid_thread_id;
-            }
-        }
-
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
-        if (0 == data.description)
-        {
-            HPX_THROWS_IF(ec, bad_parameter,
-                "threadmanager_impl::register_thread", "description is NULL");
-            return invalid_thread_id;
-        }
-#endif
-
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-        if (0 == data.parent_id) {
-            thread_self* self = get_self_ptr();
-            if (self)
-            {
-                data.parent_id = self->get_thread_id();
-                data.parent_phase = self->get_thread_phase();
-            }
-        }
-        if (0 == data.parent_locality_id)
-            data.parent_locality_id = get_locality_id();
-#endif
-
-        // NOTE: This code overrides a request to schedule a thread on a scheduler
-        // selected queue. The schedulers are written to select a queue to put
-        // a thread in if the OS thread number is -1. Not only does overriding this
-        // prevent extensibility by forcing a certain queuing behavior, but it also
-        // schedules unfairly. A px thread is always put into the queue of the
-        // OS thread that it's producer is currently running on. In a single
-        // producer environment, this can lead to unexpected imbalances and
-        // work only gets distributed by work stealing.
-        //if (std::size_t(-1)  == data.num_os_thread)
-        //    data.num_os_thread = get_worker_thread_num();
-
-        // create the new thread
-        thread_id_type newid = scheduler_.create_thread(
-            data, initial_state, run_now, ec, data.num_os_thread);
-
-        LTM_(info) << "register_thread(" << newid << "): initial_state("
-                   << get_thread_state_name(initial_state) << "), "
-                   << "run_now(" << (run_now ? "true" : "false")
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
-                   << "), description(" << data.description
-#endif
-                   << ")";
-
-        return newid;
+        return detail::create_thread(scheduler_, data, initial_state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -235,7 +175,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
         // verify state
-        if (thread_count_ == 0 && state_.load() != running)
+        if (thread_count_ == 0 && state_ != running)
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -244,112 +184,7 @@ namespace hpx { namespace threads
             return;
         }
 
-        // verify parameters
-        switch (initial_state) {
-        case pending:
-        case suspended:
-            break;
-
-        default:
-            {
-                hpx::util::osstream strm;
-                strm << "invalid initial state: "
-                     << get_thread_state_name(initial_state);
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "threadmanager_impl::register_work",
-                    hpx::util::osstream_get_string(strm));
-                return;
-            }
-        }
-
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
-        if (0 == data.description)
-        {
-            HPX_THROWS_IF(ec, bad_parameter,
-                "threadmanager_impl::register_work", "description is NULL");
-            return;
-        }
-#endif
-
-        LTM_(info) << "register_work: initial_state("
-                   << get_thread_state_name(initial_state) << "), thread_priority("
-                   << get_thread_priority_name(data.priority)
-#if HPX_THREAD_MAINTAIN_DESCRIPTION
-                   << "), description(" << data.description
-#endif
-                   << ")";
-
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-        if (0 == data.parent_id) {
-            thread_self* self = get_self_ptr();
-            if (self)
-            {
-                data.parent_id = self->get_thread_id();
-                data.parent_phase = self->get_thread_phase();
-            }
-        }
-        if (0 == data.parent_locality_id)
-            data.parent_locality_id = get_locality_id();
-#endif
-
-        // NOTE: This code overrides a request to schedule a thread on a scheduler
-        // selected queue. The schedulers are written to select a queue to put
-        // a thread in if the OS thread number is -1. Not only does overriding this
-        // prevent extensibility by forcing a certain queuing behavior, but it also
-        // schedules unfairly. A px thread is always put into the queue of the
-        // OS thread that it's producer is currently running on. In a single
-        // producer environment, this can lead to unexpected imbalances and
-        // work only gets distributed by work stealing.
-        //if (std::size_t(-1) == data.num_os_thread)
-        //    data.num_os_thread = get_worker_thread_num();
-
-        if (thread_priority_critical == data.priority) {
-            // For critical priority threads, create the thread immediately.
-            scheduler_.create_thread(data, initial_state, true, ec, data.num_os_thread);
-        }
-        else {
-            // Create a task description for the new thread.
-            scheduler_.create_thread(data, initial_state, false, ec, data.num_os_thread);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // thread function registered for set_state if thread is currently active
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_active_state(thread_id_type id,
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority, thread_state previous_state)
-    {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::set_active_state",
-                "NULL thread id encountered");
-            return terminated;
-        }
-
-        // make sure that the thread has not been suspended and set active again
-        // in the mean time
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        thread_state current_state = thrd->get_state();
-
-        if (thread_state_enum(current_state) == thread_state_enum(previous_state) &&
-            current_state != previous_state)
-        {
-            LTM_(warning)
-                << "set_active_state: thread is still active, however "
-                      "it was non-active since the original set_state "
-                      "request was issued, aborting state change, thread("
-                << id << "), description("
-                << thrd->get_description() << "), new state("
-                << get_thread_state_name(newstate) << ")";
-            return terminated;
-        }
-
-        // just retry, set_state will create new thread if target is still active
-        error_code ec(lightweight);      // do not throw
-        set_state(id, newstate, newstate_ex, priority, ec);
-        return terminated;
+        detail::create_work(scheduler_, data, initial_state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -361,140 +196,8 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
-            HPX_THROWS_IF(ec, null_thread_id, "threadmanager_impl::set_state",
-                "NULL thread id encountered");
-            return thread_state(unknown);
-        }
-
-        util::block_profiler_wrapper<set_state_tag> bp(set_state_logger_);
-
-        // set_state can't be used to force a thread into active state
-        if (new_state == active) {
-            hpx::util::osstream strm;
-            strm << "invalid new state: " << get_thread_state_name(new_state);
-            HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
-                hpx::util::osstream_get_string(strm));
-            return thread_state(unknown);
-        }
-
-        // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
-        if (!thrd) {
-            if (&ec != &throws)
-                ec = make_success_code();
-            return thread_state(terminated);     // this thread has already been terminated
-        }
-
-        thread_state previous_state;
-        do {
-            // action depends on the current state
-            previous_state = thrd->get_state();
-            thread_state_enum previous_state_val = previous_state;
-
-            // nothing to do here if the state doesn't change
-            if (new_state == previous_state_val) {
-                LTM_(warning) << "set_state: old thread state is the same as new "
-                               "thread state, aborting state change, thread("
-                            << id << "), description("
-                            << thrd->get_description() << "), new state("
-                            << get_thread_state_name(new_state) << ")";
-
-                if (&ec != &throws)
-                    ec = make_success_code();
-
-                return thread_state(new_state);
-            }
-
-            // the thread to set the state for is currently running, so we
-            // schedule another thread to execute the pending set_state
-            if (active == previous_state_val) {
-                // schedule a new thread to set the state
-                LTM_(warning)
-                    << "set_state: thread is currently active, scheduling "
-                        "new thread, thread(" << id << "), description("
-                    << thrd->get_description() << "), new state("
-                    << get_thread_state_name(new_state) << ")";
-
-                thread_init_data data(
-                    boost::bind(&threadmanager_impl::set_active_state, this,
-                        id, new_state, new_state_ex, priority, previous_state),
-                    "set state for active thread", 0, priority);
-                register_work(data);
-
-                if (&ec != &throws)
-                    ec = make_success_code();
-
-                return previous_state;     // done
-            }
-            else if (terminated == previous_state_val) {
-                LTM_(warning)
-                    << "set_state: thread is terminated, aborting state "
-                        "change, thread(" << id << "), description("
-                    << thrd->get_description() << "), new state("
-                    << get_thread_state_name(new_state) << ")";
-
-                if (&ec != &throws)
-                    ec = make_success_code();
-
-                // If the thread has been terminated while this set_state was
-                // pending nothing has to be done anymore.
-                return previous_state;
-            }
-            else if (pending == previous_state_val && suspended == new_state) {
-                // we do not allow explicit resetting of a state to suspended
-                // without the thread being executed.
-                hpx::util::osstream strm;
-                strm << "set_state: invalid new state, can't demote a pending thread, "
-                     << "thread(" << id << "), description("
-                     << thrd->get_description() << "), new state("
-                     << get_thread_state_name(new_state) << ")";
-
-                LTM_(fatal) << hpx::util::osstream_get_string(strm);
-
-                HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
-                    hpx::util::osstream_get_string(strm));
-                return thread_state(unknown);
-            }
-
-            // If the previous state was pending we are supposed to remove the
-            // thread from the queue. But in order to avoid linearly looking
-            // through the queue we defer this to the thread function, which
-            // at some point will ignore this thread by simply skipping it
-            // (if it's not pending anymore).
-
-            LTM_(info) << "set_state: thread(" << id << "), "
-                          "description(" << thrd->get_description() << "), "
-                          "new state(" << get_thread_state_name(new_state) << "), "
-                          "old state(" << get_thread_state_name(previous_state_val)
-                       << ")";
-
-            // So all what we do here is to set the new state.
-            if (thrd->restore_state(new_state, previous_state)) {
-                thrd->set_state_ex(new_state_ex);
-                break;
-            }
-
-            // state has changed since we fetched it from the thread, retry
-            LTM_(error) << "set_state: state has been changed since it was fetched, "
-                          "retrying, thread(" << id << "), "
-                          "description(" << thrd->get_description() << "), "
-                          "new state(" << get_thread_state_name(new_state) << "), "
-                          "old state(" << get_thread_state_name(previous_state_val)
-                       << ")";
-        } while (true);
-
-        if (new_state == pending) {
-            // REVIEW: Passing a specific target thread may interfere with the
-            // round robin queuing.
-            scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
-            do_some_work();
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return previous_state;
+        return detail::set_thread_state(scheduler_, id, new_state, 
+            new_state_ex, priority, get_worker_thread_num(), ec);
     }
 
     /// The get_state function is part of the thread related API. It
@@ -1449,7 +1152,7 @@ namespace hpx { namespace threads
         hpx::util::coroutines::prepare_main_thread main_thread;
 
         // run main scheduling loop until terminated
-        scheduling_loop(num_thread, scheduler_, state_,
+        detail::scheduling_loop(num_thread, scheduler_, state_,
             executed_threads_[num_thread], tfunc_times[num_thread],
             exec_times[num_thread]);
 
@@ -1640,7 +1343,7 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
-    hpx::threads::policies::local_queue_scheduler,
+    hpx::threads::policies::local_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 

@@ -29,7 +29,8 @@ namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The local_queue_scheduler maintains exactly one queue of work items
-    /// (threads) per os thread, where this OS thread pulls its next work from.
+    /// (threads) per OS thread, where this OS thread pulls its next work from.
+    template <typename Mutex>
     class local_queue_scheduler : boost::noncopyable
     {
     private:
@@ -98,7 +99,7 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
-                queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
+                queues_[i] = new thread_queue<Mutex>(init.max_queue_thread_count_);
         }
 
         local_queue_scheduler(std::size_t num_queues,
@@ -113,7 +114,7 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(num_queues != 0);
             for (std::size_t i = 0; i < num_queues; ++i)
-                queues_[i] = new thread_queue<false>(max_queue_thread_count);
+                queues_[i] = new thread_queue<Mutex>(max_queue_thread_count);
         }
 
         ~local_queue_scheduler()
@@ -194,10 +195,13 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
+            std::size_t queue_size = queues_.size();
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = ++curr_queue_ % queue_size;
+            if (num_thread >= queue_size)
+                num_thread %= queue_size;
 
-            BOOST_ASSERT(num_thread < queues_.size());
+            BOOST_ASSERT(num_thread < queue_size);
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, num_thread, ec);
         }
@@ -337,7 +341,7 @@ namespace hpx { namespace threads { namespace policies
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
-        void do_some_work(std::size_t num_thread)
+        void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
@@ -364,7 +368,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue<false>*> queues_;   ///< this manages all the HPX threads
+        std::vector<thread_queue<Mutex>*> queues_;   ///< this manages all the HPX threads
         boost::atomic<std::size_t> curr_queue_;
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;

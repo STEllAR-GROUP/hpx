@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM)
-#define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
+#if !defined(HPX_THREADMANAGER_GLOBAL_THREAD_QUEUE_AUG_25_2009_0132PM)
+#define HPX_THREADMANAGER_GLOBAL_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <map>
 #include <memory>
@@ -22,72 +22,15 @@
 #include <boost/atomic.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
-#ifdef HPX_ACCEL_QUEUING
-#   include <hpx/runtime/threads/policies/accel_fifo.hpp>
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
-#ifdef HPX_ACCEL_QUEUING
-    // hardware accelerated queuing
-    typedef accel::fifo<thread_data *> work_item_queue_type;
-
-    inline void
-    enqueue(work_item_queue_type& work_items, thread_data* thrd,
-        std::size_t num_thread)
-    {
-        //printf("enqueue invoked by thread %ld\n", num_thread);
-        work_items.enqueue(thrd, num_thread);
-    }
-
-    inline bool
-    dequeue(work_item_queue_type& work_items, thread_data*& thrd,
-        std::size_t num_thread)
-    {
-        return work_items.dequeue(thrd, num_thread);
-    }
-
-    inline bool
-    empty(work_item_queue_type& work_items, std::size_t num_thread)
-    {
-        return work_items.empty(num_thread);
-    }
-
-#else
-    // software queuing
-    typedef boost::lockfree::fifo<thread_data*> work_item_queue_type;
-
-    inline void
-    enqueue(work_item_queue_type& work_items, thread_data* thrd,
-        std::size_t num_thread)
-    {
-        work_items.enqueue(thrd);
-    }
-
-    inline bool
-    dequeue(work_item_queue_type& work_items, thread_data*& thrd,
-        std::size_t num_thread)
-    {
-        return work_items.dequeue(thrd);
-    }
-
-    inline bool
-    empty(work_item_queue_type& work_items, std::size_t num_thread)
-    {
-        return work_items.empty();
-    }
-
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = boost::mutex>
-    class thread_queue
+    class global_thread_queue
     {
     private:
         // we use a simple mutex to protect the data members for now
-        typedef Mutex mutex_type;
+        typedef boost::mutex mutex_type;
 
         // Add this number of threads to the work items queue each time the
         // function \a add_new() is called if the queue is empty.
@@ -98,6 +41,7 @@ namespace hpx { namespace threads { namespace policies
         };
 
         // this is the type of the queues of new or pending threads
+        typedef boost::lockfree::fifo<thread_data*> work_item_queue_type;
         typedef work_item_queue_type work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
@@ -115,7 +59,7 @@ namespace hpx { namespace threads { namespace policies
     protected:
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
-        std::size_t add_new(boost::int64_t add_count, thread_queue* addfrom,
+        std::size_t add_new(boost::int64_t add_count, global_thread_queue* addfrom,
             std::size_t num_thread)
         {
 #if defined(HPX_DEBUG)
@@ -180,7 +124,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
+        bool add_new_if_possible(std::size_t& added, global_thread_queue* addfrom,
             std::size_t num_thread)
         {
             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
@@ -211,7 +155,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_always(std::size_t& added, thread_queue* addfrom,
+        bool add_new_always(std::size_t& added, global_thread_queue* addfrom,
             std::size_t num_thread)
         {
             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
@@ -233,7 +177,7 @@ namespace hpx { namespace threads { namespace policies
                     if (add_count > max_add_new_count)
                         add_count = max_add_new_count;
                 }
-                else if (empty(work_items_, num_thread)) {
+                else if (work_items_.empty()) {
                     add_count = min_add_new_count;    // add this number of threads
                     max_count_ += min_add_new_count;  // increase max_count //-V101
                 }
@@ -305,7 +249,7 @@ namespace hpx { namespace threads { namespace policies
         // specified above.
         enum { max_thread_count = 1000 };
 
-        thread_queue(std::size_t max_count = max_thread_count)
+        global_thread_queue(std::size_t max_count = max_thread_count)
           : work_items_(128),
             work_items_count_(0),
             terminated_items_(128),
@@ -399,20 +343,20 @@ namespace hpx { namespace threads { namespace policies
             return invalid_thread_id;     // thread has not been created yet
         }
 
-        void move_work_items_from(thread_queue *src,
+        void move_work_items_from(global_thread_queue *src,
             boost::int64_t count, std::size_t num_thread)
         {
             threads::thread_data* trd;
-            while (dequeue(src->work_items_, trd, num_thread))
+            while (src->work_items_.dequeue(trd))
             {
                 --src->work_items_count_;
-                enqueue(work_items_, trd, num_thread);
+                work_items_.enqueue(trd);
                 if (count == ++work_items_count_)
                     break;
             }
         }
 
-        void move_task_items_from(thread_queue *src,
+        void move_task_items_from(global_thread_queue *src,
             boost::int64_t count)
         {
             task_description* td;
@@ -432,7 +376,7 @@ namespace hpx { namespace threads { namespace policies
         /// available
         bool get_next_thread(threads::thread_data*& thrd, std::size_t num_thread)
         {
-            if (dequeue(work_items_, thrd, num_thread))
+            if (work_items_.dequeue(thrd))
             {
                 --work_items_count_;
                 return true;
@@ -443,7 +387,7 @@ namespace hpx { namespace threads { namespace policies
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread)
         {
-            enqueue(work_items_, thrd, num_thread);
+            work_items_.enqueue(thrd);
             ++work_items_count_;
             do_some_work();         // wake up sleeping threads
         }
@@ -512,54 +456,121 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(std::size_t num_thread, bool running,
+        bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom_ = 0) HPX_HOT
+            global_thread_queue* addfrom_ = 0) HPX_HOT
         {
-            // this thread acquired the lock, do maintenance, if needed
-            if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
+            global_thread_queue* addfrom = addfrom_ ? addfrom_ : this;
 
+            // only one dedicated OS thread is allowed to acquire the
+            // lock for the purpose of inserting the new threads into the
+            // thread-map and deleting all terminated threads
+            if (0 == num_thread) {
+                // first clean up terminated threads
+                util::try_lock_wrapper<mutex_type> lk(mtx_);
+                if (lk) {
+                    // no point in having a thread waiting on the lock
+                    // while another thread is doing the maintenance
+                    cleanup_terminated_locked();
+
+                    // now, add new threads from the queue of task descriptions
+                    add_new_if_possible(added, addfrom, num_thread);    // calls notify_all
+                }
+            }
+
+            bool terminate = false;
+            while (0 == work_items_count_) {
                 // No obvious work has to be done, so a lock won't hurt too much
                 // but we lock only one of the threads, assuming this thread
                 // will do the maintenance
                 //
-                // We prefer to exit this function (some kind of very short
+                // We prefer to exit this while loop (some kind of very short
                 // busy waiting) to blocking on this lock. Locking fails either
                 // when a thread is currently doing thread maintenance, which
                 // means there might be new work, or the thread owning the lock
-                // just falls through to the cleanup work below (no work is available)
+                // just falls through to the wait below (no work is available)
                 // in which case the current thread (which failed to acquire
                 // the lock) will just retry to enter this loop.
                 util::try_lock_wrapper<mutex_type> lk(mtx_);
                 if (!lk)
-                    return false;            // avoid long wait on lock
+                    break;            // avoid long wait on lock
 
+                // this thread acquired the lock, do maintenance and finally
+                // call wait() if no work is available
     //            LTM_(debug) << "tfunc(" << num_thread << "): queues empty"
     //                        << ", threads left: " << thread_map_.size();
 
                 // stop running after all PX threads have been terminated
-                thread_queue* addfrom = addfrom_ ? addfrom_ : this;
                 bool added_new = add_new_always(added, addfrom, num_thread);
-                if (!added_new) {
+                if (!added_new && !running) {
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated PX threads
-                    bool canexit = cleanup_terminated_locked(true);
-                    if (!running && canexit) {
+                    if (cleanup_terminated_locked(true)) {
                         // we don't have any registered work items anymore
-                        //do_some_work();       // notify possibly waiting threads
-                        return true;            // terminate scheduling loop
+                        do_some_work();       // notify possibly waiting threads
+                        terminate = true;
+                        break;                // terminate scheduling loop
                     }
-                    return false;
+
+                    LTM_(debug) << "tfunc(" << num_thread
+                                << "): threadmap not empty";
                 }
-                cleanup_terminated_locked();
+                else {
+                    cleanup_terminated_locked();
+                }
+
+                if (added_new) {
+    #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+                    // dump list of suspended threads once a second
+                    if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
+                        detail::dump_suspended_threads(num_thread, thread_map_,
+                            idle_loop_count, running);
+                    }
+    #endif
+                    break;    // we got work, exit loop
+                }
+
+                // Wait until somebody needs some action (if no new work
+                // arrived in the meantime).
+                // Ask again if queues are empty to avoid race conditions (we
+                // needed to lock anyways...), this way no notify_all() gets lost
+                if (0 == work_items_count_) {
+                    LTM_(debug) << "tfunc(" << num_thread
+                               << "): queues empty, entering wait";
+
+    #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+                    // dump list of suspended threads once a second
+                    if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
+                        detail::dump_suspended_threads(num_thread, thread_map_,
+                            idle_loop_count, running);
+                    }
+    #endif
+
+                    namespace bpt = boost::posix_time;
+                    BOOST_ASSERT(10*idle_loop_count <
+                        static_cast<boost::int64_t>((std::numeric_limits<boost::int64_t>::max)()));
+                    bool timed_out = !cond_.timed_wait(lk,
+                        bpt::microseconds(static_cast<boost::int64_t>(10*idle_loop_count)));
+
+                    LTM_(debug) << "tfunc(" << num_thread << "): exiting wait";
+
+                    // make sure all pending new threads are properly queued
+                    // but do that only if the lock has been acquired while
+                    // exiting the condition.wait() above
+                    if ((lk && add_new_always(added, addfrom, num_thread)) || timed_out)
+                        break;
+                }
             }
-            return false;
+            return terminate;
         }
 
-        /// This function gets called by the thread-manager whenever new work
+        /// This function gets called by the threadmanager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
-        /// possibly idling OS threads
-        inline void do_some_work() {}
+        /// possibly idleing OS threads
+        void do_some_work()
+        {
+            cond_.notify_all();
+        }
 
         ///////////////////////////////////////////////////////////////////////
         bool dump_suspended_threads(std::size_t num_thread
@@ -582,11 +593,11 @@ namespace hpx { namespace threads { namespace policies
     private:
         mutable mutex_type mtx_;            ///< mutex protecting the members
 
-        thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
+        boost::condition cond_;             ///< used to trigger some action
 
+        thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
         work_items_type work_items_;        ///< list of active work items
         boost::atomic<boost::int64_t> work_items_count_; ///< count of active work items
-
         thread_id_queue_type terminated_items_;   ///< list of terminated threads
         boost::atomic<boost::int64_t> terminated_items_count_; ///< count of terminated items
 

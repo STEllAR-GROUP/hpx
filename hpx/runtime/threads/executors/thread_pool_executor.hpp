@@ -10,6 +10,7 @@
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -17,12 +18,12 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        class serial_executor
+        class thread_pool_executor
           : public threads::detail::executor_base
         {
         public:
-            serial_executor(std::size_t num_queues = 1);
-            ~serial_executor();
+            thread_pool_executor(std::size_t num_threads = 1);
+            ~thread_pool_executor();
 
             /// Schedule the specified function for execution in this executor.
             /// Depending on the subclass implementation, this may block in some
@@ -54,7 +55,8 @@ namespace hpx { namespace threads { namespace executors
             void run(std::size_t num_thread);
 
             // the scheduler used by this executor
-            policies::local_queue_scheduler scheduler_;
+            policies::local_queue_scheduler<lcos::local::spinlock> scheduler_;
+            lcos::local::counting_semaphore shutdown_sem_;
             boost::atomic<hpx::state> state_;
         };
     }
@@ -63,7 +65,7 @@ namespace hpx { namespace threads { namespace executors
     struct serial_executor : public executor
     {
         serial_executor(std::size_t num_queues = 1)
-          : executor(new detail::serial_executor(num_queues))
+          : executor(new detail::thread_pool_executor(num_queues))
         {}
     };
 }}}

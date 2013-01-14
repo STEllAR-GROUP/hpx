@@ -157,14 +157,18 @@ struct abp_queue_scheduler : boost::noncopyable
                                  bool run_now, error_code& ec,
                                  std::size_t num_thread)
     {
+        std::size_t queue_size = queues_.size();
+
         if (std::size_t(-1) != num_thread) {
-            BOOST_ASSERT(num_thread < queues_.size());
+            if (num_thread >= queue_size)
+                num_thread %= queue_size;
+
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, ec);
         }
 
         // TODO: load balancing
-        return queues_[++curr_queue_ % queues_.size()]->create_thread(
+        return queues_[++curr_queue_ % queue_size]->create_thread(
             data, initial_state, run_now, ec);
     }
 
@@ -294,7 +298,7 @@ struct abp_queue_scheduler : boost::noncopyable
     }
 
     // no-op for local scheduling
-    void do_some_work(std::size_t num_thread) { }
+    void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
 
     ///////////////////////////////////////////////////////////////////////
     void on_start_thread(std::size_t num_thread)

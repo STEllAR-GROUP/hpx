@@ -386,9 +386,12 @@ struct thread_deque
     /// Return the number of existing threads with the given state.
     boost::int64_t get_thread_count(thread_state_enum state = unknown) const
     {
+        if (terminated == state)
+            return terminated_items_count_;
+
         mutex_type::scoped_lock lk(mtx_);
         if (unknown == state)
-            return thread_map_.size();
+            return static_cast<boost::int64_t>(thread_map_.size());
 
         boost::int64_t num_threads = 0;
         thread_map_type::const_iterator end = thread_map_.end();
@@ -505,15 +508,7 @@ struct thread_deque
 
     ///////////////////////////////////////////////////////////////////////
     void on_start_thread(std::size_t num_thread) {}
-    void on_stop_thread(std::size_t num_thread)
-    {
-        if (0 == num_thread) {
-            // print queue statistics
-            log_fifo_statistics(work_items_, "thread_deque");
-            log_fifo_statistics(terminated_items_, "thread_deque");
-            log_fifo_statistics(new_tasks_, "thread_deque");
-        }
-    }
+    void on_stop_thread(std::size_t num_thread) {}
     void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
 
 private:

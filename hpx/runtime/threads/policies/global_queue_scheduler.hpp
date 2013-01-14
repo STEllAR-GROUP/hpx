@@ -13,7 +13,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/policies/global_thread_queue.hpp>
 
 #include <boost/mpl/bool.hpp>
 
@@ -137,7 +137,7 @@ namespace hpx { namespace threads { namespace policies
         /// This function gets called by the threadmanager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
-        void do_some_work(std::size_t num_thread)
+        void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
             queue_.do_some_work();
         }
@@ -157,7 +157,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        thread_queue<true> queue_;                ///< this manages all the threads
+        global_thread_queue queue_;                ///< this manages all the threads
     };
 }}}
 

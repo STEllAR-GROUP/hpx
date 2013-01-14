@@ -598,7 +598,7 @@ namespace hpx
 #endif
 
             // scheduling policy
-            typedef hpx::threads::policies::local_queue_scheduler
+            typedef hpx::threads::policies::local_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, 1000, numa_sensitive, pu_offset, pu_step, 

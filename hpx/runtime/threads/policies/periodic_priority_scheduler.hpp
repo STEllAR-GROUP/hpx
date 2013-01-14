@@ -106,14 +106,14 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
             {
-                queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
+                queues_[i] = new thread_queue<>(init.max_queue_thread_count_);
             }
 
             BOOST_ASSERT(init.num_high_priority_queues_ != 0);
             BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
             for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                 high_priority_queues_[i] =
-                    new thread_queue<false>(init.max_queue_thread_count_);
+                    new thread_queue<>(init.max_queue_thread_count_);
             }
         }
 
@@ -470,7 +470,7 @@ namespace hpx { namespace threads { namespace policies
                 average_work_count = average_work_count / high_priority_queues_.size();
 
                 // Remove items from queues that have more than the average
-                thread_queue<false> tmp_queue;
+                thread_queue<> tmp_queue;
                 for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 {
                     boost::int64_t task_items = high_priority_queues_[i]->get_task_length();
@@ -536,7 +536,7 @@ namespace hpx { namespace threads { namespace policies
                 average_work_count = average_work_count / queues_.size();
 
                 // Remove items from queues that have more than the average
-                thread_queue<false> tmp_queue;
+                thread_queue<> tmp_queue;
                 for(std::size_t i = 0; i < queues_.size(); ++i)
                 {
                     boost::int64_t task_items = queues_[i]->get_task_length();
@@ -594,7 +594,7 @@ namespace hpx { namespace threads { namespace policies
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
-        void do_some_work(std::size_t num_thread)
+        void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
@@ -645,9 +645,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
-        std::vector<thread_queue<false>*> high_priority_queues_;
-        thread_queue<false> low_priority_queue_;
+        std::vector<thread_queue<>*> queues_;   ///< this manages all the PX threads
+        std::vector<thread_queue<>*> high_priority_queues_;
+        thread_queue<> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
         topology const& topology_;

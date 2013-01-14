@@ -149,8 +149,10 @@ namespace hpx { namespace threads { namespace policies
         // pending
         thread_id_type create_thread(thread_init_data& data,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-                                     std::size_t num_thread)
+            std::size_t num_thread)
         {
+            std::size_t queue_size = queues_.size();
+
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
                 boost::uint64_t mask = 0;
@@ -159,7 +161,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
                 if (mask) {
                     std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; i < queues_.size(); m <<= 1, ++i)
+                    for (std::size_t i = 0; i < queue_size; m <<= 1, ++i)
                     {
                         if (!(m & mask))
                             continue;
@@ -168,8 +170,12 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
             }
+
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = ++curr_queue_ % queue_size;
+
+            if (num_thread >= queue_size)
+                num_thread %= queue_size;
 
             // now create the thread
             if (data.priority == thread_priority_critical) {
@@ -183,7 +189,7 @@ namespace hpx { namespace threads { namespace policies
                     run_now, ec);
             }
 
-            BOOST_ASSERT(num_thread < queues_.size());
+            BOOST_ASSERT(num_thread < queue_size);
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, ec);
         }
@@ -431,7 +437,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // no-op for local scheduling
-        void do_some_work(std::size_t num_thread) {}
+        void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)

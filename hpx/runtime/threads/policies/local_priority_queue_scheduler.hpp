@@ -101,13 +101,13 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
-                queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
+                queues_[i] = new thread_queue<>(init.max_queue_thread_count_);
 
             BOOST_ASSERT(init.num_high_priority_queues_ != 0);
             BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
             for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                 high_priority_queues_[i] =
-                    new thread_queue<false>(init.max_queue_thread_count_);
+                    new thread_queue<>(init.max_queue_thread_count_);
             }
         }
 
@@ -167,6 +167,8 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
+            std::size_t queue_size = queues_.size();
+
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
                 boost::uint64_t mask = 0;
@@ -175,7 +177,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
                 if (mask) {
                     std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; i < queues_.size(); m <<= 1, ++i)
+                    for (std::size_t i = 0; i < queue_size; m <<= 1, ++i)
                     {
                         if (!(m & mask))
                             continue;
@@ -184,19 +186,23 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
             }
+
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queues_.size();
+
+            if (num_thread >= queue_size)
+                num_thread %= queue_size;
 
             // now create the thread
             if (data.priority == thread_priority_critical) {
                 BOOST_ASSERT(run_now);
                 std::size_t num = num_thread % high_priority_queues_.size();
                 return high_priority_queues_[num]->create_thread(data,
-                    initial_state, run_now, queues_.size() + num, ec);
+                    initial_state, run_now, queue_size + num, ec);
             }
             else if (data.priority == thread_priority_low) {
                 return low_priority_queue_.create_thread(data, initial_state,
-                    run_now, queues_.size()+high_priority_queues_.size(), ec);
+                    run_now, queues_.size() + high_priority_queues_.size(), ec);
             }
 
             BOOST_ASSERT(num_thread < queues_.size());
@@ -457,7 +463,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // no-op for local scheduling
-        void do_some_work(std::size_t num_thread) {}
+        void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
@@ -489,9 +495,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
-        std::vector<thread_queue<false>*> high_priority_queues_;
-        thread_queue<false> low_priority_queue_;
+        std::vector<thread_queue<>*> queues_;   ///< this manages all the PX threads
+        std::vector<thread_queue<>*> high_priority_queues_;
+        thread_queue<> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;

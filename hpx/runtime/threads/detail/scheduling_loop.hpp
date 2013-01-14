@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_JAN_11_2013_0838PM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_JAN_11_2013_0838PM
+#if !defined(HPX_RUNTIME_THREADS_DETAIL_SCHEDULING_LOOP_JAN_11_2013_0838PM)
+#define HPX_RUNTIME_THREADS_DETAIL_SCHEDULING_LOOP_JAN_11_2013_0838PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -18,150 +18,147 @@
 #include <boost/ref.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
-namespace hpx { namespace threads
+namespace hpx { namespace threads { namespace detail 
 {
-    namespace detail
+    ///////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy>
+    inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
+        boost::atomic<hpx::state>& global_state, boost::mpl::false_)
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename SchedulingPolicy>
-        inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
-            boost::atomic<hpx::state>& global_state, boost::mpl::false_)
+    }
+
+    template <typename SchedulingPolicy>
+    inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
+        boost::atomic<hpx::state>& global_state, boost::mpl::true_)
+    {
+        scheduler.periodic_maintenance(global_state == running);
+
+        if (global_state.load() == running)
         {
-        }
-
-        template <typename SchedulingPolicy>
-        inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
-            boost::atomic<hpx::state>& global_state, boost::mpl::true_)
-        {
-            scheduler.periodic_maintenance(global_state.load() == running);
-
-            if (global_state.load() == running)
-            {
-                // create timer firing in correspondence with given time
-                boost::asio::deadline_timer t (
-                    get_thread_pool("timer-thread")->get_io_service(),
-                    boost::posix_time::milliseconds(1000));
-
-                void (*handler)(SchedulingPolicy&, boost::mpl::true_) =
-                    &periodic_maintenance_handler<SchedulingPolicy>;
-
-                t.async_wait(boost::bind(handler, boost::ref(global_state),
-                    boost::ref(scheduler), boost::mpl::true_()));
-            }
-        }
-
-        template <typename SchedulingPolicy>
-        inline void start_periodic_maintenance(SchedulingPolicy&,
-            boost::atomic<hpx::state>& global_state, boost::mpl::false_)
-        {
-        }
-
-        template <typename SchedulingPolicy>
-        inline void start_periodic_maintenance(SchedulingPolicy& scheduler,
-            boost::atomic<hpx::state>& global_state, boost::mpl::true_)
-        {
-            scheduler.periodic_maintenance(global_state.load() == running);
-
-            boost::posix_time::milliseconds expire(1000);
-
             // create timer firing in correspondence with given time
             boost::asio::deadline_timer t (
-                get_thread_pool("io-thread")->get_io_service(),
+                get_thread_pool("timer-thread")->get_io_service(),
                 boost::posix_time::milliseconds(1000));
 
-            void (*handler)(SchedulingPolicy&, boost::mpl::true_) =
+            void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
-            t.async_wait(boost::bind(handler, boost::ref(global_state),
-                boost::ref(scheduler), boost::mpl::true_()));
+            t.async_wait(boost::bind(handler, boost::ref(scheduler), 
+                boost::ref(global_state), boost::mpl::true_()));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        inline void write_new_state_log_debug(std::size_t num_thread,
-            thread_data* thrd, thread_state_enum state, char const* info)
-        {
-            LTM_(debug) << "tfunc(" << num_thread << "): "
-                << "thread(" << thrd->get_thread_id() << "), "
-                << "description(" << thrd->get_description() << "), "
-                << "new state(" << get_thread_state_name(state) << "), "
-                << info;
-        }
-        inline void write_new_state_log_warning(std::size_t num_thread,
-            thread_data* thrd, thread_state_enum state, char const* info)
-        {
-            // log this in any case
-            LTM_(warning) << "tfunc(" << num_thread << "): "
-                << "thread(" << thrd->get_thread_id() << "), "
-                << "description(" << thrd->get_description() << "), "
-                << "new state(" << get_thread_state_name(state) << "), "
-                << info;
-        }
-        inline void write_old_state_log(std::size_t num_thread,
-            thread_data* thrd, thread_state_enum state)
-        {
-            LTM_(debug) << "tfunc(" << num_thread << "): "
-                       << "thread(" << thrd->get_thread_id() << "), "
-                       << "description(" << thrd->get_description() << "), "
-                       << "old state(" << get_thread_state_name(state) << ")";
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // helper class for switching thread state in and out during execution
-        class switch_status
-        {
-        public:
-            switch_status (thread_data* t, thread_state prev_state)
-              : thread_(t), prev_state_(prev_state),
-                need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
-            {}
-
-            ~switch_status ()
-            {
-                if (need_restore_state_)
-                    store_state(prev_state_);
-            }
-
-            bool is_valid() const { return need_restore_state_; }
-
-            // allow to change the state the thread will be switched to after
-            // execution
-            thread_state operator=(thread_state_enum new_state)
-            {
-                return prev_state_ = thread_state(new_state, prev_state_.get_tag() + 1);
-            }
-
-            // Get the state this thread was in before execution (usually pending),
-            // this helps making sure no other worker-thread is started to execute this
-            // PX-thread in the meantime.
-            thread_state get_previous() const
-            {
-                return prev_state_;
-            }
-
-            // This restores the previous state, while making sure that the
-            // original state has not been changed since we started executing this
-            // thread. The function returns true if the state has been set, false
-            // otherwise.
-            bool store_state(thread_state& newstate)
-            {
-                disable_restore();
-                if (thread_->restore_state(prev_state_, orig_state_)) {
-                    newstate = prev_state_;
-                    return true;
-                }
-                return false;
-            }
-
-            // disable default handling in destructor
-            void disable_restore() { need_restore_state_ = false; }
-
-        private:
-            thread_data* thread_;
-            thread_state prev_state_;
-            thread_state orig_state_;
-            bool need_restore_state_;
-        };
     }
+
+    template <typename SchedulingPolicy>
+    inline void start_periodic_maintenance(SchedulingPolicy&,
+        boost::atomic<hpx::state>& global_state, boost::mpl::false_)
+    {
+    }
+
+    template <typename SchedulingPolicy>
+    inline void start_periodic_maintenance(SchedulingPolicy& scheduler,
+        boost::atomic<hpx::state>& global_state, boost::mpl::true_)
+    {
+        scheduler.periodic_maintenance(global_state == running);
+
+        boost::posix_time::milliseconds expire(1000);
+
+        // create timer firing in correspondence with given time
+        boost::asio::deadline_timer t (
+            get_thread_pool("io-thread")->get_io_service(),
+            boost::posix_time::milliseconds(1000));
+
+        void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
+            &periodic_maintenance_handler<SchedulingPolicy>;
+
+        t.async_wait(boost::bind(handler, boost::ref(scheduler), 
+            boost::ref(global_state), boost::mpl::true_()));
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    inline void write_new_state_log_debug(std::size_t num_thread,
+        thread_data* thrd, thread_state_enum state, char const* info)
+    {
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+            << "thread(" << thrd->get_thread_id() << "), "
+            << "description(" << thrd->get_description() << "), "
+            << "new state(" << get_thread_state_name(state) << "), "
+            << info;
+    }
+    inline void write_new_state_log_warning(std::size_t num_thread,
+        thread_data* thrd, thread_state_enum state, char const* info)
+    {
+        // log this in any case
+        LTM_(warning) << "tfunc(" << num_thread << "): "
+            << "thread(" << thrd->get_thread_id() << "), "
+            << "description(" << thrd->get_description() << "), "
+            << "new state(" << get_thread_state_name(state) << "), "
+            << info;
+    }
+    inline void write_old_state_log(std::size_t num_thread,
+        thread_data* thrd, thread_state_enum state)
+    {
+        LTM_(debug) << "tfunc(" << num_thread << "): "
+                    << "thread(" << thrd->get_thread_id() << "), "
+                    << "description(" << thrd->get_description() << "), "
+                    << "old state(" << get_thread_state_name(state) << ")";
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // helper class for switching thread state in and out during execution
+    class switch_status
+    {
+    public:
+        switch_status (thread_data* t, thread_state prev_state)
+          : thread_(t), prev_state_(prev_state),
+            need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
+        {}
+
+        ~switch_status ()
+        {
+            if (need_restore_state_)
+                store_state(prev_state_);
+        }
+
+        bool is_valid() const { return need_restore_state_; }
+
+        // allow to change the state the thread will be switched to after
+        // execution
+        thread_state operator=(thread_state_enum new_state)
+        {
+            return prev_state_ = thread_state(new_state, prev_state_.get_tag() + 1);
+        }
+
+        // Get the state this thread was in before execution (usually pending),
+        // this helps making sure no other worker-thread is started to execute this
+        // PX-thread in the meantime.
+        thread_state get_previous() const
+        {
+            return prev_state_;
+        }
+
+        // This restores the previous state, while making sure that the
+        // original state has not been changed since we started executing this
+        // thread. The function returns true if the state has been set, false
+        // otherwise.
+        bool store_state(thread_state& newstate)
+        {
+            disable_restore();
+            if (thread_->restore_state(prev_state_, orig_state_)) {
+                newstate = prev_state_;
+                return true;
+            }
+            return false;
+        }
+
+        // disable default handling in destructor
+        void disable_restore() { need_restore_state_ = false; }
+
+    private:
+        thread_data* thread_;
+        thread_state prev_state_;
+        thread_state orig_state_;
+        bool need_restore_state_;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
@@ -180,13 +177,13 @@ namespace hpx { namespace threads
         boost::uint64_t overall_timestamp = util::hardware::timestamp();
 
         typedef typename SchedulingPolicy::has_periodic_maintenance pred;
-        detail::start_periodic_maintenance(global_state, scheduler, pred());
+        detail::start_periodic_maintenance(scheduler, global_state, pred());
 
         while (true) {
             // Get the next HPX thread from the queue
             thread_data* thrd = NULL;
             if (scheduler.get_next_thread(num_thread,
-                    global_state.load() == running, idle_loop_count, thrd))
+                    global_state == running, idle_loop_count, thrd))
             {
                 idle_loop_count = 0;
                 ++busy_loop_count;
@@ -260,7 +257,7 @@ namespace hpx { namespace threads
                     if (state_val == pending) {
                         // schedule other work
                         scheduler.wait_or_add_new(num_thread,
-                            global_state.load() == running, idle_loop_count);
+                            global_state == running, idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -298,7 +295,7 @@ namespace hpx { namespace threads
             // if nothing else has to be done either wait or terminate
             else {
                 if (scheduler.wait_or_add_new(num_thread,
-                        global_state.load() == running, idle_loop_count))
+                        global_state == running, idle_loop_count))
                 {
                     break;
                 }
@@ -315,7 +312,7 @@ namespace hpx { namespace threads
         // after tfunc loop broke, record total time elapsed
         tfunc_time = util::hardware::timestamp() - overall_timestamp;
     }
-}}
+}}}
 
 #endif
 
