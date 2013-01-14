@@ -601,7 +601,7 @@ namespace hpx
             typedef hpx::threads::policies::local_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive, pu_offset, pu_step, 
+                cfg.num_threads_, 1000, numa_sensitive, pu_offset, pu_step,
                 affinity);
 
             // Build and configure this runtime instance.
@@ -1012,8 +1012,15 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int finalize(double shutdown_timeout, double localwait)
+    int finalize(double shutdown_timeout, double localwait, error_code& ec)
     {
+        if (!is_running()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
+
         if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
         else
@@ -1037,8 +1044,15 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int disconnect(double shutdown_timeout, double localwait)
+    int disconnect(double shutdown_timeout, double localwait, error_code& ec)
     {
+        if (!is_running()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
+
         if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
         else
