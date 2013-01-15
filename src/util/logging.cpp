@@ -35,6 +35,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+    typedef logging::writer::named_write<> logger_writer_type;
+
     namespace detail
     {
         hpx::util::logging::level::type 
@@ -373,6 +375,22 @@ namespace hpx { namespace util
     };
 #endif
 
+    namespace detail
+    {
+        template <typename Writer>
+        void define_formatters(Writer& writer)
+        {
+            writer.replace_formatter("osthread", shepherd_thread_id());
+            writer.replace_formatter("locality", locality_prefix());
+            writer.replace_formatter("hpxthread", thread_id());
+            writer.replace_formatter("hpxphase", thread_phase());
+            writer.replace_formatter("hpxparent", parent_thread_id());
+            writer.replace_formatter("hpxparentphase", parent_thread_phase());
+            writer.replace_formatter("parentloc", parent_thread_locality());
+            writer.replace_formatter("hpxcomponent", thread_component_id());
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
     HPX_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type,
@@ -400,6 +418,8 @@ namespace hpx { namespace util
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
+           logger_writer_type& writer = agas_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
@@ -412,17 +432,10 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            agas_logger()->writer().add_destination("console",
-                console(lvl, destination_agas)); //-V106
-            agas_logger()->writer().write(logformat, logdest);
-            agas_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            agas_logger()->writer().replace_formatter("locality", locality_prefix());
-            agas_logger()->writer().replace_formatter("hpxthread", thread_id());
-            agas_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            agas_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            agas_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            agas_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            agas_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_agas)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             agas_logger()->mark_as_initialized();
             agas_level()->set_enabled(lvl);
         }
@@ -455,10 +468,13 @@ namespace hpx { namespace util
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
+           logger_writer_type& writer = timing_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            timing_logger()->writer().add_destination("android_log", 
+
+            writer.add_destination("android_log", 
                 android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -467,17 +483,10 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            timing_logger()->writer().add_destination("console",
-                console(lvl, destination_timing)); //-V106
-            timing_logger()->writer().write(logformat, logdest);
-            timing_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            timing_logger()->writer().replace_formatter("locality", locality_prefix());
-            timing_logger()->writer().replace_formatter("hpxthread", thread_id());
-            timing_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            timing_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            timing_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            timing_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            timing_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_timing)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             timing_logger()->mark_as_initialized();
             timing_level()->set_enabled(lvl);
         }
@@ -510,12 +519,15 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
+        logger_writer_type& writer = hpx_logger()->writer();
+        logger_writer_type& error_writer = hpx_error_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "android_log" : "console";
-        hpx_logger()->writer().add_destination("android_log", android_log("hpx"));
-        hpx_error_logger()->writer().add_destination("android_log", 
-            android_log("hpx"));
+
+        writer.add_destination("android_log", android_log("hpx"));
+        error_writer.add_destination("android_log", android_log("hpx"));
 #else
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
@@ -524,60 +536,39 @@ namespace hpx { namespace util
             logformat = "|\\n";
 
         if (hpx::util::logging::level::disable_all != lvl) {
-            hpx_logger()->writer().add_destination("console",
-                console(lvl, destination_hpx)); //-V106
-            hpx_logger()->writer().write(logformat, logdest);
-            hpx_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            hpx_logger()->writer().replace_formatter("locality", locality_prefix());
-            hpx_logger()->writer().replace_formatter("hpxthread", thread_id());
-            hpx_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            hpx_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            hpx_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            hpx_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            hpx_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            hpx_error_logger()->writer().add_destination("console",
-                console(lvl, destination_hpx)); //-V106
+            error_writer.add_destination("console", console(lvl, destination_hpx)); //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
-                hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+                error_writer.write(logformat, logdest + " cerr");
 #endif
-            hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
-            hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            hpx_error_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            hpx_error_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            hpx_error_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            detail::define_formatters(error_writer);
+
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(lvl);
         }
         else {
             // errors are always logged to cerr
             if (!isconsole) {
-                hpx_error_logger()->writer().add_destination("console",
-                    console(lvl, destination_hpx)); //-V106
-                hpx_error_logger()->writer().write(logformat, "console");
+                error_writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+                error_writer.write(logformat, "console");
             }
             else {
 #if defined(ANDROID) || defined(__ANDROID__)
-                hpx_error_logger()->writer().write(logformat, "android_log");
+                error_writer.write(logformat, "android_log");
 #else
-                hpx_error_logger()->writer().write(logformat, "cerr");
+                error_writer.write(logformat, "cerr");
 #endif
             }
-            hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
-            hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            hpx_error_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            hpx_error_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            hpx_error_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            detail::define_formatters(error_writer);
+
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(hpx::util::logging::level::fatal);
         }
@@ -612,11 +603,12 @@ namespace hpx { namespace util
             lvl = detail::get_log_level(loglevel);
 
         if (hpx::util::logging::level::disable_all != lvl) {
+            logger_writer_type& writer = app_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            app_logger()->writer().add_destination("android_log", 
-                android_log("hpx.application"));
+            writer.add_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -624,17 +616,10 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            app_logger()->writer().add_destination("console",
-                console(lvl, destination_app)); //-V106
-            app_logger()->writer().write(logformat, logdest);
-            app_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            app_logger()->writer().replace_formatter("locality", locality_prefix());
-            app_logger()->writer().replace_formatter("hpxthread", thread_id());
-            app_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            app_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            app_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            app_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            app_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_app)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             app_logger()->mark_as_initialized();
             app_level()->set_enabled(lvl);
         }
@@ -666,11 +651,12 @@ namespace hpx { namespace util
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
+            logger_writer_type& writer = agas_console_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            agas_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx.agas"));
+            writer.add_destination("android_log", android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -678,7 +664,8 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            agas_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             agas_console_logger()->mark_as_initialized();
             agas_console_level()->set_enabled(lvl);
         }
@@ -710,11 +697,12 @@ namespace hpx { namespace util
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
+            logger_writer_type& writer = timing_console_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            timing_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx.timing"));
+            writer.add_destination("android_log", android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -722,7 +710,8 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            timing_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             timing_console_logger()->mark_as_initialized();
             timing_console_level()->set_enabled(lvl);
         }
@@ -752,20 +741,23 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-#if defined(ANDROID) || defined(__ANDROID__)
-            if (logdest.empty())      // ensure minimal defaults
-                logdest = "android_log";
-            hpx_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx"));
-#else
-            if (logdest.empty())      // ensure minimal defaults
-                logdest = "cerr";
-#endif
         if (logformat.empty())
             logformat = "|";
 
         if (hpx::util::logging::level::disable_all != lvl) {
-            hpx_console_logger()->writer().write(logformat, logdest);
+            logger_writer_type& writer = hpx_console_logger()->writer();
+
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "android_log";
+            writer.add_destination("android_log", android_log("hpx"));
+#else
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "cerr";
+#endif
+
+            writer.write(logformat, logdest);
+
             hpx_console_logger()->mark_as_initialized();
             hpx_console_level()->set_enabled(lvl);
         }
@@ -797,11 +789,12 @@ namespace hpx { namespace util
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
+            logger_writer_type& writer = app_console_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            app_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx.application"));
+            writer.add_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -809,7 +802,8 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            app_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             app_console_logger()->mark_as_initialized();
             app_console_level()->set_enabled(lvl);
         }

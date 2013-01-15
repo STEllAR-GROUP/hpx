@@ -154,8 +154,9 @@ namespace hpx { namespace parcelset { namespace tcp
                     accepted_connections_)
                 {
                     boost::system::error_code ec;
-                    c->socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-                    c->socket().close(ec);    // close the socket to give it back to the OS
+                    boost::asio::ip::tcp::socket& s = c->socket();
+                    s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                    s.close(ec);    // close the socket to give it back to the OS
                 }
                 accepted_connections_.clear();
             }
@@ -198,8 +199,9 @@ namespace hpx { namespace parcelset { namespace tcp
             }
 
             // disable Nagle algorithm, disable lingering on close
-            c->socket().set_option(boost::asio::ip::tcp::no_delay(true));
-            c->socket().set_option(boost::asio::socket_base::linger(true, 0));
+            boost::asio::ip::tcp::socket& s = c->socket();
+            s.set_option(boost::asio::ip::tcp::no_delay(true));
+            s.set_option(boost::asio::socket_base::linger(true, 0));
 
             // now accept the incoming connection by starting to read from the
             // socket
@@ -260,7 +262,8 @@ namespace hpx { namespace parcelset { namespace tcp
             iterator it = pending_parcels_.find(locality_id);
             if (it != pending_parcels_.end())
             {
-                BOOST_FOREACH(parcel const& pp, it->second.first)
+                map_second_type const& data = it->second;
+                BOOST_FOREACH(parcel const& pp, data.first)
                 {
                     if (pp.get_parcel_id() == parcel_id)
                     {
@@ -344,14 +347,15 @@ namespace hpx { namespace parcelset { namespace tcp
     {
 #if defined(HPX_DEBUG)
         // verify the connection points to the right destination
+        boost::asio::ip::tcp::socket& s = client_connection->socket();
         BOOST_FOREACH(parcel const& p, parcels)
         {
             naming::locality const parcel_locality_id = p.get_destination_locality();
             BOOST_ASSERT(parcel_locality_id == client_connection->destination());
             BOOST_ASSERT(parcel_locality_id.get_address() ==
-                client_connection->socket().remote_endpoint().address().to_string());
+                s.remote_endpoint().address().to_string());
             BOOST_ASSERT(parcel_locality_id.get_port() ==
-                client_connection->socket().remote_endpoint().port());
+                s.remote_endpoint().port());
         }
 #endif
         // store parcels in connection
@@ -366,15 +370,15 @@ namespace hpx { namespace parcelset { namespace tcp
                 boost::asio::placeholders::error, ::_2, ::_3));
     }
 
-    void early_write_handler(boost::system::error_code const& ec, 
+    void early_write_handler(boost::system::error_code const& ec,
         std::size_t size)
     {
         if (ec) {
             // all errors during early parcel handling are fatal
             try {
-                HPX_THROW_EXCEPTION(network_error, "early_write_handler", 
+                HPX_THROW_EXCEPTION(network_error, "early_write_handler",
                     "error while handling early parcel: " +
-                        ec.message() + "(" + 
+                        ec.message() + "(" +
                         boost::lexical_cast<std::string>(ec.value())+ ")");
             }
             catch (hpx::exception const& e) {
@@ -390,9 +394,9 @@ namespace hpx { namespace parcelset { namespace tcp
         if (ec) {
             // all errors during early parcel handling are fatal
             try {
-                HPX_THROW_EXCEPTION(network_error, "early_write_handler", 
+                HPX_THROW_EXCEPTION(network_error, "early_write_handler",
                     "error while handling early parcel: " +
-                        ec.message() + "(" + 
+                        ec.message() + "(" +
                         boost::lexical_cast<std::string>(ec.value())+ ")");
             }
             catch (hpx::exception const& e) {
@@ -468,8 +472,9 @@ namespace hpx { namespace parcelset { namespace tcp
                             connect_begin(l, io_service_pool_.get_io_service());
                          it != end; ++it)
                     {
-                        client_connection->socket().close();
-                        client_connection->socket().connect(*it, error);
+                        boost::asio::ip::tcp::socket& s = client_connection->socket();
+                        s.close();
+                        s.connect(*it, error);
                         if (!error)
                             break;
                     }

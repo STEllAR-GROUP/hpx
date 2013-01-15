@@ -471,9 +471,11 @@ response primary_namespace::bind_gid(
         // binding (e.g. move semantics).
         if (it->first == id)
         {
+            gva& gaddr = it->second;
+
             // Check for count mismatch (we can't change block sizes of
             // existing bindings).
-            if (HPX_UNLIKELY(it->second.count != g.count))
+            if (HPX_UNLIKELY(gaddr.count != g.count))
             {
                 // REVIEW: Is this the right error code to use?
                 HPX_THROWS_IF(ec, bad_parameter
@@ -494,10 +496,10 @@ response primary_namespace::bind_gid(
             }
 
             // Store the new endpoint and offset
-            it->second.endpoint = g.endpoint;
-            it->second.type = g.type;
-            it->second.lva(g.lva());
-            it->second.offset = g.offset;
+            gaddr.endpoint = g.endpoint;
+            gaddr.type = g.type;
+            gaddr.lva(g.lva());
+            gaddr.offset = g.offset;
 
             LAGAS_(info) << (boost::format(
                 "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
@@ -1663,7 +1665,7 @@ boost::int64_t primary_namespace::counter_data::get_num_localities_count() const
 boost::int64_t primary_namespace::counter_data::get_num_threads_count() const
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_localities_.count_;
+    return num_threads_.count_;
 }
 
 boost::int64_t primary_namespace::counter_data::get_resolved_localities_count() const

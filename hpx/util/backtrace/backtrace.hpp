@@ -36,13 +36,14 @@
 #define HPX_BACKTRACE_DECL
 #endif
 
-namespace hpx { namespace util {
-
-    namespace stack_trace {
-        HPX_BACKTRACE_DECL std::size_t trace(void **addresses,std::size_t size);
-        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &);
+namespace hpx { namespace util
+{
+    namespace stack_trace
+    {
+        HPX_BACKTRACE_DECL std::size_t trace(void **addresses, std::size_t size);
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses, std::size_t size,std::ostream &);
         HPX_BACKTRACE_DECL std::string get_symbol(void *address);
-        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size);
+        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address, std::size_t size);
     } // stack_trace
 
     class backtrace {
@@ -50,7 +51,7 @@ namespace hpx { namespace util {
 
         enum { default_stack_size = 128 };
 
-        backtrace(size_t frames_no = default_stack_size)
+        backtrace(std::size_t frames_no = default_stack_size)
         {
             if(frames_no == 0)
                 return;
@@ -64,25 +65,25 @@ namespace hpx { namespace util {
         {
         }
 
-        size_t stack_size() const
+        std::size_t stack_size() const
         {
             return frames_.size();
         }
 
-        void *return_address(unsigned frame_no) const
+        void *return_address(std::size_t frame_no) const
         {
             if(frame_no < stack_size())
                 return frames_[frame_no];
             return 0;
         }
 
-        void trace_line(unsigned frame_no,std::ostream &out) const
+        void trace_line(std::size_t frame_no,std::ostream &out) const
         {
             if(frame_no < frames_.size())
                 stack_trace::write_symbols(&frames_[frame_no],1,out);
         }
 
-        std::string trace_line(unsigned frame_no) const
+        std::string trace_line(std::size_t frame_no) const
         {
             if(frame_no < frames_.size())
                 return stack_trace::get_symbol(frames_[frame_no]);

@@ -51,11 +51,11 @@ namespace hpx { namespace parcelset { namespace shmem
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport::parcelport(util::runtime_configuration const& ini, 
+    parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
-        io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 
+        io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
         acceptor_(NULL), connection_count_(0),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc()),
@@ -103,7 +103,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
                 boost::asio::ip::tcp::endpoint ep = *it;
 
-                std::string fullname(ep.address().to_string() + "." + 
+                std::string fullname(ep.address().to_string() + "." +
                     boost::lexical_cast<std::string>(ep.port()));
 
                 acceptor_->set_option(acceptor::msg_num(10));
@@ -146,8 +146,9 @@ namespace hpx { namespace parcelset { namespace shmem
                 accepted_connections_)
             {
                 boost::system::error_code ec;
-                c->window().shutdown(ec); // shut down connection
-                c->window().close(ec);    // close the data window to give it back to the OS
+                parcelset::shmem::data_window& w = c->window();
+                w.shutdown(ec); // shut down connection
+                w.close(ec);    // close the data window to give it back to the OS
             }
             accepted_connections_.clear();
         }
@@ -196,7 +197,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             // now accept the incoming connection by starting to read from the
             // data window
-            c->async_read(boost::bind(&parcelport::handle_read_completion, 
+            c->async_read(boost::bind(&parcelport::handle_read_completion,
                 this, boost::asio::placeholders::error, c));
         }
         else {
@@ -212,7 +213,7 @@ namespace hpx { namespace parcelset { namespace shmem
     {
         if (!e) return;
 
-        if (e != boost::asio::error::operation_aborted && 
+        if (e != boost::asio::error::operation_aborted &&
             e != boost::asio::error::eof)
         {
             LPT_(error)
@@ -244,7 +245,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         error_code ec;
-        parcelport_connection_ptr client_connection = 
+        parcelport_connection_ptr client_connection =
             get_connection(locality_id, ec);
 
         if (!client_connection)
@@ -258,7 +259,8 @@ namespace hpx { namespace parcelset { namespace shmem
             iterator it = pending_parcels_.find(locality_id);
             if (it != pending_parcels_.end())
             {
-                BOOST_FOREACH(parcel const& pp, it->second.first)
+                map_second_type const& data = it->second;
+                BOOST_FOREACH(parcel const& pp, data.first)
                 {
                     if (pp.get_parcel_id() == parcel_id)
                     {
@@ -403,11 +405,12 @@ namespace hpx { namespace parcelset { namespace shmem
                          it != end; ++it)
                     {
                         boost::asio::ip::tcp::endpoint const& ep = *it;
-                        std::string fullname(ep.address().to_string() + "." + 
+                        std::string fullname(ep.address().to_string() + "." +
                             boost::lexical_cast<std::string>(ep.port()));
 
-                        client_connection->window().close();
-                        client_connection->window().connect(fullname, error);
+                        parcelset::shmem::data_window& w = client_connection->window();
+                        w.close();
+                        w.connect(fullname, error);
                         if (!error)
                             break;
                     }
@@ -449,7 +452,7 @@ namespace hpx { namespace parcelset { namespace shmem
         parcelset::shmem::data_buffer parcel_data,
         performance_counters::parcels::data_point receive_data)
     {
-        // protect from un-handled exceptions bubbling up 
+        // protect from un-handled exceptions bubbling up
         try {
             try {
                 // mark start of serialization

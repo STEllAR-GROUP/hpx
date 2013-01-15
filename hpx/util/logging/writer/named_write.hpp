@@ -308,7 +308,6 @@ private:
 
     template<class manipulator, class parser_type> void set_and_configure(manipulator & manip, const string_type & name, parser_type parser) {
         // need to parse string
-        string_type prev ;
         bool parsing_params = false;
         string_type params;
         string_type stripped_str;
