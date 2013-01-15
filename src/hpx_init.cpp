@@ -1021,6 +1021,9 @@ namespace hpx
             return -1;
         }
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
         else
@@ -1052,6 +1055,9 @@ namespace hpx
                 "call finalize?)");
             return -1;
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
