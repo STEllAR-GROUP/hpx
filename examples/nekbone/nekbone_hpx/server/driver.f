@@ -443,7 +443,9 @@ c PARALLEL
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c WZ
-     &     zgm1,wxm1,wym1,wzm1,w3m1)
+     &     zgm1,wxm1,wym1,wzm1,w3m1,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
       use, intrinsic :: iso_c_binding, only : c_ptr
       TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
 ccccccccccccccccccccccccccccccccccc
@@ -510,6 +512,10 @@ c     Gauss-Labotto and Gauss points
 c     Weights
       real wxm1(lx1), wym1(ly1), wzm1(lz1), w3m1(lx1,ly1,lz1)
 ccccccccccccccccccccccccccccccccccc
+c nekmpi
+      integer nid_,np_,nekcomm,nekgroup,nekreal
+ccccccccccccccccccccccccccccccccccc
+
       parameter (lxyz=lx1*ly1*lz1)
       real ur(lxyz),us(lxyz),ut(lxyz),wk(lxyz)
 
@@ -727,7 +733,9 @@ c PARALLEL
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c WZ
-     &     zgm1,wxm1,wym1,wzm1,w3m1)
+     &     zgm1,wxm1,wym1,wzm1,w3m1,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
 
         return
       end subroutine nekproxy ! }}}

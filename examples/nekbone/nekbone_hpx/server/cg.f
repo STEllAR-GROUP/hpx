@@ -15,8 +15,20 @@ c PARALLEL
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c WZ
-     &     zgm1,wxm1,wym1,wzm1,w3m1)
+     &     zgm1,wxm1,wym1,wzm1,w3m1,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
       use, intrinsic :: iso_c_binding, only : c_ptr
+      interface ! {{{
+      function glsc3(hpx_bti,a,b,mult,n,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
+        use, intrinsic :: iso_c_binding, only : c_ptr
+        TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
+        real a(1),b(1),mult(1)
+        integer nid_,np_,nekcomm,nekgroup,nekreal
+      end function glsc3
+      end interface ! }}}
       TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
 ccccccccccccccccccccccccccccccccccc
 c SIZE
@@ -81,6 +93,9 @@ c     Gauss-Labotto and Gauss points
 c     Weights
       real wxm1(lx1), wym1(ly1), wzm1(lz1), w3m1(lx1,ly1,lz1)
 ccccccccccccccccccccccccccccccccccc
+c nekmpi
+      integer nid_,np_,nekcomm,nekgroup,nekreal
+ccccccccccccccccccccccccccccccccccc
 
 c     Solve Ax=f where A is SPD and is invoked by ax()
 c
@@ -113,13 +128,19 @@ c     set machine tolerances
 
       rtz1=1.0
 
-c      call rzero(x,n)
-c      call copy (r,f,n)
-c      call mask (r)   ! Zero out Dirichlet conditions
-c
-c      rnorm = sqrt(glsc3(r,c,r,n))
-c      iter = 0
-c      if (nid.eq.0)write(6,6) iter,rnorm
+      call rzero(x,n)
+      call copy (r,f,n)
+      call mask (r,
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid)   ! Zero out Dirichlet conditions
+
+
+      rnorm = sqrt(glsc3(hpx_bti,r,c,r,n,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal))
+      iter = 0
+      if (nid.eq.0)write(6,6) iter,rnorm
 c
 c      miter = niter
 c      do iter=1,miter
@@ -145,7 +166,7 @@ c         if (iter.eq.1) rlim2 = rtr*eps**2
 c         if (iter.eq.1) rtr0  = rtr
 c         rnorm = sqrt(rtr)
 c         if (nid.eq.0) write(6,6) iter,rnorm,alpha,beta,pap
-c    6    format('cg:',i4,1p4e12.4)
+    6    format('cg:',i4,1p4e12.4)
 c         if (rtr.le.rlim2) goto 1001
 c
 c      enddo
@@ -156,3 +177,37 @@ c     write(6,6) iter,rnorm,rlim2,rtr
 
       return
       end
+
+c-----------------------------------------------------------------------
+      subroutine mask(w,
+c SIZE
+     &     nelx,nely,nelz,nelt,nelg,
+     &     nx1,ny1,nz1,ndim,nfield,nid)   ! Zero out Dirichlet conditions
+
+ccccccccccccccccccccccccccccccccccc
+c SIZE
+c     These numbers come from example1 
+      parameter (ldim=3)
+      parameter (lx1=10,ly1=lx1,lz1=lx1)
+      parameter (lxd=10,lyd=lxd,lzd=1)
+
+      parameter (lp = 2)
+      parameter (lelt=1)
+
+      parameter (lelg=lelt*lp)
+      parameter (lelx=lelg,lely=1,lelz=1)
+
+      parameter (ldimt=1,ldimt1=ldimt+1)
+
+c      common /dimn/ nelx,nely,nelz,nelt,nelg
+c     $            , nx1,ny1,nz1,ndim,nfield,nid
+      integer nelx,nely,nelz,nelt,nelg
+     &            , nx1,ny1,nz1,ndim,nfield,nid
+ccccccccccccccccccccccccccccccccccc
+      real w(1)
+
+      if (nid.eq.0) w(1) = 0.  ! suitable for solvability
+
+      return
+      end
+
