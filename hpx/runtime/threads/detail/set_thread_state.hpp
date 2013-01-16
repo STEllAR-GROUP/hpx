@@ -350,6 +350,15 @@ namespace hpx { namespace threads { namespace detail
         return create_thread(scheduler, data, pending, true, ec);
     }
 
+    template <typename SchedulingPolicy>
+    thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
+        boost::posix_time::ptime const& expire_at, thread_id_type id,
+        error_code& ec)
+    {
+        return set_thread_state_timed(scheduler, expire_at, id, pending, 
+            wait_timeout, thread_priority_normal, std::size_t(-1), ec);
+    }
+
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (after the given duration)
     template <typename SchedulingPolicy>
@@ -375,6 +384,15 @@ namespace hpx { namespace threads { namespace detail
             "at_timer (from now)", 0, priority, thread_num);
 
         return create_thread(scheduler, data, pending, true, ec);
+    }
+
+    template <typename SchedulingPolicy>
+    thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
+        boost::posix_time::time_duration const& from_now, thread_id_type id,
+        error_code& ec)
+    {
+        return set_thread_state_timed(scheduler, from_now, id, pending, 
+            wait_timeout, thread_priority_normal, std::size_t(-1), ec);
     }
 }}}
 

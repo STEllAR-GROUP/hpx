@@ -43,7 +43,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Depending on the subclass implementation, this may block in some
     // situations.
     void service_executor::add(HPX_STD_FUNCTION<void()> f, char const* desc,
-        threads::thread_state_enum initial_state, bool run_now)
+        threads::thread_state_enum initial_state, bool run_now, error_code& ec)
     {
         ++task_count_;
 
@@ -57,7 +57,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // nothing and return false.
     bool service_executor::try_add(HPX_STD_FUNCTION<void()> f,
         char const* desc, threads::thread_state_enum initial_state,
-        bool run_now)
+        bool run_now, error_code& ec)
     {
         ++task_count_;
 
@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     void service_executor::add_at(
         boost::posix_time::ptime const& abs_time,
-        HPX_STD_FUNCTION<void()> f, char const* desc)
+        HPX_STD_FUNCTION<void()> f, char const* desc, error_code& ec)
     {
         ++task_count_;
 
@@ -105,7 +105,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void service_executor::add_after(
         boost::posix_time::time_duration const& rel_time,
-        HPX_STD_FUNCTION<void()> f, char const* desc)
+        HPX_STD_FUNCTION<void()> f, char const* desc, error_code& ec)
     {
         ++task_count_;
 
@@ -118,7 +118,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    std::size_t service_executor::num_pending_tasks() const
+    std::size_t service_executor::num_pending_tasks(error_code& ec) const
     {
         return task_count_;
     }
