@@ -45,6 +45,8 @@ namespace fft { namespace server
         data_.comp_rank_vec_ = comp_rank;
         data_.comp_id_ = comp_id;
         data_.valid_ = true;
+		//std::cout << "Inputfile name in data-split, init-config:" <<
+		//data_.data_filename_;
         
         BOOST_FOREACH(fft::comp_rank_pair_type& cr, data_.comp_rank_vec_)
         {
@@ -75,30 +77,62 @@ namespace fft { namespace server
     {
         distribute::complex_vec x;                                                       
         distribute::complex_vec::iterator itr; 
-        //std::size_t fft_size;
+        std::size_t count = 0;
+		bool file_read = false;
+		hpx::naming::locality this_locality = hpx::get_locality();
+		//std::cout<< "Input filename, in data-split, read_file_data():"
+		//<< data_filename << std::endl;
 
-        std::ifstream fin(data_filename);                                          
-        if(fin.is_open())                                                          
-        {                                                                          
-            while(!fin.eof())                                                           
-            {                                                                        
-                fft::complex_type temp(0,0);                                         
-                fin >> temp.re >> temp.im;                                       
-                x.push_back(temp);                                               
-            }
-            fft_size_ = x.size() - 1;
-            x.resize(fft_size_);
-            std::cout << " Read from file complete!! Size of read array:" <<         
-                x.size() << std::endl;                                               
-                                                                                    
-            fin.close();
-        }
-        else                                                                         
-        {                                                                            
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "fft::distribute::read_file_data",
-                "unable to open file");
-        } 
+        std::ifstream fin(data_filename);
+		while(count < 10)
+		{
+        	if(fin.is_open())
+        	{
+            	while(!fin.eof())
+            	{
+                	fft::complex_type temp(0,0);
+                	fin >> temp.re >> temp.im;
+                	x.push_back(temp);
+            	}
+            	fft_size_ = x.size() - 1;
+            	x.resize(fft_size_);
+            	std::cout << " Read from file complete!! Size of read array:" <<
+                	x.size() << std::endl;
+				count = 10;
+				file_read = true;  
+
+            	fin.close();
+        	}
+        	else
+        	{
+				hpx::naming::id_type here = hpx::find_here();
+				//std::cout <<"File read failed, count:"<< count <<
+				//", my cardinality:" << data_.comp_cardinality_ << 
+				//", host address:" << this_locality.get_address() <<
+				//", filename:" << data_filename << std::endl;
+				++count;
+				hpx::this_thread::suspend(boost::posix_time::microseconds(50));
+        	}
+		}
+		
+		if(file_read != true)
+		{
+				//std::string hostname_ = "";
+				//hpx::get_host_name(hpx::bad_parameter);
+				//hpx::util::osstream strm;
+				//	strm << hpx::get_runtime().here();
+				//hostname_ = hpx::util::osstream_get_string(strm);
+				//hpx::naming::locality locality = hpx::get_locality();
+					//hpx::get_runtime().here;
+				//std::cout << "My host's address:" << locality.get_address()
+				//<< ", and my cardinality:"
+				//<<  data_.comp_cardinality_ << std::endl;
+
+            	HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                	"fft::distribute::read_file_data",
+                	"unable to open file");
+		}
+		
         return x;
     }
 

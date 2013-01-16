@@ -30,7 +30,10 @@ namespace fft
         , bool const& use_dataflow)
         :datafilename_(datafilename), sn_base_(symbolic_name_base)
         , num_workers_(num_workers), use_dataflow_(use_dataflow)
-    {}
+    {
+		//std::cout << "Filename(distrib-obj creation), fft_distrib:" <<
+		//datafilename_ << std::endl;
+	}
     /////////////////////////////////////////////////////////////////////////////
     // create instance of component
     void fft_distrib::instantiate()
@@ -73,6 +76,9 @@ namespace fft
         //fft_distrib::result_type result_idtype;
         std::size_t available_locs = results.size();
         std::size_t cardinality = 0;
+	
+		//std::cout << "Filename inside init, fft-distrib:" << datafilename 
+		//<< std::endl;
 
         /// pair< locality, cardinality> 
         ///fft::comp_rank_vec_type comp_rank_pair;

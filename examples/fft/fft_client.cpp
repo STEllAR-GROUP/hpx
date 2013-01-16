@@ -62,6 +62,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         //hpx::lcos::future<complex_vec> result_vec;
         complex_vec final;
         std::string const datafilename = vm["file"].as<std::string>();
+		//std::cout<<"Input filename at fft_client.cpp:" << datafilename << std::endl; 
         std::size_t num_workers = vm["num-workers"].as<std::size_t>();
         bool use_dataflow = vm["use-dataflow"].as<bool>();
 
