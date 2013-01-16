@@ -141,18 +141,20 @@ c nekmpi
      &     nid_,np_,nekcomm,nekgroup,nekreal))
       iter = 0
       if (nid.eq.0)write(6,6) iter,rnorm
-c
-c      miter = niter
-c      do iter=1,miter
-c         call solveM(z,r,n)    ! preconditioner here
-c
-c         rtz2=rtz1
-c         rtz1=glsc3(r,c,z,n)   ! parallel weighted inner product r^T C z
-c
-c         beta = rtz1/rtz2
-c         if (iter.eq.1) beta=0.0
-c         call add2s1(p,z,beta,n)
-c
+
+      miter = niter
+      do iter=1,miter
+         call solveM(z,r,n)    ! preconditioner here
+
+         rtz2=rtz1
+         rtz1=glsc3(hpx_bti,r,c,z,n,   ! parallel weighted inner product r^T C z
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
+
+         beta = rtz1/rtz2
+         if (iter.eq.1) beta=0.0
+         call add2s1(p,z,beta,n)
+
 c         call ax(w,p,g,ur,us,ut,wk,n)
 c         pap=glsc3(w,c,p,n)
 c
@@ -167,9 +169,9 @@ c         if (iter.eq.1) rtr0  = rtr
 c         rnorm = sqrt(rtr)
 c         if (nid.eq.0) write(6,6) iter,rnorm,alpha,beta,pap
     6    format('cg:',i4,1p4e12.4)
-c         if (rtr.le.rlim2) goto 1001
-c
-c      enddo
+         if (rtr.le.rlim2) goto 1001
+
+      enddo
 
  1001 continue
 c     write(6,6) iter,rnorm,rlim2,rtr
@@ -209,5 +211,15 @@ ccccccccccccccccccccccccccccccccccc
       if (nid.eq.0) w(1) = 0.  ! suitable for solvability
 
       return
-      end
+      end subroutine mask
+
+c-----------------------------------------------------------------------
+      subroutine solveM(z,r,n)
+      real z(n),r(n)
+
+      call copy(z,r,n)
+
+      return
+      end subroutine solveM
+c-----------------------------------------------------------------------
 

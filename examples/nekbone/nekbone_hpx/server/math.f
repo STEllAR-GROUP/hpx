@@ -104,5 +104,15 @@ c nekmpi
       glsc3 = tmp(1)
       return
       end
+c-----------------------------------------------------------------------
+      subroutine add2s1(a,b,c1,n)
+      real a(1),b(1)
+
+      DO 100 I=1,N
+        A(I)=C1*A(I)+B(I)
+  100 CONTINUE
+      return
+      END subroutine add2s1
+
 
 
