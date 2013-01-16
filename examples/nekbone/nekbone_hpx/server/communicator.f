@@ -136,3 +136,40 @@ c N/A
       subroutine exitt
         print*, 'EXIT'
       end subroutine exitt
+c-----------------------------------------------------------------------
+      subroutine gop(hpx_bti, x, w, op, n,
+c nekmpi
+     &     nid,np,nekcomm,nekgroup,nekreal)
+      use, intrinsic :: iso_c_binding, only : c_ptr
+      TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
+c
+c     Global vector commutative operation
+c
+c      common /nekmpi/ nid,np,nekcomm,nekgroup,nekreal
+c
+      real x(n), w(n)
+      character*3 op
+ccccccccccccccccccccccccccccccccccc
+c nekmpi
+      integer nid,np,nekcomm,nekgroup,nekreal
+ccccccccccccccccccccccccccccccccccc
+cc
+      if (op.eq.'+  ') then
+c         call mpi_allreduce(x,w,n,nekreal,mpi_sum ,nekcomm,ierr)
+         call double_mpi_allreduce_cmm(hpx_bti,x,w,n,ierr)
+      elseif (op.EQ.'M  ') then
+c         call mpi_allreduce (x,w,n,nekreal,mpi_max ,nekcomm,ierr)
+      elseif (op.EQ.'m  ') then
+c         call mpi_allreduce (x,w,n,nekreal,mpi_min ,nekcomm,ierr)
+      elseif (op.EQ.'*  ') then
+c         call mpi_allreduce (x,w,n,nekreal,mpi_prod,nekcomm,ierr)
+      else
+         write(6,*) nid,' OP ',op,' not supported.  ABORT in GOP.'
+         call exitt
+      endif
+c
+c      call copy(x,w,n)
+
+      return
+      end
+

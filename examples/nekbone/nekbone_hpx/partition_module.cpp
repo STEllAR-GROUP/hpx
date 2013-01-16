@@ -35,3 +35,7 @@ HPX_REGISTER_ACTION(
     nekbone_partition_type::wrapped_type::set_int_params_action,
     nekbone_partition_set_int_params_action);
 
+HPX_REGISTER_ACTION(
+    nekbone_partition_type::wrapped_type::set_double_mpi_allreduce_action,
+    nekbone_partition_set_double_mpi_allreduce_action);
+
