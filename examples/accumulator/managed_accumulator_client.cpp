@@ -53,7 +53,7 @@ int hpx_main()
                     accu.reset_sync();
                 }
                 else if (cmd[0] == "add") {
-                    if (cmd.size() != 2) {
+                    if (cmd.size() == 2) {
                         accu.add_sync(boost::lexical_cast<argument_type>(cmd[1]));
                     }
                     else {
