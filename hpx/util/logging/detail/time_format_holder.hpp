@@ -92,7 +92,7 @@ public:
 
         if ( yy_idx != hold_string_type::npos || yyyy_idx != hold_string_type::npos) {
             if ( yyyy_idx  != hold_string_type::npos)
-                indexes.push_back( index_info(yyyy_idx, &m_yyyy, 4) );
+                indexes.push_back( index_info(yyyy_idx, &m_yyyy, 4) ); //-V112
             else
                 indexes.push_back( index_info(yy_idx, &m_yy) );
         }
@@ -104,11 +104,11 @@ public:
         if ( sec_idx != hold_string_type::npos)
             indexes.push_back( index_info(sec_idx, &m_sec) );
         if ( millisec_idx != hold_string_type::npos)
-            indexes.push_back( index_info(millisec_idx, &m_millisec, 4, 3) );
+            indexes.push_back( index_info(millisec_idx, &m_millisec, 4, 3) ); //-V112 //-V525
         if ( microsec_idx != hold_string_type::npos)
             indexes.push_back( index_info(microsec_idx, &m_microsec, 5, 6) );
         if ( nanosec_idx != hold_string_type::npos)
-            indexes.push_back( index_info(nanosec_idx, &m_nanosec, 4, 9) );
+            indexes.push_back( index_info(nanosec_idx, &m_nanosec, 4, 9) ); //-V112
 
         std::sort( indexes.begin(), indexes.end(), index_info::by_index);
 
