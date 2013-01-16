@@ -11,15 +11,16 @@ set(subdirs
     balancing
     bfs
     cancelable_action
-    gtcx
+    heartbeat
     nqueen
     performance_counters
     quickstart
     random_mem_access
-    sendrecv
     sheneos
     spell_check
     startup_shutdown
+    thread_aware_timer
+    throttle
    )
 
 foreach(subdir ${subdirs})
