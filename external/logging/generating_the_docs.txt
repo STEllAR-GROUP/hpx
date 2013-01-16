@@ -1,3 +1,0 @@
-To generate the documentation, go into logging\detail\raw_doc,
-and use the Doxyfile from there.
-

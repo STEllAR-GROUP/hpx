@@ -47,9 +47,15 @@ namespace hpx { namespace util
     //  In addition this type registers global construction and destruction
     //  functions used by the HPX runtime system to reinitialize the held data
     //  structures.
-    template <typename T, typename Tag = T, std::size_t N = 1>
-    struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
-      : boost::noncopyable
+    template <typename T, typename Tag = T, std::size_t N = 1,
+        typename Once = boost::once_flag>
+    struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
+
+    //////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Tag, std::size_t N>
+    struct HPX_EXPORT_REINITIALIZABLE_STATIC
+            reinitializable_static<T, Tag, N, boost::once_flag>
+      : private boost::noncopyable
     {
     public:
         typedef T value_type;
@@ -96,14 +102,16 @@ namespace hpx { namespace util
 
         reinitializable_static()
         {
-            boost::call_once(constructed_,
+            // rely on ADL to find the proper call_once
+            call_once(constructed_,
                 &reinitializable_static::default_constructor);
         }
 
         template <typename U>
         reinitializable_static(U const& val)
         {
-            boost::call_once(constructed_,
+            // rely on ADL to find the proper call_once
+            call_once(constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
@@ -145,12 +153,123 @@ namespace hpx { namespace util
     };
 
     template <typename T, typename Tag, std::size_t N>
-    typename reinitializable_static<T, Tag, N>::storage_type
-        reinitializable_static<T, Tag, N>::data_[N];
+    typename reinitializable_static<
+            T, Tag, N, boost::once_flag>::storage_type
+        reinitializable_static<T, Tag, N, boost::once_flag>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    boost::once_flag reinitializable_static<T, Tag, N>::constructed_ =
-        BOOST_ONCE_INIT;
+    boost::once_flag reinitializable_static<
+            T, Tag, N, boost::once_flag>::constructed_ = BOOST_ONCE_INIT;
+
+    //////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Tag, std::size_t N>
+    struct HPX_EXPORT_REINITIALIZABLE_STATIC
+            reinitializable_static<T, Tag, N, lcos::local::once_flag>
+      : private boost::noncopyable
+    {
+    public:
+        typedef T value_type;
+
+    private:
+        static void default_construct()
+        {
+            for (std::size_t i = 0; i < N; ++i)
+                new (get_address(i)) value_type();
+        }
+
+        template <typename U>
+        static void value_construct(U const& v)
+        {
+            for (std::size_t i = 0; i < N; ++i)
+                new (get_address(i)) value_type(v);
+        }
+
+        static void destruct()
+        {
+            for (std::size_t i = 0; i < N; ++i)
+                get_address(i)->~value_type();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static void default_constructor()
+        {
+            default_construct();
+            reinit_register(
+                &reinitializable_static::default_construct, &destruct);
+        }
+
+        template <typename U>
+        static void value_constructor(U const* pv)
+        {
+            value_construct(*pv);
+            reinit_register(boost::bind(
+                &reinitializable_static::value_construct<U>, *pv), &destruct);
+        }
+
+    public:
+        typedef typename boost::call_traits<T>::reference reference;
+        typedef typename boost::call_traits<T>::const_reference const_reference;
+
+        reinitializable_static()
+        {
+            // rely on ADL to find the proper call_once
+            call_once(constructed_,
+                &reinitializable_static::default_constructor);
+        }
+
+        template <typename U>
+        reinitializable_static(U const& val)
+        {
+            // rely on ADL to find the proper call_once
+            call_once(constructed_,
+                boost::bind(&reinitializable_static::value_constructor<U>,
+                    boost::addressof(val)));
+        }
+
+        operator reference()
+        {
+            return this->get();
+        }
+
+        operator const_reference() const
+        {
+            return this->get();
+        }
+
+        reference get(std::size_t item = 0)
+        {
+            return *this->get_address(item);
+        }
+
+        const_reference get(std::size_t item = 0) const
+        {
+            return *this->get_address(item);
+        }
+
+    private:
+        typedef typename boost::add_pointer<value_type>::type pointer;
+
+        static pointer get_address(std::size_t item)
+        {
+            BOOST_ASSERT(item < N);
+            return static_cast<pointer>(data_[item].address());
+        }
+
+        typedef boost::aligned_storage<sizeof(value_type),
+            boost::alignment_of<value_type>::value> storage_type;
+
+        static storage_type data_[N];
+        static lcos::local::once_flag constructed_;
+    };
+
+    template <typename T, typename Tag, std::size_t N>
+    typename reinitializable_static<
+            T, Tag, N, lcos::local::once_flag>::storage_type
+        reinitializable_static<T, Tag, N, lcos::local::once_flag>::data_[N];
+
+    template <typename T, typename Tag, std::size_t N>
+    lcos::local::once_flag reinitializable_static<
+            T, Tag, N, lcos::local::once_flag>::constructed_;
 }}
 
 #endif

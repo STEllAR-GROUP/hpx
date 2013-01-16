@@ -22,6 +22,10 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/exception.hpp>
 
+#if PAPI_VERSION_MAJOR(PAPI_VERSION) > 4
+#define PAPI_EXTENDED_EVENT_CODES 1
+#endif
+
 namespace hpx { namespace performance_counters { namespace papi { namespace util
 {
     using boost::program_options::options_description;
@@ -51,6 +55,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     {
     protected:
         int const mask_;          // event type mask
+        int const cid_;           // component ID
         int event_;               // next event to get info about
         bool active_;             // false when generation terminated
         PAPI_event_info_t info_;  // event info to be returned
@@ -67,8 +72,16 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         }
 
         event_info_generator():
-            mask_(0), event_(PAPI_NULL), active_(false) { }
-        event_info_generator(int mask, int first): mask_(mask) {reset(first);}
+            mask_(0), cid_(0), event_(PAPI_NULL), active_(false) { }
+        event_info_generator(int mask, int first, int cid = 0):
+            mask_(mask), cid_(cid)
+        {
+#if defined(PAPI_EXTENDED_EVENT_CODES)
+            reset(first);
+#else
+            reset(first | PAPI_COMPONENT_MASK(cid));
+#endif
+        }
 
     public:
         // required generator interface
@@ -92,7 +105,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 return;
             }
             // init is the event type flag; obtain the first valid event code
+#if defined(PAPI_EXTENDED_EVENT_CODES)
+            active_ = (PAPI_enum_cmp_event(&init, PAPI_ENUM_FIRST, cid_) == PAPI_OK);
+#else
             active_ = (PAPI_enum_event(&init, PAPI_ENUM_FIRST) == PAPI_OK);
+#endif
             if (active_) event_ = init;
         }
     };
@@ -174,8 +191,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     public:
         native_enumerator(unsigned comp, int mask = PAPI_ENUM_EVENTS):
-            event_info_generator(mask,
-                PAPI_COMPONENT_MASK(comp) | PAPI_NATIVE_MASK),
+            event_info_generator(mask, PAPI_NATIVE_MASK, comp),
             component_index_(comp), umask_seq_(false)
         {
             PAPI_component_info_t const *ci = PAPI_get_component_info(comp);

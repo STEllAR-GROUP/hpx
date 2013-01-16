@@ -11,19 +11,19 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/static.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/static.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/logging/format/named_write.hpp>
+#include <hpx/util/logging/format/destination/defaults.hpp>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 #include <boost/filesystem/operations.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/logging/format/named_write.hpp>
-#include <boost/logging/format/destination/defaults.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -35,31 +35,34 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+    typedef logging::writer::named_write<> logger_writer_type;
+
     namespace detail
     {
-        boost::logging::level::type get_log_level(std::string const& env, bool allow_always = false)
+        hpx::util::logging::level::type 
+        get_log_level(std::string const& env, bool allow_always = false)
         {
             try {
                 int env_val = boost::lexical_cast<int>(env);
                 if (env_val < 0)
-                    return boost::logging::level::disable_all;
+                    return hpx::util::logging::level::disable_all;
 
                 switch (env_val) {
                 case 0:
                     return allow_always ?
-                        boost::logging::level::always :
-                        boost::logging::level::disable_all;
-                case 1:   return boost::logging::level::fatal;
-                case 2:   return boost::logging::level::error;
-                case 3:   return boost::logging::level::warning;
-                case 4:   return boost::logging::level::info;
+                        hpx::util::logging::level::always :
+                        hpx::util::logging::level::disable_all;
+                case 1:   return hpx::util::logging::level::fatal;
+                case 2:   return hpx::util::logging::level::error;
+                case 3:   return hpx::util::logging::level::warning;
+                case 4:   return hpx::util::logging::level::info;
                 default:
                     break;
                 }
-                return boost::logging::level::debug;
+                return hpx::util::logging::level::debug;
             }
             catch (boost::bad_lexical_cast const&) {
-                return boost::logging::level::disable_all;
+                return hpx::util::logging::level::disable_all;
             }
         }
 
@@ -104,19 +107,19 @@ namespace hpx { namespace util
     std::string levelname(int level)
     {
         switch (level) {
-        case boost::logging::level::enable_all:
+        case hpx::util::logging::level::enable_all:
             return "     <all>";
-        case boost::logging::level::debug:
+        case hpx::util::logging::level::debug:
             return "   <debug>";
-        case boost::logging::level::info:
+        case hpx::util::logging::level::info:
             return "    <info>";
-        case boost::logging::level::warning:
+        case hpx::util::logging::level::warning:
             return " <warning>";
-        case boost::logging::level::error:
+        case hpx::util::logging::level::error:
             return "   <error>";
-        case boost::logging::level::fatal:
+        case hpx::util::logging::level::fatal:
             return "   <fatal>";
-        case boost::logging::level::always:
+        case hpx::util::logging::level::always:
             return "  <always>";
         }
         // FIXME: This one will screw up the formatting.
@@ -127,9 +130,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: shepherd
     struct shepherd_thread_id
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             shepherd_thread_id,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         shepherd_thread_id()
         {}
@@ -147,9 +150,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix
     struct locality_prefix
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             locality_prefix,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         locality_prefix()
         {}
@@ -177,9 +180,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread id
     struct thread_id
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             thread_id,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
@@ -205,9 +208,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread phase
     struct thread_phase
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             thread_phase,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
@@ -232,9 +235,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix of parent thread
     struct parent_thread_locality
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             parent_thread_locality,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
@@ -256,9 +259,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread id
     struct parent_thread_id
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             parent_thread_id,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
@@ -281,9 +284,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread phase
     struct parent_thread_phase
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             parent_thread_phase,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
@@ -305,9 +308,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX component id of current thread
     struct thread_component_id
-      : boost::logging::formatter::class_<
+      : hpx::util::logging::formatter::class_<
             thread_component_id,
-            boost::logging::formatter::implement_op_equal::no_context>
+            hpx::util::logging::formatter::implement_op_equal::no_context>
     {
         void operator()(param str) const
         {
@@ -328,7 +331,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
-    struct console : boost::logging::destination::is_generic
+    struct console : hpx::util::logging::destination::is_generic
     {
         console(std::size_t level, logging_destination dest)
           : level_(level), dest_(dest)
@@ -351,7 +354,7 @@ namespace hpx { namespace util
 
 #if defined(ANDROID) || defined(__ANDROID__)
     // default log destination for Android
-    struct android_log : boost::logging::destination::is_generic
+    struct android_log : hpx::util::logging::destination::is_generic
     {
         android_log(char const* tag_)
           : tag(tag_)
@@ -372,11 +375,27 @@ namespace hpx { namespace util
     };
 #endif
 
+    namespace detail
+    {
+        template <typename Writer>
+        void define_formatters(Writer& writer)
+        {
+            writer.replace_formatter("osthread", shepherd_thread_id());
+            writer.replace_formatter("locality", locality_prefix());
+            writer.replace_formatter("hpxthread", thread_id());
+            writer.replace_formatter("hpxphase", thread_phase());
+            writer.replace_formatter("hpxparent", parent_thread_id());
+            writer.replace_formatter("hpxparentphase", parent_thread_phase());
+            writer.replace_formatter("parentloc", parent_thread_locality());
+            writer.replace_formatter("hpxcomponent", thread_component_id());
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(agas_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(agas_logger, logger_type)
 
     // initialize logging for AGAS
     void init_agas_log(util::section const& ini, bool isconsole)
@@ -393,12 +412,14 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (boost::logging::level::disable_all != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
+           logger_writer_type& writer = agas_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
@@ -411,17 +432,10 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            agas_logger()->writer().add_destination("console",
-                console(lvl, destination_agas));
-            agas_logger()->writer().write(logformat, logdest);
-            agas_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            agas_logger()->writer().replace_formatter("locality", locality_prefix());
-            agas_logger()->writer().replace_formatter("hpxthread", thread_id());
-            agas_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            agas_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            agas_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            agas_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            agas_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_agas)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             agas_logger()->mark_as_initialized();
             agas_level()->set_enabled(lvl);
         }
@@ -429,9 +443,9 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library for timings
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(timing_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(timing_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(timing_logger, logger_type)
 
     // initialize logging for performance measurements
     void init_timing_log(util::section const& ini, bool isconsole)
@@ -448,16 +462,19 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (boost::logging::level::disable_all != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
+           logger_writer_type& writer = timing_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            timing_logger()->writer().add_destination("android_log", 
+
+            writer.add_destination("android_log", 
                 android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -466,30 +483,23 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            timing_logger()->writer().add_destination("console",
-                console(lvl, destination_timing));
-            timing_logger()->writer().write(logformat, logdest);
-            timing_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            timing_logger()->writer().replace_formatter("locality", locality_prefix());
-            timing_logger()->writer().replace_formatter("hpxthread", thread_id());
-            timing_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            timing_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            timing_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            timing_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            timing_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_timing)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             timing_logger()->mark_as_initialized();
             timing_level()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(hpx_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(hpx_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(hpx_logger, logger_type)
 
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_error_level, filter_type,
-        boost::logging::level::fatal)
-    BOOST_DEFINE_LOG(hpx_error_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(hpx_error_level, filter_type,
+        hpx::util::logging::level::fatal)
+    HPX_DEFINE_LOG(hpx_error_logger, logger_type)
 
     void init_hpx_logs(util::section const& ini, bool isconsole)
     {
@@ -505,16 +515,19 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
+
+        logger_writer_type& writer = hpx_logger()->writer();
+        logger_writer_type& error_writer = hpx_error_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "android_log" : "console";
-        hpx_logger()->writer().add_destination("android_log", android_log("hpx"));
-        hpx_error_logger()->writer().add_destination("android_log", 
-            android_log("hpx"));
+
+        writer.add_destination("android_log", android_log("hpx"));
+        error_writer.add_destination("android_log", android_log("hpx"));
 #else
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
@@ -522,74 +535,53 @@ namespace hpx { namespace util
         if (logformat.empty())
             logformat = "|\\n";
 
-        if (boost::logging::level::disable_all != lvl) {
-            hpx_logger()->writer().add_destination("console",
-                console(lvl, destination_hpx));
-            hpx_logger()->writer().write(logformat, logdest);
-            hpx_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            hpx_logger()->writer().replace_formatter("locality", locality_prefix());
-            hpx_logger()->writer().replace_formatter("hpxthread", thread_id());
-            hpx_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            hpx_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            hpx_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            hpx_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            hpx_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+        if (hpx::util::logging::level::disable_all != lvl) {
+            writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             hpx_logger()->mark_as_initialized();
             hpx_level()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            hpx_error_logger()->writer().add_destination("console",
-                console(lvl, destination_hpx));
+            error_writer.add_destination("console", console(lvl, destination_hpx)); //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
-                hpx_error_logger()->writer().write(logformat, logdest + " cerr");
+                error_writer.write(logformat, logdest + " cerr");
 #endif
-            hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
-            hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            hpx_error_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            hpx_error_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            hpx_error_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            detail::define_formatters(error_writer);
+
             hpx_error_logger()->mark_as_initialized();
             hpx_error_level()->set_enabled(lvl);
         }
         else {
             // errors are always logged to cerr
             if (!isconsole) {
-                hpx_error_logger()->writer().add_destination("console",
-                    console(lvl, destination_hpx));
-                hpx_error_logger()->writer().write(logformat, "console");
+                error_writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+                error_writer.write(logformat, "console");
             }
             else {
 #if defined(ANDROID) || defined(__ANDROID__)
-                hpx_error_logger()->writer().write(logformat, "android_log");
+                error_writer.write(logformat, "android_log");
 #else
-                hpx_error_logger()->writer().write(logformat, "cerr");
+                error_writer.write(logformat, "cerr");
 #endif
             }
-            hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
-            hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            hpx_error_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            hpx_error_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            hpx_error_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            hpx_error_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            detail::define_formatters(error_writer);
+
             hpx_error_logger()->mark_as_initialized();
-            hpx_error_level()->set_enabled(boost::logging::level::fatal);
+            hpx_error_level()->set_enabled(hpx::util::logging::level::fatal);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(app_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(app_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(app_logger, logger_type)
 
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_error_level, filter_type,
-        boost::logging::level::fatal)
-    BOOST_DEFINE_LOG(app_error_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(app_error_level, filter_type,
+        hpx::util::logging::level::fatal)
+    HPX_DEFINE_LOG(app_error_logger, logger_type)
 
     // initialize logging for application
     void init_app_logs(util::section const& ini, bool isconsole)
@@ -606,16 +598,17 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (boost::logging::level::disable_all != lvl) {
+        if (hpx::util::logging::level::disable_all != lvl) {
+            logger_writer_type& writer = app_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            app_logger()->writer().add_destination("android_log", 
-                android_log("hpx.application"));
+            writer.add_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -623,26 +616,19 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            app_logger()->writer().add_destination("console",
-                console(lvl, destination_app));
-            app_logger()->writer().write(logformat, logdest);
-            app_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
-            app_logger()->writer().replace_formatter("locality", locality_prefix());
-            app_logger()->writer().replace_formatter("hpxthread", thread_id());
-            app_logger()->writer().replace_formatter("hpxphase", thread_phase());
-            app_logger()->writer().replace_formatter("hpxparent", parent_thread_id());
-            app_logger()->writer().replace_formatter("hpxparentphase", parent_thread_phase());
-            app_logger()->writer().replace_formatter("parentloc", parent_thread_locality());
-            app_logger()->writer().replace_formatter("hpxcomponent", thread_component_id());
+            writer.add_destination("console", console(lvl, destination_app)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
             app_logger()->mark_as_initialized();
             app_level()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(agas_console_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(agas_console_logger, logger_type)
 
     // initialize logging for AGAS
     void init_agas_console_log(util::section const& ini)
@@ -659,17 +645,18 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (boost::logging::level::disable_all != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
+            logger_writer_type& writer = agas_console_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            agas_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx.agas"));
+            writer.add_destination("android_log", android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -677,16 +664,17 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            agas_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             agas_console_logger()->mark_as_initialized();
             agas_console_level()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_console_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(timing_console_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(timing_console_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(timing_console_logger, logger_type)
 
     // initialize logging for performance measurements
     void init_timing_console_log(util::section const& ini)
@@ -703,17 +691,18 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (boost::logging::level::disable_all != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
+            logger_writer_type& writer = timing_console_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            timing_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx.timing"));
+            writer.add_destination("android_log", android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -721,16 +710,17 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            timing_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             timing_console_logger()->mark_as_initialized();
             timing_console_level()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_console_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(hpx_console_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(hpx_console_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(hpx_console_logger, logger_type)
 
     // initialize logging for HPX runtime
     void init_hpx_console_log(util::section const& ini)
@@ -747,33 +737,36 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
+
+        if (logformat.empty())
+            logformat = "|";
+
+        if (hpx::util::logging::level::disable_all != lvl) {
+            logger_writer_type& writer = hpx_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            hpx_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx"));
+            writer.add_destination("android_log", android_log("hpx"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-        if (logformat.empty())
-            logformat = "|";
 
-        if (boost::logging::level::disable_all != lvl) {
-            hpx_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             hpx_console_logger()->mark_as_initialized();
             hpx_console_level()->set_enabled(lvl);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_console_level, filter_type,
-        boost::logging::level::disable_all)
-    BOOST_DEFINE_LOG(app_console_logger, logger_type)
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(app_console_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(app_console_logger, logger_type)
 
     // initialize logging for applications
     void init_app_console_log(util::section const& ini)
@@ -790,17 +783,18 @@ namespace hpx { namespace util
             logformat = detail::unescape(logini->get_entry("format", empty));
         }
 
-        unsigned lvl = boost::logging::level::disable_all;
+        unsigned lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (boost::logging::level::disable_all != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
+            logger_writer_type& writer = app_console_logger()->writer();
+
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            app_console_logger()->writer().add_destination("android_log", 
-                android_log("hpx.application"));
+            writer.add_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -808,7 +802,8 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            app_console_logger()->writer().write(logformat, logdest);
+            writer.write(logformat, logdest);
+
             app_console_logger()->mark_as_initialized();
             app_console_level()->set_enabled(lvl);
         }

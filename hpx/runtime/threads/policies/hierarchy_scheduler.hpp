@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -173,6 +173,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        {
+            return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
+        }
 
         std::size_t get_pu_num(std::size_t num_thread) const
         {

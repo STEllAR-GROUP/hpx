@@ -1,0 +1,213 @@
+[/=============================================================================
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:commandline __hpx__ Command Line Options]
+
+The predefined command line options for any application using `hpx::init` are
+described in the table below:
+
+[/ TODO: proofread the options]
+[table:commandline Default HPX Command Line Options
+    [[Option]                   [Description]]
+    [[[*__hpx__ options (allowed on command line only)]]]
+    [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible
+                                             values: 'full' (additionally prints options from components)]]
+    [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
+    [[`--hpx:options-file arg`]             [specify a file containing command line options
+                                             (alternatively: @filepath)]]
+
+    [[[*__hpx__ options (additionally allowed in an options file)]]]
+    [[`--hpx:worker`]           [run this instance in worker mode]]
+    [[`--hpx:console`]          [run this instance in console mode]]
+    [[`--hpx:connect`]          [run this instance in worker mode, but connecting
+                                 late]]
+    [[`--hpx:run-agas-server`]  [run AGAS server as part of this runtime instance]]
+    [[`--hpx:run-hpx-main`]     [run the hpx_main function, regardless of locality
+                                 mode]]
+    [[`--hpx:hpx arg`]          [the IP address the __hpx__ parcelport is listening
+                                 on, expected format: 'address:port' (default:
+                                 127.0.0.1:7910)]]
+    [[`--hpx:agas arg`]         [the IP address the AGAS root server is running on,
+                                 expected format: 'address:port' (default:
+                                 127.0.0.1:7910)]]
+    [[`--hpx:run-agas-server-only`][run only the AGAS server]]
+    [[`--hpx:nodefile arg`]     [the file name of a node file to use (list of nodes, one
+                                 node name per line and core)]]
+    [[`--hpx:nodes arg`]        [the (space separated) list of the nodes to use (usually
+                                 this is extracted from a node file)]]
+    [[`--hpx:ifsuffix arg`]     [suffix to append to host names in order to resolve them
+                                 to the proper network interconnect]]
+    [[`--hpx:ifprefix arg`]     [prefix to prepend to host names in order to resolve them
+                                 to the proper network interconnect]]
+    [[`--hpx:iftransform arg`]  [sed-style search and replace (s/search/replace/) used to
+                                 transform host names to the proper network interconnect]]
+    [[`--hpx:localities arg`]   [the number of localities to wait for at
+                                 application startup (default: 1)]]
+    [[`--hpx:node arg`]         [number of the node this locality is run on
+                                 (must be unique)]]
+    [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
+                                 run on (default: 0), valid for 
+                                 --hpx:queuing=local and priority_local only]]
+    [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
+                                 instance of __hpx__ (default: 1), valid for 
+                                 --hpx:queuing=local and priority_local only]]
+    [[`--hpx:threads arg`]      [the number of operating system threads to spawn
+                                 for this __hpx__ locality (default: 1, using 'all' will
+                                 spawn one thread for each processing unit)]]
+    [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
+                                 possible values: pu, core, numa, machine (default: pu), valid for 
+                                 --hpx:queuing=local and priority_local only]]
+    [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
+                                 'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
+                                 'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
+    [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
+                                 --hpx:queuing=hierarchy only (default: 2)]]
+    [[`--hpx:high-priority-threads arg`] [the number of operating system threads
+                                 maintaining a high priority queue (default:
+                                 number of OS threads), valid for
+                                 --hpx:queuing=priority_local only]]
+    [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
+                                 --hpx:queuing=local and priority_local only]]
+
+    [[[*__hpx__ configuration options]]]
+    [[`--hpx:app-config arg`]   [load the specified application configuration
+                                 (ini) file]]
+    [[`--hpx:config arg`]       [load the specified hpx configuration (ini) file]]
+    [[`--hpx:ini arg`]          [add a configuration definition to the default
+                                 runtime configuration]]
+    [[`--hpx:exit`]             [exit after configuring the runtime]]
+
+    [[[*__hpx__ debugging options]]]
+    [[`--hpx:list-symbolic-names`][list all registered symbolic names after startup]]
+    [[`--hpx:list-component-types`][list all dynamic component types after startup]]
+    [[`--hpx:dump-config-initial`][print the initial runtime configuration]]
+    [[`--hpx:dump-config`]      [print the final runtime configuration]]
+    [[`--hpx:debug-hpx-log`]    [enable all messages on the __hpx__ log channel and send all
+                                 __hpx__ logs to the target destination]]
+    [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
+                                 AGAS logs to the target destination]]
+    [[`--hpx:debug-clp`]        [debug command line processing]]
+
+    [[[*__hpx__ options related to performance counters]]]
+    [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
+                                 before shutting down the system (see option --hpx:print-counter-interval)]]
+    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --hpx:print-counter
+                                 repeatedly after the time interval (specified in milliseconds)
+                                 (default: 0, which means print once at shutdown)]]
+    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
+                                 to the given file (default: console)]]
+    [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible
+                                 values: 'minimal' (prints counter name skeletons),
+                                 'full' (prints all available counter names)]]
+    [[`--hpx:list-counter-infos`][list the description of all registered performance counters,
+                                   possible values: 'minimal' (prints info for counter name skeletons),
+                                  'full' (prints all available counter infos)]]
+]
+
+[heading Command Line Argument Shortcuts]
+
+Additionally, every __hpx__ application defines certain shortcuts allowing to
+significantly shorten the command line options. The follwoing table lists all
+predefined command line option shortcuts:
+
+[teletype]
+
+[table Predefined command line option shortcuts
+    [[Shortcut option]  [ Equivalent long option]]
+    [[`-a`]               [`--hpx:agas`]]
+    [[`-c`]               [`--hpx:console`]]
+    [[`-h`]               [`--hpx:help`]]
+    [[`--help`]           [`--hpx:help`]]
+    [[`-I`]               [`--hpx:ini`]]
+    [[`-l`]               [`--hpx:localities`]]
+    [[`-p`]               [`--hpx:app-config`]]
+    [[`-q`]               [`--hpx:queuing`]]
+    [[`-r`]               [`--hpx:run-agas-server`]]
+    [[`-t`]               [`--hpx:threads`]]
+    [[`-v`]               [`--hpx:version`]]
+    [[`--version`]        [`--hpx:version`]]
+    [[`-w`]               [`--hpx:worker`]]
+    [[`-x`]               [`--hpx:hpx`]]
+    [[`-0`]               [`--hpx:node=0`]]
+    [[`-1`]               [`--hpx:node=1`]]
+    [[`-2`]               [`--hpx:node=2`]]
+    [[`-3`]               [`--hpx:node=3`]]
+    [[`-4`]               [`--hpx:node=4`]]
+    [[`-5`]               [`--hpx:node=5`]]
+    [[`-6`]               [`--hpx:node=6`]]
+    [[`-7`]               [`--hpx:node=7`]]
+    [[`-8`]               [`--hpx:node=8`]]
+    [[`-9`]               [`--hpx:node=9`]]
+]
+
+[c++]
+
+It is possible to define your own shortcut options. In fact, all of the shortcuts
+listed above are pre-defined using the technique described here. This implies,
+that it is possible to redefine any of the pre-defined shortcuts to expand
+differently as well.
+
+Shortcut options are looked up in the internal configuration database. They are
+stored as key-value properties in a special properties section named
+`hpx.commandline`. You can define your own shortcuts by adding the corresponding
+definitions to one of the `ini` configuration files as described in the section
+__configuration__. For instance, in order to define a command line shortcut 
+`--pc` which should expand to `--hpx:print-counter`, the following configuration
+information needs to be stored in one of the `ini` configuration files:
+``
+    [hpx.commandline]
+    --pc = --hpx:print-counter
+``
+[teletype]
+[note Any arguments for shortcut options passed on the command line are retained 
+      and passed as arguments to the corresponding expanded option. For instance, 
+      given the definition above, the command line option
+
+          `--pc=/threads{locality#0/total}/count/cumulative`
+
+      would be expanded to
+
+          `--hpx:print-counter=/threads{locality#0/total}/count/cumulative`
+      ]
+
+[important Any shortcut option defined as described should either start with 
+      a single `'-'` or with two `'--'` characters. Shortcuts starting with a 
+      single `'-'` are interpreted as short options (i.e. everything after the
+      first character following the `'-'` is treated as the argument). Shortcuts
+      starting with `'--'` are interpreted as long options. Any other shortcut
+      formats are not supported.]
+[c++]
+
+[heading Specifying Options for Single Localities Only]
+
+For runs involving more than one locality it is sometimes desireable to supply
+specific command line options to single localities only. Especially when the
+__hpx__ application is launched using a scheduler (like PBS, for more details
+see section __pbs__), specifying dedicated command line options for single
+localities could prove to be tricky. For this reason all of the command line
+options which have the general format `--hpx:<some_key>` can be used in a more
+general form: `--hpx:<N>:<some_key>`, where <N> is the number of the locality
+this command line options will be applied to, all other localities will simply
+ignore the option. For instance, the following PBS script passes the option
+[hpx_cmdline `--hpx:pu-offset=4`] to the locality `'1'` only.
+
+[teletype]
+```
+    #!/bin/bash
+    #
+    #PBS -l nodes=2:ppn=4
+
+    APP_PATH=~/packages/hpx/bin/hello_world
+    APP_OPTIONS=
+
+    __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:1:pu-offset=4]`` ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+```
+[c++]
+
+[endsect] [/ Command Line Handling]
+

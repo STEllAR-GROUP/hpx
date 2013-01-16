@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace server { namespace detail
     }
 
     /// Get the current data for reading
-    components::memory_block_data memory_block::checkout()
+    components::memory_block_data memory_block::checkout() //-V524
     {
         return components::memory_block_data(wrapper_->component_);
     }

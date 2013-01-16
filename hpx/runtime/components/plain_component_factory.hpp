@@ -191,7 +191,7 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 // This macro is used to create and to register a minimal factory for plain
-// actions with Boost.Plugin.
+// actions with Hpx.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_(...)                                       \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)             \

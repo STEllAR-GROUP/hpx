@@ -20,7 +20,7 @@ using hpx::find_here;
 
 using hpx::naming::gid_type;
 using hpx::naming::get_agas_client;
-using hpx::naming::strip_credit_from_cgid;
+using hpx::naming::strip_credit_from_gid;
 using hpx::naming::address;
 
 using hpx::test::simple_mobile_object;
@@ -36,7 +36,7 @@ int hpx_main(
         simple_mobile_object a(hpx::find_here());
         simple_mobile_object b(hpx::find_here());
 
-        gid_type a_id = strip_credit_from_cgid(a.get_gid().get_gid());
+        gid_type a_id = strip_credit_from_gid(a.get_gid().get_gid());
         boost::uint64_t b_lva = b.get_lva();
 
         // Resolve a_id.

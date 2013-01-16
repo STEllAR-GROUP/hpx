@@ -462,9 +462,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
         if (stacksize > HPX_MEDIUM_STACK_SIZE) {
             if (stacksize > HPX_LARGE_STACK_SIZE)
-                return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS/4));
+                return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
 
-            return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS/4));
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
         }
         if (stacksize > HPX_SMALL_STACK_SIZE)
             return get_heap<HPX_COROUTINE_NUM_HEAPS/2, heap_tag_medium>(i % (HPX_COROUTINE_NUM_HEAPS/2));
@@ -476,7 +476,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static std::size_t get_heap_count(ptrdiff_t stacksize)
     {
         if (stacksize > HPX_MEDIUM_STACK_SIZE)
-            return HPX_COROUTINE_NUM_HEAPS/4;
+            return HPX_COROUTINE_NUM_HEAPS/4; //-V112
 
         if (stacksize > HPX_SMALL_STACK_SIZE)
             return HPX_COROUTINE_NUM_HEAPS/2;

@@ -19,7 +19,7 @@
 #endif
 
 #include <boost/cstdint.hpp>
-#include <boost/plugin/dll.hpp>
+#include <hpx/util/plugin/dll.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace hpx { namespace util
@@ -28,9 +28,9 @@ namespace hpx { namespace util
         std::string library
         )
     {
-#if !defined(__ANDROID__) && !defined(ANDROID)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
         try {
-            boost::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
+            hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 
             using boost::filesystem::path;
 
@@ -87,10 +87,9 @@ namespace hpx { namespace util
         r = exe_path;
 
 #elif defined(__APPLE__)
-        char exe_path[MAXPATHLEN + 1];
-        boost::uint32_t buf_length
+        char exe_path[PATH_MAX + 1];
+        boost::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
 
-        int length = _NSGetExecutablePath(exe_path, &len);
         if (0 != _NSGetExecutablePath(exe_path, &len))
         {
             HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
@@ -98,7 +97,7 @@ namespace hpx { namespace util
                 "unable to find executable filename");
         }
 
-        exe_path[length] = '\0';
+        exe_path[len] = '\0';
         r = exe_path;
 
 #else

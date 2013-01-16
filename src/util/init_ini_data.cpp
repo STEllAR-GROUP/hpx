@@ -20,7 +20,7 @@
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
-#include <boost/plugin.hpp>
+#include <hpx/util/plugin.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
 
@@ -221,10 +221,10 @@ namespace hpx { namespace util
 
                 try {
                     // get the handle of the library
-                    boost::plugin::dll d(curr.string(), name);
+                    hpx::util::plugin::dll d(curr.string(), name);
 
                     // get the factory
-                    boost::plugin::plugin_factory<components::component_registry_base>
+                    hpx::util::plugin::plugin_factory<components::component_registry_base>
                         pf(d, "registry");
 
                     // retrieve the names of all known registries

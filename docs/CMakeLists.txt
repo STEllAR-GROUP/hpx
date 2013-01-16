@@ -8,9 +8,10 @@ hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 file(GLOB base_files ${hpx_SOURCE_DIR}/docs/*.qbk)
 file(GLOB_RECURSE manual_files ${hpx_SOURCE_DIR}/docs/manual/*.qbk)
 file(GLOB_RECURSE tutorial_files ${hpx_SOURCE_DIR}/docs/tutorial/*.qbk)
+file(GLOB_RECURSE index_files ${hpx_SOURCE_DIR}/docs/*.idx)
 
 set(documentation_files
-    ${manual_files} ${tutorial_files} ${base_files})
+    ${manual_files} ${tutorial_files} ${base_files} ${index_files})
 
 set(documentation_dependencies
     ${documentation_files}
@@ -88,11 +89,17 @@ if(HPX_DOCUMENTATION_DEVELOPMENT)
   set(quickbook_fixme_mode "-D__hpx_enable_fixme__")
 endif()
 
+if(BOOSTAUTOINDEX_FOUND)
+  set(auto_index_mode "-D__use_auto_index__")
+  set(auto_index_xsl_param --stringparam index.on.type 1)
+endif()
+
 set(image
     images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
 
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
+  INDEX hpx.idx
   DEPENDENCIES ${documentation_dependencies}
   CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
   XSLTPROC_ARGS --stringparam chunk.section.depth 4
@@ -104,7 +111,9 @@ hpx_quickbook_to_html(hpx
                 --stringparam boost.image.w 458 
                 --stringparam boost.image.h 110
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
-  QUICKBOOK_ARGS ${quickbook_fixme_mode})
+                ${auto_index_xsl_param}
+  QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
+  AUTOINDEX_ARGS --internal-index)
 
 add_custom_target(docs
   DEPENDS hpx_HTML.manifest
@@ -113,6 +122,9 @@ add_custom_target(docs
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
 source_group("Documentation\\Tutorial" FILES ${tutorial_files})
+if(BOOSTAUTOINDEX_FOUND)
+  source_group("Documentation\\Index" FILES ${index_files})
+endif()
 
 set_source_files_properties(${documentation_files}
   PROPERTIES HEADER_FILE_ONLY TRUE)

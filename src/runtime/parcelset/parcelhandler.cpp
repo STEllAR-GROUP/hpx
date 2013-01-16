@@ -132,7 +132,7 @@ namespace hpx { namespace parcelset
     parcelport* parcelhandler::find_parcelport(connection_type type,
         error_code& ec) const
     {
-        if (!pports_[type]) {
+        if (!pports_[type]) { //-V108
             HPX_THROWS_IF(ec, bad_parameter, "parcelhandler::find_parcelport",
                 "cannot find parcelport for connection type " +
                     get_connection_type_name(type));
@@ -142,7 +142,7 @@ namespace hpx { namespace parcelset
         if (&ec != &throws)
             ec = make_success_code();
 
-        return pports_[type].get();
+        return pports_[type].get(); //-V108
     }
 
     void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> pp,
@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset
     {
 #if defined(HPX_USE_SHMEM_PARCELPORT)
         std::string enable_shmem =
-            get_config_entry("hpx.parcel.enable_shmem_parcelport", "0");
+            get_config_entry("hpx.parcel.use_shmem_parcelport", "0");
 
         if (boost::lexical_cast<int>(enable_shmem)) {
             // we use the provided information to decide what types of parcel-ports

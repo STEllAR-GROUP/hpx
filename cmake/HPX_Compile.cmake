@@ -59,8 +59,8 @@ macro(hpx_compile name)
 
   if(${name}_QUIET)
     hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
-        "${${name}_FLAGS} ${${name}_SOURCE}"
-        ${outflag} "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
+        " ${${name}_FLAGS} ${${name}_SOURCE} "
+        " ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
       COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
@@ -69,8 +69,8 @@ macro(hpx_compile name)
       message(${${name}_ERROR_OUTPUT})
   else()
     hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
-        "${${name}_FLAGS} ${${name}_SOURCE}"
-        ${outflag} "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
+        " ${${name}_FLAGS} ${${name}_SOURCE}"
+        " ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
       COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
@@ -82,16 +82,18 @@ macro(hpx_compile name)
       ERROR_STRIP_TRAILING_WHITESPACE
       )
       if(${name}_STDERR)
-          if("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Intel")
-              string(REGEX MATCH ".*command line warning #.*" ${name}_HAS_COMMAND_LINE_WARNING ${${name}_STDERR})
-            if(${name}_HAS_COMMAND_LINE_WARNING)
-              set(${name}_RESULT "1")
-            endif()
+        if("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Intel")
+          string(REGEX MATCH ".*command line warning #.*" ${name}_HAS_COMMAND_LINE_WARNING ${${name}_STDERR})
+          if(${name}_HAS_COMMAND_LINE_WARNING)
+            set(${name}_RESULT "1")
           endif()
-          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stderr ${${name}_STDERR})
+        elseif("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Clang")
+          string(REGEX MATCH ".*(argument unused during compilation|unknown warning option).*" ${name}_HAS_UNUSED_ARGUMENT_WARNING ${${name}_STDERR})
+        endif()
+        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stderr ${${name}_STDERR})
       endif()
       if(${name}_STDOUT)
-          file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stdout ${${name}_STDOUT})
+        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stdout ${${name}_STDOUT})
       endif()
   endif()
 endmacro()

@@ -23,8 +23,6 @@ namespace hpx
         stopping = BOOST_BINARY_U(100)
     };
 
-    typedef boost::atomic<state> atomic_state;
-
     namespace threads
     {
         // return whether thread manager is in the state described by 'mask'

@@ -204,9 +204,6 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_full", ec);
-                if (ec) return;
-
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
@@ -218,7 +215,8 @@ namespace hpx { namespace lcos { namespace detail
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_full");
+                        "full_empty_entry::enqueue_full_full", ec);
+                    if (ec) return;
                 }
 
                 ++full_empty_counter_data_.read_dequeued_;
@@ -244,9 +242,6 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_full", ec);
-                if (ec) return;
-
                 queue_entry f(id);
                 read_queue_.push_back(f);
 
@@ -258,7 +253,8 @@ namespace hpx { namespace lcos { namespace detail
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_full");
+                        "full_empty_entry::enqueue_full_full", ec);
+                    if (ec) return;
                 }
 
                 ++full_empty_counter_data_.read_dequeued_;
@@ -283,9 +279,6 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_empty", ec);
-                if (ec) return;
-
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
@@ -295,7 +288,8 @@ namespace hpx { namespace lcos { namespace detail
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_empty");
+                        "full_empty_entry::enqueue_full_empty", ec);
+                    if (ec) return;
                 }
 
                 // move the data to the destination
@@ -325,9 +319,6 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_full_empty", ec);
-                if (ec) return;
-
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
 
@@ -337,7 +328,8 @@ namespace hpx { namespace lcos { namespace detail
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_empty");
+                        "full_empty_entry::enqueue_full_empty", ec);
+                    if (ec) return;
                 }
             }
             else {
@@ -364,9 +356,6 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_if_full", ec);
-                if (ec) return;
-
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
@@ -376,7 +365,8 @@ namespace hpx { namespace lcos { namespace detail
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_if_full");
+                        "full_empty_entry::enqueue_if_full", ec);
+                    if (ec) return;
                 }
             }
 
@@ -404,9 +394,6 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 // enqueue the request and block this thread
-                threads::set_thread_lco_description(id, "enqueue_if_full", ec);
-                if (ec) return;
-
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
@@ -416,7 +403,8 @@ namespace hpx { namespace lcos { namespace detail
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_if_full");
+                        "full_empty_entry::enqueue_if_full", ec);
+                    if (ec) return;
                 }
             }
 
@@ -468,9 +456,6 @@ namespace hpx { namespace lcos { namespace detail
                 write_queue_.front().id_ = 0;
                 write_queue_.pop_front();
 
-                threads::set_thread_lco_description(id, 0, ec);
-                if (ec) return false;
-
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_timeout, threads::thread_priority_normal, ec);
 
@@ -492,9 +477,6 @@ namespace hpx { namespace lcos { namespace detail
                 read_queue_.front().id_ = 0;
                 read_queue_.pop_front();
 
-                threads::set_thread_lco_description(id, 0, ec);
-                if (ec) return false;
-
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_timeout, threads::thread_priority_normal, ec);
                 if (ec) return false;
@@ -508,9 +490,6 @@ namespace hpx { namespace lcos { namespace detail
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
                 read_and_empty_queue_.front().id_ = 0;
                 read_and_empty_queue_.pop_front();
-
-                threads::set_thread_lco_description(id, 0, ec);
-                if (ec) return false;
 
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_timeout, threads::thread_priority_normal, ec);

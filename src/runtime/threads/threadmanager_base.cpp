@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -19,8 +19,14 @@ namespace hpx { namespace threads
     void threadmanager_base::init_tss(std::size_t thread_num, bool numa_sensitive)
     {
         BOOST_ASSERT(NULL == threadmanager_base::thread_num_.get());    // shouldn't be initialized yet
-        threadmanager_base::thread_num_.reset(
-            new std::size_t(thread_num | (std::size_t(0x1) << 31)));
+        threadmanager_base::thread_num_.reset(new std::size_t);
+        if (numa_sensitive) {
+            *threadmanager_base::thread_num_.get() = 
+                thread_num | (std::size_t(0x1) << 31);
+        }
+        else {
+            *threadmanager_base::thread_num_.get() = thread_num;
+        }
     }
 
     void threadmanager_base::deinit_tss()
@@ -52,8 +58,8 @@ namespace hpx { namespace threads
     std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
-        std::size_t thread_num
-            = threadmanager_base::get_worker_thread_num(&numa_sensitive);
+        std::size_t thread_num = 
+            threadmanager_base::get_worker_thread_num(&numa_sensitive);
         return get_topology().get_numa_node_number(
             get_thread_manager().get_pu_num(thread_num));
     }

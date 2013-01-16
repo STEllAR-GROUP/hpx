@@ -14,8 +14,8 @@
     [copyright 2011 2012 2013 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
-        accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
-        [@http://www.boost.org/LICENSE_1_0.txt])
+        accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] 
+        or copy at [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
 
@@ -52,6 +52,8 @@
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
+[def __boost_quickbook__        [@http://www.boost.org/doc/libs/release/doc/html/quickbook.html QuickBook]]
+[def __boost_auto_index__       [@http://www.boost.org/doc/libs/release/tools/auto_index/doc/html/index.html AutoIndex]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 [def __boost_downloads__        [@http://www.boost.org/users/download/ Boost Downloads]]
@@ -61,6 +63,8 @@
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
+
+[def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
@@ -75,9 +79,9 @@
 [def __visual_cxx__             [@http://msdn.microsoft.com/en-us/visualc/default.aspx Visual C++]]
 [def __jemalloc__               [@http://www.canonware.com/jemalloc jemalloc]]
 [def __libunwind__              [@http://www.nongnu.org/libunwind libunwind]]
-[def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5) Libraries]]
+[def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5)]]
 [def __lorene__                 [@http://www.lorene.obspm.fr LORENE]]
-[def __papi__                   [@http://icl.cs.utk.edu/papi/ Performance Application Programming Interface]]
+[def __papi__                   [@http://icl.cs.utk.edu/papi/ Performance Application Programming Interface (PAPI)]]
 [def __lapack__                 [@http://math-atlas.sourceforge.net/ Linear Algebra PACKage (LAPACK)]]
 [def __blas__                   [@http://math-atlas.sourceforge.net/ Basic Linear Algebra Subroutines 3 (BLAS)]]
 [def __gsl__                    [@http://www.gnu.org/software/gsl/ GNU Scientific Library (GSL)]]
@@ -110,16 +114,16 @@
 [def __caution__                [$./images/caution.png]]
 [def __danger__                 [$./images/alert.png]]
 
-[/ C++ references]
-
+[/ template definitions]
 [template cxx_crtp              [@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern [str]]]
+[template issue[num]            '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''#[num]'''</ulink>''']
 
 [/ Section link shortcuts]
 [def __boost_installation__     [link hpx.tutorial.getting_started.boost_installation Installing Boost Libraries]]
 [def __unix_installation__      [link hpx.tutorial.getting_started.unix_installation How to Install __hpx__ on Unix Variants]]
+[def __macos_installation__     [link hpx.tutorial.getting_started.macos_installation How to Install __hpx__ on Mac OS]]
 [def __windows_installation__   [link hpx.tutorial.getting_started.windows_installation How to Install __hpx__ on Windows]]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
-[def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
@@ -147,12 +151,21 @@
 [def __action_invocation__      [link hpx.manual.applying_actions.action_invocation Action Invocation]]
 [def __action_error_handling__  [link hpx.manual.applying_actions.action_error_handling Action Error Handling ]]
 
+[def __scheduling__             [link hpx.manual.schedulers __hpx__ Thread Scheduling Policies]]
+
+[def __cmake_hpx__              [link hpx.manual.cmake Building __hpx__ with CMake]]
+[def __cmake_quick_start__      [link hpx.manual.cmake.quick_start Quick Start]]
+[def __cmake_basic_usage__      [link hpx.manual.cmake.basic_usage Basic CMake Usage]]
+[def __cmake_options__          [link hpx.manual.cmake.options Options and Variables]]
+[def __cmake_doc_tools__        [link hpx.manual.cmake.doc_tools Setting up the HPX Documentation Tool Chain]]
+[def __pkg_config__             [link hpx.manual.cmake.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
+
 [/ Do not add any whitespace between [str]and the template body, it ends upin the
    generated docs, which may cause unwanted effects.]
 [template hpx_cmdline[str][link hpx.manual.init.commandline [str]]]
 
-[/ [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>'''] ] 
-[template hpx_link[url txt]     '''<ulink url="./'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>'''] 
+[/ [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>'''] ]
+[template hpx_link[url txt]     '''<ulink url="./'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 
 [/  fig[ref title label]
     Image element with a title.
@@ -175,6 +188,33 @@
     </figure>
 ''']
 
+[/ Indexing support]
+
+[template index[title]'''
+    <index>
+       <title id="hpx.index">'''[title]'''</title>
+    </index>
+''']
+
+[template indexterm1 [primary]'''
+    <indexterm>
+        <primary>'''[primary]'''</primary>
+    </indexterm>
+''']
+[template indexterm2 [primary secondary]'''
+    <indexterm type="hpx_index">
+        <primary>'''[primary]'''</primary>
+        <secondary>'''[secondary]'''</secondary>
+    </indexterm>
+''']
+[template indexterm3 [primary secondary tertiary]'''
+    <indexterm type="hpx_index">
+        <primary>'''[primary]'''</primary>
+        <secondary>'''[secondary]'''</secondary>
+        <tertiary>'''[tertiary]'''</tertiary>
+    </indexterm>
+''']
+
 [/ CONTENT]
 
 The __stellar__ Group ([*S]ystems [*T]echnologies, [*E]mergent Para[*ll]elism,
@@ -183,8 +223,8 @@ a list of people working in this group and participating in writing this
 documentation see __people__.
 
 This documentation is automatically generated for __hpx__ __version__ (from Git
-commit: __hpx_git_commit__) by the Boost QuickBook documentation tool.
-QuickBook can be found in the collection of __boost_tools__.
+commit: __hpx_git_commit__) by the Boost __boost_quickbook__ documentation tool.
+__boost_quickbook__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
@@ -202,7 +242,16 @@ QuickBook can be found in the collection of __boost_tools__.
 [section:manual Manual]
 
 [include manual/cmake.qbk]
-[include manual/init.qbk]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:init Launching __hpx__]
+
+[include manual/configuration.qbk]
+[include manual/logging.qbk]
+[include manual/commandline.qbk]
+
+[endsect] [/ Launching HPX]
+
 [include manual/applications.qbk]
 [include manual/names.qbk]
 [include manual/applying_actions.qbk]
@@ -211,8 +260,13 @@ QuickBook can be found in the collection of __boost_tools__.
 [include manual/lcos.qbk]
 [include manual/exceptions.qbk]
 [include manual/performance_counters.qbk]
+[include manual/scheduling_policies.qbk]
 
 [endsect] [/ Manual]
+
+[? __use_auto_index__
+    [index Index]
+]
 
 [? __hpx_doxygen__ [xinclude __hpx_docs_dir__/hpx_autodoc.xml]]
 

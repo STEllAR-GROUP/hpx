@@ -107,10 +107,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support(util::section& ini,
+    runtime_support::runtime_support(
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             applier::applier& applier)
-      : stopped_(false), terminated_(false), ini_(ini)
+      : stopped_(false), terminated_(false)
     {
     }
 
@@ -772,17 +772,18 @@ namespace hpx { namespace components { namespace server
             namespace fs = boost::filesystem;
 
             // the section name is the instance name of the component
-            std::string instance (i->second.get_name());
+            util::section const& sect = i->second;
+            std::string instance (sect.get_name());
             std::string component;
 
             if (i->second.has_entry("name"))
-                component = i->second.get_entry("name");
+                component = sect.get_entry("name");
             else
                 component = instance;
 
             bool isenabled = true;
-            if (i->second.has_entry("enabled")) {
-                std::string tmp = i->second.get_entry("enabled");
+            if (sect.has_entry("enabled")) {
+                std::string tmp = sect.get_entry("enabled");
                 boost::algorithm::to_lower (tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0") {
                     LRT_(info) << "component factory disabled: " << instance;
@@ -792,8 +793,8 @@ namespace hpx { namespace components { namespace server
 
             // test whether this component section was generated
             bool isdefault = false;
-            if (i->second.has_entry("isdefault")) {
-                std::string tmp = i->second.get_entry("isdefault");
+            if (sect.has_entry("isdefault")) {
+                std::string tmp = sect.get_entry("isdefault");
                 boost::algorithm::to_lower (tmp);
                 if (tmp == "true")
                     isdefault = true;
@@ -801,8 +802,8 @@ namespace hpx { namespace components { namespace server
 
             fs::path lib;
             try {
-                if (i->second.has_entry("path"))
-                    lib = hpx::util::create_path(i->second.get_entry("path"));
+                if (sect.has_entry("path"))
+                    lib = hpx::util::create_path(sect.get_entry("path"));
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
@@ -882,11 +883,11 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_startup_shutdown_functions(boost::plugin::dll& d)
+    bool runtime_support::load_startup_shutdown_functions(hpx::util::plugin::dll& d)
     {
         try {
             // get the factory, may fail
-            boost::plugin::plugin_factory<component_startup_shutdown_base> pf (d,
+            hpx::util::plugin::plugin_factory<component_startup_shutdown_base> pf (d,
                 "startup_shutdown");
 
             // create the startup_shutdown object
@@ -930,12 +931,12 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_commandline_options(boost::plugin::dll& d,
+    bool runtime_support::load_commandline_options(hpx::util::plugin::dll& d,
         boost::program_options::options_description& options)
     {
         try {
             // get the factory, may fail
-            boost::plugin::plugin_factory<component_commandline_base> pf (d,
+            hpx::util::plugin::plugin_factory<component_commandline_base> pf (d,
                 "commandline_options");
 
             // create the startup_shutdown object
@@ -977,7 +978,7 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
-            boost::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
 
             // initialize the factory instance using the preferences from the
             // ini files
@@ -992,7 +993,7 @@ namespace hpx { namespace components { namespace server
 
             if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0")) {
                 // get the factory
-                boost::plugin::plugin_factory<component_factory_base> pf (d,
+                hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
                     "factory");
 
                 // create the component factory object, if not disabled

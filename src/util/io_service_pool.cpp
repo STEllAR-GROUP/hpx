@@ -200,7 +200,7 @@ namespace hpx { namespace util
                 next_io_service_ = 0;
         }
 
-        return *io_services_[index];
+        return *io_services_[index]; //-V108
     }
 
 ///////////////////////////////////////////////////////////////////////////////

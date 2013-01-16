@@ -1,0 +1,37 @@
+[/=============================================================================
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:configuration Configure __hpx__ Applications]
+
+All __hpx__ applications can be configured using special command line options
+and/or using special configuration files. This section describes the available
+options, the configuration file format, and the algorithm used to locate
+possible predefined configuration files. Additionally this section describes
+the defaults assumed if no external configuration information is supplied.
+
+During startup any __hpx__ application applies a predefined search pattern to
+locate one or more configuration files. All found files will be read and merged
+in the sequence they are found into one single internal database holding
+all configuration properties. This database is used during the execution of the
+application to configure different aspects of the runtime system.
+
+In addition to the ini files, any application can supply its own configuration
+files, which will be merged with the configuration database as well. Moreover,
+the user can specify additional configuration parameters on the command
+line when executing an application. The __hpx__ runtime system will merge all
+command line configuration options (see the description of the
+[hpx_cmdline `--hpx::ini`], [hpx_cmdline `--hpx:config`], and
+[hpx_cmdline `--hpx::app-config`] command line options).
+
+[include ini_format.qbk]
+[include config_defaults.qbk]
+[include loading_ini_files.qbk]
+[include loading_components.qbk]
+
+[endsect] [/ Configure __hpx__ Applications]
+

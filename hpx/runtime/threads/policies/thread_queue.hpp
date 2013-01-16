@@ -168,7 +168,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
                         "threadmanager::add_new",
                         "Couldn't add new thread to the thread map");
-                    return false;
+                    return 0;
                 }
 
                 // only insert the thread into the work-items queue if it is in
@@ -208,7 +208,7 @@ namespace hpx { namespace threads { namespace policies
             // FIXME: why do we have this test? can max_count_ ever be zero?
             if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
-                if (max_count_ >= count + min_add_new_count) {
+                if (max_count_ >= count + min_add_new_count) { //-V104
                     BOOST_ASSERT(max_count_ - count <
                         static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
@@ -239,7 +239,7 @@ namespace hpx { namespace threads { namespace policies
             // map holds more than max_count
             if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
-                if (max_count_ >= count + min_add_new_count) {
+                if (max_count_ >= count + min_add_new_count) { //-V104
                     BOOST_ASSERT(max_count_ - count <
                         static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
@@ -250,7 +250,7 @@ namespace hpx { namespace threads { namespace policies
                 }
                 else if (empty(work_items_, num_thread)) {
                     add_count = min_add_new_count;    // add this number of threads
-                    max_count_ += min_add_new_count;  // increase max_count
+                    max_count_ += min_add_new_count;  // increase max_count //-V101
                 }
                 else {
                     return false;
@@ -336,7 +336,7 @@ namespace hpx { namespace threads { namespace policies
 
         void set_max_count(std::size_t max_count = max_thread_count)
         {
-            max_count_ = (0 == max_count) ? max_thread_count : max_count;
+            max_count_ = (0 == max_count) ? max_thread_count : max_count; //-V105
         }
 
         ///////////////////////////////////////////////////////////////////////

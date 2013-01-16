@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -575,7 +575,7 @@ namespace hpx { namespace actions
     >::type
     get(transfer_action<Action> & args)
     {
-        return args.get<N>();
+        return args.template get<N>();
     }
 
     #include <hpx/runtime/actions/construct_continuation_function_objects.hpp>

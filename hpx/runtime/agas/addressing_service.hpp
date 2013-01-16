@@ -79,8 +79,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             naming::gid_type const& id_
           , boost::uint64_t count_ = 1
             )
-          : key_(naming::strip_credit_from_cgid(id_)
-               , naming::strip_credit_from_cgid(id_) + (count_ - 1))
+          : key_(naming::strip_credit_from_gid(id_)
+               , naming::strip_credit_from_gid(id_) + (count_ - 1))
         {
             BOOST_ASSERT(count_);
         }
@@ -234,7 +234,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
 
-    atomic_state state_;
+    boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
 
     naming::address primary_ns_addr_;

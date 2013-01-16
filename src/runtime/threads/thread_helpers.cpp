@@ -117,7 +117,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_phase(id);
     }
 
-    void interrupt_thread(thread_id_type id, error_code& ec)
+    void interrupt_thread(thread_id_type id, bool flag, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -127,7 +127,7 @@ namespace hpx { namespace threads
                 "global applier object is not accessible");
             return;
         }
-        app->get_thread_manager().interrupt(id, ec);
+        app->get_thread_manager().interrupt(id, flag, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -383,7 +383,7 @@ namespace hpx { namespace this_thread
         {
             reset_backtrace(threads::thread_id_type id, error_code& ec)
               : id_(id),
-                backtrace_(new boost::backtrace(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)),
+                backtrace_(new hpx::util::backtrace(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)),
                 ec_(ec)
             {
                 threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
@@ -394,7 +394,7 @@ namespace hpx { namespace this_thread
             }
 
             threads::thread_id_type id_;
-            boost::scoped_ptr<boost::backtrace> backtrace_;
+            boost::scoped_ptr<hpx::util::backtrace> backtrace_;
             error_code& ec_;
         };
 #endif

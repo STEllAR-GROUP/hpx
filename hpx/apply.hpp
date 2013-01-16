@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/async.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
@@ -38,8 +38,7 @@ namespace hpx
     template <typename F>
     bool apply(BOOST_FWD_REF(F) f)
     {
-        thread t(boost::forward<F>(f));
-        t.detach();     // detach the thread
+        threads::register_thread(boost::forward<F>(f), "hpx::apply");
         return false;   // executed locally
     }
 
@@ -61,9 +60,8 @@ namespace hpx
     >::type                                                                   \
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \
     {                                                                         \
-        thread t(boost::forward<F>(f),                                        \
-            HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
-        t.detach();                                                           \
+        threads::register_thread(util::bind(boost::forward<F>(f),             \
+            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
     /**/
@@ -117,8 +115,7 @@ namespace hpx
             >
         ))) bound)
     {
-        thread t(boost::move(bound));
-        t.detach();     // detach the thread
+        threads::register_thread(boost::move(bound), "hpx::apply");
         return false;   // executed locally
     }
 
@@ -140,9 +137,8 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        thread t(boost::move(bound)                                           \
-          , HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
-        t.detach();                                                           \
+        threads::register_thread(util::bind(boost::move(bound),               \
+            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
     /**/
@@ -175,8 +171,7 @@ namespace hpx
             >
         ))) bound)
     {
-        thread t(boost::move(bound));
-        t.detach();     // detach the thread
+        threads::register_thread(boost::move(bound));
         return false;   // executed locally
     }
 
@@ -202,9 +197,8 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        thread t(boost::move(bound)                                           \
-          , HPX_ENUM_FORWARD_ARGS(N, A, a));                                  \
-        t.detach();                                                           \
+        threads::register_thread(util::bind(boost::move(bound),               \
+            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
     /**/
@@ -231,8 +225,7 @@ namespace hpx
             >
         ))) bound)
     {
-        thread t(boost::move(bound));
-        t.detach();     // detach the thread
+        threads::register_thread(boost::move(bound));
         return false;   // executed locally
     }
 
@@ -252,8 +245,8 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        thread t(boost::move(bound), HPX_ENUM_FORWARD_ARGS(N, A, a));         \
-        t.detach();                                                           \
+        threads::register_thread(util::bind(boost::move(bound),               \
+            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
     /**/

@@ -84,7 +84,8 @@ namespace hpx { namespace lcos { namespace local
         public:
             /// \brief Construct a new event semaphore
             event()
-              : event_(false) {}
+              : event_(false) 
+            {}
 
             ~event()
             {
@@ -128,8 +129,6 @@ namespace hpx { namespace lcos { namespace local
             /// \brief Check if the event has occurred.
             bool occurred()
             {
-                // REVIEW: Is this memory order correct? See the example in
-                // quickstart.
                 return event_.load(boost::memory_order_acquire);
             }
 
@@ -150,6 +149,12 @@ namespace hpx { namespace lcos { namespace local
 
                 typename mutex_type::scoped_lock l(mtx_);
                 set_locked(l);
+            }
+
+            /// \brief Reset the event
+            void reset()
+            {
+                event_.store(false, boost::memory_order_release);
             }
 
         private:
@@ -178,23 +183,6 @@ namespace hpx { namespace lcos { namespace local
             {
                 BOOST_ASSERT(l.owns_lock());
 
-#if BOOST_VERSION < 103600
-                // slist::swap has a bug in Boost 1.35.0
-                while (!queue_.empty())
-                {
-                    threads::thread_id_type id = queue_.front().id_;
-                    if (HPX_UNLIKELY(!id))
-                    {
-                        HPX_THROW_EXCEPTION(null_thread_id,
-                            "lcos::event::set_locked",
-                            "NULL thread id encountered");
-                    }
-                    queue_.front().id_ = 0;
-                    queue_.pop_front();
-                    threads::set_thread_lco_description(id);
-                    threads::set_thread_state(id, threads::pending);
-                }
-#else
                 // swap the list
                 queue_type queue;
                 queue.swap(queue_);
@@ -215,10 +203,9 @@ namespace hpx { namespace lcos { namespace local
                     threads::set_thread_lco_description(id);
                     threads::set_thread_state(id, threads::pending);
                 }
-#endif
             }
 
-            mutex_type mtx_; ///< This mutex protects the queue.
+            mutex_type mtx_;      ///< This mutex protects the queue.
             queue_type queue_;
 
             boost::atomic<bool> event_;

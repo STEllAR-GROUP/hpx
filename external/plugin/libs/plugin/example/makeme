@@ -1,9 +1,0 @@
-#!/bin/sh -x 
-
-g++ -DBOOST_DYNA_LOAD -g -Wall -I/home/merzky/Links/saga/saga-a/external/boost/ -c -o application.o application.cpp
-g++ -DBOOST_DYNA_LOAD -ldl -o application application.o
-g++ -DBOOST_DYNA_LOAD -g -Wall -I/home/merzky/Links/saga/saga-a/external/boost/ -c -o library.o library.cpp
-g++ -DBOOST_DYNA_LOAD -shared -o library.so library.o
-
-./application
-

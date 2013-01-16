@@ -54,7 +54,7 @@ namespace hpx { namespace naming
 
         static boost::uint64_t const credit_base_mask = 0x7ffful;
         static boost::uint64_t const credit_mask = credit_base_mask << 16;
-        static boost::uint64_t const was_split_mask = 0x80000000ul;
+        static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
 
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
@@ -97,7 +97,7 @@ namespace hpx { namespace naming
         gid_type operator--(int)     // post-decrement
         {
             gid_type t(*this);
-            ++(*this);
+            --(*this);
             return t;
         }
 
@@ -258,14 +258,14 @@ namespace hpx { namespace naming
 
     inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
     {
-        return gid_type(boost::uint64_t(locality_id+1) << 32, 0);
+        return gid_type(boost::uint64_t(locality_id+1) << 32, 0); //-V112
     }
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32)-1;
+        return boost::uint32_t(id.get_msb() >> 32)-1; //-V112
     }
 
     inline gid_type get_locality_from_gid(gid_type const& id)
@@ -302,23 +302,15 @@ namespace hpx { namespace naming
         return msb & ~(gid_type::credit_mask | gid_type::was_split_mask);
     }
 
-    inline void strip_credit_from_gid(gid_type& id)
+    inline gid_type& strip_credit_from_gid(gid_type& id)
     {
         id.set_msb(strip_credit_from_gid(id.get_msb()));
+        return id;
     }
 
     inline gid_type strip_credit_from_gid(gid_type const& id) HPX_PURE;
 
     inline gid_type strip_credit_from_gid(gid_type const& id)
-    {
-        boost::uint64_t const msb = strip_credit_from_gid(id.get_msb());
-        boost::uint64_t const lsb = id.get_lsb();
-        return gid_type(msb, lsb);
-    }
-
-    inline gid_type strip_credit_from_cgid(gid_type const& id) HPX_PURE;
-
-    inline gid_type strip_credit_from_cgid(gid_type const& id)
     {
         boost::uint64_t const msb = strip_credit_from_gid(id.get_msb());
         boost::uint64_t const lsb = id.get_lsb();
@@ -621,14 +613,14 @@ namespace hpx { namespace naming
 
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged);
+        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged); //-V112
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32)-1;
+        return boost::uint32_t(id.get_msb() >> 32)-1; //-V112
     }
 
     inline id_type get_locality_from_id(id_type const& id)

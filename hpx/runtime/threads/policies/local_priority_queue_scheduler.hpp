@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
@@ -28,46 +29,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Structure holding the information related to thread affinity selection
-    // for the shepherd threads of this instance
-    struct affinity_data
-    {
-        affinity_data() : pu_offset_(0), pu_step_(1) {}
-        affinity_data(std::size_t pu_offset, std::size_t pu_step)
-          : pu_offset_(pu_offset), pu_step_(pu_step) {}
-
-        std::size_t get_pu_num(std::size_t num_thread) const
-        {
-            // The offset shouldn't be larger than the number of available
-            // processing units.
-            BOOST_ASSERT(pu_offset_ < hardware_concurrency());
-
-            // The distance between assigned processing units shouldn't be zero
-            BOOST_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency());
-
-            // We 'scale' the thread number to compute the corresponding
-            // processing unit number.
-            //
-            // The base line processing unit number is computed from the given
-            // pu-offset and pu-step.
-            std::size_t num_pu = pu_offset_ + pu_step_ * num_thread;
-
-            // We add an additional offset, which allows to 'roll over' if the
-            // pu number would get larger than the number of available
-            // processing units. Note that it does not make sense to 'roll over'
-            // farther than the given pu-step.
-            std::size_t offset = (num_pu / hardware_concurrency()) % pu_step_;
-
-            // The resulting pu number has to be smaller than the available
-            // number of processing units.
-            return (num_pu + offset) % hardware_concurrency();
-        }
-
-        std::size_t pu_offset_; ///< offset of the first processing unit to use
-        std::size_t pu_step_;   ///< step between used processing units
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
@@ -100,7 +61,8 @@ namespace hpx { namespace threads { namespace policies
                 max_queue_thread_count_(max_thread_count),
                 pu_offset_(0),
                 pu_step_(1),
-                numa_sensitive_(false)
+                numa_sensitive_(false),
+                affinity_("pu")
             {}
 
             init_parameter(std::size_t num_queues,
@@ -108,12 +70,14 @@ namespace hpx { namespace threads { namespace policies
                     std::size_t max_queue_thread_count = max_thread_count,
                     bool numa_sensitive = false,
                     std::size_t pu_offset = 0,
-                    std::size_t pu_step = 1)
+                    std::size_t pu_step = 1,
+                    std::string const& affinity = "pu")
               : num_queues_(num_queues),
                 num_high_priority_queues_(num_high_priority_queues),
                 max_queue_thread_count_(max_queue_thread_count),
                 pu_offset_(pu_offset), pu_step_(pu_step),
-                numa_sensitive_(numa_sensitive)
+                numa_sensitive_(numa_sensitive),
+                affinity_(affinity)
             {}
 
             std::size_t num_queues_;
@@ -122,6 +86,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t pu_offset_;
             std::size_t pu_step_;
             bool numa_sensitive_;
+            std::string affinity_;
         };
         typedef init_parameter init_parameter_type;
 
@@ -130,7 +95,7 @@ namespace hpx { namespace threads { namespace policies
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
-            affinity_data_(init.pu_offset_, init.pu_step_),
+            affinity_data_(init.pu_offset_, init.pu_step_, init.affinity_),
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology())
         {
@@ -155,6 +120,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        {
+            return affinity_data_.get_pu_mask(topology, num_thread, numa_sensitive_);
+        }
 
         std::size_t get_pu_num(std::size_t num_thread) const
         {
@@ -433,10 +403,10 @@ namespace hpx { namespace threads { namespace policies
             // steal work items: first try to steal from other cores in
             // the same NUMA node
             std::size_t num_pu = get_pu_num(num_thread);
-            boost::uint64_t core_mask
-                = topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
-            boost::uint64_t node_mask
-                = topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
+            mask_type core_mask = 
+                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
+            mask_type node_mask = 
+                topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
 
             if (core_mask && node_mask) {
                 boost::uint64_t m = 0x01LL;
@@ -476,7 +446,7 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] "
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";
                     }
@@ -523,7 +493,7 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue<false>*> high_priority_queues_;
         thread_queue<false> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
-        affinity_data affinity_data_;
+        detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
     };

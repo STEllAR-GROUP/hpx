@@ -72,7 +72,7 @@ public:
     virtual const char *what() const throw()
     {
         const char *msg = "programmer error";
-        switch(code){
+        switch (static_cast<exception_code>(code)) {
         case invalid_flags:
             msg = "cannot be both big and little endian";
         default:

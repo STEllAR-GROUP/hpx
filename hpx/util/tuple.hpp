@@ -189,7 +189,7 @@ namespace hpx { namespace util
     typename detail::tuple_element<N, Tuple>::rtype
     get(Tuple& t) 
     {
-        return t.get<N>();
+        return t.template get<N>();
     }
 
     template <int N, typename Tuple>
@@ -197,7 +197,7 @@ namespace hpx { namespace util
     typename detail::tuple_element<N, Tuple>::crtype
     get(Tuple const& t) 
     {
-        return t.get<N>();
+        return t.template get<N>();
     }
 }}
 

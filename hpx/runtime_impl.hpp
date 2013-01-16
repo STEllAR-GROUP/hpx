@@ -65,8 +65,11 @@ namespace hpx {
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
+        /// \param num_threads    [in] The initial number of threads to be started
+        ///                       by the thread-manager.
         explicit runtime_impl(util::runtime_configuration const& rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
+            std::size_t num_threads = 1,
             init_scheduler_type const& init = init_scheduler_type());
 
         /// \brief The destructor makes sure all HPX runtime services are
@@ -81,9 +84,6 @@ namespace hpx {
         ///                   been initialized. This function is expected to
         ///                   expose an interface as defined by the typedef
         ///                   \a hpx_main_function_type.
-        /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the threadmanager. This parameter is optional
-        ///                   and defaults to 1.
         /// \param blocking   [in] This allows to control whether this
         ///                   call blocks until the runtime system has been
         ///                   stopped. If this parameter is \a true the
@@ -94,15 +94,11 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
-                HPX_STD_FUNCTION<hpx_main_function_type>(),
-            std::size_t num_threads = 1, std::size_t num_localities = 1,
-            bool blocking = false);
+        int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func,
+                bool blocking = false);
 
         /// \brief Start the runtime system
         ///
-        /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the threadmanager.
         /// \param blocking   [in] This allows to control whether this
         ///                   call blocks until the runtime system has been
         ///                   stopped. If this parameter is \a true the
@@ -113,8 +109,7 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(std::size_t num_threads, std::size_t num_localities = 1,
-            bool blocking = false);
+        int start(bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
         ///
@@ -177,15 +172,6 @@ namespace hpx {
         ///                   optional and defaults to none main thread
         ///                   function, in which case all threads have to be
         ///                   scheduled explicitly.
-        /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the thread-manager. This parameter is optional
-        ///                   and defaults to 1.
-        /// \num_localities   [in] The overall number of localities which are
-        ///                   initially used for the full application. The
-        ///                   runtime system will block during startup until
-        ///                   this many localities have been brought on line.
-        ///                   If this is not specified the number of localities
-        ///                   is assumed to be one.
         ///
         /// \note             The parameter \a func is optional. If no function
         ///                   is supplied, the runtime system will simply wait
@@ -195,25 +181,14 @@ namespace hpx {
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
-                    HPX_STD_FUNCTION<hpx_main_function_type>(),
-                std::size_t num_threads = 1, std::size_t num_localities = 1);
+        int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func);
 
         /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the thread-manager and block waiting for
         ///        all threads to finish.
         ///
-        /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the thread-manager.
-        /// \num_localities   [in] The overall number of localities which are
-        ///                   initially used for the full application. The
-        ///                   runtime system will block during startup until
-        ///                   this many localities have been brought on line.
-        ///                   If this is not specified the number of localities
-        ///                   is assumed to be one.
-        ///
         /// \returns          This function will always return 0 (zero).
-        int run(std::size_t num_threads, std::size_t num_localities = 1);
+        int run();
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Connection>
@@ -359,13 +334,15 @@ namespace hpx {
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     private:
-        void init_tss(char const* context, std::size_t num, char const* postfix);
+        void init_tss(char const* context, std::size_t num, char const* postfix,
+            bool service_thread);
         void deinit_tss();
 
     private:
         util::unique_ids id_pool;
         runtime_mode mode_;
         int result_;
+        std::size_t num_threads_;
         util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
         util::io_service_pool timer_pool_;

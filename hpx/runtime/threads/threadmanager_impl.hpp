@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,7 +61,8 @@ namespace hpx { namespace threads
         ///
         threadmanager_impl(util::io_service_pool& timer_pool,
             scheduling_policy_type& scheduler,
-            notification_policy_type& notifier);
+            notification_policy_type& notifier, 
+            std::size_t num_threads);
         ~threadmanager_impl();
 
         /// The function \a register_work adds a new work item to the thread
@@ -177,12 +179,13 @@ namespace hpx { namespace threads
         /// interruption point.
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
-        ///
-        /// \returns        This function returns whether the thread referenced
-        ///                 by the \a id parameter has been interrupted. If the
-        ///                 thread is not known to the thread-manager the return
-        ///                 value will be false.
-        void interrupt(thread_id_type id, error_code& ec = throws);
+        /// \param flag     [in] The flag encodes whether the thread should be 
+        ///                 interrupted (if it is \a true), or 'uninterrupted'
+        ///                 (if it is \a false).
+        /// \param ec       [in,out] this represents the error status on exit,
+        ///                 if this is pre-initialized to \a hpx#throws
+        ///                 the function will throw on error instead.
+        void interrupt(thread_id_type id, bool flag, error_code& ec = throws);
 
         /// The run_thread_exit_callbacks function is part of the thread related
         /// API. It runs all exit functions for one of the threads.
@@ -473,10 +476,25 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         void register_counter_types();
 
-        /// Return number of the processing unit the given thread is running on
-        std::size_t get_pu_num(std::size_t num_thread)
+        /// Returns of the number of the processing units the given thread 
+        /// is allowed to run on
+        std::size_t get_pu_num(std::size_t num_thread) const
         {
             return scheduler_.get_pu_num(num_thread);
+        }
+
+        /// Return the mask for processing units the given thread is allowed 
+        /// to run on.
+        mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
+        {
+            return scheduler_.get_pu_mask(topology, num_thread);
+        }
+
+        // Returns the mask identifying all processing units used by this 
+        // thread manager.
+        mask_type get_used_processing_units() const
+        {
+            return used_processing_units_;
         }
 
     private:
@@ -499,7 +517,7 @@ namespace hpx { namespace threads
         std::vector<boost::int64_t> executed_threads_;
         boost::atomic<long> thread_count_;
 
-        atomic_state state_;                ///< thread manager state
+        boost::atomic<hpx::state> state_;   ///< thread manager state
         util::io_service_pool& timer_pool_; ///< used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
@@ -511,6 +529,10 @@ namespace hpx { namespace threads
 
         // tfunc_impl timers
         std::vector<boost::uint64_t> exec_times, tfunc_times;
+
+        // Stores the mask identifying all processing units used by this 
+        // thread manager.
+        threads::mask_type used_processing_units_;
     };
 }}
 

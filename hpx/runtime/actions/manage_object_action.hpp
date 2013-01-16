@@ -47,7 +47,7 @@ namespace hpx { namespace actions
             using namespace std;    // some systems have memcpy in std
             memcpy(dest, src, size);
         }
-        static void assign_(void* dest, void const* src, std::size_t size)
+        static void assign_(void* dest, void const* src, std::size_t size) //-V524
         {
             using namespace std;    // some systems have memcpy in std
             memcpy(dest, src, size);

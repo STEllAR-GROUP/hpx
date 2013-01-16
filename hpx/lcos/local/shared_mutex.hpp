@@ -207,7 +207,7 @@ namespace hpx { namespace lcos { namespace local
                 release_waiters();
             }
 
-            void try_unlock_shared_and_lock()
+            bool try_unlock_shared_and_lock()
             {
                 typename mutex_type::scoped_lock lk(state_change);
                 if(    !state.exclusive

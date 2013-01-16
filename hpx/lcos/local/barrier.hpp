@@ -129,24 +129,6 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
             else {
-            // slist::swap has a bug in Boost 1.35.0
-#if BOOST_VERSION < 103600
-                // release the threads
-                while (!queue_.empty())
-                {
-                    threads::thread_id_type id = queue_.front().id_;
-                    if (HPX_UNLIKELY(!id))
-                    {
-                        HPX_THROW_EXCEPTION(null_thread_id,
-                            "barrier::wait",
-                            "NULL thread id encountered");
-                    }
-                    queue_.front().id_ = 0;
-                    queue_.pop_front();
-                    threads::set_thread_lco_description(id);
-                    threads::set_thread_state(id, threads::pending);
-                }
-#else
                 // swap the list
                 queue_type queue;
                 queue.swap(queue_);
@@ -167,7 +149,6 @@ namespace hpx { namespace lcos { namespace local
                     threads::set_thread_lco_description(id);
                     threads::set_thread_state(id, threads::pending);
                 }
-#endif
             }
         }
 

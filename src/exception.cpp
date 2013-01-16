@@ -29,6 +29,13 @@
 #include <stdexcept>
 #include <algorithm>
 
+#ifdef __APPLE__
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron())
+#elif !defined(BOOST_WINDOWS)
+extern char **environ;
+#endif
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -39,9 +46,9 @@ namespace hpx { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     //  Figure out the size of the given environment
-    inline int get_arraylen(char** array)
+    inline std::size_t get_arraylen(char** array)
     {
-        int count = 0;
+        std::size_t count = 0;
         if (NULL != array) {
             while(NULL != array[count])
                 ++count;   // simply count the environment strings
@@ -54,15 +61,15 @@ namespace hpx { namespace detail
         std::vector<std::string> env;
 
 #if defined(BOOST_WINDOWS)
-        int len = get_arraylen(_environ);
+        std::size_t len = get_arraylen(_environ);
         env.reserve(len);
         std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
 #elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__AIX__)
-        int len = get_arraylen(environ);
+        std::size_t len = get_arraylen(environ);
         env.reserve(len);
         std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #elif defined(__APPLE__)
-        int len = get_arraylen(environ);
+        std::size_t len = get_arraylen(environ);
         env.reserve(len);
         std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #else
@@ -171,41 +178,61 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template HPX_EXPORT void throw_exception(hpx::exception const&,
+    template HPX_EXPORT boost::exception_ptr
+        get_exception(hpx::exception const&, std::string const&,
+        std::string const&, long);
+
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(hpx::exception const&,
         std::string const&, std::string const&, long);
 
-    template HPX_EXPORT void throw_exception(boost::system::system_error const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(boost::system::system_error const&,
         std::string const&, std::string const&, long);
 
-    template HPX_EXPORT void throw_exception(std::exception const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::exception const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(hpx::detail::std_exception const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(hpx::detail::std_exception const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(std::bad_exception const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::bad_exception const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(hpx::detail::bad_exception const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(hpx::detail::bad_exception const&,
         std::string const&, std::string const&, long);
 #ifndef BOOST_NO_TYPEID
-    template HPX_EXPORT void throw_exception(std::bad_typeid const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::bad_typeid const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(hpx::detail::bad_typeid const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(hpx::detail::bad_typeid const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(std::bad_cast const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::bad_cast const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(hpx::detail::bad_cast const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(hpx::detail::bad_cast const&,
         std::string const&, std::string const&, long);
 #endif
-    template HPX_EXPORT void throw_exception(std::bad_alloc const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::bad_alloc const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(hpx::detail::bad_alloc const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(hpx::detail::bad_alloc const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(std::logic_error const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::logic_error const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(std::runtime_error const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::runtime_error const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(std::out_of_range const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::out_of_range const&,
         std::string const&, std::string const&, long);
-    template HPX_EXPORT void throw_exception(std::invalid_argument const&,
+    template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
+        throw_exception(std::invalid_argument const&,
         std::string const&, std::string const&, long);
 
     ///////////////////////////////////////////////////////////////////////////

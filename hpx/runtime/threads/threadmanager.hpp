@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +19,7 @@
 #include <hpx/state.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -187,7 +189,7 @@ namespace hpx { namespace threads
         virtual char const* set_lco_description(thread_id_type id, char const* desc = 0) = 0;
 
         /// The function get_thread_backtrace is part of the thread related API
-        /// allows to query the currently stored thread back trace (which is 
+        /// allows to query the currently stored thread back trace (which is
         /// captured during thread suspension).
         ///
         /// \param id         [in] The thread id of the thread being queried.
@@ -196,8 +198,8 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         ///
         /// \returns          This function returns the currently captured stack
-        ///                   back trace of the thread referenced by the \a id 
-        ///                   parameter. If the thread is not known to the 
+        ///                   back trace of the thread referenced by the \a id
+        ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
         virtual util::backtrace const* get_backtrace(thread_id_type id) const = 0;
         virtual util::backtrace const* set_backtrace(thread_id_type id, util::backtrace const* bt = 0) = 0;
@@ -318,7 +320,14 @@ namespace hpx { namespace threads
         /// interruption point.
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
-        virtual void interrupt(thread_id_type id, error_code& ec = throws) = 0;
+        /// \param flag     [in] The flag encodes whether the thread should be 
+        ///                 interrupted (if it is \a true), or 'uninterrupted'
+        ///                 (if it is \a false).
+        /// \param ec       [in,out] this represents the error status on exit,
+        ///                 if this is pre-initialized to \a hpx#throws
+        ///                 the function will throw on error instead.
+        virtual void interrupt(thread_id_type id, bool flag, 
+            error_code& ec = throws) = 0;
 
         /// The run_thread_exit_callbacks function is part of the thread related
         /// API. It runs all exit functions for one of the threads.
@@ -365,9 +374,14 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         virtual void register_counter_types() = 0;
 
-        /// Return number of the processing unit the given thread is running on
-        virtual std::size_t get_pu_num(std::size_t num_thread) = 0;
-        
+        /// Returns of the number of the processing unit the given thread 
+        /// is allowed to run on
+        virtual std::size_t get_pu_num(std::size_t) const = 0;
+
+        /// Return the mask for processing units the given thread is allowed 
+        /// to run on.
+        virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
+
         virtual boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1)) const = 0;
 
@@ -377,7 +391,7 @@ namespace hpx { namespace threads
         ///
         /// \param id       [in] The thread id of the thread to query.
         ///
-        /// \returns        This function returns the thread specific data 
+        /// \returns        This function returns the thread specific data
         ///                 pointer or zero if none is set.
         virtual std::size_t get_thread_data(thread_id_type id,
             error_code& ec = throws) const = 0;
@@ -386,14 +400,18 @@ namespace hpx { namespace threads
         /// API. It sets the currently stored thread specific data pointer.
         ///
         /// \param id       [in] The thread id of the thread to query.
-        /// \param data     [in] The thread specific data pointer to set for 
+        /// \param data     [in] The thread specific data pointer to set for
         ///                 the given thread.
         ///
-        /// \returns        This function returns the previously set thread 
+        /// \returns        This function returns the previously set thread
         ///                 specific data pointer or zero if none was set.
         virtual std::size_t set_thread_data(thread_id_type id,
             std::size_t data, error_code& ec = throws) = 0;
 #endif
+
+        // Returns the mask identifying all processing units used by this 
+        // thread manager.
+        virtual mask_type get_used_processing_units() const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);

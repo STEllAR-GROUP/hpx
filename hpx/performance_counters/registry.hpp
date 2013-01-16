@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,7 +34,7 @@ namespace hpx { namespace performance_counters
         typedef std::map<std::string, counter_data> counter_type_map_type;
 
     public:
-        registry(naming::resolver_client& agas_client);
+        registry() {}
 
         /// \brief Add a new performance counter type to the (local) registry
         counter_status add_counter_type(counter_info const& info,
@@ -123,7 +123,6 @@ namespace hpx { namespace performance_counters
             locate_counter_type(std::string const& type_name) const;
 
     private:
-        naming::resolver_client& agas_client_;
         counter_type_map_type countertypes_;
     };
 }}

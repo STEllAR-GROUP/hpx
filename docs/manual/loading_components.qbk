@@ -1,0 +1,191 @@
+[/=============================================================================
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:loading_components Loading Components]
+
+__hpx__ relies on loading application specific components during the runtime
+of an application. Moreover, __hpx__ comes with a set of preinstalled
+components supporting basic functionalities useful for almost every
+application. Any component in __hpx__ is loaded from a shared library, where
+any of the shared libraries can contain more than one component type. During
+startup, __hpx__ tries to locate all available components (e.g. their
+corresponding shared libraries) and creates an internal component registry for
+later use. This section describes the algorithm used by __hpx__ to locate all
+relevant shared libraries on a system. As described, this algorithm is
+customizable by the configuration properties loaded from the ini files (see
+section __loading_ini__).
+
+Loading components is a two stage process. First __hpx__ tries to locate all
+component shared libraries, loads those, and generates default configuration
+section in the internal configuration database for each component found. For
+each found component the following information is generated:
+
+[teletype]
+``
+    [hpx.components.<component_instance_name>]
+    name = <name_of_shared_library>
+    path = $[component_path]
+    enabled = $[hpx.components.load_external]
+    default = 1
+``
+[c++]
+
+The values in this section correspond to the expected configuration information
+for a component as described in the section __config_defaults__.
+
+In order to locate component shared libraries, __hpx__ will try loading all
+shared libraries (files with the platform specific extension of a shared
+library, Linux: `*.so`, Windows: `*.dll`, MacOS: `*.dylib`) found in the
+directory referenced by the ini property `hpx.component_path`.
+
+This first step corresponds to step 1) during the process of filling the
+internal configuration database with default information as described in
+section __loading_ini__.
+
+After all of the configuration information has been loaded, __hpx__ performs
+the second step in terms of loading components. During this step, __hpx__ scans
+all existing configuration sections `[hpx.component.<some_component_instance_name>]`
+and instantiates a special factory object for each of the successfully located
+and loaded components. During the application's life time, these factory objects
+will be responsible to create new and discard old instances of the component
+they are associated with. This step is performed after step 11) of the process
+of filling the internal configuration database with default information as
+described in section __loading_ini__.
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:component_example Application Specific Component Example]
+
+In this section we assume to have a simple application component which exposes
+one member function as a component action. The header file `app_server.hpp`
+declares the C++ type to be exposed as a component. This type has a member
+function `print_greating()` which is exposed as an action (`print_greating_action`).
+We assume the source files for this example are located in a directory
+referenced by [teletype]`$APP_ROOT`[c++]:
+
+    // file: $APP_ROOT/app_server.hpp
+    #include <hpx/hpx.hpp>
+    #include <hpx/include/iostreams.hpp>
+
+    namespace app
+    {
+        // Define a simple component exposing one action 'print_greating'
+        class HPX_COMPONENT_EXPORT server
+          : public hpx::components::simple_component_base<server>
+        {
+            void print_greating ()
+            {
+                hpx::cout << "Hey, how are you?\n" << hpx::flush;
+            }
+
+            // Component actions need to be declared, this also defines the
+            // type 'print_greating_action' representing the action.
+            ``[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]``(server, print_greating, print_greating_action);
+        };
+    }
+
+    // Declare boilerplate code required for each of the component actions.
+    ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::server::print_greating_action);
+
+The corresponding source file contains mainly macro invocations which define
+boilerplate code needed for __hpx__ to function properly:
+
+    // file: $APP_ROOT/app_server.cpp
+    #include "app_server.hpp"
+
+    // Define boilerplate required once per component module.
+    ``[macroref HPX_REGISTER_COMPONENT_MODULE `HPX_REGISTER_COMPONENT_MODULE`]``();
+
+    // Define factory object associated with our component of type 'app::server'.
+    ``[macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]``(app::server, app_server);
+
+    // Define boilerplate code required for each of the component actions. Use the
+    // same argument as used for HPX_REGISTER_ACTION_DECLARATION above.
+    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::server::print_greating_action);
+
+The following gives an example of how the component can be used. We create one
+instance of the `app::server` component on the current locality and invoke the
+exposed action `print_greating_action` using the global id of the newly created
+instance. Note, that no special code is required to delete the component
+instance after it is not needed anymore. It will be deleted automatically when
+its last reference goes out of scope, here at the closing brace of the block
+surrounding the code.
+
+    // file: $APP_ROOT/use_app_server_example.cpp
+    #include <hpx/hpx_init.hpp>
+    #include "app_server.hpp"
+
+    int hpx_main()
+    {
+        {
+            // Create an instance of the app_server component on the current locality.
+            hpx::naming:id_type app_server_instance =
+                hpx::create_component<app::server>(``[funcref hpx::find_here `hpx::find_here`]``());
+
+            // Create an instance of the action 'print_greating_action'.
+            app::server::print_greating_action print_greating;
+
+            // Invoke the action 'print_greating' on the newly created component.
+            print_greating(app_server_instance);
+        }
+        return ``[funcref hpx::finalize `hpx::finalize`]``();
+    }
+
+    int main(int argc, char* argv[])
+    {
+        return ``[funcref hpx::init `hpx::init`]``(argc, argv);
+    ]
+
+In order to make sure that the application will be able to use the component
+`app::server`, special configuration information must be passed to __hpx__.
+The simples way to allow __hpx__ to 'find' the component is to provide special
+ini configuration files, which add the necessary information to the internal
+configuration database. The component should have a special ini file containing
+the information specific to the component `app_server`:
+
+[teletype]
+``
+    # file: $APP_ROOT/app_server.ini
+    [hpx.components.app_server]
+    name = app_server
+    path = $APP_LOCATION/
+``
+[c++]
+
+Here [teletype]`$APP_LOCATION`[c++] is the directory where the (binary)
+component shared library is located. __hpx__ will attempt to load the shared
+library from there. The section name `hpx.components.app_server`
+reflects the instance name of the component (`app_server` is an arbitrary,
+but unique name) . The property value for `hpx.components.app_server.name`
+should be the same as used for the second argument to the macro
+[macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]
+above.
+
+Additionally a file `.hpx.ini` which could be located in the current working
+directory (see step 3 as described in the section __loading_ini__) allows to
+add the directory to the ini search path where the above ini file specific to
+the component is located:
+
+[teletype]
+``
+    # file: $PWD/.hpx.ini
+    [hpx]
+    ini_path = $[hpx.ini_path]:$APP_ROOT/
+``
+[c++]
+
+This assumes that the above ini file specific to the component is located in
+the directory [teletype]`$APP_ROOT`[c++].
+
+[note It is possible to reference the defined property from inside its
+      value. __hpx__ will gracefully use the previous value of `hpx.ini_path`
+      for the reference on the right hand side and assign the overall (now
+      expanded) value to the property.]
+
+[endsect] [/ Application Specific Component Example]
+
+[endsect] [/ Loading Components]

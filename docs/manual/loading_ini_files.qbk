@@ -1,0 +1,84 @@
+[/=============================================================================
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:loading_ini_files Loading INI Files]
+
+During startup and after the internal database has been initialized as
+described in the section __config_defaults__, __hpx__ will try to locate and
+load additional ini files to be used as a source for configuration properties.
+This allows for a wide spectrum of additional customization possibilities by
+the user and system administrators. The sequence of locations where __hpx__
+will try loading the ini files is well defined and documented in this section.
+All ini files found are merged into the internal configuration database.
+The merge operation itself conforms to the rules as described in the section
+__iniformat__.
+
+# Load all component shared libraries found in the directory specified by the
+  property `hpx.component_path` and retrieve their default configuration
+  information (see section __loading_components__ for more details).
+# Load a file named `hpx.ini` in the directory referenced by the property
+  `hpx.master_ini_path`.
+# Load a file named `.hpx.ini` in the current working directory, e.g. the
+  directory the application was invoked from.
+# Load a file referenced by the environment variable `HPX_INI`. This
+  variable is expected to provide the full path name of the ini configuration
+  file (if any).
+# Load a file named `/etc/hpx.ini`. This lookup is done on Linux systems
+  only.
+# Load a file named `.hpx.ini` in the home directory of the current user,
+  e.g. the directory referenced by the environment variable `HOME`.
+# Load a file named `.hpx.ini` in the directory referenced by the environment
+  variable `PWD`.
+# Load the file specified on the command line using the option
+  [hpx_cmdline `--hpx:config`].
+# Load all properties specified on the command line using the option
+  [hpx_cmdline `--hpx:ini`]. The properties will be added to the database in the
+  same sequence as they are specified on the command line. The format for those
+  options is for instance `--hpx:ini=hpx.default_stack_size=0x4000`. In
+  adddition to the explicit command line options, this will set the following
+  properties as implied from other settings:
+    * `hpx.parcel.address` and `hpx.parcel.port` as set by
+      [hpx_cmdline `--hpx:hpx`]
+    * `hpx.agas.address`, `hpx.agas.port`, and `hpx.agas.service_mode` as set
+      by [hpx_cmdline `--hpx:agas`]
+    * `hpx.program_name` and `hpx.cmd_line` will be derived from the actual
+      command line
+    * `hpx.os_threads`, and `hpx.localities` as set by
+       [hpx_cmdline `--hpx:threads`] and [hpx_cmdline `--hpx:localities`]
+    * `hpx.runtime_mode` will be derived from any explicit
+      [hpx_cmdline `--hpx:console`], [hpx_cmdline `--hpx:worker`], or
+      [hpx_cmdline `--hpx:connect`], or it will be derived from other settings,
+      such as [hpx_cmdline `--hpx:node=0`] which implies
+      [hpx_cmdline `--hpx:console`]
+# Load files based on the pattern `*.ini` in all directories listed by the
+  property `hpx.ini_path`. All files found during this search will be merged.
+  The property `hpx.ini_path` can hold a list of directories separated by `':'`
+  (on Linux or Mac) or `';'` (on Windows)
+# Load the file specified on the command line using the option
+  [hpx_cmdline `--hpx:app-config`]. Note that this file will be merged as the
+  content for a top level section `[application]`.
+
+[note Any changes made to the configuration database caused by one of the steps
+      will influence the loading process for all subsequent steps. For instance,
+      if one of the ini files loaded changes the property `hpx.ini_path`, this
+      will influence the directories searched in step 9 as described above.]
+
+[important The __hpx__ core library will verify that all configuration settings
+           specified on the command line (using the [hpx_cmdline `--hpx:ini`]
+           option) will be checked for validity. That means that the library
+           will accept only /known/ configuration settings. This is to protect
+           the user from unintentional typos while specifying those settings.
+           This behavior can be overwritten by appending a `'!'` to the
+           configuration key, thus forcing the setting to be entered into the
+           configuration database, for instance: `--hpx:ini=hpx.foo! = 1`.]
+
+If any of the environment variables or files listed above is not found the
+corresponding loading step will be silently skipped.
+
+[endsect] [/ Loading INI Files]
+

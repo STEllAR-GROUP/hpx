@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,20 +23,18 @@
 namespace hpx { namespace performance_counters
 {
     ///////////////////////////////////////////////////////////////////////////
-    registry::registry(naming::resolver_client& agas_client)
-      : agas_client_(agas_client)
-    {}
-
     registry::counter_type_map_type::iterator
         registry::locate_counter_type(std::string const& type_name)
     {
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
-            counter_path_elements p;
+            // if the full type is not available, try to locate the object name
+            // as a type only
             error_code ec(lightweight);
+            counter_path_elements p;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
-                it = countertypes_.find(p.objectname_);
+                it = countertypes_.find("/" + p.objectname_);
         }
         return it;
     }
@@ -46,11 +44,13 @@ namespace hpx { namespace performance_counters
     {
         counter_type_map_type::const_iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
-            counter_path_elements p;
+            // if the full type is not available, try to locate the object name
+            // as a type only
             error_code ec(lightweight);
+            counter_path_elements p;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
-                it = countertypes_.find("/"+p.objectname_);
+                it = countertypes_.find("/" + p.objectname_);
         }
         return it;
     }
@@ -69,7 +69,8 @@ namespace hpx { namespace performance_counters
         counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it != countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter_type",
-                "counter type already defined");
+                boost::str(boost::format(
+                    "counter type already defined: %s") % type_name));
             return status_already_defined;
         }
 
@@ -77,18 +78,18 @@ namespace hpx { namespace performance_counters
             countertypes_.insert(counter_type_map_type::value_type(
             type_name, counter_data(info, create_counter_, discover_counters_)));
 
-        if (p.second) {
-            LPCS_(info) << (boost::format("counter type %s registered") %
-                type_name);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-            return status_valid_data;
+        if (!p.second) {
+            LPCS_(warning) << (
+                boost::format("failed to register counter type %s") % type_name);
+            return status_invalid_data;
         }
 
-        LPCS_(warning) << (
-            boost::format("failed to register counter type %s") %type_name);
-        return status_invalid_data;
+        LPCS_(info) << (boost::format("counter type %s registered") %
+            type_name);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return status_valid_data;
     }
 
     /// \brief Call the supplied function for the given registered counter type.
@@ -104,8 +105,18 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
+            // compose a list of known counter types
+            std::string types;
+            counter_type_map_type::const_iterator end = countertypes_.end();
+            for (counter_type_map_type::const_iterator it = countertypes_.begin();
+                 it != end; ++it)
+            {
+                types += "  " + (*it).first + "\n";
+            }
+
             HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                "unknown counter type");
+                boost::str(boost::format("unknown counter type: %s, known counter types: %s") % 
+                    type_name % types));
             return status_counter_type_unknown;
         }
 

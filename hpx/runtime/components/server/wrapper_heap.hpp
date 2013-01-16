@@ -89,8 +89,15 @@ namespace hpx { namespace components { namespace detail
         };
 
     public:
-        explicit wrapper_heap(char const* class_name,
-                std::size_t count, std::size_t step = static_cast<std::size_t>(-1))
+        explicit wrapper_heap(
+            char const* class_name,
+#if defined(HPX_DEBUG)
+            std::size_t count,
+#else
+            std::size_t,
+#endif
+            std::size_t step = static_cast<std::size_t>(-1)
+        )
           : pool_(NULL), first_free_(NULL), step_(step), size_(0), free_size_(0),
             base_gid_(naming::invalid_gid),
             class_name_(class_name),
@@ -100,16 +107,15 @@ namespace hpx { namespace components { namespace detail
             heap_alloc_function_("wrapper_heap::alloc", class_name),
             heap_free_function_("wrapper_heap::free", class_name)
         {
-            (void)count;
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia;
 
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
-            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step)
-                step_ = heap_step;
+            if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step) //-V104
+                step_ = heap_step; //-V101
             else
-                step_ = ((step_ + heap_step - 1)/heap_step)*heap_step;
+                step_ = ((step_ + heap_step - 1)/heap_step)*heap_step; //-V104
 
             if (!init_pool())
                 throw std::bad_alloc();
@@ -319,13 +325,13 @@ namespace hpx { namespace components { namespace detail
             BOOST_ASSERT(size_ == 0);
             BOOST_ASSERT(first_free_ == NULL);
 
-            std::size_t s = step_ * heap_size;
+            std::size_t s = step_ * heap_size; //-V104
             pool_ = static_cast<storage_type*>(Allocator::alloc(s));
             if (NULL == pool_)
                 return false;
 
             first_free_ = pool_;
-            size_ = s / heap_size;
+            size_ = s / heap_size; //-V104
             free_size_ = size_;
 
             LOSH_(info)

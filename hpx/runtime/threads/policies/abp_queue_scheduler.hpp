@@ -86,6 +86,11 @@ struct abp_queue_scheduler : boost::noncopyable
 
     bool numa_sensitive() const { return numa_sensitive_; }
 
+    std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+    {
+        return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
+    }
+
     std::size_t get_pu_num(std::size_t num_thread) const
     {
         return num_thread;
@@ -278,7 +283,7 @@ struct abp_queue_scheduler : boost::noncopyable
                         << "no new work available, are we deadlocked?";
                 }
                 else {
-                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                    LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] "
                           << "queue(" << num_thread << "): "
                           << "no new work available, are we deadlocked?\n";
                 }

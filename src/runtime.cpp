@@ -161,8 +161,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration const& rtcfg)
+    runtime::runtime(util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         topology_(threads::create_topology()),
@@ -171,7 +170,7 @@ namespace hpx
         // initialize our TSS
         runtime::init_tss();
 
-        counters_.reset(new performance_counters::registry(agas_client));
+        counters_.reset(new performance_counters::registry());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -190,7 +189,9 @@ namespace hpx
             BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
-            runtime::uptime_.reset(new boost::uint64_t (util::high_resolution_clock::now()));
+            runtime::uptime_.reset(new boost::uint64_t);
+            *runtime::uptime_.get() = util::high_resolution_clock::now();
+
             threads::coroutine_type::impl_type::init_self();
         }
     }

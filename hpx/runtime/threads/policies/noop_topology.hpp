@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2012 Thomas Heller
 //
@@ -29,7 +29,17 @@ struct noop_topology : topology
         return std::size_t(-1);
     }
 
-    std::size_t get_numa_node_affinity_mask(
+    mask_type get_machine_affinity_mask(
+        error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return 0;
+    }
+
+    mask_type get_numa_node_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -41,7 +51,7 @@ struct noop_topology : topology
         return 0;
     }
 
-    std::size_t get_thread_affinity_mask(
+    mask_type get_core_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -53,10 +63,21 @@ struct noop_topology : topology
         return 0;
     }
 
-    void set_thread_affinity(
+    mask_type get_thread_affinity_mask(
+        std::size_t thread_num
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return 0;
+    }
+
+    void set_thread_affinity_mask(
         boost::thread& thrd
-      , std::size_t num_thread
-      , bool numa_sensitive
+      , mask_type mask
       , error_code& ec = throws
         ) const
     {
@@ -64,9 +85,8 @@ struct noop_topology : topology
             ec = make_success_code();
     }
 
-    void set_thread_affinity(
-        std::size_t num_thread
-      , bool numa_sensitive
+    void set_thread_affinity_mask(
+        mask_type mask
       , error_code& ec = throws
         ) const
     {
@@ -74,7 +94,7 @@ struct noop_topology : topology
             ec = make_success_code();
     }
 
-    std::size_t get_thread_affinity_mask_from_lva(
+    mask_type get_thread_affinity_mask_from_lva(
         naming::address::address_type lva
       , error_code& ec = throws
         ) const

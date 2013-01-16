@@ -20,10 +20,10 @@ namespace hpx { namespace threads { namespace detail
         union cast_type
         {
             tagged_thread_state_type value;
-            thread_state_type tag[4];
+            thread_state_type tag[sizeof(boost::int32_t)];
         };
 
-        static const int state_index = 3;
+        static const int state_index = sizeof(boost::int32_t)-1;
         static const tagged_thread_state_type tag_mask = 0xffffff;  // (1L<<24L)-1;
 
         static tag_type

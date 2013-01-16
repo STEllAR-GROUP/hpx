@@ -1,4 +1,5 @@
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2012-2013 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,26 +11,25 @@ include(HPX_Include)
 hpx_include(Message)
 
 find_package(HPX_DocBook)
-#find_package(HPX_BoostBook)
-find_package(HPX_QuickBook)
+find_package(HPX_BoostQuickBook)
 find_package(HPX_Doxygen)
 find_package(HPX_Xsltproc)
+find_package(HPX_BoostAutoIndex)
 
 # issue a meaningful warning if part of the documentation toolchain is not available
 if((NOT DOCBOOK_DTD_PATH_FOUND) OR (NOT DOCBOOK_XSL_PATH_FOUND))
   hpx_warn("documentation" "DocBook DTD or XSL is unavailable, documentation generation disabled. Set DOCBOOK_ROOT pointing to your DocBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
-#elseif((NOT BOOSTBOOK_DTD_PATH_FOUND) OR (NOT BOOSTBOOK_XSL_PATH_FOUND))
-#  hpx_warn("documentation" "BoostBook DTD or XSL is unavailable, documentation generation disabled. Set BOOSTBOOK_ROOT pointing to your BoostBook installation directory.")
-#  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
-elseif(NOT QUICKBOOK_FOUND)
-  hpx_warn("documentation" "QuickBook tool is unavailable, documentation generation disabled. Set QUICKBOOK_ROOT pointing to your QuickBook installation directory.")
+elseif(NOT BOOSTQUICKBOOK_FOUND)
+  hpx_warn("documentation" "Boost QuickBook tool is unavailable, documentation generation disabled. Set BOOSTQUICKBOOK_ROOT pointing to your Boost QuickBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT XSLTPROC_FOUND)
   hpx_warn("documentation" "xsltproc tool is unavailable, documentation generation disabled. Set XSLTPROC_ROOT pointing to your xsltproc installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT DOXYGEN_FOUND)
   hpx_warn("documentation" "Doxygen tool is unavailable, API reference will be unavailable. Set DOXYGEN_ROOT pointing to your Doxygen installation directory.")
+elseif(NOT BOOSTAUTOINDEX_FOUND)
+  hpx_warn("documentation" "Boost auto_index tool is unavailable, index generation will be disabled. Set BOOSTAUTOINDEX_ROOT pointing to your Boost auto_index installation directory.")
 else()
   set(HPX_BUILD_DOCUMENTATION ON CACHE BOOL "True if the HPX documentation toolchain is available.")
 endif()
@@ -72,10 +72,17 @@ if(NOT HPX_BUILD_DOCUMENTATION)
   macro(hpx_source_to_boostbook name)
     hpx_error("source_to_boostbook" "Documentation toolchain is unavailable.")
   endmacro()
+
+  macro(hpx_generate_auto_index name)
+    hpx_error("generate_auto_index" "Documentation toolchain is unavailable.")
+  endmacro()
+
 else()
+
   set(BOOSTBOOK_DTD_PATH ${hpx_SOURCE_DIR}/external/boostbook/dtd/)
   set(BOOSTBOOK_XSL_PATH ${hpx_SOURCE_DIR}/external/boostbook/xsl/)
 
+  # Generate catalog file for XSLT processing
   macro(hpx_write_boostbook_catalog file)
     file(WRITE ${file}
       "<?xml version=\"1.0\"?>\n"
@@ -122,8 +129,8 @@ else()
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS" "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "quickbook_to_boostbook.${name}" "Quickbook arguments"
-        ${name}_QUICKBOOK_ARGS)
+      "quickbook_to_boostbook.${name}" "Quickbook arguments"
+      ${name}_QUICKBOOK_ARGS)
 
     # If input is not a full path, it's in the current source directory.
     get_filename_component(input_path ${${name}_SOURCE} PATH)
@@ -145,7 +152,7 @@ else()
     endif()
 
     add_custom_command(OUTPUT ${name}.xml
-      COMMAND ${QUICKBOOK_PROGRAM}
+      COMMAND ${BOOSTQUICKBOOK_PROGRAM}
           "--output-file=${name}.xml"
           "${git_commit_option}"
           "${doxygen_option}"
@@ -242,15 +249,15 @@ else()
     endif()
   endmacro()
 
-  # Quickbook -> BoostBook XML -> DocBook -> HTML
+  # Quickbook -> BoostBook XML -> DocBook -> HTML, AutoIndex (if available)
   macro(hpx_quickbook_to_html name)
     hpx_parse_arguments(${name}
-        "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET;QUICKBOOK_ARGS"
-        "" ${ARGN})
+      "SOURCE;INDEX;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET;QUICKBOOK_ARGS;AUTOINDEX_ARGS"
+      "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "quickbook_to_html.${name}" "Documentation dependencies"
-        ${name}_DEPENDENCIES)
+      "quickbook_to_html.${name}" "Documentation dependencies"
+      ${name}_DEPENDENCIES)
 
     hpx_quickbook_to_boostbook(${name}
       SOURCE ${${name}_SOURCE}
@@ -262,8 +269,17 @@ else()
       CATALOG ${${name}_CATALOG}
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
 
+    set(docbook_source ${name}.dbk)
+    if(BOOSTAUTOINDEX_FOUND)
+      hpx_generate_auto_index(${name}
+        INDEX ${${name}_INDEX}
+        SOURCE ${name}.dbk
+        AUTOINDEX_ARGS ${${name}_AUTOINDEX_ARGS})
+      set(docbook_source ${name}.auto_index.dbk)
+    endif()
+
     hpx_docbook_to_html(${name}
-      SOURCE ${name}.dbk
+      SOURCE ${docbook_source}
       CATALOG ${${name}_CATALOG}
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
 
@@ -278,8 +294,8 @@ else()
     hpx_parse_arguments(${name} "DEPENDENCIES;DOXYGEN_ARGS" "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "source_to_doxygen.${name}" "Doxygen dependencies"
-        ${name}_DEPENDENCIES)
+      "source_to_doxygen.${name}" "Doxygen dependencies"
+      ${name}_DEPENDENCIES)
 
     add_custom_command(OUTPUT ${name}/index.xml
       COMMAND ${DOXYGEN_PROGRAM} ${${name}_DOXYGEN_ARGS}
@@ -371,5 +387,35 @@ else()
         DEPENDENCIES ${${name}_DEPENDENCIES})
     endif()
   endmacro()
+
+  # Generate auto_index reference for docs
+  macro(hpx_generate_auto_index name)
+    hpx_parse_arguments(${name} "AUTOINDEX_ARGS;INDEX;SOURCE"
+      "" ${ARGN})
+
+    hpx_print_list("DEBUG"
+      "hpx_generate_auto_index.${name}" "AutoIndex arguments"
+      ${name}_AUTOINDEX_ARGS)
+    hpx_debug("hpx_generate_auto_index.${name}"
+      "INDEX:${${name}_INDEX}, SOURCE:${${name}_SOURCE}")
+
+    # If input is not a full path, it's in the current source directory.
+    get_filename_component(input_path ${${name}_INDEX} PATH)
+
+    if(input_path STREQUAL "")
+      set(input_path "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_INDEX}")
+    else()
+      set(input_path ${${name}_INDEX})
+    endif()
+
+    add_custom_command(OUTPUT ${name}.auto_index.dbk
+      COMMAND ${BOOSTAUTOINDEX_PROGRAM} ${${name}_AUTOINDEX_ARGS}
+              "--script=${input_path}"
+              "--in=${${name}_SOURCE}"
+              "--out=${name}.auto_index.dbk"
+      COMMENT "Collecting Generating auto index."
+      DEPENDS ${${name}_SOURCE} ${${name}_INDEX})
+  endmacro()
+
 endif()
 

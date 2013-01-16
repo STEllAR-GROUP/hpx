@@ -104,7 +104,7 @@ namespace hpx { namespace util
 #else
             "endian_out=${HPX_ENDIAN_OUT:little}",
 #endif
-            "enable_shmem_parcelport=${HPX_ENABLE_SHMEM_PARCELPORT:0}",
+            "use_shmem_parcelport=${HPX_USE_SHMEM_PARCELPORT:0}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -464,7 +464,7 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>(
                     sec->get_entry("promise_pool_size",
-                        4 * get_os_thread_count()));
+                        4 * get_os_thread_count())); //-V112
             }
         }
         return 16;

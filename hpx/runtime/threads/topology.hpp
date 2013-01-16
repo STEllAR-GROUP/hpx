@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2012 Thomas Heller
 //
@@ -18,56 +18,147 @@
 
 namespace hpx { namespace threads
 {
+    /// \cond NOINTERNAL
+    typedef boost::uint64_t mask_type;
+    /// \endcond
 
-struct topology
-{
-    virtual ~topology() {}
+    struct topology
+    {
+        virtual ~topology() {}
 
-    virtual std::size_t get_numa_node_number(std::size_t num_thread, error_code& ec = throws) const = 0;
-    virtual std::size_t get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual std::size_t get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual void set_thread_affinity(boost::thread& t, std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual void set_thread_affinity(std::size_t num_thread, bool numa_sensitive, error_code& ec = throws) const = 0;
-    virtual std::size_t get_thread_affinity_mask_from_lva(naming::address::address_type, error_code& ec = throws) const = 0;
-};
+        /// \brief Return the NUMA node number of the processing unit the
+        ///        given thread is running on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual std::size_t get_numa_node_number(std::size_t num_thread,
+            error_code& ec = throws) const = 0;
 
-inline std::size_t least_significant_bit(boost::uint64_t mask)
-{
-    if (mask) {
-        int c = 0;    // Will count mask's trailing zero bits.
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit available to the application.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_machine_affinity_mask(
+            error_code& ec = throws) const = 0;
 
-        // Set mask's trailing 0s to 1s and zero rest.
-        mask = (mask ^ (mask - 1)) >> 1;
-        for (/**/; mask; ++c)
-            mask >>= 1;
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit available to the service threads in the
+        ///        application.
+        ///
+        /// \param used_processing_units [in] This is the mask of processing 
+        ///                   units which are not available for service threads.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_service_affinity_mask(
+            mask_type used_processing_units, error_code& ec = throws) const;
 
-        return std::size_t(1) << c;
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit available to the given thread inside
+        ///        the NUMA domain it is running on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_numa_node_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive, error_code& ec = throws) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit available to the given thread inside
+        ///        the core it is running on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_core_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive, error_code& ec = throws) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit available to the given thread.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_thread_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive, error_code& ec = throws) const = 0;
+
+        /// \brief Use the given bit mask to set the affinity of the given
+        ///        thread. Each set bit corresponds to a processing unit the
+        ///        thread will be allowed to run on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        ///
+        /// \note  Use this function on systems where the affinity must be 
+        ///        set from outside the thread itself.
+        virtual void set_thread_affinity_mask(boost::thread& t,
+            mask_type mask, error_code& ec = throws) const = 0;
+
+        /// \brief Use the given bit mask to set the affinity of the given
+        ///        thread. Each set bit corresponds to a processing unit the
+        ///        thread will be allowed to run on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        ///
+        /// \note  Use this function on systems where the affinity must be 
+        ///        set from inside the thread itself.
+        virtual void set_thread_affinity_mask(mask_type mask,
+            error_code& ec = throws) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit colocated with the memory the given 
+        ///        address is currently allocated on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_thread_affinity_mask_from_lva(
+            naming::address::address_type, error_code& ec = throws) const = 0;
+    };
+
+    /// \cond NOINTERNAL
+    inline std::size_t least_significant_bit(mask_type mask)
+    {
+        if (mask) {
+            int c = 0;    // Will count mask's trailing zero bits.
+
+            // Set mask's trailing 0s to 1s and zero rest.
+            mask = (mask ^ (mask - 1)) >> 1;
+            for (/**/; mask; ++c)
+                mask >>= 1;
+
+            return std::size_t(1) << c;
+        }
+        return std::size_t(1);
     }
-    return std::size_t(1);
-}
 
-inline std::size_t least_significant_bit_set(boost::uint64_t mask)
-{
-    if (mask) {
-        std::size_t c = 0;    // Will count mask's trailing zero bits.
+    inline std::size_t least_significant_bit_set(mask_type mask)
+    {
+        if (mask) {
+            std::size_t c = 0;    // Will count mask's trailing zero bits.
 
-        // Set mask's trailing 0s to 1s and zero rest.
-        mask = (mask ^ (mask - 1)) >> 1;
-        for (/**/; mask; ++c)
-            mask >>= 1;
+            // Set mask's trailing 0s to 1s and zero rest.
+            mask = (mask ^ (mask - 1)) >> 1;
+            for (/**/; mask; ++c)
+                mask >>= 1;
 
-        return c;
+            return c;
+        }
+        return std::size_t(-1);
     }
-    return std::size_t(-1);
-}
 
-HPX_EXPORT std::size_t hardware_concurrency();
+    HPX_EXPORT std::size_t hardware_concurrency();
 
-HPX_EXPORT topology const& get_topology();
+    HPX_EXPORT topology const& get_topology();
 
-}
-
-}
+    /// \endcond
+}}
 
 #endif // HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798
 

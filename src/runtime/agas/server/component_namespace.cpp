@@ -271,9 +271,10 @@ response component_namespace::bind_prefix(
 
     if (fit != fend)
     {
-        prefixes_type::iterator pit = fit->second.find(prefix);
+        prefixes_type& prefixes = fit->second;
+        prefixes_type::iterator pit = prefixes.find(prefix);
 
-        if (pit != fit->second.end())
+        if (pit != prefixes.end())
         {
             // Duplicate type registration for this locality.
             HPX_THROWS_IF(ec, duplicate_component_id
@@ -408,15 +409,16 @@ response component_namespace::resolve_id(
     {
         std::vector<boost::uint32_t> p;
 
-        prefixes_type::const_iterator pit = it->second.begin()
-                                    , pend = it->second.end();
+        prefixes_type const& prefixes = it->second;
+        prefixes_type::const_iterator pit = prefixes.begin()
+                                    , pend = prefixes.end();
 
         for (; pit != pend; ++pit)
             p.push_back(*pit);
 
         LAGAS_(info) << (boost::format(
             "component_namespace::resolve_id, key(%1%), localities(%2%)")
-            % key % it->second.size());
+            % key % prefixes.size());
 
         if (&ec != &throws)
             ec = make_success_code();

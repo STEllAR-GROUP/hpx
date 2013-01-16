@@ -124,7 +124,7 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_gid() const
         {
             return naming::id_type(
-                naming::strip_credit_from_cgid(get_base_gid())
+                naming::strip_credit_from_gid(get_base_gid())
               , naming::id_type::unmanaged);
         }
 
@@ -223,7 +223,7 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_gid() const
         {
             return naming::id_type(
-                naming::strip_credit_from_cgid(get_base_gid())
+                naming::strip_credit_from_gid(get_base_gid())
               , naming::id_type::unmanaged);
         }
 

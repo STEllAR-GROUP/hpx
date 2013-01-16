@@ -45,12 +45,12 @@ int hpx_main()
         //[exception_diagnostic_elements
         hpx::cout << "Detailed error reporting using exceptions\n";
         try {
-            // invoke raise_exception() which throws an exception
+            // Invoke raise_exception() which throws an exception.
             raise_exception_action do_it;
             do_it(hpx::find_here());
         }
         catch (hpx::exception const& e) {
-            // Print the elements of the diagnostic information separately
+            // Print the elements of the diagnostic information separately.
             hpx::cout << "{locality-id}: " << hpx::get_locality_id(e) << "\n";
             hpx::cout << "{hostname}: "    << hpx::get_host_name(e) << "\n";
             hpx::cout << "{pid}: "         << hpx::get_process_id(e) << "\n";
@@ -80,8 +80,8 @@ int hpx_main()
             raise_exception_action do_it;
             do_it(hpx::find_here(), ec);
 
-            // Print just the essential error information.
             if (ec) {
+                // Print just the essential error information.
                 hpx::cout << "returned error: " << ec.get_message() << "\n";
 
                 // Print all of the available diagnostic information as stored with
@@ -108,8 +108,8 @@ int hpx_main()
             raise_exception_action do_it;
             do_it(hpx::find_here(), ec);
 
-            // Print the elements of the diagnostic information separately
             if (ec) {
+                // Print the elements of the diagnostic information separately.
                 hpx::cout << "{locality-id}: " << hpx::get_locality_id(ec) << "\n";
                 hpx::cout << "{hostname}: "    << hpx::get_host_name(ec) << "\n";
                 hpx::cout << "{pid}: "         << hpx::get_process_id(ec) << "\n";
@@ -140,8 +140,8 @@ int hpx_main()
             raise_exception_action do_it;
             do_it(hpx::find_here(), ec);
 
-            // Print just the essential error information.
             if (ec) {
+                // Print just the essential error information.
                 hpx::cout << "returned error: " << ec.get_message() << "\n";
 
                 // Print all of the available diagnostic information as stored with

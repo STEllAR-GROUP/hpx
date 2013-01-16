@@ -129,7 +129,11 @@ endif()
 
 # Decide whether to use Boost.Context for coroutine implementation
 if(${BOOST_MINOR_VERSION} GREATER 50)
-  hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+  if (APPLE)
+    hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: ON)." ON ADVANCED)
+  else()
+    hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
+  endif()
 endif()
 
 ################################################################################
@@ -161,9 +165,6 @@ if(${BOOST_MINOR_VERSION} LESS 53)
 endif()
 hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
-hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
 if(${BOOST_MINOR_VERSION} LESS 49)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
 endif()
@@ -187,10 +188,10 @@ add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
 if(NOT MSVC)
   add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-add_definitions(-DBOOST_LOG_NO_TSS)
-add_definitions(-DBOOST_LOG_NO_TS)
+add_definitions(-DHPX_LOG_NO_TSS)
+add_definitions(-DHPX_LOG_NO_TS)
+add_definitions(-DHPX_PLUGIN_SYMBOLS_PREFIX=hpx)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
-add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
@@ -458,7 +459,11 @@ endif()
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+if(APPLE)
+  hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: OFF)" OFF ADVANCED)
+else()
+  hpx_option(HPX_HAVE_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
+endif()
 
 if(HPX_HAVE_NATIVE_TLS)
   hpx_info("tls" "Native TLS is enabled.")
@@ -774,6 +779,11 @@ else()
     hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
 
+  if(APPLE)
+    hpx_use_flag_if_available(-stdlib=libc++ LANGUAGES CXX)
+    hpx_use_flag_if_available(-ftemplate-depth=256 LANGUAGES CXX)
+  endif()
+
   ##############################################################################
   # C++11
   ##############################################################################
@@ -876,7 +886,7 @@ else()
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
-          add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
+          add_definitions(-DHPX_PLUGIN_GCC_HAVE_VISIBILITY)
           hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
         endif()
       endif()
@@ -971,7 +981,11 @@ else()
   ##############################################################################
   # System libraries
   ##############################################################################
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl rt)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl)
+
+  if(NOT APPLE)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} rt)
+  endif()
 
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)
@@ -1211,8 +1225,6 @@ if(NOT HPX_NO_INSTALL)
   install( # install external dependencies
     DIRECTORY external/cache/boost
               external/endian/boost
-              external/logging/boost
-              external/plugin/boost
     DESTINATION include/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
@@ -1238,7 +1250,7 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
-  if(${BOOST_MINOR_VERSION} LESS 52)
+  if(${BOOST_MINOR_VERSION} LESS 53)
     # install Boost.Lockfree library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
@@ -1342,6 +1354,7 @@ set(external_libraries
 
 foreach(lib ${external_libraries})
   get_filename_component(lib ${lib} NAME_WE)
+  string(REGEX REPLACE "^lib" "" lib ${lib})
   set(external_libraries_name "${external_libraries_name} -l${lib}")
 endforeach()
 
@@ -1387,29 +1400,39 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION share/${cmake_dir}/Modules)
 endif()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_application.pc
-               @ONLY)
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
-               @ONLY)
+if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_application.pc
+                   @ONLY)
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_component.pc
+                   @ONLY)
+endif()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_component.pc
-               @ONLY)
-configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
-               ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
-               @ONLY)
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+                   @ONLY)
+
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
+                   ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
+                   @ONLY)
+endif()
 
 if(NOT HPX_NO_INSTALL)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
-          DESTINATION lib/pkgconfig)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
-          DESTINATION lib/pkgconfig)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
-          DESTINATION lib/pkgconfig)
-  install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
-          DESTINATION lib/pkgconfig)
+  if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
+            DESTINATION lib/pkgconfig)
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+            DESTINATION lib/pkgconfig)
+  endif()
+
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
+            DESTINATION lib/pkgconfig)
+    install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
+            DESTINATION lib/pkgconfig)
+  endif()
 endif()
 
 file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)

@@ -7,102 +7,168 @@
 
 [section:applications Writing __hpx__ applications]
 
-In order to write an application which uses services from the __hpx__ runtime 
-system you need to initialize the __hpx__ library by inserting certain calls 
+In order to write an application which uses services from the __hpx__ runtime
+system you need to initialize the __hpx__ library by inserting certain calls
 into the code of your application. Depending on your use case, this can be done
 in 3 different ways:
 
-* Minimally invasive: Re-use the `main()` function as the main __hpx__ entry 
-  point.
-* Balanced use case: Supply your own main __hpx__ entry point while blocking 
-  the main thread.
-* Most flexibility: Supply your own main __hpx__ entry point while avoiding to 
-  block the main thread.
+* [link hpx.manual.applications.minimal Minimally invasive]: Re-use the `main()`
+  function as the main __hpx__ entry point.
+* [link hpx.manual.applications.medium Balanced use case]: Supply your own main
+  __hpx__ entry point while blocking the main thread.
+* [link hpx.manual.applications.flexible Most flexibility]: Supply your own main
+  __hpx__ entry point while avoiding to block the main thread.
 
 [heading:minimal Re-use the `main()` function as the main __hpx__ entry point]
 
-This method is the least intrusive to your code. It however provides you with 
-the smallest flexibility in terms of initializing the __hpx__ runtime system 
+This method is the least intrusive to your code. It however provides you with
+the smallest flexibility in terms of initializing the __hpx__ runtime system
 only. The following code snippet shows what a minimal __hpx__ application using
 this technique looks like:
 
-    #include <hpx/hpx_main.hpp>
+    #include <``[headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`]``>
 
     int main(int argc, char* argv[])
     {
         return 0;
     }
 
-The only change to your code you have to make is to include the file 
+The only change to your code you have to make is to include the file
 [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`].
-In this case the function `main()` will be invoked as the first __hpx__ thread 
+In this case the function `main()` will be invoked as the first __hpx__ thread
 of the application. The runtime system will be initialized behind the scenes
-before the function `main()` is executed and will automatically stopped after 
+before the function `main()` is executed and will automatically stopped after
 `main()` has returned. All __hpx__ API functions can be used from within this
 function now.
 
 [note The function `main()` does not need to expect receiving `argc`/`argv`
-      as shown above, but could expose the signature `int main()`. This 
-      is consistent with the usually allowed prototypes for the function 
+      as shown above, but could expose the signature `int main()`. This
+      is consistent with the usually allowed prototypes for the function
       `main()` in C++ applications.]
 
-All commandline arguments specific to __hpx__ will still be processed by the 
-__hpx__ runtime system as usual. However, those command line options will be 
-removed from the list of values passed to `argc`/`argv` of the function 
-`main()`. The list of values passed to `main()` will hold only the commandline 
+All command line arguments specific to __hpx__ will still be processed by the
+__hpx__ runtime system as usual. However, those command line options will be
+removed from the list of values passed to `argc`/`argv` of the function
+`main()`. The list of values passed to `main()` will hold only the commandline
 options which are not recognized by the __hpx__ runtime system (see the section
 __commandline__ for more details on what options are recognized by __hpx__).
 
-The value returned from the function `main()` as shown above will be returned 
+The value returned from the function `main()` as shown above will be returned
 to the operating system as usual.
+
+[important To achieve this seamless integration, the header file
+           [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`] defines a macro
+           ``
+              #define main hpx::user_main
+           ``
+           which could result in unexpected behavior.]
+
 
 [heading:medium Supply your own main __hpx__ entry point while blocking the main thread]
 
-With this method you need to provide an explicit main thread function name 
-`hpx_main`. This function will be invoked as the main entry point of your 
-__hpx__ application on the console locality only (this function will be invoked 
-as the first __hpx__ thread of your application). All __hpx__ API functions 
-can be used from within this function.
+With this method you need to provide an explicit main thread function named
+[funcref hpx_main `hpx_main`] at global scope. This function will be invoked
+as the main entry point of your __hpx__ application on the console locality
+only (this function will be invoked as the first __hpx__ thread of your application).
+All __hpx__ API functions can be used from within this function.
 
-The thread executing the function [funcref hpx::init `hpx::init`] will block 
-waiting for the runtime system to exit. The value returned from 
-[funcref hpx_main `hpx_main`] will be returned from [funcref hpx::init `hpx::init`] 
+The thread executing the function [funcref hpx::init `hpx::init`] will block
+waiting for the runtime system to exit. The value returned from
+[funcref hpx_main `hpx_main`] will be returned from [funcref hpx::init `hpx::init`]
 after the runtime system has stopped.
 
-This method has the advantage of you being able to decide which version of 
-[funcref hpx::init `hpx::init`] to call. This allows to pass additional 
-configuration parameters while initializing the __hpx__ runtime system. 
+The function [funcref hpx::finalize `hpx::finalize`] has to be called on one
+of the __hpx__ localities in order to signal that all work has been scheduled
+and the runtime system should be stopped after the scheduled work has been executed.
 
-    #include <hpx/hpx_init.hpp>
+This method of invoking __hpx__ has the advantage of you being able to
+decide which version of [funcref hpx::init `hpx::init`] to call. This allows
+to pass additional configuration parameters while initializing the __hpx__
+runtime system.
 
-    int hpx_main(int argc, char* argv[])
+    #include <``[headerref hpx/hpx_init.hpp `hpx/hpx_init.hpp`]``>
+
+    int ``[funcref hpx_main `hpx_main`]``(int argc, char* argv[])
     {
-        return hpx::finalize();
+        // Any HPX application logic goes here...
+        return ``[funcref hpx::finalize `hpx::finalize`]``();
     }
 
     int main(int argc, char* argv[])
     {
-        // Initialize HPX, run hpx_main as the first HPX thread, and 
+        // Initialize HPX, run hpx_main as the first HPX thread, and
         // wait for hpx::finalize being called.
-        return hpx::init(argc, argv);
+        return ``[funcref hpx::init `hpx::init`]``(argc, argv);
     }
 
+[note The function [funcref hpx_main `hpx_main`] does not need to expect receiving
+      `argc`/`argv` as shown above, but could expose one of the following signatures:
+      ``
+          int hpx_main();
+          int hpx_main(int argc, char* argv[]);
+          int hpx_main(boost::program_options::variables_map& vm);
+      ``
+      This is consistent with (and extends) the usually allowed prototypes for the
+      function `main()` in C++ applications.]
+
+The header file to include for this method of using __hpx__ is
+[headerref hpx/hpx_init.hpp `hpx/hpx_init.hpp`].
 
 [heading:flexible Supply your own main __hpx__ entry point while avoiding to block the main thread]
 
+With this method you need to provide an explicit main thread function named
+[funcref hpx_main `hpx_main`] at global scope. This function will be invoked
+as the main entry point of your __hpx__ application on the console locality
+only (this function will be invoked as the first __hpx__ thread of your application).
+All __hpx__ API functions can be used from within this function.
 
-    int hpx_main(int argc, char* argv[])
+The thread executing the function [funcref hpx::start `hpx::start`] will *not* block
+waiting for the runtime system to exit, but will return immediatlely.
+
+[important You cannot use any of the __hpx__ API functions other that
+           [funcref hpx::stop `hpx::stop`] from inside your `main()` function.]
+
+The function [funcref hpx::finalize `hpx::finalize`] has to be called on one
+of the __hpx__ localities in order to signal that all work has been scheduled
+and the runtime system should be stopped after the scheduled work has been executed.
+
+This method of invoking __hpx__ is useful for applications where the main thread
+is used for special operations, such a GUIs. The function [funcref hpx::stop `hpx::stop`]
+can be used to wait for the __hpx__ runtime system to exit and should be at least
+used as the last function called in `main()`.
+The value returned from [funcref hpx_main `hpx_main`] will be returned from
+[funcref hpx::stop `hpx::stop`] after the runtime system has stopped.
+
+    #include <``[headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`]``>
+
+    int ``[funcref hpx_main `hpx_main`]``(int argc, char* argv[])
     {
-        return hpx::finalize();
+        // Any HPX application logic goes here...
+        return ``[funcref hpx::finalize `hpx::finalize`]``();
     }
 
     int main(int argc, char* argv[])
     {
         // Initialize HPX, run hpx_main.
-        hpx::start(argc, argv);
+        ``[funcref hpx::start `hpx::start`]``(argc, argv);
+
+        // ...Execute other code here...
 
         // Wait for hpx::finalize being called.
-        return hpx::stop();
+        return ``[funcref hpx::stop `hpx::stop`]``();
     }
+
+[note The function [funcref hpx_main `hpx_main`] does not need to expect receiving
+      `argc`/`argv` as shown above, but could expose one of the following signatures:
+      ``
+          int hpx_main();
+          int hpx_main(int argc, char* argv[]);
+          int hpx_main(boost::program_options::variables_map& vm);
+      ``
+      This is consistent with (and extends) the usually allowed prototypes for the
+      function `main()` in C++ applications.]
+
+The header file to include for this method of using __hpx__ is
+[headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`].
 
 [endsect]

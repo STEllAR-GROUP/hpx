@@ -258,10 +258,9 @@ namespace hpx { namespace parcelset
         server::parcelport_queue parcels_;
 
         /// The cache for pending parcels
-        typedef std::map<
-            naming::locality,
-            std::pair<std::vector<parcel>, std::vector<write_handler_type> >
-        > pending_parcels_map;
+        typedef std::pair<std::vector<parcel>, std::vector<write_handler_type> >
+            map_second_type;
+        typedef std::map<naming::locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
         /// The local locality

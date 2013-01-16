@@ -49,8 +49,7 @@ namespace hpx
             boost::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(naming::resolver_client& agas_client,
-            util::runtime_configuration const& rtcfg);
+        runtime(util::runtime_configuration const& rtcfg);
 
         virtual ~runtime()
         {
@@ -148,19 +147,14 @@ namespace hpx
         void register_counter_types();
 
         ///////////////////////////////////////////////////////////////////////
-        virtual int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
-                HPX_STD_FUNCTION<hpx_main_function_type>(),
-            std::size_t num_threads = 1, std::size_t num_localities = 1) = 0;
+        virtual int run(HPX_STD_FUNCTION<hpx_main_function_type> const& func) = 0;
 
-        virtual int run(std::size_t num_threads, std::size_t num_localities = 1) = 0;
+        virtual int run() = 0;
 
-        virtual int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func =
-                HPX_STD_FUNCTION<hpx_main_function_type>(),
-            std::size_t num_threads = 1, std::size_t num_localities = 1,
+        virtual int start(HPX_STD_FUNCTION<hpx_main_function_type> const& func,
             bool blocking = false) = 0;
 
-        virtual int start(std::size_t num_threads, std::size_t num_localities = 1,
-            bool blocking = false) = 0;
+        virtual int start(bool blocking = false) = 0;
 
         virtual int wait() = 0;
 

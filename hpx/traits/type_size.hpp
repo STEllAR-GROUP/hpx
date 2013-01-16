@@ -88,7 +88,7 @@ namespace hpx { namespace traits
         template <typename T_>
         static BOOST_FORCEINLINE std::size_t call(T_ const& v, boost::mpl::true_)
         {
-            return sizeof(T_) + v.size() * sizeof(typename T_::value_type);
+            return sizeof(T_) + v.size() * sizeof(typename T_::value_type); //-V119
         }
 
         static BOOST_FORCEINLINE std::size_t call(T const& v)
