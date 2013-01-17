@@ -114,12 +114,14 @@ namespace hpx { namespace util
         std::ptrdiff_t init_huge_stack_size() const;
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-        void init_use_stack_guard_pages() const;
+        bool init_use_stack_guard_pages() const;
 #endif
 
         void pre_initialize_ini();
         void post_initialize_ini(std::string const& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs);
+
+        void reconfigure();
 
     private:
         std::ptrdiff_t small_stacksize;

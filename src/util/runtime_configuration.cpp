@@ -243,6 +243,9 @@ namespace hpx { namespace util
         util::merge_component_inis(*this);
 
         need_to_call_pre_initialize = true;
+
+        // invoke last reconfigure
+        reconfigure();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -268,7 +271,7 @@ namespace hpx { namespace util
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-        init_use_stack_guard_pages();
+        coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
     }
 
@@ -277,37 +280,18 @@ namespace hpx { namespace util
         std::string const& hpx_ini_file_)
     {
         hpx_ini_file = hpx_ini_file_;
-
-        pre_initialize_ini();
-
-        std::vector<std::string> const& prefill =
-            util::detail::get_logging_data();
-        if (!prefill.empty())
-            this->parse("static prefill defaults", prefill, false);
-
-        post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
-
-        // set global config options
-#if HPX_USE_ITTNOTIFY != 0
-        use_ittnotify_api = get_itt_notify_mode();
-#endif
-        BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
-
-        small_stacksize = init_small_stack_size();
-        medium_stacksize = init_medium_stack_size();
-        large_stacksize = init_large_stack_size();
-        huge_stacksize = init_huge_stack_size();
-
-#if defined(__linux) || defined(linux) || defined(__linux__)
-        init_use_stack_guard_pages();
-#endif
+        reconfigure();
     }
 
     void runtime_configuration::reconfigure(
         std::vector<std::string> const& cmdline_ini_defs_)
     {
         cmdline_ini_defs = cmdline_ini_defs_;
+        reconfigure();
+    }
 
+    void runtime_configuration::reconfigure()
+    {
         pre_initialize_ini();
 
         std::vector<std::string> const& prefill =
@@ -329,7 +313,7 @@ namespace hpx { namespace util
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-        init_use_stack_guard_pages();
+        coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
     }
 
@@ -650,16 +634,16 @@ namespace hpx { namespace util
     }
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-    void runtime_configuration::init_use_stack_guard_pages() const
+    bool runtime_configuration::init_use_stack_guard_pages() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.stacks");
             if (NULL != sec) {
                 std::string entry = sec->get_entry("use_guard_pages", "1");
-                coroutines::detail::posix::use_guard_pages = 
-                    (entry != "0") ? true : false;
+                return (entry != "0") ? true : false;
             }
         }
+        return true;    // default is true
     }
 #endif
 
