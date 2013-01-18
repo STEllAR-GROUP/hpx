@@ -121,6 +121,37 @@ Every full Performance Counter will implement a predefined interface:
 [import ../../hpx/performance_counters/performance_counter.hpp]
 [performance_counter_interface]
 
+In order to implement a full Performance Counter you have to create an __hpx__
+component exposing this interface. To simplify this task, __hpx__ provides a
+ready made base class which handles all the boiler plate of creating a
+component for you. The remainder of this section will explain the process
+of creating a full Performance Counter based on the Sine example which you
+can find in the directory `examples/performance_counters/sine/`.
+
+This base class is defined in the header file
+[hpx_link hpx/performance_counters/base_performance_counter.hpp..hpx/performance_counters/base_performance_counter.hpp]
+as:
+
+[import ../../hpx/performance_counters/base_performance_counter.hpp]
+[base_performance_counter_class]
+
+The single template parameter is expected to receive the type of the
+derived class implementing the Performance Counter. In the Sine example
+this looks like:
+
+[import ../../examples/performance_counters/sine/server/sine.hpp]
+[sine_counter_definition]
+
+i.e. the type `sine_counter` is derived from the mentioned base class passing
+the type itself as a template argument (please see
+[hpx_link examples/performance_counters/sine/server/sine.hpp..sine.hpp]
+for the full source code of the counter definition). For more information
+about this technique (called Curiously Recurring Template Pattern - CRTP),
+please see for instance the corresponding
+[@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern Wikipedia article].
+This base class itself is derived from the `performance_counter` interface
+described above.
+
 
 Additionally, full Performance Counters not only expose the actual value but
 also provide information about

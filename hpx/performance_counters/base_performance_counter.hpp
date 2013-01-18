@@ -14,6 +14,15 @@
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+//[performance_counter_base_class
+namespace hpx { namespace performance_counters
+{
+    template <typename Derived>
+    class base_performance_counter;
+}}
+//]
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
     template <typename Derived>

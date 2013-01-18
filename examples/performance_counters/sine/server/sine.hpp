@@ -14,13 +14,11 @@
 namespace performance_counters { namespace sine { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    //[sine_counter
+    //[sine_counter_definition
     class sine_counter
       : public hpx::performance_counters::base_performance_counter<sine_counter>
+    //]
     {
-        typedef hpx::performance_counters::base_performance_counter<sine_counter>
-            base_type;
-
     public:
         sine_counter() : current_value_(0) {}
         sine_counter(hpx::performance_counters::counter_info const& info);
@@ -50,7 +48,6 @@ namespace performance_counters { namespace sine { namespace server
         hpx::util::interval_timer timer_;
         boost::uint64_t started_at_;
     };
-    //]
 }}}
 
 #endif

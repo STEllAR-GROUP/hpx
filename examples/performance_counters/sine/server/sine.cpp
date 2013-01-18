@@ -24,7 +24,8 @@ namespace performance_counters { namespace sine { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     sine_counter::sine_counter(hpx::performance_counters::counter_info const& info)
-      : base_type(info), current_value_(0),
+      : hpx::performance_counters::base_performance_counter<sine_counter>(info),
+        current_value_(0),
         timer_(boost::bind(&sine_counter::evaluate, this), 1000000,
             "sine example performance counter"),
         started_at_(hpx::util::high_resolution_clock::now())
@@ -66,7 +67,7 @@ namespace performance_counters { namespace sine { namespace server
     void sine_counter::finalize()
     {
         timer_.stop();
-        base_type::finalize();
+        hpx::performance_counters::base_performance_counter<sine_counter>::finalize();
     }
 
     bool sine_counter::evaluate()
