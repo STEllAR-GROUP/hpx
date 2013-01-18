@@ -59,17 +59,17 @@ Listing all available counters (`hello_world --hpx:list-counters`) yields:
 [teletype]
 ```
     List of available counter instances
-    (replace <*> below with the appropriate sequence number)
+    (replace '`*`' below with the appropriate sequence number)
     -------------------------------------------------------------------------
     /agas/count/allocate
     /agas/count/bind
     /agas/count/bind_gid
     /agas/count/bind_name
     ...
-    /threads{locality#<*>/allocator#<*>}/count/objects
-    /threads{locality#<*>/total}/count/stack-recycles
-    /threads{locality#<*>/total}/idle-rate
-    /threads{locality#<*>/worker-thread#<*>}/idle-rate
+    /threads{locality#*/allocator#*}/count/objects
+    /threads{locality#*/total}/count/stack-recycles
+    /threads{locality#*/total}/idle-rate
+    /threads{locality#*/worker-thread#*}/idle-rate
 ```
 [c++]
 
@@ -79,7 +79,7 @@ Providing more information about all available counters
 [teletype]
 ```
     Information about available counter instances
-    (replace <*> below with the appropriate sequence number)
+    (replace * below with the appropriate sequence number)
     ------------------------------------------------------------------------------
     fullname: /agas/count/allocate
     helptext: returns the number of invocations of the AGAS service 'allocate'
@@ -167,6 +167,38 @@ example for brevity):
 The command `--hpx:print-counter-destination=<file>` will redirect all counter
 data gathered to the specified file name, which avoids cluttering the console
 output of your application.
+
+The command line option `--hpx:print-counter` supports using a limited set of
+wildcards for a (very limited) set of use cases. In particular, all occurences
+of `#*` as in `locality#*` and in `worker-thread#*` will be automatically expanded
+to the proper set of performance counter names representing the actual
+environment for the executed program. For instance, if your program is utilizing
+4 worker threads for the execution of HPX threads (see command line option
+[hpx_cmdline `--hpx:threads`]) the following command line
+
+[teletype]
+```
+    hello_world \
+        --hpx:threads=4 \
+        --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative
+```
+[c++]
+
+will print the value of the performance counters monitoring each of the worker
+threads:
+
+[teletype]
+```
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 3 on locality 0
+    hello world from OS-thread 2 on locality 0
+    /threads{locality#0/worker-thread#0}/count/cumulative,1,0.0025214[s],27
+    /threads{locality#0/worker-thread#1}/count/cumulative,1,0.0025453[s],33
+    /threads{locality#0/worker-thread#2}/count/cumulative,1,0.0025683[s],29
+    /threads{locality#0/worker-thread#3}/count/cumulative,1,0.0025904[s],33
+```
+[c++]
 
 [endsect]
 

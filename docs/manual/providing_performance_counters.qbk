@@ -64,7 +64,7 @@ any consumer instantiates and queries an instance of this counter type.
     }
 
 Now it is possible to instantiate a new counter instance based on
-the naming scheme `"/test{locality#<*>/total}/data"`, where `<*>` is a zero
+the naming scheme `"/test{locality#*/total}/data"`, where '`*`' is a zero
 based integer index indentifying the locality for which the counter instance
 should be accessed. The function [funcref hpx::performance_counters::install_counter_type `install_counter_type`]
 enables to instantiate exactly one counter instance for each locality. Repeated
