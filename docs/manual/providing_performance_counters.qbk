@@ -17,7 +17,12 @@ Counter to provide the data. When a consumer queries performance data, the
 __hpx__ runtime system calls the provider to collect the data. The runtime
 system uses an internal registry to determine which provider to call.
 
-[heading Exposing Performance Counter Data using a Simple Function]
+Generally, there two ways of exposing yur own pPerformance Counter data: a
+simple, function based way and a more complex, but more powerful way of
+implementing a full Performance Counter. Both alternatives are described in
+the following sections.
+
+[section:simple_counters Exposing Performance Counter Data using a Simple Function]
 
 The simplest way to expose arbitrary numeric data is to write a function which
 then will be called whenever a consumer queries this counter. Currently, this
@@ -95,6 +100,40 @@ calling `hpx::init` to initialize the runtime system:
 Please see the code in
 [hpx_link examples/performance_counters/simplest_performance_counter.cpp..simplest_performance_counter.cpp]
 for a full example demonstrating this functionality.
+
+[endsect] [/ Exposing Performance Counter Data using a Simple Function]
+
+[section:full_counters Implementing a Full Performance Counter]
+
+Somtimes, the simple way of exposing a single value as a Performance Counter is
+not sufficient. For that reason, __hpx__ provides a means of implementing full
+Performance Counters which support:
+
+* Retrieving the descriptive information about the Performance Counter
+* Retrieving the current counter value
+* Resetting the Performance Counter (value)
+* Starting the Performance Counter
+* Stopping the Performance Counter
+* Setting the (initial) value of the Performance Counter
+
+Every full Performance Counter will implement a predefined interface:
+
+[import ../../hpx/performance_counters/performance_counter.hpp]
+[performance_counter_interface]
+
+
+Additionally, full Performance Counters not only expose the actual value but
+also provide information about
+
+* The point in time a particular value was retrieved
+* A (sequential) invocation count
+* The actual counter value
+* An optional scaling coefficient
+* Information about the counter status
+
+
+
+[endsect] [/ Implementing a Full Performance Counter]
 
 [endsect] [/ Providing Performance Counter Data]
 

@@ -17,15 +17,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
-    class base_performance_counter
+    class base_performance_counter : public performance_counter
     {
     protected:
-        /// Destructor, needs to be virtual to allow for clean destruction of
-        /// derived objects
-        virtual ~base_performance_counter() {}
-
-        virtual void get_counter_value(counter_value& value) = 0;
-
         /// the following functions are not implemented by default, they will
         /// just throw
         virtual void reset_counter_value()
@@ -48,6 +42,11 @@ namespace hpx { namespace performance_counters { namespace server
         virtual bool stop()
         {
             return false;
+        }
+
+        virtual counter_info get_counter_info() const
+        {
+            return info_;
         }
 
     public:
@@ -76,9 +75,9 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
-        counter_info get_counter_info_nonvirt()
+        counter_info get_counter_info_nonvirt() const
         {
-            return info_;
+            return get_counter_info();
         }
 
         counter_value get_counter_value_nonvirt()
@@ -93,7 +92,7 @@ namespace hpx { namespace performance_counters { namespace server
             set_counter_value(info);
         }
 
-        void reset_counter_value_nonvirt()
+        void reset_counter_value_nonvirt() const
         {
             reset_counter_value();
         }
@@ -115,7 +114,7 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
         typedef hpx::actions::result_action0<
-            base_performance_counter, counter_info,
+            base_performance_counter const, counter_info,
             &base_performance_counter::get_counter_info_nonvirt
         > get_counter_info_action;
 
