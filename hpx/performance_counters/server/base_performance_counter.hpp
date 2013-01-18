@@ -11,13 +11,15 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 
 #include <boost/detail/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
-    class base_performance_counter : public performance_counter
+    class base_performance_counter
+      : public hpx::performance_counters::performance_counter
     {
     protected:
         /// the following functions are not implemented by default, they will
@@ -77,34 +79,32 @@ namespace hpx { namespace performance_counters { namespace server
         ///////////////////////////////////////////////////////////////////////
         counter_info get_counter_info_nonvirt() const
         {
-            return get_counter_info();
+            return this->get_counter_info();
         }
 
         counter_value get_counter_value_nonvirt()
         {
-            counter_value value;
-            get_counter_value(value);
-            return value;
+            return this->get_counter_value();
         }
 
         void set_counter_value_nonvirt(counter_value const& info)
         {
-            set_counter_value(info);
+            this->set_counter_value(info);
         }
 
-        void reset_counter_value_nonvirt() const
+        void reset_counter_value_nonvirt()
         {
-            reset_counter_value();
+            this->reset_counter_value();
         }
 
         bool start_nonvirt()
         {
-            return start();
+            return this->start();
         }
 
         bool stop_nonvirt()
         {
-            return stop();
+            return this->stop();
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -150,9 +150,9 @@ namespace hpx { namespace performance_counters { namespace server
             &base_performance_counter::stop_nonvirt
         > stop_action;
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {

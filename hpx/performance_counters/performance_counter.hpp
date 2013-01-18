@@ -13,7 +13,7 @@
 namespace hpx { namespace performance_counters
 {
     //[performance_counter_interface
-    /// Abstract base interface for all Performance Counters.
+    // Abstract base interface for all Performance Counters.
     struct performance_counter
     {
         //<-
@@ -22,7 +22,7 @@ namespace hpx { namespace performance_counters
         virtual ~performance_counter() {}
         //->
         // Retrieve the descriptive information about the Performance Counter.
-        virtual counter_info get_counter_value() const = 0;
+        virtual counter_info get_counter_info() const = 0;
 
         // Retrieve the current Performance Counter value.
         virtual counter_value get_counter_value() = 0;
@@ -30,14 +30,14 @@ namespace hpx { namespace performance_counters
         // Reset the Performance Counter (value).
         virtual void reset_counter_value() = 0;
 
+        // Set the (initial) value of the Performance Counter.
+        virtual void set_counter_value(counter_value const& /*value*/) = 0;
+
         // Start the Performabnce Counter.
         virtual bool start() = 0;
 
         // Stop the Performabnce Counter.
         virtual bool stop() = 0;
-
-        // Set the (initial) value of the Performance Counter.
-        virtual void set_counter_value(counter_value const& /*value*/) = 0;
     };
     //]
 }}

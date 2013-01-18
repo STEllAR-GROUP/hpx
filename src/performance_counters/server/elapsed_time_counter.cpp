@@ -37,15 +37,18 @@ namespace hpx { namespace performance_counters { namespace server
         }
     }
 
-    void elapsed_time_counter::get_counter_value(counter_value& value)
+    hpx::performance_counters::counter_value
+        elapsed_time_counter::get_counter_value()
     {
         // gather the current value
+        hpx::performance_counters::counter_value value;
         value.value_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         value.scaling_ = 1000000000LL;      // coefficient to get seconds
         value.scale_inverse_ = true;
         value.status_ = status_new_data;
         value.time_ = static_cast<boost::uint64_t>(util::high_resolution_clock::now());
         value.count_ = ++invocation_count_;
+        return value;
     }
 }}}
 
