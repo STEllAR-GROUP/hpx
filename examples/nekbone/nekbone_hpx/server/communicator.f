@@ -158,10 +158,16 @@ cc
 c         call mpi_allreduce(x,w,n,nekreal,mpi_sum ,nekcomm,ierr)
          call double_mpi_allreduce_cmm(hpx_bti,x,w,n,ierr)
       elseif (op.EQ.'M  ') then
+          print*,' M NOT IMPLEMENTED ! '
+          stop
 c         call mpi_allreduce (x,w,n,nekreal,mpi_max ,nekcomm,ierr)
       elseif (op.EQ.'m  ') then
+          print*,' m NOT IMPLEMENTED ! '
+          stop
 c         call mpi_allreduce (x,w,n,nekreal,mpi_min ,nekcomm,ierr)
       elseif (op.EQ.'*  ') then
+          print*,' * NOT IMPLEMENTED ! '
+          stop
 c         call mpi_allreduce (x,w,n,nekreal,mpi_prod,nekcomm,ierr)
       else
          write(6,*) nid,' OP ',op,' not supported.  ABORT in GOP.'

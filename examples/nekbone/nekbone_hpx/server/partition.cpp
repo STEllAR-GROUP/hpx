@@ -28,6 +28,18 @@ extern "C" {
     nekbone::server::partition *ptr_to_class = *static_cast<nekbone::server::partition**>(pfoo);
     ptr_to_class->double_mpi_allreduce(x,w,n,ierr);
   }
+  double FNAME(system_uptime)() {
+    boost::uint64_t uptime_nano = hpx::get_system_uptime();
+    return uptime_nano*1.e-9;
+  }
+  double system_uptime() {
+    boost::uint64_t uptime_nano = hpx::get_system_uptime();
+    return uptime_nano*1.e-9;
+  }
+  void allreduce_cmm(void* pfoo) {
+    nekbone::server::partition *ptr_to_class = *static_cast<nekbone::server::partition**>(pfoo);
+    ptr_to_class->allreduce();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,6 +146,11 @@ namespace nekbone { namespace server
           mpi_allreduce_data_[i] += data[i];
       }
       double_allreduce_gate_.set(which); // trigger corresponding and-gate input
+    }
+
+    void partition::allreduce()
+    {
+      std::cout << " TEST HELLO WORLD FROM C++ " << std::endl;
     }
 
 }}

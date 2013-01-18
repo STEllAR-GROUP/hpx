@@ -42,6 +42,7 @@ namespace nekbone { namespace server
                            std::size_t generation,
                            int intparams);
 
+        void allreduce();
         void double_mpi_allreduce(double *x, double *w,int *n,int *ierr);
         void set_double_mpi_allreduce(std::size_t which,
                                std::size_t generation,
