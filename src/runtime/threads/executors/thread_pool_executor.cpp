@@ -11,6 +11,8 @@
 #include <hpx/runtime/threads/executors/thread_pool_executor.hpp>
 #include <hpx/util/register_locks.hpp>
 
+#include <boost/scope_exit.hpp>
+
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     void get_processing_units(std::size_t num_threads,
@@ -32,7 +34,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     protected:
         // Return the requested policy element.
-        std::size_t get_policy_element(threads::detail::executor_policy p,
+        std::size_t get_policy_element(threads::detail::executor_parameter p,
             error_code& ec) const
         {
             return sched_.get_policy_element(p, ec);
@@ -66,7 +68,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             std::size_t min_punits)
       : scheduler_(max_punits), shutdown_sem_(0),
         states_(max_punits), puinits_(max_punits),
-        tasks_scheduled_(0), tasks_completed_(0),
+        current_concurrency_(0), tasks_scheduled_(0), tasks_completed_(0),
         min_punits_(min_punits), max_punits_(max_punits), cookie_(0)
     {
         // Inform the resource manager about this new executor. This causes the
@@ -222,6 +224,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor::run(std::size_t virt_core)
     {
         states_[virt_core] = running;
+        ++current_concurrency_;
+
+        BOOST_SCOPE_EXIT(&current_concurrency_) {
+            --current_concurrency_;
+        } BOOST_SCOPE_EXIT_END
 
         boost::int64_t executed_threads = 0;
         boost::uint64_t overall_times = 0, thread_times = 0;
@@ -245,7 +252,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     // Return the requested policy element
     std::size_t thread_pool_executor::get_policy_element(
-        threads::detail::executor_policy p, error_code& ec) const
+        threads::detail::executor_parameter p, error_code& ec) const
     {
         switch(p) {
         case threads::detail::min_concurrency:
@@ -253,6 +260,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         case threads::detail::max_concurrency:
             return max_punits_;
+
+        case threads::detail::current_concurrency:
+            return current_concurrency_;
 
         default:
             break;

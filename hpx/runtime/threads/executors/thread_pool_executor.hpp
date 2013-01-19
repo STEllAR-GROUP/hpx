@@ -29,7 +29,7 @@ namespace hpx { namespace threads { namespace executors
           : public threads::detail::executor_base
         {
         public:
-            thread_pool_executor(std::size_t max_punits = 1, 
+            thread_pool_executor(std::size_t max_punits = 1,
                 std::size_t min_punits = 1);
             ~thread_pool_executor();
 
@@ -37,28 +37,28 @@ namespace hpx { namespace threads { namespace executors
             // Depending on the subclass implementation, this may block in some
             // situations.
             void add(HPX_STD_FUNCTION<void()> f, char const* description,
-                threads::thread_state_enum initial_state, bool run_now, 
+                threads::thread_state_enum initial_state, bool run_now,
                 error_code& ec);
 
             // Like add(), except that if the attempt to add the function would
             // cause the caller to block in add, try_add would instead do
             // nothing and return false.
             bool try_add(HPX_STD_FUNCTION<void()> f, char const* description,
-                threads::thread_state_enum initial_state, bool run_now, 
+                threads::thread_state_enum initial_state, bool run_now,
                 error_code& ec);
 
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
             void add_at(boost::posix_time::ptime const& abs_time,
-                HPX_STD_FUNCTION<void()> f, char const* description, 
+                HPX_STD_FUNCTION<void()> f, char const* description,
                 error_code& ec);
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
             void add_after(boost::posix_time::time_duration const& rel_time,
-                HPX_STD_FUNCTION<void()> f, char const* description, 
+                HPX_STD_FUNCTION<void()> f, char const* description,
                 error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
@@ -67,18 +67,18 @@ namespace hpx { namespace threads { namespace executors
         protected:
             friend class manage_thread_pool_executor;
 
-            // The function below are used by the resource manager to 
+            // The function below are used by the resource manager to
             // interact with the scheduler.
 
             // Return the requested policy element
-            std::size_t get_policy_element(threads::detail::executor_policy p, 
+            std::size_t get_policy_element(threads::detail::executor_parameter p,
                 error_code& ec) const;
 
             // Return statistics collected by this scheduler
             void get_statistics(executor_statistics& stats, error_code& ec) const;
 
             // Provide the given processing unit to the scheduler.
-            void add_processing_unit(std::size_t virt_core, 
+            void add_processing_unit(std::size_t virt_core,
                 std::size_t thread_num, error_code& ec);
 
             // Remove the given processing unit from the scheduler.
@@ -100,6 +100,7 @@ namespace hpx { namespace threads { namespace executors
             std::vector<std::size_t> puinits_;
 
             // collect statistics
+            boost::atomic<std::size_t> current_concurrency_;
             boost::atomic<boost::uint64_t> tasks_scheduled_;
             boost::atomic<boost::uint64_t> tasks_completed_;
 

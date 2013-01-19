@@ -35,10 +35,11 @@ namespace hpx { namespace threads
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        enum executor_policy
+        enum executor_parameter
         {
             min_concurrency = 1,
-            max_concurrency = 2
+            max_concurrency = 2,
+            current_concurrency = 3
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -47,7 +48,7 @@ namespace hpx { namespace threads
         struct manage_executor
         {
             // Return the requested policy element
-            virtual std::size_t get_policy_element(executor_policy p,
+            virtual std::size_t get_policy_element(executor_parameter p,
                 error_code& ec) const = 0;
 
             // Return statistics collected by this scheduler
