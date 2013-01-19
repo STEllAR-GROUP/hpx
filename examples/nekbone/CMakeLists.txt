@@ -19,6 +19,7 @@ if(HDF5_CPP_FOUND AND HDF5_THREAD_SAFE AND CMAKE_Fortran_COMPILER AND HDF5_FORTR
   # for all targets specified above
   set(sources
     nekbone_client.cpp
+    blas.f
   )
 
   source_group("Source Files" FILES ${sources})

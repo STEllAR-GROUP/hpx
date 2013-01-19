@@ -47,15 +47,25 @@ echo "DONE"
 (cd packages/tar.bz2 && tar -xf ../$TARBZ2)
 (cd packages/7z && 7zr x ../$SEVENZ > /dev/null)
 
+ZIP_MD5=`md5sum packages/$ZIP | awk {'print $1'}`
+TARGZ_MD5=`md5sum packages/$TARGZ | awk {'print $1'}`
+TARBZ2_MD5=`md5sum packages/$TARBZ2 | awk {'print $1'}`
+SEVENZ_MD5=`md5sum packages/$SEVENZ | awk {'print $1'}`
+
+ZIP_SIZE=`ls -s -h packages/$ZIP | awk {'print $1'}`
+TARGZ_SIZE=`ls -s -h packages/$TARGZ | awk {'print $1'}`
+TARBZ2_SIZE=`ls -s -h packages/$TARBZ2 | awk {'print $1'}`
+SEVENZ_SIZE=`ls -s -h packages/$SEVENZ | awk {'print $1'}`
+
 echo "<ul>"
-echo "    <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$WEBSITE/downloads/hpx-v$DASH_VERSION-release-notes/\">release notes</a>"
-echo "    <table>"
-echo "        <tr><th>File</th><th>MD5 Hash</th></tr>"
-echo "        <tr><td><a title=\"HPX V$DOT_VERSION (zip)\" href=\"$WEBSITE/files/$ZIP\">zip</a></td><td><code>`md5sum packages/$ZIP | awk {'print $1'}`</code></td></tr>"
-echo "        <tr><td><a title=\"HPX V$DOT_VERSION (gz)\" href=\"$WEBSITE/files/$TARGZ\">gz</a></td><td><code>`md5sum packages/$TARGZ | awk {'print $1'}`</code></td></tr>"
-echo "        <tr><td><a title=\"HPX V$DOT_VERSION (bz2)\" href=\"$WEBSITE/files/$TARBZ2\">bz2</a></td><td><code>`md5sum packages/$TARBZ2 | awk {'print $1'}`</code></td></tr>"
-echo "        <tr><td><a title=\"HPX V$DOT_VERSION (7z)\" href=\"$WEBSITE/files/$SEVENZ\">7z</a></td><td><code>`md5sum packages/$SEVENZ | awk {'print $1'}`</code></td></tr>"
-echo "    </table>"
-echo "    </li>"
+echo "  <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$WEBSITE/downloads/hpx-v$DASH_VERSION-release-notes/\">release notes</a>"
+echo "  <table>"
+echo "    <tr><th>File</th><th>MD5 Hash</th></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (zip)\" href=\"$WEBSITE/files/$ZIP\">zip ($ZIP_SIZE)</a></td><td><code>$ZIP_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (gz)\" href=\"$WEBSITE/files/$TARGZ\">gz ($TARGZ_SIZE)</a></td><td><code>$TARGZ_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (bz2)\" href=\"$WEBSITE/files/$TARBZ2\">bz2 ($TARBZ2_SIZE)</a></td><td><code>$TARBZ2_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (7z)\" href=\"$WEBSITE/files/$SEVENZ\">7z ($SEVENZ_SIZE)</a></td><td><code>$SEVENZ_MD5</code></td></tr>"
+echo "  </table>"
+echo "  </li>"
 echo "</ul>"
 
