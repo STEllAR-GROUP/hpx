@@ -103,7 +103,7 @@ namespace hpx { namespace util
         reinitializable_static()
         {
             // rely on ADL to find the proper call_once
-            call_once(constructed_,
+            boost::call_once(constructed_,
                 &reinitializable_static::default_constructor);
         }
 
@@ -111,7 +111,7 @@ namespace hpx { namespace util
         reinitializable_static(U const& val)
         {
             // rely on ADL to find the proper call_once
-            call_once(constructed_,
+            boost::call_once(constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
@@ -213,7 +213,7 @@ namespace hpx { namespace util
         reinitializable_static()
         {
             // rely on ADL to find the proper call_once
-            call_once(constructed_,
+            lcos::local::call_once(constructed_,
                 &reinitializable_static::default_constructor);
         }
 
@@ -221,7 +221,7 @@ namespace hpx { namespace util
         reinitializable_static(U const& val)
         {
             // rely on ADL to find the proper call_once
-            call_once(constructed_,
+            lcos::local::call_once(constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
