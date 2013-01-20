@@ -10,6 +10,9 @@ namespace hpx { namespace lcos { namespace local
 {
     // call_once support
     struct once_flag;
+
+    template <typename Function>
+    void call_once(once_flag& flag, Function f);
 }}}
 
 #define HPX_ONCE_INIT hpx::lcos::local::once_flag()
