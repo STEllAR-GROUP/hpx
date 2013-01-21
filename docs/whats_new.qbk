@@ -16,8 +16,12 @@ TBD
 
 [heading Bug Fixes (Closed Tickets)]
 
-Here is a list of the important tickets we closed for this release. 
+Here is a list of the important tickets we closed for this release.
 
+* [issue 672] - External build breaks if library path has spaces
+* [issue 671] - release tarballs are tarbombs
+* [issue 670] - CMake won't find Boost headers in layout=versioned install
+* [issue 669] - Links in docs to source files broken if not installed
 * [issue 667] - Not reading ini file properly
 
 
