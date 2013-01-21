@@ -60,6 +60,10 @@ macro(get_boost_version)
           PATHS ${BOOST_INCLUDE_DIR}
           PATH_SUFFIXES ${boost_possible_suffixes}
           NO_DEFAULT_PATH)
+
+      if(NOT ${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+        set(BOOST_INCLUDE_DIR "${BOOST_VERSION_HPP}")
+      endif()
     endif()
 
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
