@@ -151,12 +151,16 @@ else()
       set(doxygen_option "-D__hpx_doxygen__")
     endif()
 
+    set(doc_source_dir "'''./code'''")
+    if(HPX_NO_INSTALL)
+      set(doc_source_dir "'''file:///${hpx_SOURCE_DIR}/'''")
+    endif()
     add_custom_command(OUTPUT ${name}.xml
       COMMAND ${BOOSTQUICKBOOK_PROGRAM}
           "--output-file=${name}.xml"
           "${git_commit_option}"
           "${doxygen_option}"
-          "-D__hpx_source_dir__=code"
+          "-D__hpx_source_dir__=${doc_source_dir}"
           "-D__hpx_binary_dir__=${CMAKE_BINARY_DIR}"
           "-D__hpx_docs_dir__=${CMAKE_CURRENT_BINARY_DIR}"
           ${${name}_QUICKBOOK_ARGS}
