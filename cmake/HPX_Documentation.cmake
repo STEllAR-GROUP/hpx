@@ -153,7 +153,7 @@ else()
 
     set(doc_source_dir "'''./code'''")
     if(HPX_NO_INSTALL)
-      set(doc_source_dir "'''file:///${hpx_SOURCE_DIR}/'''")
+      set(doc_source_dir "'''file:///${hpx_SOURCE_DIR}'''")
     endif()
     add_custom_command(OUTPUT ${name}.xml
       COMMAND ${BOOSTQUICKBOOK_PROGRAM}
