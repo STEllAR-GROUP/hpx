@@ -16,9 +16,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     resource_manager& resource_manager::get()
     {
-        typedef util::reinitializable_static<
-           resource_manager, tag, 1, lcos::local::once_flag
-        > static_type;
+        typedef util::reinitializable_static<resource_manager, tag> static_type;
 
         static_type instance;
         return instance.get();

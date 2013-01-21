@@ -14,7 +14,7 @@ namespace hpx { namespace threads
     executor& executor::default_executor()
     {
         typedef util::reinitializable_static<
-            executors::default_executor, tag, 1, lcos::local::once_flag
+            executors::default_executor, tag
         > static_type;
 
         static_type instance;
