@@ -172,6 +172,29 @@ macro(find_boost_library target_lib)
     endforeach()
 
     if(NOT BOOST_${target_lib_uc}_LIBRARY)
+      hpx_warn("boost.${target_lib}" "Could not locate Boost ${target_lib} shared library in ${BOOST_LIBRARY_DIR}. Now searching in versioned boost library layout path.")
+      unset(BOOST_${target_lib_uc}_LIBRARY)
+
+      build_boost_libname(${target_lib})
+      hpx_print_list("DEBUG" "boost.${target_lib}" "Searching in versioned boost library layout path" BOOST_LIBNAMES)
+
+      set(versioned_library_dir "${BOOST_LIBRARY_DIR}/boost-${BOOST_MAJOR_VERSION}_${BOOST_MINOR_VERSION}")
+      if(${BOOST_PATCH_VERSION} GREATER 0)
+        set(versioned_library_dir "${versioned_library_dir}_${BOOST_PATCH_VERSION}")
+      endif()
+      foreach(BOOST_TARGET ${BOOST_LIBNAMES})
+        find_library(BOOST_${target_lib_uc}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${versioned_library_dir} NO_DEFAULT_PATH)
+
+        if(BOOST_${target_lib_uc}_LIBRARY)
+          get_filename_component(path ${BOOST_${target_lib_uc}_LIBRARY} PATH)
+          get_filename_component(name ${BOOST_${target_lib_uc}_LIBRARY} NAME)
+          hpx_info("boost.${target_lib}" "Found ${name} in ${path}.")
+          break()
+        endif()
+      endforeach()
+    endif()
+
+    if(NOT BOOST_${target_lib_uc}_LIBRARY)
       hpx_warn("boost.${target_lib}" "Could not locate Boost ${target_lib} shared library in ${BOOST_LIBRARY_DIR}. Now searching the system path.")
       unset(BOOST_${target_lib_uc}_LIBRARY)
 
