@@ -118,7 +118,7 @@ macro(add_hpx_executable name)
       endif()
     endif()
 
-    if(HPX_EXTERNAL_CMAKE)
+    if(HPX_EXTERNAL_CMAKE AND "${HPX_LIBRARIES}")
       set(hpx_libs "${hpx_libs} ${HPX_LIBRARIES}")
     endif()
 
