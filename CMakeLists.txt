@@ -1352,7 +1352,7 @@ set(external_include_directories "")
 set(external_include_flags "")
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
-  string(REPLACE " " "\\ " directory ${directory})
+  string(REGEX REPLACE "([ ()])" "\\\\\\1" directory "${directory}")
   set(external_link_directories "${external_link_directories} ${directory}")
   set(external_link_flags "${external_link_flags} -L${directory}")
   set(external_rpath "${external_rpath}:${directory}")
@@ -1368,7 +1368,7 @@ foreach(lib ${external_libraries})
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
-  string(REPLACE " " "\\ " directory ${directory})
+  string(REGEX REPLACE "([ ()])" "\\\\\\1" directory "${directory}")
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
@@ -1377,7 +1377,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
-  string(REPLACE " " "\\ " BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
+  string(REGEX REPLACE "([ ()])" "\\\\\\1" BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info
