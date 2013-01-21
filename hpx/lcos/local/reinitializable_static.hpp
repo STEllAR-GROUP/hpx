@@ -4,10 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM)
-#define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
+#if !defined(HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM)
+#define HPX_LCOS_LOCAL_REINITIALIZABLE_STATIC_JAN_20_2013_0409PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/local/once.hpp>
 #include <hpx/util/static_reinit.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -20,9 +21,6 @@
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
-#include <boost/thread/once.hpp>
-#include <boost/bind.hpp>
-
 #include <memory>   // for placement new
 
 #if !defined(BOOST_WINDOWS)
@@ -31,7 +29,7 @@
 #  define HPX_EXPORT_REINITIALIZABLE_STATIC
 #endif
 
-namespace hpx { namespace util
+namespace hpx { namespace lcos { namespace local
 {
     ///////////////////////////////////////////////////////////////////////////
     //  Provides thread-safe initialization of a single static instance of T.
@@ -50,7 +48,6 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T, std::size_t N = 1>
     struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
 
-    //////////////////////////////////////////////////////////////////////////
     template <typename T, typename Tag, std::size_t N>
     struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
       : private boost::noncopyable
@@ -82,7 +79,7 @@ namespace hpx { namespace util
         static void default_constructor()
         {
             default_construct();
-            reinit_register(
+            util::reinit_register(
                 &reinitializable_static::default_construct, &destruct);
         }
 
@@ -90,7 +87,7 @@ namespace hpx { namespace util
         static void value_constructor(U const* pv)
         {
             value_construct(*pv);
-            reinit_register(boost::bind(
+            util::reinit_register(boost::bind(
                 &reinitializable_static::value_construct<U>, *pv), &destruct);
         }
 
@@ -101,7 +98,7 @@ namespace hpx { namespace util
         reinitializable_static()
         {
             // rely on ADL to find the proper call_once
-            boost::call_once(constructed_,
+            lcos::local::call_once(constructed_,
                 &reinitializable_static::default_constructor);
         }
 
@@ -109,7 +106,7 @@ namespace hpx { namespace util
         reinitializable_static(U const& val)
         {
             // rely on ADL to find the proper call_once
-            boost::call_once(constructed_,
+            lcos::local::call_once(constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
@@ -147,7 +144,7 @@ namespace hpx { namespace util
             boost::alignment_of<value_type>::value> storage_type;
 
         static storage_type data_[N];
-        static boost::once_flag constructed_;
+        static lcos::local::once_flag constructed_;
     };
 
     template <typename T, typename Tag, std::size_t N>
@@ -155,9 +152,9 @@ namespace hpx { namespace util
         reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    boost::once_flag reinitializable_static<
-        T, Tag, N>::constructed_ = BOOST_ONCE_INIT;
-}}
+    lcos::local::once_flag reinitializable_static<
+            T, Tag, N>::constructed_;
+}}}
 
 #undef HPX_EXPORT_REINITIALIZABLE_STATIC
 

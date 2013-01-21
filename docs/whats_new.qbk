@@ -8,6 +8,25 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_1_0_0 __hpx__ V1.0.0]
+
+[heading General Changes]
+
+TBD
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release. 
+
+* [issue 667] - Not reading ini file properly
+
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_previous Previous __hpx__ Releases]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_5 __hpx__ V0.9.5]
 
 We have had over 1000 commits since the last release and we have closed
@@ -76,6 +95,7 @@ HPX' releases so far.
 * [issue 638] - hpx build with intel compilers fails on linux
 * [issue 637] - --copy-dt-needed-entries breaks with gold
 * [issue 635] - Boost V1.53 will add Boost.Lockfree and Boost.Atomic
+* [issue 633] - Re-add examples to final 0.9.5 release
 * [issue 632] - Example `thread_aware_timer` is broken
 * [issue 631] - FFT application throws error in parcellayer
 * [issue 630] - Event synchronization example is broken
@@ -743,6 +763,8 @@ Here is a list of the important tickets we closed for this release:
 * [issue 277] - Invalid CMake logic for Windows
 
 [endsect]
+
+[endsect] [/ Previous HPX Releases]
 
 [endsect] [/ What's New]
 

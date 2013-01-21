@@ -61,6 +61,9 @@
          
 */
 
+
+double system_uptime(void);
+
 #ifdef MPI
 #include <mpi.h>
 typedef MPI_Comm comm_ext;
@@ -187,7 +190,7 @@ static double comm_time(void)
 #ifdef MPI
   return MPI_Wtime();
 #else
-  return 0;
+  return system_uptime();
 #endif
 }
 
@@ -253,6 +256,7 @@ static void comm_bcast(const struct comm *c, void *p, size_t n, uint root)
 #ifdef MPI
   MPI_Bcast(p,n,MPI_UNSIGNED_CHAR,root,c->c);
 #endif
+  exit(0);
 }
 
 #endif

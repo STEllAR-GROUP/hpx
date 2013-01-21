@@ -12,11 +12,9 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/util/static.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/lcos/local/reinitializable_static.hpp>
 #include <hpx/components/iostreams/lazy_ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
-#include <hpx/lcos/local/once.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
@@ -128,9 +126,8 @@ namespace hpx { namespace iostreams
     // return the singleton stream objects
     lazy_ostream& cout()
     {
-        typedef util::reinitializable_static<
-            stream_raii<detail::raii_cout_tag>, detail::raii_cout_tag, 
-            1, lcos::local::once_flag
+        typedef lcos::local::reinitializable_static<
+            stream_raii<detail::raii_cout_tag>, detail::raii_cout_tag
         > static_type;
 
         static_type cout_(detail::cout_name);
@@ -139,9 +136,8 @@ namespace hpx { namespace iostreams
 
     lazy_ostream& cerr()
     {
-        typedef util::reinitializable_static<
-            stream_raii<detail::raii_cerr_tag>, detail::raii_cerr_tag, 
-            1, lcos::local::once_flag
+        typedef lcos::local::reinitializable_static<
+            stream_raii<detail::raii_cerr_tag>, detail::raii_cerr_tag
         > static_type;
 
         static_type cerr_(detail::cerr_name);

@@ -106,9 +106,12 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     template <typename Statistic>
-    void aggregating_counter<Statistic>::get_counter_value(counter_value& value)
+    hpx::performance_counters::counter_value
+        aggregating_counter<Statistic>::get_counter_value()
     {
         mutex_type::scoped_lock l(mtx_);
+
+        hpx::performance_counters::counter_value value;
 
         value = prev_value_;                              // return value
         value.value_ = detail::counter_type_from_statistic<Statistic>::call(value_);
@@ -120,6 +123,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         value_ = mean_accumulator_type();                 // reset accumulator
         value_(static_cast<double>(prev_value_.value_));  // start off with last base value
+
+        return value;
     }
 
     template <typename Statistic>
