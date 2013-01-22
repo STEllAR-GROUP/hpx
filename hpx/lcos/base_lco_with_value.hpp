@@ -14,7 +14,12 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/base_lco_continuation.hpp>
 #include <hpx/util/ini.hpp>
+
+#if defined(HPX_HAVE_CXX11)
 #include <type_traits>
+#else
+#include <boost/type_traits.hpp>
+#endif
 
 #include <boost/mpl/bool.hpp>
 
