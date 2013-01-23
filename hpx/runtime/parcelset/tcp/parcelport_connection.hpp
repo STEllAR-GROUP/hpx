@@ -121,7 +121,7 @@ namespace hpx { namespace parcelset { namespace tcp
             send_data_.num_parcels_ = 0;
 
             // now handle the acknowledgement byte which is sent by the receiver
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+#if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);
             socket_.set_option(quickack);
