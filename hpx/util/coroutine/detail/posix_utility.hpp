@@ -61,6 +61,10 @@ HPX_EXPORT extern bool use_guard_pages;
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 
+#if defined(__FreeBSD__)
+#define EXEC_PAGESIZE (getpagesize())
+#endif
+
   inline
   void*
   alloc_stack(std::size_t size) {
