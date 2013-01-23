@@ -10,8 +10,7 @@
 #ifndef HPX_COROUTINE_CONTEXT_LINUX_HPP_20071126
 #define HPX_COROUTINE_CONTEXT_LINUX_HPP_20071126
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
-
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 
 #include <sys/param.h>
 #include <cstdlib>

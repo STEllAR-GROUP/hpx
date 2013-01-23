@@ -23,7 +23,7 @@
 #include <boost/spirit/include/qi_sequence.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix 
 {
     // this global (urghhh) variable is used to control whether guard pages 
@@ -79,7 +79,7 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
             "huge_size = ${HPX_HUGE_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
@@ -270,7 +270,7 @@ namespace hpx { namespace util
         BOOST_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
         huge_stacksize = init_huge_stack_size();
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
     }
@@ -312,7 +312,7 @@ namespace hpx { namespace util
         large_stacksize = init_large_stack_size();
         huge_stacksize = init_huge_stack_size();
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
     }
@@ -633,7 +633,7 @@ namespace hpx { namespace util
         return defaultvalue;
     }
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
     bool runtime_configuration::init_use_stack_guard_pages() const
     {
         if (has_section("hpx")) {

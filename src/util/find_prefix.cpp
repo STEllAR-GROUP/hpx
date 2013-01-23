@@ -11,7 +11,7 @@
 
 #if defined(BOOST_WINDOWS)
 #  include <windows.h>
-#elif defined(__linux__)
+#elif defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 #  include <unistd.h>
 #  include <linux/limits.h>
 #elif __APPLE__
@@ -72,7 +72,7 @@ namespace hpx { namespace util
         }
         r = exe_path;
 
-#elif defined(__linux__)
+#elif defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         char exe_path[PATH_MAX + 1];
         ssize_t length = readlink("/proc/self/exe", exe_path, sizeof(exe_path));
 

@@ -93,7 +93,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
             buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
             boost::asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);
             socket_.set_option(quickack);
@@ -132,7 +132,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
                 boost::asio::detail::socket_option::boolean<
                     IPPROTO_TCP, TCP_QUICKACK> quickack(true);
                 socket_.set_option(quickack);

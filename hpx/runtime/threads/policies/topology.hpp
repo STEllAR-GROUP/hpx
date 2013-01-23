@@ -14,7 +14,8 @@
 #  include <hpx/runtime/threads/policies/windows_topology.hpp>
 #elif defined(__APPLE__)
 #  include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
+#elif (defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)) && \
+      !defined(__ANDROID__) && !defined(ANDROID)
 #  include <hpx/runtime/threads/policies/linux_topology.hpp>
 #else
 #  include <hpx/runtime/threads/policies/noop_topology.hpp>
