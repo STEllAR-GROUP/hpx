@@ -41,6 +41,7 @@ set(subdirs
     sheneos
     spell_check
     startup_shutdown
+    str_srch
     thread_aware_timer
     throttle
    )
