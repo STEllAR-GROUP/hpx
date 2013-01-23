@@ -47,7 +47,7 @@
 #include <boost/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
-#if defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500
+#if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500)
 
 // OS X 10.4 -- despite passing the test above -- doesn't support
 // swapcontext() et al. Use GNU Pth workalike functions.
@@ -112,7 +112,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         if (error)
             return error;
 
-        ctx->uc_stack.ss_sp = stack;
+        ctx->uc_stack.ss_sp = (char*)stack;
         ctx->uc_stack.ss_size = size;
         ctx->uc_link = exitto;
 
