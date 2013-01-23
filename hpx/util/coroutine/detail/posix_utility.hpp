@@ -77,7 +77,7 @@ HPX_EXPORT extern bool use_guard_pages;
         throw std::runtime_error("mmap() failed to allocate thread stack due "
                                  "to insufficient resources, "
                                  "increase /proc/sys/vm/max_map_count or add "
-                                 "-Ihpx.use_guard_pages=0 to the command line");
+                                 "-Ihpx.stacks.use_guard_pages=0 to the command line");
       else
         throw std::runtime_error("mmap() failed to allocate thread stack");
     }
