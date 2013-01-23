@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cctype>
+#include <set>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -87,29 +88,28 @@ namespace hpx { namespace performance_counters { namespace papi
 
     template<typename T> void discard_result(T const&) { }
 
-    // find thread categories
-    void find_thread_groups(std::vector<std::string>& tdesc)
+    // find threads or their categories
+    void find_threads(std::set<std::string>& tdesc,
+                      hpx::performance_counters::discover_counters_mode mode)
     {
         hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
-        std::set<thread_category> cats;
         std::string label;
         boost::uint32_t tix = 0;
         while (!((label = tm.get_thread_label(tix++)).empty()))
         {
-            size_t pos = label.find_last_of('#');
-            if (pos == label.npos)
-                cats.insert(std::make_pair(label, false));
-            else
-            cats.insert(std::make_pair(label.substr(0, pos), true));
+            if (mode == discover_counters_minimal)
+            {
+                size_t pos = label.find_last_of('#');
+                if (pos == label.npos)tdesc.insert(label);
+                else tdesc.insert(label.substr(0, pos)+"#*");
+            }
+            else tdesc.insert(label);
         }
-        std::set<thread_category>::iterator si;
-        for (si = cats.begin(); si != cats.end(); si++)
-            tdesc.push_back(si->second? si->first+"#*": si->first);
     }
 
     template<class T>
     bool discover_events(counter_path_elements& cpe,
-        std::vector<std::string> const& tdesc,
+        std::set<std::string> const& tdesc,
         hpx::performance_counters::counter_info& info,
         T& gen,
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
@@ -119,7 +119,7 @@ namespace hpx { namespace performance_counters { namespace papi
             boost::make_generator_iterator(gen);
         for ( ; *gi != 0; ++gi)
         {
-            std::vector<std::string>::const_iterator it;
+            std::set<std::string>::const_iterator it;
             // iterate over known thread names
             for (it = tdesc.begin(); it != tdesc.end(); ++it)
             {
@@ -152,28 +152,55 @@ namespace hpx { namespace performance_counters { namespace papi
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        // obtain known OS thread labels
-        std::vector<std::string> tdesc;
-        find_thread_groups(tdesc);
+        if (p.objectname_ == "papi" && p.parentinstancename_.empty() &&
+            p.instancename_.empty() && p.countername_.empty())
+        { // discover all available PAPI counters
+            // obtain known OS thread labels
+            std::set<std::string> tdesc;
+            find_threads(tdesc, mode);
 
-        // fill in common path segments for all counters
-        counter_path_elements cpe;
-        cpe.objectname_ = p.objectname_;
-        cpe.parentinstancename_ = "locality#*";
-        cpe.parentinstanceindex_ = -1;
-        cpe.instanceindex_ = -1;
+            // fill in common path segments for all counters
+            counter_path_elements cpe;
+            cpe.objectname_ = p.objectname_;
+            cpe.parentinstancename_ = "locality#*";
+            cpe.parentinstanceindex_ = -1;
+            cpe.instanceindex_ = -1;
 
-        // enumerate PAPI presets
-        {
-            util::all_preset_info_gen gen;
-            if (!discover_events(cpe, tdesc, cnt_info, gen, f, ec))
-                return false;
+            // enumerate PAPI presets
+            {
+                util::all_preset_info_gen gen;
+                if (!discover_events(cpe, tdesc, cnt_info, gen, f, ec))
+                    return false;
+            }
+            // enumerate PAPI native events
+            for (int ci = 0; ci < PAPI_num_components(); ++ci)
+            {
+                util::native_info_gen gen(ci);
+                if (!discover_events(cpe, tdesc, cnt_info, gen, f, ec))
+                    return false;
+            }
         }
-        // enumerate PAPI native events
-        for (int ci = 0; ci < PAPI_num_components(); ++ci)
-        {
-            util::native_info_gen gen(ci);
-            if (!discover_events(cpe, tdesc, cnt_info, gen, f, ec))
+        else
+        { // no wildcards expected here
+            if (p.instanceindex_ < 0 || p.parentinstanceindex_ < 0) return false;
+            hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
+            std::string lab = p.instancename_+"#"+
+                boost::lexical_cast<std::string>(p.instanceindex_);
+            if (p.objectname_ == "papi" &&
+                p.parentinstancename_ == "locality" &&
+                tm.get_thread_index(lab) != tm.invalid_index &&
+                !p.countername_.empty())
+            { // validate specific PAPI event
+                int code;
+                if (PAPI_event_name_to_code(const_cast<char *>(p.countername_.c_str()), &code) != PAPI_OK)
+                    return false;
+                hpx::performance_counters::counter_status status =
+                    get_counter_name(p, cnt_info.fullname_, ec);
+                if (!status_is_valid(status)) return false;
+                // this is just validation, no helptext required
+                if (!f(cnt_info, ec) || ec) return false;
+            }
+            else // unsupported path components
                 return false;
         }
 
