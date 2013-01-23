@@ -990,7 +990,9 @@ else()
   ##############################################################################
   # System libraries
   ##############################################################################
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl)
+  if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl)
+  endif()
 
   if(NOT APPLE)
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} rt)
