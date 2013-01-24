@@ -885,14 +885,24 @@ else()
   # GCC-only configuration
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(enable_visibility_hidden ON)
     if(040400 LESS ${GCC_VERSION})
+      # visibility can't be disabled for gcc < 4.4
+      set(enable_visibility_hidden OFF)
+    elif(${GCC_VERSION} GREATER 040699 AND ${GCC_VERSION} LESS 040800)
+      # visibility is broken for gcc 4.7.x
+      set(enable_visibility_hidden OFF)
+    endif()
+
+    if(${enable_visibility_hidden})
       option(HPX_ELF_HIDDEN_VISIBILITY
         "Use -fvisibility=hidden for Release and MinSizeRel builds (default: ON)" ON)
 
       if(HPX_ELF_HIDDEN_VISIBILITY)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
-       "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-       "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+           "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+           "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DHPX_PLUGIN_GCC_HAVE_VISIBILITY)
