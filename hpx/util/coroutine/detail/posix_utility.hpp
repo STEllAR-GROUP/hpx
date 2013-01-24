@@ -52,6 +52,11 @@
 #include <errno.h>
 #endif
 
+#if defined(__FreeBSD__)
+#include <sys/param.h>
+#define EXEC_PAGESIZE PAGE_SIZE
+#endif
+
 /**
  * Stack allocation routines and trampolines for setcontext
  */
@@ -60,10 +65,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 HPX_EXPORT extern bool use_guard_pages;
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
-
-#if defined(__FreeBSD__)
-#define EXEC_PAGESIZE (getpagesize())
-#endif
 
   inline
   void*
