@@ -12,4 +12,4 @@ There is only one command line option: --os_factor.  This is the oversubscriptio
 it gives the number of HPX-threads you would like to run per locality.  The larger this number,
 the finer grain the computation. 
 
-The GTC code base was GTC_nersc6.  However, it was modified in order to become thread safe.  The gtc_nersc6.tar.gz contains the original fortran code.
+The GTC code base was GTC_nersc6.  However, it was modified in order to become thread safe.  The original fortran code can be downloaded from the PPPL website (http://w3.pppl.gov/theory/proj_gksim.html).
