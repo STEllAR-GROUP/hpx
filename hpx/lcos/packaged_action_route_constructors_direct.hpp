@@ -64,21 +64,6 @@
         apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_action_route(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
 #undef N
 
 #endif
