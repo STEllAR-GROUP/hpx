@@ -889,7 +889,7 @@ else()
     if(040400 LESS ${GCC_VERSION})
       # visibility can't be disabled for gcc < 4.4
       set(enable_visibility_hidden OFF)
-    elif(${GCC_VERSION} GREATER 040699 AND ${GCC_VERSION} LESS 040800)
+    elseif(${GCC_VERSION} GREATER 040699 AND ${GCC_VERSION} LESS 040800)
       # visibility is broken for gcc 4.7.x
       set(enable_visibility_hidden OFF)
     endif()
