@@ -17,6 +17,7 @@ hpx_include(Message
             Compile
             TargetPaths
             AddComponent
+            AddDefinitions
             AddLibrary
             AddExecutable
             AddConfigTest
