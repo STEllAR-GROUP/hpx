@@ -51,7 +51,7 @@ macro(get_boost_version)
 
       if(NOT BOOST_INCLUDE_DIR)
         set(BOOST_INCLUDE_DIR "${BOOST_ROOT}/include")
-        hpx_warn("boost.version" "Could not locate Boost include directory. Now searching versioned include directory (${BOOST_INCLUDE_DIR}).")
+        hpx_warn("boost.version" "Could not locate Boost include directory. Now searching versioned include directory (\${BOOST_ROOT}/include).")
       else()
         hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching versioned include directory.")
       endif()

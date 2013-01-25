@@ -11,11 +11,15 @@
 
 #if defined(BOOST_WINDOWS)
 #  include <windows.h>
-#elif defined(__linux__)
+#elif defined(__linux) || defined(linux) || defined(__linux__)
 #  include <unistd.h>
 #  include <linux/limits.h>
 #elif __APPLE__
 #  include <mach-o/dyld.h>
+#elif defined(__FreeBSD__)
+#  include <sys/types.h>
+#  include <sys/sysctl.h>
+#  include <vector>
 #endif
 
 #include <boost/cstdint.hpp>
@@ -72,7 +76,7 @@ namespace hpx { namespace util
         }
         r = exe_path;
 
-#elif defined(__linux__)
+#elif defined(__linux) || defined(linux) || defined(__linux__)
         char exe_path[PATH_MAX + 1];
         ssize_t length = readlink("/proc/self/exe", exe_path, sizeof(exe_path));
 
@@ -99,6 +103,17 @@ namespace hpx { namespace util
 
         exe_path[len] = '\0';
         r = exe_path;
+
+#elif defined(__FreeBSD__)
+        int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+        size_t cb = 0;
+        sysctl(mib, 4, NULL, &cb, NULL, 0);
+        if (cb)
+        {
+            std::vector<char> buf(cb);
+            sysctl(mib, 4, &buf[0], &cb, NULL, 0);
+            r = &buf[0];
+        }
 
 #else
 #  error Unsupported platform
