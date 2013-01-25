@@ -20,32 +20,46 @@ TARBZ2=hpx_$DOT_VERSION.tar.bz2
 SEVENZ=hpx_$DOT_VERSION.7z
 
 rm -rf packages
-mkdir packages
-mkdir packages/zip
-mkdir packages/tar.gz
-mkdir packages/tar.bz2
-mkdir packages/7z
+mkdir -p packages/zip/hpx_$DOT_VERSION
+mkdir -p packages/tar.gz/hpx_$DOT_VERSION
+mkdir -p packages/tar.bz2/hpx_$DOT_VERSION
+mkdir -p packages/7z/hpx_$DOT_VERSION
 
 echo -n "Packaging $ZIP... "
 zip -q -x .git\* -x packages -x packages/\* -r packages/$ZIP .
+(cd packages/zip/hpx_$DOT_VERSION && unzip -qq ../../$ZIP)
+rm -f packages/$ZIP
+(cd packages/zip && zip -q -r ../$ZIP hpx_$DOT_VERSION)  
+rm -rf packages/zip/hpx_$DOT_VERSION
+(cd packages/zip && unzip -qq ../$ZIP)
 echo "DONE"
 
 echo -n "Packaging $TARGZ... "
 tar --exclude=.git\* --exclude=packages --exclude=packages/\* -czf packages/$TARGZ .
+(cd packages/tar.gz/hpx_$DOT_VERSION && tar -xf ../../$TARGZ)
+rm -f packages/$TARGZ
+(cd packages/tar.gz && tar -czf ../$TARGZ hpx_$DOT_VERSION)
+rm -rf packages/tar.gz/hpx_$DOT_VERSION
+(cd packages/tar.gz && tar -xf ../$TARGZ)
 echo "DONE"
 
 echo -n "Packaging $TARBZ2... "
 tar --exclude=.git\* --exclude=packages --exclude=packages/\* -cjf packages/$TARBZ2 .
+(cd packages/tar.bz2/hpx_$DOT_VERSION && tar -xf ../../$TARBZ2)
+rm -f packages/$TARBZ2
+(cd packages/tar.bz2 && tar -cjf ../$TARBZ2 hpx_$DOT_VERSION)
+rm -rf packages/tar.bz2/hpx_$DOT_VERSION
+(cd packages/tar.bz2 && tar -xf ../$TARBZ2)
 echo "DONE"
 
 echo -n "Packaging $SEVENZ... "
 7zr a -xr\!.git -xr\!packages packages/$SEVENZ . > /dev/null 
-echo "DONE"
-
-(cd packages/zip && unzip -qq ../$ZIP)
-(cd packages/tar.gz && tar -xf ../$TARGZ)
-(cd packages/tar.bz2 && tar -xf ../$TARBZ2)
+(cd packages/7z/hpx_$DOT_VERSION && 7zr x ../../$SEVENZ > /dev/null)
+rm -f packages/$SEVENZ
+(cd packages/7z && 7zr a ../$SEVENZ hpx_$DOT_VERSION > /dev/null)
+rm -rf packages/7z/hpx_$DOT_VERSION
 (cd packages/7z && 7zr x ../$SEVENZ > /dev/null)
+echo "DONE"
 
 ZIP_MD5=`md5sum packages/$ZIP | awk {'print $1'}`
 TARGZ_MD5=`md5sum packages/$TARGZ | awk {'print $1'}`
