@@ -171,7 +171,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ));
         }
@@ -186,7 +186,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ));
@@ -203,7 +203,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Callback>(cb),
             boost::forward<Arg0>( arg0 ));
     }
@@ -217,7 +217,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             boost::forward<Callback>(cb), boost::forward<Arg0>( arg0 ));
     }
@@ -385,7 +385,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -400,7 +400,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
@@ -417,7 +417,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Callback>(cb),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
@@ -431,7 +431,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             boost::forward<Callback>(cb), boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
@@ -599,7 +599,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -614,7 +614,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
@@ -631,7 +631,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Callback>(cb),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
@@ -645,7 +645,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             boost::forward<Callback>(cb), boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
@@ -813,7 +813,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -828,7 +828,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
@@ -845,7 +845,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Callback>(cb),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
@@ -859,7 +859,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             boost::forward<Callback>(cb), boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
@@ -1027,7 +1027,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -1042,7 +1042,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_cb<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Callback>(cb),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
@@ -1059,7 +1059,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Callback>(cb),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
@@ -1073,7 +1073,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p_cb<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             boost::forward<Callback>(cb), boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }

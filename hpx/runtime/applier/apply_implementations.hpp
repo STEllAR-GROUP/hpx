@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -496,7 +496,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -511,7 +511,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -525,7 +525,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -540,7 +540,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -556,7 +556,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -570,7 +570,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
@@ -587,7 +587,7 @@ namespace hpx
                 result_type;
 
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -601,7 +601,7 @@ namespace hpx
                 result_type;
 
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }

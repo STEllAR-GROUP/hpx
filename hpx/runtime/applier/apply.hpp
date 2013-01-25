@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/base_lco_continuation.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/remove_local_destinations.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -476,7 +476,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
@@ -490,7 +490,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
@@ -504,7 +504,7 @@ namespace hpx
                 result_type;
 
             return apply_r<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid), gid);
+                new actions::typed_continuation<result_type>(contgid), gid);
         }
 
         template <typename Action>
@@ -517,7 +517,7 @@ namespace hpx
                 result_type;
 
             return apply_r_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid), gid);
+                new actions::typed_continuation<result_type>(contgid), gid);
         }
     }}
 
@@ -532,7 +532,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority);
     }
 
@@ -545,7 +545,7 @@ namespace hpx
             result_type;
 
         return apply<Action>(
-            new actions::base_lco_continuation<result_type>(contgid), gid);
+            new actions::typed_continuation<result_type>(contgid), gid);
     }
 
     namespace applier
@@ -560,7 +560,7 @@ namespace hpx
                 result_type;
 
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
@@ -573,7 +573,7 @@ namespace hpx
                 result_type;
 
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid), gid);
+                new actions::typed_continuation<result_type>(contgid), gid);
         }
     }
 }

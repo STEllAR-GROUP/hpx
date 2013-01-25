@@ -20,9 +20,9 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/decay.hpp>
+
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-
 #include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>

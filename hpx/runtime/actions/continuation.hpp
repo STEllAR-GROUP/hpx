@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -90,12 +90,30 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+                BOOST_FWD_REF(F) f)
+          : continuation(gid), f_(boost::move(f))
+        {}
+
         virtual ~typed_continuation()
         {
             detail::guid_initialization<typed_continuation>();
         }
 
-        virtual void trigger_value(BOOST_RV_REF(Result)) const = 0;
+        void trigger_value(BOOST_RV_REF(Result) result) const
+        {
+            LLCO_(info) << "continuation::trigger(" << this->get_gid() << ")";
+            if (!f_.empty())
+                f_(this->get_gid(), boost::move(result));
+            else {
+                typedef typename
+                    lcos::template base_lco_with_value<Result>::set_value_action
+                set_value_action_type;
+
+                hpx::apply<set_value_action_type>(this->get_gid(), boost::move(result));
+            }
+        }
 
         static void register_base()
         {
@@ -111,8 +129,17 @@ namespace hpx { namespace actions
         template <class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
+            // serialize function
+            bool have_function = !f_.empty();
+            ar & have_function;
+            if (have_function)
+                ar & f_;
+
+            // serialize base class
             ar & util::base_object_nonvirt<base_type>(*this);
         }
+
+        util::function<void(naming::id_type, Result)> f_;
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -161,11 +188,11 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (hpx::actions::typed_continuation<Result>)
 )
 
-
 #define HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(Result, Name)             \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
-        struct needs_guid_initialization<hpx::actions::typed_continuation<Result> >                              \
+        struct needs_guid_initialization<                                     \
+                hpx::actions::typed_continuation<Result> >                    \
           : boost::mpl::false_                                                \
         {};                                                                   \
     }}                                                                        \
@@ -178,8 +205,8 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     BOOST_CLASS_EXPORT_KEY2(hpx::actions::typed_continuation<Result>,         \
         BOOST_PP_STRINGIZE(Name))                                             \
 /**/
-    
-#define HPX_REGISTER_TYPED_CONTINUATION(Result, Name)                    \
+
+#define HPX_REGISTER_TYPED_CONTINUATION(Result, Name)                         \
     HPX_REGISTER_BASE_HELPER(                                                 \
         hpx::actions::typed_continuation<Result>, Name)                       \
     BOOST_CLASS_EXPORT_IMPLEMENT(                                             \
