@@ -27,7 +27,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F>
     typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == 0>
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::result_type
@@ -53,7 +54,8 @@ namespace hpx
 
     template <typename Action, typename F>
     typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == 0>
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::result_type
@@ -129,14 +131,18 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type
-    >
-    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
+        typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == N>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::result_type
+            >::type>
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -146,46 +152,62 @@ namespace hpx
             packaged_action_type;
 
         packaged_action_type p;
-        if (policy & launch::async)
-            p.apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        if (policy & launch::async) {
+            apply<Action>(
+                new hpx::actions::typed_continuation<remote_result_type>(
+                    p.get_gid(), boost::forward<F>(f))
+              , gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        }
         return p.get_future();
     }
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type
-    >
-    async (naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == N>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::result_type
+            >::type>
+    >::type
+    async_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        BOOST_FWD_REF(F) f)
     {
         return async<Action>(launch::all, gid,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<typename traits::promise_local_result<Result>::type>
-    async (BOOST_SCOPED_ENUM(launch) policy,
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>
+      , lcos::future<typename traits::promise_local_result<Result>::type
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        BOOST_FWD_REF(F) f)
     {
         return async<Derived>(policy, gid,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::forward<F>(f));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<typename traits::promise_local_result<Result>::type>
-    async (
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>
+      , lcos::future<typename traits::promise_local_result<Result>::type
+    >::type
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        BOOST_FWD_REF(F) f)
     {
         return async<Derived>(launch::all, gid,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::forward<F>(f));
     }
 }
 

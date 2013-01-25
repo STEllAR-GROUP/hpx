@@ -31,7 +31,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
@@ -46,7 +46,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 2>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
@@ -61,7 +61,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 3>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
@@ -76,7 +76,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 4>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
@@ -91,7 +91,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 5>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
@@ -106,7 +106,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 6>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5,
@@ -121,7 +121,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 7>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6,
@@ -136,7 +136,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 8>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7,
@@ -151,7 +151,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 9>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8,
@@ -166,7 +166,7 @@ namespace hpx
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 10>
       , lcos::future<typename traits::promise_local_result<Result>::type
     >::type
-    async (
+    async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9,

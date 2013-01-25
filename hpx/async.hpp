@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async.hpp>
+#include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind_action.hpp>
