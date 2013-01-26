@@ -32,6 +32,13 @@ namespace hpx
 {
     HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
 
+    // forward declare the required overload of apply.
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg>
+    inline bool apply(
+        hpx::actions::action<Component, Result, Arguments, Derived>,
+        naming::id_type const&, BOOST_FWD_REF(Arg));
+
     template <typename T>
     void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t)
     {
@@ -41,7 +48,7 @@ namespace hpx
         apply(set, id, boost::move(t));
     }
 
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id, 
+    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr const& e);
 }
 
