@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2012      Bryce Adelstein-Lelbach 
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,26 +21,25 @@ int test()
 HPX_PLAIN_ACTION(test, test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-void future_callback(hpx::lcos::future<int> p)
+int future_callback(hpx::lcos::future<int> p)
 {
     HPX_TEST(p.has_value());
-    HPX_TEST_EQ(p.get(), 42);
+    int result = p.get();
+    HPX_TEST_EQ(result, 42);
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     using hpx::lcos::future;
-    using hpx::async_callback;
+    using hpx::async;
 
     {
         test_action do_test;
 
-        future<int> p = async_callback(
-            do_test,
-            boost::bind(future_callback, _1),
-            hpx::find_here()
-        );
+        future<int> f = async(do_test, hpx::find_here());
+        future<int> p = f.then(boost::bind(future_callback, _1));
 
         HPX_TEST_EQ(p.get(), 42);
     }
