@@ -19,20 +19,25 @@
 
 namespace hpx { namespace util { namespace detail { namespace adl_barrier
 {
-    template <typename T>
+    struct has_serialize_mem_fun_getter
+    {
+        template <
+            typename T
+          , void (T::*)(int&, unsigned int const) const = &T::serialize>
+        struct get
+        {};
+    };
+
+    template <typename T, typename Getter = has_serialize_mem_fun_getter>
     struct has_serialize_mem_fun
     {
-        typedef void (T::*SerializationFun)(int&, unsigned);
-
-        template <SerializationFun>
-        struct A {};
-
         template <typename Q>
         static boost::type_traits::yes_type
-            has_serialize_mem_fun_tester(A<&Q::serialize>*);
+            has_serialize_mem_fun_tester(typename Getter::template get<Q>*);
 
         template <typename Q>
-        static boost::type_traits::no_type has_serialize_mem_fun_tester(...);
+        static boost::type_traits::no_type
+            has_serialize_mem_fun_tester(...);
 
         BOOST_STATIC_CONSTANT(bool, value =
             (sizeof(has_serialize_mem_fun_tester<T>(0)) ==
