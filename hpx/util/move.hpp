@@ -69,9 +69,9 @@ namespace hpx { namespace util { namespace detail
     struct move_if_no_ref<T &, false>
     {
         template <typename A>
-        static T call(BOOST_FWD_REF(A) t)
+        static T & call(BOOST_FWD_REF(A) t)
         {
-            return boost::move(t);
+            return t;
         }
     };
 
