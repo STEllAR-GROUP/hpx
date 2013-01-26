@@ -31,8 +31,19 @@ int hpx_main()
 {
     sequence_action seq;
 
-    hpx::future<int> f = hpx::async_continue(seq, hpx::find_here(), 42, continuation());
-    HPX_TEST_EQ(f.get(), 43);
+    // test locally
+    { 
+        hpx::future<int> f = hpx::async_continue(seq, hpx::find_here(), 42, continuation());
+        HPX_TEST_EQ(f.get(), 43);
+    }
+
+    // test remotely, if possible
+    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+    if (!localities.empty()) 
+    {
+        hpx::future<int> f = hpx::async_continue(seq, localities[0], 42, continuation());
+        HPX_TEST_EQ(f.get(), 43);
+    }
 
     return hpx::finalize();
 }
