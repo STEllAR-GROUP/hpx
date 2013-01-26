@@ -19,7 +19,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/async_fwd.hpp>
+#  include <hpx/lcos/preprocessed/async_continue_fwd.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)

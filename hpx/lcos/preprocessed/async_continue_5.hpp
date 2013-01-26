@@ -25,12 +25,10 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type remote_result_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-        packaged_action_type p;
+            remote_result_type>::type result_type;
+        lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
@@ -51,7 +49,7 @@ namespace hpx
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
         BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid,
+        return async_continue<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ), boost::forward<F>(f));
     }
     
@@ -67,7 +65,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid,
+        return async_continue<Derived>(policy, gid,
             boost::forward<Arg0>( arg0 ), boost::forward<F>(f));
     }
     template <typename Component, typename Result, typename Arguments,
@@ -82,7 +80,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid,
+        return async_continue<Derived>(launch::all, gid,
             boost::forward<Arg0>( arg0 ), boost::forward<F>(f));
     }
 }
@@ -103,12 +101,10 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type remote_result_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-        packaged_action_type p;
+            remote_result_type>::type result_type;
+        lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
@@ -129,7 +125,7 @@ namespace hpx
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
         BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid,
+        return async_continue<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ), boost::forward<F>(f));
     }
     
@@ -145,7 +141,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid,
+        return async_continue<Derived>(policy, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ), boost::forward<F>(f));
     }
     template <typename Component, typename Result, typename Arguments,
@@ -160,7 +156,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid,
+        return async_continue<Derived>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ), boost::forward<F>(f));
     }
 }
@@ -181,12 +177,10 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type remote_result_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-        packaged_action_type p;
+            remote_result_type>::type result_type;
+        lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
@@ -207,7 +201,7 @@ namespace hpx
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
         BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid,
+        return async_continue<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ), boost::forward<F>(f));
     }
     
@@ -223,7 +217,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid,
+        return async_continue<Derived>(policy, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ), boost::forward<F>(f));
     }
     template <typename Component, typename Result, typename Arguments,
@@ -238,7 +232,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid,
+        return async_continue<Derived>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ), boost::forward<F>(f));
     }
 }
@@ -259,12 +253,10 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type remote_result_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-        packaged_action_type p;
+            remote_result_type>::type result_type;
+        lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
@@ -285,7 +277,7 @@ namespace hpx
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
         BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid,
+        return async_continue<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ), boost::forward<F>(f));
     }
     
@@ -301,7 +293,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid,
+        return async_continue<Derived>(policy, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ), boost::forward<F>(f));
     }
     template <typename Component, typename Result, typename Arguments,
@@ -316,7 +308,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid,
+        return async_continue<Derived>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ), boost::forward<F>(f));
     }
 }
@@ -337,12 +329,10 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type remote_result_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-        packaged_action_type p;
+            remote_result_type>::type result_type;
+        lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
@@ -363,7 +353,7 @@ namespace hpx
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
         BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid,
+        return async_continue<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ), boost::forward<F>(f));
     }
     
@@ -379,7 +369,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid,
+        return async_continue<Derived>(policy, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ), boost::forward<F>(f));
     }
     template <typename Component, typename Result, typename Arguments,
@@ -394,7 +384,7 @@ namespace hpx
         > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid,
+        return async_continue<Derived>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ), boost::forward<F>(f));
     }
 }

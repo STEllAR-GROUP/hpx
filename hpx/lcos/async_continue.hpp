@@ -63,7 +63,7 @@ namespace hpx
     >::type
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid, boost::forward<F>(f));
+        return async_continue<Action>(launch::all, gid, boost::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ namespace hpx
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid, BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid, boost::forward<F>(f));
+        return async_continue<Derived>(policy, gid, boost::forward<F>(f));
     }
 
     template <typename Component, typename Result, typename Arguments,
@@ -92,12 +92,12 @@ namespace hpx
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid, BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid, boost::forward<F>(f));
+        return async_continue<Derived>(launch::all, gid, boost::forward<F>(f));
     }
 }
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/async.hpp>
+#  include <hpx/lcos/preprocessed/async_continue.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
@@ -145,13 +145,11 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg), BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type remote_result_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
+            remote_result_type>::type result_type;
 
-        packaged_action_type p;
+        lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
@@ -173,7 +171,7 @@ namespace hpx
     async_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         BOOST_FWD_REF(F) f)
     {
-        return async<Action>(launch::all, gid,
+        return async_continue<Action>(launch::all, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::forward<F>(f));
     }
 
@@ -190,7 +188,7 @@ namespace hpx
         > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(policy, gid,
+        return async_continue<Derived>(policy, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::forward<F>(f));
     }
 
@@ -206,7 +204,7 @@ namespace hpx
         > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         BOOST_FWD_REF(F) f)
     {
-        return async<Derived>(launch::all, gid,
+        return async_continue<Derived>(launch::all, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg), boost::forward<F>(f));
     }
 }
