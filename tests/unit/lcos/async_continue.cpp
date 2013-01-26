@@ -9,14 +9,12 @@
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int32_t sequence(boost::int32_t i)
+boost::int32_t increment(boost::int32_t i)
 {
-    return i+1;
+    return i + 1;
 }
+HPX_PLAIN_ACTION(increment);
 
-HPX_PLAIN_ACTION(sequence);
-
-///////////////////////////////////////////////////////////////////////////////
 struct continuation
 {
     void operator()(hpx::id_type const& next, boost::int32_t i) const
@@ -26,13 +24,20 @@ struct continuation
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+boost::int32_t mult2(boost::int32_t i)
+{
+    return i * 2;
+}
+HPX_PLAIN_ACTION(mult2);
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    sequence_action seq;
+    increment_action inc;
 
     // test locally
     {
-        hpx::future<int> f = hpx::async_continue(seq, hpx::find_here(), 42, continuation());
+        hpx::future<int> f = hpx::async_continue(inc, hpx::find_here(), 42, continuation());
         HPX_TEST_EQ(f.get(), 43);
     }
 
@@ -40,9 +45,17 @@ int hpx_main()
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
     if (!localities.empty())
     {
-        hpx::future<int> f = hpx::async_continue(seq, localities[0], 42, continuation());
+        hpx::future<int> f = hpx::async_continue(inc, localities[0], 42, continuation());
         HPX_TEST_EQ(f.get(), 43);
     }
+
+    // test chaining locally
+//    {
+//        mult2_action mult;
+//        hpx::future<int> f = hpx::async_continue(inc, localities[0], 42, 
+//            util::bind(mult, _1, _2));
+//
+//    }
 
     return hpx::finalize();
 }
