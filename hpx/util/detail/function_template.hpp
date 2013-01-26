@@ -426,7 +426,12 @@ namespace hpx { namespace util {
                     functor_type;
 
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(BOOST_PP_ENUM_PARAMS(N, A))
                         >::template get<
                             IArchive
@@ -494,7 +499,12 @@ namespace hpx { namespace util {
 
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(BOOST_PP_ENUM_PARAMS(N, A))
                   >::template get<
                       IArchive

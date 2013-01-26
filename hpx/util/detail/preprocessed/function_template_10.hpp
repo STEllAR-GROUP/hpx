@@ -66,7 +66,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R()
                         >::template get<
                             IArchive
@@ -128,7 +133,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R()
                   >::template get<
                       IArchive
@@ -293,7 +303,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0)
                         >::template get<
                             IArchive
@@ -355,7 +370,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0)
                   >::template get<
                       IArchive
@@ -520,7 +540,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1)
                         >::template get<
                             IArchive
@@ -582,7 +607,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1)
                   >::template get<
                       IArchive
@@ -747,7 +777,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2)
                         >::template get<
                             IArchive
@@ -809,7 +844,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2)
                   >::template get<
                       IArchive
@@ -974,7 +1014,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3)
                         >::template get<
                             IArchive
@@ -1036,7 +1081,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3)
                   >::template get<
                       IArchive
@@ -1201,7 +1251,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4)
                         >::template get<
                             IArchive
@@ -1263,7 +1318,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4)
                   >::template get<
                       IArchive
@@ -1428,7 +1488,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5)
                         >::template get<
                             IArchive
@@ -1490,7 +1555,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5)
                   >::template get<
                       IArchive
@@ -1655,7 +1725,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                         >::template get<
                             IArchive
@@ -1717,7 +1792,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                   >::template get<
                       IArchive
@@ -1882,7 +1962,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                         >::template get<
                             IArchive
@@ -1944,7 +2029,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                   >::template get<
                       IArchive
@@ -2109,7 +2199,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
                         >::template get<
                             IArchive
@@ -2171,7 +2266,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
                   >::template get<
                       IArchive
@@ -2336,7 +2436,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
                         >::template get<
                             IArchive
@@ -2398,7 +2503,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
                   >::template get<
                       IArchive
@@ -2563,7 +2673,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
                         >::template get<
                             IArchive
@@ -2625,7 +2740,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
                   >::template get<
                       IArchive
@@ -2790,7 +2910,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
                         >::template get<
                             IArchive
@@ -2852,7 +2977,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
                   >::template get<
                       IArchive
@@ -3017,7 +3147,12 @@ namespace hpx { namespace util {
                     >::type
                     functor_type;
                 vptr = detail::get_table<
-                            detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
                         >::template get<
                             IArchive
@@ -3079,7 +3214,12 @@ namespace hpx { namespace util {
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      detail::add_serialization<IArchive, OArchive>::template get<functor_type>::type
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
                     , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
                   >::template get<
                       IArchive
