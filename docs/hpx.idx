@@ -7,6 +7,11 @@
 
 #!scan-path "../hpx" ".*\.hpp" true
 
+# action invocation
+apply                                 "" "hpx\.manual\.applying_actions\.action_invocation.*"
+async                                 "" "hpx\.manual\.applying_actions\.action_invocation.*"
+async_continue                        "" "hpx\.manual\.applying_actions\.action_invocation.*"
+
 # hpx/hpx_fwd.hpp
 find_here                             "" "hpx\.find_here.*"
 find_all_localities                   "" "hpx\.find_all_localities.*"
