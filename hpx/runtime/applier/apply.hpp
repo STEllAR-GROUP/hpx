@@ -215,8 +215,8 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>());
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived>
     inline bool apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -228,7 +228,8 @@ namespace hpx
     // same for multiple destinations
     template <typename Action>
     inline bool
-    apply_p (std::vector<naming::id_type> const& ids, threads::thread_priority priority)
+    apply_p (std::vector<naming::id_type> const& ids, 
+        threads::thread_priority priority)
     {
         // Determine whether the gids are local or remote
         std::vector<naming::gid_type> gids;
@@ -269,8 +270,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>());
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived>
     inline bool apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived

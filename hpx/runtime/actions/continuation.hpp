@@ -12,8 +12,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/base_object.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -25,6 +26,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Version of continuation
 #define HPX_CONTINUATION_VERSION 0x10
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
+
+    template <typename T>
+    void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t)
+    {
+        typename lcos::base_lco_with_value<
+            typename util::detail::remove_reference<T>::type
+        >::set_value_action set;
+        apply(set, id, boost::forward<T>(t));
+    }
+
+    HPX_API_EXPORT void set_lco_error(naming::id_type const& id, 
+        boost::exception_ptr const& e);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -106,13 +125,8 @@ namespace hpx { namespace actions
             LLCO_(info) << "continuation::trigger(" << this->get_gid() << ")";
             if (!f_.empty())
                 f_(this->get_gid(), boost::move(result));
-            else {
-                typedef typename
-                    lcos::template base_lco_with_value<Result>::set_value_action
-                set_value_action_type;
-
-                hpx::apply<set_value_action_type>(this->get_gid(), boost::move(result));
-            }
+            else
+                set_lco_value(this->get_gid(), boost::move(result));
         }
 
         static void register_base()

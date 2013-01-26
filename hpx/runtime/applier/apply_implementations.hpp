@@ -206,16 +206,13 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/,
-        naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -273,9 +270,8 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (
         hpx::actions::action<

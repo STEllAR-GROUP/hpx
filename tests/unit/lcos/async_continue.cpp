@@ -19,10 +19,9 @@ HPX_PLAIN_ACTION(sequence);
 ///////////////////////////////////////////////////////////////////////////////
 struct continuation
 {
-    void operator()(hpx::id_type next, boost::int32_t i) const
+    void operator()(hpx::id_type const& next, boost::int32_t i) const
     {
-        hpx::lcos::base_lco_with_value<boost::int32_t>::set_value_action set_int;
-        hpx::apply(set_int, next, boost::move(i));
+        hpx::set_lco_value(next, i);
     }
 };
 
@@ -32,14 +31,14 @@ int hpx_main()
     sequence_action seq;
 
     // test locally
-    { 
+    {
         hpx::future<int> f = hpx::async_continue(seq, hpx::find_here(), 42, continuation());
         HPX_TEST_EQ(f.get(), 43);
     }
 
     // test remotely, if possible
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    if (!localities.empty()) 
+    if (!localities.empty())
     {
         hpx::future<int> f = hpx::async_continue(seq, localities[0], 42, continuation());
         HPX_TEST_EQ(f.get(), 43);
