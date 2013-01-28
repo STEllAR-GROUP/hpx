@@ -214,7 +214,9 @@ namespace hpx { namespace util {
         template <typename F>
         struct bound_functor0
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+
+            functor_type f;
 
             typedef typename F::result_type result_type;
 
@@ -780,7 +782,9 @@ namespace hpx { namespace util {
         >
         struct BOOST_PP_CAT(bound_functor, N)
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+
+            functor_type f;
 
             typedef typename F::result_type result_type;
 
