@@ -53,6 +53,7 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp"
   "hpx/runtime/applier/apply_implementations.hpp"
   "hpx/runtime/applier/apply_implementations_callback.hpp"
+  "hpx/runtime/applier/apply_continue.hpp"
   "hpx/runtime/components/new.hpp"
   "hpx/runtime/components/server/runtime_support.hpp"
   "hpx/runtime/components/server/create_component_with_args.hpp"
