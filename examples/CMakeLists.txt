@@ -44,6 +44,7 @@ set(subdirs
     str_srch
     thread_aware_timer
     throttle
+    tictactoe
    )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
