@@ -670,6 +670,13 @@ namespace hpx { namespace actions
         {
             return boost::move(Component::wrap_action(boost::move(f), lva));
         }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template <class Archive>
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
