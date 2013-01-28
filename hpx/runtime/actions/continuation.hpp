@@ -15,6 +15,7 @@
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/traits/supports_result_of.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -30,14 +31,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
-
+    //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg>
     inline bool apply(
         hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const&, BOOST_FWD_REF(Arg));
+
+    template <typename F, typename Arg1, typename Arg2>
+    inline typename boost::enable_if<
+        traits::supports_result_of<F>, bool
+    >::type
+    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
+
+    //////////////////////////////////////////////////////////////////////////
+    // handling special case of triggering an LCO
+    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
 
     template <typename T>
     void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t)
@@ -106,6 +116,19 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct set_lco_value_continuation
+    {
+        typedef void result_type;
+
+        template <typename T>
+        BOOST_FORCEINLINE void operator()(id_type const& lco,
+            BOOST_FWD_REF(T) t) const
+        {
+            hpx::set_lco_value(lco, boost::forward<T>(t));
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct typed_continuation : continuation
     {
@@ -119,7 +142,12 @@ namespace hpx { namespace actions
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
                 BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::move(f))
+          : continuation(gid), f_(boost::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(BOOST_FWD_REF(F) f)
+          : f_(boost::forward<F>(f))
         {}
 
         virtual ~typed_continuation()
@@ -129,11 +157,18 @@ namespace hpx { namespace actions
 
         void trigger_value(BOOST_RV_REF(Result) result) const
         {
+            if (!this->get_gid()) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "typed_continuation<Result>::trigger_value",
+                    "attempt to trigger invalid LCO (the id is invalid)");
+                return;
+            }
+
             LLCO_(info) << "continuation::trigger(" << this->get_gid() << ")";
-            if (!f_.empty())
-                f_(this->get_gid(), boost::move(result));
+            if (f_.empty())
+                hpx::set_lco_value(this->get_gid(), boost::move(result));
             else
-                set_lco_value(this->get_gid(), boost::move(result));
+                f_(this->get_gid(), boost::move(result));
         }
 
         static void register_base()
