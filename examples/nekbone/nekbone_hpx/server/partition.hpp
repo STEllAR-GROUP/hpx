@@ -42,11 +42,18 @@ namespace nekbone { namespace server
                            std::size_t generation,
                            int intparams);
 
+        void allreduce();
+        void double_mpi_allreduce(double *x, double *w,int *n,int *ierr);
+        void set_double_mpi_allreduce(std::size_t which,
+                               std::size_t generation,
+                               std::vector<double> const& data);
+
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(partition, loop_wrapper, loop_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_params, set_int_params_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_double_mpi_allreduce, set_double_mpi_allreduce_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -55,9 +62,11 @@ namespace nekbone { namespace server
         std::size_t item_;
         std::vector<hpx::naming::id_type> components_;
         std::vector<hpx::naming::id_type> all_but_root_;
+        std::vector<double> mpi_allreduce_data_;
         mutable mutex_type mtx_;
         int intparams_;
         and_gate_type broadcast_gate_;
+        and_gate_type double_allreduce_gate_;     
     };
 }}
 
@@ -70,6 +79,10 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     nekbone::server::partition::set_int_params_action,
     nekbone_point_set_int_params_action);
+
+HPX_REGISTER_ACTION_DECLARATION(
+    nekbone::server::partition::set_double_mpi_allreduce_action,
+    nekbone_point_set_double_mpi_allreduce_action);
 
 
 #endif

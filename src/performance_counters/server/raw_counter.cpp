@@ -37,14 +37,17 @@ namespace hpx { namespace performance_counters { namespace server
         }
     }
 
-    void raw_counter::get_counter_value(counter_value& value)
+    hpx::performance_counters::counter_value
+        raw_counter::get_counter_value()
     {
+        hpx::performance_counters::counter_value value;
         value.value_ = f_();                // gather the current value
         value.scaling_ = 1;
         value.scale_inverse_ = false;
         value.status_ = status_new_data;
         value.time_ = util::high_resolution_clock::now();
         value.count_ = ++invocation_count_;
+        return value;
     }
 }}}
 

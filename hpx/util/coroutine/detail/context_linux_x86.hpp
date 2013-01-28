@@ -12,7 +12,6 @@
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
-
 #include <sys/param.h>
 #include <cstdlib>
 #include <cstddef>

@@ -48,14 +48,14 @@ namespace hpx { namespace components
         async_create_result_type create_components_async(
             components::component_type type, std::size_t count = 1)
         {
-            return this->base_type::create_components_async(gid_, type, count);
+            return this->base_type::create_components_async(this->base_type::get_gid(), type, count);
         }
 
         ///
         result_type create_components(components::component_type type,
             std::size_t count = 1)
         {
-            return this->base_type::create_components(gid_, type, count);
+            return this->base_type::create_components(this->base_type::get_gid(), type, count);
         }
     };
 }}

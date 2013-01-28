@@ -177,7 +177,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         virtual bool stop();
 
         // get the current value of this performance counter
-        void get_counter_value(hpx::performance_counters::counter_value& value);
+        hpx::performance_counters::counter_value get_counter_value();
 
         // called just before the instance gets destructed
         void finalize();

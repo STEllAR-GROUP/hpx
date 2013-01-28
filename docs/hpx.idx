@@ -7,6 +7,11 @@
 
 #!scan-path "../hpx" ".*\.hpp" true
 
+# action invocation
+apply                                 "" "hpx\.manual\.applying_actions\.action_invocation.*"
+async                                 "" "hpx\.manual\.applying_actions\.action_invocation.*"
+async_continue                        "" "hpx\.manual\.applying_actions\.action_invocation.*"
+
 # hpx/hpx_fwd.hpp
 find_here                             "" "hpx\.find_here.*"
 find_all_localities                   "" "hpx\.find_all_localities.*"
@@ -24,6 +29,9 @@ get_thread_name                       "" "hpx\.get_thread_name.*"
 get_system_uptime                     "" "hpx\.get_system_uptime.*"
 get_colocation_id                     "" "hpx\.get_colocation_id.*"
 get_colocation_id_async               "" "hpx\.get_colocation_id_async.*"
+set_lco_event                         "" "hpx\.set_lco_event.*"
+set_lco_value                         "" "hpx\.set_lco_value.*"
+set_lco_error                         "" "hpx\.set_lco_error.*"
 
 # hpx/exception.hpp
 HPX_THROW_EXCEPTION                   "" "HPX_THROW_EXCEPTION"

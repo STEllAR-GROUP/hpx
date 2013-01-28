@@ -25,7 +25,7 @@ namespace hpx { namespace performance_counters { namespace server
         raw_counter() {}
         raw_counter(counter_info const& info, HPX_STD_FUNCTION<boost::int64_t()> f);
 
-        void get_counter_value(counter_value& value);
+        hpx::performance_counters::counter_value get_counter_value();
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed

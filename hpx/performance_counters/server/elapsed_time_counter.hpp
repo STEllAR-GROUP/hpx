@@ -28,7 +28,7 @@ namespace hpx { namespace performance_counters { namespace server
         elapsed_time_counter() {}
         elapsed_time_counter(counter_info const& info);
 
-        void get_counter_value(counter_value& value);
+        hpx::performance_counters::counter_value get_counter_value();
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed

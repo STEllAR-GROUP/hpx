@@ -45,6 +45,28 @@ macro(get_boost_version)
     find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
 
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+      set(boost_possible_suffixes
+        "boost-1_54" "boost-1_53" "boost-1_52" "boost-1_51" "boost-1_49" "boost-1_48"
+        "boost-1_47" "boost-1_46" "boost-1_45" "boost-1.44" "boost-1_43" "boost-1_42")
+
+      if(NOT BOOST_INCLUDE_DIR)
+        set(BOOST_INCLUDE_DIR "${BOOST_ROOT}/include")
+        hpx_warn("boost.version" "Could not locate Boost include directory. Now searching versioned include directory (\${BOOST_ROOT}/include).")
+      else()
+        hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching versioned include directory.")
+      endif()
+
+      find_path(BOOST_VERSION_HPP boost/version.hpp
+          PATHS ${BOOST_INCLUDE_DIR}
+          PATH_SUFFIXES ${boost_possible_suffixes}
+          NO_DEFAULT_PATH)
+
+      if(NOT ${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
+        set(BOOST_INCLUDE_DIR "${BOOST_VERSION_HPP}")
+      endif()
+    endif()
+
+    if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
       if(NOT BOOST_INCLUDE_DIR)
         hpx_warn("boost.version" "Could not locate Boost include directory. Now searching the system.")
       else()

@@ -119,7 +119,7 @@
 #define gs         PREFIXED_NAME(gs       )
 #define gs_vec     PREFIXED_NAME(gs_vec   )
 #define gs_many    PREFIXED_NAME(gs_many  )
-#define gs_setup   PREFIXED_NAME(gs_setup_ )
+#define gs_setup   PREFIXED_NAME(gs_setup )
 #define gs_free    PREFIXED_NAME(gs_free  )
 #define gs_unique  PREFIXED_NAME(gs_unique)
 

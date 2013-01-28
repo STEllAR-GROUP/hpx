@@ -20,15 +20,16 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/decay.hpp>
+
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-
 #include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/is_serializable.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
@@ -44,6 +45,44 @@ namespace hpx { namespace util
 {
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Base, typename Enable = void>
+        struct add_serialization_impl
+          : Base
+        {
+            template <typename Archive> 
+            void serialize(Archive&, const unsigned int) {}
+        };
+
+        template <typename Base>
+        struct add_serialization_impl<
+                Base
+              , typename boost::enable_if<
+                    hpx::util::is_intrusively_serializable<Base> >::type>
+          : Base
+        {};
+
+        template <typename IArchive, typename OArchive>
+        struct add_serialization
+        {
+            template <typename Functor>
+            struct get
+            {
+                typedef add_serialization_impl<Functor> type;
+            };
+        };
+
+        template <>
+        struct add_serialization<void, void>
+        {
+            template <typename Functor>
+            struct get
+            {
+                typedef Functor type;
+            };
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <
             typename Functor
           , typename Sig
@@ -387,7 +426,12 @@ namespace hpx { namespace util {
                     functor_type;
 
                 vptr = detail::get_table<
-                            functor_type
+                            typename detail::add_serialization<
+                                IArchive
+                              , OArchive
+                            >::template get<
+                                functor_type
+                            >::type
                           , R(BOOST_PP_ENUM_PARAMS(N, A))
                         >::template get<
                             IArchive
@@ -452,13 +496,22 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
-            vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
-                    IArchive
-                  , OArchive
-                >();
 
+            vtable_ptr_type * f_vptr
+                = detail::get_table<
+                      typename detail::add_serialization<
+                          IArchive
+                        , OArchive
+                      >::template get<
+                          functor_type
+                      >::type
+                    , R(BOOST_PP_ENUM_PARAMS(N, A))
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);

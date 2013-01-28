@@ -39,11 +39,13 @@ else()
         foreach(dir ${include_dirs})
             hpx_list_contains(INCLUDE_DIR_ADDED_ALREADY ${dir} ${HPX_PREPROCESS_INCLUDE_DIRS})
             if(NOT INCLUDE_DIR_ADDED_ALREADY)
+                hpx_debug("preprocessing" "Adding ${dir} to list of additional include directories")
                 set(HPX_PREPROCESS_INCLUDE_DIRS ${HPX_PREPROCESS_INCLUDE_DIRS} ${dir} CACHE INTERNAL "")
             endif()
         endforeach()
 
         if(NOT FILE_ADDED_ALREADY)
+            hpx_debug("preprocessing" "Adding ${file} to list of targets to preprocess")
             set(HPX_PREPROCESS_HEADERS ${HPX_PREPROCESS_HEADERS} ${file} CACHE INTERNAL "")
             hpx_parse_arguments(HPX_PREPROCESS_HEADERS_${file} "GUARD;LIMIT" "" ${ARGN})
             if(HPX_PREPROCESS_HEADERS_${file}_LIMIT)
@@ -69,6 +71,7 @@ else()
 
         set(HPX_PREPROCESS_INCLUDE_HEADERS)
         foreach(file ${HPX_PREPROCESS_HEADERS})
+            hpx_debug("preprocessing" "Generating preprocessing wrapper ${file}")
             set(HPX_PREPROCESS_INCLUDE_HEADERS "${HPX_PREPROCESS_INCLUDE_HEADERS}#include <${file}>\n")
 
             set(HPX_PREPROCESS_LIMIT ${HPX_PREPROCESS_HEADERS_${file}_LIMIT})
@@ -94,6 +97,10 @@ else()
 
         foreach(dir ${HPX_PREPROCESS_INCLUDE_DIRS})
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-S${dir}\n")
+        endforeach()
+
+        foreach(def ${HPX_PREPROCESS_DEFINITIONS})
+            set(HPX_WAVE_DEFINITIONS "${HPX_WAVE_DEFINITIONS}${def}\n")
         endforeach()
 
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}#\n")

@@ -25,7 +25,10 @@ set(documentation_dependencies
     ${hpx_SOURCE_DIR}/examples/accumulator/managed_accumulator_client.cpp
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp
-    ${hpx_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp)
+    ${hpx_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp
+    ${hpx_SOURCE_DIR}/examples/performance_counters/sine/server/sine.hpp
+    ${hpx_SOURCE_DIR}/hpx/performance_counters/performance_counter.hpp
+    ${hpx_SOURCE_DIR}/hpx/performance_counters/base_performance_counter.hpp)
 
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
@@ -108,8 +111,8 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
                 --stringparam boost.image.src ${image}
-                --stringparam boost.image.w 458 
-                --stringparam boost.image.h 110
+                --stringparam boost.image.w 322 
+                --stringparam boost.image.h 101
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

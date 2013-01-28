@@ -871,6 +871,7 @@ static void allreduce_exec(
   void *data, gs_mode mode, unsigned vn, gs_dom dom, gs_op op,
   unsigned transpose, const void *execdata, const struct comm *comm, char *buf)
 {
+  printf(" HELLO WORLD TEST!\n");
   const struct allreduce_data *ard = execdata;
   static gs_scatter_fun *const scatter_to_buf[] =
     { &gs_scatter, &gs_scatter_vec, &gs_scatter_many_to_vec, &scatter_noop };
@@ -953,7 +954,7 @@ static void allreduce_setup(struct gs_remote *r, struct gs_topology *top,
   Automatic Setup --- dynamically picks the fastest method
 ------------------------------------------------------------------------------*/
 
-static void dry_run_time(double times[3], const struct gs_remote *r,
+static void dry_run_time(void *hpx_bti,double times[3], const struct gs_remote *r,
                          const struct comm *comm, buffer *buf)
 {
   int i; double t;
@@ -971,7 +972,7 @@ static void dry_run_time(double times[3], const struct gs_remote *r,
   comm_allreduce(comm,gs_double,gs_max, &times[2],1, &t);
 }
 
-static void auto_setup(struct gs_remote *r, struct gs_topology *top,
+static void auto_setup(void *hpx_bti,struct gs_remote *r, struct gs_topology *top,
                        const struct comm *comm, buffer *buf)
 {
   pw_setup(r, top,comm,buf);
@@ -983,7 +984,7 @@ static void auto_setup(struct gs_remote *r, struct gs_topology *top,
 
     #define DRY_RUN(i,gsr,str) do { \
       if(comm->id==0) printf("   " str ": "); \
-      dry_run_time(time[i],gsr,comm,buf); \
+      dry_run_time(hpx_bti,time[i],gsr,comm,buf); \
       if(comm->id==0) \
         printf("%g %g %g\n",time[i][0],time[i][1],time[i][2]); \
     } while(0)
@@ -1073,7 +1074,8 @@ static void local_setup(struct gs_data *gsh, const struct array *nz)
   gsh->flagged_primaries = flagged_primaries_map(nz);
 }
 
-static void gs_setup_aux(struct gs_data *gsh, const slong *id, uint n,
+static void gs_setup_aux(void *hpx_bti,
+                         struct gs_data *gsh, const slong *id, uint n,
                          int unique, gs_method method, int verbose)
 {
   static setup_fun *const remote_setup[] =
@@ -1092,7 +1094,8 @@ static void gs_setup_aux(struct gs_data *gsh, const slong *id, uint n,
   if(verbose && gsh->comm.id==0)
     printf("gs_setup: %ld unique labels shared\n",(long)top.total_shared);
 
-  remote_setup[method](&gsh->r, &top,&gsh->comm,&cr.data);
+  auto_setup(hpx_bti,&gsh->r,&top,&gsh->comm,&cr.data);
+ // remote_setup[method](&gsh->r, &top,&gsh->comm,&cr.data);
 
   gs_topology_free(&top);
   crystal_free(&cr);
@@ -1101,9 +1104,12 @@ static void gs_setup_aux(struct gs_data *gsh, const slong *id, uint n,
 struct gs_data *gs_setup(const slong *id, uint n, const struct comm *comm,
                          int unique, gs_method method, int verbose)
 {
-  struct gs_data *gsh = tmalloc(struct gs_data,1);
-  comm_dup(&gsh->comm,comm);
-  gs_setup_aux(gsh,id,n,unique,method,verbose);
+  printf(" THIS ROUTINE IS NEVER CALLED\n");
+  exit(0);
+  struct gs_data *gsh;
+  //struct gs_data *gsh = tmalloc(struct gs_data,1);
+  //comm_dup(&gsh->comm,comm);
+  //gs_setup_aux(gsh,id,n,unique,method,verbose);
   return gsh;
 }
 
@@ -1155,7 +1161,7 @@ static struct gs_data **fgs_info = 0;
 static int fgs_max = 0;
 static int fgs_n = 0;
 
-void fgs_setup(sint *handle, const slong id[], const sint *n,
+void fgs_setup(void *hpx_bti,sint *handle, const slong id[], const sint *n,
                const MPI_Fint *comm, const sint *np,const sint *mid)
 {
   struct gs_data *gsh;
@@ -1163,7 +1169,7 @@ void fgs_setup(sint *handle, const slong id[], const sint *n,
                      fgs_info=trealloc(struct gs_data*,fgs_info,fgs_max);
   gsh=fgs_info[fgs_n]=tmalloc(struct gs_data,1);
   comm_init_check(&gsh->comm,*comm,*np,*mid);
-  gs_setup_aux(gsh,id,*n,0,gs_auto,1);
+  gs_setup_aux(hpx_bti,gsh,id,*n,0,gs_auto,1);
   *handle = fgs_n++;
 }
 

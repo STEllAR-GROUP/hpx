@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -84,21 +84,6 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-      : base_type(data_sink),
-        apply_logger_("packaged_action::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_action(naming::gid_type const& gid,
             threads::thread_priority priority,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -111,22 +96,6 @@
                     << ") args(" << (N + 1) << ")";
         apply_p(naming::id_type(gid, naming::id_type::unmanaged),
             priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_action(naming::id_type const& gid,
-            threads::thread_priority priority,
-            completed_callback_type const& data_sink,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-      : base_type(data_sink),
-        apply_logger_("packaged_action::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply_p(gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 #undef N

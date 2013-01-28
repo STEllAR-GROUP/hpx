@@ -24,6 +24,22 @@ extern "C" {
     nekbone::server::partition *ptr_to_class = *static_cast<nekbone::server::partition**>(pfoo);
     ptr_to_class->broadcast_int_parameters(integer_par);
   }
+  void FNAME(double_mpi_allreduce_cmm)(void* pfoo,double *x, double *w,int *n,int *ierr) {
+    nekbone::server::partition *ptr_to_class = *static_cast<nekbone::server::partition**>(pfoo);
+    ptr_to_class->double_mpi_allreduce(x,w,n,ierr);
+  }
+  double FNAME(system_uptime)() {
+    boost::uint64_t uptime_nano = hpx::get_system_uptime();
+    return uptime_nano*1.e-9;
+  }
+  double system_uptime() {
+    boost::uint64_t uptime_nano = hpx::get_system_uptime();
+    return uptime_nano*1.e-9;
+  }
+  void allreduce_cmm(void* pfoo) {
+    nekbone::server::partition *ptr_to_class = *static_cast<nekbone::server::partition**>(pfoo);
+    ptr_to_class->allreduce();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,6 +107,50 @@ namespace nekbone { namespace server
 
         // which is always zero in this case
         broadcast_gate_.set(which);         // trigger corresponding and-gate input
+    }
+
+    void partition::double_mpi_allreduce(double *x, double *w,int *n,int *ierr)
+    {
+      int vsize = *n;
+      mpi_allreduce_data_.resize(vsize);
+      std::fill(mpi_allreduce_data_.begin(),mpi_allreduce_data_.end(),0.0);
+
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      hpx::future<void> f = double_allreduce_gate_.get_future(components_.size(),
+          &generation);
+
+      std::vector<double> send(x, x+vsize);
+
+      set_double_mpi_allreduce_action set_data_;
+      for (std::size_t i=0;i<components_.size();i++) {
+        hpx::apply(set_data_, components_[i], item_, generation, send);
+      }
+
+      // possibly do other stuff while the allgather is going on...
+      f.get();
+      
+      mutex_type::scoped_lock l(mtx_);
+      for (std::size_t i=0;i<vsize;i++) {
+        x[i] = mpi_allreduce_data_[i];
+      }
+    }
+
+    void partition::set_double_mpi_allreduce(std::size_t which,std::size_t generation,
+                                             std::vector<double> const& data)
+    {
+      double_allreduce_gate_.synchronize(generation,"partition::set_double_mpi_allreduce");
+      {
+        mutex_type::scoped_lock l(mtx_);
+        for (std::size_t i=0;i<mpi_allreduce_data_.size();i++)
+          mpi_allreduce_data_[i] += data[i];
+      }
+      double_allreduce_gate_.set(which); // trigger corresponding and-gate input
+    }
+
+    void partition::allreduce()
+    {
+      std::cout << " TEST HELLO WORLD FROM C++ " << std::endl;
     }
 
 }}

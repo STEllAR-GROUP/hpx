@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2013 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,24 +9,6 @@
 #
 -DHPX_CREATE_PREPROCESSED_FILES
 -DHPX_USE_PREPROCESSOR_LIMIT_EXPANSION
-
-#
-# Macro names configuring HPX, no need to change.
-#
--DBOOST_PARAMETER_MAX_ARITY=7 
--DBOOST_COROUTINE_USE_ATOMIC_COUNT 
--DBOOST_COROUTINE_ARG_MAX=1 
--DBOOST_LOG_NO_TSS 
--DBOOST_LOG_NO_TS 
--DBOOST_BIGINT_HAS_NATIVE_INT64 
--DBOOST_PLUGIN_PREFIX=hpx 
--DBOOST_LOCKFREE_NO_HDR_ATOMIC
--DHPX_GLOBAL_SCHEDULER 
--DHPX_LOCAL_SCHEDULER 
--DHPX_ABP_SCHEDULER 
--DHPX_ABP_PRIORITY_SCHEDULER 
--DHPX_HIERARCHY_SCHEDULER 
--DHPX_PERIODIC_PRIORITY_SCHEDULER 
 
 #
 # Names of macros which should not be expanded
@@ -90,6 +72,10 @@
 # Specify the HPX include directories (adapt for your install)
 #
 @HPX_WAVE_ARGUMENTS@
+#
+# Macro names configuring HPX
+#
+@HPX_WAVE_DEFINITIONS@
 #
 # Some unimportant Wave command line options, drop if needed.
 #

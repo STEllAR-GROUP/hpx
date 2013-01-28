@@ -17,7 +17,12 @@ Counter to provide the data. When a consumer queries performance data, the
 __hpx__ runtime system calls the provider to collect the data. The runtime
 system uses an internal registry to determine which provider to call.
 
-[heading Exposing Performance Counter Data using a Simple Function]
+Generally, there two ways of exposing yur own pPerformance Counter data: a
+simple, function based way and a more complex, but more powerful way of
+implementing a full Performance Counter. Both alternatives are described in
+the following sections.
+
+[section:simple_counters Exposing Performance Counter Data using a Simple Function]
 
 The simplest way to expose arbitrary numeric data is to write a function which
 then will be called whenever a consumer queries this counter. Currently, this
@@ -64,7 +69,7 @@ any consumer instantiates and queries an instance of this counter type.
     }
 
 Now it is possible to instantiate a new counter instance based on
-the naming scheme `"/test{locality#<*>/total}/data"`, where `<*>` is a zero
+the naming scheme `"/test{locality#*/total}/data"`, where '`*`' is a zero
 based integer index indentifying the locality for which the counter instance
 should be accessed. The function [funcref hpx::performance_counters::install_counter_type `install_counter_type`]
 enables to instantiate exactly one counter instance for each locality. Repeated
@@ -95,6 +100,71 @@ calling `hpx::init` to initialize the runtime system:
 Please see the code in
 [hpx_link examples/performance_counters/simplest_performance_counter.cpp..simplest_performance_counter.cpp]
 for a full example demonstrating this functionality.
+
+[endsect] [/ Exposing Performance Counter Data using a Simple Function]
+
+[section:full_counters Implementing a Full Performance Counter]
+
+Somtimes, the simple way of exposing a single value as a Performance Counter is
+not sufficient. For that reason, __hpx__ provides a means of implementing full
+Performance Counters which support:
+
+* Retrieving the descriptive information about the Performance Counter
+* Retrieving the current counter value
+* Resetting the Performance Counter (value)
+* Starting the Performance Counter
+* Stopping the Performance Counter
+* Setting the (initial) value of the Performance Counter
+
+Every full Performance Counter will implement a predefined interface:
+
+[import ../../hpx/performance_counters/performance_counter.hpp]
+[performance_counter_interface]
+
+In order to implement a full Performance Counter you have to create an __hpx__
+component exposing this interface. To simplify this task, __hpx__ provides a
+ready made base class which handles all the boiler plate of creating a
+component for you. The remainder of this section will explain the process
+of creating a full Performance Counter based on the Sine example which you
+can find in the directory `examples/performance_counters/sine/`.
+
+This base class is defined in the header file
+[hpx_link hpx/performance_counters/base_performance_counter.hpp..hpx/performance_counters/base_performance_counter.hpp]
+as:
+
+[import ../../hpx/performance_counters/base_performance_counter.hpp]
+[base_performance_counter_class]
+
+The single template parameter is expected to receive the type of the
+derived class implementing the Performance Counter. In the Sine example
+this looks like:
+
+[import ../../examples/performance_counters/sine/server/sine.hpp]
+[sine_counter_definition]
+
+i.e. the type `sine_counter` is derived from the mentioned base class passing
+the type itself as a template argument (please see
+[hpx_link examples/performance_counters/sine/server/sine.hpp..sine.hpp]
+for the full source code of the counter definition). For more information
+about this technique (called Curiously Recurring Template Pattern - CRTP),
+please see for instance the corresponding
+[@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern Wikipedia article].
+This base class itself is derived from the `performance_counter` interface
+described above.
+
+
+Additionally, full Performance Counters not only expose the actual value but
+also provide information about
+
+* The point in time a particular value was retrieved
+* A (sequential) invocation count
+* The actual counter value
+* An optional scaling coefficient
+* Information about the counter status
+
+
+
+[endsect] [/ Implementing a Full Performance Counter]
 
 [endsect] [/ Providing Performance Counter Data]
 

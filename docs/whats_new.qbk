@@ -8,6 +8,37 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_1_0_0 __hpx__ V1.0.0]
+
+[heading General Changes]
+
+TBD
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release.
+
+* [issue 679] - Remove obsolete async_callback API functions
+* [issue 678] - Add new API for setting/triggering LCOs
+* [issue 677] - Add async_continue for true continuation style actions
+* [issue 675] - Partial preprocessing broken
+* [issue 674] - HPX segfaults when built with gcc 4.7
+* [issue 673] - `use_guard_pages` has inconsistent preprocessor guards
+* [issue 672] - External build breaks if library path has spaces
+* [issue 671] - release tarballs are tarbombs
+* [issue 670] - CMake won't find Boost headers in layout=versioned install
+* [issue 669] - Links in docs to source files broken if not installed
+* [issue 667] - Not reading ini file properly
+* [issue 643] - Error parsing host file
+* [issue 642] - HWLoc issue with TAU
+* [issue 626] - hpx/future.hpp header
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_previous Previous __hpx__ Releases]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_5 __hpx__ V0.9.5]
 
 We have had over 1000 commits since the last release and we have closed
@@ -76,6 +107,7 @@ HPX' releases so far.
 * [issue 638] - hpx build with intel compilers fails on linux
 * [issue 637] - --copy-dt-needed-entries breaks with gold
 * [issue 635] - Boost V1.53 will add Boost.Lockfree and Boost.Atomic
+* [issue 633] - Re-add examples to final 0.9.5 release
 * [issue 632] - Example `thread_aware_timer` is broken
 * [issue 631] - FFT application throws error in parcellayer
 * [issue 630] - Event synchronization example is broken
@@ -743,6 +775,8 @@ Here is a list of the important tickets we closed for this release:
 * [issue 277] - Invalid CMake logic for Windows
 
 [endsect]
+
+[endsect] [/ Previous HPX Releases]
 
 [endsect] [/ What's New]
 

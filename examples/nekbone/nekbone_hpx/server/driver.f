@@ -443,7 +443,9 @@ c PARALLEL
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c WZ
-     &     zgm1,wxm1,wym1,wzm1,w3m1)
+     &     zgm1,wxm1,wym1,wzm1,w3m1,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
       use, intrinsic :: iso_c_binding, only : c_ptr
       TYPE(C_PTR), INTENT(IN), VALUE :: hpx_bti
 ccccccccccccccccccccccccccccccccccc
@@ -510,6 +512,10 @@ c     Gauss-Labotto and Gauss points
 c     Weights
       real wxm1(lx1), wym1(ly1), wzm1(lz1), w3m1(lx1,ly1,lz1)
 ccccccccccccccccccccccccccccccccccc
+c nekmpi
+      integer nid_,np_,nekcomm,nekgroup,nekreal
+ccccccccccccccccccccccccccccccccccc
+
       parameter (lxyz=lx1*ly1*lz1)
       real ur(lxyz),us(lxyz),ut(lxyz),wk(lxyz)
 
@@ -727,7 +733,9 @@ c PARALLEL
      &     nvtot,ifgprnt,wdsize,isize,lsize,csize,
      &     ifdblas,cr_h,gsh,gsh_fld,xxth,
 c WZ
-     &     zgm1,wxm1,wym1,wzm1,w3m1)
+     &     zgm1,wxm1,wym1,wzm1,w3m1,
+c nekmpi
+     &     nid_,np_,nekcomm,nekgroup,nekreal)
 
         return
       end subroutine nekproxy ! }}}
@@ -1021,6 +1029,7 @@ c other variables
     
 c N/A
       !t0 = dnekclock()
+      t0 = system_uptime()
   
       call set_vert_box(glo_num, ! Set global-to-local map
 c SIZE
@@ -1033,14 +1042,15 @@ c PARALLEL
      &     ifdblas,cr_h,gsh,gsh_fld,xxth)
 
       ntot      = nx1*ny1*nz1*nelt
-      call fgs_setup(gs_handle,glo_num,ntot,nekcomm,mp,mid) ! Initialize gather-scatter
+      call fgs_setup(hpx_bti,gs_handle,glo_num,ntot,nekcomm,mp,mid) ! Initialize gather-scatter
 
       dof = ntot *mp
-c      t1 = dnekclock() - t0
-c      if (nid.eq.0) then
-c         write(6,1) t1,gs_handle,nx1,dof
-c    1    format('   setupds time',1pe11.4,' seconds ',2i3,i12)
-c      endif
+      !t1 = dnekclock() - t0
+      t1 = system_uptime() - t0
+      if (nid.eq.0) then
+         write(6,1) t1,gs_handle,nx1,dof
+    1    format('   setupds time',1pe11.4,' seconds ',2i3,i12)
+      endif
 
       return
       end subroutine proxy_setupds ! }}}

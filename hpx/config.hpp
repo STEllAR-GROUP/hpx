@@ -304,7 +304,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable guard pages.
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 #  if !defined(HPX_THREAD_GUARD_PAGE)
 #    define HPX_THREAD_GUARD_PAGE 1
 #  endif

@@ -221,17 +221,21 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // counting is not enabled here; it has to be started explicitly
     }
 
-    void papi_counter::get_counter_value(hpx::performance_counters::counter_value& value)
+    hpx::performance_counters::counter_value papi_counter::get_counter_value()
     {
         thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
 
         if (status_ == PAPI_COUNTER_ACTIVE)
             counters_->read_value(this);
 
+        hpx::performance_counters::counter_value value;
+
         if (timestamp_ != -1) copy_value(value);
         else value.status_ = hpx::performance_counters::status_invalid_data;
 
         value.count_ = ++invocation_count_;
+
+        return value;
     }
 
     bool papi_counter::start()

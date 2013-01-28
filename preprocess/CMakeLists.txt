@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2013 Hartmut Kaiser
 # Copyright (c) 2011-2012 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +7,8 @@
 ################################################################################
 # Automatic Preprocessing. Used to preprocess C++ macro iterations
 ################################################################################
-hpx_setup_partial_preprocess_headers()
 
-################################################################################
 # add headers to preprocessing
-################################################################################
 set(function_argument_limit_preprocessing_files
   "hpx/util/detail/function_template.hpp"
   "hpx/util/detail/get_table.hpp"
@@ -32,15 +29,17 @@ endforeach()
 
 set(lock_argument_limit_preprocessing_files
   "hpx/util/locking_helpers.hpp")
-foreach(file ${tuple_argument_limit_preprocessing_files})
+foreach(file ${lock_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LOCK_LIMIT)
 endforeach()
 
 set(action_argument_limit_preprocessing_files
   "hpx/apply.hpp"
   "hpx/async.hpp"
-  "hpx/new.hpp"
+  "hpx/lcos/async.hpp"
   "hpx/lcos/async_fwd.hpp"
+  "hpx/lcos/async_continue.hpp"
+  "hpx/lcos/async_continue_fwd.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"
   "hpx/lcos/deferred_packaged_task_constructors.hpp"
@@ -54,6 +53,7 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp"
   "hpx/runtime/applier/apply_implementations.hpp"
   "hpx/runtime/applier/apply_implementations_callback.hpp"
+  "hpx/runtime/components/new.hpp"
   "hpx/runtime/components/server/runtime_support.hpp"
   "hpx/runtime/components/server/create_component_with_args.hpp"
   "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
@@ -70,4 +70,8 @@ set(wait_argument_limit_preprocessing_files
 foreach(file ${wait_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_WAIT_ARGUMENT_LIMIT)
 endforeach()
+
+# invoke preprocessing routines
+hpx_setup_partial_preprocess_headers()
+
 

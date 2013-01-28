@@ -11,6 +11,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 
 #include <boost/detail/atomic_count.hpp>
 
@@ -18,14 +19,9 @@
 namespace hpx { namespace performance_counters { namespace server
 {
     class base_performance_counter
+      : public hpx::performance_counters::performance_counter
     {
     protected:
-        /// Destructor, needs to be virtual to allow for clean destruction of
-        /// derived objects
-        virtual ~base_performance_counter() {}
-
-        virtual void get_counter_value(counter_value& value) = 0;
-
         /// the following functions are not implemented by default, they will
         /// just throw
         virtual void reset_counter_value()
@@ -48,6 +44,11 @@ namespace hpx { namespace performance_counters { namespace server
         virtual bool stop()
         {
             return false;
+        }
+
+        virtual counter_info get_counter_info() const
+        {
+            return info_;
         }
 
     public:
@@ -76,36 +77,34 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
-        counter_info get_counter_info_nonvirt()
+        counter_info get_counter_info_nonvirt() const
         {
-            return info_;
+            return this->get_counter_info();
         }
 
         counter_value get_counter_value_nonvirt()
         {
-            counter_value value;
-            get_counter_value(value);
-            return value;
+            return this->get_counter_value();
         }
 
         void set_counter_value_nonvirt(counter_value const& info)
         {
-            set_counter_value(info);
+            this->set_counter_value(info);
         }
 
         void reset_counter_value_nonvirt()
         {
-            reset_counter_value();
+            this->reset_counter_value();
         }
 
         bool start_nonvirt()
         {
-            return start();
+            return this->start();
         }
 
         bool stop_nonvirt()
         {
-            return stop();
+            return this->stop();
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -115,7 +114,7 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
         typedef hpx::actions::result_action0<
-            base_performance_counter, counter_info,
+            base_performance_counter const, counter_info,
             &base_performance_counter::get_counter_info_nonvirt
         > get_counter_info_action;
 
@@ -151,9 +150,9 @@ namespace hpx { namespace performance_counters { namespace server
             &base_performance_counter::stop_nonvirt
         > stop_action;
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {

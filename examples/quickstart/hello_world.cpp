@@ -28,9 +28,9 @@
 //
 // The function hello_world_foreman_action is executed once on each locality.
 // It schedules a HPX-thread (encapsulating hello_world_worker) once for each
-// OS-thread on that locality. The code make sure that the PX-thread gets
+// OS-thread on that locality. The code make sure that the HPX-thread gets
 // really executed by the requested OS-thread. While the HPX-thread is scheduled
-// to run on a particular OS-thread, we may have to retry as the PX-thread may
+// to run on a particular OS-thread, we may have to retry as the HPX-thread may
 // end up being 'stolen' by another OS-thread.
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,11 +38,11 @@
 std::size_t hello_world_worker(std::size_t desired)
 {
     // Returns the OS-thread number of the worker that is running this
-    // PX-thread.
+    // HPX-thread.
     std::size_t current = hpx::get_worker_thread_num();
     if (current == desired)
     {
-        // The PX-thread has been run on the desired OS-thread.
+        // The HPX-thread has been run on the desired OS-thread.
         char const* msg = "hello world from OS-thread %1% on locality %2%\n";
 
         hpx::cout << (boost::format(msg) % desired % hpx::get_locality_id())
@@ -51,7 +51,7 @@ std::size_t hello_world_worker(std::size_t desired)
         return desired;
     }
 
-    // This PX-thread has been run by the wrong OS-thread, make the foreman
+    // This HPX-thread has been run by the wrong OS-thread, make the foreman
     // try again by rescheduling it.
     return std::size_t(-1);
 }
@@ -80,9 +80,9 @@ void hello_world_foreman()
         attendance.insert(os_thread);
 
     // As long as there are still elements in the set, we must keep scheduling
-    // PX-threads. Because HPX features work-stealing task schedulers, we have
+    // HPX-threads. Because HPX features work-stealing task schedulers, we have
     // no way of enforcing which worker OS-thread will actually execute
-    // each PX-thread.
+    // each HPX-thread.
     while (!attendance.empty())
     {
         // Each iteration, we create a task for each element in the set of

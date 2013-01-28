@@ -11,27 +11,49 @@
 BOOST_CLASS_EXPORT(hpx::actions::continuation)
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx 
+{
+    void trigger_lco_event(naming::id_type const& id)
+    {
+        lcos::base_lco::set_event_action set;
+        apply(set, id);
+    }
+
+    void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
+    {
+        lcos::base_lco::set_exception_action set;
+        apply(set, id, e);
+    }
+
+    void set_lco_error(naming::id_type const& id, 
+        BOOST_RV_REF(boost::exception_ptr) e)
+    {
+        lcos::base_lco::set_exception_action set;
+        apply(set, id, boost::move(e));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
     void continuation::trigger() const
     {
         LLCO_(info) << "continuation::trigger(" << gid_ << ")";
-        hpx::apply<lcos::base_lco::set_event_action>(gid_);
+        trigger_lco_event(gid_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void continuation::trigger_error(boost::exception_ptr const& e) const
     {
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
-        hpx::apply<lcos::base_lco::set_exception_action>(gid_, e);
+        set_lco_error(gid_, e);
     }
 
     void continuation::trigger_error(BOOST_RV_REF(boost::exception_ptr) e) const
     {
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
-        hpx::apply<lcos::base_lco::set_exception_action>(
-            gid_, boost::move(e));
+        set_lco_error(gid_, boost::move(e));
     }
 }}
 

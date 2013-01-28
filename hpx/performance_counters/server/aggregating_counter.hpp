@@ -41,7 +41,7 @@ namespace hpx { namespace performance_counters { namespace server
             boost::int64_t base_time_interval);
 
         /// Overloads from the base_counter base class.
-        void get_counter_value(counter_value& value);
+        hpx::performance_counters::counter_value get_counter_value();
 
         bool start();
 

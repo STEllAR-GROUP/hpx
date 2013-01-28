@@ -271,7 +271,7 @@ struct hwloc_topology : topology
                 }
             }
         }
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         sleep(0);   // Allow the OS to pick up the change.
 #endif
 // #if HPX_DEBUG
