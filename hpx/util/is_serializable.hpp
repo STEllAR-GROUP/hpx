@@ -13,22 +13,25 @@
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/detail/yes_no_type.hpp>
 #include <boost/type_traits/detail/bool_trait_def.hpp>
-#include <boost/preprocessor/iteration.hpp>
-#include <boost/preprocessor/enum_params.hpp>
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace util { namespace detail { namespace adl_barrier
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Archive>
     struct has_serialize_mem_fun_getter
     {
         template <
             typename T
-          , void (T::*)(int&, unsigned int const) const = &T::serialize>
+          , void (T::*)(Archive&, unsigned int const) =
+                (void(T::*)(Archive&, unsigned int const))
+                    &T::serialize<Archive> >
         struct get
         {};
     };
 
-    template <typename T, typename Getter = has_serialize_mem_fun_getter>
+    template <typename T, typename Archive,
+        typename Getter = has_serialize_mem_fun_getter<Archive> >
     struct has_serialize_mem_fun
     {
         template <typename Q>
@@ -44,73 +47,62 @@ namespace hpx { namespace util { namespace detail { namespace adl_barrier
                 sizeof(boost::type_traits::yes_type)));
     };
 
-    template <typename T, typename IsFundamental = void>
+    template <typename T, typename Archive, typename IsFundamental = void>
     struct is_serializable_impl
     {
-        BOOST_STATIC_CONSTANT(bool, value = has_serialize_mem_fun<T>::value);
+        typedef has_serialize_mem_fun<T, Archive> type;
+        BOOST_STATIC_CONSTANT(bool, value = type::value);
     };
 
-    template <typename T>
-    struct is_serializable_impl<T,
+    template <typename T, typename Archive>
+    struct is_serializable_impl<T, Archive,
         typename boost::enable_if<boost::is_fundamental<T> >::type>
     {
         BOOST_STATIC_CONSTANT(bool, value = true);
     };
 
-/*
     ///////////////////////////////////////////////////////////////////////////
-    struct tag {};
+    struct serialization_tag {};
+    serialization_tag operator,(serialization_tag, int);
 
-#define BOOST_PP_LOCAL_LIMITS (1, 10)
-#define BOOST_PP_LOCAL_MACRO(N)                                               \
-        template <                                                            \
-            typename Archive,                                                 \
-            template <BOOST_PP_ENUM_PARAMS(N, class I)> class T,              \
-            BOOST_PP_ENUM_PARAMS(N, typename T)>                              \
-        tag serialize(Archive& ar, T<BOOST_PP_ENUM_PARAMS(N, T)>&,            \
-            const unsigned);                                                  \
+    template <typename Archive, typename T>
+    serialization_tag serialize(Archive& ar, T&, const unsigned);
 
-#include BOOST_PP_LOCAL_ITERATE()
-
-    template <typename T>
+    template <typename T, typename Archive>
     struct is_non_intrusively_serializable_impl
     {
-        tag operator,(tag, int);
-
-        boost::type_traits::no_type check(tag);
+        static boost::type_traits::no_type check(serialization_tag);
 
         template <typename T>
-        boost::type_traits::yes_type check(T const&);
+        static boost::type_traits::yes_type check(T const&);
 
         static typename boost::remove_cv<T>::type& x;
-        static const int& archive;
+        static Archive& archive;
         static const unsigned version;
 
         BOOST_STATIC_CONSTANT(bool, value =
             sizeof(check((serialize(archive, x, version), 0))) ==
                 sizeof(boost::type_traits::yes_type));
     };
-*/
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    BOOST_TT_AUX_BOOL_TRAIT_DEF1(is_intrusively_serializable, T,
-        hpx::util::detail::adl_barrier::is_serializable_impl<T>::value)
+    BOOST_TT_AUX_BOOL_TRAIT_DEF2(is_intrusively_serializable, T, Archive,
+        (hpx::util::detail::adl_barrier::is_serializable_impl<T, Archive>::value))
 
-/*
-    BOOST_TT_AUX_BOOL_TRAIT_DEF1(is_non_intrusively_serializable, T,
-        hpx::util::detail::adl_barrier::is_non_intrusively_serializable_impl<T>::value)
+    BOOST_TT_AUX_BOOL_TRAIT_DEF2(is_non_intrusively_serializable, T, Archive,
+        (hpx::util::detail::adl_barrier::is_non_intrusively_serializable_impl<
+            T, Archive>::value))
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    template <typename T, typename Archive>
     struct is_serializable
       : boost::mpl::or_<
-            is_intrusively_serializable<T>
-          , is_non_intrusively_serializable<T> >
+            is_intrusively_serializable<T, Archive>,
+            is_non_intrusively_serializable<T, Archive> >
     {};
-*/
 }}
 
 #endif
