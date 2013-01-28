@@ -723,7 +723,8 @@
         >
         struct bound_functor1
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0>
             bound_functor1(
@@ -1537,7 +1538,8 @@
         >
         struct bound_functor2
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1>
             bound_functor2(
@@ -2351,7 +2353,8 @@
         >
         struct bound_functor3
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2>
             bound_functor3(
@@ -3165,7 +3168,8 @@
         >
         struct bound_functor4
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3>
             bound_functor4(
@@ -3979,7 +3983,8 @@
         >
         struct bound_functor5
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
             bound_functor5(
@@ -4793,7 +4798,8 @@
         >
         struct bound_functor6
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
             bound_functor6(
@@ -5607,7 +5613,8 @@
         >
         struct bound_functor7
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
             bound_functor7(
@@ -6421,7 +6428,8 @@
         >
         struct bound_functor8
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
             bound_functor8(
@@ -7235,7 +7243,8 @@
         >
         struct bound_functor9
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
             bound_functor9(
@@ -8049,7 +8058,8 @@
         >
         struct bound_functor10
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
             bound_functor10(
@@ -8863,7 +8873,8 @@
         >
         struct bound_functor11
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
             bound_functor11(
@@ -9677,7 +9688,8 @@
         >
         struct bound_functor12
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
             bound_functor12(
@@ -10491,7 +10503,8 @@
         >
         struct bound_functor13
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+            functor_type f;
             typedef typename F::result_type result_type;
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
             bound_functor13(
