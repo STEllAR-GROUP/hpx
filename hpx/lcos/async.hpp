@@ -100,8 +100,6 @@ namespace hpx
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-#include <hpx/runtime/actions/define_function_operators.hpp>
-
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

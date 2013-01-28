@@ -6,8 +6,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_ASYNC_C_NTINUE_JAN_25_2013_0824AM)
-#define HPX_LCOS_ASYNC_C_NTINUE_JAN_25_2013_0824AM
+#if !defined(HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM)
+#define HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
@@ -116,8 +116,6 @@ namespace hpx
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#include <hpx/runtime/actions/define_function_operators.hpp>
 
 #endif
 
