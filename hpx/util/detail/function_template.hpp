@@ -50,7 +50,9 @@ namespace hpx { namespace util
         struct add_serialization_impl
           : Base
         {
-            template <typename Archive> 
+            add_serialization_impl() {}
+
+            template <typename Archive>
             void serialize(Archive&, const unsigned int) {}
         };
 
@@ -58,9 +60,13 @@ namespace hpx { namespace util
         struct add_serialization_impl<
                 Base
               , typename boost::enable_if<
-                    hpx::util::is_intrusively_serializable<Base> >::type>
+                    hpx::util::is_serializable<
+                        Base, portable_binary_iarchive>
+                >::type>
           : Base
-        {};
+        {
+            add_serialization_impl() {}
+        };
 
         template <typename IArchive, typename OArchive>
         struct add_serialization
@@ -139,6 +145,9 @@ namespace hpx { namespace util
     >
     struct function : function_base<Sig, IArchive, OArchive>
     {
+        typedef typename function_base<Sig, IArchive, OArchive>::result_type 
+            result_type;
+
         using function_base<Sig, IArchive, OArchive>::reset;
 
         typedef function_base<Sig, IArchive, OArchive> base_type;
@@ -219,7 +228,6 @@ namespace hpx { namespace util
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-
     };
 
     template <
@@ -227,6 +235,8 @@ namespace hpx { namespace util
     >
     struct function<Sig, void, void> : function_base<Sig, void, void>
     {
+        typedef typename function_base<Sig, void, void>::result_type result_type;
+
         using function_base<Sig, void, void>::reset;
 
         typedef function_base<Sig, void, void> base_type;
