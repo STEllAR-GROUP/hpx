@@ -22,6 +22,8 @@
 
 #include <hpx/util/logging/format.hpp>
 
+#if !defined(HPX_LOG_NO_TS)
+
 #include <hpx/util/logging/writer/ts_write.hpp>
 #include <hpx/util/logging/writer/on_dedicated_thread.hpp>
 
@@ -38,6 +40,7 @@ and you want to define the logger classes, in a source file
 
 }}}
 
+#endif
 
 #endif
 
