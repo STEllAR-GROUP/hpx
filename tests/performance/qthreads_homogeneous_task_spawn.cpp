@@ -1,3 +1,4 @@
+//  Copyright (c) 2011-2012 Patricia Grubel
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
@@ -85,7 +86,7 @@ extern "C" aligned_t worker(
 {
     double volatile d = 0.;
     for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
+        d += 1. / (2. * i + 1.);
 
     ++donecount;
 
@@ -97,22 +98,26 @@ int qthreads_main(
     variables_map& vm
     )
 {
-    // Validate command line.
-    if (0 == tasks)
-        throw std::invalid_argument("count of 0 tasks specified\n");
+    if (vm.count("no-header"))
+        header = false;
+    {
+        // Validate command line.
+        if (0 == tasks)
+            throw std::invalid_argument("count of 0 tasks specified\n");
 
-    // Start the clock.
-    high_resolution_timer t;
+        // Start the clock.
+        high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i < tasks; ++i)
-        qthread_fork(&worker, NULL, NULL);
+        for (boost::uint64_t i = 0; i < tasks; ++i)
+            qthread_fork(&worker, NULL, NULL);
 
-    // Yield until all our null qthreads are done.
-    do {
-        qthread_yield();
-    } while (donecount != tasks);
+        // Yield until all our null qthreads are done.
+        do {
+            qthread_yield();
+        } while (donecount != tasks);
 
-    print_results(qthread_num_workers(), t.elapsed());
+        print_results(qthread_num_workers(), t.elapsed());
+    }
 
     return 0;
 }
@@ -129,8 +134,8 @@ int main(
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
-        ( "help,h"
-        , "print out program usage (this message)")
+       ( "help,h"
+       , "print out program usage (this message)")
         
         ( "shepherds,s"
         , value<boost::uint64_t>()->default_value(1),
