@@ -26,14 +26,15 @@ namespace hpx
     template <typename Action, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 0>
+            typename Action::arguments_type>::value == 0>,
+        bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
 
-        apply<Action>(
+        return apply<Action>(
             new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid);
@@ -43,14 +44,15 @@ namespace hpx
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename F>
     typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid, BOOST_FWD_REF(F) f)
     {
-        apply_continue<Derived>(gid, boost::forward<F>(f));
+        return apply_continue<Derived>(gid, boost::forward<F>(f));
     }
 }
 
@@ -91,7 +93,8 @@ namespace hpx
         typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == N>
+            typename Action::arguments_type>::value == N>,
+        bool
     >::type
     apply_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         BOOST_FWD_REF(F) f)
@@ -99,7 +102,7 @@ namespace hpx
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
 
-        apply<Action>(
+        return apply<Action>(
             new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid
@@ -110,7 +113,8 @@ namespace hpx
     template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
     typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>,\
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
