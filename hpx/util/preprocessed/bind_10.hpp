@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2012 Hartmut Kaiser
-// Copyright (c)      2012 Thomas Heller
+// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2012-2013 Thomas Heller
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@
 // Do not edit manually.
 
 
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -123,7 +123,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -854,7 +854,7 @@ namespace boost { namespace serialization
         ar & bound.arg0;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -969,7 +969,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -1700,7 +1700,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -1815,7 +1815,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -2546,7 +2546,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -2661,7 +2661,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -3392,7 +3392,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -3507,7 +3507,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -4238,7 +4238,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -4353,7 +4353,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -5084,7 +5084,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -5199,7 +5199,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -5930,7 +5930,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -6045,7 +6045,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -6776,7 +6776,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6; ar & bound.arg7;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -6891,7 +6891,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -7622,7 +7622,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6; ar & bound.arg7; ar & bound.arg8;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -7737,7 +7737,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -8468,7 +8468,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6; ar & bound.arg7; ar & bound.arg8; ar & bound.arg9;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -8583,7 +8583,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -9314,7 +9314,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6; ar & bound.arg7; ar & bound.arg8; ar & bound.arg9; ar & bound.arg10;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -9429,7 +9429,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -10160,7 +10160,7 @@ namespace boost { namespace serialization
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6; ar & bound.arg7; ar & bound.arg8; ar & bound.arg9; ar & bound.arg10; ar & bound.arg11;
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -10275,7 +10275,7 @@ namespace hpx { namespace util
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ));
     }
 }}
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
