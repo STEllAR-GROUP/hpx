@@ -139,6 +139,11 @@ namespace hpx { namespace threads { namespace policies
             return num_thread;
         }
 
+        std::size_t get_num_stolen_threads() const
+        {
+            return 0;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
         {

@@ -109,7 +109,8 @@ namespace hpx { namespace threads { namespace policies
             curr_queue_(0),
             affinity_data_(pu_offset, pu_step, affinity),
             numa_sensitive_(numa_sensitive),
-            topology_(get_topology())
+            topology_(get_topology()),
+            stolen_threads_(0)
         {
             BOOST_ASSERT(num_queues != 0);
             for (std::size_t i = 0; i < num_queues; ++i)
@@ -132,6 +133,11 @@ namespace hpx { namespace threads { namespace policies
         std::size_t get_pu_num(std::size_t num_thread) const
         {
             return affinity_data_.get_pu_num(num_thread);
+        }
+
+        std::size_t get_num_stolen_threads() const
+        {
+            return stolen_threads_;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -228,7 +234,10 @@ namespace hpx { namespace threads { namespace policies
             for (std::size_t i = 1; i < queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % queues_.size();
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
+                {
+                    ++stolen_threads_;
                     return true;
+                }
             }
             return false;
         }
@@ -296,6 +305,11 @@ namespace hpx { namespace threads { namespace policies
 
                         result = queues_[num_thread]->wait_or_add_new(idx,
                             running, idle_loop_count, added, queues_[idx]) && result;
+                        if (0 != added)
+                        {
+                            stolen_threads_ += added;
+                            return result;
+                        }
                     }
                 }
 
@@ -304,6 +318,11 @@ namespace hpx { namespace threads { namespace policies
                     std::size_t idx = (i + num_thread) % queues_.size();
                     result = queues_[num_thread]->wait_or_add_new(idx, running,
                         idle_loop_count, added, queues_[idx]) && result;
+                    if (0 != added)
+                    {
+                        stolen_threads_ += added;
+                        return result;
+                    }
                 }
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -369,6 +388,7 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
+        boost::atomic<std::size_t> stolen_threads_;
     };
 }}}
 
