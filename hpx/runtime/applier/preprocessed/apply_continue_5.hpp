@@ -22,10 +22,8 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            result_type;
         apply<Action>(
-            new hpx::actions::typed_continuation<result_type>(
+            new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid
           , boost::forward<Arg0>( arg0 ));
@@ -60,10 +58,8 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            result_type;
         apply<Action>(
-            new hpx::actions::typed_continuation<result_type>(
+            new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid
           , boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
@@ -98,10 +94,8 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            result_type;
         apply<Action>(
-            new hpx::actions::typed_continuation<result_type>(
+            new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid
           , boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
@@ -136,10 +130,8 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            result_type;
         apply<Action>(
-            new hpx::actions::typed_continuation<result_type>(
+            new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid
           , boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
@@ -174,10 +166,8 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            result_type;
         apply<Action>(
-            new hpx::actions::typed_continuation<result_type>(
+            new hpx::actions::typed_continuation<remote_result_type>(
                 boost::forward<F>(f))
           , gid
           , boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
