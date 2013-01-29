@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -45,6 +46,23 @@ namespace hpx
         traits::supports_result_of<F>, bool
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
+
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0, typename F>
+    inline typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>,
+        bool
+    >::type apply_continue(
+        hpx::actions::action<Component, Result, Arguments, Derived>,
+        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
+        BOOST_FWD_REF(F) f);
+
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0>
+    inline bool apply_c(
+        hpx::actions::action<Component, Result, Arguments, Derived>,
+        naming::id_type const& contgid, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0);
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
@@ -300,8 +318,8 @@ namespace hpx { namespace actions
 
         void trigger() const
         {
-            LLCO_(info) 
-                << "typed_continuation<hpx::util::unused_type>::trigger(" 
+            LLCO_(info)
+                << "typed_continuation<hpx::util::unused_type>::trigger("
                 << this->get_gid() << ")";
             if (f_.empty()) {
                 if (!this->get_gid()) {
