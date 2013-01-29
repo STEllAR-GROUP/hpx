@@ -8,8 +8,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/trigger.hpp>
 
 #include <boost/foreach.hpp>
 
@@ -50,7 +48,7 @@ managed_refcnt_checker::~managed_refcnt_checker()
         strm << ( boost::format("[%1%/%2%]: triggering flag %3%\n")
                 % prefix_ % this_ % target_);
 
-        applier::trigger(target_);
+        hpx::trigger_lco_event(target_);
     }
 
     std::string const str = util::osstream_get_string(strm);

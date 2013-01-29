@@ -214,9 +214,15 @@ namespace hpx { namespace util {
         template <typename F>
         struct bound_functor0
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+
+            functor_type f;
 
             typedef typename F::result_type result_type;
+
+            // default constructor is needed for serialization
+            bound_functor0()
+            {}
 
             bound_functor0(bound_functor0 const & other)
                 : f(other.f)
@@ -280,6 +286,28 @@ namespace hpx { namespace util {
     {
         return detail::bound_functor0<F>(boost::forward<F>(f));
     }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost { namespace serialization
+{
+    // serialization of the bound object, just serialize the function object
+    template <typename F>
+    void serialize(hpx::util::portable_binary_iarchive& ar
+      , hpx::util::detail::bound_functor0<F>& bound
+      , unsigned int const)
+    {
+        ar & bound.f;
+    }
+
+    template <typename F>
+    void serialize(hpx::util::portable_binary_oarchive& ar
+      , hpx::util::detail::bound_functor0<F>& bound
+      , unsigned int const)
+    {
+        ar & bound.f;
+    }
+}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/preprocessed/bind.hpp>
@@ -314,8 +342,6 @@ namespace hpx { namespace util {
 #undef HPX_UTIL_BIND_REFERENCE
 #undef HPX_UTIL_BIND_FUNCTOR_OPERATOR
 
-}}
-
 #endif
 
 #else  // !BOOST_PP_IS_ITERATING
@@ -327,7 +353,9 @@ namespace hpx { namespace util {
     BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
 /**/
 #define HPX_UTIL_BIND_MEMBER(Z, N, D)                                           \
-    typename boost::remove_const<typename decay<BOOST_PP_CAT(Arg, N)>::type>::type BOOST_PP_CAT(arg, N);            \
+    typename boost::remove_const<                                               \
+        typename decay<BOOST_PP_CAT(Arg, N)>::type                              \
+    >::type BOOST_PP_CAT(arg, N);                                               \
 /**/
 
 #define HPX_UTIL_BIND_INIT_COPY_MEMBER(Z, N, D)                                 \
@@ -346,8 +374,10 @@ namespace hpx { namespace util {
     BOOST_PP_CAT(arg, N) = boost::move(other.BOOST_PP_CAT(arg, N));             \
 /**/
 
-    ///////////////////////////////////////////////////////////////////////////
-    // free functions
+///////////////////////////////////////////////////////////////////////////////
+// free functions
+namespace hpx { namespace util
+{
     namespace detail
     {
         template <
@@ -474,9 +504,12 @@ namespace hpx { namespace util {
             >
             (f, HPX_ENUM_FORWARD_ARGS(N, A, a));
     }
+}}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // member function pointers
+///////////////////////////////////////////////////////////////////////////////
+// member function pointers
+namespace hpx { namespace util
+{
     namespace detail
     {
         template <
@@ -553,7 +586,7 @@ namespace hpx { namespace util {
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                                  \
+          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
           , <hpx/util/detail/bind_functor_operator.hpp>                         \
         )                                                                       \
     )                                                                           \
@@ -769,9 +802,12 @@ namespace hpx { namespace util {
             >
             (f, HPX_ENUM_FORWARD_ARGS(N, A, a));
     }
+}}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // functor
+///////////////////////////////////////////////////////////////////////////////
+// functor
+namespace hpx { namespace util
+{
     namespace detail
     {
         template <
@@ -780,9 +816,15 @@ namespace hpx { namespace util {
         >
         struct BOOST_PP_CAT(bound_functor, N)
         {
-            F f;
+            typedef typename boost::remove_const<F>::type functor_type;
+
+            functor_type f;
 
             typedef typename F::result_type result_type;
+
+            // default constructor is needed for serialization
+            BOOST_PP_CAT(bound_functor, N)()
+            {}
 
             template <BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(bound_functor, N)(
@@ -893,6 +935,39 @@ namespace hpx { namespace util {
               , HPX_ENUM_FORWARD_ARGS(N, A, a)
             );
     }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost { namespace serialization
+{
+#define HPX_UTIL_BIND_SERIALIZE_MEMBER(Z, NNN, _) ar & BOOST_PP_CAT(bound.arg, NNN);
+
+    // serialization of the bound object, just serialize function object and
+    // members
+    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    void serialize(hpx::util::portable_binary_iarchive& ar
+      , BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
+            F, BOOST_PP_ENUM_PARAMS(N, Arg)
+        >& bound
+      , unsigned int const)
+    {
+        ar & bound.f;
+        BOOST_PP_REPEAT(N, HPX_UTIL_BIND_SERIALIZE_MEMBER, _)
+    }
+
+    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    void serialize(hpx::util::portable_binary_oarchive& ar
+      , BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
+            F, BOOST_PP_ENUM_PARAMS(N, Arg)
+        >& bound
+      , unsigned int const)
+    {
+        ar & bound.f;
+        BOOST_PP_REPEAT(N, HPX_UTIL_BIND_SERIALIZE_MEMBER, _)
+    }
+
+#undef HPX_UTIL_BIND_SERIALIZE_MEMBER
+}}
 
 #undef HPX_UTIL_BIND_ASSIGN_MEMBER
 #undef HPX_UTIL_BIND_INIT_MOVE_MEMBER

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -77,80 +77,6 @@ namespace hpx
     {
         return async<Derived>(launch::all, gid);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename F>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type
-    >
-    async_callback (BOOST_SCOPED_ENUM(launch) policy,
-        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const&*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid)
-    {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-
-        packaged_action_type p(boost::forward<F>(data_sink));
-        if (policy & launch::async)
-            p.apply(gid);
-        return p.get_future();
-    }
-
-    template <typename Action, typename F>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type
-    >
-    async_callback (
-        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const& data_sink*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid)
-    {
-        return async_callback<Action>(launch::all, boost::forward<F>(data_sink), gid);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename F>
-    lcos::future<typename traits::promise_local_result<Result>::type>
-    async_callback (BOOST_SCOPED_ENUM(launch) policy,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/,
-        /*
-        HPX_STD_FUNCTION<void(
-            lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const& data_sink,*/
-        BOOST_FWD_REF(F) data_sink,
-        naming::id_type const& gid)
-    {
-        return async_callback<Derived>(policy, boost::forward<F>(data_sink), gid);
-    }
-
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename F>
-    lcos::future<typename traits::promise_local_result<Result>::type>
-    async_callback (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/,
-        /*
-        HPX_STD_FUNCTION<void(
-            lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const& data_sink,*/
-        BOOST_FWD_REF(F) data_sink,
-        naming::id_type const& gid)
-    {
-        return async_callback<Derived>(launch::all, boost::forward<F>(data_sink), gid);
-    }
 }
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -173,8 +99,6 @@ namespace hpx
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#include <hpx/runtime/actions/define_function_operators.hpp>
 
 #endif
 
@@ -244,85 +168,6 @@ namespace hpx
         > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Derived>(launch::all, gid,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type
-    >
-    async_callback (BOOST_SCOPED_ENUM(launch) policy,
-        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const&*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
-
-        packaged_action_type p(boost::forward<F>(data_sink));
-        if (policy & launch::async)
-            p.apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        return p.get_future();
-    }
-
-    template <typename Action, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type
-    >
-    async_callback (
-        /*HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
-        >::type>)> const&*/BOOST_FWD_REF(F) data_sink, naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return async_callback<Action>(launch::all, boost::forward<F>(data_sink), gid,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename F, 
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<typename traits::promise_local_result<Result>::type>
-    async_callback (BOOST_SCOPED_ENUM(launch) policy,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/,
-        /*HPX_STD_FUNCTION<void(
-            lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const&*/BOOST_FWD_REF(F) data_sink,
-        naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return async_callback<Derived>(policy, boost::forward<F>(data_sink), gid,
-            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename F, 
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<typename traits::promise_local_result<Result>::type>
-    async_callback (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/,
-        /*HPX_STD_FUNCTION<void(
-            lcos::future<typename traits::promise_local_result<Result>::type>
-        )> const&*/BOOST_FWD_REF(F) data_sink,
-        naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return async_callback<Derived>(launch::all, boost::forward<F>(data_sink), gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 }

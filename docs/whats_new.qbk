@@ -18,12 +18,20 @@ TBD
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 679] - Remove obsolete async_callback API functions
+* [issue 678] - Add new API for setting/triggering LCOs
+* [issue 677] - Add async_continue for true continuation style actions
+* [issue 675] - Partial preprocessing broken
+* [issue 674] - HPX segfaults when built with gcc 4.7
+* [issue 673] - `use_guard_pages` has inconsistent preprocessor guards
 * [issue 672] - External build breaks if library path has spaces
 * [issue 671] - release tarballs are tarbombs
 * [issue 670] - CMake won't find Boost headers in layout=versioned install
 * [issue 669] - Links in docs to source files broken if not installed
 * [issue 667] - Not reading ini file properly
-
+* [issue 643] - Error parsing host file
+* [issue 642] - HWLoc issue with TAU
+* [issue 626] - hpx/future.hpp header
 
 [endsect]
 

@@ -268,7 +268,7 @@ namespace hpx { namespace lcos
     ///
     ///     // initiate the action supplying the promise as a
     ///     // continuation
-    ///     appy<some_action>(new continuation(f.get_gid()), ...);
+    ///     apply<some_action>(new continuation(f.get_gid()), ...);
     ///
     ///     // Wait for the result to be returned, yielding control
     ///     // in the meantime.

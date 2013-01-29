@@ -19,14 +19,14 @@ inline void trigger(
   , BOOST_FWD_REF(Arg0) arg0
     )
 {
-    actions::continuation(k).trigger<Arg0>(boost::forward<Arg0>(arg0));
+    set_lco_value(k, boost::forward<Arg0>(arg0));
 }
 
 inline void trigger(
     naming::id_type const& k
     )
 {
-    actions::continuation(k).trigger();
+    trigger_lco_event(k);
 }
 
 inline void trigger_error(
@@ -34,7 +34,7 @@ inline void trigger_error(
   , boost::exception_ptr const& e
     )
 {
-    actions::continuation(k).trigger_error(e);
+    set_lco_error(k, e);
 }
 
 inline void trigger_error(
@@ -42,7 +42,7 @@ inline void trigger_error(
   , BOOST_RV_REF(boost::exception_ptr) e
     )
 {
-    actions::continuation(k).trigger_error(boost::move(e));
+    set_lco_error(k, e);
 }
 
 }}

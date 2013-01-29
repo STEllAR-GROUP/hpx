@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>

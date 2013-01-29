@@ -22,6 +22,8 @@
 # pragma once
 #endif
 
+#if !defined(HPX_LOG_NO_TS)
+
 // many thanks to Terris Linerbach!
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -68,6 +70,8 @@ private:
 };
 
 }}}}
+
+#endif
 
 #endif
 

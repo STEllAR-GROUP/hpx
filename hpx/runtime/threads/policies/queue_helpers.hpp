@@ -22,6 +22,12 @@ struct add_new_tag {};
 ///////////////////////////////////////////////////////////////////////////////
 namespace detail
 {
+    template <typename Fifo>
+    inline void log_fifo_statistics(Fifo const& q, char const* const desc)
+    {
+        // FIXME
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // debug helper function, logs all suspended threads
     // this returns true if all threads in the map are currently suspended

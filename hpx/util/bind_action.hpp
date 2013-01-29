@@ -183,28 +183,28 @@ namespace hpx { namespace util
 
 #define HPX_UTIL_BIND_ACTION_APPLY(Z, N, D)                                   \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    bool apply(HPX_ENUM_FWD_ARGS(N, A, a))                                     \
+    bool apply(HPX_ENUM_FWD_ARGS(N, A, a))                                    \
     {                                                                         \
         typedef                                                               \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
         return hpx::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
                 BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
     }                                                                         \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    bool apply(HPX_ENUM_FWD_ARGS(N, A, a)) const                               \
+    bool apply(HPX_ENUM_FWD_ARGS(N, A, a)) const                              \
     {                                                                         \
         typedef                                                               \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
         return hpx::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
@@ -243,14 +243,14 @@ namespace hpx { namespace util
 #define HPX_UTIL_BIND_ACTION_ASYNC(Z, N, D)                                   \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
     hpx::lcos::future<result_type>                                            \
-    async(HPX_ENUM_FWD_ARGS(N, A, a))                                          \
+    async(HPX_ENUM_FWD_ARGS(N, A, a))                                         \
     {                                                                         \
         typedef                                                               \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
         return hpx::async<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
@@ -258,14 +258,14 @@ namespace hpx { namespace util
     }                                                                         \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
     hpx::lcos::future<result_type>                                            \
-    async(HPX_ENUM_FWD_ARGS(N, A, a)) const                                    \
+    async(HPX_ENUM_FWD_ARGS(N, A, a)) const                                   \
     {                                                                         \
         typedef                                                               \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
         return hpx::async<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
@@ -394,7 +394,7 @@ namespace hpx { namespace util
 namespace boost { namespace serialization
 {
     // serialization of the bound object, just serialize members
-#define HPX_UTIL_BIND_SERIALIZE_MEMBER(Z, N, _) ar & BOOST_PP_CAT(bound.arg, N);
+#define HPX_UTIL_BIND_SERIALIZE_MEMBER(Z, NNN, _) ar & BOOST_PP_CAT(bound.arg, NNN);
 
     template <
         typename Action

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/base_lco_continuation.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/remove_local_destinations.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -215,8 +215,8 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>());
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, threads::thread_priority Priority>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived>
     inline bool apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -228,7 +228,8 @@ namespace hpx
     // same for multiple destinations
     template <typename Action>
     inline bool
-    apply_p (std::vector<naming::id_type> const& ids, threads::thread_priority priority)
+    apply_p (std::vector<naming::id_type> const& ids, 
+        threads::thread_priority priority)
     {
         // Determine whether the gids are local or remote
         std::vector<naming::gid_type> gids;
@@ -269,8 +270,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>());
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived>
     inline bool apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -476,7 +477,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
@@ -490,7 +491,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
@@ -504,7 +505,7 @@ namespace hpx
                 result_type;
 
             return apply_r<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid), gid);
+                new actions::typed_continuation<result_type>(contgid), gid);
         }
 
         template <typename Action>
@@ -517,7 +518,7 @@ namespace hpx
                 result_type;
 
             return apply_r_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid), gid);
+                new actions::typed_continuation<result_type>(contgid), gid);
         }
     }}
 
@@ -532,7 +533,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority);
     }
 
@@ -544,8 +545,26 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
-        return apply<Action>(
-            new actions::base_lco_continuation<result_type>(contgid), gid);
+        return apply_p<Action>(
+            new actions::typed_continuation<result_type>(contgid), gid,
+            actions::action_priority<Action>());
+    }
+
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/, naming::id_type const& contgid, naming::id_type const& gid)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>());
     }
 
     namespace applier
@@ -560,7 +579,7 @@ namespace hpx
                 result_type;
 
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority);
         }
 
@@ -573,7 +592,7 @@ namespace hpx
                 result_type;
 
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid), gid);
+                new actions::typed_continuation<result_type>(contgid), gid);
         }
     }
 }

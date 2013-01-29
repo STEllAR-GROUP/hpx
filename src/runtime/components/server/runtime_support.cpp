@@ -25,6 +25,7 @@
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -34,6 +35,7 @@
 #include <algorithm>
 #include <set>
 
+#include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -707,7 +709,11 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::id_type> locality_ids = find_remote_localities();
 
         typedef server::runtime_support::remove_from_connection_cache_action action_type;
-        apply(action_type(), locality_ids, rt->here());
+        action_type act;
+        BOOST_FOREACH(naming::id_type const& id, locality_ids)
+        {
+            apply(act, id, rt->here());
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

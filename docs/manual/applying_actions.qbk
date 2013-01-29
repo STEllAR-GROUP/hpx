@@ -123,11 +123,17 @@ can have arguments, which will be supplied while the action is applied. At the
 minimum, one parameter is required to apply any action - the id of the locality
 the associated function should be invoked on (for global functions), or the id
 of the component instance (for member functions). Generally, __hpx__ provides
-three ways to apply an action:
+several ways to apply an action:
 
-* [link hpx.manual.applying_actions.action_invocation.apply Applying an Action Asynchronously without any Synchronization]
-* [link hpx.manual.applying_actions.action_invocation.async Applying an Action Asynchronously with Synchronization]
-* [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]
+[def __apply__          [link hpx.manual.applying_actions.action_invocation.apply Applying an Action Asynchronously without any Synchronization]]
+[def __async__          [link hpx.manual.applying_actions.action_invocation.async Applying an Action Asynchronously with Synchronization]]
+[def __async_continue__ [link hpx.manual.applying_actions.action_invocation.continuation Applying an Action with a Continuation]]
+[def __sync__           [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]]
+
+* __apply__
+* __async__
+* __async_continue__
+* __sync__
 
 __hpx__ allows to apply any action with a syntax which is very close to the
 standard C++ way of invoking functions. In fact, all action types have an
@@ -145,7 +151,10 @@ way `std::async` works for plain C++ function.
       __hpx__ facilities not only support conventional functions, but can be
       used for actions as well.]
 
-[heading:apply Applying an action asynchronously without any synchronization]
+Additionally, __hpx__ exposes `hpx::apply` and `hpx::async_continue`, both of which refine
+and extend the standard C++ facilities.
+
+[heading:apply Applying an Action Asynchronously without any Synchronization]
 
 This method ('fire and forget') will make sure the function associated with
 the action is scheduled to run on the target locality. Applying the action
@@ -177,9 +186,9 @@ This method will make sure the action is scheduled to run on the target locality
 Applying the action itself does not wait for the function to start running or
 to complete, instead this is a fully asynchronous operation similar to using
 `hpx::apply` as described above. The difference is that this method will return
-an instance of a `hpx::future<>` encapsulating the result of the (possibly 
-remote) execution. The future can be used to synchronize with the asynchronous 
-operation. The following example shows how to apply the action from above on 
+an instance of a `hpx::future<>` encapsulating the result of the (possibly
+remote) execution. The future can be used to synchronize with the asynchronous
+operation. The following example shows how to apply the action from above on
 the local locality:
 
     some_global_action act;     // define an instance of some_global_action
@@ -197,9 +206,9 @@ locality (the locality this code is executed on).
 
 [note Any `std::future<>` returned from `std::async()` is required to block in its
       destructor if the value has not been set for this future yet. This is not
-      true for `hpx::future<>` which will never block in its destriuctor, even 
+      true for `hpx::future<>` which will never block in its destriuctor, even
       if the value has not been returned to the future yet. We believe that
-      consistency in the behavior of futures is more important than standards 
+      consistency in the behavior of futures is more important than standards
       conformance in this case.]
 
 Any component member function can be invoked using the same syntactic
@@ -218,6 +227,50 @@ created earlier, this invocation looks like:
       has already been returned. Otherwise, the invocation of `f.get()` will suspend
       the execution of the calling thread until the asynchronous operation returns
       its result.]
+
+[heading:continuation Applying an Action with a Continuation]
+
+This method is very similar to the method described in section __async__. In 
+addition to what `hpx::async` can do the functions `hpx::async_continue` take
+an additional function argument. This function will be called as the continuation
+of the executed action. It is expected to perform additional operations and to 
+make sure that a result is returned to the original invocation site. This method 
+allows to chain operations asynchronously by providing a continuation operation
+which is automatically executed once the first action has finished executing.
+
+As an example we chain two actions, where the result of the first action is
+forwarded to the second action and the result of the second action is sent back 
+to the original invocation site:
+
+    // first action
+    boost::int32_t action1(boost::int32_t i)
+    {
+        return i+1;
+    }
+    HPX_PLAIN_ACTION(action1);    // defines action1_type
+
+    struct continuation1
+    {
+        void operator()(hpx::id_type id, boost::int32_t i)
+        {
+            
+        }
+    };
+
+    // second action
+    boost::int32_t action2(boost::int32_t i)
+    {
+        return i*3;
+    }
+    HPX_PLAIN_ACTION(action2);    // defines action2_type
+
+
+    // this code invokes 'action1' above and passes along a continuation
+    // function which will forward the result returned from 'action1' to
+    // 'action2'.
+    action1_type act1;     // define an instance of 'action1_type'
+    hpx::future<int> f = hpx::async_continue(act1, hpx::find_here(), 42);
+
 
 [heading:sync Applying an Action Synchronously]
 

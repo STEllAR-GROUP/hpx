@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/base_lco_continuation.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/ini.hpp>
 
 #if defined(HPX_HAVE_CXX11)
@@ -171,9 +171,6 @@ namespace hpx { namespace traits
     HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(                                \
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
-    HPX_REGISTER_BASE_LCO_CONTINUATION_DECLARATION(                             \
-        Value                                                                   \
-      , BOOST_PP_CAT(base_lco_continuation_, Name))                             \
 /**/
 
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE(Value, Name)                           \
@@ -186,12 +183,7 @@ namespace hpx { namespace traits
     HPX_REGISTER_TYPED_CONTINUATION(                                            \
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
-    HPX_REGISTER_BASE_LCO_CONTINUATION(                                         \
-        Value                                                                   \
-      , BOOST_PP_CAT(base_lco_continuation_, Name))                             \
 /**/
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
@@ -212,6 +204,5 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint64_t, uint64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, section)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::unused_type, void)
 
 #endif

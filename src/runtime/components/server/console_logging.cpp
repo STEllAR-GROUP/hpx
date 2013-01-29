@@ -35,20 +35,17 @@
 
 namespace boost { namespace serialization
 {
-    template <typename Archive>
-    void serialize(Archive& ar, hpx::components::message_type& r,
-        unsigned int version)
+    HPX_EXPORT void serialize(hpx::util::portable_binary_oarchive& ar,
+        hpx::components::message_type& r, unsigned int version)
     {
         hpx::util::serialize_sequence(ar, r);
     }
 
-    template HPX_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive&,
-        hpx::components::message_type&, unsigned int version);
-
-    template HPX_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive&,
-        hpx::components::message_type&, unsigned int version);
+    HPX_EXPORT void serialize(hpx::util::portable_binary_iarchive& ar,
+        hpx::components::message_type& r, unsigned int version)
+    {
+        hpx::util::serialize_sequence(ar, r);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

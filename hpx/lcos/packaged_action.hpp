@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -158,35 +158,8 @@ namespace hpx { namespace lcos
         }
 
         packaged_action(naming::id_type const& gid,
-                completed_callback_type const& data_sink)
-          : base_type(data_sink),
-            apply_logger_("packaged_action::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(0)";
-            apply(gid);
-        }
-
-        packaged_action(naming::id_type const& gid,
                 threads::thread_priority priority)
           : apply_logger_("packaged_action::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(0)";
-            apply_p(gid, priority);
-        }
-
-        packaged_action(naming::id_type const& gid,
-                threads::thread_priority priority,
-                completed_callback_type const& data_sink)
-          : base_type(data_sink),
-            apply_logger_("packaged_action::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
@@ -260,40 +233,9 @@ namespace hpx { namespace lcos
 
         template <typename Arg0>
         packaged_action(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink),
-            apply_logger_("packaged_action::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply(gid, boost::forward<Arg0>(arg0));
-        }
-
-        template <typename Arg0>
-        packaged_action(naming::id_type const& gid,
                 threads::thread_priority priority,
                 BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("packaged_action::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply_p(gid, priority, boost::forward<Arg0>(arg0));
-        }
-
-        template <typename Arg0>
-        packaged_action(naming::id_type const& gid,
-                threads::thread_priority priority,
-                completed_callback_type const& data_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink),
-            apply_logger_("packaged_action::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
@@ -341,15 +283,6 @@ namespace hpx { namespace lcos
         /// called.
         packaged_action()
           : apply_logger_("packaged_action_direct::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ") args(0)";
-        }
-
-        packaged_action(completed_callback_type const& data_sink)
-          : base_type(data_sink),
-            apply_logger_("packaged_action_direct::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
@@ -417,18 +350,6 @@ namespace hpx { namespace lcos
                         << ") args(0)";
             apply(gid);
         }
-        packaged_action(naming::id_type const& gid,
-                completed_callback_type const& data_sink)
-          : base_type(data_sink),
-            apply_logger_("packaged_action_direct::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(0)";
-            apply(gid);
-        }
 
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
@@ -488,20 +409,6 @@ namespace hpx { namespace lcos
         packaged_action(naming::id_type const& gid,
                 BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("packaged_action_direct::apply")
-        {
-            LLCO_(info) << "packaged_action::packaged_action("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply(gid, boost::forward<Arg0>(arg0));
-        }
-        template <typename Arg0>
-        packaged_action(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink),
-            apply_logger_("packaged_action_direct::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()

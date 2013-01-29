@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2012 Hartmut Kaiser
-// Copyright (c)      2012 Thomas Heller
+// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2012-2013 Thomas Heller
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -143,16 +143,13 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > ,
-        naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0)
+        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ));
@@ -203,9 +200,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, typename Arg0>
     inline bool
     apply (
         hpx::actions::action<
@@ -400,7 +396,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ));
         }
         template <typename Action, typename Arg0>
@@ -413,7 +409,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ));
         }
         template <typename Action, typename Arg0>
@@ -425,7 +421,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ));
         }
@@ -438,7 +434,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ));
         }
@@ -452,7 +448,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Arg0>( arg0 ));
     }
     template <typename Action, typename Arg0>
@@ -464,8 +460,25 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            boost::forward<Arg0>( arg0 ));
+    }
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        BOOST_FWD_REF(Arg0) arg0)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ));
     }
     namespace applier
@@ -479,7 +492,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ));
         }
         template <typename Action, typename Arg0>
@@ -491,7 +504,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ));
         }
@@ -632,16 +645,13 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > ,
-        naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
@@ -692,9 +702,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, typename Arg0 , typename Arg1>
     inline bool
     apply (
         hpx::actions::action<
@@ -889,7 +898,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
         template <typename Action, typename Arg0 , typename Arg1>
@@ -902,7 +911,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
         template <typename Action, typename Arg0 , typename Arg1>
@@ -914,7 +923,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -927,7 +936,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -941,7 +950,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     template <typename Action, typename Arg0 , typename Arg1>
@@ -953,8 +962,25 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+    }
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     namespace applier
@@ -968,7 +994,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
         template <typename Action, typename Arg0 , typename Arg1>
@@ -980,7 +1006,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -1121,16 +1147,13 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1 , typename Arg2>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > ,
-        naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
@@ -1181,9 +1204,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1 , typename Arg2>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
     inline bool
     apply (
         hpx::actions::action<
@@ -1378,7 +1400,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -1391,7 +1413,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -1403,7 +1425,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -1416,7 +1438,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -1430,7 +1452,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -1442,8 +1464,25 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+    }
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     namespace applier
@@ -1457,7 +1496,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -1469,7 +1508,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -1610,16 +1649,13 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > ,
-        naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
@@ -1670,9 +1706,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     inline bool
     apply (
         hpx::actions::action<
@@ -1867,7 +1902,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -1880,7 +1915,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -1892,7 +1927,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -1905,7 +1940,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -1919,7 +1954,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -1931,8 +1966,25 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+    }
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     namespace applier
@@ -1946,7 +1998,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -1958,7 +2010,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -2099,16 +2151,13 @@ namespace hpx
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > ,
-        naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
@@ -2159,9 +2208,8 @@ namespace hpx
         return apply_p<Action>(gids, actions::action_priority<Action>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     inline bool
     apply (
         hpx::actions::action<
@@ -2356,7 +2404,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -2369,7 +2417,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -2381,7 +2429,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -2394,7 +2442,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -2408,7 +2456,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -2420,8 +2468,25 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+    }
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>(),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     namespace applier
@@ -2435,7 +2500,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -2447,7 +2512,7 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::result_type
                 result_type;
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }

@@ -508,7 +508,15 @@ struct thread_deque
 
     ///////////////////////////////////////////////////////////////////////
     void on_start_thread(std::size_t num_thread) {}
-    void on_stop_thread(std::size_t num_thread) {}
+    void on_stop_thread(std::size_t num_thread)
+    {
+        if (0 == num_thread) {
+            // print queue statistics
+            detail::log_fifo_statistics(work_items_, "thread_deque");
+            detail::log_fifo_statistics(terminated_items_, "thread_deque");
+            detail::log_fifo_statistics(new_tasks_, "thread_deque");
+        }
+    }
     void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
 
 private:

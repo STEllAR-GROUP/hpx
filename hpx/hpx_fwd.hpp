@@ -9,8 +9,10 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
+/// \cond NOINTERNAL
 // FIXME: Make HPX work with the "decltype" result_of, and remove this #define!
 #define BOOST_RESULT_OF_USE_TR1
+/// \endcond
 
 #include <cstdlib>
 #include <vector>
@@ -1005,6 +1007,34 @@ namespace hpx
         error_code& ec = throws);
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
         naming::id_type id);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Trigger the LCO referenced by the given id
+    ///
+    /// \param id [in] this represents the id of the LCO which should be
+    ///           triggered.
+    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
+
+    /// \brief Set the result value for the LCO referenced by the given id
+    ///
+    /// \param id [in] this represents the id of the LCO which should
+    ///           receive the given value.
+    /// \param t  [in] this is the value which should be sent to the LCO.
+    template <typename T>
+    void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t);
+
+    /// \brief Set the error state for the LCO referenced by the given id
+    ///
+    /// \param id [in] this represents the id of the LCO which should
+    ///           eceive the error value.
+    /// \param e  [in] this is the error value which should be sent to
+    ///           the LCO.
+    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+        boost::exception_ptr const& e);
+
+    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
+    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+        BOOST_RV_REF(boost::exception_ptr) e);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

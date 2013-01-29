@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2012 Hartmut Kaiser
-// Copyright (c)      2012 Thomas Heller
+// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2012-2013 Thomas Heller
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,20 +46,6 @@
                     << ") args(" << (2 + 1) << ")";
         apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
-    template <typename Arg0 , typename Arg1>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (2 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
-    }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     void apply(naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -90,20 +76,6 @@
     packaged_action(naming::id_type const& gid,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
       : apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (3 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
-    }
-    template <typename Arg0 , typename Arg1 , typename Arg2>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
                     << hpx::actions::detail::get_action_name<action_type>()
@@ -150,20 +122,6 @@
                     << ") args(" << (4 + 1) << ")";
         apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (4 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
-    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     void apply(naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -194,20 +152,6 @@
     packaged_action(naming::id_type const& gid,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
       : apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (5 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
-    }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
                     << hpx::actions::detail::get_action_name<action_type>()
@@ -254,20 +198,6 @@
                     << ") args(" << (6 + 1) << ")";
         apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (6 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
-    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     void apply(naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -298,20 +228,6 @@
     packaged_action(naming::id_type const& gid,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
       : apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (7 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
-    }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
                     << hpx::actions::detail::get_action_name<action_type>()
@@ -358,20 +274,6 @@
                     << ") args(" << (8 + 1) << ")";
         apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (8 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
-    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     void apply(naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
@@ -410,20 +312,6 @@
                     << ") args(" << (9 + 1) << ")";
         apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (9 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
-    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     void apply(naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
@@ -454,20 +342,6 @@
     packaged_action(naming::id_type const& gid,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
       : apply_logger_("packaged_action_direct::apply")
-    {
-        LLCO_(info) << "packaged_action::packaged_action("
-                    << hpx::actions::detail::get_action_name<action_type>()
-                    << ", "
-                    << gid
-                    << ") args(" << (10 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
-    }
-    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    packaged_action(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
-      : base_type(data_sink),
-        apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
                     << hpx::actions::detail::get_action_name<action_type>()

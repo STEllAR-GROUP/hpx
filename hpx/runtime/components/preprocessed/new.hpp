@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c)      2012 Thomas Heller
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_COMPONENTS_PREPROCESSED_NEW_HPP)
-#define HPX_RUNTIME_COMPONENTS_PREPROCESSED_NEW_HPP
+#if !defined(HPX_PREPROCESSED_RUNTIME_COMPONENTS_NEW_HPP)
+#define HPX_PREPROCESSED_RUNTIME_COMPONENTS_NEW_HPP
 
 #if HPX_ACTION_ARGUMENT_LIMIT  <= 5
 #include <hpx/runtime/components/preprocessed/new_5.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -206,16 +206,13 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/,
-        naming::id_type const& gid,
-        HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_p<Derived>(gid, actions::action_priority<Derived>(),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -273,9 +270,8 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename Component, typename Result, typename Arguments, 
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (
         hpx::actions::action<
@@ -496,7 +492,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -511,7 +507,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -525,7 +521,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -540,7 +536,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p_route<Action>(addr,
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -556,7 +552,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -570,8 +566,27 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::base_lco_continuation<result_type>(contgid),
+            new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/, naming::id_type const& contgid, naming::id_type const& gid, 
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>(),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -587,7 +602,7 @@ namespace hpx
                 result_type;
 
             return apply_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -601,7 +616,7 @@ namespace hpx
                 result_type;
 
             return apply_p_route<Action>(
-                new actions::base_lco_continuation<result_type>(contgid),
+                new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }

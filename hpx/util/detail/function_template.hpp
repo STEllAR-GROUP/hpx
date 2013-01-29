@@ -20,15 +20,16 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/decay.hpp>
+
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-
 #include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/serialize_empty_type.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
@@ -44,6 +45,7 @@ namespace hpx { namespace util
 {
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         template <
             typename Functor
           , typename Sig
@@ -100,6 +102,9 @@ namespace hpx { namespace util
     >
     struct function : function_base<Sig, IArchive, OArchive>
     {
+        typedef typename function_base<Sig, IArchive, OArchive>::result_type 
+            result_type;
+
         using function_base<Sig, IArchive, OArchive>::reset;
 
         typedef function_base<Sig, IArchive, OArchive> base_type;
@@ -180,7 +185,6 @@ namespace hpx { namespace util
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-
     };
 
     template <
@@ -188,6 +192,8 @@ namespace hpx { namespace util
     >
     struct function<Sig, void, void> : function_base<Sig, void, void>
     {
+        typedef typename function_base<Sig, void, void>::result_type result_type;
+
         using function_base<Sig, void, void>::reset;
 
         typedef function_base<Sig, void, void> base_type;
@@ -452,13 +458,17 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
-            vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
-                    IArchive
-                  , OArchive
-                >();
 
+            vtable_ptr_type * f_vptr
+                = detail::get_table<
+                      functor_type
+                    , R(BOOST_PP_ENUM_PARAMS(N, A))
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);

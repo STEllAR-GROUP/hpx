@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2012 Hartmut Kaiser
-// Copyright (c)      2012 Thomas Heller
+// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2012-2013 Thomas Heller
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -126,12 +126,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R()>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R()
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -350,12 +353,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -574,12 +580,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -798,12 +807,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -1022,12 +1034,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -1246,12 +1261,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -1470,12 +1488,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -1694,12 +1715,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -1918,12 +1942,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -2142,12 +2169,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -2366,12 +2396,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -2590,12 +2623,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -2814,12 +2850,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -3038,12 +3077,15 @@ namespace hpx { namespace util {
                     >::type
                 >::type
                 functor_type;
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<functor_type, R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)>::template get<
-                    IArchive
-                  , OArchive
-                >();
+                = detail::get_table<
+                      functor_type
+                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
