@@ -35,6 +35,8 @@
 # pragma once
 #endif
 
+#if !defined(HPX_LOG_NO_TS)
+
 #include <errno.h>
 #include <pthread.h>
 #include <stdexcept>
@@ -113,6 +115,7 @@ private:
 
 }}}
 
+#endif
 
 #endif
 
