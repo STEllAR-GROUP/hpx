@@ -178,20 +178,18 @@ namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // implement the serialization functions
-    template <typename Archive>
-    void serialize(Archive& ar, hpx::components::server::partition_info& info,
-        unsigned int const)
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive& ar,
+        hpx::components::server::partition_info& info, unsigned int const)
     {
         ar & info.dims_ & info.dim_sizes_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
-    template HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive&,
-        hpx::components::server::partition_info&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive&,
-        hpx::components::server::partition_info&, unsigned int const);
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive& ar,
+        hpx::components::server::partition_info& info, unsigned int const)
+    {
+        ar & info.dims_ & info.dim_sizes_;
+    }
 }}
 
