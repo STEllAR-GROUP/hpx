@@ -509,9 +509,9 @@ struct thread_deque
     {
         if (0 == num_thread) {
             // print queue statistics
-            log_fifo_statistics(work_items_, "thread_deque");
-            log_fifo_statistics(terminated_items_, "thread_deque");
-            log_fifo_statistics(new_tasks_, "thread_deque");
+            detail::log_fifo_statistics(work_items_, "thread_deque");
+            detail::log_fifo_statistics(terminated_items_, "thread_deque");
+            detail::log_fifo_statistics(new_tasks_, "thread_deque");
         }
     }
     void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
