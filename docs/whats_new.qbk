@@ -18,9 +18,12 @@ TBD
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 682] - Add performance counters exposing number of stolen threads
+* [issue 681] - Add apply_continue for asynchronous chaining of actions
 * [issue 679] - Remove obsolete async_callback API functions
 * [issue 678] - Add new API for setting/triggering LCOs
 * [issue 677] - Add async_continue for true continuation style actions
+* [issue 676] - Buildbot for gcc 4.4 broken
 * [issue 675] - Partial preprocessing broken
 * [issue 674] - HPX segfaults when built with gcc 4.7
 * [issue 673] - `use_guard_pages` has inconsistent preprocessor guards
