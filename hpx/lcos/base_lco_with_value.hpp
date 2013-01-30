@@ -173,10 +173,6 @@ namespace hpx { namespace traits
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
 /**/
 
-//    HPX_REGISTER_BASE_LCO_CONTINUATION_DECLARATION(                             
-//        Value                                                                   
-//      , BOOST_PP_CAT(base_lco_continuation_, Name))                             
-
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE(Value, Name)                           \
     HPX_REGISTER_ACTION(                                                        \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
@@ -188,12 +184,6 @@ namespace hpx { namespace traits
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
 /**/
-
-//    HPX_REGISTER_BASE_LCO_CONTINUATION(                                         
-//        Value                                                                   
-//      , BOOST_PP_CAT(base_lco_continuation_, Name))                             
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
@@ -214,6 +204,5 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint64_t, uint64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, section)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::unused_type, void)
 
 #endif

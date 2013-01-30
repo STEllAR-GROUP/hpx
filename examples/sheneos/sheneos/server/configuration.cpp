@@ -35,20 +35,19 @@ namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    template <typename Archive>
-    void serialize(Archive& ar, sheneos::config_data& cfg, unsigned int const)
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive& ar,
+        sheneos::config_data& cfg, unsigned int const)
     {
         ar & cfg.datafile_name_ & cfg.symbolic_name_& cfg.num_instances_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Explicit instantiation for the correct archive types.
-    template HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive&, sheneos::config_data&,
-        unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive&, sheneos::config_data&,
-        unsigned int const);
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive& ar,
+        sheneos::config_data& cfg, unsigned int const)
+    {
+        ar & cfg.datafile_name_ & cfg.symbolic_name_& cfg.num_instances_;
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

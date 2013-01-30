@@ -25,6 +25,8 @@
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 
+#if !defined(HPX_LOG_NO_TS)
+
 namespace hpx { namespace util { namespace logging { namespace writer {
 
     namespace detail {
@@ -80,6 +82,8 @@ Depending on your scenario, you could prefer on_dedicated_thread class.
     };
 
 }}}}
+
+#endif
 
 #endif
 

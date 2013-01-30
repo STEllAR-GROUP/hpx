@@ -81,7 +81,8 @@ namespace hpx { namespace threads { namespace policies
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
             numa_sensitive_(init.numa_sensitive_),
-            topology_(get_topology())
+            topology_(get_topology()),
+            stolen_threads_(0)
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
@@ -113,6 +114,11 @@ namespace hpx { namespace threads { namespace policies
         std::size_t get_pu_num(std::size_t num_thread) const
         {
             return num_thread;
+        }
+
+        std::size_t get_num_stolen_threads() const
+        {
+            return stolen_threads_;
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -221,14 +227,20 @@ namespace hpx { namespace threads { namespace policies
             for (std::size_t i = 1; i < high_priority_queue_size; ++i) {
                 std::size_t idx = (i + num_thread) % high_priority_queue_size;
                 if (high_priority_queues_[idx]->steal_next_thread(thrd))
+                {
+                    ++stolen_threads_;
                     return true;
+                }
             }
 
             // steal thread from other queue
             for (std::size_t i = 1; i < queue_size; ++i) {
                 std::size_t idx = (i + num_thread) % queue_size;
                 if (queues_[idx]->steal_next_thread(thrd))
+                {
+                    ++stolen_threads_;
                     return true;
+                }
             }
             return false;
         }
@@ -391,7 +403,11 @@ namespace hpx { namespace threads { namespace policies
 
                     result = queues_[num_thread]->steal_new_or_terminate(
                         i, running, added, queues_[i]) && result;
-                    if (0 != added) return result;
+                    if (0 != added)
+                    {
+                        stolen_threads_ += added;
+                        return result;
+                    }
                 }
             }
 
@@ -400,7 +416,11 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t idx = (i + num_thread) % queues_size;
                 result = queues_[num_thread]->steal_new_or_terminate(
                     idx, running, added, queues_[idx]) && result;
-                if (0 != added) return result;
+                if (0 != added)
+                {
+                    stolen_threads_ += added;
+                    return result;
+                }
             }
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -469,6 +489,7 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
         topology const& topology_;
+        boost::atomic<std::size_t> stolen_threads_;
     };
 }}}
 

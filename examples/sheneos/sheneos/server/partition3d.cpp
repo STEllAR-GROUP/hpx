@@ -382,20 +382,19 @@ namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    template <typename Archive>
-    void serialize(Archive& ar, sheneos::sheneos_coord& coord, unsigned int const)
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive& ar,
+        sheneos::sheneos_coord& coord, unsigned int const)
     {
         ar & coord.ye_ & coord.temp_ & coord.rho_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Explicit instantiation for the correct archive types.
-    template HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive&, sheneos::sheneos_coord&,
-        unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive&, sheneos::sheneos_coord&,
-        unsigned int const);
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive& ar,
+        sheneos::sheneos_coord& coord, unsigned int const)
+    {
+        ar & coord.ye_ & coord.temp_ & coord.rho_;
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

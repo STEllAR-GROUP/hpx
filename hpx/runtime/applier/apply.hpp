@@ -545,8 +545,26 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
-        return apply<Action>(
-            new actions::typed_continuation<result_type>(contgid), gid);
+        return apply_p<Action>(
+            new actions::typed_continuation<result_type>(contgid), gid,
+            actions::action_priority<Action>());
+    }
+
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived>
+    inline bool
+    apply_c (
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/, naming::id_type const& contgid, naming::id_type const& gid)
+    {
+        typedef
+            typename hpx::actions::extract_action<Derived>::result_type
+            result_type;
+
+        return apply_p<Derived>(
+            new actions::typed_continuation<result_type>(contgid),
+            gid, actions::action_priority<Derived>());
     }
 
     namespace applier

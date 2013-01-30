@@ -82,13 +82,6 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Fifo>
-    inline void log_fifo_statistics(Fifo const& q, char const* const desc)
-    {
-        // FIXME
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <bool Global> struct condition;
@@ -552,9 +545,9 @@ namespace hpx { namespace threads { namespace policies
         {
             if (0 == num_thread) {
                 // print queue statistics
-                log_fifo_statistics(work_items_, "thread_queue");
-                log_fifo_statistics(terminated_items_, "thread_queue");
-                log_fifo_statistics(new_tasks_, "thread_queue");
+                detail::log_fifo_statistics(work_items_, "thread_queue");
+                detail::log_fifo_statistics(terminated_items_, "thread_queue");
+                detail::log_fifo_statistics(new_tasks_, "thread_queue");
             }
         }
         void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}

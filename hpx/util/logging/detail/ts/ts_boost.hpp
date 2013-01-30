@@ -20,18 +20,21 @@
 # pragma once
 #endif
 
+#if !defined(HPX_LOG_NO_TS)
+
 #include <boost/thread/mutex.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
 namespace threading {
 
-    typedef hpx::util::mutex mutex_boost;
+    typedef boost::mutex mutex_boost;
     typedef mutex::scoped_lock scoped_lock_boost;
 }
 
 }}}
 
+#endif
 
 #endif
 

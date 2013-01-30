@@ -310,6 +310,18 @@ system and application performance.
         [Returns the total number of __hpx__-thread recycling operations
          performed.]
     ]
+    [   [`/threads/count/stolen`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the unbind
+          (madvise) operations should be queried for. The locality id is a
+          (zero based) number identifying the locality.
+        ]
+        [None]
+        [Returns the total number of __hpx__-threads 'stolen' from a 
+         neighboring worker thread (these threads are executed by a 
+         different worker thread than they were initially scheduled on).]
+    ]
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]

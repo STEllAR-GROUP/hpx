@@ -29,7 +29,7 @@
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/is_serializable.hpp>
+#include <hpx/util/serialize_empty_type.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
@@ -45,43 +45,6 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Base, typename Enable = void>
-        struct add_serialization_impl
-          : Base
-        {
-            template <typename Archive> 
-            void serialize(Archive&, const unsigned int) {}
-        };
-
-        template <typename Base>
-        struct add_serialization_impl<
-                Base
-              , typename boost::enable_if<
-                    hpx::util::is_intrusively_serializable<Base> >::type>
-          : Base
-        {};
-
-        template <typename IArchive, typename OArchive>
-        struct add_serialization
-        {
-            template <typename Functor>
-            struct get
-            {
-                typedef add_serialization_impl<Functor> type;
-            };
-        };
-
-        template <>
-        struct add_serialization<void, void>
-        {
-            template <typename Functor>
-            struct get
-            {
-                typedef Functor type;
-            };
-        };
-
         ///////////////////////////////////////////////////////////////////////
         template <
             typename Functor
@@ -139,6 +102,9 @@ namespace hpx { namespace util
     >
     struct function : function_base<Sig, IArchive, OArchive>
     {
+        typedef typename function_base<Sig, IArchive, OArchive>::result_type 
+            result_type;
+
         using function_base<Sig, IArchive, OArchive>::reset;
 
         typedef function_base<Sig, IArchive, OArchive> base_type;
@@ -219,7 +185,6 @@ namespace hpx { namespace util
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-
     };
 
     template <
@@ -227,6 +192,8 @@ namespace hpx { namespace util
     >
     struct function<Sig, void, void> : function_base<Sig, void, void>
     {
+        typedef typename function_base<Sig, void, void>::result_type result_type;
+
         using function_base<Sig, void, void>::reset;
 
         typedef function_base<Sig, void, void> base_type;
@@ -426,12 +393,7 @@ namespace hpx { namespace util {
                     functor_type;
 
                 vptr = detail::get_table<
-                            typename detail::add_serialization<
-                                IArchive
-                              , OArchive
-                            >::template get<
-                                functor_type
-                            >::type
+                            functor_type
                           , R(BOOST_PP_ENUM_PARAMS(N, A))
                         >::template get<
                             IArchive
@@ -499,12 +461,7 @@ namespace hpx { namespace util {
 
             vtable_ptr_type * f_vptr
                 = detail::get_table<
-                      typename detail::add_serialization<
-                          IArchive
-                        , OArchive
-                      >::template get<
-                          functor_type
-                      >::type
+                      functor_type
                     , R(BOOST_PP_ENUM_PARAMS(N, A))
                   >::template get<
                       IArchive

@@ -67,7 +67,7 @@ void print_results(
         = boost::str(boost::format("%lu,") % total_delay);
 
     cout <<
-        ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.12s\n")
+        ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.12s, %10.12s\n")
         % cores_str % seed_str % tasks_str
         % min_delay_str % max_delay_str % total_delay_str
         % walltime % (walltime / tasks)) << flush;
