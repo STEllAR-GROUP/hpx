@@ -41,15 +41,15 @@ namespace hpx
         hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const&, BOOST_FWD_REF(Arg));
 
+#if !defined(BOOST_MSVC)
+    // MSVC complains about async_continue beeing ambiguous if it sees this
+    // forward declaration
     template <typename F, typename Arg1, typename Arg2>
     inline typename boost::enable_if<
         traits::supports_result_of<F>, bool
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 
-#if !defined(BOOST_MSVC)
-    // MSVC complains about async_continue beeing ambiguous if it sees this
-    // forward declaration
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
     inline typename boost::enable_if<
