@@ -319,7 +319,7 @@ struct hwloc_topology : topology
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
-                    return static_cast<std::size_t>(obj->logical_index);
+                    return static_cast<std::size_t>(obj->os_index);
                 obj = obj->parent;
             }
         }
@@ -344,7 +344,7 @@ struct hwloc_topology : topology
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_CORE) == 0)
-                    return static_cast<std::size_t>(obj->logical_index);
+                    return static_cast<std::size_t>(obj->os_index);
                 obj = obj->parent;
             }
         }
@@ -413,8 +413,16 @@ struct hwloc_topology : topology
         mask_type node_affinity_mask = 0;
         std::size_t numa_node = get_numa_node_number(num_thread);
 
+        // If we have only one or no numa domain, the numa affinity mask spans
+        // all processors
         if (std::size_t(-1) == numa_node)
-            return 0;
+        {
+            for(std::size_t i = 0; i < core_numbers_.size(); ++i)
+            {
+                node_affinity_mask |= 1 << i;
+            }
+            return node_affinity_mask;
+        }
         hwloc_obj_t numa_node_obj;
         {
             scoped_lock lk(topo_mtx);
@@ -454,6 +462,7 @@ struct hwloc_topology : topology
         {
             extract_node_mask(core_obj, node_affinity_mask);
             return node_affinity_mask;
+
         }
 
         HPX_THROW_EXCEPTION(kernel_error
@@ -483,7 +492,9 @@ struct hwloc_topology : topology
             numa_nodes = static_cast<std::size_t>(numa_nodes_int);
 
             if (numa_nodes == 0)
-                return 0;
+            {
+                numa_nodes = 1;
+            }
 
             std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
             mask_type mask = 0;
