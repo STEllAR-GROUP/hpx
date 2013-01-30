@@ -42,7 +42,7 @@ struct hwloc_topology : topology
             HPX_THROW_EXCEPTION(no_success, "hwloc_topology::hwloc_topology", 
                 "Failed to load hwloc topology");
         }
-
+        
         numa_node_numbers_.reserve(num_of_cores);
         core_numbers_.reserve(num_of_cores);
         numa_node_affinity_masks_.reserve(num_of_cores);
@@ -235,19 +235,19 @@ struct hwloc_topology : topology
 //         hwloc_bitmap_free(cpuset_cmp);
 // #endif
 
-        hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF); //-V112
-        hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF); //-V112
+//        hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF); //-V112
+//        hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF); //-V112
 
-//         std::size_t idx = 0;
-//         for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
-//         {
-//             if (mask & (static_cast<std::size_t>(1) << i))
-//             {
-//                 idx = i;
-//             }
-//         }
-//
-//         hwloc_bitmap_only(cpuset, static_cast<unsigned int>(idx));
+         std::size_t idx = 0;
+         for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+         {
+             if (mask & (static_cast<std::size_t>(1) << i))
+             {
+                 idx = i;
+             }
+         }
+
+         hwloc_bitmap_only(cpuset, static_cast<unsigned int>(idx));
 
 //         hwloc_bitmap_singlify(cpuset);
         {
