@@ -19,7 +19,9 @@ namespace hpx { namespace threads
     mask_type topology::get_service_affinity_mask(
         mask_type used_processing_units, error_code& ec) const
     {
-        mask_type machine_mask = this->get_machine_affinity_mask(ec);
+        // We bind the service threads to the first numa domain. This is useful
+        // as the first numa domain is likely to have the PCI controllers etc.
+        mask_type machine_mask = this->get_numa_node_affinity_mask(0, true, ec);
         if (ec || 0 == machine_mask)
             return 0;
 
