@@ -47,6 +47,9 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 
+#if !defined(BOOST_MSVC)
+    // MSVC complains about async_continue beeing ambiguous if it sees this
+    // forward declaration
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
     inline typename boost::enable_if<
@@ -56,6 +59,7 @@ namespace hpx
         hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
         BOOST_FWD_REF(F) f);
+#endif
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0>

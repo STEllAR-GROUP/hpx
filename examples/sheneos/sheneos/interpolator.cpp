@@ -328,6 +328,8 @@ namespace sheneos
     // bulk operation has been completed
     struct on_completed_bulk_one
     {
+        typedef void result_type;
+
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         on_completed_bulk_one(boost::shared_ptr<partitions_type> parts,
@@ -377,7 +379,7 @@ namespace sheneos
             overall_result.resize(size);
 
             // asynchronously invoke the interpolation on the different partitions
-            std::vector<lcos::future<std::vector<double> > > lazy_results;
+            std::vector<lcos::future<void> > lazy_results;
             lazy_results.reserve(partitions->size());
 
             typedef std::map<naming::id_type, context_data>::value_type value_type;
@@ -388,9 +390,12 @@ namespace sheneos
 
                 context_data& d = p.second;
                 lazy_results.push_back(
-                    hpx::async_callback<action_type>(
-                        on_completed_bulk_one(partitions, d, overall_result),
-                        p.first, boost::move(d.coords_), eosvalue));
+                    hpx::async<action_type>(
+                        p.first, boost::move(d.coords_), eosvalue
+                    ).then(
+                        on_completed_bulk_one(partitions, d, overall_result)
+                    )
+                );
             }
 
             // wait for all asynchronous operations to complete
@@ -439,6 +444,8 @@ namespace sheneos
     // bulk operation has been completed
     struct on_completed_bulk
     {
+        typedef void result_type;
+
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         on_completed_bulk(boost::shared_ptr<partitions_type> parts,
@@ -490,7 +497,7 @@ namespace sheneos
             overall_results.resize(size);
 
             // asynchronously invoke the interpolation on the different partitions
-            std::vector<lcos::future<std::vector<std::vector<double> > > > lazy_results;
+            std::vector<lcos::future<void> > lazy_results;
             lazy_results.reserve(partitions->size());
 
             typedef std::map<naming::id_type, context_data>::value_type value_type;
@@ -501,9 +508,12 @@ namespace sheneos
 
                 context_data& d = p.second;
                 lazy_results.push_back(
-                    hpx::async_callback<action_type>(
-                        on_completed_bulk(partitions, d, overall_results),
-                        p.first, boost::move(d.coords_), eosvalues));
+                    hpx::async<action_type>(
+                        p.first, boost::move(d.coords_), eosvalues
+                    ).then(
+                        on_completed_bulk(partitions, d, overall_results)
+                    )
+                 );
             }
 
             // wait for all asynchronous operations to complete
