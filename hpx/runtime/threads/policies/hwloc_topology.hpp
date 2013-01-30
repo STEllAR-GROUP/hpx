@@ -235,19 +235,18 @@ struct hwloc_topology : topology
 //         hwloc_bitmap_free(cpuset_cmp);
 // #endif
 
-//        hwloc_bitmap_from_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF); //-V112
-//        hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF); //-V112
+//        hwloc_bitmap_zero(cpuset);
+//        hwloc_bitmap_set_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF); //-V112
+//        hwloc_bitmap_set_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF); //-V112
 
-         std::size_t idx = 0;
          for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
          {
              if (mask & (static_cast<std::size_t>(1) << i))
              {
-                 idx = i;
+                 hwloc_bitmap_set(cpuset, static_cast<unsigned int>(i));
              }
          }
 
-         hwloc_bitmap_only(cpuset, static_cast<unsigned int>(idx));
 
 //         hwloc_bitmap_singlify(cpuset);
         {
