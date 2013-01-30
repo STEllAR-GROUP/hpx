@@ -26,7 +26,10 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return ~used_processing_units & machine_mask;
+        mask_type res = ~used_processing_units & machine_mask;
+
+        if(res == 0) return machine_mask;
+        else return res;
     }
 
     ///////////////////////////////////////////////////////////////////////////
