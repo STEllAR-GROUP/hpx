@@ -382,15 +382,13 @@ namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar,
+    void serialize(hpx::util::portable_binary_iarchive& ar,
         sheneos::sheneos_coord& coord, unsigned int const)
     {
         ar & coord.ye_ & coord.temp_ & coord.rho_;
     }
 
-    HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar,
+    void serialize(hpx::util::portable_binary_oarchive& ar,
         sheneos::sheneos_coord& coord, unsigned int const)
     {
         ar & coord.ye_ & coord.temp_ & coord.rho_;
