@@ -11,8 +11,15 @@
 
 namespace hpx { namespace test
 {
+    // This base class is there to void the is_pod optimization
+    // during serialization to make the move semantic tests more meaningful
+    struct HPX_COMPONENT_EXPORT object_base
+    {
+        virtual ~object_base() {};
+    };
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT movable_object
+        : object_base
     {
         static std::size_t count;
 
@@ -45,6 +52,7 @@ namespace hpx { namespace test
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT non_movable_object
+        : object_base
     {
         static std::size_t count;
 
@@ -63,7 +71,12 @@ namespace hpx { namespace test
         void reset_count();
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int);
+        void load(Archive& ar, const unsigned int);
+
+        template <typename Archive>
+        void save(Archive& ar, const unsigned int) const;
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 }}
 
