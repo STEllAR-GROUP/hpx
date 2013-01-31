@@ -19,6 +19,7 @@ set(subdirs
     dataflow
     distributed_test
     embarrassingly_parallel
+    fft
     fortran_threadsafe
     gtcx
     gravity
@@ -40,8 +41,10 @@ set(subdirs
     sheneos
     spell_check
     startup_shutdown
+    str_srch
     thread_aware_timer
     throttle
+    tictactoe
    )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
