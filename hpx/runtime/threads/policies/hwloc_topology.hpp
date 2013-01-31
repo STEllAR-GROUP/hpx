@@ -343,7 +343,13 @@ struct hwloc_topology : topology
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_CORE) == 0)
-                    return static_cast<std::size_t>(obj->os_index);
+                {
+                    if (obj->os_index != ~0x0)
+                        return static_cast<std::size_t>(obj->os_index);
+
+                    // on Windows os_index is always -1
+                    return static_cast<std::size_t>(obj->logical_index);
+                }
                 obj = obj->parent;
             }
         }
@@ -418,7 +424,7 @@ struct hwloc_topology : topology
         {
             for(std::size_t i = 0; i < core_numbers_.size(); ++i)
             {
-                node_affinity_mask |= 1 << i;
+                node_affinity_mask |= (std::size_t(1) << i);
             }
             return node_affinity_mask;
         }
