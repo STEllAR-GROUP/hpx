@@ -157,7 +157,8 @@ int hpx_main(boost::program_options::variables_map&)
         std::string what_msg;
 
         try {
-            p.get();      // throws
+            f.get();      // throws
+            p.get();
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
@@ -187,7 +188,8 @@ int hpx_main(boost::program_options::variables_map&)
         std::string what_msg;
 
         try {
-            p.get();      // throws
+            f.get();      // throws
+            p.get();
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
