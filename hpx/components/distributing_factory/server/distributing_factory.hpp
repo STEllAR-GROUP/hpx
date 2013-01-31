@@ -112,7 +112,7 @@ namespace hpx { namespace components { namespace server
 namespace boost { namespace serialization
 {
     template <typename Archive>
-    void serialize(Archive&, hpx::components::server::partition_info&,
+    HPX_COMPONENT_EXPORT void serialize(Archive&, hpx::components::server::partition_info&,
         unsigned int const);
 }}
 
