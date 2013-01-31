@@ -1,4 +1,4 @@
-// Copyright (C) 2012 Hartmut Kaiser
+// Copyright (C) 2013 Hartmut Kaiser
 // Copyright (C) 2007 Anthony Williams
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threadmanager.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
@@ -15,8 +16,9 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_nothing()
+void do_nothing(hpx::lcos::local::barrier& b)
 {
+    b.wait();
     hpx::this_thread::suspend(100);     // wait for 100 ms
 }
 
@@ -28,15 +30,22 @@ void test_thread_id_for_default_constructed_thread_is_default_constructed_id()
 
 void test_thread_id_for_running_thread_is_not_default_constructed_id()
 {
-    hpx::thread t(&do_nothing);
+    hpx::lcos::local::barrier b(2);
+    hpx::thread t(HPX_STD_BIND(&do_nothing, boost::ref(b)));
+    b.wait();
+
     HPX_TEST_NEQ(t.get_id(), hpx::thread::id());
     t.join();
 }
 
 void test_different_threads_have_different_ids()
 {
-    hpx::thread t(&do_nothing);
-    hpx::thread t2(&do_nothing);
+    hpx::lcos::local::barrier b(3);
+
+    hpx::thread t(HPX_STD_BIND(&do_nothing, boost::ref(b)));
+    hpx::thread t2(HPX_STD_BIND(&do_nothing, boost::ref(b)));
+    b.wait();
+
     HPX_TEST_NEQ(t.get_id(), t2.get_id());
     t.join();
     t2.join();
@@ -44,9 +53,12 @@ void test_different_threads_have_different_ids()
 
 void test_thread_ids_have_a_total_order()
 {
-    hpx::thread t1(&do_nothing);
-    hpx::thread t2(&do_nothing);
-    hpx::thread t3(&do_nothing);
+    hpx::lcos::local::barrier b(3);
+
+    hpx::thread t1(HPX_STD_BIND(&do_nothing, boost::ref(b)));
+    hpx::thread t2(HPX_STD_BIND(&do_nothing, boost::ref(b)));
+    hpx::thread t3(HPX_STD_BIND(&do_nothing, boost::ref(b)));
+    b.wait();
 
     hpx::thread::id t1_id = t1.get_id();
     hpx::thread::id t2_id = t2.get_id();
