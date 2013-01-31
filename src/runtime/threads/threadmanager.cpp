@@ -1521,7 +1521,7 @@ namespace hpx { namespace threads
               "returns the overall number of HPX-threads stolen from neighboring"
               "schedulers for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator,
-              &locality_allocator_counter_discoverer,
+              &performance_counters::locality_counter_discoverer,
               ""
             },
         };
