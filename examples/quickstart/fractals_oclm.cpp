@@ -5,8 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with futures.
-
 #include <stdio.h>
 #include <stdlib.h>
 
