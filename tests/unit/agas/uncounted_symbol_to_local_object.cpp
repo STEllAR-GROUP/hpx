@@ -81,11 +81,12 @@ void hpx_test_main(
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
 
-            // let id go out of scope
+            // let id go out of scope. id was the last reference to the
+            // component
         }
 
-        // The component should still be alive, as the symbolic binding holds
-        // a reference to it.
+        // The component should not be alive anymore, as the symbolic binding
+        // does not hold a reference to it.
         HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
 
         // Remove the symbolic name.
