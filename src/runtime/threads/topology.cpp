@@ -37,11 +37,11 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     std::size_t hardware_concurrency()
     {
-    #if defined(__ANDROID__) && defined(ANDROID)
+#if defined(__ANDROID__) && defined(ANDROID)
         static std::size_t num_of_cores = ::android_getCpuCount();
-    #else
+#else
         static std::size_t num_of_cores = boost::thread::hardware_concurrency();
-    #endif
+#endif
 
         if (0 == num_of_cores)
             return 1;           // Assume one core.
