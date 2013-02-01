@@ -57,6 +57,7 @@ struct hwloc_topology : topology
         machine_affinity_mask_ = init_machine_affinity_mask();
 
         std::size_t num_of_nodes = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
+        (void)num_of_nodes;
         for (std::size_t i = 0; i < num_of_cores; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
@@ -355,7 +356,7 @@ struct hwloc_topology : topology
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_CORE) == 0)
                 {
-                    if (obj->os_index != ~0x0)
+                    if (obj->os_index != ~0x0u)
                         return static_cast<std::size_t>(obj->os_index);
 
                     // on Windows os_index is always -1
