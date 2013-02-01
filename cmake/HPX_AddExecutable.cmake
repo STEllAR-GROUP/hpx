@@ -118,8 +118,10 @@ macro(add_hpx_executable name)
       endif()
     endif()
 
-    if(HPX_EXTERNAL_CMAKE AND "${HPX_LIBRARIES}")
-      set(hpx_libs "${hpx_libs} ${HPX_LIBRARIES}")
+    if(HPX_EXTERNAL_CMAKE)
+      set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
+    else()
+      set(hpx_libs ${hpx_libs} ${hpx_LIBRARIES})
     endif()
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
