@@ -18,6 +18,10 @@ TBD
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 687] - compilation error fix (hwloc_topology)
+* [issue 686] - Linker Error for Applications
+* [issue 684] - Pinning of service thread fails when number of worker threads
+                equals the number of cores
 * [issue 682] - Add performance counters exposing number of stolen threads
 * [issue 681] - Add apply_continue for asynchronous chaining of actions
 * [issue 679] - Remove obsolete async_callback API functions
@@ -202,6 +206,7 @@ HPX' releases so far.
 * [issue 505] - undefined_symbol regression test currently failing
 * [issue 502] - Adding OpenCL and OCLM support to HPX for Windows and Linux
 * [issue 501] - find_package(HPX) sets cmake output variables
+* [issue 500] - wait_any/wait_all are badly named
 * [issue 499] - Add support for disabling pbs support in pbs runs
 * [issue 498] - Error during no-cache runs
 * [issue 496] - Add partial preprocessing support to cmake
@@ -250,6 +255,7 @@ HPX' releases so far.
 * [issue 354] - Create a coroutines wrapper for Boost.Context
 * [issue 349] - Commandline option `--localities=N/-lN` should be necessary
                 only on AGAS locality
+* [issue 334] - Add auto_index support to cmake based documentation toolchain
 * [issue 317] - Implement network performance counters
 * [issue 310] - Duplicate logging entries
 * [issue 230] - Add compile time option to disable thread debugging info
