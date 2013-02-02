@@ -34,24 +34,21 @@ namespace hpx { namespace threads
         else return res;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    std::size_t hardware_concurrency()
-    {
-#if defined(__ANDROID__) && defined(ANDROID)
-        static std::size_t num_of_cores = ::android_getCpuCount();
-#else
-        static std::size_t num_of_cores = boost::thread::hardware_concurrency();
-#endif
-
-        if (0 == num_of_cores)
-            return 1;           // Assume one core.
-
-        return num_of_cores;
-    }
-
     topology const& get_topology()
     {
         return get_runtime().get_topology();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t hardware_concurrency()
+    {
+    #if defined(__ANDROID__) && defined(ANDROID)
+        static std::size_t num_of_cores = ::android_getCpuCount();
+        
+        return num_of_cores;
+    #else
+        return get_topology().hardware_concurrency();
+    #endif
     }
 }}
 

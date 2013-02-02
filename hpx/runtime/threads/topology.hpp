@@ -120,6 +120,18 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual mask_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
+
+        /// \brief Return the numbers ofs core in the topology
+        virtual std::size_t hardware_concurrency() const
+        {
+            static std::size_t
+                num_of_cores = boost::thread::hardware_concurrency();
+
+            if (0 == num_of_cores)
+                return 1;           // Assume one core.
+
+            return num_of_cores;
+        }
     };
 
     /// \cond NOINTERNAL
