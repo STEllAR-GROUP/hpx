@@ -123,17 +123,13 @@ can have arguments, which will be supplied while the action is applied. At the
 minimum, one parameter is required to apply any action - the id of the locality
 the associated function should be invoked on (for global functions), or the id
 of the component instance (for member functions). Generally, __hpx__ provides
-several ways to apply an action:
+several ways to apply an action, all of which are described in the following sections.
 
 [def __apply__          [link hpx.manual.applying_actions.action_invocation.apply Applying an Action Asynchronously without any Synchronization]]
 [def __async__          [link hpx.manual.applying_actions.action_invocation.async Applying an Action Asynchronously with Synchronization]]
-[def __async_continue__ [link hpx.manual.applying_actions.action_invocation.continuation Applying an Action with a Continuation]]
+[def __apply_continue__ [link hpx.manual.applying_actions.action_invocation.async_continue Applying an Action with a Continuation but without any Synchronization]]
+[def __async_continue__ [link hpx.manual.applying_actions.action_invocation.apply_continue Applying an Action with a Continuation and with Synchronization]]
 [def __sync__           [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]]
-
-* __apply__
-* __async__
-* __async_continue__
-* __sync__
 
 __hpx__ allows to apply any action with a syntax which is very close to the
 standard C++ way of invoking functions. In fact, all action types have an
@@ -154,7 +150,8 @@ way `std::async` works for plain C++ function.
 Additionally, __hpx__ exposes `hpx::apply` and `hpx::async_continue`, both of which refine
 and extend the standard C++ facilities.
 
-[heading:apply Applying an Action Asynchronously without any Synchronization]
+[//////////////////////////////////////////////////////////////////////////////]
+[section:apply Applying an Action Asynchronously without any Synchronization]
 
 This method ('fire and forget') will make sure the function associated with
 the action is scheduled to run on the target locality. Applying the action
@@ -180,7 +177,10 @@ In this case any value returned from this action (e.g. in this case the
 integer `42`) is ignored. Please look at __action_type_definition__ for the
 code defining the component action (`some_component_action`) used.
 
-[heading:async Applying an Action Asynchronously with Synchronization]
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:async Applying an Action Asynchronously with Synchronization]
 
 This method will make sure the action is scheduled to run on the target locality.
 Applying the action itself does not wait for the function to start running or
@@ -228,51 +228,10 @@ created earlier, this invocation looks like:
       the execution of the calling thread until the asynchronous operation returns
       its result.]
 
-[heading:continuation Applying an Action with a Continuation]
+[endsect]
 
-This method is very similar to the method described in section __async__. In 
-addition to what `hpx::async` can do the functions `hpx::async_continue` take
-an additional function argument. This function will be called as the continuation
-of the executed action. It is expected to perform additional operations and to 
-make sure that a result is returned to the original invocation site. This method 
-allows to chain operations asynchronously by providing a continuation operation
-which is automatically executed once the first action has finished executing.
-
-As an example we chain two actions, where the result of the first action is
-forwarded to the second action and the result of the second action is sent back 
-to the original invocation site:
-
-    // first action
-    boost::int32_t action1(boost::int32_t i)
-    {
-        return i+1;
-    }
-    HPX_PLAIN_ACTION(action1);    // defines action1_type
-
-    struct continuation1
-    {
-        void operator()(hpx::id_type id, boost::int32_t i)
-        {
-            
-        }
-    };
-
-    // second action
-    boost::int32_t action2(boost::int32_t i)
-    {
-        return i*3;
-    }
-    HPX_PLAIN_ACTION(action2);    // defines action2_type
-
-
-    // this code invokes 'action1' above and passes along a continuation
-    // function which will forward the result returned from 'action1' to
-    // 'action2'.
-    action1_type act1;     // define an instance of 'action1_type'
-    hpx::future<int> f = hpx::async_continue(act1, hpx::find_here(), 42);
-
-
-[heading:sync Applying an Action Synchronously]
+[//////////////////////////////////////////////////////////////////////////////]
+[section:sync Applying an Action Synchronously]
 
 This method will schedule the function wrapped in the specified action on the
 target locality. While the invocation appears to be synchronous (as we will
@@ -324,7 +283,116 @@ communication latencies.
       there. Once this thread runs on the remote locality, it will execute the
       function encapsulated by the action.]
 
-[heading:compare Comparing Actions with C++ Functions]
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:async_continue Applying an Action with a Continuation but without any Synchronization]
+
+This method is very similar to the method described in section __apply__. The main
+difference is that it allows to chain a sequence of asynchronous operations, while
+handing the (intermediate) results from one step to the next step in the chain.
+Where `hpx::apply` invokes a single function using 'fire and forget' semantics,
+`hpx::apply_continue` allows to asynchronously trigger a chain of functions 
+asynchronously, without the need for the execution flow 'to come back' to the 
+invocation site. Each of the asynchronous functions can be executed on a different 
+locality.
+
+
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:apply_continue Applying an Action with a Continuation and with Synchronization]
+
+This method is very similar to the method described in section __async__. In
+addition to what `hpx::async` can do, the functions `hpx::async_continue` takes
+an additional function argument. This function will be called as the continuation
+of the executed action. It is expected to perform additional operations and to
+make sure that a result is returned to the original invocation site. This method
+allows to chain operations asynchronously by providing a continuation operation
+which is automatically executed once the first action has finished executing.
+
+As an example we chain two actions, where the result of the first action is
+forwarded to the second action and the result of the second action is sent back
+to the original invocation site:
+
+    // first action
+    boost::int32_t action1(boost::int32_t i)
+    {
+        return i+1;
+    }
+    HPX_PLAIN_ACTION(action1);    // defines action1_type
+
+    // second action
+    boost::int32_t action2(boost::int32_t i)
+    {
+        return i*2;
+    }
+    HPX_PLAIN_ACTION(action2);    // defines action2_type
+
+    // this code invokes 'action1' above and passes along a continuation
+    // function which will forward the result returned from 'action1' to
+    // 'action2'.
+    action1_type act1;     // define an instance of 'action1_type'
+    action2_type act2;     // define an instance of 'action2_type'
+    hpx::future<int> f =
+        hpx::async_continue(act1, hpx::find_here(), 42,
+            hpx::make_continuation(act2));
+    hpx::cout << f.get() << "\n";   // will print: 86 ((42 + 1) * 2)
+
+By default, the continuation is executed on the same locality as
+`hpx::async_continue` is invoked from. If you want to specify the locality where
+the continuation should be executed, the code above has to be written as:
+
+    // this code invokes 'action1' above and passes along a continuation
+    // function which will forward the result returned from 'action1' to
+    // 'action2'.
+    action1_type act1;     // define an instance of 'action1_type'
+    action2_type act2;     // define an instance of 'action2_type'
+    hpx::future<int> f =
+        hpx::async_continue(act1, hpx::find_here(), 42,
+            hpx::make_continuation(act2, hpx::find_here()));
+    hpx::cout << f.get() << "\n";   // will print: 86 ((42 + 1) * 2)
+
+Similarily, it is possible to chain more than 2 operations:
+
+    action1_type act1;     // define an instance of 'action1_type'
+    action2_type act2;     // define an instance of 'action2_type'
+    hpx::future<int> f =
+        hpx::async_continue(act1, hpx::find_here(), 42,
+            hpx::make_continuation(act2,
+                hpx::make_continuation(act1)));
+    hpx::cout << f.get() << "\n";   // will print: 87 ((42 + 1) * 2 + 1)
+
+The function `hpx::make_continuation` creates a special function object
+which exposes the following prototype:
+
+    struct continuation
+    {
+        template <typename Result>
+        void operator()(hpx::id_type id, Result&& result) const
+        {
+            ...
+        }
+    };
+
+where the parameters passed to the overloaded function operator (`operator()()`)
+are:
+
+* the `id` is the global id where the final result of the asynchronous chain of
+  operations should be sent to (in most cases this is the id of the `hpx::future`
+  returned from the initial call to `hpx::async_continue`). Any custom continuation
+  function should make sure this `id` is forwarded to the last operation in the
+  chain.
+* the `result` is the result value of the current operation in the asynchronous
+  execution chain. This value needs to be forwarded to the next operation.
+
+[note All of those operations are implemented by the predefined continuation
+      function object which is returned from `hpx::make_continuation`. Any (custom)
+      function object used as a continuation should conform to the same interface.]
+
+[endsect]
+
+[section:compare Comparing Actions with C++ Functions]
 
 As mentioned above, __hpx__ actions are very similar to 'normal' C++ functions
 except that actions can be invoked remotely. The following table compares the
@@ -357,6 +425,8 @@ arbitrary result type.
      [`R r = act(id, ...)`]
     ]
 ]
+
+[endsect]
 
 [endsect] [/ Action Invocation]
 
