@@ -58,14 +58,14 @@ struct hwloc_topology : topology
 
         std::size_t num_of_nodes = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
         (void)num_of_nodes;
-        for (std::size_t i = 0; i < num_of_cores; ++i)
+        for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
             BOOST_ASSERT(numa_node < num_of_nodes);
             numa_node_numbers_.push_back(numa_node);
         }
 
-        for (std::size_t i = 0; i < num_of_cores; ++i)
+        for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t core_number = init_core_number(i);
             BOOST_ASSERT(core_number < num_of_cores);
