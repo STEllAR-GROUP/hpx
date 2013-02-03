@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/threads/detail/partlit.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -64,6 +65,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    //
     // mappings:
     //     mapping(;mapping)*
     //
@@ -72,6 +74,8 @@ namespace hpx { namespace threads
     //
     // thread-spec:
     //     t:int
+    //     t:int-int
+    //     t:all
     //
     // pu-specs:
     //     pu-spec(.pu-spec)*
@@ -90,7 +94,7 @@ namespace hpx { namespace threads
 
     struct spec_type
     {
-        enum type { unknown, socket, numanode, core, pu };
+        enum type { unknown, thread, socket, numanode, core, pu };
 
         spec_type()
           : type_(unknown), index_min_(0), index_max_(0)
@@ -103,6 +107,11 @@ namespace hpx { namespace threads
         type type_;
         mask_type index_min_;
         mask_type index_max_;
+    };
+
+    struct thread_spec_type : spec_type
+    {
+        thread_spec_type() : spec_type(spec_type::thread) {}
     };
 
     struct socket_spec_type : spec_type
@@ -127,6 +136,11 @@ namespace hpx { namespace threads
 }}
 
 BOOST_FUSION_ADAPT_STRUCT(
+    hpx::threads::thread_spec_type,
+    (hpx::threads::mask_type, index_min_)
+    (hpx::threads::mask_type, index_max_)
+)
+BOOST_FUSION_ADAPT_STRUCT(
     hpx::threads::socket_spec_type,
     (hpx::threads::mask_type, index_min_)
     (hpx::threads::mask_type, index_max_)
@@ -150,7 +164,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 namespace hpx { namespace threads
 {
     typedef std::vector<spec_type> mapping_type;
-    typedef std::pair<int, mapping_type> full_mapping_type;
+    typedef std::pair<thread_spec_type, mapping_type> full_mapping_type;
     typedef std::vector<full_mapping_type> mappings_type;
 
     namespace qi = boost::spirit::qi;
@@ -161,15 +175,20 @@ namespace hpx { namespace threads
         mappings_parser()
           : mappings_parser::base_type(start)
         {
+            using detail::partlit;
+
             start = mapping % ';';
 
             mapping =  thread_spec >> '=' >> pu_spec;
 
-            thread_spec = 
-                    "thread:" >> qi::int_
+            thread_spec =
+                    partlit("thread") >> ':'
+                    >>  (   qi::int_ >> -('-' >> qi::int_)
+                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
+                        )
                 ;
 
-            pu_spec = 
+            pu_spec =
                     qi::attr_cast<spec_type>(socket_spec)
                     >>  qi::attr_cast<spec_type>(numanode_spec)
                     >>  qi::attr_cast<spec_type>(core_spec)
@@ -178,33 +197,33 @@ namespace hpx { namespace threads
                 ;
 
             socket_spec =
-                    "socket:"
+                    partlit("socket") >> ':'
                     >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   "all" >> qi::attr(~0x0) >> qi::attr(0)
+                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
                         )
                 |   qi::attr(0) >> qi::attr(0)
                 ;
 
             numanode_spec =
-                    -qi::lit('.') >> "numanode:"
+                    -qi::lit('.') >> partlit("numanode") >> ':'
                     >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   "all" >> qi::attr(~0x0) >> qi::attr(0)
+                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
                         )
                 |   qi::attr(0) >> qi::attr(0)
                 ;
 
             core_spec =
-                    -qi::lit('.') >> "core:"
+                    -qi::lit('.') >> partlit("core") >> ':'
                     >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   "all" >> qi::attr(~0x0) >> qi::attr(0)
+                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
                         )
                 |   qi::attr(0) >> qi::attr(0)
                 ;
 
             processing_unit_spec =
-                    -qi::lit('.') >> "pu:"
+                    -qi::lit('.') >> partlit("pu") >> ':'
                     >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   "all" >> qi::attr(~0x0) >> qi::attr(0)
+                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
                         )
                 |   qi::attr(0) >> qi::attr(0)
                 ;
@@ -212,7 +231,7 @@ namespace hpx { namespace threads
 
         qi::rule<Iterator, mappings_type()> start;
         qi::rule<Iterator, full_mapping_type()> mapping;
-        qi::rule<Iterator, int()> thread_spec;
+        qi::rule<Iterator, thread_spec_type()> thread_spec;
         qi::rule<Iterator, mapping_type()> pu_spec;
         qi::rule<Iterator, socket_spec_type()> socket_spec;
         qi::rule<Iterator, numanode_spec_type()> numanode_spec;
