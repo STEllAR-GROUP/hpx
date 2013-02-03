@@ -8,7 +8,7 @@
 #define HPX_WAIT_ARGUMENT_LIMIT 5
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/thread.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>

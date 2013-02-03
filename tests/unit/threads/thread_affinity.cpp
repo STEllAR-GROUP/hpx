@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/thread.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>

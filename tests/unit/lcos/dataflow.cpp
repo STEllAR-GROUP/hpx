@@ -5,7 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/thread.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #if HPX_ACTION_ARGUMENT_LIMIT < 10
