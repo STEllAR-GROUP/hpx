@@ -7,6 +7,7 @@ set(tests
     bind_action
     function
     merging_map
+    parse_affinity_options
    )
 
 set(merging_map_FLAGS NOLIBS)

@@ -8,6 +8,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/detail/partlit.hpp>
 
+//#define BOOST_SPIRIT_DEBUG
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
 #include <boost/spirit/include/qi_nonterminal.hpp>
@@ -18,6 +19,8 @@
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
+
+#include <boost/foreach.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>
@@ -63,7 +66,10 @@ namespace hpx { namespace threads
     {
         return get_runtime().get_topology();
     }
+}}
 
+namespace hpx { namespace threads { namespace detail
+{
     ///////////////////////////////////////////////////////////////////////////
     //
     // mappings:
@@ -109,6 +115,13 @@ namespace hpx { namespace threads
         mask_type index_max_;
     };
 
+#if defined(BOOST_SPIRIT_DEBUG)
+    std::ostream& operator<<(std::ostream& os, spec_type const& spec)
+    {
+        return os;
+    }
+#endif
+
     struct thread_spec_type : spec_type
     {
         thread_spec_type() : spec_type(spec_type::thread) {}
@@ -133,35 +146,35 @@ namespace hpx { namespace threads
     {
         pu_spec_type() : spec_type(spec_type::pu) {}
     };
-}}
+}}}
 
 BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::thread_spec_type,
+    hpx::threads::detail::thread_spec_type,
     (hpx::threads::mask_type, index_min_)
     (hpx::threads::mask_type, index_max_)
 )
 BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::socket_spec_type,
+    hpx::threads::detail::socket_spec_type,
     (hpx::threads::mask_type, index_min_)
     (hpx::threads::mask_type, index_max_)
 )
 BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::numanode_spec_type,
+    hpx::threads::detail::numanode_spec_type,
     (hpx::threads::mask_type, index_min_)
     (hpx::threads::mask_type, index_max_)
 )
 BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::core_spec_type,
+    hpx::threads::detail::core_spec_type,
     (hpx::threads::mask_type, index_min_)
     (hpx::threads::mask_type, index_max_)
 )
 BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::pu_spec_type,
+    hpx::threads::detail::pu_spec_type,
     (hpx::threads::mask_type, index_min_)
     (hpx::threads::mask_type, index_max_)
 )
 
-namespace hpx { namespace threads
+namespace hpx { namespace threads { namespace detail
 {
     typedef std::vector<spec_type> mapping_type;
     typedef std::pair<thread_spec_type, mapping_type> full_mapping_type;
@@ -169,6 +182,25 @@ namespace hpx { namespace threads
 
     namespace qi = boost::spirit::qi;
 
+    // We need this wrapper as spirit::attr_casthas a bug and can't be used 
+    // with rules.
+    template <typename Exposed, typename OutputIterator,
+        typename T1, typename T2, typename T3, typename T4>
+    boost::spirit::stateful_tag_type<
+        typename qi::rule<OutputIterator, T1, T2, T3, T4>::reference_,
+        boost::spirit::tag::attr_cast,
+        Exposed
+    >
+    attr_cast(qi::rule<OutputIterator, T1, T2, T3, T4> const& r)
+    {
+        return boost::spirit::stateful_tag_type<
+            typename qi::rule<OutputIterator, T1, T2, T3, T4>::reference_,
+            boost::spirit::tag::attr_cast,
+            Exposed
+        >(r.alias());
+    }
+
+    // parser for affinity options
     template <typename Iterator>
     struct mappings_parser : qi::grammar<Iterator, mappings_type()>
     {
@@ -189,10 +221,10 @@ namespace hpx { namespace threads
                 ;
 
             pu_spec =
-                    qi::attr_cast<spec_type>(socket_spec)
-                    >>  qi::attr_cast<spec_type>(numanode_spec)
-                    >>  qi::attr_cast<spec_type>(core_spec)
-                    >>  qi::attr_cast<spec_type>(processing_unit_spec)
+                    attr_cast<spec_type>(socket_spec)
+                    >>  attr_cast<spec_type>(numanode_spec)
+                    >>  attr_cast<spec_type>(core_spec)
+                    >>  attr_cast<spec_type>(processing_unit_spec)
                 |   '~' >> pu_spec
                 ;
 
@@ -227,6 +259,11 @@ namespace hpx { namespace threads
                         )
                 |   qi::attr(0) >> qi::attr(0)
                 ;
+
+            BOOST_SPIRIT_DEBUG_NODES(
+                (start)(mapping)(thread_spec)(pu_spec)(socket_spec)
+                (numanode_spec)(core_spec)(processing_unit_spec)
+            );
         }
 
         qi::rule<Iterator, mappings_type()> start;
@@ -246,15 +283,32 @@ namespace hpx { namespace threads
         return qi::parse(begin, end, p, m);
     }
 
-    bool parse (std::string const& spec)
+    ///////////////////////////////////////////////////////////////////////////
+    bool decode_mapping(full_mapping_type const& m,
+        std::vector<mask_type>& affinities)
     {
-        mappings_type m;
+        return true;
+    }
+}}}
+
+namespace hpx { namespace threads
+{
+    ///////////////////////////////////////////////////////////////////////////
+    bool parse_affinity_options(std::string const& spec,
+        std::vector<mask_type>& affinities)
+    {
+        detail::mappings_type mappings;
         std::string::const_iterator begin = spec.begin();
-        if (!parse(begin, spec.end(), m) || begin != spec.end())
+        if (!detail::parse(begin, spec.end(), mappings) || begin != spec.end())
             return false;
+
+        BOOST_FOREACH(detail::full_mapping_type const& m, mappings)
+        {
+            if (!detail::decode_mapping(m, affinities))
+                return false;
+        }
 
         return true;
     }
-
 }}
 

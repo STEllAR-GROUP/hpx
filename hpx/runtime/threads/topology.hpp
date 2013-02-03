@@ -153,9 +153,12 @@ namespace hpx { namespace threads
         return std::size_t(-1);
     }
 
-    HPX_EXPORT std::size_t hardware_concurrency();
+    HPX_API_EXPORT std::size_t hardware_concurrency();
 
-    HPX_EXPORT topology const& get_topology();
+    HPX_API_EXPORT topology const& get_topology();
+
+    HPX_API_EXPORT bool parse_affinity_options(std::string const& spec, 
+        std::vector<mask_type>& affinities);
 
     /// \endcond
 }}
