@@ -16,6 +16,9 @@
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 
+#include <string>
+#include <vector>
+
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
@@ -156,6 +159,37 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::size_t hardware_concurrency();
 
     HPX_API_EXPORT topology const& get_topology();
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct spec_type
+        {
+            enum type { unknown, thread, socket, numanode, core, pu };
+
+            spec_type(type t = unknown, mask_type min = ~0x0ul, mask_type max = ~0x0ul)
+              : type_(t), index_min_(min), index_max_(max)
+            {}
+
+            bool operator==(spec_type const& rhs) const
+            {
+                return type_ == rhs.type_ &&
+                    index_min_ == rhs.index_min_ &&
+                    index_max_ == rhs.index_max_;
+            }
+
+            type type_;
+            mask_type index_min_;
+            mask_type index_max_;
+        };
+
+        typedef std::vector<spec_type> mapping_type;
+        typedef std::pair<spec_type, mapping_type> full_mapping_type;
+        typedef std::vector<full_mapping_type> mappings_type;
+
+        HPX_API_EXPORT bool parse_mappings(std::string const& spec, 
+            mappings_type& mappings);
+    }
 
     HPX_API_EXPORT bool parse_affinity_options(std::string const& spec, 
         std::vector<mask_type>& affinities);

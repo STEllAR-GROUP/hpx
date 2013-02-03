@@ -8,7 +8,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/detail/partlit.hpp>
 
-//#define BOOST_SPIRIT_DEBUG
+// #define BOOST_SPIRIT_DEBUG
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
 #include <boost/spirit/include/qi_nonterminal.hpp>
@@ -68,137 +68,45 @@ namespace hpx { namespace threads
     }
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+BOOST_FUSION_ADAPT_STRUCT(
+    hpx::threads::detail::spec_type,
+    (hpx::threads::mask_type, index_min_)
+    (hpx::threads::mask_type, index_max_)
+    (hpx::threads::detail::spec_type::type, type_)
+)
+
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     //
-    // mappings:
-    //     mapping(;mapping)*
+    //    mappings:
+    //        mapping(;mapping)*
     //
-    // mapping:
-    //     thread-spec=pu-specs
+    //    mapping:
+    //        thread-spec=pu-specs
     //
-    // thread-spec:
-    //     t:int
-    //     t:int-int
-    //     t:all
+    //    thread-spec:
+    //        t:int
+    //        t:int-int
+    //        t:all
     //
-    // pu-specs:
-    //     pu-spec(.pu-spec)*
+    //    pu-specs:
+    //        pu-spec(.pu-spec)*
     //
-    // pu-spec:
-    //     type:int
-    //     type:int-int
-    //     type:all
-    //     ~mapping
+    //    pu-spec:
+    //        type:int
+    //        type:int-int
+    //        type:all
+    //        ~pu-spec
     //
-    // type:
-    //     socket
-    //     numanode
-    //     core
-    //     pu
-
-    struct spec_type
-    {
-        enum type { unknown, thread, socket, numanode, core, pu };
-
-        spec_type()
-          : type_(unknown), index_min_(0), index_max_(0)
-        {}
-
-        spec_type(type t)
-          : type_(t), index_min_(0), index_max_(0)
-        {}
-
-        type type_;
-        mask_type index_min_;
-        mask_type index_max_;
-    };
-
-#if defined(BOOST_SPIRIT_DEBUG)
-    std::ostream& operator<<(std::ostream& os, spec_type const& spec)
-    {
-        return os;
-    }
-#endif
-
-    struct thread_spec_type : spec_type
-    {
-        thread_spec_type() : spec_type(spec_type::thread) {}
-    };
-
-    struct socket_spec_type : spec_type
-    {
-        socket_spec_type() : spec_type(spec_type::socket) {}
-    };
-
-    struct numanode_spec_type : spec_type
-    {
-        numanode_spec_type() : spec_type(spec_type::numanode) {}
-    };
-
-    struct core_spec_type : spec_type
-    {
-        core_spec_type() : spec_type(spec_type::core) {}
-    };
-
-    struct pu_spec_type : spec_type
-    {
-        pu_spec_type() : spec_type(spec_type::pu) {}
-    };
-}}}
-
-BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::detail::thread_spec_type,
-    (hpx::threads::mask_type, index_min_)
-    (hpx::threads::mask_type, index_max_)
-)
-BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::detail::socket_spec_type,
-    (hpx::threads::mask_type, index_min_)
-    (hpx::threads::mask_type, index_max_)
-)
-BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::detail::numanode_spec_type,
-    (hpx::threads::mask_type, index_min_)
-    (hpx::threads::mask_type, index_max_)
-)
-BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::detail::core_spec_type,
-    (hpx::threads::mask_type, index_min_)
-    (hpx::threads::mask_type, index_max_)
-)
-BOOST_FUSION_ADAPT_STRUCT(
-    hpx::threads::detail::pu_spec_type,
-    (hpx::threads::mask_type, index_min_)
-    (hpx::threads::mask_type, index_max_)
-)
-
-namespace hpx { namespace threads { namespace detail
-{
-    typedef std::vector<spec_type> mapping_type;
-    typedef std::pair<thread_spec_type, mapping_type> full_mapping_type;
-    typedef std::vector<full_mapping_type> mappings_type;
-
+    //    type:
+    //        socket
+    //        numanode
+    //        core
+    //        pu
+    //
     namespace qi = boost::spirit::qi;
-
-    // We need this wrapper as spirit::attr_casthas a bug and can't be used 
-    // with rules.
-    template <typename Exposed, typename OutputIterator,
-        typename T1, typename T2, typename T3, typename T4>
-    boost::spirit::stateful_tag_type<
-        typename qi::rule<OutputIterator, T1, T2, T3, T4>::reference_,
-        boost::spirit::tag::attr_cast,
-        Exposed
-    >
-    attr_cast(qi::rule<OutputIterator, T1, T2, T3, T4> const& r)
-    {
-        return boost::spirit::stateful_tag_type<
-            typename qi::rule<OutputIterator, T1, T2, T3, T4>::reference_,
-            boost::spirit::tag::attr_cast,
-            Exposed
-        >(r.alias());
-    }
 
     // parser for affinity options
     template <typename Iterator>
@@ -208,6 +116,7 @@ namespace hpx { namespace threads { namespace detail
           : mappings_parser::base_type(start)
         {
             using detail::partlit;
+            using detail::spec_type;
 
             start = mapping % ';';
 
@@ -215,49 +124,61 @@ namespace hpx { namespace threads { namespace detail
 
             thread_spec =
                     partlit("thread") >> ':'
-                    >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
+                    >>  (   qi::uint_
+                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                            >>  qi::attr(spec_type::thread)
+                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                            >>  qi::attr(spec_type::thread)
                         )
                 ;
 
             pu_spec =
-                    attr_cast<spec_type>(socket_spec)
-                    >>  attr_cast<spec_type>(numanode_spec)
-                    >>  attr_cast<spec_type>(core_spec)
-                    >>  attr_cast<spec_type>(processing_unit_spec)
-                |   '~' >> pu_spec
+                    socket_spec >> numanode_spec >> core_spec >> processing_unit_spec
+//                 |   '~' >> pu_spec
                 ;
 
             socket_spec =
                     partlit("socket") >> ':'
-                    >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
+                    >>  (   qi::uint_
+                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                            >>  qi::attr(spec_type::socket)
+                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                            >>  qi::attr(spec_type::socket)
                         )
-                |   qi::attr(0) >> qi::attr(0)
+                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
                 ;
 
             numanode_spec =
                     -qi::lit('.') >> partlit("numanode") >> ':'
-                    >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
+                    >>  (   qi::uint_
+                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                            >>  qi::attr(spec_type::numanode)
+                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                            >>  qi::attr(spec_type::numanode)
                         )
-                |   qi::attr(0) >> qi::attr(0)
+                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
                 ;
 
             core_spec =
                     -qi::lit('.') >> partlit("core") >> ':'
-                    >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
+                    >>  (   qi::uint_
+                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                            >>  qi::attr(spec_type::core)
+                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                            >>  qi::attr(spec_type::core)
                         )
-                |   qi::attr(0) >> qi::attr(0)
+                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
                 ;
 
             processing_unit_spec =
                     -qi::lit('.') >> partlit("pu") >> ':'
-                    >>  (   qi::int_ >> -('-' >> qi::int_)
-                        |   partlit("all") >> qi::attr(~0x0) >> qi::attr(0)
+                    >>  (   qi::uint_
+                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                            >>  qi::attr(spec_type::pu)
+                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                            >>  qi::attr(spec_type::pu)
                         )
-                |   qi::attr(0) >> qi::attr(0)
+                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
                 ;
 
             BOOST_SPIRIT_DEBUG_NODES(
@@ -268,12 +189,12 @@ namespace hpx { namespace threads { namespace detail
 
         qi::rule<Iterator, mappings_type()> start;
         qi::rule<Iterator, full_mapping_type()> mapping;
-        qi::rule<Iterator, thread_spec_type()> thread_spec;
+        qi::rule<Iterator, spec_type()> thread_spec;
         qi::rule<Iterator, mapping_type()> pu_spec;
-        qi::rule<Iterator, socket_spec_type()> socket_spec;
-        qi::rule<Iterator, numanode_spec_type()> numanode_spec;
-        qi::rule<Iterator, core_spec_type()> core_spec;
-        qi::rule<Iterator, pu_spec_type()> processing_unit_spec;
+        qi::rule<Iterator, spec_type()> socket_spec;
+        qi::rule<Iterator, spec_type()> numanode_spec;
+        qi::rule<Iterator, spec_type()> core_spec;
+        qi::rule<Iterator, spec_type()> processing_unit_spec;
     };
 
     template <typename Iterator>
@@ -284,7 +205,15 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool decode_mapping(full_mapping_type const& m,
+    bool parse_mappings(std::string const& spec, mappings_type& mappings)
+    {
+        std::string::const_iterator begin = spec.begin();
+        if (!detail::parse(begin, spec.end(), mappings) || begin != spec.end())
+            return false;
+        return true;
+    }
+
+    bool decode_mappings(full_mapping_type const& m,
         std::vector<mask_type>& affinities)
     {
         return true;
@@ -298,13 +227,12 @@ namespace hpx { namespace threads
         std::vector<mask_type>& affinities)
     {
         detail::mappings_type mappings;
-        std::string::const_iterator begin = spec.begin();
-        if (!detail::parse(begin, spec.end(), mappings) || begin != spec.end())
+        if (!detail::parse_mappings(spec, mappings))
             return false;
 
         BOOST_FOREACH(detail::full_mapping_type const& m, mappings)
         {
-            if (!detail::decode_mapping(m, affinities))
+            if (!detail::decode_mappings(m, affinities))
                 return false;
         }
 
