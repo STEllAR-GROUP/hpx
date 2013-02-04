@@ -205,38 +205,77 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool parse_mappings(std::string const& spec, mappings_type& mappings)
+    void parse_mappings(std::string const& spec, mappings_type& mappings,
+        error_code& ec)
     {
         std::string::const_iterator begin = spec.begin();
         if (!detail::parse(begin, spec.end(), mappings) || begin != spec.end())
-            return false;
-        return true;
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                "failed to parse affinity specification: " + spec);
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 
-    bool decode_mappings(full_mapping_type const& m,
-        std::vector<mask_type>& affinities)
+    void decode_mapping(topology const& t, std::size_t thread_num,
+        mapping_type const& m, std::vector<mask_type>& affinities,
+        error_code& ec)
     {
-        return true;
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    void decode_mappings(full_mapping_type const& m,
+        std::vector<mask_type>& affinities, error_code& ec)
+    {
+        topology const& t = get_topology();
+
+        // repeat for each of the threads in the affinity specification
+        std::size_t first = m.first.index_min_;
+        std::size_t last = m.first.index_max_;
+
+        if (first == ~0x0ul) {
+            if (last == ~0x0ul) {
+                HPX_THROWS_IF(ec, bad_parameter, "decode_mappings",
+                    boost::str(boost::format("invalid thread specification, "
+                        "min: %x, max %x") % first % last));
+                return;
+            }
+
+            // bind all threads
+            first = 0;
+            last = affinities.size();
+        }
+        if (0 == last)
+            last = first;
+
+        for (std::size_t i = first; i != last; ++i)
+        {
+            decode_mapping(t, i, m.second, affinities, ec);
+            if (ec) return;
+        }
     }
 }}}
 
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    bool parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities)
+    void parse_affinity_options(std::string const& spec,
+        std::vector<mask_type>& affinities, error_code& ec)
     {
         detail::mappings_type mappings;
-        if (!detail::parse_mappings(spec, mappings))
-            return false;
-
-        BOOST_FOREACH(detail::full_mapping_type const& m, mappings)
-        {
-            if (!detail::decode_mappings(m, affinities))
-                return false;
+        detail::parse_mappings(spec, mappings, ec);
+        if (!ec) {
+            BOOST_FOREACH(detail::full_mapping_type const& m, mappings)
+            {
+                detail::decode_mappings(m, affinities, ec);
+                if (ec) return;
+            }
         }
-
-        return true;
     }
 }}
 

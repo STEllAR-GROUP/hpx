@@ -187,12 +187,12 @@ namespace hpx { namespace threads
         typedef std::pair<spec_type, mapping_type> full_mapping_type;
         typedef std::vector<full_mapping_type> mappings_type;
 
-        HPX_API_EXPORT bool parse_mappings(std::string const& spec, 
-            mappings_type& mappings);
+        HPX_API_EXPORT void parse_mappings(std::string const& spec, 
+            mappings_type& mappings, error_code& ec = throws);
     }
 
-    HPX_API_EXPORT bool parse_affinity_options(std::string const& spec, 
-        std::vector<mask_type>& affinities);
+    HPX_API_EXPORT void parse_affinity_options(std::string const& spec, 
+        std::vector<mask_type>& affinities, error_code& ec = throws);
 
     /// \endcond
 }}

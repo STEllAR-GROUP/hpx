@@ -99,7 +99,7 @@ namespace hpx { namespace threads { namespace policies
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
-            affinity_data_(init.pu_offset_, init.pu_step_,
+            affinity_data_(init.num_queues_, init.pu_offset_, init.pu_step_,
                 init.affinity_domain_, init.affinity_desc_),
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology()),
