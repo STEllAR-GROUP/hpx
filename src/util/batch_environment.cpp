@@ -15,6 +15,9 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+
 namespace hpx { namespace util
 {
     // The function will analyze the current environment and return true
@@ -186,7 +189,53 @@ namespace hpx { namespace util
         std::string const& agas_host)
     {
         char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
+        char* tasks_per_node_env = std::getenv("SLURM_TASKS_PER_NODE");
+
+        std::vector<std::size_t> tasks_per_node;
+        if(tasks_per_node_env)
+        {
+            if (debug_) {
+                std::cerr << "SLURM tasks per node found: " << slurm_nodelist_env
+                          << std::endl;
+            }
+
+            std::string tasks_per_node_str(tasks_per_node_env);
+            std::string::iterator begin = tasks_per_node_str.begin();
+            std::string::iterator end = tasks_per_node_str.end();
+            int i = 0;
+            boost::spirit::qi::parse(
+                begin
+              , end
+              , (
+                  (   boost::spirit::qi::int_
+                    >> boost::spirit::qi::lit('(')
+                    >> boost::spirit::qi::lit('x')
+                    >> boost::spirit::qi::int_
+                    >> boost::spirit::qi::lit(')'))[
+                           boost::phoenix::for_(
+                               boost::phoenix::ref(i) = 0
+                             , boost::phoenix::ref(i) != boost::spirit::qi::_2
+                             , ++boost::phoenix::ref(i)
+                           )
+                           [
+                               boost::phoenix::push_back(
+                                   boost::phoenix::ref(tasks_per_node)
+                                 , boost::spirit::qi::_1
+                               )
+                           ]
+                       ]
+                  | boost::spirit::qi::int_[
+                      boost::phoenix::push_back(
+                          boost::phoenix::ref(tasks_per_node)
+                        , boost::spirit::qi::_1
+                      )
+                    ]
+                ) % ','
+            );
+        }
+
         if (slurm_nodelist_env) {
+
             if (debug_) {
                 std::cerr << "SLURM nodelist found: " << slurm_nodelist_env
                           << std::endl;
@@ -198,8 +247,22 @@ namespace hpx { namespace util
             boost::char_separator<char> sep (" \t:");
             tokenizer_type tok(std::string(slurm_nodelist_env), sep);
             tokenizer_type::iterator end = tok.end();
+            std::size_t i = 0;
             for (tokenizer_type::iterator it = tok.begin (); it != end; ++it)
-                nodes.push_back (*it);
+            {
+                if(!tasks_per_node.empty())
+                {
+                    for(std::size_t j = 0; j != tasks_per_node[j]; ++j)
+                    {
+                        nodes.push_back (*it);
+                    }
+                }
+                else
+                {
+                    nodes.push_back (*it);
+                }
+                ++i;
+            }
 
             return init_from_nodelist(nodes, agas_host);
         }
