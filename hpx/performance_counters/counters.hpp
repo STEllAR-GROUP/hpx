@@ -393,7 +393,7 @@ namespace hpx { namespace performance_counters
         boost::int64_t value_;      ///< The current counter value
         boost::int64_t scaling_;    ///< The scaling of the current counter value
         counter_status status_;     ///< The status of the counter value
-        bool scale_inverse_;        ///< If true, value_ needs to be deleted by
+        bool scale_inverse_;        ///< If true, value_ needs to be divided by
                                     ///< scaling_, otherwise it has to be
                                     ///< multiplied.
 

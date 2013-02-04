@@ -73,7 +73,7 @@ namespace hpx { namespace util
         // PBS, false otherwise
         bool run_with_pbs() const;
 
-        // The function run_with_pbs returns true if the job was started using
+        // The function run_with_slurm returns true if the job was started using
         // SLURM, false otherwise
         bool run_with_slurm() const;
 

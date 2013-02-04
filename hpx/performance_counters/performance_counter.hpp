@@ -33,10 +33,10 @@ namespace hpx { namespace performance_counters
         // Set the (initial) value of the Performance Counter.
         virtual void set_counter_value(counter_value const& /*value*/) = 0;
 
-        // Start the Performabnce Counter.
+        // Start the Performance Counter.
         virtual bool start() = 0;
 
-        // Stop the Performabnce Counter.
+        // Stop the Performance Counter.
         virtual bool stop() = 0;
     };
     //]
