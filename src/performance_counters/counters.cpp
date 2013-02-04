@@ -265,7 +265,7 @@ namespace hpx { namespace performance_counters
         path_parser()
           : path_parser::base_type(start)
         {
-          start = -qi::lit(counter_prefix)
+            start = -qi::lit(counter_prefix)
                 >> '/' >> +~qi::char_("/{#@") >> -instance
                 >> -('/' >>  +~qi::char_("#}@")) >> -('@' >> +qi::char_);
             instance = '{' >> parent >> -('/' >> child) >> '}';
