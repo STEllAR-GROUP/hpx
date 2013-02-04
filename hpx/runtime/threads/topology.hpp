@@ -115,7 +115,7 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
-        ///        processing unit colocated with the memory the given 
+        ///        processing unit co-located with the memory the given 
         ///        address is currently allocated on.
         ///
         /// \param ec         [in,out] this represents the error status on exit,

@@ -464,18 +464,26 @@ namespace hpx
             // pu control is available for HWLOC and Windows only
             if (vm.count("hpx:pu-offset")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:pu-offset, valid for --hpx:queuing=priority_local only.");
+                    "--hpx:pu-offset, valid for --hpx:queuing=priority or "
+                    "--hpx:queuing=priority_local only.");
             }
             if (vm.count("hpx:pu-step")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:pu-step, valid for --hpx:queuing=priority_local only.");
+                    "--hpx:pu-step, valid for --hpx:queuing=priority or "
+                    "--hpx:queuing=priority_local only.");
             }
 #endif
 #if defined(HPX_HAVE_HWLOC)
             // affinity control is available for HWLOC only
             if (vm.count("hpx:affinity")) {
                 throw std::logic_error("Invalid command line option "
-                    "--hpx:affinity, valid for --hpx:queuing=priority_local only.");
+                    "--hpx:affinity, valid for --hpx:queuing=priority or "
+                    "--hpx:queuing=priority_local only.");
+            }
+            if (vm.count("hpx:bind")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hpx:bind, valid for --hpx:queuing=priority or "
+                    "--hpx:queuing=priority_local only.");
             }
 #endif
         }
@@ -562,7 +570,9 @@ namespace hpx
 
             std::size_t pu_offset = 0;
             std::size_t pu_step = 1;
-            std::string affinity("pu");
+            std::string affinity_domain("pu");
+            std::string affinity_desc;
+
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
             if (cfg.vm_.count("hpx:pu-offset")) {
                 pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
@@ -584,16 +594,37 @@ namespace hpx
 #endif
 #if defined(HPX_HAVE_HWLOC)
             if (cfg.vm_.count("hpx:affinity")) {
-                affinity = cfg.vm_["hpx:affinity"].as<std::string>();
-                if (0 != std::string("pu").find(affinity) &&
-                    0 != std::string("core").find(affinity) &&
-                    0 != std::string("numa").find(affinity) &&
-                    0 != std::string("machine").find(affinity))
+                affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity_domain) &&
+                    0 != std::string("core").find(affinity_domain) &&
+                    0 != std::string("numa").find(affinity_domain) &&
+                    0 != std::string("machine").find(affinity_domain))
                 {
                     throw std::logic_error("Invalid command line option "
                         "--hpx:affinity, value must be one of: pu, core, numa, "
                         "or machine.");
                 }
+            }
+            if (cfg.vm_.count("hpx:bind")) {
+                if (cfg.vm_.count("hpx:pu-offset") ||
+                    cfg.vm_.count("hpx:pu-step") ||
+                    cfg.vm_.count("hpx:affinity"))
+                {
+                    throw std::logic_error("Command line option --hpx:bind "
+                        "should not be used with --hpx:pu-step, --hpx:pu-offset, "
+                        "or --hpx:affinity.");
+                }
+
+                std::vector<std::string> bind_affinity = 
+                    cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
+                BOOST_FOREACH(std::string const& s, bind_affinity)
+                {
+                    if (!affinity_desc.empty())
+                        affinity_desc += ";";
+                    affinity_desc += s;
+                }
+
+                numa_sensitive = true;
             }
 #endif
 
@@ -602,7 +633,7 @@ namespace hpx
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, 1000, numa_sensitive, pu_offset, pu_step,
-                affinity);
+                affinity_domain, affinity_desc);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -643,7 +674,9 @@ namespace hpx
 
             std::size_t pu_offset = 0;
             std::size_t pu_step = 1;
-            std::string affinity("pu");
+            std::string affinity_domain("pu");
+            std::string affinity_desc;
+
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
             if (cfg.vm_.count("hpx:pu-offset")) {
                 pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
@@ -665,16 +698,37 @@ namespace hpx
 #endif
 #if defined(HPX_HAVE_HWLOC)
             if (cfg.vm_.count("hpx:affinity")) {
-                affinity = cfg.vm_["hpx:affinity"].as<std::string>();
-                if (0 != std::string("pu").find(affinity) &&
-                    0 != std::string("core").find(affinity) &&
-                    0 != std::string("numa").find(affinity) &&
-                    0 != std::string("machine").find(affinity))
+                affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity_domain) &&
+                    0 != std::string("core").find(affinity_domain) &&
+                    0 != std::string("numa").find(affinity_domain) &&
+                    0 != std::string("machine").find(affinity_domain))
                 {
                     throw std::logic_error("Invalid command line option "
                         "--hpx:affinity, value must be one of: pu, core, numa, "
                         "or machine.");
                 }
+            }
+            if (cfg.vm_.count("hpx:bind")) {
+                if (cfg.vm_.count("hpx:pu-offset") ||
+                    cfg.vm_.count("hpx:pu-step") ||
+                    cfg.vm_.count("hpx:affinity"))
+                {
+                    throw std::logic_error("Command line option --hpx:bind "
+                        "should not be used with --hpx:pu-step, --hpx:pu-offset, "
+                        "or --hpx:affinity.");
+                }
+
+                std::vector<std::string> bind_affinity = 
+                    cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
+                BOOST_FOREACH(std::string const& s, bind_affinity)
+                {
+                    if (!affinity_desc.empty())
+                        affinity_desc += ";";
+                    affinity_desc += s;
+                }
+
+                numa_sensitive = true;
             }
 #endif
             // scheduling policy
@@ -682,7 +736,8 @@ namespace hpx
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive, pu_offset, pu_step, affinity);
+                numa_sensitive, pu_offset, pu_step, affinity_domain,
+                affinity_desc);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;

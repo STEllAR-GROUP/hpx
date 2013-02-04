@@ -13,36 +13,56 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     // for the shepherd threads of this instance
     struct affinity_data
     {
-        affinity_data() : pu_offset_(0), pu_step_(1), affinity_("pu") {}
-        affinity_data(std::size_t pu_offset, std::size_t pu_step, 
-                std::string const& affinity)
-          : pu_offset_(pu_offset), pu_step_(pu_step), affinity_(affinity) {}
+        affinity_data()
+          : pu_offset_(0), pu_step_(1),
+            affinity_domain_("pu"), affinity_masks_()
+        {}
+        affinity_data(std::size_t pu_offset, std::size_t pu_step,
+                std::string const& affinity_domain,
+                std::string const& affinity_desc)
+          : pu_offset_(pu_offset), pu_step_(pu_step),
+            affinity_domain_(affinity_domain), affinity_masks_()
+        {
+            if (!affinity_desc.empty()) {
+                affinity_masks_.resize(hardware_concurrency());
+                if (!parse_affinity_options(affinity_desc, affinity_masks_)) {
+                    HPX_THROW_EXCEPTION(bad_parameter, 
+                        "affinity_data::affinity_data", 
+                        "invalid affinity specification: " + affinity_desc);
+                }
+            }
+        }
 
         mask_type get_pu_mask(topology const& topology, std::size_t num_thread,
             bool numa_sensitive) const
         {
+            // if we have individual, predefined affinity masks, return those
+            if (!affinity_masks_.empty())
+                return affinity_masks_[num_thread];
+
+            // otherwise return mask based on affinity domain
             std::size_t pu_num = get_pu_num(num_thread);
-            if (0 == std::string("pu").find(affinity_)) {
+            if (0 == std::string("pu").find(affinity_domain_)) {
                 // The affinity domain is 'processing unit', just convert the
                 // pu-number into a bit-mask.
                 return topology.get_thread_affinity_mask(pu_num, numa_sensitive);
             }
-            if (0 == std::string("core").find(affinity_)) {
+            if (0 == std::string("core").find(affinity_domain_)) {
                 // The affinity domain is 'core', return a bit mask corresponding
-                // to all processing units of the core containing the given 
+                // to all processing units of the core containing the given
                 // pu_num.
                 return topology.get_core_affinity_mask(pu_num, numa_sensitive);
             }
-            if (0 == std::string("numa").find(affinity_)) {
+            if (0 == std::string("numa").find(affinity_domain_)) {
                 // The affinity domain is 'numa', return a bit mask corresponding
-                // to all processing units of the NUMA domain containing the 
+                // to all processing units of the NUMA domain containing the
                 // given pu_num.
                 return topology.get_numa_node_affinity_mask(pu_num, numa_sensitive);
             }
 
             // The affinity domain is 'machine', return a bit mask corresponding
             // to all processing units of the machine.
-            BOOST_ASSERT(0 == std::string("machine").find(affinity_));
+            BOOST_ASSERT(0 == std::string("machine").find(affinity_domain_));
             return topology.get_machine_affinity_mask();
         }
 
@@ -75,7 +95,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         std::size_t pu_offset_; ///< offset of the first processing unit to use
         std::size_t pu_step_;   ///< step between used processing units
-        std::string affinity_;
+        std::string affinity_domain_;
+        std::vector<mask_type> affinity_masks_;
     };
 }}}}
 
