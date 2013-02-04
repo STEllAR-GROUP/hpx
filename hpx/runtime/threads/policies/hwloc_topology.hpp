@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
-//  Copyright (c)      2012 Thomas Heller
+//  Copyright (c) 2012-2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,16 +48,13 @@ struct hwloc_topology : topology
         numa_node_affinity_masks_.reserve(num_of_pus_);
         core_affinity_masks_.reserve(num_of_pus_);
         thread_affinity_masks_.reserve(num_of_pus_);
-        ns_thread_affinity_masks_.reserve(num_of_pus_);
 
         // Initialize each set of data entirely, as some of the initialization
         // routines rely on access to other pieces of topology data. The
         // compiler will optimize the loops where possible anyways.
 
-        machine_affinity_mask_ = init_machine_affinity_mask();
-
         std::size_t num_of_nodes = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
-        (void)num_of_nodes;
+        if(num_of_nodes == 0) num_of_nodes = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
@@ -65,12 +62,16 @@ struct hwloc_topology : topology
             numa_node_numbers_.push_back(numa_node);
         }
 
+        std::size_t num_of_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        if(num_of_cores == 0) num_of_cores = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t core_number = init_core_number(i);
             BOOST_ASSERT(core_number < num_of_cores);
             core_numbers_.push_back(core_number);
         }
+
+        machine_affinity_mask_ = init_machine_affinity_mask();
 
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -85,8 +86,6 @@ struct hwloc_topology : topology
         {
             thread_affinity_masks_.push_back(
                 init_thread_affinity_mask(i, false));
-            ns_thread_affinity_masks_.push_back(
-                init_thread_affinity_mask(i, true));
         }
     } // }}}
 
@@ -101,12 +100,14 @@ struct hwloc_topology : topology
       , error_code& ec = throws
         ) const
     { // {{{
-        if (num_thread < numa_node_numbers_.size())
+        std::size_t num_pu = num_thread % num_of_pus_;
+
+        if (num_pu < numa_node_numbers_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_node_numbers_[num_thread];
+            return numa_node_numbers_[num_pu];
         }
 
         HPX_THROWS_IF(ec, bad_parameter
@@ -122,12 +123,14 @@ struct hwloc_topology : topology
       , error_code& ec = throws
         ) const
     { // {{{
-        if (num_thread < core_numbers_.size())
+        std::size_t num_pu = num_thread % num_of_pus_;
+
+        if (num_pu < core_numbers_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return core_numbers_[num_thread];
+            return core_numbers_[num_pu];
         }
 
         HPX_THROWS_IF(ec, bad_parameter
@@ -154,12 +157,14 @@ struct hwloc_topology : topology
       , error_code& ec = throws
         ) const
     { // {{{
-        if (num_thread < numa_node_affinity_masks_.size())
+        std::size_t num_pu = num_thread % num_of_pus_;
+
+        if (num_pu < numa_node_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_node_affinity_masks_[num_thread];
+            return numa_node_affinity_masks_[num_pu];
         }
 
         HPX_THROWS_IF(ec, bad_parameter
@@ -176,12 +181,14 @@ struct hwloc_topology : topology
       , error_code& ec = throws
         ) const
     {
-        if (num_thread < core_affinity_masks_.size())
+        std::size_t num_pu = num_thread % num_of_pus_;
+
+        if (num_pu < core_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return core_affinity_masks_[num_thread];
+            return core_affinity_masks_[num_pu];
         }
 
         HPX_THROWS_IF(ec, bad_parameter
@@ -198,13 +205,14 @@ struct hwloc_topology : topology
       , error_code& ec = throws
         ) const
     { // {{{
-        if (num_thread < thread_affinity_masks_.size())
+        std::size_t num_pu = num_thread % num_of_pus_;
+
+        if (num_pu < thread_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_sensitive ? ns_thread_affinity_masks_[num_thread]
-                                  : thread_affinity_masks_[num_thread];
+            return thread_affinity_masks_[num_pu];
         }
 
         HPX_THROWS_IF(ec, bad_parameter
@@ -230,34 +238,16 @@ struct hwloc_topology : topology
       , error_code& ec = throws
         ) const
     { // {{{
-        // Figure out how many cores are available.
-        // Now set the affinity to the required PU.
-
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+        
+        for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+        {
+            if (mask & (static_cast<std::size_t>(1) << i))
+            {
+                hwloc_bitmap_set(cpuset, static_cast<unsigned int>(i));
+            }
+        }
 
-// #if HPX_DEBUG
-//         hwloc_bitmap_singlify(cpuset);
-//         hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
-//         if (0 == hwloc_get_cpubind(topo, cpuset_cmp, HWLOC_CPUBIND_THREAD)) {
-//             hwloc_bitmap_singlify(cpuset_cmp);
-//             BOOST_ASSERT(hwloc_bitmap_compare(cpuset, cpuset_cmp) != 0);
-//         }
-//         hwloc_bitmap_free(cpuset_cmp);
-// #endif
-
-//        hwloc_bitmap_zero(cpuset);
-//        hwloc_bitmap_set_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF); //-V112
-//        hwloc_bitmap_set_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF); //-V112
-
-         for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
-         {
-             if (mask & (static_cast<std::size_t>(1) << i))
-             {
-                 hwloc_bitmap_set(cpuset, static_cast<unsigned int>(i));
-             }
-         }
-
-//         hwloc_bitmap_singlify(cpuset);
         {
             scoped_lock lk(topo_mtx);
             if (hwloc_set_cpubind(topo, cpuset,
@@ -282,14 +272,6 @@ struct hwloc_topology : topology
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         sleep(0);   // Allow the OS to pick up the change.
 #endif
-// #if HPX_DEBUG
-//         cpuset_cmp = hwloc_bitmap_alloc();
-//         if (0 == hwloc_get_cpubind(topo, cpuset_cmp, HWLOC_CPUBIND_THREAD)) {
-//             hwloc_bitmap_singlify(cpuset_cmp);
-//             BOOST_ASSERT(hwloc_bitmap_compare(cpuset, cpuset_cmp) == 0);
-//         }
-//         hwloc_bitmap_free(cpuset_cmp);
-// #endif
 
         hwloc_bitmap_free(cpuset);
 
@@ -307,11 +289,6 @@ struct hwloc_topology : topology
 
         return 0;
     } // }}}
-
-    std::size_t hardware_concurrency() const
-    {
-        return num_of_pus_;
-    }
 
   private:
     std::size_t init_numa_node_number(
@@ -346,7 +323,7 @@ struct hwloc_topology : topology
             }
         }
 
-        return std::size_t(-1);
+        return 0;
     } // }}}
 
     std::size_t init_core_number(
@@ -381,7 +358,7 @@ struct hwloc_topology : topology
             }
         }
 
-        return std::size_t(-1);
+        return 0;
     } // }}}
 
     void extract_node_mask(
@@ -420,7 +397,7 @@ struct hwloc_topology : topology
 
     mask_type init_machine_affinity_mask()
     { // {{{
-        mask_type node_affinity_mask = 0;
+        mask_type machine_affinity_mask = 0;
 
         hwloc_obj_t machine_obj;
         {
@@ -429,8 +406,8 @@ struct hwloc_topology : topology
         }
         if (machine_obj)
         {
-            extract_node_mask(machine_obj, node_affinity_mask);
-            return node_affinity_mask;
+            extract_node_mask(machine_obj, machine_affinity_mask);
+            return machine_affinity_mask;
         }
 
         HPX_THROW_EXCEPTION(kernel_error
@@ -454,17 +431,19 @@ struct hwloc_topology : topology
         }
 
         hwloc_obj_t numa_node_obj;
-
         {
             scoped_lock lk(topo_mtx);
             numa_node_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
         }
-
         if (numa_node_obj)
         {
             extract_node_mask(numa_node_obj, node_affinity_mask);
             return node_affinity_mask;
+        }
+        else
+        {
+            return machine_affinity_mask_;
         }
 
         HPX_THROW_EXCEPTION(kernel_error
@@ -479,7 +458,7 @@ struct hwloc_topology : topology
         std::size_t num_thread
         )
     { // {{{
-        mask_type node_affinity_mask = 0;
+        mask_type core_affinity_mask = 0;
         std::size_t core = get_core_number(num_thread);
         
         if (std::size_t(-1) == core)
@@ -497,8 +476,12 @@ struct hwloc_topology : topology
 
         if (core_obj)
         {
-            extract_node_mask(core_obj, node_affinity_mask);
-            return node_affinity_mask;
+            extract_node_mask(core_obj, core_affinity_mask);
+            return core_affinity_mask;
+        }
+        else
+        {
+            return get_numa_node_affinity_mask(num_thread, true);
         }
 
         HPX_THROW_EXCEPTION(kernel_error
@@ -514,6 +497,11 @@ struct hwloc_topology : topology
       , bool numa_sensitive
         )
     { // {{{
+
+        if(std::size_t(-1) == num_thread)
+        {
+            return get_core_affinity_mask(num_thread, numa_sensitive);
+        }
 
         std::size_t num_pu = num_thread % num_of_pus_;
             
@@ -561,7 +549,6 @@ struct hwloc_topology : topology
     std::vector<mask_type> numa_node_affinity_masks_;
     std::vector<mask_type> core_affinity_masks_;
     std::vector<mask_type> thread_affinity_masks_;
-    std::vector<mask_type> ns_thread_affinity_masks_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
