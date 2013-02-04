@@ -121,13 +121,9 @@ namespace hpx
         return id(native_handle());
     }
 
-    unsigned thread::hardware_concurrency() BOOST_NOEXCEPT
+    std::size_t thread::hardware_concurrency() BOOST_NOEXCEPT
     {
-#if defined(__ANDROID__) || defined(ANDROID)
-        return ::android_getCpuCount();
-#else
-        return boost::thread::hardware_concurrency();
-#endif
+        return hpx::threads::hardware_concurrency();
     }
 
     void thread::start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func)
