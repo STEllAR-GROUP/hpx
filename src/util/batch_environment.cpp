@@ -195,7 +195,7 @@ namespace hpx { namespace util
         if(tasks_per_node_env)
         {
             if (debug_) {
-                std::cerr << "SLURM tasks per node found: " << slurm_nodelist_env
+                std::cerr << "SLURM tasks per node found: " << tasks_per_node_env
                           << std::endl;
             }
 
