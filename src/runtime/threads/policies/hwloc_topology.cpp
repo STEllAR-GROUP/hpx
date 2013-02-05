@@ -420,6 +420,147 @@ namespace hpx { namespace threads
         }
     } // }}}
 
+    std::size_t hwloc_topology::extract_node_count(
+        hwloc_obj_t parent
+      , hwloc_obj_type_t type
+      , std::size_t count
+        ) const
+    { // {{{
+        hwloc_obj_t obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            obj = hwloc_get_next_child(topo, parent, NULL);
+        }
+
+        while (obj)
+        {
+            if (hwloc_compare_types(type, obj->type) == 0)
+            {
+                do {
+                    ++count;
+                    {
+                        scoped_lock lk(topo_mtx);
+                        obj = hwloc_get_next_child(topo, parent, obj);
+                    }
+                } while (obj != NULL && hwloc_compare_types(type, obj->type) == 0);
+                return count;
+            }
+
+            count = extract_node_count(obj, type, count);
+
+            scoped_lock lk(topo_mtx);
+            obj = hwloc_get_next_child(topo, parent, obj);
+        }
+
+        return count;
+    } // }}}
+
+    std::size_t hwloc_topology::get_number_of_socket_pus(
+        std::size_t num_socket
+        ) const
+    {
+        hwloc_obj_t socket_obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            socket_obj = hwloc_get_obj_by_type(topo,
+                HWLOC_OBJ_SOCKET, static_cast<unsigned>(num_socket));
+        }
+
+        if (socket_obj)
+        {
+            std::size_t pu_count = 0;
+            return extract_node_count(socket_obj, HWLOC_OBJ_PU, pu_count);
+        }
+
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+    }
+
+    std::size_t hwloc_topology::get_number_of_numa_node_pus(
+        std::size_t numa_node
+        ) const
+    {
+        hwloc_obj_t node_obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            node_obj = hwloc_get_obj_by_type(topo,
+                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+        }
+
+        if (node_obj)
+        {
+            std::size_t pu_count = 0;
+            return extract_node_count(node_obj, HWLOC_OBJ_PU, pu_count);
+        }
+
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+    }
+
+    std::size_t hwloc_topology::get_number_of_core_pus(
+        std::size_t core
+        ) const
+    {
+        hwloc_obj_t core_obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            core_obj = hwloc_get_obj_by_type(topo,
+                HWLOC_OBJ_CORE, static_cast<unsigned>(core));
+        }
+
+        if (core_obj)
+        {
+            std::size_t pu_count = 0;
+            return extract_node_count(core_obj, HWLOC_OBJ_PU, pu_count);
+        }
+
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+    }
+
+    std::size_t hwloc_topology::get_number_of_socket_cores(
+        std::size_t num_socket
+        ) const
+    {
+        hwloc_obj_t socket_obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            socket_obj = hwloc_get_obj_by_type(topo,
+                HWLOC_OBJ_SOCKET, static_cast<unsigned>(num_socket));
+        }
+
+        if (socket_obj)
+        {
+            std::size_t pu_count = 0;
+            return extract_node_count(socket_obj, HWLOC_OBJ_CORE, pu_count);
+        }
+
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+    }
+
+    std::size_t hwloc_topology::get_number_of_numa_node_cores(
+        std::size_t numa_node
+        ) const
+    {
+        hwloc_obj_t node_obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            node_obj = hwloc_get_obj_by_type(topo,
+                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+        }
+
+        if (node_obj)
+        {
+            std::size_t pu_count = 0;
+            return extract_node_count(node_obj, HWLOC_OBJ_CORE, pu_count);
+        }
+
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+    }
+
     mask_type hwloc_topology::init_machine_affinity_mask() const
     { // {{{
         mask_type machine_affinity_mask = 0;

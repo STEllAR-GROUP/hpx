@@ -14,9 +14,11 @@
 #include <iostream>
 #include <algorithm>
 
-// The affinity masks this test is verifying the results against are specific 
-// to a particular machine. If you enable this option you might see a lot of 
+// The affinity masks this test is verifying the results against are specific
+// to a particular machine. If you enable this option you might see a lot of
 // test failures, which is expected.
+// The bit masks in the tests below are assuming a 12 core system (with
+// hyper threading), with 2 NUMA nodes (2 sockets), 6 cores each.
 // #define VERIFY_AFFINITY_MASKS
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,7 +105,7 @@ namespace test
                     spec_type(spec_type::unknown, 0, 0)
                 }
             },
-            { 0xfff, 0xfff }
+            { 0x000fff, 0x000fff }
         },
         {   "thread:0=socket:0.core:0;thread:1=socket:0.core:1",
             {
@@ -119,7 +121,7 @@ namespace test
                     spec_type(spec_type::unknown, 0, 0)
                 }
             },
-            { 0x003, 0x00c }
+            { 0x000003, 0x00000c }
         },
         {   "thread:0-1=socket:0.core:0-1",
             {
@@ -130,7 +132,29 @@ namespace test
                     spec_type(spec_type::unknown, 0, 0)
                 }
             },
-            { 0x003, 0x00c }
+            { 0x000003, 0x00000c }
+        },
+        {   "thread:0-1=socket:1.core:0-1",
+            {
+                {
+                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::socket, 1, 0),
+                    spec_type(spec_type::core, 0, 1),
+                    spec_type(spec_type::unknown, 0, 0)
+                }
+            },
+            { 0x003000, 0x00c000 }
+        },
+        {   "thread:0-1=socket:1.core:0-1.pu:1",
+            {
+                {
+                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::socket, 1, 0),
+                    spec_type(spec_type::core, 0, 1),
+                    spec_type(spec_type::pu, 1, 0)
+                }
+            },
+            { 0x002000, 0x008000 }
         },
         {   "thread:0-1=socket:0.core:all.pu:0",
             {
@@ -141,7 +165,7 @@ namespace test
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
-            { 0x001, 0x008 }
+            { 0x000001, 0x000004 }
         },
 
 //         { "thread:0-1=socket:0.core:0-1",

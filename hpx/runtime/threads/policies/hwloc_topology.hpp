@@ -97,6 +97,24 @@ namespace hpx { namespace threads
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
 
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t get_number_of_socket_pus(
+            std::size_t socket
+            ) const;
+        std::size_t get_number_of_numa_node_pus(
+            std::size_t numa_node
+            ) const;
+        std::size_t get_number_of_core_pus(
+            std::size_t core
+            ) const;
+
+        std::size_t get_number_of_socket_cores(
+            std::size_t socket
+            ) const;
+        std::size_t get_number_of_numa_node_cores(
+            std::size_t numa_node
+            ) const;
+
     private:
         std::size_t hwloc_topology::init_node_number(
             std::size_t num_thread, hwloc_obj_type_t type
@@ -120,6 +138,12 @@ namespace hpx { namespace threads
         void extract_node_mask(
             hwloc_obj_t parent
           , mask_type& mask
+            ) const;
+
+        std::size_t extract_node_count(
+            hwloc_obj_t parent
+          , hwloc_obj_type_t type
+          , std::size_t count
             ) const;
 
         mask_type init_machine_affinity_mask() const;

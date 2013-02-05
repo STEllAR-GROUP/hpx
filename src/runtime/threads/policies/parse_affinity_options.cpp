@@ -229,7 +229,7 @@ namespace hpx { namespace threads { namespace detail
 
     mask_type decode_mapping_pu(hwloc_topology const& t,
         mapping_type const& m, std::size_t size, mask_type mask,
-        std::size_t thread_index, error_code& ec)
+        std::size_t pu_base_index, std::size_t thread_index, error_code& ec)
     {
         std::pair<std::size_t, std::size_t> b = extract_bounds(m[2], size, ec);
         if (ec) return 0;
@@ -240,7 +240,7 @@ namespace hpx { namespace threads { namespace detail
             if (thread_index == std::size_t(-1))
                 pu_mask |= t.init_thread_affinity_mask(i);
             else
-                pu_mask |= t.init_thread_affinity_mask(i+thread_index);
+                pu_mask |= t.init_thread_affinity_mask(i+pu_base_index);
         }
         return mask & pu_mask;
     }
@@ -248,11 +248,11 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     mask_type decode_mapping1_unknown(hwloc_topology const& t,
         mapping_type const& m, std::size_t size, mask_type mask,
-        std::size_t thread_index, error_code& ec)
+        std::size_t pu_base_index, std::size_t thread_index, error_code& ec)
     {
         switch (m[2].type_) {
         case spec_type::pu:
-            return decode_mapping_pu(t, m, size, mask, thread_index, ec);
+            return decode_mapping_pu(t, m, size, mask, pu_base_index, thread_index, ec);
 
         case spec_type::unknown:
             return decode_mapping2_unknown(t, m, size, mask, ec);
@@ -269,7 +269,7 @@ namespace hpx { namespace threads { namespace detail
 
     mask_type decode_mapping_core(hwloc_topology const& t,
         mapping_type const& m, std::size_t size, mask_type mask,
-        std::size_t thread_index, error_code& ec)
+        std::size_t core_base_index, std::size_t thread_index, error_code& ec)
     {
         std::pair<std::size_t, std::size_t> b = extract_bounds(m[1], size, ec);
         if (ec) return 0;
@@ -284,23 +284,32 @@ namespace hpx { namespace threads { namespace detail
         for (std::size_t i = b.first; i <= b.second; ++i, ++core_index)
         {
             if (index == std::size_t(-1) || core_index == index)
-                core_mask |= t.init_core_affinity_mask_from_core(i, 0);
+                core_mask |= t.init_core_affinity_mask_from_core(i+core_base_index, 0);
         }
 
-        return decode_mapping1_unknown(t, m, size, mask & core_mask, thread_index, ec);
+        if (thread_index != std::size_t(-1))
+            core_base_index += thread_index;
+
+        std::size_t base_index = 0;
+        for (std::size_t i = 0; i != core_base_index; ++i)
+            base_index += t.get_number_of_core_pus(i);
+
+        return decode_mapping1_unknown(t, m, size, mask & core_mask,
+            base_index, thread_index, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     mask_type decode_mapping0_unknown(hwloc_topology const& t,
         mapping_type const& m, std::size_t size, mask_type mask,
-        std::size_t thread_index, error_code& ec)
+        std::size_t core_base_index, std::size_t thread_index, error_code& ec)
     {
         switch (m[1].type_) {
         case spec_type::core:
-            return decode_mapping_core(t, m, size, mask, thread_index, ec);
+            return decode_mapping_core(t, m, size, mask, core_base_index,
+                thread_index, ec);
 
         case spec_type::unknown:
-            return decode_mapping1_unknown(t, m, size, mask, thread_index, ec);
+            return decode_mapping1_unknown(t, m, size, mask, 0, thread_index, ec);
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping0_unknown",
@@ -323,7 +332,12 @@ namespace hpx { namespace threads { namespace detail
         for (std::size_t i = b.first; i <= b.second; ++i)
             mask |= t.init_socket_affinity_mask_from_socket(i);
 
-        return decode_mapping0_unknown(t, m, size, mask, thread_index, ec);
+        std::size_t base_index = 0;
+        for (std::size_t i = 0; i != b.first; ++i)
+            base_index += t.get_number_of_socket_cores(i);
+
+        return decode_mapping0_unknown(t, m, size, mask, base_index,
+            thread_index, ec);
     }
 
     mask_type decode_mapping_numanode(hwloc_topology const& t,
@@ -337,7 +351,12 @@ namespace hpx { namespace threads { namespace detail
         for (std::size_t i = b.first; i <= b.second; ++i)
             mask |= t.init_numa_node_affinity_mask_from_numa_node(i);
 
-        return decode_mapping0_unknown(t, m, size, mask, thread_index, ec);
+        std::size_t base_index = 0;
+        for (std::size_t i = 0; i != b.first; ++i)
+            base_index += t.get_number_of_numa_node_cores(i);
+
+        return decode_mapping0_unknown(t, m, size, mask, base_index,
+            thread_index, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -367,7 +386,7 @@ namespace hpx { namespace threads { namespace detail
         case spec_type::unknown:
             // no top level is requested
             mask = decode_mapping0_unknown(t, m, size,
-                t.get_machine_affinity_mask(), thread_index, ec);
+                t.get_machine_affinity_mask(), 0, thread_index, ec);
             break;
 
         default:
