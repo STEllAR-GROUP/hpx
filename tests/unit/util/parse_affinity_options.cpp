@@ -19,7 +19,6 @@ namespace test
         std::string option_;
         spec_type thread;
         spec_type socket;
-        spec_type numanode;
         spec_type core;
         spec_type pu;
     };
@@ -32,8 +31,8 @@ namespace test
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0)
         },
-        { "thread:1=socket:0",
-          spec_type(spec_type::thread, 1, 0),
+        { "thread:0-1=socket:0",
+          spec_type(spec_type::thread, 0, 1),
           spec_type(spec_type::socket, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0)
@@ -44,10 +43,22 @@ namespace test
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0)
         },
+        { "thread:0-1=numanode:0",
+          spec_type(spec_type::thread, 0, 1),
+          spec_type(spec_type::numanode, 0, 0),
+          spec_type(spec_type::unknown, 0, 0),
+          spec_type(spec_type::unknown, 0, 0)
+        },
         { "thread:1=socket:0.core:0",
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::socket, 0, 0),
           spec_type(spec_type::core, 0, 0),
+          spec_type(spec_type::unknown, 0, 0)
+        },
+        { "thread:0-1=socket:0.core:0-1",
+          spec_type(spec_type::thread, 0, 1),
+          spec_type(spec_type::socket, 0, 0),
+          spec_type(spec_type::core, 0, 1),
           spec_type(spec_type::unknown, 0, 0)
         },
         { "thread:1=numanode:0.core:0",
@@ -121,16 +132,17 @@ namespace test
         for (data_good* t = data; !t->option_.empty(); ++t)
         {
             hpx::threads::detail::mappings_type mappings;
-            HPX_TEST(hpx::threads::detail::parse_mappings(t->option_, mappings));
+            hpx::error_code ec;
+            hpx::threads::detail::parse_mappings(t->option_, mappings, ec);
+            HPX_TEST(!ec);
             HPX_TEST(mappings.size() == 1);
             if (mappings.size() == 1) {
                 HPX_TEST(t->thread == mappings[0].first);
                 HPX_TEST(mappings[0].second.size() == 3);
                 if (mappings[0].second.size() == 3) {
                     HPX_TEST(t->socket == mappings[0].second[0]);
-                    HPX_TEST(t->numanode == mappings[0].second[1]);
-                    HPX_TEST(t->core == mappings[0].second[2]);
-                    HPX_TEST(t->pu == mappings[0].second[3]);
+                    HPX_TEST(t->core == mappings[0].second[1]);
+                    HPX_TEST(t->pu == mappings[0].second[2]);
                 }
             }
         }
@@ -170,7 +182,9 @@ namespace test
         for (char const* t = data_bad[0]; NULL != t; t = data_bad[++i])
         {
             std::vector<hpx::threads::mask_type> affinities;
-            HPX_TEST(!hpx::threads::parse_affinity_options(t, affinities));
+            hpx::error_code ec;
+            hpx::threads::parse_affinity_options(t, affinities, ec);
+            HPX_TEST(ec);
         }
     }
 }

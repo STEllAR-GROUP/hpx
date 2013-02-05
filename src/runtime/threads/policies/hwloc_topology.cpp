@@ -663,12 +663,19 @@ namespace hpx { namespace threads { namespace detail
                 ;
 
             socket_spec =
-                    ( partlit("socket") | partlit("numanode") ) >> ':'
+                    partlit("socket") >> ':'
                     >>  (   qi::uint_
                             >>  ('-' >> qi::uint_ | qi::attr(0ul))
                             >>  qi::attr(spec_type::socket)
                         |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
                             >>  qi::attr(spec_type::socket)
+                        )
+                |   partlit("numanode") >> ':'
+                    >>  (   qi::uint_
+                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                            >>  qi::attr(spec_type::numanode)
+                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                            >>  qi::attr(spec_type::numanode)
                         )
                 |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
                 ;
@@ -779,7 +786,7 @@ namespace hpx { namespace threads { namespace detail
         if (ec) return 0;
 
         mask_type pu_mask = 0;
-        for (std::size_t i = b.first; i != b.second; ++i)
+        for (std::size_t i = b.first; i <= b.second; ++i)
             pu_mask |= t.init_thread_affinity_mask(i);
 
         return mask & pu_mask;
@@ -815,7 +822,7 @@ namespace hpx { namespace threads { namespace detail
         if (ec) return 0;
 
         mask_type core_mask = 0;
-        for (std::size_t i = b.first; i != b.second; ++i)
+        for (std::size_t i = b.first; i <= b.second; ++i)
             core_mask |= t.init_core_affinity_mask_from_core(i, 0);
 
         return decode_mapping1_unknown(t, m, size, mask & core_mask, ec);
@@ -850,7 +857,7 @@ namespace hpx { namespace threads { namespace detail
         if (ec) return 0;
 
         mask_type mask = 0;
-        for (std::size_t i = b.first; i != b.second; ++i)
+        for (std::size_t i = b.first; i <= b.second; ++i)
             mask |= t.init_socket_affinity_mask_from_socket(i);
 
         return decode_mapping0_unknown(t, m, size, mask, ec);
@@ -863,7 +870,7 @@ namespace hpx { namespace threads { namespace detail
         if (ec) return 0;
 
         mask_type mask = 0;
-        for (std::size_t i = b.first; i != b.second; ++i)
+        for (std::size_t i = b.first; i <= b.second; ++i)
             mask |= t.init_numa_node_affinity_mask_from_numa_node(i);
 
         return decode_mapping0_unknown(t, m, size, mask, ec);
@@ -932,7 +939,7 @@ namespace hpx { namespace threads { namespace detail
             extract_bounds(m.first, affinities.size(), ec);
         if (ec) return;
 
-        for (std::size_t i = bounds.first; i != bounds.second; ++i)
+        for (std::size_t i = bounds.first; i <= bounds.second; ++i)
         {
             decode_mapping(t, i, m.second, affinities, ec);
             if (ec) return;
