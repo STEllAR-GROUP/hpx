@@ -506,6 +506,43 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        bool discover_counters(counter_info const& info,
+            std::vector<counter_info>& counters, error_code& ec)
+        {
+            counters.push_back(info);
+            return true;
+        }
+    }
+
+    counter_status discover_counter_type(
+        std::string const& name, std::vector<counter_info>& counters,
+        discover_counters_mode mode, error_code& ec)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+
+        HPX_STD_FUNCTION<discover_counter_func> func(
+            HPX_STD_BIND(&detail::discover_counters, _1, boost::ref(counters),
+                boost::ref(ec)));
+
+        return discover_counter_type(name, func, mode);
+    }
+
+    counter_status discover_counter_type(
+        counter_info const& info, std::vector<counter_info>& counters,
+        discover_counters_mode mode, error_code& ec)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+
+        HPX_STD_FUNCTION<discover_counter_func> func(
+            HPX_STD_BIND(&detail::discover_counters, _1, boost::ref(counters),
+                boost::ref(ec)));
+
+        return discover_counter_type(info, func, mode);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     counter_status remove_counter_type(counter_info const& info, error_code& ec)
     {
         // the runtime might not be available any more
