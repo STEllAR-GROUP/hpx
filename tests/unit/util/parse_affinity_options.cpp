@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+
+#if defined(HPX_HAVE_HWLOC)
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -28,48 +30,41 @@ namespace test
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::socket, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
+          spec_type(spec_type::unknown, 0, 0)
+        },
+        { "thread:1=socket:0",
+          spec_type(spec_type::thread, 1, 0),
+          spec_type(spec_type::socket, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0)
         },
-        { "thread:1=socket:0.numanode:0",
+        { "thread:1=numanode:0",
           spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::socket, 0, 0),
           spec_type(spec_type::numanode, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0)
-        },
-        { "thread:1=socket:0.numanode:0.core:0",
-          spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::socket, 0, 0),
-          spec_type(spec_type::numanode, 0, 0),
-          spec_type(spec_type::core, 0, 0),
-          spec_type(spec_type::unknown, 0, 0)
-        },
-        { "thread:1=socket:0.numanode:0.core:0.pu:0",
-          spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::socket, 0, 0),
-          spec_type(spec_type::numanode, 0, 0),
-          spec_type(spec_type::core, 0, 0),
-          spec_type(spec_type::pu, 0, 0)
-        },
-        { "thread:1=socket:0.numanode:0.pu:0",
-          spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::socket, 0, 0),
-          spec_type(spec_type::numanode, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::pu, 0, 0)
         },
         { "thread:1=socket:0.core:0",
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::socket, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
+          spec_type(spec_type::core, 0, 0),
+          spec_type(spec_type::unknown, 0, 0)
+        },
+        { "thread:1=numanode:0.core:0",
+          spec_type(spec_type::thread, 1, 0),
+          spec_type(spec_type::numanode, 0, 0),
           spec_type(spec_type::core, 0, 0),
           spec_type(spec_type::unknown, 0, 0)
         },
         { "thread:1=socket:0.core:0.pu:0",
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::socket, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
+          spec_type(spec_type::core, 0, 0),
+          spec_type(spec_type::pu, 0, 0)
+        },
+        { "thread:1=numanode:0.core:0.pu:0",
+          spec_type(spec_type::thread, 1, 0),
+          spec_type(spec_type::numanode, 0, 0),
           spec_type(spec_type::core, 0, 0),
           spec_type(spec_type::pu, 0, 0)
         },
@@ -77,34 +72,10 @@ namespace test
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::socket, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::pu, 0, 0)
-        },
-
-        { "thread:1=numanode:0",
-          spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::numanode, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::unknown, 0, 0)
-        },
-        { "thread:1=numanode:0.core:0",
-          spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::numanode, 0, 0),
-          spec_type(spec_type::core, 0, 0),
-          spec_type(spec_type::unknown, 0, 0)
-        },
-        { "thread:1=numanode:0.core:0.pu:0",
-          spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::numanode, 0, 0),
-          spec_type(spec_type::core, 0, 0),
           spec_type(spec_type::pu, 0, 0)
         },
         { "thread:1=numanode:0.pu:0",
           spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::numanode, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::pu, 0, 0)
@@ -113,13 +84,11 @@ namespace test
         { "thread:1=core:3",
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::core, 3, 0),
           spec_type(spec_type::unknown, 0, 0)
         },
         { "thread:1=core:0.pu:2",
           spec_type(spec_type::thread, 1, 0),
-          spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::core, 0, 0),
           spec_type(spec_type::pu, 2, 0)
@@ -129,20 +98,17 @@ namespace test
           spec_type(spec_type::thread, 1, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::pu, 2, 0)
         },
 
         { "thread:2=core:all.pu:1",
           spec_type(spec_type::thread, 2, 0),
           spec_type(spec_type::unknown, 0, 0),
-          spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::core, ~0x0ul, 0),
           spec_type(spec_type::pu, 1, 0)
         },
         { "t:0-3=c:0-3.p:1",
           spec_type(spec_type::thread, 0, 3),
-          spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::unknown, 0, 0),
           spec_type(spec_type::core, 0, 3),
           spec_type(spec_type::pu, 1, 0)
@@ -159,8 +125,8 @@ namespace test
             HPX_TEST(mappings.size() == 1);
             if (mappings.size() == 1) {
                 HPX_TEST(t->thread == mappings[0].first);
-                HPX_TEST(mappings[0].second.size() == 4);
-                if (mappings[0].second.size() == 4) {
+                HPX_TEST(mappings[0].second.size() == 3);
+                if (mappings[0].second.size() == 3) {
                     HPX_TEST(t->socket == mappings[0].second[0]);
                     HPX_TEST(t->numanode == mappings[0].second[1]);
                     HPX_TEST(t->core == mappings[0].second[2]);
@@ -184,6 +150,7 @@ namespace test
         "thread:0=numanode:0.numanode:0",
         "thread:0=core:0.core:0",
         "thread:0=pu:0.pu:0",
+        "thread:1=socket:0.numanode:0",
         // empty
         "thread:0=socket",
         "thread:0=numanode",
@@ -207,14 +174,17 @@ namespace test
         }
     }
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
+#if defined(HPX_HAVE_HWLOC)
     {
         test::good();
         test::bad();
     }
+#endif
 
     return hpx::finalize();
 }

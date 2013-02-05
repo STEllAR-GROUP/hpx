@@ -61,6 +61,16 @@ namespace hpx { namespace threads
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
+        ///        the socket it is running on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_socket_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive, error_code& ec = throws) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit available to the given thread inside
         ///        the NUMA domain it is running on.
         ///
         /// \param ec         [in,out] this represents the error status on exit,
@@ -160,12 +170,14 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT topology const& get_topology();
 
+#if defined(HPX_HAVE_HWLOC)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         struct spec_type
         {
             enum type { unknown, thread, socket, numanode, core, pu };
+            static char const* const type_name(type t);
 
             spec_type(type t = unknown, mask_type min = ~0x0ul, mask_type max = ~0x0ul)
               : type_(t), index_min_(min), index_max_(max)
@@ -193,6 +205,7 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT void parse_affinity_options(std::string const& spec, 
         std::vector<mask_type>& affinities, error_code& ec = throws);
+#endif
 
     /// \endcond
 }}
