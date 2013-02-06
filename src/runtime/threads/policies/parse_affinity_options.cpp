@@ -462,17 +462,19 @@ namespace hpx { namespace threads { namespace detail
 
             if (bounds.first != bounds.second) {
                 ++count_ranges;
-                if (b.first != b.second) {
-                    // threads have bounds ranges as well
-                    if (b.second - b.first > bounds.second - bounds.first) {
-                        HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
-                            boost::str(boost::format("the thread index range "
-                                "is larger than the index range specified for "
-                                "the %s node") % spec_type::type_name(
-                                    m[i].type_)));
-                        return;
-                    }
-                }
+// FIXME: replace this with proper counting of processing units specified by 
+//        the affinity desc
+//                 if (b.first != b.second) {
+//                     // threads have bounds ranges as well
+//                     if (b.second - b.first > bounds.second - bounds.first) {
+//                         HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
+//                             boost::str(boost::format("the thread index range "
+//                                 "is larger than the index range specified for "
+//                                 "the %s node") % spec_type::type_name(
+//                                     m[i].type_)));
+//                         return;
+//                     }
+//                 }
             }
         }
         if (count_ranges > 1) {
