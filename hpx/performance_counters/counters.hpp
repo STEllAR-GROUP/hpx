@@ -460,6 +460,12 @@ namespace hpx { namespace performance_counters
         discover_counters_mode mode = discover_counters_minimal,
         error_code& ec = throws);
 
+    /// \brief Return a list of all available counter descriptions.
+    HPX_API_EXPORT counter_status discover_counter_types(
+        std::vector<counter_info>& counters,
+        discover_counters_mode mode = discover_counters_minimal,
+        error_code& ec = throws);
+
     /// \brief Call the supplied function for the given registered counter type.
     HPX_API_EXPORT counter_status discover_counter_type(
         std::string const& name,
@@ -470,6 +476,18 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT counter_status discover_counter_type(
         counter_info const& info,
         HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        discover_counters_mode mode = discover_counters_minimal,
+        error_code& ec = throws);
+
+    /// \brief Return a list of matching counter descriptions for the given 
+    ///        registered counter type.
+    HPX_API_EXPORT counter_status discover_counter_type(
+        std::string const& name, std::vector<counter_info>& counters,
+        discover_counters_mode mode = discover_counters_minimal,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT counter_status discover_counter_type(
+        counter_info const& info, std::vector<counter_info>& counters,
         discover_counters_mode mode = discover_counters_minimal,
         error_code& ec = throws);
 

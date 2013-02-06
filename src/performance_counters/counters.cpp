@@ -484,6 +484,7 @@ namespace hpx { namespace performance_counters
             discover_counter, mode, ec) : status_generic_error;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Call the supplied function for the given registered counter type.
     counter_status discover_counter_type(
         counter_info const& info,
@@ -503,6 +504,55 @@ namespace hpx { namespace performance_counters
         runtime* rt = get_runtime_ptr();
         return rt ? rt->get_counter_registry().discover_counter_type(
             name, discover_counter, mode, ec) : status_generic_error;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        bool discover_counters(counter_info const& info,
+            std::vector<counter_info>& counters, error_code& ec)
+        {
+            counters.push_back(info);
+            return true;
+        }
+    }
+
+    counter_status discover_counter_types(std::vector<counter_info>& counters,
+        discover_counters_mode mode, error_code& ec)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+
+        HPX_STD_FUNCTION<discover_counter_func> func(
+            HPX_STD_BIND(&detail::discover_counters, _1, boost::ref(counters),
+                boost::ref(ec)));
+
+        return discover_counter_types(func, mode, ec);
+    }
+
+    counter_status discover_counter_type(
+        std::string const& name, std::vector<counter_info>& counters,
+        discover_counters_mode mode, error_code& ec)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+
+        HPX_STD_FUNCTION<discover_counter_func> func(
+            HPX_STD_BIND(&detail::discover_counters, _1, boost::ref(counters),
+                boost::ref(ec)));
+
+        return discover_counter_type(name, func, mode, ec);
+    }
+
+    counter_status discover_counter_type(
+        counter_info const& info, std::vector<counter_info>& counters,
+        discover_counters_mode mode, error_code& ec)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+
+        HPX_STD_FUNCTION<discover_counter_func> func(
+            HPX_STD_BIND(&detail::discover_counters, _1, boost::ref(counters),
+                boost::ref(ec)));
+
+        return discover_counter_type(info, func, mode, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
