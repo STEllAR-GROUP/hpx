@@ -234,14 +234,18 @@ namespace hpx { namespace threads { namespace detail
         std::pair<std::size_t, std::size_t> b = extract_bounds(m[2], size, ec);
         if (ec) return 0;
 
+        std::size_t index = std::size_t(-1);
+        if (b.first != b.second)
+            index = thread_index;
+
         mask_type pu_mask = 0;
-        for (std::size_t i = b.first; i <= b.second; ++i)
+        std::size_t pu_index = 0;
+        for (std::size_t i = b.first; i <= b.second; ++i, ++pu_index)
         {
-            if (thread_index == std::size_t(-1))
-                pu_mask |= t.init_thread_affinity_mask(i);
-            else
+            if (index == std::size_t(-1) || pu_index == index)
                 pu_mask |= t.init_thread_affinity_mask(i+pu_base_index);
         }
+
         return mask & pu_mask;
     }
 
@@ -252,10 +256,12 @@ namespace hpx { namespace threads { namespace detail
     {
         switch (m[2].type_) {
         case spec_type::pu:
-            return decode_mapping_pu(t, m, size, mask, pu_base_index, thread_index, ec);
+            mask = decode_mapping_pu(t, m, size, mask, pu_base_index, thread_index, ec);
+            break;
 
         case spec_type::unknown:
-            return decode_mapping2_unknown(t, m, size, mask, ec);
+            mask = decode_mapping2_unknown(t, m, size, mask, ec);
+            break;
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping1_unknown",
@@ -276,8 +282,9 @@ namespace hpx { namespace threads { namespace detail
 
         // We have to account for the thread index at this level if there are
         // no specifications related to processing units.
-        std::size_t index = (m[2].type_ == spec_type::unknown) ?
-            thread_index : std::size_t(-1);
+        std::size_t index = std::size_t(-1);
+        if (m[2].type_ == spec_type::unknown && b.first != b.second)
+            index = thread_index;
 
         mask_type core_mask = 0;
         std::size_t core_index = 0;
@@ -287,7 +294,8 @@ namespace hpx { namespace threads { namespace detail
                 core_mask |= t.init_core_affinity_mask_from_core(i+core_base_index, 0);
         }
 
-        if (thread_index != std::size_t(-1))
+        core_base_index += b.first;
+        if (thread_index != std::size_t(-1) && b.first != b.second)
             core_base_index += thread_index;
 
         std::size_t base_index = 0;
@@ -305,11 +313,20 @@ namespace hpx { namespace threads { namespace detail
     {
         switch (m[1].type_) {
         case spec_type::core:
-            return decode_mapping_core(t, m, size, mask, core_base_index,
+            mask = decode_mapping_core(t, m, size, mask, core_base_index,
                 thread_index, ec);
+            break;
 
         case spec_type::unknown:
-            return decode_mapping1_unknown(t, m, size, mask, 0, thread_index, ec);
+            {
+                std::size_t base_index = 0;
+                for (std::size_t i = 0; i != core_base_index; ++i)
+                    base_index += t.get_number_of_core_pus(i);
+
+                mask = decode_mapping1_unknown(t, m, size, mask, base_index,
+                    thread_index, ec);
+            }
+            break;
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping0_unknown",
@@ -328,12 +345,28 @@ namespace hpx { namespace threads { namespace detail
         std::pair<std::size_t, std::size_t> b = extract_bounds(m[0], size, ec);
         if (ec) return 0;
 
+        std::size_t index = std::size_t(-1);
+        if (m[1].type_ == spec_type::unknown &&
+            m[2].type_ == spec_type::unknown &&
+            b.first != b.second)
+        {
+            index = thread_index;
+        }
+
         mask_type mask = 0;
-        for (std::size_t i = b.first; i <= b.second; ++i)
-            mask |= t.init_socket_affinity_mask_from_socket(i);
+        std::size_t socket_index = 0;
+        for (std::size_t i = b.first; i <= b.second; ++i, ++socket_index)
+        {
+            if (index == std::size_t(-1) || socket_index == index)
+                mask |= t.init_socket_affinity_mask_from_socket(i);
+        }
+
+        std::size_t socket_base_index = b.first;
+        if (thread_index != std::size_t(-1) && b.first != b.second)
+            socket_base_index += thread_index;
 
         std::size_t base_index = 0;
-        for (std::size_t i = 0; i != b.first; ++i)
+        for (std::size_t i = 0; i != socket_base_index; ++i)
             base_index += t.get_number_of_socket_cores(i);
 
         return decode_mapping0_unknown(t, m, size, mask, base_index,
@@ -347,12 +380,28 @@ namespace hpx { namespace threads { namespace detail
         std::pair<std::size_t, std::size_t> b = extract_bounds(m[0], size, ec);
         if (ec) return 0;
 
+        std::size_t index = std::size_t(-1);
+        if (m[1].type_ == spec_type::unknown &&
+            m[2].type_ == spec_type::unknown &&
+            b.first != b.second)
+        {
+            index = thread_index;
+        }
+
         mask_type mask = 0;
-        for (std::size_t i = b.first; i <= b.second; ++i)
-            mask |= t.init_numa_node_affinity_mask_from_numa_node(i);
+        std::size_t node_index = 0;
+        for (std::size_t i = b.first; i <= b.second; ++i, ++node_index)
+        {
+            if (index == std::size_t(-1) || node_index == index)
+                mask |= t.init_numa_node_affinity_mask_from_numa_node(i);
+        }
+
+        std::size_t node_base_index = b.first;
+        if (thread_index != std::size_t(-1) && b.first != b.second)
+            node_base_index += thread_index;
 
         std::size_t base_index = 0;
-        for (std::size_t i = 0; i != b.first; ++i)
+        for (std::size_t i = 0; i != node_base_index; ++i)
             base_index += t.get_number_of_numa_node_cores(i);
 
         return decode_mapping0_unknown(t, m, size, mask, base_index,
@@ -364,12 +413,6 @@ namespace hpx { namespace threads { namespace detail
         mapping_type const& m, std::vector<mask_type>& affinities,
         std::size_t thread_index, error_code& ec)
     {
-        if (m.size() != 3) {
-            HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
-                "bad size of mappings specification array");
-            return 0;
-        }
-
         std::size_t size = affinities.size();
         mask_type mask = 0;
         switch (m[0].type_) {
@@ -399,6 +442,50 @@ namespace hpx { namespace threads { namespace detail
         return mask;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // sanity checks
+    void mappings_sanity_checks(mapping_type const& m, std::size_t size, 
+        std::pair<std::size_t, std::size_t> const& b, error_code& ec)
+    {
+        if (m.size() != 3) {
+            HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
+                "bad size of mappings specification array");
+            return;
+        }
+
+        std::size_t count_ranges = 0;
+        for (std::size_t i = 0; i != 3; ++i)
+        {
+            std::pair<std::size_t, std::size_t> bounds =
+                extract_bounds(m[i], size, ec);
+            if (ec) return;
+
+            if (bounds.first != bounds.second) {
+                ++count_ranges;
+                if (b.first != b.second) {
+                    // threads have bounds ranges as well
+                    if (b.second - b.first > bounds.second - bounds.first) {
+                        HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
+                            boost::str(boost::format("the thread index range "
+                                "is larger than the index range specified for "
+                                "the %s node") % spec_type::type_name(
+                                    m[i].type_)));
+                        return;
+                    }
+                }
+            }
+        }
+        if (count_ranges > 1) {
+            HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
+                "index ranges can be specified only for one node type "
+                "(socket/numanode, core, or pu)");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
     void decode_mappings(full_mapping_type const& m,
         std::vector<mask_type>& affinities, error_code& ec)
     {
@@ -407,8 +494,11 @@ namespace hpx { namespace threads { namespace detail
         hwloc_topology t;
 
         // repeat for each of the threads in the affinity specification
-        std::pair<std::size_t, std::size_t> b =
-            extract_bounds(m.first, affinities.size(), ec);
+        std::size_t size = affinities.size();
+        std::pair<std::size_t, std::size_t> b = extract_bounds(m.first, size, ec);
+        if (ec) return;
+
+        mappings_sanity_checks(m.second, size, b, ec);
         if (ec) return;
 
         // we need to keep track of the thread index if the bounds are different
