@@ -23,6 +23,7 @@
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/apex.hpp>
 
 #if !defined(BOOST_WINDOWS)
 #  include <signal.h>
@@ -37,7 +38,6 @@
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -501,6 +501,8 @@ namespace hpx
         {
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
+            util::apex_wrapper apex("hpx-application");
+
             // Run this runtime instance using the given function f.
             if (0 != f)
                 return rt.run(boost::bind(f, vm));
@@ -620,7 +622,7 @@ namespace hpx
                         "or --hpx:affinity.");
                 }
 
-                std::vector<std::string> bind_affinity = 
+                std::vector<std::string> bind_affinity =
                     cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
                 BOOST_FOREACH(std::string const& s, bind_affinity)
                 {
@@ -724,7 +726,7 @@ namespace hpx
                         "or --hpx:affinity.");
                 }
 
-                std::vector<std::string> bind_affinity = 
+                std::vector<std::string> bind_affinity =
                     cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
                 BOOST_FOREACH(std::string const& s, bind_affinity)
                 {
@@ -933,6 +935,10 @@ namespace hpx
         shutdown_function_type const& shutdown, hpx::runtime_mode mode,
         bool blocking)
     {
+#ifdef HPX_HAVE_APEX
+        apex_init(argc, argv);
+#endif
+
         int result = 0;
         set_error_handlers();
 

@@ -8,6 +8,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/apex.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -116,6 +117,10 @@ namespace hpx { namespace util
     {
         error_code ec(lightweight);        // do not throw
         double val = value.get_value<double>(ec);
+
+#ifdef HPX_HAVE_APEX
+        apex_sample_value(name.c_str(), val);
+#endif
 
         out << performance_counters::remove_counter_prefix(name) << ",";
         out << value.count_ << ",";

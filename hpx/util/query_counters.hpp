@@ -26,7 +26,7 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
-            boost::int64_t interval, std::string const& dest);
+            boost::int64_t interval, std::string const& dest);  
 
         void start();
         bool evaluate();

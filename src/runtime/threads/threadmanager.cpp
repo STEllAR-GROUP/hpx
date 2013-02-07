@@ -19,6 +19,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/apex.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 
@@ -1572,6 +1573,7 @@ namespace hpx { namespace threads
         start_periodic_maintenance<SchedulingPolicy>(
             typename SchedulingPolicy::has_periodic_maintenance());
 
+        util::apex_wrapper apex("hpx-thread-scheduler-loop");
         while (true) {
             // Get the next PX thread from the queue
             thread_data* thrd = NULL;
@@ -1606,6 +1608,8 @@ namespace hpx { namespace threads
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
 #endif
+                                util::apex_wrapper apex("hpx-thread-scheduler-loop");
+
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
                                 boost::uint64_t timestamp = util::hardware::timestamp();
