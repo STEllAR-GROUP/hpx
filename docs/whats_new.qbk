@@ -18,6 +18,9 @@ TBD
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 693] - `--help` doesn't print component specific command line options
+* [issue 691] - exception while executing any application linked with hwloc
+* [issue 689] - Make the buildbots use hwloc
 * [issue 687] - compilation error fix (hwloc_topology)
 * [issue 686] - Linker Error for Applications
 * [issue 684] - Pinning of service thread fails when number of worker threads
@@ -36,9 +39,14 @@ Here is a list of the important tickets we closed for this release.
 * [issue 670] - CMake won't find Boost headers in layout=versioned install
 * [issue 669] - Links in docs to source files broken if not installed
 * [issue 667] - Not reading ini file properly
+* [issue 664] - Adapt new meanings of 'const' and 'mutable'
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
 * [issue 626] - hpx/future.hpp header
+* [issue 557] - Remove action codes
+* [issue 529] - Investigate the state of hwloc support
+* [issue 526] - Make HPX aware of hyper-threading
+* [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
 
 [endsect]
 
