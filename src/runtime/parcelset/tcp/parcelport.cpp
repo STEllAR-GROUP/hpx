@@ -262,13 +262,22 @@ namespace hpx { namespace parcelset { namespace tcp
             iterator it = pending_parcels_.find(locality_id);
             if (it != pending_parcels_.end())
             {
-                map_second_type const& data = it->second;
-                BOOST_FOREACH(parcel const& pp, data.first)
+                map_second_type& data = it->second;
+
+                std::vector<parcel>::iterator end = data.first.end();
+                std::vector<write_handler_type>::iterator fit = data.second.begin();
+                for (std::vector<parcel>::iterator pit = data.first.begin();
+                     pit != end; ++pit, ++fit)
                 {
-                    if (pp.get_parcel_id() == parcel_id)
+                    if ((*pit).get_parcel_id() == parcel_id)
                     {
-                        // our parcel is still here, bailing out
-                        throw hpx::detail::access_exception(ec);
+                        // remove this parcel from pending parcel queue
+                        data.first.erase(pit);
+                        data.second.erase(fit);
+
+                        // re-schedule this function call and bail out
+                        threads::register_thread_nullary(
+                            util::bind(&parcelport::put_parcel, this, p, f));
                     }
                 }
             }
