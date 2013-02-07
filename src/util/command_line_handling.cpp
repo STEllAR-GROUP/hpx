@@ -591,16 +591,16 @@ namespace hpx { namespace util
         store_command_line(argc, argv);
         store_unregistered_options(argv[0], unregistered_options);
 
+        // help can be printed only after the runtime mode has been set
+        if (handle_help_options(help))
+            return 1;     // exit application gracefully
+
         // add all remaining ini settings to the global configuration
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
         if (vm_.count("hpx:version"))
             return detail::print_version(std::cout);
-
-        // help can be printed only after the runtime mode has been set
-        if (handle_help_options(help))
-            return 1;     // exit application gracefully
 
         // all is good
         return 0;
