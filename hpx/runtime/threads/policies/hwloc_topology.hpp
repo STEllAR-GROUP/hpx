@@ -116,7 +116,7 @@ namespace hpx { namespace threads
             ) const;
 
     private:
-        std::size_t hwloc_topology::init_node_number(
+        std::size_t init_node_number(
             std::size_t num_thread, hwloc_obj_type_t type
             );
 
