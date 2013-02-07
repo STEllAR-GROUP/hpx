@@ -485,6 +485,11 @@ namespace hpx
                     "--hpx:bind, valid for --hpx:queuing=priority or "
                     "--hpx:queuing=priority_local only.");
             }
+            if (vm.count("hpx:print-bind")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hpx:print-bind, valid for --hpx:queuing=priority or "
+                    "--hpx:queuing=priority_local only.");
+            }
 #endif
         }
 

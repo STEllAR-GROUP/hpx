@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <iosfwd>
 
 namespace hpx { namespace threads
 {
@@ -205,6 +206,9 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT void parse_affinity_options(std::string const& spec,
         std::vector<mask_type>& affinities, error_code& ec = throws);
+
+    HPX_API_EXPORT void print_affinity_options(std::ostream& s,
+        std::string const& affinity_options, error_code& ec = throws);
 #endif
 
     /// \endcond

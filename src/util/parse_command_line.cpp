@@ -420,6 +420,9 @@ namespace hpx { namespace util
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
                   "--hpx:affinity options. Implies --hpx:numa-sensitive.")
+                ("hpx:print-bind", 
+                  "print to the console the bit masks calculated from the "
+                  "arguments specified to all --hpx:bind options.")
 #endif
                 ("hpx:threads", value<std::string>(),
                  "the number of operating system threads to spawn for this HPX "

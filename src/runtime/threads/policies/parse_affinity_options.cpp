@@ -545,6 +545,26 @@ namespace hpx { namespace threads
             }
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void print_affinity_options(std::ostream& os,
+        std::string const& affinity_options, error_code& ec)
+    {
+        std::vector<mask_type> affinities;
+        parse_affinity_options(affinity_options, affinities, ec);
+        if (ec) return;
+
+        int i = 0;
+        os << "{ ";
+        BOOST_FOREACH(mask_type const& m, affinities)
+        {
+            if (i++ > 0)
+                os << ", ";
+            os << std::hex << std::setw(sizeof(mask_type)*2)
+               << std::setfill('0') << "0x" << m;
+        }
+        os << "}" << std::endl;
+    }
 }}
 
 #endif
