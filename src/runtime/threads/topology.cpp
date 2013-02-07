@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/static.hpp>
 
 #include <boost/foreach.hpp>
 
@@ -83,20 +84,30 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    struct hardware_concurrency_tag {};
+
+    struct hw_concurrency
+    {
+        hw_concurrency()
+#if defined(__ANDROID__) && defined(ANDROID)
+          : num_of_cores_(::android_getCpuCount())
+#elif defined(HPX_HAVE_HWLOC)
+          : num_of_cores_(detail::hwloc_hardware_concurrency())
+#else
+          : num_of_cores_(boost::thread::hardware_concurrency())
+#endif
+        {
+            if (num_of_cores_ == 0)
+                num_of_cores_ = 1;
+        }
+
+        std::size_t num_of_cores_;
+    };
+
     std::size_t hardware_concurrency()
     {
-#if defined(__ANDROID__) && defined(ANDROID)
-        static std::size_t num_of_cores = ::android_getCpuCount();
-#elif defined(HPX_HAVE_HWLOC)
-        static std::size_t num_of_cores = detail::hwloc_hardware_concurrency();
-#else
-        static std::size_t num_of_cores = boost::thread::hardware_concurrency();
-#endif
-
-        if (0 == num_of_cores)
-            return 1;           // Assume one core.
-
-        return num_of_cores;
+        util::static_<hw_concurrency, hardware_concurrency_tag> hwc;
+        return hwc.get().num_of_cores_;
     }
 }}
 
