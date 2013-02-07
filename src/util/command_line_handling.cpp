@@ -616,7 +616,8 @@ namespace hpx { namespace util
                 affinity_desc += s;
             }
 
-            threads::print_affinity_options(std::cout, affinity_desc);
+            threads::print_affinity_options(std::cout, num_threads_, 
+                affinity_desc);
             return 1;
         }
 #endif

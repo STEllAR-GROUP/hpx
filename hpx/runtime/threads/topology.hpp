@@ -208,7 +208,8 @@ namespace hpx { namespace threads
         std::vector<mask_type>& affinities, error_code& ec = throws);
 
     HPX_API_EXPORT void print_affinity_options(std::ostream& s,
-        std::string const& affinity_options, error_code& ec = throws);
+        std::size_t num_threads, std::string const& affinity_options, 
+        error_code& ec = throws);
 #endif
 
     /// \endcond

@@ -1,6 +1,4 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
-//  Copyright (c) 2012-2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -547,10 +545,10 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void print_affinity_options(std::ostream& os,
+    void print_affinity_options(std::ostream& os, std::size_t num_threads,
         std::string const& affinity_options, error_code& ec)
     {
-        std::vector<mask_type> affinities;
+        std::vector<mask_type> affinities(num_threads);
         parse_affinity_options(affinity_options, affinities, ec);
         if (ec) return;
 
@@ -560,10 +558,10 @@ namespace hpx { namespace threads
         {
             if (i++ > 0)
                 os << ", ";
-            os << std::hex << std::setw(sizeof(mask_type)*2)
-               << std::setfill('0') << "0x" << m;
+            os << "0x" << std::hex << std::setw(sizeof(mask_type)*2)
+               << std::setfill('0') << m;
         }
-        os << "}" << std::endl;
+        os << " }" << std::endl;
     }
 }}
 
