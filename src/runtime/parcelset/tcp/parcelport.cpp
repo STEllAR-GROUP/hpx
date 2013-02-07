@@ -251,12 +251,8 @@ namespace hpx { namespace parcelset { namespace tcp
         error_code ec;
         parcelport_connection_ptr client_connection = get_connection(locality_id, ec);
 
-
         if (!client_connection)
         {
-            // REVIEW: We also reach this codepath if the connection cache is
-            // contended and has no free room, which is not persay an error.
-/*
             // If there was an error, we might be safe if there are no parcels
             // to be sent anymore (some other thread already picked them up)
             // or if there are parcels, but the parcel we were about to sent
@@ -285,7 +281,6 @@ namespace hpx { namespace parcelset { namespace tcp
                     }
                 }
             }
-*/
             return;
         }
 
