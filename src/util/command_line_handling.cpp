@@ -27,11 +27,11 @@ namespace hpx { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        bool print_version(std::ostream& out)
+        int print_version(std::ostream& out)
         {
             out << std::endl << hpx::copyright() << std::endl;
             out << hpx::complete_version() << std::endl;
-            return true;
+            return 1;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -60,12 +60,12 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void report_thread_warning(std::string const& batch_name, 
+        void report_thread_warning(std::string const& batch_name,
             std::size_t threads, std::size_t batch_threads)
         {
             std::cerr << "hpx::init: command line warning: --hpx:threads "
                     "used when running with "
-                << batch_name 
+                << batch_name
                 << ", requesting a larger number of threads ("
                 << threads
                 << ") than cores have been assigned by "
@@ -82,7 +82,7 @@ namespace hpx { namespace util
                     "--hpx:localities used when running with "
                 << batch_name
                 << ", requesting a different number of localities than have "
-                    "been assigned by " 
+                    "been assigned by "
                 << batch_name
                 << ", the application might not run properly."
                 << std::endl;
@@ -182,7 +182,7 @@ namespace hpx { namespace util
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
             using_nodelist && (num_threads_ > batch_threads))
         {
-            detail::report_thread_warning(env.get_batch_name(), 
+            detail::report_thread_warning(env.get_batch_name(),
                 num_threads_, batch_threads);
         }
 
@@ -199,7 +199,7 @@ namespace hpx { namespace util
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
                 using_nodelist && (threads > batch_threads))
             {
-                detail::report_thread_warning(env.get_batch_name(), 
+                detail::report_thread_warning(env.get_batch_name(),
                     threads, batch_threads);
             }
             num_threads_ = threads;
@@ -601,6 +601,30 @@ namespace hpx { namespace util
         // print version/copyright information
         if (vm_.count("hpx:version"))
             return detail::print_version(std::cout);
+
+#if defined(HPX_HAVE_HWLOC)
+        if (vm_.count("hpx:print-bind")) {
+            if (!vm_.count("hpx:bind")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hpx:print-bind, valid only if --hpx:bind is "
+                    "specified as well.");
+            }
+
+            std::string affinity_desc;
+            std::vector<std::string> bind_affinity = 
+                vm_["hpx:bind"].as<std::vector<std::string> >();
+            BOOST_FOREACH(std::string const& s, bind_affinity)
+            {
+                if (!affinity_desc.empty())
+                    affinity_desc += ";";
+                affinity_desc += s;
+            }
+
+            threads::print_affinity_options(std::cout, num_threads_, 
+                affinity_desc);
+            return 1;
+        }
+#endif
 
         // all is good
         return 0;

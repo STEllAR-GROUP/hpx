@@ -1,24 +1,26 @@
-////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2012-2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/static.hpp>
+
+#include <boost/foreach.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>
 #endif
-    
+
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 #include <hpx/exception.hpp>
 
-namespace {
+namespace hpx { namespace threads { namespace detail
+{
     std::size_t hwloc_hardware_concurrency()
     {
         hwloc_topology_t topo;
@@ -45,10 +47,9 @@ namespace {
         }
 
         hwloc_topology_destroy(topo);
-
         return num_of_pus;
     }
-}
+}}}
 #endif
 
 namespace hpx { namespace threads
@@ -57,8 +58,8 @@ namespace hpx { namespace threads
     mask_type topology::get_service_affinity_mask(
         mask_type used_processing_units, error_code& ec) const
     {
-        // We bind the service threads to the first numa domain. This is useful
-        // as the first numa domain is likely to have the PCI controllers etc.
+        // We bind the service threads to the first NUMA domain. This is useful
+        // as the first NUMA domain is likely to have the PCI controllers etc.
         mask_type machine_mask = this->get_numa_node_affinity_mask(0, true, ec);
         if (ec || 0 == machine_mask)
             return 0;
@@ -68,35 +69,45 @@ namespace hpx { namespace threads
 
         mask_type res = ~used_processing_units & machine_mask;
 
-        if(res == 0) return machine_mask;
-        else return res;
+        return (res == 0) ? machine_mask : res;
     }
 
     topology const& get_topology()
     {
-        return get_runtime().get_topology();
+        runtime* rt = get_runtime_ptr();
+        if (rt == NULL)
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::get_topology",
+                "the hpx runtime system has not been initialized yet");
+        }
+        return rt->get_topology();
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    struct hardware_concurrency_tag {};
+
+    struct hw_concurrency
+    {
+        hw_concurrency()
+#if defined(__ANDROID__) && defined(ANDROID)
+          : num_of_cores_(::android_getCpuCount())
+#elif defined(HPX_HAVE_HWLOC)
+          : num_of_cores_(detail::hwloc_hardware_concurrency())
+#else
+          : num_of_cores_(boost::thread::hardware_concurrency())
+#endif
+        {
+            if (num_of_cores_ == 0)
+                num_of_cores_ = 1;
+        }
+
+        std::size_t num_of_cores_;
+    };
+
     std::size_t hardware_concurrency()
     {
-    #if defined(__ANDROID__) && defined(ANDROID)
-        static std::size_t num_of_cores = ::android_getCpuCount();
-        
-    #else
-    #  if defined(HPX_HAVE_HWLOC)
-        static std::size_t
-            num_of_cores = ::hwloc_hardware_concurrency();
-    #  else
-        static std::size_t
-            num_of_cores = boost::thread::hardware_concurrency();
-    #  endif
-    #endif
-
-        if (0 == num_of_cores)
-            return 1;           // Assume one core.
-
-        return num_of_cores;
+        util::static_<hw_concurrency, hardware_concurrency_tag> hwc;
+        return hwc.get().num_of_cores_;
     }
 }}
 
