@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #include <algorithm>
 
@@ -23,6 +24,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
       : pu_offset_(pu_offset), pu_step_(pu_step),
         affinity_domain_(affinity_domain), affinity_masks_()
     {
+#if defined(HPX_HAVE_HWLOC)
         if (!affinity_desc.empty()) {
             affinity_masks_.resize(num_threads, 0);
             parse_affinity_options(affinity_desc, affinity_masks_);
@@ -37,6 +39,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                             "bind (%2%)") % num_threads % num_initialized));
             }
         }
+#endif
     }
 
     mask_type affinity_data::get_pu_mask(topology const& topology, 
