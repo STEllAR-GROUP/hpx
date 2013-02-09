@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <iosfwd>
+#include <limits>
 
 namespace hpx { namespace threads
 {
@@ -175,30 +176,60 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        typedef std::vector<boost::int64_t> bounds_type;
+
         struct spec_type
         {
             enum type { unknown, thread, socket, numanode, core, pu };
             HPX_API_EXPORT static char const* const type_name(type t);
 
-            spec_type(type t = unknown, mask_type min = ~0x0ul, mask_type max = ~0x0ul)
-              : type_(t), index_min_(min), index_max_(max)
-            {}
+            static boost::int64_t all_entities()
+            {
+                return (std::numeric_limits<boost::int64_t>::min)();
+            }
+
+            spec_type(type t = unknown, boost::int64_t min = all_entities(),
+                    boost::int64_t max = all_entities())
+              : type_(t), index_bounds_()
+            {
+                if (t != unknown) {
+                    if (max == 0 || max == all_entities()) {
+                        // one or all entities
+                        index_bounds_.push_back(min);
+                    }
+                    else if (min != all_entities()) {
+                        // all entities between min and -max, or just min,max
+                        BOOST_ASSERT(min >= 0);
+                        index_bounds_.push_back(min);
+                        index_bounds_.push_back(max);
+                    }
+                }
+            }
 
             bool operator==(spec_type const& rhs) const
             {
-                return type_ == rhs.type_ &&
-                    index_min_ == rhs.index_min_ &&
-                    index_max_ == rhs.index_max_;
+                if (type_ != rhs.type_ || index_bounds_.size() != rhs.index_bounds_.size())
+                    return false;
+
+                for (std::size_t i = 0; i < index_bounds_.size(); ++i)
+                {
+                    if (index_bounds_[i] != rhs.index_bounds_[i])
+                        return false;
+                }
+
+                return true;
             }
 
             type type_;
-            mask_type index_min_;
-            mask_type index_max_;
+            bounds_type index_bounds_;
         };
 
         typedef std::vector<spec_type> mapping_type;
         typedef std::pair<spec_type, mapping_type> full_mapping_type;
         typedef std::vector<full_mapping_type> mappings_type;
+
+        HPX_API_EXPORT bounds_type extract_bounds(spec_type& m,
+            std::size_t default_last, error_code& ec);
 
         HPX_API_EXPORT void parse_mappings(std::string const& spec,
             mappings_type& mappings, error_code& ec = throws);
@@ -208,7 +239,7 @@ namespace hpx { namespace threads
         std::vector<mask_type>& affinities, error_code& ec = throws);
 
     HPX_API_EXPORT void print_affinity_options(std::ostream& s,
-        std::size_t num_threads, std::string const& affinity_options, 
+        std::size_t num_threads, std::string const& affinity_options,
         error_code& ec = throws);
 #endif
 

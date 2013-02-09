@@ -26,8 +26,11 @@ namespace hpx { namespace threads { namespace detail
 {
     std::ostream& operator<<(std::ostream& os, spec_type const& data)
     {
-        os << spec_type::type_name(data.type_)
-           << "," << data.index_min_ << "," << data.index_max_;
+        os << spec_type::type_name(data.type_);
+        BOOST_FOREACH(std::size_t i, data.index_bounds_)
+        {
+            os  << "," << i;
+        }
         return os;
     }
 }}}
@@ -90,13 +93,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0x000fff }
@@ -104,10 +107,21 @@ namespace test
         {   "thread:0-1=socket:0",
             {
                 {
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::socket, 0, 0),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
+                }
+            },
+            { 0x000fff, 0x000fff }
+        },
+        {   "thread:0,1=socket:0",
+            {
+                {
                     spec_type(spec_type::thread, 0, 1),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0x000fff }
@@ -118,13 +132,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0xfff000 }
@@ -132,10 +146,21 @@ namespace test
         {   "thread:0-1=socket:0-1",
             {
                 {
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::socket, 0, -1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
+                }
+            },
+            { 0x000fff, 0xfff000 }
+        },
+        {   "thread:0,1=socket:0-1",
+            {
+                {
                     spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::socket, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::socket, 0, -1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0xfff000 }
@@ -146,13 +171,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0x000fff }
@@ -160,10 +185,21 @@ namespace test
         {   "thread:0-1=numanode:0",
             {
                 {
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::numanode, 0, 0),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
+                }
+            },
+            { 0x000fff, 0x000fff }
+        },
+        {   "thread:0,1=numanode:0",
+            {
+                {
                     spec_type(spec_type::thread, 0, 1),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0x000fff }
@@ -174,13 +210,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0xfff000 }
@@ -188,10 +224,21 @@ namespace test
         {   "thread:0-1=numanode:0-1",
             {
                 {
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::numanode, 0, -1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
+                }
+            },
+            { 0x000fff, 0xfff000 }
+        },
+        {   "thread:0,1=numanode:0,1",
+            {
+                {
                     spec_type(spec_type::thread, 0, 1),
                     spec_type(spec_type::numanode, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000fff, 0xfff000 }
@@ -201,14 +248,14 @@ namespace test
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x000003 }
@@ -216,10 +263,21 @@ namespace test
         {   "thread:0-1=core:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
+                }
+            },
+            { 0x000003, 0x000003 }
+        },
+        {   "thread:0,1=core:0",
+            {
+                {
+                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::core, 0, 0),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x000003 }
@@ -229,14 +287,14 @@ namespace test
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x00000c }
@@ -244,26 +302,36 @@ namespace test
         {   "thread:0-1=core:0-1",
             {
                 {
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::core, 0, -1),
+                    spec_type(spec_type::unknown)
+                }
+            },
+            { 0x000003, 0x00000c }
+        },
+        {   "thread:0,1=core:0,1",
+            {
+                {
                     spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x00000c }
         },
 
-
         {   "thread:0=core:1.pu:0;thread:1=core:1.pu:0",
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
                 }
@@ -273,8 +341,8 @@ namespace test
         {   "thread:0-1=core:1.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
                 }
@@ -286,12 +354,12 @@ namespace test
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 1, 0)
                 }
@@ -301,10 +369,10 @@ namespace test
         {   "thread:0-1=core:1.pu:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::core, 1, 0),
-                    spec_type(spec_type::pu, 0, 1)
+                    spec_type(spec_type::pu, 0, -1)
                 }
             },
             { 0x000004, 0x000008 }
@@ -314,13 +382,13 @@ namespace test
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -329,9 +397,9 @@ namespace test
         {   "thread:0-1=pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -342,13 +410,13 @@ namespace test
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 1, 0)
                 }
             },
@@ -357,10 +425,10 @@ namespace test
         {   "thread:0-1=pu:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::pu, 0, 1)
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::pu, 0, -1)
                 }
             },
             { 0x000001, 0x000002 }
@@ -372,12 +440,12 @@ namespace test
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x000003 }
@@ -385,10 +453,10 @@ namespace test
         {   "thread:0-1=socket:0.core:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 0, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x000003 }
@@ -400,12 +468,12 @@ namespace test
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x003000, 0x00c000 }
@@ -413,10 +481,10 @@ namespace test
         {   "thread:0-1=socket:1.core:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 1, 0),
-                    spec_type(spec_type::core, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::core, 0, -1),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x003000, 0x00c000 }
@@ -428,12 +496,12 @@ namespace test
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x000003 }
@@ -441,10 +509,10 @@ namespace test
         {   "thread:0-1=numanode:0.core:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::numanode, 0, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x000003, 0x000003 }
@@ -456,12 +524,12 @@ namespace test
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 1, 0),
                     spec_type(spec_type::core, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }, {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 1, 0),
                     spec_type(spec_type::core, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x003000, 0x00c000 }
@@ -469,10 +537,10 @@ namespace test
         {   "thread:0-1=numanode:1.core:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::numanode, 1, 0),
-                    spec_type(spec_type::core, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0)
+                    spec_type(spec_type::core, 0, -1),
+                    spec_type(spec_type::unknown)
                 }
             },
             { 0x003000, 0x00c000 }
@@ -497,9 +565,9 @@ namespace test
         {   "thread:0-1=socket:1.core:0-1.pu:1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 1, 0),
-                    spec_type(spec_type::core, 0, 1),
+                    spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::pu, 1, 0)
                 }
             },
@@ -525,7 +593,7 @@ namespace test
         {   "thread:0-1=socket:1.core:1.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
@@ -553,10 +621,10 @@ namespace test
         {   "thread:0-1=socket:1.core:1.pu:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 1, 0),
                     spec_type(spec_type::core, 1, 0),
-                    spec_type(spec_type::pu, 0, 1)
+                    spec_type(spec_type::pu, 0, -1)
                 }
             },
             { 0x004000, 0x008000 }
@@ -581,7 +649,7 @@ namespace test
         {   "thread:0-1=numanode:1.core:1.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::numanode, 1, 0),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 0, 0)
@@ -609,9 +677,9 @@ namespace test
         {   "thread:0-1=numanode:1.core:0-1.pu:1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::numanode, 1, 0),
-                    spec_type(spec_type::core, 0, 1),
+                    spec_type(spec_type::core, 0, -1),
                     spec_type(spec_type::pu, 1, 0)
                 }
             },
@@ -621,9 +689,9 @@ namespace test
         {   "thread:0-1=socket:0.core:all.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::core, ~0x0ul, 0),
+                    spec_type(spec_type::core, spec_type::all_entities(), 0),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -650,8 +718,8 @@ namespace test
         {   "thread:0-1=socket:0-1.core:1.pu:1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::socket, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::socket, 0, -1),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 1, 0)
                 }
@@ -679,8 +747,8 @@ namespace test
         {   "thread:0-1=numanode:0-1.core:1.pu:1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::numanode, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::numanode, 0, -1),
                     spec_type(spec_type::core, 1, 0),
                     spec_type(spec_type::pu, 1, 0)
                 }
@@ -693,13 +761,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 },
                 {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -708,9 +776,9 @@ namespace test
         {   "thread:0-1=socket:0-1.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::socket, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::socket, 0, -1),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -722,13 +790,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 },
                 {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 1, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -737,9 +805,9 @@ namespace test
         {   "thread:0-1=numanode:0-1.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
-                    spec_type(spec_type::numanode, 0, 1),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::thread, 0, -1),
+                    spec_type(spec_type::numanode, 0, -1),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -751,13 +819,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 },
                 {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -766,9 +834,9 @@ namespace test
         {   "thread:0-1=socket:0.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -780,13 +848,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 },
                 {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 1, 0)
                 }
             },
@@ -795,10 +863,10 @@ namespace test
         {   "thread:0-1=socket:0.pu:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::socket, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::pu, 0, 1)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::pu, 0, -1)
                 }
             },
             { 0x000001, 0x000002 }
@@ -809,13 +877,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 },
                 {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -824,9 +892,9 @@ namespace test
         {   "thread:0-1=numanode:0.pu:0",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 }
             },
@@ -838,13 +906,13 @@ namespace test
                 {
                     spec_type(spec_type::thread, 0, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 0, 0)
                 },
                 {
                     spec_type(spec_type::thread, 1, 0),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
+                    spec_type(spec_type::unknown),
                     spec_type(spec_type::pu, 1, 0)
                 }
             },
@@ -853,10 +921,10 @@ namespace test
         {   "thread:0-1=numanode:0.pu:0-1",
             {
                 {
-                    spec_type(spec_type::thread, 0, 1),
+                    spec_type(spec_type::thread, 0, -1),
                     spec_type(spec_type::numanode, 0, 0),
-                    spec_type(spec_type::unknown, 0, 0),
-                    spec_type(spec_type::pu, 0, 1)
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::pu, 0, -1)
                 }
             },
             { 0x000001, 0x000002 }
