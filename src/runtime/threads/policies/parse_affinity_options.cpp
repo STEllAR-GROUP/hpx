@@ -553,6 +553,32 @@ namespace hpx { namespace threads
         if (!ec) {
             BOOST_FOREACH(detail::full_mapping_type& m, mappings)
             {
+                if (m.first.type_ != detail::spec_type::thread)
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                        boost::str(boost::format("bind specification (%1%) is "
+                            "ill formatted") % spec));
+                    return;
+                }
+
+                if (m.second.size() != 3)
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                        boost::str(boost::format("bind specification (%1%) is "
+                            "ill formatted") % spec));
+                    return;
+                }
+
+                if (m.second[0].type_ == detail::spec_type::unknown &&
+                    m.second[1].type_ == detail::spec_type::unknown &&
+                    m.second[2].type_ == detail::spec_type::unknown)
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                        boost::str(boost::format("bind specification (%1%) is "
+                            "ill formatted") % spec));
+                    return;
+                }
+
                 detail::decode_mappings(m, affinities, ec);
                 if (ec) return;
             }
