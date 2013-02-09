@@ -12,12 +12,16 @@
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
+    inline void apex_init()
+    {
+        apex_set_node_id(hpx::get_locality_id());
+    }
+
     struct apex_wrapper
     {
         apex_wrapper(char const* const name)
           : name_(name)
         {
-            apex_set_node_id(hpx::get_locality_id());
             apex_start(name_);
         }
         ~apex_wrapper()
@@ -28,6 +32,8 @@ namespace hpx { namespace util
         char const* const name_;
     };
 #else
+    inline void apex_init() {}
+
     struct apex_wrapper
     {
         apex_wrapper(char const* const name) {}

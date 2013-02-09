@@ -21,6 +21,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/set_thread_name.hpp>
+#include <hpx/util/apex.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -215,6 +216,10 @@ namespace hpx {
         _isatty(0);
 #endif
         // {{{ early startup code - local
+
+        // initialize instrumentation system
+        util::apex_init();
+
         // in AGAS v2, the runtime pointer (accessible through get_runtime
         // and get_runtime_ptr) is already initialized at this point.
         applier_.init_tss();
