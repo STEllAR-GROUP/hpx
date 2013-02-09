@@ -175,25 +175,26 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        typedef std::pair<std::size_t, std::size_t> bounds_type;
+
         struct spec_type
         {
             enum type { unknown, thread, socket, numanode, core, pu };
             HPX_API_EXPORT static char const* const type_name(type t);
 
-            spec_type(type t = unknown, mask_type min = ~0x0ul, mask_type max = ~0x0ul)
-              : type_(t), index_min_(min), index_max_(max)
+            spec_type(type t = unknown, std::size_t min = ~0x0ul, 
+                    std::size_t max = ~0x0ul)
+              : type_(t), index_bounds_(min, max)
             {}
 
             bool operator==(spec_type const& rhs) const
             {
                 return type_ == rhs.type_ &&
-                    index_min_ == rhs.index_min_ &&
-                    index_max_ == rhs.index_max_;
+                    index_bounds_ == rhs.index_bounds_;
             }
 
             type type_;
-            mask_type index_min_;
-            mask_type index_max_;
+            bounds_type index_bounds_;
         };
 
         typedef std::vector<spec_type> mapping_type;

@@ -12,6 +12,8 @@ set(tests
 
 set(merging_map_FLAGS NOLIBS)
 
+set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

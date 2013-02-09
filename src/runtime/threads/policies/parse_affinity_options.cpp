@@ -25,15 +25,14 @@
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
+// #include <boost/fusion/include/std_pair.hpp>
 
 #include <hpx/runtime/threads/detail/partlit.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 BOOST_FUSION_ADAPT_STRUCT(
     hpx::threads::detail::spec_type,
-    (hpx::threads::mask_type, index_min_)
-    (hpx::threads::mask_type, index_max_)
+    (hpx::threads::detail::bounds_type, index_bounds_)
     (hpx::threads::detail::spec_type::type, type_)
 )
 
@@ -96,12 +95,7 @@ namespace hpx { namespace threads { namespace detail
 
             thread_spec =
                     partlit("thread") >> ':'
-                    >>  (   qi::uint_
-                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
-                            >>  qi::attr(spec_type::thread)
-                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
-                            >>  qi::attr(spec_type::thread)
-                        )
+                    >>  spec >> qi::attr(spec_type::thread)
                 ;
 
             pu_spec =
@@ -110,47 +104,32 @@ namespace hpx { namespace threads { namespace detail
                 ;
 
             socket_spec =
-                    partlit("socket") >> ':'
-                    >>  (   qi::uint_
-                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
-                            >>  qi::attr(spec_type::socket)
-                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
-                            >>  qi::attr(spec_type::socket)
-                        )
-                |   partlit("numanode") >> ':'
-                    >>  (   qi::uint_
-                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
-                            >>  qi::attr(spec_type::numanode)
-                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
-                            >>  qi::attr(spec_type::numanode)
-                        )
-                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
+                    partlit("socket") >> ':' >>  spec >> qi::attr(spec_type::socket)
+                |   partlit("numanode") >> ':' >>  spec >> qi::attr(spec_type::numanode)
+                |   no_spec >> qi::attr(spec_type::unknown)
                 ;
 
             core_spec =
                     -qi::lit('.') >> partlit("core") >> ':'
-                    >>  (   qi::uint_
-                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
-                            >>  qi::attr(spec_type::core)
-                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
-                            >>  qi::attr(spec_type::core)
-                        )
-                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
+                    >> ':' >>  spec >> qi::attr(spec_type::core)
+                |   no_spec >> qi::attr(spec_type::unknown)
                 ;
 
             processing_unit_spec =
                     -qi::lit('.') >> partlit("pu") >> ':'
-                    >>  (   qi::uint_
-                            >>  ('-' >> qi::uint_ | qi::attr(0ul))
-                            >>  qi::attr(spec_type::pu)
-                        |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
-                            >>  qi::attr(spec_type::pu)
-                        )
-                |   qi::attr(0ul) >> qi::attr(0ul) >> qi::attr(spec_type::unknown)
+                    >> ':' >>  spec >> qi::attr(spec_type::pu)
+                |   no_spec >> qi::attr(spec_type::unknown)
                 ;
 
+            spec =
+                    qi::uint_ >>  ('-' >> qi::uint_ | qi::attr(0ul))
+                |   partlit("all") >> qi::attr(~0x0ul) >> qi::attr(0ul)
+                ;
+
+            no_spec = qi::attr(0ul) >> qi::attr(0ul);
+
             BOOST_SPIRIT_DEBUG_NODES(
-                (start)(mapping)(thread_spec)(pu_spec)
+                (start)(mapping)(thread_spec)(pu_spec)(spec)(no_spec)
                 (socket_spec)(core_spec)(processing_unit_spec)
             );
         }
@@ -161,6 +140,8 @@ namespace hpx { namespace threads { namespace detail
         qi::rule<Iterator, mapping_type()> pu_spec;
         qi::rule<Iterator, spec_type()> socket_spec;
         qi::rule<Iterator, spec_type()> core_spec;
+        qi::rule<Iterator, bounds_type()> spec;
+        qi::rule<Iterator, bounds_type()> no_spec;
         qi::rule<Iterator, spec_type()> processing_unit_spec;
     };
 
@@ -188,11 +169,11 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::pair<std::size_t, std::size_t> extract_bounds(spec_type const& m,
-        std::size_t default_last, error_code& ec)
+    bounds_type extract_bounds(spec_type const& m, std::size_t default_last, 
+        error_code& ec)
     {
-        std::size_t first = m.index_min_;
-        std::size_t last = m.index_max_;
+        std::size_t first = m.index_bounds_.first;
+        std::size_t last = m.index_bounds_.second;
 
         if (first == ~0x0ul) {
             if (last == ~0x0ul) {
@@ -553,15 +534,12 @@ namespace hpx { namespace threads
         if (ec) return;
 
         int i = 0;
-        os << "{ ";
         BOOST_FOREACH(mask_type const& m, affinities)
         {
-            if (i++ > 0)
-                os << ", ";
-            os << "0x" << std::hex << std::setw(sizeof(mask_type)*2)
-               << std::setfill('0') << m;
+            os << i++ << ": 0x" 
+               << std::hex << std::setw(sizeof(mask_type)*2)
+               << std::setfill('0') << m << std::endl;
         }
-        os << " }" << std::endl;
     }
 }}
 

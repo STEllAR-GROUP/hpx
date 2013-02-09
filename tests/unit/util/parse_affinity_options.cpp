@@ -27,7 +27,8 @@ namespace hpx { namespace threads { namespace detail
     std::ostream& operator<<(std::ostream& os, spec_type const& data)
     {
         os << spec_type::type_name(data.type_)
-           << "," << data.index_min_ << "," << data.index_max_;
+           << "," << data.index_bounds_.first << "," 
+           << data.index_bounds_.second;
         return os;
     }
 }}}
