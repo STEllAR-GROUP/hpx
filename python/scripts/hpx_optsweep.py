@@ -284,10 +284,12 @@ if __name__ == '__main__':
         writeres(sepstr('=')+'\nExecuting:'+quoteopts(cmd)+'\n', ofhs)
         # run test requested number of times
         for i in range(nrep):
+            start = datetime.now()
             txt = 'BEGIN RUN '+str(i+1)+' @ '+timestr(datetime.now())
-            writeres(sepstr('*', txt)+'\n', ofhs)
+            writeres(sepstr('-', txt)+'\n', ofhs)
             (rc, walltime) = run(cmd, ofhs, timeout)
             txt = 'END RUN '+str(i+1)+' @ '+timestr(datetime.now())
+            txt += ' (ELAPSED '+str(datetime.now()-start)+')'
             runs += 1
             if rc: erruns += 1
             outs = sepstr('-', txt)

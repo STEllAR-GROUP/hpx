@@ -62,7 +62,8 @@ namespace hpx { namespace threads { namespace policies
                 pu_offset_(0),
                 pu_step_(1),
                 numa_sensitive_(false),
-                affinity_("pu")
+                affinity_domain_("pu"),
+                affinity_desc_()
             {}
 
             init_parameter(std::size_t num_queues,
@@ -71,13 +72,15 @@ namespace hpx { namespace threads { namespace policies
                     bool numa_sensitive = false,
                     std::size_t pu_offset = 0,
                     std::size_t pu_step = 1,
-                    std::string const& affinity = "pu")
+                    std::string const& affinity = "pu",
+                    std::string const& affinity_desc = "")
               : num_queues_(num_queues),
                 num_high_priority_queues_(num_high_priority_queues),
                 max_queue_thread_count_(max_queue_thread_count),
                 pu_offset_(pu_offset), pu_step_(pu_step),
                 numa_sensitive_(numa_sensitive),
-                affinity_(affinity)
+                affinity_domain_(affinity),
+                affinity_desc_(affinity_desc)
             {}
 
             std::size_t num_queues_;
@@ -86,7 +89,8 @@ namespace hpx { namespace threads { namespace policies
             std::size_t pu_offset_;
             std::size_t pu_step_;
             bool numa_sensitive_;
-            std::string affinity_;
+            std::string affinity_domain_;
+            std::string affinity_desc_;
         };
         typedef init_parameter init_parameter_type;
 
@@ -95,9 +99,11 @@ namespace hpx { namespace threads { namespace policies
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
-            affinity_data_(init.pu_offset_, init.pu_step_, init.affinity_),
+            affinity_data_(init.num_queues_, init.pu_offset_, init.pu_step_,
+                init.affinity_domain_, init.affinity_desc_),
             numa_sensitive_(init.numa_sensitive_),
-            topology_(get_topology())
+            topology_(get_topology()),
+            stolen_threads_(0)
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
@@ -129,6 +135,11 @@ namespace hpx { namespace threads { namespace policies
         std::size_t get_pu_num(std::size_t num_thread) const
         {
             return affinity_data_.get_pu_num(num_thread);
+        }
+
+        std::size_t get_num_stolen_threads() const
+        {
+            return stolen_threads_;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -245,6 +256,7 @@ namespace hpx { namespace threads { namespace policies
                 if (high_priority_queues_[idx]->
                         get_next_thread(thrd, queue_size + idx))
                 {
+                    ++stolen_threads_;
                     return true;
                 }
             }
@@ -253,7 +265,10 @@ namespace hpx { namespace threads { namespace policies
             for (std::size_t i = 1; i < queue_size; ++i) {
                 std::size_t idx = (i + num_thread) % queue_size;
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
+                {
+                    ++stolen_threads_;
                     return true;
+                }
             }
             return false;
         }
@@ -389,8 +404,8 @@ namespace hpx { namespace threads { namespace policies
 //                 // Convert high priority tasks to threads before attempting to
 //                 // steal from other OS thread.
 //                 bool result = high_priority_queues_[num_thread]->
-//                     wait_or_add_new(queues_size + num_thread, running, 
-//                         idle_loop_count, added); 
+//                     wait_or_add_new(queues_size + num_thread, running,
+//                         idle_loop_count, added);
 //                 if (0 != added) return result;
 //             }
 
@@ -409,9 +424,9 @@ namespace hpx { namespace threads { namespace policies
             // steal work items: first try to steal from other cores in
             // the same NUMA node
             std::size_t num_pu = get_pu_num(num_thread);
-            mask_type core_mask = 
+            mask_type core_mask =
                 topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
-            mask_type node_mask = 
+            mask_type node_mask =
                 topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
 
             if (core_mask && node_mask) {
@@ -423,7 +438,11 @@ namespace hpx { namespace threads { namespace policies
 
                     result = queues_[num_thread]->wait_or_add_new(i,
                         running, idle_loop_count, added, queues_[i]) && result;
-                    if (0 != added) return result;
+                    if (0 != added)
+                    {
+                        stolen_threads_ += added;
+                        return result;
+                    }
                 }
             }
 
@@ -432,7 +451,11 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t idx = (i + num_thread) % queues_size;
                 result = queues_[num_thread]->wait_or_add_new(idx, running,
                     idle_loop_count, added, queues_[idx]) && result;
-                if (0 != added) return result;
+                if (0 != added)
+                {
+                    stolen_threads_ += added;
+                    return result;
+                }
             }
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -502,6 +525,7 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
+        boost::atomic<std::size_t> stolen_threads_;
     };
 }}}
 

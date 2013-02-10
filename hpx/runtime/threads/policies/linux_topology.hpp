@@ -47,6 +47,18 @@ struct linux_topology : topology
         return 0;
     }
 
+    mask_type get_socket_affinity_mask(
+        std::size_t thread_num
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return 0;
+    }
+
     mask_type get_numa_node_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive

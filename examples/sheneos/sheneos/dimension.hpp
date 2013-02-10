@@ -35,8 +35,13 @@ namespace sheneos
 // Non-intrusive serialization support.
 namespace boost { namespace serialization
 {
-    template <typename Archive>
-    void serialize(Archive&, sheneos::dimension&, unsigned int const);
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive& ar, sheneos::dimension& dim,
+        unsigned int const);
+
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive& ar, sheneos::dimension& dim,
+        unsigned int const);
 }}
 
 #endif

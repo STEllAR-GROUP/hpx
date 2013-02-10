@@ -51,17 +51,23 @@ described in the table below:
     [[`--hpx:node arg`]         [number of the node this locality is run on
                                  (must be unique)]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
-                                 run on (default: 0), valid for 
+                                 run on (default: 0), valid for
                                  --hpx:queuing=local and priority_local only]]
     [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
-                                 instance of __hpx__ (default: 1), valid for 
+                                 instance of __hpx__ (default: 1), valid for
                                  --hpx:queuing=local and priority_local only]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
-                                 possible values: pu, core, numa, machine (default: pu), valid for 
+                                 possible values: pu, core, numa, machine (default: pu), valid for
                                  --hpx:queuing=local and priority_local only]]
+    [[`--hpx:bind arg`]         [the detailed affinity description for the OS threads, see
+                                 the documentation for a detailed description of possible
+                                 values. Do not use with --hpx:pu-step, --hpx:pu-offset, or
+                                 --hpx:affinity options. Implies --hpx:numa-sensitive.]]
+    [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
+                                 arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
                                  'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
                                  'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
@@ -156,7 +162,7 @@ Shortcut options are looked up in the internal configuration database. They are
 stored as key-value properties in a special properties section named
 `hpx.commandline`. You can define your own shortcuts by adding the corresponding
 definitions to one of the `ini` configuration files as described in the section
-__configuration__. For instance, in order to define a command line shortcut 
+__configuration__. For instance, in order to define a command line shortcut
 `--pc` which should expand to `--hpx:print-counter`, the following configuration
 information needs to be stored in one of the `ini` configuration files:
 ``
@@ -164,8 +170,8 @@ information needs to be stored in one of the `ini` configuration files:
     --pc = --hpx:print-counter
 ``
 [teletype]
-[note Any arguments for shortcut options passed on the command line are retained 
-      and passed as arguments to the corresponding expanded option. For instance, 
+[note Any arguments for shortcut options passed on the command line are retained
+      and passed as arguments to the corresponding expanded option. For instance,
       given the definition above, the command line option
 
           `--pc=/threads{locality#0/total}/count/cumulative`
@@ -175,8 +181,8 @@ information needs to be stored in one of the `ini` configuration files:
           `--hpx:print-counter=/threads{locality#0/total}/count/cumulative`
       ]
 
-[important Any shortcut option defined as described should either start with 
-      a single `'-'` or with two `'--'` characters. Shortcuts starting with a 
+[important Any shortcut option defined as described should either start with
+      a single `'-'` or with two `'--'` characters. Shortcuts starting with a
       single `'-'` are interpreted as short options (i.e. everything after the
       first character following the `'-'` is treated as the argument). Shortcuts
       starting with `'--'` are interpreted as long options. Any other shortcut
@@ -208,6 +214,120 @@ ignore the option. For instance, the following PBS script passes the option
     __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:1:pu-offset=4]`` ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
 ```
 [c++]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:details More Details about __hpx__ Command Line Options]
+
+This section documents the following list of the command line options in more
+detail:
+
+* [link hpx.manual.init.commandline.details.bind `--hpx:bind`]
+
+[heading:bind The Command Line Option `--hpx:bind`]
+
+This command line option allows to specify the required affinity of the __hpx__
+worker threads to the underlying processing units. As a result the worker
+threads will run only on the processing units identified by the corresponding
+bind specification.
+
+[note This command line option is only available if __hpx__ was built with
+      support for HWLOC (__hwloc__) enabled. Please see __cmake_options__ for more
+      details on how to enable support for HWLOC in __hpx__.]
+
+The specified affinities refer to specific regions within a machine hardware
+topology. In order to understand the hardware topology of a particular machine
+it may be useful to run the lstopo tool which is part of __hwloc__to see the
+reported topology tree. Seeing and understanding a topology tree will definitely
+help in understanding the concepts that are discussed below.
+
+Affinities can be specified using HWLOC (__hwloc__) tuples.
+Tuples of HWLOC /objects/ and associated /indexes/ can be
+specified in the form `object:index`, `object:index-index`, or
+`object:index,...,index`. HWLOC objects  represent types of mapped items in
+a topology tree. Possible values for objects are `socket`, `numanode`, `core`,
+and `pu` (processing unit). Indexes are non-negative integers that specify a
+unique physical object in a topology tree using its logical sequence number.
+
+Chaining multiple tuples together in the more general form
+`object1:index1[.object2:index2[...]]` is permissable. While the first tuple's
+object may appear anywhere in the topology, the Nth tuple's object must have
+a shallower topology depth than the (N+1)th tuple's object. Put simply: as
+you  move right in a tuple chain, objects must go deeper in the topology tree.
+Indexes specified in chained tuples are relative to the scope of the parent
+object. For example, `socket:0.core:1` refers to the second core in the first
+socket (all indicies are zero based).
+
+Multiple affinities can be specified using several `--hpx:bind` command line
+options or by appending several affinities separated by a `';'`. By default,
+if multiple affinities are specified, they are added.
+
+[/
+  If prefixed with `"~"`, the given affinity will be cleared instead of added to
+  the current list of locations. If prefixed with `"x"`, the given location will
+  be and'ed instead of added to the current list. If prefixed with `"^"`, the
+  given location will be xor'ed.
+]
+
+[teletype]
+
+`"all"` is a special affinity consisting in the entire current topology.
+
+[note All 'names' in an affinity specification, such as `thread`, `socket`, 
+      `numanode`, `pu`, or `all` can be abbreviated. Thus the affinity 
+      specification `threads:0-3=socket:0.core:1.pu:1` is fully equivalent to
+      its shortened form `t:0-3=s:0.c:1.p:1`.]
+
+Here is a full grammar describing the possible format of mappings:
+
+    mappings:
+        mapping(;mapping)*
+
+    mapping:
+        thread-spec=pu-specs
+
+    thread-spec:
+        'thread':range-specs
+
+    pu-specs:
+        pu-spec(.pu-spec)*
+
+    pu-spec:
+        type:range-specs
+        ~pu-spec
+
+    range-specs:
+        range-spec(,range-spec)*
+
+    range-spec:
+        int
+        int-int
+        'all'
+
+    type:
+        'socket' | 'numanode'
+        'core'
+        'pu'
+
+[c++]
+
+[note The command line option `--hpx:print-bind` can be used to print the
+      bitmasks generated from the affinity mappings as specified with
+      `--hpx:bind`. For instance, on a system with hyperthreading enabled (i.e.
+      2 processing units per core), the command line:[teletype]
+      ``
+          hello_world -t4 --hpx:bind=thread:0-3=core:0-3.pu:0 --hpx:print-bind
+      ``
+      will cause this output to be printed:
+      ``
+          0: 0x0000000000000001
+          1: 0x0000000000000004
+          2: 0x0000000000000010
+          3: 0x0000000000000040
+      ``
+      [c++]where each bit in the bitmasks corresponds to a processing unit the listed
+      worker thread will be bound to run on.]
+
+[endsect]
 
 [endsect] [/ Command Line Handling]
 

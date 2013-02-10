@@ -18,9 +18,19 @@ TBD
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 693] - `--help` doesn't print component specific command line options
+* [issue 691] - exception while executing any application linked with hwloc
+* [issue 689] - Make the buildbots use hwloc
+* [issue 687] - compilation error fix (hwloc_topology)
+* [issue 686] - Linker Error for Applications
+* [issue 684] - Pinning of service thread fails when number of worker threads
+                equals the number of cores
+* [issue 682] - Add performance counters exposing number of stolen threads
+* [issue 681] - Add apply_continue for asynchronous chaining of actions
 * [issue 679] - Remove obsolete async_callback API functions
 * [issue 678] - Add new API for setting/triggering LCOs
 * [issue 677] - Add async_continue for true continuation style actions
+* [issue 676] - Buildbot for gcc 4.4 broken
 * [issue 675] - Partial preprocessing broken
 * [issue 674] - HPX segfaults when built with gcc 4.7
 * [issue 673] - `use_guard_pages` has inconsistent preprocessor guards
@@ -29,9 +39,14 @@ Here is a list of the important tickets we closed for this release.
 * [issue 670] - CMake won't find Boost headers in layout=versioned install
 * [issue 669] - Links in docs to source files broken if not installed
 * [issue 667] - Not reading ini file properly
+* [issue 664] - Adapt new meanings of 'const' and 'mutable'
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
 * [issue 626] - hpx/future.hpp header
+* [issue 557] - Remove action codes
+* [issue 529] - Investigate the state of hwloc support
+* [issue 526] - Make HPX aware of hyper-threading
+* [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
 
 [endsect]
 
@@ -199,6 +214,7 @@ HPX' releases so far.
 * [issue 505] - undefined_symbol regression test currently failing
 * [issue 502] - Adding OpenCL and OCLM support to HPX for Windows and Linux
 * [issue 501] - find_package(HPX) sets cmake output variables
+* [issue 500] - wait_any/wait_all are badly named
 * [issue 499] - Add support for disabling pbs support in pbs runs
 * [issue 498] - Error during no-cache runs
 * [issue 496] - Add partial preprocessing support to cmake
@@ -247,6 +263,7 @@ HPX' releases so far.
 * [issue 354] - Create a coroutines wrapper for Boost.Context
 * [issue 349] - Commandline option `--localities=N/-lN` should be necessary
                 only on AGAS locality
+* [issue 334] - Add auto_index support to cmake based documentation toolchain
 * [issue 317] - Implement network performance counters
 * [issue 310] - Duplicate logging entries
 * [issue 230] - Add compile time option to disable thread debugging info

@@ -8,7 +8,7 @@
 #define HPX_WAIT_ARGUMENT_LIMIT 5
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/thread.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -250,6 +250,11 @@ void test_invoking_a_packaged_task_twice_throws()
     catch (...) {
         HPX_TEST(false);
     }
+    // retrieve the future so the destructor of packaged_task is happy.
+    // Otherwise an exception will be tried to set to future_data which
+    // leads to another exception to the fact that the future has already been
+    // set.
+    pt.get_future().get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

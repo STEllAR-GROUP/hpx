@@ -708,6 +708,7 @@ void check_QR(
     orthotope<T> const& A
   , orthotope<T> const& Q
   , orthotope<T> const& R
+  , std::size_t block_size
     )
 { // {{{
     BOOST_ASSERT(2 == A.order());
@@ -724,7 +725,7 @@ void check_QR(
 
     ///////////////////////////////////////////////////////////////////////////
     /// Make sure Q * R equals A.
-    orthotope<T> QR = matrix_multiply(Q, R);
+    orthotope<T> QR = blocked_matrix_multiply(Q, R, block_size);
 
     for (std::size_t l = 0; l < n; ++l)
     {
@@ -769,7 +770,7 @@ void check_QR(
             std::swap(QT(l, i), QT(i, l));
 
     // Compute Q^T * Q and store the result in QT.
-    QT = matrix_multiply(Q, QT);
+    QT = blocked_matrix_multiply(Q, QT, block_size);
 
     for (std::size_t l = 0; l < n; ++l)
     {
@@ -872,6 +873,7 @@ void householders_qr_factor(
     orthotope<T> const& A
   , orthotope<T>& Q
   , orthotope<T>& R
+  , std::size_t block_size
     )
 {
     BOOST_ASSERT(2 == A.order());
@@ -924,9 +926,9 @@ void householders_qr_factor(
             print(H, "H");
         #endif
 
-        R = matrix_multiply(H, R);
+        R = blocked_matrix_multiply(H, R, block_size);
 
-        Q = matrix_multiply(Q, H);
+        Q = blocked_matrix_multiply(Q, H, block_size);
 
         for (std::size_t i = l + 1; i < n; ++i)
             R(i, l) = 0;
@@ -937,7 +939,7 @@ void householders_qr_factor(
     #endif
 
     #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
-        check_QR(A, Q, R);
+        check_QR(A, Q, R, block_size);
     #endif
 }
 
@@ -946,6 +948,7 @@ template <
 >
 void householders_tri_factor(
     orthotope<T>& A
+  , std::size_t block_size
   , T eps = 1e-8
     )
 {
@@ -980,9 +983,9 @@ void householders_tri_factor(
         orthotope<T> H = compute_H(w);
 
         /// A_l = H * A_l_minus_1 * H
-        orthotope<T> H_A_l_minus_1 = matrix_multiply(H, A);
+        orthotope<T> H_A_l_minus_1 = blocked_matrix_multiply(H, A, block_size);
 
-        A = matrix_multiply(H_A_l_minus_1, H);
+        A = blocked_matrix_multiply(H_A_l_minus_1, H, block_size);
     }
 }
 
@@ -992,6 +995,7 @@ template <
 std::vector<std::complex<T> > qr_eigenvalue(
     orthotope<T> const& A
   , std::size_t max_iterations
+  , std::size_t block_size 
   , T const& tolerance = 1.0
     )
 {
@@ -1012,7 +1016,7 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
     orthotope<T> Ak = A.copy(), R, Q;
 
-    householders_tri_factor(Ak);
+    householders_tri_factor(Ak, block_size);
 
     write_matrix_to_octave_file(Ak, "hess_A0");
 
@@ -1032,9 +1036,9 @@ std::vector<std::complex<T> > qr_eigenvalue(
         }
 */
 
-        householders_qr_factor(Ak, Q, R);
+        householders_qr_factor(Ak, Q, R, block_size);
 
-        Ak = matrix_multiply(R, Q); 
+        Ak = blocked_matrix_multiply(R, Q, block_size); 
 
 /*
         if (0 != iterations)
@@ -1080,7 +1084,7 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
         bool converged = true;
 
-        std::cout << "ITERATION " << iterations << "\n";
+//        std::cout << "ITERATION " << iterations << "\n";
 
         for (std::size_t j = 0; j < n; ++j)
         {
@@ -1109,10 +1113,12 @@ std::vector<std::complex<T> > qr_eigenvalue(
                         evs[j    ] = (a + d) / i2 + comp_part / i2; 
                         evs[j + 1] = (a + d) / i2 - comp_part / i2; 
 
+/*
                         std::cout << "evs[" << j << "] = " << evs[j] << "\n"
                                   << "old[" << j << "] = " << old[j] << "\n"
                                   << "evs[" << (j + 1) << "] = " << evs[j + 1] << "\n"
                                   << "old[" << (j + 1) << "] = " << old[j + 1] << "\n";
+*/
 
                         if ((old[j] == nan_) || (old[j + 1] == nan_))
                             converged = false;
@@ -1135,8 +1141,10 @@ std::vector<std::complex<T> > qr_eigenvalue(
                                && compare_are(old1_real, evs1_real, 0.1)
                                && compare_are(old1_imag, evs1_imag, 0.1);
 
+/*
                             std::cout << "test = " << test1 << "\n";
                             std::cout << "converged = " << converged << "\n";
+*/
 
                             converged = converged && test1;
                         }
@@ -1157,8 +1165,10 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
             evs[j] = Ak(j, j);
 
+/*
             std::cout << "evs[" << j << "] = " << evs[j] << "\n"
                       << "old[" << j << "] = " << old[j] << "\n";
+*/
 
             if (old[j] == nan_)
                 converged = false;
@@ -1174,8 +1184,10 @@ std::vector<std::complex<T> > qr_eigenvalue(
                 bool const test = compare_are(old_real, evs_real, 0.1)
                                 && compare_are(old_imag, evs_imag, 0.1);
 
+/*
                 std::cout << "test = " << test << "\n";
                 std::cout << "converged = " << converged << "\n";
+*/
 
                 converged = converged && test;
             }
@@ -1315,6 +1327,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     std::size_t const dimensions = vm["dimensions"].as<std::size_t>();
 
+    std::size_t const block_size = vm["block-size"].as<std::size_t>();
+
     std::size_t const max_iterations = vm["max-iterations"].as<std::size_t>();
 
     std::size_t seed = vm["seed"].as<std::size_t>();
@@ -1334,7 +1348,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::util::high_resolution_timer t;
 
         std::vector<std::complex<double> > evs
-            = qr_eigenvalue(A0, max_iterations);
+            = qr_eigenvalue(A0, max_iterations, block_size);
 
         std::cout << "Elapsed Time: " << t.elapsed() << " [s]\n";
 
@@ -1353,8 +1367,10 @@ int main(int argc, char* argv[])
     using boost::program_options::value;
 
     cmdline.add_options()
-        ("dimensions", value<std::size_t>()->default_value(14),
+        ("dimensions", value<std::size_t>()->default_value(24),
             "dimensions of randomly generated square input matrix")
+        ("block-size", value<std::size_t>()->default_value(6),
+            "sub-block size for matrix multiplication")
         ("max-iterations", value<std::size_t>()->default_value(10000),
             "maximum number of iterations before admitting failure to converge")
         ("seed", value<std::size_t>()->default_value(0),

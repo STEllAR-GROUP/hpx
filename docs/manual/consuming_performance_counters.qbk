@@ -170,7 +170,7 @@ output of your application.
 
 The command line option `--hpx:print-counter` supports using a limited set of
 wildcards for a (very limited) set of use cases. In particular, all occurences
-of `#*` as in `locality#*` and in `worker-thread#*` will be automatically expanded
+of [teletype]`#*` as in `locality#*` and in `worker-thread#*`[c++] will be automatically expanded
 to the proper set of performance counter names representing the actual
 environment for the executed program. For instance, if your program is utilizing
 4 worker threads for the execution of HPX threads (see command line option

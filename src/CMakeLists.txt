@@ -56,7 +56,7 @@ if(UNIX)
   endif()
 endif()
 
-foreach(lib ${hpx_LIBRARIES})
+foreach(lib "hpx hpx_serialization")
   set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
 
   if(MSVC)

@@ -22,17 +22,13 @@
 const int sizeY = 256;
 const int sizeX = sizeY;
 
-//[fib_action
-// forward declaration of the Fibonacci function
 int fractals(float x0, float y0, int max_iteration);
 
 // This is to generate the required boilerplate we need for the remote
 // invocation to work.
 HPX_PLAIN_ACTION(fractals, fractals_action);
 
-
 ///////////////////////////////////////////////////////////////////////////////
-//[fib_func
 int fractals(float x0, float y0, int max_iteration)
 {
     
@@ -49,12 +45,8 @@ int fractals(float x0, float y0, int max_iteration)
               }
     return iteration;   // wait for the Futures to return their values
 }
-//]
-//]
-
 
 ///////////////////////////////////////////////////////////////////////////////
-//[fib_hpx_main
 int hpx_main()
 {
     BMP SetImage;
@@ -110,9 +102,9 @@ int hpx_main()
 
     return hpx::finalize(); // Handles HPX shutdown
 }
-//]
 
 int main()
 {
     return hpx::init();
 }
+

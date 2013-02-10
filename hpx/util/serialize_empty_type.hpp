@@ -12,9 +12,7 @@
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/type_traits/is_empty.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/mpl/and.hpp>
 
 namespace boost { namespace serialization
 {

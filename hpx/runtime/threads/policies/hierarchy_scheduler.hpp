@@ -184,6 +184,11 @@ namespace hpx { namespace threads { namespace policies
             return num_thread;
         }
 
+        std::size_t get_num_stolen_threads() const
+        {
+            return 0;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
         boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const

@@ -114,23 +114,28 @@ macro(add_hpx_component name)
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
-  set(libs "")
+  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
+
+  set(hpx_libs "")
 
   if(NOT ${${name}_NOLIBS})
-    set(libs ${hpx_LIBRARIES})
+    if(HPX_EXTERNAL_CMAKE)
+      set(hpx_libs ${HPX_LIBRARIES})
+    else()
+      set(hpx_libs ${hpx_LIBRARIES})
+    endif()
+
     set_property(TARGET ${name}_component APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_PREFIX=\"${HPX_PREFIX}\""
                  "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
                  "BOOST_ENABLE_ASSERT_HANDLER")
-  endif()
 
-  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-
-  if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
-    set(hpx_libs hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX})
-  else()
-    set(hpx_libs hpx hpx_serialization)
+    if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
+      set(hpx_libs hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX} ${hpx_libs})
+    else()
+      set(hpx_libs hpx hpx_serialization ${hpx_libs})
+    endif()
   endif()
 
   target_link_libraries(${name}_component

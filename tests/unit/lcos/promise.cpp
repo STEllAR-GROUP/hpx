@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/thread.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -157,7 +157,8 @@ int hpx_main(boost::program_options::variables_map&)
         std::string what_msg;
 
         try {
-            p.get();      // throws
+            f.get();      // throws
+            p.get();
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
@@ -187,7 +188,8 @@ int hpx_main(boost::program_options::variables_map&)
         std::string what_msg;
 
         try {
-            p.get();      // throws
+            f.get();      // throws
+            p.get();
             HPX_TEST(false);
         }
         catch (std::exception const& e) {

@@ -116,12 +116,12 @@ namespace hpx { namespace performance_counters { namespace server
         value = prev_value_;                              // return value
         value.value_ = detail::counter_type_from_statistic<Statistic>::call(value_);
         value.status_ = status_new_data;
-        value.time_ = util::high_resolution_clock::now();
+        value.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         value.count_ = ++invocation_count_;
 
         prev_value_ = value;
 
-        value_ = mean_accumulator_type();                 // reset accumulator
+        value_ = accumulator_type();                      // reset accumulator
         value_(static_cast<double>(prev_value_.value_));  // start off with last base value
 
         return value;
@@ -215,7 +215,7 @@ namespace hpx { namespace performance_counters { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        value_ = mean_accumulator_type();                 // reset accumulator
+        value_ = accumulator_type();                      // reset accumulator
         value_(static_cast<double>(prev_value_.value_));  // start off with last base value
     }
 }}}

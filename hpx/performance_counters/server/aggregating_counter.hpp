@@ -79,8 +79,8 @@ namespace hpx { namespace performance_counters { namespace server
         naming::id_type base_counter_id_;
         typedef boost::accumulators::accumulator_set<
             double, boost::accumulators::stats<Statistic>
-        > mean_accumulator_type;
-        mean_accumulator_type value_;
+        > accumulator_type;
+        accumulator_type value_;
         counter_value prev_value_;
     };
 }}}

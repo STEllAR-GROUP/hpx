@@ -6,6 +6,7 @@
 #if !defined(HPX_PARCELSET_SHMEM_INTERPROCESS_ERRORS_NOV_25_2012_0703PM)
 #define HPX_PARCELSET_SHMEM_INTERPROCESS_ERRORS_NOV_25_2012_0703PM
 
+#include <hpx/config.hpp>
 #include <boost/interprocess/errors.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/static_assert.hpp>

@@ -182,6 +182,10 @@ find_package(HPX_Boost)
 hpx_include_sys_directories(${BOOST_INCLUDE_DIR})
 hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
+if(NOT MSVC)
+  set(hpx_LIBRARIES ${BOOST_FOUND_LIBRARIES})
+endif()
+
 # Boost preprocessor definitions
 hpx_add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
 hpx_add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
@@ -392,6 +396,12 @@ endif()
 # PAPI event counters
 ################################################################################
 find_package(HPX_PAPI)
+
+################################################################################
+# Apex event counters
+################################################################################
+find_package(HPX_TAU)
+find_package(HPX_APEX)
 
 ################################################################################
 # hwloc
@@ -1049,7 +1059,7 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        #hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
         hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         hpx_add_definitions(-DHPX_TCMALLOC)
       endif()
@@ -1086,10 +1096,6 @@ endif()
 ################################################################################
 # target specification
 ################################################################################
-# hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by
-# default.
-set(hpx_LIBRARIES hpx hpx_serialization)
-
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
@@ -1370,12 +1376,10 @@ foreach(directory ${HPX_LINK_DIRECTORIES})
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
-set(external_libraries
-  ${BOOST_FOUND_LIBRARIES})
-
-foreach(lib ${external_libraries})
+foreach(lib ${hpx_LIBRARIES})
   get_filename_component(lib ${lib} NAME_WE)
   string(REGEX REPLACE "^lib" "" lib ${lib})
+  set(external_libraries "${external_libraries} ${lib}")
   set(external_libraries_name "${external_libraries_name} -l${lib}")
 endforeach()
 

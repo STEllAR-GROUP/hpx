@@ -227,8 +227,13 @@ namespace sheneos { namespace server
 // Non-intrusive serialization.
 namespace boost { namespace serialization
 {
-    template <typename Archive>
-    void serialize(Archive&, sheneos::sheneos_coord&, unsigned int const);
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive& ar,
+        sheneos::sheneos_coord& coord, unsigned int const);
+
+    HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive& ar,
+        sheneos::sheneos_coord& coord, unsigned int const);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

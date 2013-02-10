@@ -46,7 +46,6 @@ namespace performance_counters { namespace sine { namespace server
         boost::uint64_t evaluated_at_;
 
         hpx::util::interval_timer timer_;
-        boost::uint64_t started_at_;
     };
 }}}
 
