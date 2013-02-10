@@ -121,7 +121,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     bool thread_counters::read_value(papi_counter *cnt)
     {
         if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
-        timestamp_ = hpx::util::high_resolution_clock::now();
+        timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
         return true;
     }
@@ -149,7 +149,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             if (PAPI_stop(evset_, &tmp[0]) != PAPI_OK) return false;
             // accumulate existing counts before modifying event set
             if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
-            timestamp_ = hpx::util::high_resolution_clock::now();
+            timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         }
         return true;
     }

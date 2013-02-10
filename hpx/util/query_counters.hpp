@@ -53,7 +53,6 @@ namespace hpx { namespace util
         std::string destination_;
 
         interval_timer timer_;
-        boost::uint64_t started_at_;
     };
 }}
 

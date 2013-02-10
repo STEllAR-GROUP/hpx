@@ -27,8 +27,7 @@ namespace hpx { namespace util
             boost::int64_t interval, std::string const& dest)
       : names_(names), destination_(dest),
         timer_(boost::bind(&query_counters::evaluate, this_()),
-            interval*1000, "query_counters", true),
-        started_at_(0)
+            interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary
         BOOST_FOREACH(std::string& name, names_)
@@ -107,7 +106,6 @@ namespace hpx { namespace util
         }
 
         // this will invoke the evaluate function for the first time
-        started_at_ = hpx::util::high_resolution_clock::now();
         timer_.start();
     }
 
@@ -125,7 +123,7 @@ namespace hpx { namespace util
         out << performance_counters::remove_counter_prefix(name) << ",";
         out << value.count_ << ",";
         if (!ec) {
-            double elapsed = static_cast<double>(value.time_ - started_at_) * 1e-9;
+            double elapsed = static_cast<double>(value.time_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
                 << "[s]," << val;
             if (!uom.empty())
