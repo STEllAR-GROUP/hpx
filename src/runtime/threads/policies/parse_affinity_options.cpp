@@ -276,7 +276,8 @@ namespace hpx { namespace threads { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping1_unknown",
                 boost::str(boost::format("unexpected specification type at "
-                    "index two: %x (%s)") % m[1].type_ %
+                    "index two: %x (%s)") % 
+                        static_cast<unsigned>(m[1].type_) %
                         spec_type::type_name(m[1].type_)));
             break;
         }
@@ -344,7 +345,8 @@ namespace hpx { namespace threads { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping0_unknown",
                 boost::str(boost::format("unexpected specification type at "
-                    "index one: %x (%s)") % m[1].type_ %
+                    "index one: %x (%s)") % 
+                        static_cast<unsigned>(m[1].type_) %
                         spec_type::type_name(m[1].type_)));
             break;
         }
@@ -448,7 +450,8 @@ namespace hpx { namespace threads { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
                 boost::str(boost::format("unexpected specification type at "
-                    "index zero: %x (%s)") % m[0].type_ %
+                    "index zero: %x (%s)") % 
+                        static_cast<unsigned>(m[0].type_) %
                         spec_type::type_name(m[0].type_)));
             return 0;
         }
