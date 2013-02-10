@@ -346,6 +346,7 @@ hpx_get_target_file(name hpx)
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_DLL_STRING=\"${name}\""
+  "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
   "HPX_PREFIX=\"${HPX_PREFIX}\""
   "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""

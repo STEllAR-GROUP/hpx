@@ -385,10 +385,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_COMPONENT_NAME)
-#  define HPX_COMPONENT_NAME hpx
-#endif
-
 #if !defined(HPX_COMPONENT_STRING)
 #  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
