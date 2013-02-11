@@ -1333,8 +1333,8 @@ if(NOT HPX_NO_INSTALL)
       COMPONENT docs)
 
     install(
-      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/code/
-      DESTINATION share/hpx-${HPX_VERSION}/doc/html/code
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
+      DESTINATION share/hpx-${HPX_VERSION}/doc/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
       PATTERN ".git" EXCLUDE)
