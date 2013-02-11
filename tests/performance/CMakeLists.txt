@@ -24,7 +24,10 @@ set(benchmarks
     sizeof
    )
 
-add_hpx_library(test_worker SOURCES worker.cpp HEADERS worker.hpp)
+add_hpx_library(test_worker
+    SOURCES worker.cpp
+    HEADERS worker.hpp
+    FOLDER "Benchmarks/Worker")
 
 if(MSVC)
   set(boost_library_dependencies)
