@@ -24,6 +24,8 @@ set(benchmarks
     sizeof
    )
 
+add_hpx_library(test_worker SOURCES worker.cpp HEADERS worker.hpp)
+
 if(MSVC)
   set(boost_library_dependencies)
 else()
@@ -88,7 +90,7 @@ if(SWARM_FOUND)
 endif()
 
 set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies})
+    DEPENDENCIES ${boost_library_dependencies} test_worker_lib)
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
@@ -106,9 +108,9 @@ set(native_tls_overhead_FLAGS NOLIBS
 set(hpx_tls_overhead_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
-set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 
-set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}

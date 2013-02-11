@@ -17,6 +17,8 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/sum.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -40,14 +42,6 @@ using hpx::util::high_resolution_timer;
 boost::uint64_t tasks = 64;
 boost::uint64_t delay = 0;
 bool header = true;
-
-///////////////////////////////////////////////////////////////////////////////
-void worker()
-{
-    double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1. / (2. * i + 1.);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -78,12 +72,14 @@ int app_main(
 
     accumulator_set<double, stats<median_tag, mean_tag, sum_tag> > results;
   
+    volatile double d = 0.0;
+        
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
         // Start the clock.
         high_resolution_timer t;
 
-        worker(); 
+        worker(delay, &d);
 
         results(t.elapsed());
     }
@@ -91,7 +87,7 @@ int app_main(
     // Print out the results.
     print_results(vm, median(results), mean(results), sum(results));
 
-    return 0;
+    return static_cast<int>(d);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
