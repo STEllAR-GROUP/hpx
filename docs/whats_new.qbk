@@ -16,8 +16,12 @@ TBD
 
 [heading Bug Fixes (Closed Tickets)]
 
-Here is a list of the important tickets we closed for this release.
+Here is a list of the tickets we closed for this release.
 
+* [issue 706] - `hpx::init` removes portions of non-option command line 
+                arguments before last `=` sign
+* [issue 698] - compilation failure with hwloc absent
+* [issue 697] - Performance counter counts should be zero indexed
 * [issue 693] - `--help` doesn't print component specific command line options
 * [issue 691] - exception while executing any application linked with hwloc
 * [issue 689] - Make the buildbots use hwloc
