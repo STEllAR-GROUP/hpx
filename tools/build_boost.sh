@@ -14,7 +14,7 @@ usage()
     echo "Options:"
     echo "  -d    Directory where Boost should be built."
     echo "  -v    Version of Boost to build (format: X.YY.Z)"
-    echo "  -n    Don't download Boost (expects tarball in current directory named boost_X.YY.Z.tar.bz2)"
+    echo "  -n    Don't download Boost (expects tarball named boost_X.YY.Z.tar.bz2 in the -d directory)"
     echo "  -x    Libraries to exclude (format: exclude0,exclude1...) [default: mpi,graph_parallel,python]"
     echo "  -t    Number of threads to use while building [default: number of processors]" 
     echo "  -c    Compiler [default: automatically detected]" 
