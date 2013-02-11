@@ -166,6 +166,8 @@
 
 [template hpx_link[url txt]     '''<ulink url="'''__hpx_source_dir__'''/'''[url]'''">'''[txt]'''</ulink>''']
 
+[template git_commit_link[commit] '''<ulink url="https://github.com/STEllAR-GROUP/hpx/commit/'''[commit]'''">'''[commit]'''</ulink>''']
+
 [/  fig[ref title label]
     Image element with a title.
 
@@ -222,8 +224,9 @@ a list of people working in this group and participating in writing this
 documentation see __people__.
 
 This documentation is automatically generated for __hpx__ __version__ (from Git
-commit: __hpx_git_commit__) by the Boost __boost_quickbook__ documentation tool.
-__boost_quickbook__ can be found in the collection of __boost_tools__.
+commit: [git_commit_link __hpx_git_commit__]) by the Boost __boost_quickbook__ 
+and __boost_auto_index__ documentation tools. __boost_quickbook__ and 
+__boost_auto_index__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
