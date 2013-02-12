@@ -22,6 +22,8 @@ Here is a list of the tickets we closed for this release.
 * [issue 707] - Many examples do not link with Git HEAD version
 * [issue 706] - `hpx::init` removes portions of non-option command line 
                 arguments before last `=` sign
+* [issue 705] - Create rolling average and median aggregating performance 
+                counters
 * [issue 703] - Add support to HPX build system to find librcrtool.a and 
                 related headers
 * [issue 698] - compilation failure with hwloc absent
