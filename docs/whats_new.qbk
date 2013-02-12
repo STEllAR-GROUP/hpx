@@ -20,6 +20,8 @@ Here is a list of the tickets we closed for this release.
 
 * [issue 706] - `hpx::init` removes portions of non-option command line 
                 arguments before last `=` sign
+* [issue 703] - Add support to HPX build system to find librcrtool.a and 
+                related headers
 * [issue 698] - compilation failure with hwloc absent
 * [issue 697] - Performance counter counts should be zero indexed
 * [issue 693] - `--help` doesn't print component specific command line options
@@ -51,6 +53,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 529] - Investigate the state of hwloc support
 * [issue 526] - Make HPX aware of hyper-threading
 * [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
+* [issue 219] - Only copy arguments into actions once
 
 [endsect]
 
