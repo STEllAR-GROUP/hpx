@@ -594,7 +594,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
-            boost::int64_t base_time_interval, error_code& ec = throws);
+            std::vector<boost::int64_t> const& parameters, error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given
         //        counter info

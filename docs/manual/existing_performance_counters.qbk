@@ -86,7 +86,7 @@ system and application performance.
           based) number identifying the locality.
         ]
         [None]
-        [Returns the overall number of bytes of memory consumed by the messages 
+        [Returns the overall number of bytes of memory consumed by the messages
          (see `<operation>`, e.g. `sent` or `received`).]
     ]
     [   [`/serialize/count/<operation>`
@@ -284,7 +284,7 @@ system and application performance.
           for the application using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the overall length of all queues for the given worker 
+        [Returns the overall length of all queues for the given worker
          thread(s) on the given locality.]
     ]
     [   [`/threads/count/stack-unbinds`]
@@ -318,8 +318,8 @@ system and application performance.
           (zero based) number identifying the locality.
         ]
         [None]
-        [Returns the total number of __hpx__-threads 'stolen' from a 
-         neighboring worker thread (these threads are executed by a 
+        [Returns the total number of __hpx__-threads 'stolen' from a
+         neighboring worker thread (these threads are executed by a
          different worker thread than they were initially scheduled on).]
     ]
 ]
@@ -421,9 +421,33 @@ system and application performance.
     [   [`/statistics/average`]
         [Any full performance counter name. The referenced performance counter
          is queried at fixed time intervals.]
-        [Returns the current average value calculated based on the values
+        [Returns the current average (mean) value calculated based on the values
          queried from the underlying counter (the one specified as the instance
          name).]
+        [Any parameter will be interpreted as the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume 1000ms as the default.]
+    ]
+    [   [`/statistics/rolling_average`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals.]
+        [Returns the current rolling average (mean) value calculated based on the values
+         queried from the underlying counter (the one specified as the instance
+         name).]
+        [Any parameter will be interpreted as a list of two comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`.]
+    ]
+    [   [`/statistics/median`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals.]
+        [Returns the current (statistically estimated) median value calculated 
+         based on the values queried from the underlying counter (the one 
+         specified as the instance name).]
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume 1000ms as the default.]

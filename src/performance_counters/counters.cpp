@@ -611,12 +611,12 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
-            boost::int64_t base_time_interval, error_code& ec)
+            std::vector<boost::int64_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
                 create_aggregating_counter(info, base_counter_name,
-                    base_time_interval, gid, ec);
+                    parameters, gid, ec);
             return gid;
         }
 

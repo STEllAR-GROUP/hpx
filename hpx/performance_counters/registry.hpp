@@ -101,7 +101,8 @@ namespace hpx { namespace performance_counters
         ///        on given base counter name and given base time interval
         ///        (milliseconds).
         counter_status create_aggregating_counter(counter_info const& info,
-            std::string const& base_counter_name, boost::int64_t base_time_interval,
+            std::string const& base_counter_name,
+            std::vector<boost::int64_t> const& parameters,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Add an existing performance counter instance to the registry
