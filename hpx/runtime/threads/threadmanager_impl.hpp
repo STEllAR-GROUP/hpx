@@ -223,7 +223,7 @@ namespace hpx { namespace threads
             return state_.load();
         }
 
-        /// \brief return the number of PX-threads with the given state
+        /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the threadmanager
         boost::int64_t get_thread_count(thread_state_enum state = unknown) const;

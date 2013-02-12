@@ -388,7 +388,11 @@ struct thread_deque
     {
         mutex_type::scoped_lock lk(mtx_);
         if (unknown == state)
-            return thread_map_.size();
+        {
+            BOOST_ASSERT((thread_map_.size()  + new_tasks_count_) <
+                static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+            return static_cast<boost::int64_t>(thread_map_.size() + new_tasks_count_);
+        }
 
         boost::int64_t num_threads = 0;
         thread_map_type::const_iterator end = thread_map_.end();

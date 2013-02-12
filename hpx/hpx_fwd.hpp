@@ -326,6 +326,11 @@ namespace hpx
 
         /// The function \a get_thread_count returns the number of currently
         /// known threads.
+        ///
+        /// \note If state == unknown this function will not only return the 
+        ///       number of currently existing threads, but will add the number
+        ///       of registered task descriptions (which have not been 
+        ///       converted into threads yet.
         HPX_API_EXPORT boost::int64_t get_thread_count(
             thread_state_enum state = unknown);
     }

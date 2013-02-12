@@ -78,7 +78,7 @@ int hpx_main(
         for (boost::uint64_t i = 0; i < tasks; ++i)
             register_work(HPX_STD_BIND(&worker, delay, &d));
 
-        // Reschedule hpx_main until all other px-threads have finished. We
+        // Reschedule hpx_main until all other hpx-threads have finished. We
         // should be resumed after most of the null px-threads have been
         // executed. If we haven't, we just reschedule ourselves again.
         do {
