@@ -15,9 +15,6 @@
 
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/max.hpp>
-#include <boost/accumulators/statistics/min.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -443,7 +440,7 @@ namespace hpx { namespace performance_counters
             else if (p.countername_ == "rolling_average") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::aggregating_counter<
-                        boost::accumulators::tag::mean>
+                        boost::accumulators::tag::rolling_mean>
                 > counter_t;
 
                 boost::uint64_t window_size = 10;   // default rolling window size
@@ -456,7 +453,7 @@ namespace hpx { namespace performance_counters
             else if (p.countername_ == "median") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::aggregating_counter<
-                        boost::accumulators::tag::mean>
+                        boost::accumulators::tag::median>
                 > counter_t;
                 gid = components::server::create_with_args<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);

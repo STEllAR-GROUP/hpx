@@ -52,6 +52,8 @@ namespace hpx { namespace performance_counters { namespace server
                 return static_cast<boost::int64_t>(
                     boost::accumulators::mean(accum));
             }
+
+            typedef boost::mpl::false_ need_reset;
         };
 
         template <>
@@ -73,6 +75,8 @@ namespace hpx { namespace performance_counters { namespace server
                 return static_cast<boost::int64_t>(
                     boost::accumulators::median(accum));
             }
+
+            typedef boost::mpl::false_ need_reset;
         };
 
         template <>
@@ -95,6 +99,8 @@ namespace hpx { namespace performance_counters { namespace server
                 return static_cast<boost::int64_t>(
                     boost::accumulators::rolling_mean(accum));
             }
+
+            typedef boost::mpl::false_ need_reset;
         };
 
         template <>
@@ -115,6 +121,8 @@ namespace hpx { namespace performance_counters { namespace server
                 return static_cast<boost::int64_t>(
                     (boost::accumulators::max)(accum));
             }
+
+            typedef boost::mpl::true_ need_reset;
         };
 
         template <>
@@ -135,6 +143,8 @@ namespace hpx { namespace performance_counters { namespace server
                 return static_cast<boost::int64_t>(
                     (boost::accumulators::min)(accum));
             }
+
+            typedef boost::mpl::true_ need_reset;
         };
     }
 
@@ -193,6 +203,7 @@ namespace hpx { namespace performance_counters { namespace server
     protected:
         bool evaluate_base_counter(counter_value& value);
         bool evaluate();
+        bool ensure_base_counter();
 
     private:
         typedef lcos::local::spinlock mutex_type;

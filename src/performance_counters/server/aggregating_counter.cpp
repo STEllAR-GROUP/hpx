@@ -64,9 +64,12 @@ namespace hpx { namespace performance_counters { namespace server
         prev_value_.count_ = ++invocation_count_;
         value = prev_value_;                              // return value
 
-        value_.reset(detail::counter_type_from_statistic<Statistic>::create(
-            parameter2_)); // reset accumulator
-        (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+        if (detail::counter_type_from_statistic<Statistic>::need_reset::value)
+        {
+            value_.reset(detail::counter_type_from_statistic<Statistic>::create(
+                parameter2_)); // reset accumulator
+            (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+        }
 
         return value;
     }
@@ -99,33 +102,40 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     template <typename Statistic>
-    bool aggregating_counter<Statistic>::evaluate_base_counter(
-        counter_value& value)
+    bool aggregating_counter<Statistic>::ensure_base_counter()
     {
-        {
-            // lock here to avoid checking out multiple reference counted GIDs
-            // from AGAS
-            mutex_type::scoped_lock l(mtx_);
+        // lock here to avoid checking out multiple reference counted GIDs
+        // from AGAS
+        mutex_type::scoped_lock l(mtx_);
 
-            if (!base_counter_id_) {
-                // get or create the base counter
-                error_code ec(lightweight);
-                base_counter_id_ = get_counter(base_counter_name_, ec);
-                if (HPX_UNLIKELY(ec || !base_counter_id_))
-                {
-                    // base counter could not be retrieved
-                    HPX_THROW_EXCEPTION(bad_parameter,
-                        "aggregating_counter<Statistic>::evaluate_base_counter",
-                        boost::str(boost::format(
-                            "could not get or create performance counter: '%s'") %
-                                base_counter_name_)
-                        )
-                    return false;
-                }
+        if (!base_counter_id_) {
+            // get or create the base counter
+            error_code ec(lightweight);
+            base_counter_id_ = get_counter(base_counter_name_, ec);
+            if (HPX_UNLIKELY(ec || !base_counter_id_))
+            {
+                // base counter could not be retrieved
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "aggregating_counter<Statistic>::evaluate_base_counter",
+                    boost::str(boost::format(
+                        "could not get or create performance counter: '%s'") %
+                            base_counter_name_)
+                    )
+                return false;
             }
         }
 
+        return true;
+    }
+
+    template <typename Statistic>
+    bool aggregating_counter<Statistic>::evaluate_base_counter(
+        counter_value& value)
+    {
         // query the actual value
+        if (!base_counter_id_ && !ensure_base_counter())
+            return false;
+
         value = stubs::performance_counter::get_value(base_counter_id_);
         return true;
     }
@@ -138,6 +148,9 @@ namespace hpx { namespace performance_counters { namespace server
     {
         if (!timer_.is_started()) {
             // start base counter
+            if (!base_counter_id_ && !ensure_base_counter())
+                return false;
+
             bool result = stubs::performance_counter::start(base_counter_id_);
             if (result) {
                 // acquire the current value of the base counter
@@ -162,6 +175,9 @@ namespace hpx { namespace performance_counters { namespace server
     {
         if (timer_.is_started()) {
             timer_.stop();
+
+            if (!base_counter_id_ && !ensure_base_counter())
+                return false;
             return stubs::performance_counter::stop(base_counter_id_);
         }
         return false;
