@@ -250,34 +250,10 @@ namespace hpx { namespace parcelset { namespace shmem
 
         if (!client_connection)
         {
-            // If there was an error, we might be safe if there are no parcels
-            // to be sent anymore (some other thread already picked them up)
-            // or if there are parcels, but the parcel we were about to sent
-            // has been already processed.
-            util::spinlock::scoped_lock l(mtx_);
-
-            iterator it = pending_parcels_.find(locality_id);
-            if (it != pending_parcels_.end())
-            {
-                map_second_type& data = it->second;
-
-                std::vector<parcel>::iterator end = data.first.end();
-                std::vector<write_handler_type>::iterator fit = data.second.begin();
-                for (std::vector<parcel>::iterator pit = data.first.begin();
-                     pit != end; ++pit, ++fit)
-                {
-                    if ((*pit).get_parcel_id() == parcel_id)
-                    {
-                        // remove this parcel from pending parcel queue
-                        data.first.erase(pit);
-                        data.second.erase(fit);
-
-                        // re-schedule this function call and bail out
-                        threads::register_thread_nullary(
-                            util::bind(&parcelport::put_parcel, this, p, f));
-                    }
-                }
-            }
+            // We can safely return at this point if no connection is
+            // available at this point. As soon as a connection becomes
+            // available it checks for pending parcels and sends those 
+            // out.
             return;
         }
 
