@@ -61,7 +61,7 @@ namespace hpx { namespace parcelset { namespace tcp
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp"),
         acceptor_(NULL),
-        connection_cache_(ini.get_max_connections_per_loc())
+        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
         if (here_.get_type() != connection_tcpip) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
@@ -248,12 +248,39 @@ namespace hpx { namespace parcelset { namespace tcp
             e.second.push_back(f);
         }
 
-        error_code ec(lightweight);
-        parcelport_connection_ptr
-            client_connection = get_connection(locality_id, ec);
+        error_code ec;
+        parcelport_connection_ptr client_connection = 
+            get_connection(locality_id, ec);
 
         if (!client_connection)
         {
+            if (ec)
+            {
+                // If there was an error, we might be safe if there are no parcels
+                // to be sent anymore (some other thread already picked them up)
+                // or if there are parcels, but the parcel we were about to sent
+                // has been already processed.
+                util::spinlock::scoped_lock l(mtx_);
+
+                iterator it = pending_parcels_.find(locality_id);
+                if (it != pending_parcels_.end())
+                {
+                    map_second_type& data = it->second;
+
+                    std::vector<parcel>::iterator end = data.first.end();
+                    std::vector<write_handler_type>::iterator fit = data.second.begin();
+                    for (std::vector<parcel>::iterator pit = data.first.begin();
+                         pit != end; ++pit, ++fit)
+                    {
+                        if ((*pit).get_parcel_id() == parcel_id)
+                        {
+                            // our parcel is still here, bailing out
+                            throw hpx::detail::access_exception(ec);
+                        }
+                    }
+                }
+            }
+
             // We can safely return if no connection is available at this point.
             // As soon as a connection becomes available it checks for pending
             // parcels and sends those out.
@@ -433,6 +460,8 @@ namespace hpx { namespace parcelset { namespace tcp
         // unlikely), bail.
         if (!got_cache_space)
         {
+            if (&ec != &throws)
+                ec = make_success_code();
             return client_connection;
         }
 
@@ -508,6 +537,9 @@ namespace hpx { namespace parcelset { namespace tcp
         BOOST_ASSERT(l.get_address() == connection_addr);
         BOOST_ASSERT(l.get_port() == connection_port);
 #endif
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         return client_connection;
     }

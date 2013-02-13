@@ -58,6 +58,7 @@ namespace hpx { namespace util
 
         // Get the number of maximum concurrent connections per locality
         std::size_t get_max_connections_per_loc() const;
+        std::size_t get_max_connections() const;
 
         // Get the size of the shmem parcelport data buffer cache
         std::size_t get_shmem_data_buffer_cache_size() const;
