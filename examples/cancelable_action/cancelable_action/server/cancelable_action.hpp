@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/thread.hpp>
+#include <hpx/include/threads.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server
