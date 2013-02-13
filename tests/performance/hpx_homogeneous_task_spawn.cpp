@@ -60,6 +60,15 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// avoid to have one single volatile variable to become a contention point
+double invoke_worker(boost::uint64_t delay)
+{
+    volatile double d = 0;
+    worker(delay, &d);
+    return d;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
     )
@@ -67,7 +76,6 @@ int hpx_main(
     if (vm.count("no-header"))
         header = false;
 
-    volatile double d = 0.0;
     {
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
@@ -76,7 +84,7 @@ int hpx_main(
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&worker, delay, &d));
+            register_work(HPX_STD_BIND(&invoke_worker, delay));
 
         // Reschedule hpx_main until all other hpx-threads have finished. We
         // should be resumed after most of the null px-threads have been
@@ -88,9 +96,7 @@ int hpx_main(
         print_results(get_os_thread_count(), t.elapsed());
     }
 
-    finalize();
-
-    return static_cast<int>(d);
+    return finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

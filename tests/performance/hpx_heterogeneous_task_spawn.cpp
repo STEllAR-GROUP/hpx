@@ -76,6 +76,15 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// avoid to have one single volatile variable to become a contention point
+double invoke_worker(boost::uint64_t delay)
+{
+    volatile double d = 0;
+    worker(delay, &d);
+    return d;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t shuffler(
     boost::random::mt19937_64& prng
   , boost::uint64_t high
@@ -202,9 +211,8 @@ int hpx_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Queue the tasks in a serial loop.
-        volatile double d = 0.0;
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&worker, payloads[i], &d));
+            register_work(HPX_STD_BIND(&invoke_worker, payloads[i]));
 
         ///////////////////////////////////////////////////////////////////////
         // Wait for the work to finish.

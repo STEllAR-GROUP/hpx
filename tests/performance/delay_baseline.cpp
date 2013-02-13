@@ -53,7 +53,7 @@ void print_results(
 {
     if (header)
         std::cout << "Tasks,Delay (iterations),Total Walltime (seconds),"
-                     "Median Walltime (seconds),Average Walltime (seconds),\n"; 
+                     "Median Walltime (seconds),Average Walltime (seconds),\n";
 
     std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
     std::string const delay_str = boost::str(boost::format("%lu,") % delay);
@@ -71,15 +71,15 @@ int app_main(
         throw std::invalid_argument("error: count of 0 tasks specified\n");
 
     accumulator_set<double, stats<median_tag, mean_tag, sum_tag> > results;
-  
+
     volatile double d = 0.0;
-        
+
     for (boost::uint64_t i = 0; i < tasks; ++i)
     {
         // Start the clock.
         high_resolution_timer t;
 
-        worker(delay, &d);
+        invoke_worker(delay, &d);
 
         results(t.elapsed());
     }
