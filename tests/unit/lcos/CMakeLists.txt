@@ -68,7 +68,8 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
-set_target_properties(dataflow_test_exe
-    PROPERTIES COMPILE_FLAGS
-    "-DHPX_ACTION_ARGUMENT_LIMIT=10")
+set_property(TARGET dataflow_test_exe APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    "HPX_ACTION_ARGUMENT_LIMIT=10"
+    "HPX_FUNCTION_ARGUMENT_LIMIT=13")
 

@@ -34,6 +34,29 @@
 namespace hpx { namespace util {
     namespace detail
     {
+        struct not_enough_parameters {};
+
+        namespace result_of
+        {
+            template <typename Env, typename T>
+            struct eval
+            {
+                typedef T & type;
+            };
+
+            template <typename Env, typename T>
+            struct eval<Env, boost::reference_wrapper<T const> >
+            {
+                typedef T const & t;
+            };
+
+            template <typename Env, typename T>
+            struct eval<Env, boost::reference_wrapper<T> >
+            {
+                typedef T & t;
+            };
+        }
+
         template <typename Env, typename T>
         T & eval(Env &, T & t)
         {
@@ -112,10 +135,40 @@ namespace hpx { namespace util {
 /**/
         BOOST_PP_REPEAT(HPX_FUNCTION_ARGUMENT_LIMIT, HPX_UTIL_BIND_PLACEHOLDERS, _)
 #undef HPX_UTIL_BIND_PLACEHOLDERS
+
+        template <typename>
+        struct is_placeholder
+          : boost::mpl::false_
+        {};
+
+        template <typename T>
+        struct is_placeholder<T const>
+          : is_placeholder<T>
+        {};
+
+        template <int N>
+        struct is_placeholder<arg<N> >
+          : boost::mpl::true_
+        {};
     }
 
     namespace detail
     {
+        namespace result_of
+        {
+            template <typename Env, int N>
+            struct eval<Env, util::placeholders::arg<N> >
+            {
+                typedef typename boost::fusion::result_of::at_c<Env, N>::type type;
+            };
+            
+            template <typename Env, int N>
+            struct eval<Env, util::placeholders::arg<N> const>
+            {
+                typedef typename boost::fusion::result_of::at_c<Env, N>::type type;
+            };
+        }
+
         template <typename Env, int N>
         typename boost::fusion::result_of::at_c<Env, N>::type
         eval(Env & env, util::placeholders::arg<N>)
@@ -136,7 +189,7 @@ namespace hpx { namespace util {
     typename detail::env_value_type<BOOST_PP_CAT(D, N)>::type                   \
 /**/
 
-#define HPX_UTIL_BIND_FUNCTOR_OPERATOR(Z, N, D)                                 \
+#define HPX_UTIL_BIND_FUNCTION_OPERATOR(Z, N, D)                                \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const  \
     {                                                                           \
@@ -157,7 +210,7 @@ namespace hpx { namespace util {
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
             >                                                                   \
             env_type;                                                           \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                           \
         return eval(env, f) D;                                                  \
     }                                                                           \
 /**/
@@ -182,8 +235,17 @@ namespace hpx { namespace util {
             }
 
             BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
-                HPX_UTIL_BIND_FUNCTOR_OPERATOR, ())
+                HPX_UTIL_BIND_FUNCTION_OPERATOR, ())
         };
+
+        namespace result_of
+        {
+            template <typename Env, typename R>
+            struct eval<Env, util::detail::bound_function0<R> >
+            {
+                typedef R type;
+            };
+        }
 
         template <typename Env, typename R>
         R
@@ -218,7 +280,9 @@ namespace hpx { namespace util {
 
             functor_type f;
 
-            typedef typename F::result_type result_type;
+            typedef
+                typename boost::result_of<F()>::type
+                result_type;
 
             // default constructor is needed for serialization
             bound_functor0()
@@ -263,14 +327,23 @@ namespace hpx { namespace util {
             }
 
             BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
-                HPX_UTIL_BIND_FUNCTOR_OPERATOR, ())
+                HPX_UTIL_BIND_FUNCTION_OPERATOR, ())
 
         private:
             BOOST_COPYABLE_AND_MOVABLE(bound_functor0)
         };
 
+        namespace result_of
+        {
+            template <typename Env, typename F>
+            struct eval<Env, util::detail::bound_functor0<F> >
+            {
+                typedef typename boost::result_of<F()>::type type;
+            };
+        }
+
         template <typename Env, typename F>
-        typename F::result_type
+        typename boost::result_of<F()>::type
         eval(Env & env, util::detail::bound_functor0<F> const & f)
         {
             return f();
@@ -340,6 +413,7 @@ namespace boost { namespace serialization
 #undef HPX_UTIL_BIND_EVAL
 #undef HPX_UTIL_BIND_REMOVE_REFERENCE
 #undef HPX_UTIL_BIND_REFERENCE
+#undef HPX_UTIL_BIND_FUNCTION_OPERATOR
 #undef HPX_UTIL_BIND_FUNCTOR_OPERATOR
 
 #endif
@@ -351,6 +425,11 @@ namespace boost { namespace serialization
 
 #define HPX_UTIL_BIND_INIT_MEMBER(Z, N, D)                                      \
     BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
+/**/
+#define HPX_UTIL_BIND_MEMBER_TYPE(Z, NN, D)                                           \
+    typename boost::remove_const<                                               \
+        typename decay<BOOST_PP_CAT(Arg, NN)>::type                              \
+    >::type                                               \
 /**/
 #define HPX_UTIL_BIND_MEMBER(Z, N, D)                                           \
     typename boost::remove_const<                                               \
@@ -443,7 +522,7 @@ namespace hpx { namespace util
             }
 
             BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
-                HPX_UTIL_BIND_FUNCTOR_OPERATOR,
+                HPX_UTIL_BIND_FUNCTION_OPERATOR,
                 (BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)))
 
             BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MEMBER, _)
@@ -451,6 +530,26 @@ namespace hpx { namespace util
         private:
             BOOST_COPYABLE_AND_MOVABLE(BOOST_PP_CAT(bound_function, N));
         };
+
+        namespace result_of
+        {
+            template <
+                typename Env
+              , typename R
+              , BOOST_PP_ENUM_PARAMS(N, typename T)
+              , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+            >
+            struct eval<Env, 
+                BOOST_PP_CAT(detail::bound_function, N)<
+                    R
+                  , BOOST_PP_ENUM_PARAMS(N, T)
+                  , BOOST_PP_ENUM_PARAMS(N, Arg)
+                >
+            >
+            {
+                typedef R type;
+            };
+        }
 
         template <
             typename Env
@@ -671,7 +770,7 @@ namespace hpx { namespace util
                         (BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-#define HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR(Z, N, D)                          \
+#define HPX_UTIL_BIND_MEMBER_FUNCTION_OPERATOR(Z, N, D)                         \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(N, A, a))        \
     {                                                                           \
@@ -705,11 +804,34 @@ namespace hpx { namespace util
             BOOST_PP_REPEAT_FROM_TO(
                 1
               , HPX_FUNCTION_ARGUMENT_LIMIT
-              , HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR, _
+              , HPX_UTIL_BIND_MEMBER_FUNCTION_OPERATOR, _
             )
-#undef HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR
+#undef HPX_UTIL_BIND_MEMBER_FUNCTION_OPERATOR
             BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MEMBER, _)
         };
+
+        namespace result_of
+        {
+            template <
+                typename Env
+              , typename R
+              , typename C
+              , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename T)
+              BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
+                  BOOST_PP_ENUM_PARAMS(N, typename Arg)
+            >
+            struct eval<Env, 
+                BOOST_PP_CAT(detail::bound_member_function, N)<
+                    R
+                  , C
+                  , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
+                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N)) BOOST_PP_ENUM_PARAMS(N, Arg)
+                >
+            >
+            {
+                typedef R type;
+            };
+        }
 
         template <
             typename Env
@@ -810,6 +932,112 @@ namespace hpx { namespace util
 {
     namespace detail
     {
+#define HPX_UTIL_BIND_RESULT_OF_BOUND_FUNCTOR_ARGS(Z, NN, D)                    \
+    typename detail::result_of::eval<                                           \
+        HPX_UTIL_STRIP(D)                                                       \
+      , HPX_UTIL_BIND_MEMBER_TYPE(Z, NN, D)                                     \
+    >::type                                                                     \
+
+        namespace result_of
+        {
+            template <
+                typename F
+              , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+              , typename Enable = typename boost::mpl::fold<
+                    boost::mpl::vector<BOOST_PP_ENUM_PARAMS(N, Arg)>
+                  , boost::mpl::false_
+                  , boost::mpl::or_<
+                        placeholders::is_placeholder<boost::mpl::_2>
+                      , boost::mpl::_1
+                    >
+                >::type
+            >
+            struct BOOST_PP_CAT(bound_functor, N);
+
+#define HPX_UTIL_BIND_RESULT_OF_BOUND_FUNCTOR(Z, NN, D)                         \
+            template <                                                          \
+                typename F                                                      \
+              , BOOST_PP_ENUM_PARAMS(NN, typename A)                            \
+              , BOOST_PP_ENUM_PARAMS(N, typename Arg)                           \
+            >                                                                   \
+            struct BOOST_PP_CAT(bound_functor, N)<                              \
+                F(BOOST_PP_ENUM_PARAMS(NN, A))                                  \
+              , BOOST_PP_ENUM_PARAMS(N, Arg)                                    \
+              , boost::mpl::false_                                              \
+            >                                                                   \
+            {                                                                   \
+                typedef                                                         \
+                    typename boost::result_of<                                  \
+                        typename boost::remove_reference<                       \
+                            typename detail::result_of::eval<                   \
+                                BOOST_PP_CAT(hpx::util::tuple, NN)<             \
+                                    BOOST_PP_ENUM(NN, HPX_UTIL_BIND_REFERENCE, A)\
+                                >                                               \
+                              , F                                               \
+                            >::type                                             \
+                        >::type(                                                \
+                            BOOST_PP_ENUM(                                      \
+                                N                                               \
+                              , HPX_UTIL_BIND_RESULT_OF_BOUND_FUNCTOR_ARGS      \
+                              , (BOOST_PP_CAT(hpx::util::tuple, NN)<            \
+                                    BOOST_PP_ENUM(NN, HPX_UTIL_BIND_REFERENCE, A)\
+                                >)                                              \
+                            )                                                   \
+                        )                                                       \
+                    >::type                                                     \
+                    type;                                                       \
+            };                                                                  \
+/**/
+
+            BOOST_PP_REPEAT_FROM_TO(
+                1
+              , HPX_FUNCTION_ARGUMENT_LIMIT
+              , HPX_UTIL_BIND_RESULT_OF_BOUND_FUNCTOR
+              , _
+            )
+
+            template <
+                typename F
+              , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+            >
+            struct BOOST_PP_CAT(bound_functor, N)<
+                F()
+              , BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::false_>
+            {
+                typedef
+                    typename boost::result_of<
+                        typename boost::remove_reference<
+                            typename detail::result_of::eval<
+                                hpx::util::tuple0<>
+                              , F
+                            >::type
+                        >::type(
+                            BOOST_PP_ENUM(
+                                N
+                              , HPX_UTIL_BIND_RESULT_OF_BOUND_FUNCTOR_ARGS
+                              , hpx::util::tuple0<>
+                            )
+                        )
+                    >::type
+                    type;
+            };
+            
+            template <
+                typename F
+              , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+            >
+            struct BOOST_PP_CAT(bound_functor, N)<
+                F()
+              , BOOST_PP_ENUM_PARAMS(N, Arg)
+              , boost::mpl::true_
+            >
+            {
+                typedef
+                    detail::not_enough_parameters
+                    type;
+            };
+        }
+
         template <
             typename F
           , BOOST_PP_ENUM_PARAMS(N, typename Arg)
@@ -820,7 +1048,20 @@ namespace hpx { namespace util
 
             functor_type f;
 
-            typedef typename F::result_type result_type;
+            template <typename Sig>
+            struct result;
+
+            template <typename This>
+            struct result<This()>
+            {
+                typedef
+                    typename result_of::BOOST_PP_CAT(bound_functor, N)<
+                        F()
+                      , BOOST_PP_ENUM_PARAMS(N, Arg)
+                    >::type
+                    type;
+            };
+
 
             // default constructor is needed for serialization
             BOOST_PP_CAT(bound_functor, N)()
@@ -872,12 +1113,54 @@ namespace hpx { namespace util
                 return *this;
             }
 
-            BOOST_FORCEINLINE result_type operator()() const
+            BOOST_FORCEINLINE
+            typename result_of::BOOST_PP_CAT(bound_functor, N)<
+                F()
+              , BOOST_PP_ENUM_PARAMS(N, Arg)
+            >::type
+            operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
                 return eval(env, f)(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
+
+#define HPX_UTIL_BIND_FUNCTOR_OPERATOR(Z, NN, D)                                 \
+    template <typename This, BOOST_PP_ENUM_PARAMS(NN, typename A)>                                                    \
+    struct result<This(BOOST_PP_ENUM_PARAMS(NN, A))>                                                       \
+    {                                                                           \
+        typedef                                                                 \
+        typename result_of::BOOST_PP_CAT(bound_functor, N)<F(BOOST_PP_ENUM_PARAMS(NN, A)), BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::false_>::type \
+            type;                                                               \
+    };                                                                          \
+    template <BOOST_PP_ENUM_PARAMS(NN, typename A)>                              \
+    BOOST_FORCEINLINE                                                           \
+    typename result_of::BOOST_PP_CAT(bound_functor, N)<F(BOOST_PP_ENUM_PARAMS(NN, A)), BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::false_>::type \
+    operator()(HPX_ENUM_FWD_ARGS(NN, A, a)) const  \
+    {                                                                           \
+        typedef                                                                 \
+            BOOST_PP_CAT(hpx::util::tuple, NN)<                                  \
+                BOOST_PP_ENUM(NN, HPX_UTIL_BIND_REFERENCE, A)                    \
+            >                                                                   \
+            env_type;                                                           \
+        env_type env(HPX_ENUM_FORWARD_ARGS(NN, A, a));                           \
+        return eval(env, f) D;                                                  \
+    }                                                                           \
+                                                                                \
+    template <BOOST_PP_ENUM_PARAMS(NN, typename A)>                              \
+    BOOST_FORCEINLINE                                                           \
+    typename result_of::BOOST_PP_CAT(bound_functor, N)<F(BOOST_PP_ENUM_PARAMS(NN, A)), BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::false_>::type \
+    operator()(HPX_ENUM_FWD_ARGS(NN, A, a))                                      \
+    {                                                                           \
+        typedef                                                                 \
+            BOOST_PP_CAT(hpx::util::tuple, NN)<                                  \
+                BOOST_PP_ENUM(NN, HPX_UTIL_BIND_REFERENCE, A)                    \
+            >                                                                   \
+            env_type;                                                           \
+        env_type env(HPX_ENUM_FORWARD_ARGS(NN, A, a));                            \
+        return eval(env, f) D;                                                  \
+    }                                                                           \
+/**/
 
             BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
                 HPX_UTIL_BIND_FUNCTOR_OPERATOR,
@@ -886,12 +1169,47 @@ namespace hpx { namespace util
             BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MEMBER, _)
         };
 
+        namespace result_of
+        {
+            template <typename Env
+              , typename F
+              , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+            >
+            struct eval<
+                Env
+              , BOOST_PP_CAT(detail::bound_functor, N)<
+                    F
+                  , BOOST_PP_ENUM_PARAMS(N, Arg)
+                >
+            >
+            {
+                typedef
+                    typename boost::result_of<
+                        boost::fusion::fused<
+                            BOOST_PP_CAT(detail::bound_functor, N)<
+                                F
+                              , BOOST_PP_ENUM_PARAMS(N, Arg)
+                            >
+                        >(Env &)
+                    >::type
+                    type;
+            };
+        }
+
+
         template <
             typename Env
           , typename F
           , BOOST_PP_ENUM_PARAMS(N, typename Arg)
         >
-        typename F::result_type
+        typename boost::result_of<
+            boost::fusion::fused<
+                BOOST_PP_CAT(detail::bound_functor, N)<
+                    F
+                  , BOOST_PP_ENUM_PARAMS(N, Arg)
+                >
+            >(Env &)
+        >::type
         eval(
             Env & env
           , BOOST_PP_CAT(detail::bound_functor, N)<
@@ -936,6 +1254,19 @@ namespace hpx { namespace util
             );
     }
 }}
+
+namespace boost {
+    template <
+        typename F
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+    >
+    struct result_of<hpx::util::detail::BOOST_PP_CAT(bound_functor, N)<F, BOOST_PP_ENUM_PARAMS(N, Arg)>()>
+    {
+        typedef
+            typename hpx::util::detail::result_of::BOOST_PP_CAT(bound_functor, N)<F(), BOOST_PP_ENUM_PARAMS(N, Arg)>::type
+            type;
+    };
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace serialization
