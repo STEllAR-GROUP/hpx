@@ -167,10 +167,10 @@ namespace hpx { namespace util
                 {
                     // See if we have enough space or can make space available.
 
-                    // Note that if we don't have any space and there are no 
+                    // Note that if we don't have any space and there are no
                     // outstanding connections for this locality, we grow the
-                    // cache size beyond its limit (hoping that it will be 
-                    // reduced in size next time some connection is handed back 
+                    // cache size beyond its limit (hoping that it will be
+                    // reduced in size next time some connection is handed back
                     // to the cache).
 
                     if (!free_space() && boost::get<1>(it->second) != 0)
@@ -199,15 +199,17 @@ namespace hpx { namespace util
                 return false;
             }
 
-            // Key isn't in cache.
+            // Key (locality) isn't in cache.
 
             // See if we have enough space or can make space available.
-            // If we can't find or make space, give up.
-            if (!free_space())
-            {
-                check_invariants();
-                return false;
-            }
+
+            // Note that we ignore the outcome of free_space() here as we have 
+            // to guarantee to have space for the new connection as there are 
+            // no connections outstanding for this locality. If free_space 
+            // fails we grow the cache size beyond its limit (hoping that it 
+            // will be reduced in size next time some connection is handed back
+            // to the cache).
+            free_space();
 
             // Update LRU meta data.
             typename key_tracker_type::iterator kt =
@@ -408,7 +410,7 @@ namespace hpx { namespace util
                     }
 
                     // If we've gone through key_tracker_ and haven't found
-                    // anything evictable, then all the entries must be 
+                    // anything evictable, then all the entries must be
                     // currently checked out.
                     if (key_tracker_.end() == kt)
                         return false;
