@@ -273,12 +273,13 @@ system and application performance.
           scheduling queues.
         ]
         [None]
-        [Returns the current number of __hpx__-threads having the given thread
-         state on the given locality since application start. If the instance
-         name is `total` the counter returns the current number of __hpx__-threads
+        [Returns the average wait time of __hpx__-threads (if the thread state 
+         is `pending`) or of task descriptions (if the thread state is `staged`) 
+         on the given locality since application start. If the instance
+         name is `total` the counter returns the wait time of __hpx__-threads
          of the given state for all worker threads (cores) on that locality. If
          the instance name is `worker-thread#*` the counter will return the
-         current number of __hpx__-threads in the given state for the specified
+         wait time of __hpx__-threads in the given state for the specified
          worker thread.
 
          These counters are available only if the compile time constant 
