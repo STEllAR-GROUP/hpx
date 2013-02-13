@@ -222,7 +222,6 @@ sections, one for each component.
     [hpx.parcel]
     address = ${HPX_PARCEL_SERVER_ADDRESS:<hpx_initial_ip_address>}
     port = ${HPX_PARCEL_SERVER_PORT:<hpx_initial_ip_port>}
-    max_connections = ${HPX_MAX_PARCEL_CONNECTIONS:<hpx_max_parcel_connections>}
     max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:<hpx_max_parcel_connections_per_locality}
 ``
 [c++]
@@ -244,11 +243,6 @@ sections, one for each component.
       command line option). ]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_INITIAL_IP_PORT` (`7010`)]]
-    [[`hpx.parcel.max_connections`]
-     [This property defines how many network connections between different
-      localities are overall kept alive by each of locality.]
-     [static information, the default depends on the compile time preprocessor
-      constant `HPX_MAX_PARCEL_CONNECTIONS` (`512`)]]
     [[`hpx.parcel.max_connections_per_locality`]
      [This property defines the maximum number of network connections that one
       locality will open to another locality.]

@@ -58,8 +58,8 @@ namespace hpx { namespace parcelset { namespace shmem
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
         acceptor_(NULL), connection_count_(0),
-        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc()),
-        data_buffer_cache_(ini.get_max_connections() * 4)
+        connection_cache_(ini.get_max_connections_per_loc()),
+        data_buffer_cache_(ini.get_shmem_data_buffer_cache_size())
     {
     }
 
@@ -363,9 +363,6 @@ namespace hpx { namespace parcelset { namespace shmem
         // unlikely), bail.
         if (!got_cache_space)
         {
-            HPX_THROWS_IF(ec, network_error,
-                "shmem::parcelport::get_connection",
-                "timed out while trying to find room in the connection cache");
             return client_connection;
         }
 

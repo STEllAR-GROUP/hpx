@@ -61,7 +61,7 @@ namespace hpx { namespace parcelset { namespace tcp
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp"),
         acceptor_(NULL),
-        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
+        connection_cache_(ini.get_max_connections_per_loc())
     {
         if (here_.get_type() != connection_tcpip) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
@@ -84,8 +84,8 @@ namespace hpx { namespace parcelset { namespace tcp
     util::io_service_pool* parcelport::get_thread_pool(char const* name)
     {
         if (0 == std::strcmp(name, io_service_pool_.get_name()))
-            return 0;
-        return &io_service_pool_;
+            return &io_service_pool_;
+        return 0;
     }
 
     bool parcelport::run(bool blocking)
@@ -249,8 +249,8 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 
         error_code ec(lightweight);
-        parcelport_connection_ptr client_connection =
-            get_connection(locality_id, ec);
+        parcelport_connection_ptr
+            client_connection = get_connection(locality_id, ec);
 
         if (!client_connection)
         {
@@ -433,9 +433,6 @@ namespace hpx { namespace parcelset { namespace tcp
         // unlikely), bail.
         if (!got_cache_space)
         {
-            HPX_THROWS_IF(ec, network_error,
-                "tcp::parcelport::get_connection",
-                "timed out while trying to find room in the connection cache");
             return client_connection;
         }
 

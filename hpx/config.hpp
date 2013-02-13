@@ -174,15 +174,15 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
-/// all other localities). This value can be changed at runtime by setting
-/// the configuration parameter:
+/// each of the other localities). This value can be changed at runtime by
+/// setting the configuration parameter:
 ///
-///   hpx.max_connections = ...
+///   hpx.parcel.max_connections_per_locality = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_PARCEL_CONNECTIONS).
-#if !defined(HPX_MAX_PARCEL_CONNECTIONS)
-#  define HPX_MAX_PARCEL_CONNECTIONS 512
+/// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
+#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
+#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,13 +190,14 @@
 /// each of the other localities). This value can be changed at runtime by
 /// setting the configuration parameter:
 ///
-///   hpx.max_connections_per_locality = ...
+///   hpx.parcel.shmem_data_buffer_cache_size = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
-#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
-#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
+/// HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE).
+#if !defined(HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE)
+#  define HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE 512
 #endif
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of AGAS address translations kept in the local
