@@ -192,8 +192,12 @@ namespace hpx
             depleted = 4,       /*!< thread has been depleted (deeply
                                      suspended, it is not known to the
                                      thread manager) */
-            terminated = 5      /*!< thread has been stopped an may be
+            terminated = 5,     /*!< thread has been stopped an may be
                                      garbage collected */
+            staged = 6          /*!< this is not a real thread state, but
+                                     allows to reference staged task descriptions,
+                                     which eventually will be converted into
+                                     thread objects */
         };
 
         /// \ cond NODETAIL

@@ -112,7 +112,7 @@ namespace hpx { namespace performance_counters
             }
 
             HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                boost::str(boost::format("unknown counter type: %s, known counter types: %s") %
+                boost::str(boost::format("unknown counter type: %s, known counter types: \n%s") % 
                     type_name % types));
             return status_counter_type_unknown;
         }

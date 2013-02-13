@@ -324,11 +324,11 @@ namespace hpx { namespace threads { namespace policies
 
                 if (num_thread < high_priority_queues_.size())
                 {
-                    count =  high_priority_queues_[num_thread]->get_thread_count();
+                    count =  high_priority_queues_[num_thread]->get_queue_length();
                 }
                 if (num_thread == queues_.size()-1)
                 {
-                    count += low_priority_queue_.get_thread_count();
+                    count += low_priority_queue_.get_queue_length();
                 }
                 return count + queues_[num_thread]->get_queue_length();
             }
@@ -380,6 +380,101 @@ namespace hpx { namespace threads { namespace policies
 
             return result;
         }
+
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+        ///////////////////////////////////////////////////////////////////////
+        boost::int64_t get_average_thread_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            // Return average thread wait time of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+
+                boost::int64_t result = 0;
+                boost::int64_t count = 0;
+                if (num_thread < high_priority_queues_.size())
+                {
+                    result = high_priority_queues_[num_thread]->
+                        get_average_thread_wait_time();
+                    ++count;
+                }
+                if (queues_.size()-1 == num_thread)
+                {
+                    result += low_priority_queue_.get_average_thread_wait_time();
+                    ++count;
+                }
+
+                result += queues_[num_thread]->get_average_thread_wait_time();
+                return result / (count + 1);
+            }
+
+            // Return the cumulative average thread wait time for all queues.
+            boost::int64_t result = 0;
+            boost::int64_t count = 0;
+            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+            {
+                result += high_priority_queues_[i]->get_average_thread_wait_time();
+                ++count;
+            }
+
+            result += low_priority_queue_.get_average_thread_wait_time();
+
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+            {
+                result += queues_[i]->get_average_thread_wait_time();
+                ++count;
+            }
+
+            return result / (count + 1);
+        }
+
+        boost::int64_t get_average_task_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            // Return average task wait time of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+
+                boost::int64_t result = 0;
+                boost::int64_t count = 0;
+                if (num_thread < high_priority_queues_.size())
+                {
+                    result = high_priority_queues_[num_thread]->
+                        get_average_task_wait_time();
+                    ++count;
+                }
+                if (queues_.size()-1 == num_thread)
+                {
+                    result += low_priority_queue_.get_average_task_wait_time();
+                    ++count;
+                }
+
+                result += queues_[num_thread]->get_average_task_wait_time();
+                return result / (count + 1);
+            }
+
+            // Return the cumulative average task wait time for all queues.
+            boost::int64_t result = 0;
+            boost::int64_t count = 0;
+            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+            {
+                result += high_priority_queues_[i]->get_average_task_wait_time();
+                ++count;
+            }
+
+            result += low_priority_queue_.get_average_task_wait_time();
+
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+            {
+                result += queues_[i]->get_average_task_wait_time();
+                ++count;
+            }
+
+            return result / (count + 1);
+        }
+#endif
 
         /// This is a function which gets called periodically by the thread
         /// manager to allow for maintenance tasks to be executed in the

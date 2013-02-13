@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/util/lockfree/deque.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
@@ -27,6 +28,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
+
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+///////////////////////////////////////////////////////////////////////////////
+// We control whether to collect queue wait times using this global bool.
+// It will be set by any of the related performance counters. Once set it 
+// stays set, thus no race conditions will occur.
+extern bool maintain_queue_wait_times;
+#endif
 
 typedef boost::lockfree::deque<thread_data*> work_item_deque_type;
 
@@ -71,7 +80,13 @@ struct thread_deque
 
     // this is the type of the queue of new tasks not yet converted to
     // threads
+// #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+//     typedef
+//         HPX_STD_TUPLE<thread_init_data, thread_state_enum, boost::uint64_t>
+//     task_description;
+// #else
     typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
+// #endif
 
     typedef boost::lockfree::deque<task_description*> task_items_type;
 
@@ -89,6 +104,10 @@ struct thread_deque
 
         while (add_count-- && dequeue(new_tasks_, task))
         {
+// #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+//             new_tasks_wait_ +=
+//                 util::high_resolution_clock::now() - HPX_STD_GET(2, *task);
+// #endif
             --new_tasks_count_;
 
             // measure thread creation time
@@ -144,6 +163,10 @@ struct thread_deque
 
         while (add_count-- && steal(addfrom->new_tasks_, task))
         {
+// #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+//             addfrom->new_tasks_wait_ +=
+//                 util::high_resolution_clock::now() - HPX_STD_GET(2, *task);
+// #endif
             --addfrom->new_tasks_count_;
 
             // measure thread creation time
@@ -223,12 +246,12 @@ struct thread_deque
     {
         {
             // delete only this many threads
-            boost::int64_t delete_count = 
+            boost::int64_t delete_count =
                 (std::max)(
-                    static_cast<boost::int64_t>(terminated_items_count_ / 10), 
+                    static_cast<boost::int64_t>(terminated_items_count_ / 10),
                     static_cast<boost::int64_t>(max_delete_count));
             thread_id_type todelete;
-            while ((delete_all || delete_count) && 
+            while ((delete_all || delete_count) &&
                 terminated_items_.dequeue(todelete))
             {
                 --terminated_items_count_;
@@ -262,6 +285,9 @@ struct thread_deque
                   : max_count),
         new_tasks_(128),
         new_tasks_count_(0),
+// #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+//         new_tasks_wait_(0),
+// #endif
         memory_pool_(64),
         add_new_logger_("thread_deque::add_new")
     {}
@@ -288,6 +314,24 @@ struct thread_deque
     {
         return new_tasks_count_;
     }
+
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+    boost::uint64_t get_average_task_wait_time() const
+    {
+//         boost::uint64_t count = new_tasks_wait_count_;
+//         if (count != 0)
+//             return new_tasks_wait_ / count;
+        return 0;
+    }
+
+    boost::uint64_t get_average_thread_wait_time() const
+    {
+//         boost::uint64_t count = work_items_wait_count_;
+//         if (count != 0)
+//             return work_items_wait_ / count;
+        return 0;
+    }
+#endif
 
     // create a new thread and schedule it if the initial state is equal to
     // pending
@@ -328,8 +372,15 @@ struct thread_deque
 
         // do not execute the work, but register a task description for
         // later thread creation
-        enqueue(new_tasks_,
-            new task_description(boost::move(data), initial_state));
+// #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+//         enqueue(new_tasks_, new task_description(
+//             boost::move(data), initial_state,
+//             util::high_resolution_clock::now()
+//         ));
+// #else
+        enqueue(new_tasks_, new task_description(
+            boost::move(data), initial_state));
+// #endif
         ++new_tasks_count_;
 
         if (&ec != &throws)
@@ -442,7 +493,7 @@ struct thread_deque
                 // Before exiting each of the OS threads deletes the
                 // remaining terminated PX threads
                 bool canexit = cleanup_terminated_locked(true);
-                if (!running && canexit) 
+                if (!running && canexit)
                     return true;
 
 //                 LTM_(debug) << "tfunc(" << num_thread
@@ -532,6 +583,9 @@ private:
     std::size_t max_count_;             ///< maximum number of existing PX-threads
     task_items_type new_tasks_;         ///< list of new tasks to run
     boost::atomic<boost::int64_t> new_tasks_count_;     ///< count of new tasks to run
+// #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+//     boost::atomic<boost::int64_t> new_tasks_wait_;      ///< overall wait time of new tasks
+// #endif
 
     threads::thread_pool memory_pool_;  ///< OS thread local memory pools for
                                         ///< PX-threads
