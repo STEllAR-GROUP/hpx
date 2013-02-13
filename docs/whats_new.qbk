@@ -35,6 +35,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 698] - compilation failure with hwloc absent
 * [issue 697] - Performance counter counts should be zero indexed
 * [issue 696] - Distributed problem
+* [issue 695] - Bad perf counter time printed
 * [issue 693] - `--help` doesn't print component specific command line options
 * [issue 691] - exception while executing any application linked with hwloc
 * [issue 689] - Make the buildbots use hwloc
