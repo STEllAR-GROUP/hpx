@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-char* argv[] =
+char const* argv[] =
 {
     "command_line_argument_test",
     "nx=1",
@@ -29,6 +29,6 @@ int hpx_main(int argc, char** argv_init)
 
 int main()
 {
-    HPX_TEST_EQ(hpx::init(3, argv), 0);
+    HPX_TEST_EQ(hpx::init(3, (char**)argv), 0);
     return hpx::util::report_errors();
 }
