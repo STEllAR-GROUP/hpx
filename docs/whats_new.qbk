@@ -18,6 +18,8 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 710] - Error "timed out while trying to find room in the connection cache" when trying to start multiple localities on a single computer
+* [issue 383] - Change result type detection for hpx::util::bind to use result_of protocol
 * [issue 709] - Add new threadstate 'staged' referring to task descriptions
 * [issue 708] - Detect/mitigate bad non-system installs of GCC on Redhat systems
 * [issue 707] - Many examples do not link with Git HEAD version
