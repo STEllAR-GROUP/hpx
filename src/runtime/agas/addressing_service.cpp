@@ -234,7 +234,7 @@ bool addressing_service::register_locality(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::allocate", e.what());
+                "addressing_service::register_locality", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
