@@ -18,13 +18,15 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 709] - Add new threadstate 'staged' referring to task descriptions
 * [issue 708] - Detect/mitigate bad non-system installs of GCC on Redhat systems
 * [issue 707] - Many examples do not link with Git HEAD version
-* [issue 706] - `hpx::init` removes portions of non-option command line 
+* [issue 706] - `hpx::init` removes portions of non-option command line
                 arguments before last `=` sign
-* [issue 705] - Create rolling average and median aggregating performance 
+* [issue 705] - Create rolling average and median aggregating performance
                 counters
-* [issue 703] - Add support to HPX build system to find librcrtool.a and 
+* [issue 704] - Create performance counter to expose thread queue waiting time
+* [issue 703] - Add support to HPX build system to find librcrtool.a and
                 related headers
 * [issue 698] - compilation failure with hwloc absent
 * [issue 697] - Performance counter counts should be zero indexed
