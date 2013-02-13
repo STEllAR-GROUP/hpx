@@ -79,7 +79,7 @@ int app_main(
         // Start the clock.
         high_resolution_timer t;
 
-        invoke_worker(delay, &d);
+        worker(delay, &d);
 
         results(t.elapsed());
     }
