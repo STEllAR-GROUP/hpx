@@ -16,6 +16,8 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -55,13 +57,12 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-extern "C" void worker(
+extern "C" void worker_func(
     void*
     )
 {
     double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
+    worker(delay, &d);
 
     swarm_satisfy(&flag, 1);
 }
@@ -92,7 +93,7 @@ extern "C" void spawner(
     swarm_dependency_init(&flag, tasks, finish, p);
 
     for (boost::uint64_t i = 0; i < tasks; ++i)
-        swarm_scheduleGeneral(worker, 0);
+        swarm_scheduleGeneral(worker_func, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

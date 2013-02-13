@@ -12,5 +12,6 @@
 #include <boost/cstdint.hpp>
 
 HPX_SYMBOL_EXPORT void worker(boost::uint64_t delay, volatile double * d);
+HPX_SYMBOL_EXPORT double invoke_worker(boost::uint64_t delay);
 
 #endif

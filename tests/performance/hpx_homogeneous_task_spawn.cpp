@@ -60,15 +60,6 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// avoid to have one single volatile variable to become a contention point
-double invoke_worker(boost::uint64_t delay)
-{
-    volatile double d = 0;
-    worker(delay, &d);
-    return d;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
     )

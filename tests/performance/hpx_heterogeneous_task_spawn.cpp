@@ -76,15 +76,6 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// avoid to have one single volatile variable to become a contention point
-double invoke_worker(boost::uint64_t delay)
-{
-    volatile double d = 0;
-    worker(delay, &d);
-    return d;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t shuffler(
     boost::random::mt19937_64& prng
   , boost::uint64_t high
