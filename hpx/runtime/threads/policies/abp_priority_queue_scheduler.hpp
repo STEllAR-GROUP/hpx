@@ -372,13 +372,94 @@ namespace hpx { namespace threads { namespace policies
         boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
-            return 0;
+            // Return average thread wait time of one specific queue.
+            boost::uint64_t wait_time = 0;
+            boost::uint64_t count = 0;
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+
+                if (num_thread < high_priority_queues_.size()) 
+                {
+                    wait_time = high_priority_queues_[num_thread]->
+                        get_average_thread_wait_time();
+                    ++count;
+                }
+
+                if (queues_.size()-1 == num_thread)
+                {
+                    wait_time += low_priority_queue_.
+                        get_average_thread_wait_time();
+                    ++count;
+                }
+
+                wait_time += queues_[num_thread]->get_average_thread_wait_time();
+                return wait_time / (count + 1);
+            }
+
+            // Return the cumulative average thread wait time for all queues.
+            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+            {
+                wait_time += high_priority_queues_[i]->get_average_thread_wait_time();
+                ++count;
+            }
+
+            wait_time += low_priority_queue_.get_average_thread_wait_time();
+
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+            {
+                wait_time += queues_[i]->get_average_thread_wait_time();
+                ++count;
+            }
+
+            return wait_time / (count + 1);
         }
 
         boost::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
-            return 0;
+            // Return average task wait time of one specific queue.
+            boost::uint64_t wait_time = 0;
+            boost::uint64_t count = 0;
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+
+                if (num_thread < high_priority_queues_.size()) 
+                {
+                    wait_time = high_priority_queues_[num_thread]->
+                        get_average_task_wait_time();
+                    ++count;
+                }
+
+                if (queues_.size()-1 == num_thread)
+                {
+                    wait_time += low_priority_queue_.
+                        get_average_task_wait_time();
+                    ++count;
+                }
+
+                wait_time += queues_[num_thread]->get_average_task_wait_time();
+                return wait_time / (count + 1);
+            }
+
+            // Return the cumulative average task wait time for all queues.
+            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+            {
+                wait_time += high_priority_queues_[i]->
+                    get_average_task_wait_time();
+                ++count;
+            }
+
+            wait_time += low_priority_queue_.get_average_task_wait_time();
+
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+            {
+                wait_time += queues_[i]->get_average_task_wait_time();
+                ++count;
+            }
+
+            return wait_time / (count + 1);
         }
 #endif
 

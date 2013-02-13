@@ -90,13 +90,13 @@ namespace hpx { namespace threads { namespace policies
         boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
-            return 0;
+            return queue_.get_average_thread_wait_time();
         }
 
         boost::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
-            return 0;
+            return queue_.get_average_task_wait_time();
         }
 #endif
 

@@ -161,13 +161,37 @@ namespace hpx { namespace threads { namespace policies
         boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
-            return 0;
+            // Return average thread wait time of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+                return queues_[num_thread]->get_average_thread_wait_time();
+            }
+
+            // Return the cumulative average thread wait time for all queues.
+            boost::int64_t wait_time = 0;
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                wait_time += queues_[i]->get_average_thread_wait_time();
+
+            return wait_time / queues_.size();
         }
 
         boost::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
-            return 0;
+            // Return average task wait time of one specific queue.
+            if (std::size_t(-1) != num_thread)
+            {
+                BOOST_ASSERT(num_thread < queues_.size());
+                return queues_[num_thread]->get_average_task_wait_time();
+            }
+
+            // Return the cumulative average task wait time for all queues.
+            boost::int64_t wait_time = 0;
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                wait_time += queues_[i]->get_average_task_wait_time();
+
+            return wait_time / queues_.size();
         }
 #endif
 

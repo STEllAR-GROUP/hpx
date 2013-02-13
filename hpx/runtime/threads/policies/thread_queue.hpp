@@ -33,7 +33,7 @@ namespace hpx { namespace threads { namespace policies
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
     ///////////////////////////////////////////////////////////////////////////
     // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it 
+    // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
     extern bool maintain_queue_wait_times;
 #endif
@@ -395,17 +395,17 @@ namespace hpx { namespace threads { namespace policies
         boost::uint64_t get_average_task_wait_time() const
         {
             boost::uint64_t count = new_tasks_wait_count_;
-            if (count != 0)
-                return new_tasks_wait_ / count;
-            return 0;
+            if (count == 0)
+                return 0;
+            return new_tasks_wait_ / count;
         }
 
         boost::uint64_t get_average_thread_wait_time() const
         {
             boost::uint64_t count = work_items_wait_count_;
-            if (count != 0)
-                return work_items_wait_ / count;
-            return 0;
+            if (count == 0)
+                return 0;
+            return work_items_wait_ / count;
         }
 #endif
 
