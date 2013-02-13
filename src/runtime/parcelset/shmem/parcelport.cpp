@@ -244,16 +244,15 @@ namespace hpx { namespace parcelset { namespace shmem
             e.second.push_back(f);
         }
 
-        error_code ec;
+        error_code ec(lightweight);
         parcelport_connection_ptr client_connection =
             get_connection(locality_id, ec);
 
         if (!client_connection)
         {
-            // We can safely return at this point if no connection is
-            // available at this point. As soon as a connection becomes
-            // available it checks for pending parcels and sends those 
-            // out.
+            // We can safely return if no connection is available at this point.
+            // As soon as a connection becomes available it checks for pending
+            // parcels and sends those out.
             return;
         }
 
