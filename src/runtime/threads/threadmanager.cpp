@@ -1582,7 +1582,7 @@ namespace hpx { namespace threads
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::thread_wait_time_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
-              "[ns]"
+              "ns"
             },
             // average task wait time for queue(s)
             { "/threads/wait-time/staged", performance_counters::counter_raw,
@@ -1591,7 +1591,7 @@ namespace hpx { namespace threads
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::task_wait_time_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
-              "[ns]"
+              "ns"
             },
 #endif
             // idle rate
