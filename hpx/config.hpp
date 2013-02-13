@@ -298,6 +298,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// By default enable collecting queue wait times
+#if !defined(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
+#  define HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 1
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, always enable storing the thread data.
 #if !defined(HPX_THREAD_MAINTAIN_THREAD_DATA)
 #  define HPX_THREAD_MAINTAIN_THREAD_DATA 1

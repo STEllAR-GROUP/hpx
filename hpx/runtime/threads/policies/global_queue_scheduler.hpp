@@ -85,6 +85,21 @@ namespace hpx { namespace threads { namespace policies
             return queue_.abort_all_suspended_threads(0);
         }
 
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+        ///////////////////////////////////////////////////////////////////////
+        boost::int64_t get_average_thread_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            return 0;
+        }
+
+        boost::int64_t get_average_task_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            return 0;
+        }
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         bool cleanup_terminated(bool delete_all = false)
         {

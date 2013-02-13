@@ -139,6 +139,21 @@ struct abp_queue_scheduler : boost::noncopyable
         return result;
     }
 
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+    ///////////////////////////////////////////////////////////////////////////
+    boost::int64_t get_average_thread_wait_time(
+        std::size_t num_thread = std::size_t(-1)) const
+    {
+        return 0;
+    }
+
+    boost::int64_t get_average_task_wait_time(
+        std::size_t num_thread = std::size_t(-1)) const
+    {
+        return 0;
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     void abort_all_suspended_threads()
     {

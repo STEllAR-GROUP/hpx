@@ -315,10 +315,10 @@ namespace hpx { namespace threads { namespace policies
                 BOOST_ASSERT(num_thread < queues_.size());
 
                 if (num_thread < high_priority_queues_.size())
-                    count = high_priority_queues_[num_thread]->get_thread_count();
+                    count = high_priority_queues_[num_thread]->get_queue_length();
 
                 if (num_thread == queues_.size()-1)
-                    count += low_priority_queue_.get_thread_count();
+                    count += low_priority_queue_.get_queue_length();
 
                 return count + queues_[num_thread]->get_queue_length();
             }
@@ -366,6 +366,21 @@ namespace hpx { namespace threads { namespace policies
 
             return count;
         }
+
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+        ///////////////////////////////////////////////////////////////////////
+        boost::int64_t get_average_thread_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            return 0;
+        }
+
+        boost::int64_t get_average_task_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            return 0;
+        }
+#endif
 
         // Note that this is more like terminate_or_add_new
         bool wait_or_add_new(std::size_t num_thread, bool running,
