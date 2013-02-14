@@ -374,10 +374,10 @@ namespace hpx { namespace threads
             {
                 if (hwloc_compare_types(obj->type, type) == 0)
                 {
-                    if (obj->os_index != ~0x0u)
+                    // on Windows os_index is always -1
+                    if (obj->logical_index == ~0x0u)
                         return static_cast<std::size_t>(obj->os_index);
 
-                    // on Windows os_index is always -1
                     return static_cast<std::size_t>(obj->logical_index);
                 }
                 obj = obj->parent;
