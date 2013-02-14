@@ -425,8 +425,13 @@ in the section __hello_world_example__.
     APP_PATH=~/packages/hpx/bin/hello_world
     APP_OPTIONS=
 
-    __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+    __pbsdsh__ -u $APP_PATH $APP_OPTIONS ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE`
 ```
+
+[caution If the first application specific argument (inside `$APP_OPTIONS`)
+         is a non-option (i.e. does not start with a '`-`' or a '`--`', then those
+         have to be placed before the option [hpx_cmdline --hpx:nodes], which
+         in this case should be the last option on the command line.]
 
 The [^#PBS -l nodes=2:ppn=4] directive will cause two compute nodes to be
 allocated for the application, as specified int the option [^nodes]. Each of the
@@ -480,7 +485,7 @@ Now, we invoke this script using the __pbsdsh__ tool:
     APP_PATH=~/packages/hpx/bin/hello_world
     APP_OPTIONS=
 
-    __pbsdsh__ -u runme.sh $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+    __pbsdsh__ -u runme.sh $APP_PATH $APP_OPTIONS ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` 
 ```
 
 All that remains now is submitting the job to the queuing system. Assuming that
