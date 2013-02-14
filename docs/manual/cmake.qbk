@@ -263,7 +263,8 @@ variables are used more seldom and are mainly useful for debugging purposes.
     ]
     [[`HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH:STRING`]
      [Sets the depth of the stack back-traces captured during thread suspension
-      (default: `5`).]
+      (default: `5`). This value is only meaningful if the CMake variable
+      `HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION` is set to `ON`.]
     ]
     [[`HPX_USE_ITT_NOTIFY:BOOL`]
      [Sets whether __hpx__ supports integration with the diagnostic tools of
@@ -279,6 +280,11 @@ variables are used more seldom and are mainly useful for debugging purposes.
       partially preprocessed files that are part of __hpx__. The default value
       for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]
+    ]
+    [[`HPX_USE_SHMEM_PARCELPORT:BOOL`]
+     [Sets whether the experimental implementation of a parcelport communicating
+      over shared memory will be enabled or not. This vaiable is set to `OFF`
+      by default.]
     ]
 ]
 

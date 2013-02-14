@@ -74,10 +74,11 @@ system and application performance.
 [/////////////////////////////////////////////////////////////////////////////]
 [table Parcel Layer Performance Counters
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
-    [   [`/data/count/<operation>`
+    [   [`/data/count/<connection_type>/<operation>`
 
           where:[br] `<operation>` is one of the following:
-          `sent`, `received`
+          `sent`, `received`[br]
+          `<connection type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -87,27 +88,19 @@ system and application performance.
         ]
         [None]
         [Returns the overall number of bytes of memory consumed by the messages
-         (see `<operation>`, e.g. `sent` or `received`).]
+         (see `<operation>`, e.g. `sent` or `received`) for the specified
+         `<connection_type>`.
+
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
     ]
-    [   [`/serialize/count/<operation>`
+    [   [`/data/time/<connection_type>/<operation>`
 
           where:[br] `<operation>` is one of the following:
-          `sent`, `received`
-        ]
-        [`locality#*/total`
-
-          where:[br] `*` is the locality id of the locality the overall number of
-          transmitted bytes should be queried for. The locality id is a (zero
-          based) number identifying the locality.
-        ]
-        [None]
-        [Returns the overall number of bytes transferred (see `<operation>`,
-         e.g. `sent` or `received`) over the network by the given locality.]
-    ]
-    [   [`/data/time/<operation>`
-
-          where:[br] `<operation>` is one of the following:
-          `sent`, `received`
+          `sent`, `received`[br]
+          `<connection type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -117,14 +110,86 @@ system and application performance.
         ]
         [None]
         [Returns the total time (in nanoseconds) between the start of each
-         asynchronous network operation and the end of the corresponding
-         transfer operation the given locality (see `<operation>`, e.g. `sent`
-         or `received`).]
+         asynchronous transmission operation and the end of the corresponding
+         operation for the specified `<connection_type>` the given locality
+         (see `<operation>`, e.g. `sent` or `received`).
+
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
     ]
-    [   [`/messages/count/<operation>`
+    [   [`/serialize/count/<connection_type>/<operation>`
 
           where:[br] `<operation>` is one of the following:
-          `sent`, `received`
+          `sent`, `received`[br]
+          `<connection type>` is one of the following: `tcp`, `shmem`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the overall number of
+          transmitted bytes should be queried for. The locality id is a (zero
+          based) number identifying the locality.
+        ]
+        [None]
+        [Returns the overall number of bytes transferred (see `<operation>`,
+         e.g. `sent` or `received`)  for the specified `<connection_type>` by
+         the given locality.
+
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
+    ]
+    [   [`/serialize/time/<connection_type>/<operation>`
+
+          where:[br] `<operation>` is one of the following:
+          `sent`, `received`[br]
+          `<connection type>` is one of the following: `tcp`, `shmem`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the serialization time
+          should be queried for. The locality id is a (zero based) number
+          identifying the locality.
+        ]
+        [None]
+        [Returns the overall time spent performing outgoing data serialization
+         for the specified `<connection_type>`on the given locality (see
+         `<operation>`, e.g. `sent` or `received`).
+
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
+    ]
+    [   [`/parcels/count/<connection_type>/<operation>`
+
+          where:[br] `<operation>` is one of the following:
+          `sent`, `received`[br]
+          `<connection type>` is one of the following: `tcp`, `shmem`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of parcels
+          should be queried for. The locality id is a (zero based) number
+          identifying the locality.
+        ]
+        [None]
+        [Returns the overall number of parcels transferred using the specified
+         `<connection_type>` by the given locality (see `<operation>`, e.g.
+         `sent` or `received`).
+
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
+    ]
+    [   [`/messages/count/<connection_type>/<operation>`
+
+          where:[br] `<operation>` is one of the following:
+          `sent`, `received`[br]
+          `<connection type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -134,24 +199,14 @@ system and application performance.
         ]
         [None]
         [Returns the overall number of messages [footnote A message can
-         potentially consist of more than one parcel.] transferred over the
-         network by the given locality (see `<operation>`, e.g. `sent` or
-         `received`).]
-    ]
-    [   [`/parcels/count/<operation>`
+         potentially consist of more than one parcel.] transferred using
+         the specified `<connection_type>` by the given locality (see
+         `<operation>`, e.g. `sent` or `received`).
 
-          where:[br] `<operation>` is one of the following:
-          `sent`, `received`
-        ]
-        [`locality#*/total`
-
-          where:[br] `*` is the locality id of the locality the number of parcels
-          should be queried for. The locality id is a (zero based) number
-          identifying the locality.
-        ]
-        [None]
-        [Returns the overall number of parcels transferred over the network by
-         the given locality (see `<operation>`, e.g. `sent` or `received`).]
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
     ]
     [   [`/parcelqueue/length/<operation>`
 
@@ -167,21 +222,6 @@ system and application performance.
         [None]
         [Returns the current number of parcels stored in the parcel queue  (see
          `<operation>` for which queue to query, e.g. `send` or `receive`).]
-    ]
-    [   [`/serialize/time/<operation>`
-
-          where:[br] `<operation>` is one of the following:
-          `sent`, `received`
-        ]
-        [`locality#*/total`
-
-          where:[br] `*` is the locality id of the locality the serialization time
-          should be queried for. The locality id is a (zero based) number
-          identifying the locality.
-        ]
-        [None]
-        [Returns the overall time spent performing outgoing data serialization
-         on the given locality (see `<operation>`, e.g. `sent` or `received`).]
     ]
 ]
 
@@ -488,8 +528,8 @@ system and application performance.
     [   [`/statistics/median`]
         [Any full performance counter name. The referenced performance counter
          is queried at fixed time intervals as specified by the first parameter.]
-        [Returns the current (statistically estimated) median value calculated 
-         based on the values queried from the underlying counter (the one 
+        [Returns the current (statistically estimated) median value calculated
+         based on the values queried from the underlying counter (the one
          specified as the instance name).]
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If

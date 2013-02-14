@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -249,7 +249,7 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 
         error_code ec;
-        parcelport_connection_ptr client_connection = 
+        parcelport_connection_ptr client_connection =
             get_connection(locality_id, ec);
 
         if (!client_connection)
