@@ -52,7 +52,7 @@ namespace hpx { namespace threads
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t socket = init_socket_number(i);
-            BOOST_ASSERT(socket <= num_of_sockets);
+            BOOST_ASSERT(socket < num_of_sockets);
             socket_numbers_.push_back(socket);
         }
 
@@ -61,7 +61,7 @@ namespace hpx { namespace threads
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
-            BOOST_ASSERT(numa_node <= num_of_nodes);
+            BOOST_ASSERT(numa_node < num_of_nodes);
             numa_node_numbers_.push_back(numa_node);
         }
 
@@ -70,7 +70,7 @@ namespace hpx { namespace threads
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t core_number = init_core_number(i);
-            BOOST_ASSERT(core_number <= num_of_cores);
+            BOOST_ASSERT(core_number < num_of_cores);
             core_numbers_.push_back(core_number);
         }
 
