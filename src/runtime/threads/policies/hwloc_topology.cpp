@@ -48,29 +48,29 @@ namespace hpx { namespace threads
         // compiler will optimize the loops where possible anyways.
 
         std::size_t num_of_sockets = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
-        if(num_of_sockets == 0) num_of_sockets = 1;
+        if (num_of_sockets == 0) num_of_sockets = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t socket = init_socket_number(i);
-            BOOST_ASSERT(socket < num_of_sockets);
+            BOOST_ASSERT(socket <= num_of_sockets);
             socket_numbers_.push_back(socket);
         }
 
         std::size_t num_of_nodes = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
-        if(num_of_nodes == 0) num_of_nodes = 1;
+        if (num_of_nodes == 0) num_of_nodes = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
-            BOOST_ASSERT(numa_node < num_of_nodes);
+            BOOST_ASSERT(numa_node <= num_of_nodes);
             numa_node_numbers_.push_back(numa_node);
         }
 
         std::size_t num_of_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
-        if(num_of_cores == 0) num_of_cores = 1;
+        if (num_of_cores == 0) num_of_cores = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t core_number = init_core_number(i);
-            BOOST_ASSERT(core_number < num_of_cores);
+            BOOST_ASSERT(core_number <= num_of_cores);
             core_numbers_.push_back(core_number);
         }
 
