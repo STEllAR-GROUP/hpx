@@ -18,11 +18,14 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 713] - Add performance counters monitoring connection caches
+* [issue 712] - Adjust parcel related performance counters to be connection type
+                specific
 * [issue 711] - configuration failure
 * [issue 710] - Error "timed out while trying to find room in the connection
                 cache" when trying to start multiple localities on a single
                 computer
-* [issue 709] - Add new threadstate 'staged' referring to task descriptions
+* [issue 709] - Add new thread state 'staged' referring to task descriptions
 * [issue 708] - Detect/mitigate bad non-system installs of GCC on Redhat systems
 * [issue 707] - Many examples do not link with Git HEAD version
 * [issue 706] - `hpx::init` removes portions of non-option command line
