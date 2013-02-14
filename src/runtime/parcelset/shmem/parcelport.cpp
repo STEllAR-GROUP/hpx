@@ -460,6 +460,33 @@ namespace hpx { namespace parcelset { namespace shmem
         return client_connection;
     }
 
+    /// Return the given connection cache statistic
+    boost::int64_t parcelport::get_connection_cache_statistics(
+        connection_cache_statistics_type t) const
+    {
+        switch (t) {
+        case connection_cache_insertions:
+            return connection_cache_.get_cache_insertions();
+
+        case connection_cache_evictions:
+            return connection_cache_.get_cache_evictions();
+
+        case connection_cache_hits:
+            return connection_cache_.get_cache_hits();
+
+        case connection_cache_misses:
+            return connection_cache_.get_cache_misses();
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "tcp::parcelport::get_connection_cache_statistics",
+            "invalid connection cache statistics type");
+        return 0;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void decode_message(parcelport& pp,
         parcelset::shmem::data_buffer parcel_data,

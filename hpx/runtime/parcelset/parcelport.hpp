@@ -116,6 +116,23 @@ namespace hpx { namespace parcelset
             return 0;     // by default no thread pool is used
         }
 
+        /// Return the given connection cache statistic
+        enum connection_cache_statistics_type
+        {
+            connection_cache_insertions = 0,
+            connection_cache_evictions = 1,
+            connection_cache_hits = 2,
+            connection_cache_misses = 3
+        };
+
+        virtual boost::int64_t
+        get_connection_cache_statistics(connection_cache_statistics_type) const
+        {
+            // by default this parcelport does not expose any conenction cache 
+            // statistics
+            return 0;
+        }
+
         /// Register an event handler to be called whenever a parcel has been
         /// received.
         ///

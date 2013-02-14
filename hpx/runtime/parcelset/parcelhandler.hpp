@@ -395,6 +395,9 @@ namespace hpx { namespace parcelset
         // total data (type only) received (bytes)
         std::size_t get_total_type_received(connection_type) const;
 
+        boost::int64_t get_connection_cache_statistics(connection_type pp_type,
+            parcelport::connection_cache_statistics_type stat_type) const;
+
     protected:
         std::size_t get_incoming_queue_length() const
         {

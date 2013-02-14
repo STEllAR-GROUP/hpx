@@ -94,6 +94,10 @@ namespace hpx { namespace parcelset { namespace shmem
         /// Return the thread pool if the name matches
         util::io_service_pool* get_thread_pool(char const* name);
 
+        /// Return the given connection cache statistic
+        boost::int64_t get_connection_cache_statistics(
+            connection_cache_statistics_type t) const;
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,

@@ -67,7 +67,7 @@ system and application performance.
         ]
         [None]
         [Returns the number of cache events (evictions, hits, inserts, and
-         misses) in the AGAS cache of the specified locality.]
+         misses) in the AGAS cache of the specified locality (see `<cache_statistics>`.]
     ]
 ]
 
@@ -78,7 +78,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection type>` is one of the following: `tcp`, `shmem`
+          `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -100,7 +100,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection type>` is one of the following: `tcp`, `shmem`
+          `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -123,7 +123,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection type>` is one of the following: `tcp`, `shmem`
+          `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -145,7 +145,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection type>` is one of the following: `tcp`, `shmem`
+          `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -167,7 +167,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection type>` is one of the following: `tcp`, `shmem`
+          `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -189,7 +189,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection type>` is one of the following: `tcp`, `shmem`
+          `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
 
@@ -202,6 +202,29 @@ system and application performance.
          potentially consist of more than one parcel.] transferred using
          the specified `<connection_type>` by the given locality (see
          `<operation>`, e.g. `sent` or `received`).
+
+         The performance counters for the conenction type `shmem` are available
+         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.]
+    ]
+    [   [`/parcelport/count/<connection_type>/<cache_statistics>`
+
+          where:[br] `<cache_statistics>` is one of the following:
+          `cache-insertions`, `cache-evictions`, `cache-hits`, `cache-misses`[br]
+          `<connection_type>` is one of the following: `tcp`, `shmem`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of messages
+          should be queried for. The locality id is a (zero based) number
+          identifying the locality.
+        ]
+        [None]
+        [Returns the overall number cache events (evictions, hits, inserts, and
+         misses) for the connection cache of the given connection type on the
+         given locality (see `<cache_statistics>`, e.g. `cache-insertions`,
+         `cache-evictions`, `cache-hits`, or `cache-misses`).
 
          The performance counters for the conenction type `shmem` are available
          only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was

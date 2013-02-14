@@ -471,6 +471,15 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_total_type_received() : 0;
     }
 
+    // connection stack statistics
+    boost::int64_t parcelhandler::get_connection_cache_statistics(
+        connection_type pp_type, parcelport::connection_cache_statistics_type stat_type) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_connection_cache_statistics(stat_type) : 0;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::register_counter_types()
     {
@@ -543,6 +552,19 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t()> data_type_received(
             boost::bind(&parcelhandler::get_total_type_received, this, pp_type));
 
+        HPX_STD_FUNCTION<boost::int64_t()> cache_insertions(
+            boost::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_insertions));
+        HPX_STD_FUNCTION<boost::int64_t()> cache_evictions(
+            boost::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_evictions));
+        HPX_STD_FUNCTION<boost::int64_t()> cache_hits(
+            boost::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_hits));
+        HPX_STD_FUNCTION<boost::int64_t()> cache_misses(
+            boost::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_misses));
+
         std::string connection_type_name(get_connection_type_name(pp_type));
         performance_counters::generic_counter_type_data const counter_types[] =
         {
@@ -591,7 +613,7 @@ namespace hpx { namespace parcelset
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time between the start of "
                   "each asynchronous write and the invocation of the write callback "
-                  "using the %s connection type for the referenced locality") % 
+                  "using the %s connection type for the referenced locality") %
                       connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -603,7 +625,7 @@ namespace hpx { namespace parcelset
               performance_counters::counter_raw,
               boost::str(boost::format("returns the total time between the start of "
                   "each asynchronous read and the invocation of the read callback "
-                  "using the %s connection type for the referenced locality") % 
+                  "using the %s connection type for the referenced locality") %
                       connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -637,7 +659,7 @@ namespace hpx { namespace parcelset
             { boost::str(boost::format("/data/count/%s/sent") % connection_type_name),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of parcel argument data sent "
-                  "using the %s connection type by the referenced locality") % 
+                  "using the %s connection type by the referenced locality") %
                       connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -648,7 +670,7 @@ namespace hpx { namespace parcelset
             { boost::str(boost::format("/data/count/%s/received") % connection_type_name),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of parcel argument data received "
-                  "using the %s connection type by the referenced locality") % 
+                  "using the %s connection type by the referenced locality") %
                       connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -678,6 +700,51 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
+
+            { boost::str(boost::format("/parcelport/count/%s/cache-insertions") % connection_type_name),
+              performance_counters::counter_raw,
+              boost::str(boost::format("returns the number of cache insertions while accessing "
+                  "the connection cache for the %s connection type on the referenced "
+                  "locality") % connection_type_name),
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, cache_insertions, _2),
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
+            },
+            { boost::str(boost::format("/parcelport/count/%s/cache-evictions") % connection_type_name),
+              performance_counters::counter_raw,
+              boost::str(boost::format("returns the number of cache evictions while accessing "
+                  "the connection cache for the %s connection type on the referenced "
+                  "locality") % connection_type_name),
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, cache_evictions, _2),
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
+            },
+            { boost::str(boost::format("/parcelport/count/%s/cache-hits") % connection_type_name),
+              performance_counters::counter_raw,
+              boost::str(boost::format("returns the number of cache hits while accessing "
+                  "the connection cache for the %s connection type on the referenced "
+                  "locality") % connection_type_name),
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, cache_hits, _2),
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
+            },
+            { boost::str(boost::format("/parcelport/count/%s/cache-misses") % connection_type_name),
+              performance_counters::counter_raw,
+              boost::str(boost::format("returns the number of cache misses while accessing "
+                  "the connection cache for the %s connection type on the referenced "
+                  "locality") % connection_type_name),
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, cache_misses, _2),
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
