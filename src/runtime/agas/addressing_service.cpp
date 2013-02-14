@@ -232,14 +232,7 @@ bool addressing_service::register_locality(
         return true;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::register_locality", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_locality");
         return false;
     }
 } // }}}
@@ -264,14 +257,7 @@ boost::uint32_t addressing_service::resolve_locality(
         return rep.get_locality_id();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::resolve_locality", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_locality");
         return 0;
     }
 } // }}}
@@ -298,14 +284,7 @@ bool addressing_service::unregister_locality(
         return true;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::unregister_locality", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::unregister_locality");
         return false;
     }
 } // }}}
@@ -366,14 +345,7 @@ bool addressing_service::get_console_locality(
         return false;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_console_locality", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_console_locality");
         return false;
     }
 } // }}}
@@ -436,14 +408,7 @@ bool addressing_service::get_localities(
         }
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_locality_ids", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_locality_ids");
         return false;
     }
 } // }}}
@@ -494,13 +459,7 @@ boost::uint32_t addressing_service::get_num_localities(
         return rep.get_num_localities();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_num_localities", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_localities");
     }
     return boost::uint32_t(-1);
 } // }}}
@@ -541,13 +500,7 @@ boost::uint32_t addressing_service::get_num_overall_threads(
         return rep.get_num_overall_threads();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_num_overall_threads", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_overall_threads");
     }
     return boost::uint32_t(-1);
 } // }}}
@@ -578,13 +531,7 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
         return rep.get_num_threads();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_num_threads", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_threads");
     }
     return std::vector<boost::uint32_t>();
 } // }}}
@@ -618,14 +565,7 @@ components::component_type addressing_service::get_component_id(
         return rep.get_component_type();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_component_id", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_component_id");
         return components::component_invalid;
     }
 } // }}}
@@ -644,14 +584,7 @@ void addressing_service::iterate_types(
             hosted->component_ns_.service(req, action_priority_, ec);
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::iterate_types"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_types");
     }
 } // }}}
 
@@ -672,14 +605,7 @@ std::string addressing_service::get_component_type_name(
         return rep.get_component_typename();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::iterate_types"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_types");
     }
     return "<unknown>";
 } // }}}
@@ -705,14 +631,7 @@ components::component_type addressing_service::register_factory(
         return rep.get_component_type();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::register_factory", e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_factory");
         return components::component_invalid;
     }
 } // }}}
@@ -847,15 +766,7 @@ bool addressing_service::get_id_range(
             f->set_exception(boost::current_exception());
         }
 
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::get_id_range"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::get_id_range");
         return false;
     }
 } // }}}
@@ -948,15 +859,7 @@ bool addressing_service::bind_range(
             f->set_exception(boost::current_exception());
         }
 
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::bind_range"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::bind_range");
         return false;
     }
 } // }}}
@@ -994,15 +897,7 @@ bool addressing_service::unbind_range(
         return true;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::unbind_range"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::unbind_range");
         return false;
     }
 } // }}}
@@ -1231,15 +1126,7 @@ bool addressing_service::resolve_full(
         return true;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-                , "addressing_service::resolve_full"
-                , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_full");
         return false;
     }
 } // }}}
@@ -1405,15 +1292,7 @@ bool addressing_service::resolve_full(
         return true;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-                , "addressing_service::resolve_full"
-                , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_full");
         return false;
     }
 }
@@ -1485,15 +1364,7 @@ void addressing_service::incref(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::incref",
-                e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
-        return;
+        HPX_RETHROWS_IF(ec, e, "addressing_service::incref");
     }
 } // }}}
 
@@ -1521,15 +1392,7 @@ void addressing_service::decref(
         increment_refcnt_requests(l, ec);
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::decref",
-                e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
-        return;
+        HPX_RETHROWS_IF(ec, e, "addressing_service::decref");
     }
 } // }}}
 
@@ -1552,15 +1415,7 @@ bool addressing_service::register_name(
         return !ec && (success == rep.get_status());
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::register_name"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::register_name");
         return false;
     }
 } // }}}
@@ -1639,15 +1494,7 @@ bool addressing_service::unregister_name(
         return false;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::unregister_name"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::unregister_name");
         return false;
     }
 } // }}}
@@ -1687,15 +1534,7 @@ bool addressing_service::resolve_name(
             return false;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::resolve_name"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_name");
         return false;
     }
 } // }}}
@@ -1727,15 +1566,7 @@ bool addressing_service::iterate_ids(
         return !ec && (success == rep.get_status());
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::iterate_ids"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_ids");
         return false;
     }
 } // }}}
@@ -1788,14 +1619,7 @@ void addressing_service::insert_cache_entry(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::insert_cache_entry"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::insert_cache_entry");
     }
 } // }}}
 
@@ -1858,14 +1682,7 @@ void addressing_service::update_cache_entry(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::update_cache_entry"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::update_cache_entry");
     }
 } // }}}
 
@@ -1890,14 +1707,7 @@ void addressing_service::clear_cache(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::clear_cache"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
+        HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
     }
 } // }}}
 
@@ -2031,15 +1841,7 @@ bool addressing_service::retrieve_statistics_counter(
         return false;
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::query_statistics"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
+        HPX_RETHROWS_IF(ec, e, "addressing_service::query_statistics");
         return false;
     }
 }
@@ -2209,16 +2011,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::increment_refcnt_requests"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
-        return;
+        HPX_RETHROWS_IF(ec, e, "addressing_service::increment_refcnt_requests");
     }
 }
 
@@ -2257,16 +2050,7 @@ void addressing_service::send_refcnt_requests_sync(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::increment_refcnt_requests"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-
-        return;
+        HPX_RETHROWS_IF(ec, e, "addressing_service::increment_refcnt_requests");
     }
 }
 

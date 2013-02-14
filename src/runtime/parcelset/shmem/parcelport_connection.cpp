@@ -89,7 +89,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // We have to repackage all exceptions thrown by the
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -97,7 +97,7 @@ namespace hpx { namespace parcelset { namespace shmem
             return;
         }
         catch (boost::system::system_error const& e) {
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -106,7 +106,7 @@ namespace hpx { namespace parcelset { namespace shmem
             return;
         }
         catch (std::exception const& e) {
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "

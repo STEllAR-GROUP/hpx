@@ -1298,12 +1298,11 @@ namespace boost
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro allowing to prepend file name and line number to a generated
 // exception
-#define HPX_THROW_EXCEPTION_(except, errcode, func, msg, mode)                \
+#define HPX_THROW_EXCEPTION_(except, errcode, func, msg, mode, file, line)    \
     {                                                                         \
-        boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
         hpx::detail::throw_exception(                                         \
             except(static_cast<hpx::error>(errcode), msg, mode),              \
-            func, p__.string(), __LINE__);                                    \
+            func, file, line);                                                \
     }                                                                         \
     /**/
 
@@ -1314,17 +1313,18 @@ namespace boost
     }                                                                         \
     /**/
 
-#define HPX_RETHROW_EXCEPTION(errcode, f, msg)                                \
-    HPX_THROW_EXCEPTION_(hpx::exception, errcode, f, msg, hpx::rethrow)       \
+#define HPX_RETHROW_EXCEPTION(e, f)                                           \
+    HPX_THROW_EXCEPTION_(hpx::exception, e.get_error(), f, e.what(),          \
+        hpx::rethrow, hpx::get_file_name(e), hpx::get_line_number(e))         \
     /**/
 
-#define HPX_RETHROWS_IF(ec, errcode, f, msg)                                  \
+#define HPX_RETHROWS_IF(ec, e, f)                                             \
     {                                                                         \
         if (&ec == &hpx::throws) {                                            \
-            HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
+            HPX_RETHROW_EXCEPTION(e, f);                                      \
         } else {                                                              \
-            ec = make_error_code(static_cast<hpx::error>(errcode), msg, f,    \
-                __FILE__, __LINE__,                                           \
+            ec = make_error_code(e.get_error(), e.what(),                     \
+                f, hpx::get_file_name(e).c_str(), hpx::get_line_number(e),    \
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?      \
                     hpx::lightweight_rethrow : hpx::rethrow);                 \
         }                                                                     \
@@ -1397,7 +1397,11 @@ namespace boost
 /// \endcode
 ///
 #define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
-    HPX_THROW_EXCEPTION_(hpx::exception, errcode, f, msg, hpx::plain)         \
+    {                                                                         \
+        boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
+        HPX_THROW_EXCEPTION_(hpx::exception, errcode, f, msg, hpx::plain,     \
+            p__.string(), __LINE__)                                           \
+    }                                                                         \
     /**/
 
 /// \def HPX_THROWS_IF(ec, errcode, f, msg)
