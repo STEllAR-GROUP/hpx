@@ -18,6 +18,9 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 716] - Non-option arguments to programs run using `pbsdsh` must be
+                before `--hpx:nodes`, contrary to directions
+* [issue 715] - Re-thrown exceptions should retain the original call site
 * [issue 713] - Add performance counters monitoring connection caches
 * [issue 712] - Adjust parcel related performance counters to be connection type
                 specific
