@@ -79,7 +79,7 @@ namespace hpx { namespace util
                 return;
             }
 
-            if (count) 
+            if (count)
             {
                 std::memcpy(address, &buffer_[current_], count);
                 current_ += count;
@@ -137,7 +137,7 @@ namespace hpx { namespace util
         {
             std::size_t l;
             This()->load(l);
-            
+
 #if BOOST_WORKAROUND(_RWSTD_VER, BOOST_TESTED_AT(20101))
             if(NULL != ws.data())   // borland de-allocator fixup
 #endif
@@ -146,7 +146,7 @@ namespace hpx { namespace util
             // note breaking a rule here - is could be a problem on some platform
             if (l != 0)
             {
-                load_binary(const_cast<wchar_t *>(ws.data()), 
+                load_binary(const_cast<wchar_t *>(ws.data()),
                     l * sizeof(wchar_t) / sizeof(char));
             }
         }
