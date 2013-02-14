@@ -431,7 +431,14 @@ in the section __hello_world_example__.
 [caution If the first application specific argument (inside `$APP_OPTIONS`)
          is a non-option (i.e. does not start with a '`-`' or a '`--`', then those
          have to be placed before the option [hpx_cmdline --hpx:nodes], which
-         in this case should be the last option on the command line.]
+         in this case should be the last option on the command line.
+
+         Alternatively, use the option [hpx_cmdline --hpx:endnodes] to explicitly 
+         mark the end of the list of node names:
+         ```
+         __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` ``[hpx_cmdline --hpx:endnodes] ``$APP_OPTIONS 
+         ```
+         ]
 
 The [^#PBS -l nodes=2:ppn=4] directive will cause two compute nodes to be
 allocated for the application, as specified int the option [^nodes]. Each of the

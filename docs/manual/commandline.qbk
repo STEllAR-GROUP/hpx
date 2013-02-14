@@ -40,6 +40,8 @@ described in the table below:
                                  node name per line and core)]]
     [[`--hpx:nodes arg`]        [the (space separated) list of the nodes to use (usually
                                  this is extracted from a node file)]]
+    [[`--hpx:endnodes`]         [this can be used to end the list of nodes specified 
+                                 using the option `--hpx:nodes`]]
     [[`--hpx:ifsuffix arg`]     [suffix to append to host names in order to resolve them
                                  to the proper network interconnect]]
     [[`--hpx:ifprefix arg`]     [prefix to prepend to host names in order to resolve them
@@ -217,7 +219,14 @@ ignore the option. For instance, the following PBS script passes the option
 [caution If the first application specific argument (inside `$APP_OPTIONS`)
          is a non-option (i.e. does not start with a '`-`' or a '`--`', then those
          have to be placed before the option [hpx_cmdline --hpx:nodes], which
-         in this case should be the last option on the command line.]
+         in this case should be the last option on the command line.
+
+         Alternatively, use the option [hpx_cmdline --hpx:endnodes] to explicitly 
+         mark the end of the list of node names:
+         ```
+         __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:1:pu-offset=4]`` ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` ``[hpx_cmdline --hpx:endnodes] ``$APP_OPTIONS 
+         ```
+         ]
 
 [c++]
 
