@@ -27,7 +27,7 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 using hpx::naming::gid_type;
 using hpx::naming::get_management_type_name;
-using hpx::naming::strip_credit_from_gid;
+using hpx::naming::detail::get_stripped_gid;
 
 using hpx::agas::register_name;
 using hpx::agas::unregister_name;
@@ -71,7 +71,7 @@ void hpx_test_main(
         // Associate a symbolic name with the object. The symbol namespace
         // should not reference-count the name, as the GID we're passing has
         // no credits.
-        gid_type raw_gid = strip_credit_from_gid(monitor.get_raw_gid());
+        gid_type raw_gid = get_stripped_gid(monitor.get_raw_gid());
         HPX_TEST_EQ(true, register_name(name, raw_gid));
 
         {

@@ -339,8 +339,8 @@ response primary_namespace::allocate(
         at_c<1>(it->second) = upper;
 
         // Set the initial credit count.
-        naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+        naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+        naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::allocate, ep(%1%), count(%2%), "
@@ -429,8 +429,8 @@ response primary_namespace::allocate(
         at_c<1>((*pit).second) = upper;
 
         // Set the initial credit count.
-        naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+        naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+        naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::allocate, ep(%1%), count(%2%), "
@@ -457,7 +457,7 @@ response primary_namespace::bind_gid(
     // parameters
     gva g = req.get_gva();
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id);
+    naming::detail::strip_credit_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -735,7 +735,7 @@ response primary_namespace::unbind_gid(
     // parameters
     boost::uint64_t count = req.get_count();
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id);
+    naming::detail::strip_credit_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -791,8 +791,8 @@ response primary_namespace::change_credit_non_blocking(
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
-    naming::strip_credit_from_gid(lower);
-    naming::strip_credit_from_gid(upper);
+    naming::detail::strip_credit_from_gid(lower);
+    naming::detail::strip_credit_from_gid(upper);
 
     // Increment.
     if (0 < credits)
@@ -839,8 +839,8 @@ response primary_namespace::change_credit_sync(
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
-    naming::strip_credit_from_gid(lower);
-    naming::strip_credit_from_gid(upper);
+    naming::detail::strip_credit_from_gid(lower);
+    naming::detail::strip_credit_from_gid(upper);
 
     // Increment.
     if (0 < credits)
@@ -1323,7 +1323,7 @@ primary_namespace::resolve_gid_locked(
 { // {{{ resolve_gid implementation
     // parameters
     naming::gid_type id = gid;
-    naming::strip_credit_from_gid(id);
+    naming::detail::strip_credit_from_gid(id);
 
     gva_table_type::const_iterator it = gvas_.lower_bound(id)
                                  , begin = gvas_.begin()

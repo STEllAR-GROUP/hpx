@@ -37,7 +37,7 @@ namespace hpx { namespace naming
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
-                    boost::uint32_t credits = get_credit_from_gid(*p);
+                    boost::uint32_t credits = detail::get_credit_from_gid(*p);
                     BOOST_ASSERT(0 != credits);
 
                     if (get_runtime_ptr())
@@ -78,7 +78,7 @@ namespace hpx { namespace naming
         {
             // a credit of zero means the component is not (globally) reference
             // counted
-            boost::uint32_t credits = get_credit_from_gid(*p);
+            boost::uint32_t credits = detail::get_credit_from_gid(*p);
             if (0 != credits)
             {
                 // We take over the ownership of the gid_type object here
@@ -132,23 +132,23 @@ namespace hpx { namespace naming
 
             // If the initial credit is zero the gid is 'unmanaged' and no
             // additional action needs to be performed.
-            boost::uint16_t oldcredits = get_credit_from_gid(*this);
+            boost::uint16_t oldcredits = detail::get_credit_from_gid(*this);
             if (0 != oldcredits)
             {
                 // Request new credits from AGAS if needed (i.e. the initial
                 // gid's credit is equal to one and the new gid has no credits
                 // after splitting).
                 naming::gid_type newid =
-                    split_credits_for_gid(const_cast<id_type_impl&>(*this));
-                if (0 == get_credit_from_gid(newid))
+                    detail::split_credits_for_gid(const_cast<id_type_impl&>(*this));
+                if (0 == detail::get_credit_from_gid(newid))
                 {
                     // We add the new credits to the gids first to avoid
                     // duplicate splitting during concurrent serialization
                     // operations.
-                    BOOST_ASSERT(1 == get_credit_from_gid(*this));
-                    add_credit_to_gid(const_cast<id_type_impl&>(*this),
+                    BOOST_ASSERT(1 == detail::get_credit_from_gid(*this));
+                    detail::add_credit_to_gid(const_cast<id_type_impl&>(*this),
                         HPX_INITIAL_GLOBALCREDIT);
-                    add_credit_to_gid(newid, HPX_INITIAL_GLOBALCREDIT);
+                    detail::add_credit_to_gid(newid, HPX_INITIAL_GLOBALCREDIT);
 
                     // We unlock the lock as all operations on the local credit
                     // have been performed and we don't want the lock to be

@@ -1007,7 +1007,7 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     // NOTE: This should still be migration safe.
-    return naming::strip_credit_from_gid(id.get_msb())
+    return naming::detail::strip_credit_from_gid(id.get_msb())
         == local_locality().get_msb();
 }
 
@@ -1161,7 +1161,7 @@ bool addressing_service::resolve_cached(
     if (gva_cache_.get_entry(k, idbase, e))
     {
         const boost::uint64_t id_msb
-            = naming::strip_credit_from_gid(id.get_msb());
+            = naming::detail::strip_credit_from_gid(id.get_msb());
 
         if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
         {
@@ -1425,7 +1425,7 @@ static void correct_credit_on_failure(future<bool> f, naming::id_type id,
 {
     // Return the credit to the GID if the operation failed
     if (f.has_exception() && mutable_gid_credit != 0) 
-        naming::add_credit_to_gid(id.get_gid(), new_gid_credit);
+        naming::detail::add_credit_to_gid(id.get_gid(), new_gid_credit);
 }
 
 lcos::future<bool> addressing_service::register_name_async(
@@ -1438,18 +1438,18 @@ lcos::future<bool> addressing_service::register_name_async(
     naming::gid_type new_gid;
 
     // FIXME: combine incref with register_name, if needed
-    if (naming::get_credit_from_gid(mutable_gid) != 0)
+    if (naming::detail::get_credit_from_gid(mutable_gid) != 0)
     {
-        new_gid = split_credits_for_gid(mutable_gid);
+        new_gid = naming::detail::split_credits_for_gid(mutable_gid);
 
         // Credit exhaustion - we need to get more.
-        if (0 == naming::get_credit_from_gid(new_gid))
+        if (0 == naming::detail::get_credit_from_gid(new_gid))
         {
-            BOOST_ASSERT(1 == naming::get_credit_from_gid(mutable_gid));
+            BOOST_ASSERT(1 == naming::detail::get_credit_from_gid(mutable_gid));
             naming::get_agas_client().incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT);
 
-            naming::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
-            naming::add_credit_to_gid(mutable_gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(mutable_gid, HPX_INITIAL_GLOBALCREDIT);
         }
     }
     else {
@@ -1463,8 +1463,8 @@ lcos::future<bool> addressing_service::register_name_async(
     using HPX_STD_PLACEHOLDERS::_1;
     f.then(
         HPX_STD_BIND(correct_credit_on_failure, _1, id,
-            naming::get_credit_from_gid(mutable_gid), 
-            naming::get_credit_from_gid(new_gid))
+            naming::detail::get_credit_from_gid(mutable_gid), 
+            naming::detail::get_credit_from_gid(new_gid))
     );
     return f;
 } // }}}

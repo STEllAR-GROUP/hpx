@@ -23,6 +23,8 @@ using hpx::find_here;
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 using hpx::naming::get_locality_id_from_id;
+using hpx::naming::detail::split_credits_for_gid;
+using hpx::naming::detail::get_credit_from_gid;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
@@ -44,7 +46,7 @@ using hpx::find_here;
 // helper functions
 inline boost::uint32_t get_credit(id_type const& id)
 {
-    return hpx::naming::get_credit_from_gid(id.get_gid());
+    return hpx::naming::detail::get_credit_from_gid(id.get_gid());
 }
 
 inline id_type split_credits(id_type const& id, int frac = 2)

@@ -226,7 +226,7 @@ namespace hpx { namespace detail
         util::osstream strm;
 
         strm << name << ", " << gid << ", "
-             << (naming::get_credit_from_gid(gid) ? "managed" : "unmanaged");
+             << (naming::detail::get_credit_from_gid(gid) ? "managed" : "unmanaged");
 
         print(strm.str());
     }

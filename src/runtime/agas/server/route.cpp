@@ -25,7 +25,7 @@ bool primary_namespace::route(
 
 //    // TODO: protection of parcel's content?
 //     naming::gid_type id = p.get_destination();
-//     naming::strip_credit_from_gid(id);
+//     naming::detail::strip_credit_from_gid(id);
 //
 //     request req(primary_ns_resolve_gid, id);
 //

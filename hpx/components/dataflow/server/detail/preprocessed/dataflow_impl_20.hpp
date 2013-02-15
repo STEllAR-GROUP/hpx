@@ -179,7 +179,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -469,7 +469,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -762,7 +762,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -1055,7 +1055,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -1348,7 +1348,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -1641,7 +1641,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -1934,7 +1934,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -2227,7 +2227,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -2520,7 +2520,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -2813,7 +2813,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -3106,7 +3106,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -3399,7 +3399,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -3692,7 +3692,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -3985,7 +3985,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -4278,7 +4278,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -4571,7 +4571,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -4864,7 +4864,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -5157,7 +5157,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -5450,7 +5450,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -5743,7 +5743,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }
@@ -6036,7 +6036,7 @@
         {
             return
                 naming::id_type(
-                    naming::strip_credit_from_gid(get_base_gid())
+                    naming::detail::get_stripped_gid(get_base_gid())
                   , naming::id_type::unmanaged
                 );
         }

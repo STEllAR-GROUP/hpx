@@ -341,7 +341,7 @@ void gs(
         BOOST_FOREACH(hpx::lcos::future<object<data_type> > const & o, objects)
         {
             using hpx::naming::id_type;
-            using hpx::naming::strip_credit_from_gid;
+            using hpx::naming::detail::strip_credit_from_gid;
 
             strip_credit_from_gid(o.get().gid_.get_gid());
             id_type
