@@ -224,8 +224,8 @@ protected:
 
 public:
     template <typename Container>
-    portable_binary_oarchive(Container& buffer, unsigned flags = 0)
-      : primitive_base_t(buffer, flags),
+    portable_binary_oarchive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
+      : primitive_base_t(buffer, filter, flags),
         archive_base_t(flags),
         m_flags(flags & (endian_big | endian_little))
     {

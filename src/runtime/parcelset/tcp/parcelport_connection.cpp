@@ -23,7 +23,7 @@ namespace hpx { namespace parcelset { namespace tcp
             naming::locality const& locality_id,
             performance_counters::parcels::gatherer& parcels_sent)
       : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-        parcels_sent_(parcels_sent), 
+        parcels_sent_(parcels_sent),
         archive_flags_(boost::archive::no_header)
     {
 #ifdef BOOST_BIG_ENDIAN
@@ -43,19 +43,23 @@ namespace hpx { namespace parcelset { namespace tcp
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
+#if defined(HPX_DEBUG)
+        // make sure that all parcels require the same serialization filter and
+        // that all of them go to the same locality
+        util::binary_filter* filter = pv[0].get_serialization_filter();
+        BOOST_FOREACH(parcel const& p, pv)
+        {
+            naming::locality const locality_id = p.get_destination_locality();
+            BOOST_ASSERT(locality_id == destination());
+            BOOST_ASSERT(filter == p.get_serialization_filter());
+        }
+#endif
+
         // we choose the highest priority of all parcels for this message
         threads::thread_priority priority = threads::thread_priority_default;
 
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
-
-#if defined(HPX_DEBUG)
-        BOOST_FOREACH(parcel const& p, pv)
-        {
-            naming::locality const locality_id = p.get_destination_locality();
-            BOOST_ASSERT(locality_id == destination());
-        }
-#endif
 
         // guard against serialization errors
         try {
@@ -76,7 +80,7 @@ namespace hpx { namespace parcelset { namespace tcp
             {
                 // Serialize the data
                 util::portable_binary_oarchive archive(out_buffer_,
-                    archive_flags_);
+                    pv[0].get_serialization_filter(), archive_flags_);
 
                 std::size_t count = pv.size();
                 archive << count;

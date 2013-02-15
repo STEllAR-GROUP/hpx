@@ -43,6 +43,8 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
+#include <hpx/util/binary_filter.hpp>
+
 #if !defined(BOOST_WINDOWS)
 #  pragma GCC visibility push(default)
 #endif
@@ -81,8 +83,13 @@ namespace hpx { namespace util
 
             if (count)
             {
-                std::memcpy(address, &buffer_[current_], count);
-                current_ += count;
+                if (filter_) {
+                    current_ += filter_->load(address, &buffer_[current_], count);
+                }
+                else {
+                    std::memcpy(address, &buffer_[current_], count);
+                    current_ += count;
+                }
             }
         }
 
@@ -96,6 +103,7 @@ namespace hpx { namespace util
         char const* buffer_;
         std::size_t size_;
         std::size_t current_;
+        binary_filter* filter_;
 
         // return a pointer to the most derived class
         Archive* This()
@@ -156,9 +164,19 @@ namespace hpx { namespace util
 
         template <typename Vector>
         basic_binary_iprimitive(Vector const& buffer, unsigned flags = 0)
-          : buffer_(buffer.data()), size_(buffer.size()),current_(0)
+          : buffer_(buffer.data()), size_(buffer.size()), current_(0), filter_(0)
         {
+            bool has_filter = false;
+            This()->load(has_filter);
+            if (has_filter)
+                This()->load(filter_);
+
             init(flags);
+        }
+
+        ~basic_binary_iprimitive()
+        {
+            delete filter_;
         }
 
     public:
