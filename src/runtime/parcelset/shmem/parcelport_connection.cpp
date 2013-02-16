@@ -75,8 +75,7 @@ namespace hpx { namespace parcelset { namespace shmem
             {
                 // Serialize the data
                 util::portable_binary_oarchive archive(
-                    out_buffer_.get_buffer(), pv[0].get_serialization_filter(),
-                    boost::archive::no_header);
+                    out_buffer_.get_buffer(), 0, boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;

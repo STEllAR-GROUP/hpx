@@ -93,7 +93,7 @@ void portable_binary_oarchive::save_impl(
 #   endif
 #   pragma GCC diagnostic ignored "-Wconversion"
 #endif
-void portable_binary_oarchive::init(unsigned int flags)
+void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int flags)
 {
     if ((m_flags & (endian_big | endian_little)) == (endian_big | endian_little))
     {
@@ -114,7 +114,15 @@ void portable_binary_oarchive::init(unsigned int flags)
         *this << v;
     }
 
+    if (filter)
+        m_flags |= enable_compression;
+
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
+
+    if (m_flags & enable_compression) {
+        *this << filter;
+        this->set_filter(filter);
+    }
 }
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #   if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)

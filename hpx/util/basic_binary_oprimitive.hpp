@@ -65,16 +65,22 @@ namespace hpx { namespace util
         struct erase_container_type
         {
             virtual ~erase_container_type() {}
+            virtual void set_filter(binary_filter* filter) = 0;
             virtual void save_binary(void const* address, std::size_t count) = 0;
         };
 
         template <typename Container>
         struct container_type : erase_container_type
         {
-            container_type(Container& cont, binary_filter* filter)
-              : cont_(cont), current_(0), filter_(filter)
+            container_type(Container& cont)
+              : cont_(cont), current_(0)
             {}
             ~container_type() {}
+
+            void set_filter(binary_filter* filter)
+            {
+                filter_.reset(filter);
+            }
 
             void save_binary(void const* address, std::size_t count)
             {
@@ -93,7 +99,7 @@ namespace hpx { namespace util
 
             Container& cont_;
             std::size_t current_;
-            binary_filter* filter_;
+            HPX_STD_UNIQUE_PTR<binary_filter> filter_;
         };
     }
 
@@ -115,7 +121,6 @@ namespace hpx { namespace util
 #else
     public:
 #endif
-
         // this is the output buffer
         boost::shared_ptr<detail::erase_container_type> buffer_;
 
@@ -160,14 +165,9 @@ namespace hpx { namespace util
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
         template <typename Container>
-        basic_binary_oprimitive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
-          : buffer_(boost::make_shared<detail::container_type<Container> >(buffer, filter))
+        basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
+          : buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
         {
-            bool has_filter = filter != 0 ? true : false;
-            This()->save(has_filter);
-            if (has_filter)
-                This()->save(filter);
-
             init(flags);
         }
 
@@ -200,6 +200,11 @@ namespace hpx { namespace util
         void save_array(boost::serialization::array<T> const& a, unsigned int)
         {
             save_binary(a.address(), a.count()*sizeof(T));
+        }
+
+        void set_filter(binary_filter* filter)
+        {
+            buffer_->set_filter(filter);
         }
     };
 }}

@@ -145,7 +145,14 @@ void portable_binary_iarchive::init(unsigned int flags)
     unsigned char x;
     load(x);
     m_flags = static_cast<unsigned int>(x << CHAR_BIT);
+
+    if (m_flags & enable_compression) {
+        util::binary_filter* filter = 0;
+        *this >> filter;
+        this->set_filter(filter);
+    }
 }
+
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop

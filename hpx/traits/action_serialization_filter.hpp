@@ -9,6 +9,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/binary_filter.hpp>
 
+#include <boost/mpl/has_xxx.hpp>
+#include <boost/utility/enable_if.hpp>
+
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -16,11 +19,17 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable>
     struct action_serialization_filter
     {
-        static util::binary_filter* call() 
+        // return a new instance of a serialization filter
+        static util::binary_filter* call()
         {
             return 0;   // by default actions don't have a serialization filter
         }
     };
+
+    template <typename Action>
+    struct action_serialization_filter<Action, typename Action::type>
+      : action_serialization_filter<typename Action::type>
+    {};
 }}
 
 #endif

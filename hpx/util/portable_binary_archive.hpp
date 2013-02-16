@@ -28,8 +28,9 @@ namespace hpx { namespace util
 {
     enum portable_binary_archive_flags
     {
-        endian_big        = 0x4000,
-        endian_little     = 0x8000
+        enable_compression = 0x2000,
+        endian_big         = 0x4000,
+        endian_little      = 0x8000
     };
 
     inline void

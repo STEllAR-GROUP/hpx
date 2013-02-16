@@ -44,14 +44,11 @@ namespace hpx { namespace parcelset { namespace tcp
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
 #if defined(HPX_DEBUG)
-        // make sure that all parcels require the same serialization filter and
-        // that all of them go to the same locality
-        util::binary_filter* filter = pv[0].get_serialization_filter();
+        // make sure that all parcels go to the same locality
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
             BOOST_ASSERT(locality_id == destination());
-            BOOST_ASSERT(filter == p.get_serialization_filter());
         }
 #endif
 
@@ -79,8 +76,13 @@ namespace hpx { namespace parcelset { namespace tcp
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(out_buffer_,
-                    pv[0].get_serialization_filter(), archive_flags_);
+                util::binary_filter* filter = pv[0].get_serialization_filter();
+                int archive_flags = archive_flags_;
+                if (filter)
+                    archive_flags |= util::enable_compression;
+
+                util::portable_binary_oarchive archive(
+                    out_buffer_, filter, archive_flags);
 
                 std::size_t count = pv.size();
                 archive << count;
