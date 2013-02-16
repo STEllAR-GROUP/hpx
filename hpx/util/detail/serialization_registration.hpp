@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -154,6 +154,44 @@ namespace boost {                                                               
 #define HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, ACTION)            \
     HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE,                               \
         (hpx::actions::transfer_action<HPX_UTIL_STRIP(ACTION)>))                \
+/**/
+
+/////////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(TYPE)                       \
+namespace boost {                                                               \
+    namespace serialization {                                                   \
+        template <>                                                             \
+        struct guid_defined<TYPE> : mpl::true_ {};                              \
+                                                                                \
+        namespace ext {                                                         \
+            template <>                                                         \
+            struct guid_impl<TYPE>                                              \
+            {                                                                   \
+                static inline const char * call()                               \
+                {                                                               \
+                    return hpx::util::detail::type_hash<TYPE>();                \
+                }                                                               \
+            };                                                                  \
+        }                                                                       \
+    }                                                                           \
+    namespace archive { namespace detail { namespace extra_detail {             \
+        template <>                                                             \
+        struct init_guid<TYPE>                                                  \
+        {                                                                       \
+            static hpx::util::detail::guid_initializer_helper<TYPE> const& g;   \
+        };                                                                      \
+    }}}                                                                         \
+}                                                                               \
+
+#define HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(TYPE)                        \
+namespace boost {                                                               \
+    namespace archive { namespace detail { namespace extra_detail {             \
+        hpx::util::detail::guid_initializer_helper<TYPE> const &                \
+            init_guid<TYPE>::g = ::boost::serialization::singleton<             \
+                    hpx::util::detail::guid_initializer_helper<TYPE>            \
+                >::get_mutable_instance().export_guid();                        \
+    }}}                                                                         \
+}                                                                               \
 /**/
 
 #endif

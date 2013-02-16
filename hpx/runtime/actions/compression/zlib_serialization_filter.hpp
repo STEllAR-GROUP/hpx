@@ -7,11 +7,11 @@
 #define HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
-#include <hpx/util/binary_filter.hpp>
-#include <hpx/util/void_cast.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
+#include <hpx/runtime/actions/guid_initialization.hpp>
+#include <hpx/util/binary_filter.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
@@ -23,8 +23,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    struct HPX_EXPORT zlib_serialization_filter
-      : public util::binary_filter
+    struct HPX_EXPORT zlib_serialization_filter : public util::binary_filter
     {
         ~zlib_serialization_filter();
 
@@ -32,26 +31,20 @@ namespace hpx { namespace actions
         std::size_t save(void* dest, void const* address, std::size_t count);
 
         /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<
-                zlib_serialization_filter, util::binary_filter>();
-        }
+        static void register_base();
 
     private:
         // serialization support
         friend class boost::serialization::access;
 
-        template <class Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int)
-        {
-            // serialize base class
-            ar & util::base_object_nonvirt<util::binary_filter>(*this);
-        }
+        template <typename Archive>
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
     };
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(hpx::actions::zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_ZLIB_COMPRESSION(action)                              \

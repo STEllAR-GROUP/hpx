@@ -7,32 +7,25 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/compression/zlib_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
+#include <hpx/util/void_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-BOOST_CLASS_EXPORT(hpx::actions::zlib_serialization_filter);
+HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(hpx::actions::zlib_serialization_filter);
 HPX_REGISTER_BASE_HELPER(hpx::actions::zlib_serialization_filter,
     zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    template <>
-    struct needs_guid_initialization<hpx::actions::zlib_serialization_filter>
-        : boost::mpl::false_
-    {};
-}}
-
-namespace boost { namespace archive { namespace detail { namespace extra_detail
-{
-    template <>
-    struct init_guid<hpx::actions::zlib_serialization_filter>;
-}}}}
-
 namespace hpx { namespace actions
 {
     zlib_serialization_filter::~zlib_serialization_filter()
     {
         detail::guid_initialization<zlib_serialization_filter>();
+    }
+
+    void zlib_serialization_filter::register_base()
+    {
+        util::void_cast_register_nonvirt<
+            zlib_serialization_filter, util::binary_filter>();
     }
 
     std::size_t zlib_serialization_filter::load(void* address,
