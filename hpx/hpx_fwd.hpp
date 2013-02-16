@@ -9,11 +9,6 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
-/// \cond NOINTERNAL
-// FIXME: Make HPX work with the "decltype" result_of, and remove this #define!
-#define BOOST_RESULT_OF_USE_TR1
-/// \endcond
-
 #include <cstdlib>
 #include <vector>
 
