@@ -33,15 +33,6 @@ namespace interpolate3d { namespace server
         // component type used to encapsulate instances of this component
         typedef partition3d wrapping_type;
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            partition3d_init = 0,
-            partition3d_interpolate = 1
-        };
-
         // exposed functionality
         void init(std::string const&, dimension const&, dimension const&,
             dimension const&);
@@ -52,13 +43,13 @@ namespace interpolate3d { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action4<
-            partition3d, partition3d_init, std::string const&,
+            partition3d, std::string const&,
             dimension const&, dimension const&, dimension const&,
             &partition3d::init
         > init_action;
 
         typedef hpx::actions::result_action3<
-            partition3d, double, partition3d_interpolate, double, double,
+            partition3d, double, double, double,
             double, &partition3d::interpolate
         > interpolate_action;
 
