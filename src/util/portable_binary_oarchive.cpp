@@ -114,9 +114,6 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
         *this << v;
     }
 
-    if (filter)
-        m_flags |= enable_compression;
-
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 
     if (m_flags & enable_compression) {
