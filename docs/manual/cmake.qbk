@@ -283,8 +283,14 @@ variables are used more seldom and are mainly useful for debugging purposes.
     ]
     [[`HPX_USE_SHMEM_PARCELPORT:BOOL`]
      [Sets whether the experimental implementation of a parcelport communicating
-      over shared memory will be enabled or not. This vaiable is set to `OFF`
+      over shared memory will be enabled or not. This variable is set to `OFF`
       by default.]
+    ]
+    [[`HPX_USE_ZLIB_COMPRESSION:BOOL`]
+     [Sets whether support for compressing parcels using the __zlib__ library will
+      be enabled or not. This variable is set to `OFF` by default. If you enable 
+      this option CMake will try to find the __zlib__ library, which might require 
+      setting the CMake variable `ZLIB_ROOT`.]
     ]
 ]
 

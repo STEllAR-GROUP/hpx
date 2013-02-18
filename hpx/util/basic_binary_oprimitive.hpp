@@ -75,7 +75,14 @@ namespace hpx { namespace util
             container_type(Container& cont)
               : cont_(cont), current_(0)
             {}
-            ~container_type() {}
+            ~container_type()
+            {
+                if (filter_) {
+                    current_ += filter_->flush(&cont_[current_],
+                        cont_.size()-current_);
+                    cont_.resize(current_);         // truncate container
+                }
+            }
 
             void set_filter(binary_filter* filter)
             {
@@ -88,7 +95,8 @@ namespace hpx { namespace util
                 {
                     cont_.resize(cont_.size() + count);
                     if (filter_) {
-                        current_ += filter_->save(&cont_[current_], address, count);
+                        current_ += filter_->save(&cont_[current_], count,
+                            address, count);
                     }
                     else {
                         std::memcpy(&cont_[current_], address, count);

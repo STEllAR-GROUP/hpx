@@ -7,8 +7,7 @@
 #if !defined(HPX_UTIL_BINARY_FILTER_FEB_14_2013_0809PM)
 #define HPX_UTIL_BINARY_FILTER_FEB_14_2013_0809PM
 
-#include <hpx/config/forceinline.hpp>
-#include <boost/assert.hpp>
+#include <memory>
 
 namespace hpx { namespace util
 {
@@ -17,8 +16,12 @@ namespace hpx { namespace util
     struct binary_filter
     {
         virtual ~binary_filter() {}
-        virtual std::size_t load(void* address, void const* src, std::size_t count) = 0;
-        virtual std::size_t save(void* dest, void const* address, std::size_t count) = 0;
+
+        virtual std::size_t load(void* dst, std::size_t dst_count,
+            void const* src, std::size_t src_count) = 0;
+        virtual std::size_t save(void* dst, std::size_t dst_count,
+            void const* src, std::size_t src_count) = 0;
+        virtual std::size_t flush(void* dst, std::size_t dst_count) = 0;
     };
 }}
 

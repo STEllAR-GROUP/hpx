@@ -84,7 +84,8 @@ namespace hpx { namespace util
             if (count)
             {
                 if (filter_) {
-                    current_ += filter_->load(address, &buffer_[current_], count);
+                    current_ += filter_->load(address, count,
+                        &buffer_[current_], size_-current_);
                 }
                 else {
                     std::memcpy(address, &buffer_[current_], count);
