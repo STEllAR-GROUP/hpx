@@ -91,6 +91,7 @@ namespace hpx { namespace util
                     std::memcpy(address, &buffer_[current_], count);
                     current_ += count;
                 }
+                BOOST_ASSERT(size_ >= current_);
             }
         }
 

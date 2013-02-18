@@ -95,13 +95,14 @@ namespace hpx { namespace util
                 {
                     cont_.resize(cont_.size() + count);
                     if (filter_) {
-                        current_ += filter_->save(&cont_[current_], 
+                        current_ += filter_->save(&cont_[current_],
                             cont_.size()-current_, address, count);
                     }
                     else {
                         std::memcpy(&cont_[current_], address, count);
                         current_ += count;
                     }
+                    BOOST_ASSERT(cont_.size() >= current_);
                 }
             }
 

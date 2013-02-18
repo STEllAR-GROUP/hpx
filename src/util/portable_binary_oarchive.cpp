@@ -116,9 +116,14 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
 
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 
-    if (m_flags & enable_compression) {
+    // handle filter and compression in the archive separately
+    bool has_filter = filter ? true : false;
+    *this << has_filter;
+
+    if (has_filter) {
         *this << filter;
-        this->set_filter(filter);
+        if (m_flags & enable_compression)
+            this->set_filter(filter);
     }
 }
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)

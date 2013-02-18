@@ -232,6 +232,11 @@ public:
         init(filter, flags);
     }
 
+    unsigned int flags() const
+    {
+        return m_flags;
+    }
+
     // the optimized save_array dispatches to save_binary
 
     // default fall through for any types not specified here

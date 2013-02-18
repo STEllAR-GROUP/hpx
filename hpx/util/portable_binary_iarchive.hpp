@@ -265,6 +265,11 @@ public:
         init(flags);
     }
 
+    unsigned int flags() const
+    {
+        return m_flags;
+    }
+
     // the optimized load_array dispatches to load_binary
     template <typename T>
     void load_array(boost::serialization::array<T>& a, unsigned int)
