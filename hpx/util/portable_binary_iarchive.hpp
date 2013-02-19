@@ -257,8 +257,9 @@ protected:
 
 public:
     template <typename Vector>
-    portable_binary_iarchive(Vector const& buffer, unsigned flags = 0)
-      : primitive_base_t(buffer, flags),
+    portable_binary_iarchive(Vector const& buffer, 
+            boost::uint64_t inbound_data_size, unsigned flags = 0)
+      : primitive_base_t(buffer, inbound_data_size, flags),
         archive_base_t(flags),
         m_flags(0)
     {

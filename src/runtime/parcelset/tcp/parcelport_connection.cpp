@@ -22,8 +22,8 @@ namespace hpx { namespace parcelset { namespace tcp
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
             performance_counters::parcels::gatherer& parcels_sent)
-      : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-        parcels_sent_(parcels_sent),
+      : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0),
+        there_(locality_id), parcels_sent_(parcels_sent),
         archive_flags_(boost::archive::no_header)
     {
 #ifdef BOOST_BIG_ENDIAN
@@ -91,6 +91,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     archive << p;
                 }
+
+                arg_size += archive.bytes_written();
             }
 
             // store the time required for serialization
@@ -127,6 +129,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
         out_priority_ = boost::integer::ulittle8_t(priority);
         out_size_ = out_buffer_.size();
+        out_data_size_ = arg_size; 
 
         send_data_.num_parcels_ = pv.size();
         send_data_.bytes_ = out_buffer_.size();

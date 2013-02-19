@@ -102,7 +102,15 @@ namespace hpx { namespace util
                         std::memcpy(&cont_[current_], address, count);
                         current_ += count;
                     }
-                    BOOST_ASSERT(cont_.size() >= current_);
+
+                    if (cont_.size() < current_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::output_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
                 }
             }
 
@@ -121,6 +129,7 @@ namespace hpx { namespace util
     protected:
         void save_binary(void const* address, std::size_t count)
         {
+            size_ += count;
             buffer_->save_binary(address, count);
         }
 
@@ -131,6 +140,7 @@ namespace hpx { namespace util
     public:
 #endif
         // this is the output buffer
+        std::size_t size_;
         boost::shared_ptr<detail::erase_container_type> buffer_;
 
         // return a pointer to the most derived class
@@ -175,7 +185,8 @@ namespace hpx { namespace util
 
         template <typename Container>
         basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
-          : buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
+          : size_(0), 
+            buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
         {
             init(flags);
         }
@@ -202,6 +213,11 @@ namespace hpx { namespace util
             {};
 #endif
         };
+
+        std::size_t bytes_written() const
+        {
+            return size_;
+        }
 
     protected:
         // the optimized save_array dispatches to save_binary

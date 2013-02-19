@@ -501,8 +501,10 @@ namespace hpx { namespace parcelset { namespace shmem
 
                 {
                     // De-serialize the parcel data
+                    data_buffer::data_buffer_type const& buffer = 
+                        parcel_data.get_buffer();
                     util::portable_binary_iarchive archive(
-                        parcel_data.get_buffer(), boost::archive::no_header);
+                        buffer, buffer.size(), boost::archive::no_header);
 
                     std::size_t parcel_count = 0;
                     std::size_t arg_size = 0;

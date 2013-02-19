@@ -574,6 +574,7 @@ namespace hpx { namespace parcelset { namespace tcp
     ///////////////////////////////////////////////////////////////////////////
     void decode_message(parcelport& pp,
         boost::shared_ptr<std::vector<char> > parcel_data,
+        boost::uint64_t inbound_data_size,
         performance_counters::parcels::data_point receive_data)
     {
         // protect from un-handled exceptions bubbling up
@@ -586,10 +587,9 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     // De-serialize the parcel data
                     util::portable_binary_iarchive archive(*parcel_data,
-                        boost::archive::no_header);
+                        inbound_data_size, boost::archive::no_header);
 
                     std::size_t parcel_count = 0;
-                    std::size_t arg_size = 0;
 
                     archive >> parcel_count;
                     for(std::size_t i = 0; i < parcel_count; ++i)
@@ -601,9 +601,6 @@ namespace hpx { namespace parcelset { namespace tcp
                         // make sure this parcel ended up on the right locality
                         BOOST_ASSERT(p.get_destination_locality() == pp.here());
 
-                        // incoming argument's size
-                        arg_size += hpx::traits::type_size<parcel>::call(p);
-
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
                         pp.add_received_parcel(p);
@@ -613,7 +610,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
                     // complete received data with parcel count
                     receive_data.num_parcels_ = parcel_count;
-                    receive_data.type_bytes_ = arg_size;
+                    receive_data.type_bytes_ = inbound_data_size;
                 }
 
                 // store the time required for serialization

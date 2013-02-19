@@ -72,15 +72,6 @@ namespace hpx { namespace util
     protected:
         void load_binary(void* address, std::size_t count)
         {
-            if (current_+count > size_)
-            {
-                BOOST_THROW_EXCEPTION(
-                    boost::archive::archive_exception(
-                        boost::archive::archive_exception::input_stream_error,
-                        "archive data bstream is too short"));
-                return;
-            }
-
             if (count)
             {
                 if (filter_) {
@@ -88,10 +79,26 @@ namespace hpx { namespace util
                         &buffer_[current_], size_-current_);
                 }
                 else {
+                    if (current_+count > size_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::input_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
                     std::memcpy(address, &buffer_[current_], count);
                     current_ += count;
                 }
-                BOOST_ASSERT(size_ >= current_);
+
+                if (size_ < current_)
+                {
+                    BOOST_THROW_EXCEPTION(
+                        boost::archive::archive_exception(
+                            boost::archive::archive_exception::input_stream_error,
+                            "archive data bstream is too short"));
+                    return;
+                }
             }
         }
 
@@ -165,8 +172,11 @@ namespace hpx { namespace util
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
         template <typename Vector>
-        basic_binary_iprimitive(Vector const& buffer, unsigned flags = 0)
-          : buffer_(buffer.data()), size_(buffer.size()), current_(0)
+        basic_binary_iprimitive(Vector const& buffer,
+                boost::uint64_t inbound_data_size, unsigned flags = 0)
+          : buffer_(buffer.data()),
+            size_((std::max)(boost::uint64_t(buffer.size()), inbound_data_size)),
+            current_(0)
         {
             init(flags);
         }
