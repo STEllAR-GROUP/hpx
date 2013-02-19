@@ -176,6 +176,41 @@ else()
 endif()
 
 ###############################################################################
+# Configure compression
+###############################################################################
+hpx_option(HPX_USE_ZLIB_COMPRESSION BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
+if(HPX_USE_ZLIB_COMPRESSION)
+  hpx_add_definitions(-DHPX_HAVE_ZLIB_COMPRESSION)
+  if(MSVC)
+    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams zlib)
+  else()
+    find_package(HPX_Zlib)
+    if(ZLIB_FOUND)
+      set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams)
+      hpx_include_sys_directories(${ZLIB_INCLUDE_DIR})
+      hpx_link_sys_directories(${ZLIB_LIBRARY_DIR})
+      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${ZLIB_LIBRARY})
+    endif()
+  endif()
+endif()
+
+hpx_option(HPX_USE_BZIP2_COMPRESSION BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
+if(HPX_USE_BZIP2_COMPRESSION)
+  hpx_add_definitions(-DHPX_HAVE_BZIP2_COMPRESSION)
+  if(MSVC)
+    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams bzip2)
+  else()
+    find_package(HPX_BZip2)
+    if(BZIP2_FOUND)
+      set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams)
+      hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
+      hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
+      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${BZIP2_LIBRARY})
+    endif()
+  endif()
+endif()
+
+###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 

@@ -220,16 +220,21 @@ protected:
     // binary files don't include the optional information
     void save_override(const boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void init(unsigned int flags);
+    HPX_ALWAYS_EXPORT void init(util::binary_filter* filter, unsigned int flags);
 
 public:
     template <typename Container>
-    portable_binary_oarchive(Container& buffer, unsigned flags = 0)
+    portable_binary_oarchive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, flags),
         archive_base_t(flags),
-        m_flags(flags & (endian_big | endian_little))
+        m_flags(flags & (enable_compression | endian_big | endian_little))
     {
-        init(flags);
+        init(filter, flags);
+    }
+
+    unsigned int flags() const
+    {
+        return m_flags;
     }
 
     // the optimized save_array dispatches to save_binary

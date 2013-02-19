@@ -125,8 +125,8 @@ namespace hpx { namespace actions
         // serialization support
         friend class boost::serialization::access;
 
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        template <typename Archive>
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
         {
             ar & gid_;
         }
@@ -172,7 +172,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, unsigned int const)
+        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
             ar & cont_ & target_;
         }
@@ -210,7 +210,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, unsigned int const)
+        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
             ar & cont_ & target_ & f_;
         }
@@ -279,7 +279,7 @@ namespace hpx { namespace actions
         typedef continuation base_type;
 
         template <class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
         {
             // serialize function
             bool have_function = !f_.empty();
@@ -356,7 +356,7 @@ namespace hpx { namespace actions
         typedef continuation base_type;
 
         template <class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
         {
             // serialize function
             bool have_function = !f_.empty();

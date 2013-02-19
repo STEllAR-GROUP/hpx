@@ -43,6 +43,8 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
+#include <hpx/util/binary_filter.hpp>
+
 #if !defined(BOOST_WINDOWS)
 #  pragma GCC visibility push(default)
 #endif
@@ -70,19 +72,33 @@ namespace hpx { namespace util
     protected:
         void load_binary(void* address, std::size_t count)
         {
-            if (current_+count > size_)
-            {
-                BOOST_THROW_EXCEPTION(
-                    boost::archive::archive_exception(
-                        boost::archive::archive_exception::input_stream_error,
-                        "archive data bstream is too short"));
-                return;
-            }
-
             if (count)
             {
-                std::memcpy(address, &buffer_[current_], count);
-                current_ += count;
+                if (filter_) {
+                    current_ += filter_->load(address, count,
+                        &buffer_[current_], size_-current_);
+                }
+                else {
+                    if (current_+count > size_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::input_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
+                    std::memcpy(address, &buffer_[current_], count);
+                    current_ += count;
+                }
+
+                if (size_ < current_)
+                {
+                    BOOST_THROW_EXCEPTION(
+                        boost::archive::archive_exception(
+                            boost::archive::archive_exception::input_stream_error,
+                            "archive data bstream is too short"));
+                    return;
+                }
             }
         }
 
@@ -96,6 +112,7 @@ namespace hpx { namespace util
         char const* buffer_;
         std::size_t size_;
         std::size_t current_;
+        HPX_STD_UNIQUE_PTR<binary_filter> filter_;
 
         // return a pointer to the most derived class
         Archive* This()
@@ -155,8 +172,11 @@ namespace hpx { namespace util
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
         template <typename Vector>
-        basic_binary_iprimitive(Vector const& buffer, unsigned flags = 0)
-          : buffer_(buffer.data()), size_(buffer.size()),current_(0)
+        basic_binary_iprimitive(Vector const& buffer,
+                boost::uint64_t inbound_data_size, unsigned flags = 0)
+          : buffer_(buffer.data()),
+            size_((std::max)(boost::uint64_t(buffer.size()), inbound_data_size)),
+            current_(0)
         {
             init(flags);
         }
@@ -189,6 +209,11 @@ namespace hpx { namespace util
         void load_array(boost::serialization::array<T>& a, unsigned int)
         {
             load_binary(a.address(), a.count()*sizeof(T));
+        }
+
+        void set_filter(util::binary_filter* filter)
+        {
+            filter_.reset(filter);
         }
     };
 }}

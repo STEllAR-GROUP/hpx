@@ -77,6 +77,7 @@ namespace hpx { namespace parcelset { namespace tcp
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
+            buffers.push_back(boost::asio::buffer(&out_data_size_, sizeof(out_data_size_)));
             buffers.push_back(boost::asio::buffer(out_buffer_));
 
             // this additional wrapping of the handler into a bind object is
@@ -114,6 +115,7 @@ namespace hpx { namespace parcelset { namespace tcp
             out_buffer_.clear();
             out_priority_ = 0;
             out_size_ = 0;
+            out_data_size_ = 0;
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -153,6 +155,7 @@ namespace hpx { namespace parcelset { namespace tcp
         /// buffer for outgoing data
         boost::integer::ulittle8_t out_priority_;
         boost::integer::ulittle64_t out_size_;
+        boost::integer::ulittle64_t out_data_size_;
         std::vector<char> out_buffer_;
         bool ack_;
 
