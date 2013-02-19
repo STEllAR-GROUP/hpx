@@ -84,6 +84,10 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base();
 
+        void set_max_compression_length(std::size_t size) {}
+        void init_decompression_data(char const* buffer, std::size_t size,
+            std::size_t decompressed_size) {}
+
     private:
         // serialization support
         friend class boost::serialization::access;

@@ -111,6 +111,7 @@ namespace hpx { namespace util
 
         char const* buffer_;
         std::size_t size_;
+        std::size_t decompressed_size_;
         std::size_t current_;
         HPX_STD_UNIQUE_PTR<binary_filter> filter_;
 
@@ -175,7 +176,8 @@ namespace hpx { namespace util
         basic_binary_iprimitive(Vector const& buffer,
                 boost::uint64_t inbound_data_size, unsigned flags = 0)
           : buffer_(buffer.data()),
-            size_((std::max)(boost::uint64_t(buffer.size()), inbound_data_size)),
+            size_(buffer.size()),
+            decompressed_size_(inbound_data_size),
             current_(0)
         {
             init(flags);
@@ -214,6 +216,10 @@ namespace hpx { namespace util
         void set_filter(util::binary_filter* filter)
         {
             filter_.reset(filter);
+            if (filter) {
+                filter->init_decompression_data(&buffer_[current_],
+                    size_-current_, decompressed_size_);
+            }
         }
     };
 }}

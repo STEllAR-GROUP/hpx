@@ -78,8 +78,10 @@ namespace hpx { namespace parcelset { namespace tcp
                 // Serialize the data
                 util::binary_filter* filter = pv[0].get_serialization_filter();
                 int archive_flags = archive_flags_;
-                if (filter)
+                if (filter) {
+                    filter->set_max_compression_length(out_buffer_.capacity());
                     archive_flags |= util::enable_compression;
+                }
 
                 util::portable_binary_oarchive archive(
                     out_buffer_, filter, archive_flags);
