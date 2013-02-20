@@ -138,7 +138,8 @@ namespace hpx { namespace actions
         compdecomp_.load(src_begin, src_begin+src_count, dst_begin,
             dst_begin+dst_count);
 
-        if (!immediate_ && dst_begin-static_cast<char*>(dst) != dst_count)
+        if (!immediate_ && 
+            std::size_t(dst_begin-static_cast<char*>(dst)) != dst_count)
         {
             HPX_THROW_EXCEPTION(serialization_error,
                 "bzip2_serialization_filter::load",
