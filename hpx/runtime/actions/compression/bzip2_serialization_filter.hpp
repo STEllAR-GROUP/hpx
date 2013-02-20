@@ -67,11 +67,14 @@ namespace hpx { namespace actions
 
     struct HPX_EXPORT bzip2_serialization_filter : public util::binary_filter
     {
-        bzip2_serialization_filter() 
+        bzip2_serialization_filter()
+          : current_(0), immediate_(binary_filter::favor_speed)
         {}
 
-        bzip2_serialization_filter(bool compress)
-          : compdecomp_(compress)
+        bzip2_serialization_filter(bool compress,
+                binary_filter::mode m = binary_filter::favor_speed)
+          : compdecomp_(compress), current_(0),
+            immediate_(m == binary_filter::favor_speed)
         {}
         ~bzip2_serialization_filter();
 
@@ -84,18 +87,28 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base();
 
-        void set_max_compression_length(std::size_t size) {}
+        void set_max_compression_length(std::size_t size);
         void init_decompression_data(char const* buffer, std::size_t size,
-            std::size_t decompressed_size) {}
+            std::size_t decompressed_size);
+
+    protected:
+        std::size_t load_impl(void* dst, std::size_t dst_count,
+            void const* src, std::size_t src_count);
 
     private:
         // serialization support
         friend class boost::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) 
+        {
+            ar & immediate_;
+        }
 
         detail::bzip2_compdecomp compdecomp_;
+        std::vector<char> buffer_;
+        std::size_t current_;
+        bool immediate_;
     };
 }}
 
@@ -114,7 +127,25 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(hpx::actions::bzip2_serialization_fi
             /* instance returned from this function */                        \
             static util::binary_filter* call()                                \
             {                                                                 \
-                return new hpx::actions::bzip2_serialization_filter(true);    \
+                return new hpx::actions::bzip2_serialization_filter(true,     \
+                    util::binary_filter::favor_memorysize);                   \
+            }                                                                 \
+        };                                                                    \
+    }}                                                                        \
+/**/
+
+#define HPX_ACTION_USES_FAST_BZIP2_COMPRESSION(action)                        \
+    namespace hpx { namespace traits                                          \
+    {                                                                         \
+        template <>                                                           \
+        struct action_serialization_filter<action>                            \
+        {                                                                     \
+            /* Note that the caller is responsible for deleting the filter */ \
+            /* instance returned from this function */                        \
+            static util::binary_filter* call()                                \
+            {                                                                 \
+                return new hpx::actions::bzip2_serialization_filter(true,     \
+                    util::binary_filter::favor_speed);                        \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
@@ -123,6 +154,7 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(hpx::actions::bzip2_serialization_fi
 #else
 
 #define HPX_ACTION_USES_BZIP2_COMPRESSION(action)
+#define HPX_ACTION_USES_FAST_BZIP2_COMPRESSION(action)
 
 #endif
 #endif
