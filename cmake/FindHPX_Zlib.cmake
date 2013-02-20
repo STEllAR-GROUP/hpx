@@ -8,7 +8,7 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(ZLIB
-  LIBRARIES zdll zlib libz
+  LIBRARIES zdll zlib libz z
   LIBRARY_PATHS lib64 lib
   HEADERS zlib.h
   HEADER_PATHS include)

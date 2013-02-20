@@ -8,8 +8,8 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(BZIP2
-  LIBRARIES bzip2 libbz
+  LIBRARIES bzip2 libbz2 bz2
   LIBRARY_PATHS lib64 lib
-  HEADERS bzip2.h
+  HEADERS bzlib.h
   HEADER_PATHS include)
 
