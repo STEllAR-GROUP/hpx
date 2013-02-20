@@ -77,45 +77,72 @@ namespace hpx { namespace actions
             zlib_serialization_filter, util::binary_filter>();
     }
 
-    std::size_t zlib_serialization_filter::load(void* dst,
+    void zlib_serialization_filter::set_max_compression_length(std::size_t size)
+    {
+        buffer_.reserve(size);
+    }
+
+    void zlib_serialization_filter::init_decompression_data(char const* buffer,
+        std::size_t size, std::size_t decompressed_size)
+    {
+        buffer_.resize(decompressed_size);
+        std::size_t s = load_impl(buffer_.data(), decompressed_size, buffer, size);
+        if (s != size)
+        {
+            HPX_THROW_EXCEPTION(serialization_error,
+                "zlib_serialization_filter::load",
+                boost::str(boost::format("decompression failure, number of "
+                    "bytes expected: %d, number of bytes decoded: %d") %
+                        size % s) );
+        }
+        current_ = 0;
+    }
+
+    std::size_t zlib_serialization_filter::load_impl(void* dst,
         std::size_t dst_count, void const* src, std::size_t src_count)
     {
         char const* src_begin = static_cast<char const*>(src);
         char* dst_begin = static_cast<char*>(dst);
         compdecomp_.load(src_begin, src_begin+src_count, dst_begin,
             dst_begin+dst_count);
-
-        if (dst_begin-static_cast<char*>(dst) != dst_count)
-        {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "zlib_serialization_filter::load",
-                boost::str(boost::format("decompression failure, number of "
-                    "bytes expected: %d, number of bytes decoded: %d") %
-                        dst_count % (dst_begin-static_cast<char*>(dst)) ));
-            return 0;
-        }
         return src_begin-static_cast<char const*>(src);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t zlib_serialization_filter::load(void* dst,
+        std::size_t dst_count, void const* src, std::size_t src_count)
+    {
+        if (current_+dst_count > buffer_.size()) 
+        {
+            BOOST_THROW_EXCEPTION(
+                boost::archive::archive_exception(
+                    boost::archive::archive_exception::input_stream_error,
+                    "archive data bstream is too short"));
+        }
+
+        std::memcpy(dst, &buffer_[current_], dst_count);
+        current_ += dst_count;
+        return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t zlib_serialization_filter::save(void* dst,
         std::size_t dst_count, void const* src, std::size_t src_count)
     {
         char const* src_begin = static_cast<char const*>(src);
-        char* dst_begin = static_cast<char*>(dst);
-        compdecomp_.save(src_begin, src_begin+src_count, dst_begin,
-            dst_begin+dst_count);
-
-        return dst_begin-static_cast<char*>(dst);
+        std::copy(src_begin, src_begin+src_count, std::back_inserter(buffer_));
+        return 0;       // no output written
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t zlib_serialization_filter::flush(void* dst,
         std::size_t dst_count)
     {
-        char dummy = '\0';
-        char const* src_begin = &dummy;
+        // compress everything in one go
         char* dst_begin = static_cast<char*>(dst);
-        if (compdecomp_.save(src_begin, src_begin, dst_begin,
-                dst_begin+dst_count, true))
+        char const* src_begin = buffer_.data();
+        if (compdecomp_.save(src_begin, src_begin+buffer_.size(),
+                dst_begin, dst_begin+dst_count, true))
         {
             HPX_THROW_EXCEPTION(serialization_error,
                 "zlib_serialization_filter::flush",
