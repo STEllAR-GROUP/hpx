@@ -23,7 +23,9 @@
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 
-#include <hwloc.h>
+#if defined(HPX_HAVE_HWLOC)
+#  include <hwloc.h>
+#endif
 
 #if defined(__linux__) && !defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
 #  include <sys/syscall.h>      // make SYS_gettid available

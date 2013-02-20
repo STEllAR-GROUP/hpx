@@ -5,7 +5,6 @@
 
 #include <hpx/hpx_init.hpp>
 
-#if defined(HPX_HAVE_HWLOC)
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -22,6 +21,7 @@
 #define VERIFY_AFFINITY_MASKS
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_HWLOC)
 namespace hpx { namespace threads { namespace detail
 {
     std::ostream& operator<<(std::ostream& os, spec_type const& data)
