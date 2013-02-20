@@ -18,6 +18,8 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 718] - Add possibility to compress parcel data
+* [issue 717] - strip_credit_from_gid has misleading semantics
 * [issue 716] - Non-option arguments to programs run using `pbsdsh` must be
                 before `--hpx:nodes`, contrary to directions
 * [issue 715] - Re-thrown exceptions should retain the original call site
@@ -65,6 +67,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 669] - Links in docs to source files broken if not installed
 * [issue 667] - Not reading ini file properly
 * [issue 664] - Adapt new meanings of 'const' and 'mutable'
+* [issue 655] - Make HPX work with the "decltype" result_of
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
 * [issue 626] - hpx/future.hpp header

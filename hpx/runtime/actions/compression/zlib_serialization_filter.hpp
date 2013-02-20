@@ -62,7 +62,11 @@ namespace hpx { namespace actions
         zlib_serialization_filter(bool compress = false,
                 binary_filter::mode m = binary_filter::favor_speed)
           : compdecomp_(compress), current_(0)
-        {}
+        {
+            // The zlib serialization filter does not support the mode 
+            // 'favour_memorysize'.
+            BOOST_ASSERT(m == binary_filter::favor_speed);
+        }
         ~zlib_serialization_filter();
 
         std::size_t load(void* dst, std::size_t dst_count,
