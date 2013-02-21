@@ -57,7 +57,8 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx"
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx",
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx"
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/../lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
 #if HPX_USE_ITTNOTIFY != 0
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
