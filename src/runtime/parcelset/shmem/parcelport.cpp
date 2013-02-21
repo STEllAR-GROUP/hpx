@@ -507,7 +507,6 @@ namespace hpx { namespace parcelset { namespace shmem
                         buffer, buffer.size(), boost::archive::no_header);
 
                     std::size_t parcel_count = 0;
-                    std::size_t arg_size = 0;
 
                     archive >> parcel_count;
                     for(std::size_t i = 0; i < parcel_count; ++i)
@@ -519,9 +518,6 @@ namespace hpx { namespace parcelset { namespace shmem
                         // make sure this parcel ended up on the right locality
                         BOOST_ASSERT(p.get_destination_locality() == pp.here());
 
-                        // incoming argument's size
-                        arg_size += traits::get_type_size(p);
-
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
                         pp.add_received_parcel(p);
@@ -531,7 +527,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
                     // complete received data with parcel count
                     receive_data.num_parcels_ = parcel_count;
-                    receive_data.type_bytes_ = arg_size;
+                    receive_data.raw_bytes_ = archive.bytes_read();     // amount of uncompressed data
                 }
 
                 // store the time required for serialization

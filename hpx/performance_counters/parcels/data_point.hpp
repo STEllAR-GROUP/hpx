@@ -20,18 +20,19 @@ namespace hpx { namespace performance_counters { namespace parcels
     {
         data_point()
           : bytes_(0), time_(0), serialization_time_(0), num_parcels_(0),
-            type_bytes_(0)
+            raw_bytes_(0)
         {}
 
-        std::size_t bytes_;           ///< number of bytes processed for this parcel
+        std::size_t bytes_;           ///< number of bytes on tyhe wire for this parcel
+                                      ///< (possibly compressed)
         boost::int64_t time_;         ///< during processing holds start timestamp
                                       ///< after processing holds elapsed time
         boost::int64_t serialization_time_;    ///< during processing holds
                                       ///< start serialization timestamp after
                                       ///< processing holds elapsed serialization time
-        std::size_t num_parcels_;     ///< The number of parcels precessed by this message
-        std::size_t type_bytes_;  ///< number of bytes processed for action in
-                                      ///< this parcel
+        std::size_t num_parcels_;     ///< The number of parcels processed by this message
+        std::size_t raw_bytes_;       ///< number of bytes processed for the action in
+                                      ///< this parcel (uncompressed)
     };
 }}}
 

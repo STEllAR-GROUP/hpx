@@ -447,12 +447,12 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_data_sent() : 0;
     }
 
-    // total data (type only) sent (bytes)
-    std::size_t parcelhandler::get_total_type_sent(connection_type pp_type) const
+    // total data (uncompressed) sent (bytes)
+    std::size_t parcelhandler::get_raw_data_sent(connection_type pp_type) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_total_type_sent() : 0;
+        return pp ? pp->get_raw_data_sent() : 0;
     }
 
     // total data received (bytes)
@@ -463,12 +463,12 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_data_received() : 0;
     }
 
-    // total data (type only) received (bytes)
-    std::size_t parcelhandler::get_total_type_received(connection_type pp_type) const
+    // total data (uncompressed) received (bytes)
+    std::size_t parcelhandler::get_raw_data_received(connection_type pp_type) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_total_type_received() : 0;
+        return pp ? pp->get_raw_data_received() : 0;
     }
 
     // connection stack statistics
@@ -547,10 +547,10 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t()> data_received(
             boost::bind(&parcelhandler::get_data_received, this, pp_type));
 
-        HPX_STD_FUNCTION<boost::int64_t()> data_type_sent(
-            boost::bind(&parcelhandler::get_total_type_sent, this, pp_type));
-        HPX_STD_FUNCTION<boost::int64_t()> data_type_received(
-            boost::bind(&parcelhandler::get_total_type_received, this, pp_type));
+        HPX_STD_FUNCTION<boost::int64_t()> data_raw_sent(
+            boost::bind(&parcelhandler::get_raw_data_sent, this, pp_type));
+        HPX_STD_FUNCTION<boost::int64_t()> data_raw_received(
+            boost::bind(&parcelhandler::get_raw_data_received, this, pp_type));
 
         HPX_STD_FUNCTION<boost::int64_t()> cache_insertions(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
@@ -658,31 +658,31 @@ namespace hpx { namespace parcelset
 
             { boost::str(boost::format("/data/count/%s/sent") % connection_type_name),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the amount of parcel argument data sent "
-                  "using the %s connection type by the referenced locality") %
-                      connection_type_name),
+              boost::str(boost::format("returns the amount of (uncompressed) parcel "
+                  "argument data sent using the %s connection type by the referenced "
+                  "locality") % connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_type_sent, _2),
+                  _1, data_raw_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
             { boost::str(boost::format("/data/count/%s/received") % connection_type_name),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the amount of parcel argument data received "
-                  "using the %s connection type by the referenced locality") %
-                      connection_type_name),
+              boost::str(boost::format("returns the amount of (uncompressed) parcel "
+                  "argument data received using the %s connection type by the referenced "
+                  "locality") % connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_type_received, _2),
+                  _1, data_raw_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
             { boost::str(boost::format("/serialize/count/%s/sent") % connection_type_name),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of parcel data (including "
-                  "headers) sent using the %s connection type by the referenced "
-                  "locality") % connection_type_name),
+                  "headers, possibly compressed) sent using the %s connection type "
+                  "by the referenced locality") % connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_sent, _2),
@@ -692,8 +692,8 @@ namespace hpx { namespace parcelset
             { boost::str(boost::format("/serialize/count/%s/received") % connection_type_name),
               performance_counters::counter_raw,
               boost::str(boost::format("returns the amount of parcel data (including "
-                  "headers) received using the %s connection type by the referenced "
-                  "locality") % connection_type_name),
+                  "headers, possibly compressed) received using the %s connection type "
+                  "by the referenced locality") % connection_type_name),
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_received, _2),

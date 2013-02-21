@@ -87,7 +87,7 @@ system and application performance.
           based) number identifying the locality.
         ]
         [None]
-        [Returns the overall number of bytes of memory consumed by the messages
+        [Returns the overall number of raw (uncompressed) bytes sent or received
          (see `<operation>`, e.g. `sent` or `received`) for the specified
          `<connection_type>`.
 
@@ -133,8 +133,8 @@ system and application performance.
         ]
         [None]
         [Returns the overall number of bytes transferred (see `<operation>`,
-         e.g. `sent` or `received`)  for the specified `<connection_type>` by
-         the given locality.
+         e.g. `sent` or `received`, possibly compressed) for the specified 
+         `<connection_type>` by the given locality.
 
          The performance counters for the conenction type `shmem` are available
          only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was

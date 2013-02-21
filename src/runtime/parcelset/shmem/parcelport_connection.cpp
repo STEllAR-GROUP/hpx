@@ -84,6 +84,8 @@ namespace hpx { namespace parcelset { namespace shmem
                 {
                     archive << p;
                 }
+
+                arg_size = archive.bytes_written();
             }
 
             // store the time required for serialization
@@ -119,8 +121,8 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         send_data_.num_parcels_ = pv.size();
-        send_data_.bytes_ = out_buffer_.size();
-        send_data_.type_bytes_ = arg_size;
+        send_data_.bytes_ = arg_size;
+        send_data_.raw_bytes_ = out_buffer_.size();
     }
 }}}
 
