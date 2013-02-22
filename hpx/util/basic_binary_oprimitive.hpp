@@ -40,6 +40,8 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
+#include <hpx/util/binary_filter.hpp>
+
 #if !defined(BOOST_WINDOWS)
 #  pragma GCC visibility push(default)
 #endif
@@ -63,22 +65,69 @@ namespace hpx { namespace util
         struct erase_container_type
         {
             virtual ~erase_container_type() {}
-            virtual std::size_t size() = 0;
-            virtual void resize(std::size_t) = 0;
-            virtual char& operator[](std::size_t) = 0;
+            virtual void set_filter(binary_filter* filter) = 0;
+            virtual void save_binary(void const* address, std::size_t count) = 0;
         };
 
         template <typename Container>
         struct container_type : erase_container_type
         {
-            container_type(Container& cont) : cont_(cont) {}
-            ~container_type() {}
+            container_type(Container& cont)
+              : cont_(cont), current_(0)
+            {}
+            ~container_type()
+            {
+                if (filter_) {
+                    std::size_t written = 0;
+                    do {
+                        bool flushed = filter_->flush(&cont_[current_],
+                            cont_.size()-current_, written);
 
-            std::size_t size() { return cont_.size(); }
-            void resize(std::size_t size) { cont_.resize(size); }
-            char& operator[](std::size_t index) { return cont_[index]; }
+                        current_ += written;
+                        if (flushed)
+                            break;
+
+                        // resize container
+                        cont_.resize(cont_.size()*2);
+
+                    } while (true);
+
+                    cont_.resize(current_);         // truncate container
+                }
+            }
+
+            void set_filter(binary_filter* filter)
+            {
+                filter_.reset(filter);
+            }
+
+            void save_binary(void const* address, std::size_t count)
+            {
+                if (count != 0)
+                {
+                    cont_.resize(cont_.size() + count);
+                    if (filter_) {
+                        filter_->save(address, count);
+                    }
+                    else {
+                        std::memcpy(&cont_[current_], address, count);
+                        current_ += count;
+                    }
+
+                    if (cont_.size() < current_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::output_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
+                }
+            }
 
             Container& cont_;
+            std::size_t current_;
+            HPX_STD_UNIQUE_PTR<binary_filter> filter_;
         };
     }
 
@@ -89,14 +138,10 @@ namespace hpx { namespace util
     class HPX_SERIALIZATION_EXPORT basic_binary_oprimitive
     {
     protected:
-        void save_binary(const void *address, std::size_t count)
+        void save_binary(void const* address, std::size_t count)
         {
-            std::size_t size = buffer_->size();
-            if (count != 0)
-            {
-                buffer_->resize(size + count);
-                std::memcpy(&buffer_->operator [](size), address, count);
-            }
+            size_ += count;
+            buffer_->save_binary(address, count);
         }
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
@@ -105,8 +150,8 @@ namespace hpx { namespace util
 #else
     public:
 #endif
-
         // this is the output buffer
+        std::size_t size_;
         boost::shared_ptr<detail::erase_container_type> buffer_;
 
         // return a pointer to the most derived class
@@ -151,7 +196,8 @@ namespace hpx { namespace util
 
         template <typename Container>
         basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
-          : buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
+          : size_(0),
+            buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
         {
             init(flags);
         }
@@ -179,12 +225,22 @@ namespace hpx { namespace util
 #endif
         };
 
+        std::size_t bytes_written() const
+        {
+            return size_;
+        }
+
     protected:
         // the optimized save_array dispatches to save_binary
         template <typename T>
         void save_array(boost::serialization::array<T> const& a, unsigned int)
         {
             save_binary(a.address(), a.count()*sizeof(T));
+        }
+
+        void set_filter(binary_filter* filter)
+        {
+            buffer_->set_filter(filter);
         }
     };
 }}

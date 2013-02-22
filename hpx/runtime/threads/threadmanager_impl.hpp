@@ -223,7 +223,7 @@ namespace hpx { namespace threads
             return state_.load();
         }
 
-        /// \brief return the number of PX-threads with the given state
+        /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the threadmanager
         boost::int64_t get_thread_count(thread_state_enum state = unknown) const;
@@ -485,6 +485,12 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+        naming::gid_type thread_wait_time_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        naming::gid_type task_wait_time_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+#endif
 
     private:
         /// this thread manager has exactly as much threads as requested

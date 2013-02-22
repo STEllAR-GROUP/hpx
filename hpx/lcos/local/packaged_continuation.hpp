@@ -563,7 +563,7 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<cont_impl_type> p(
             detail::make_continuation_base<result_type, Result>(
-                boost::forward<F>(f)));
+                util::bind(util::protect(boost::forward<F>(f)), util::placeholders::_1)));
 
         // bind an on_completed handler to this future which will invoke the
         // continuation
@@ -607,7 +607,7 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<cont_impl_type> p(
             detail::make_continuation_base<result_type, void>(
-                boost::forward<F>(f)));
+                util::bind(util::protect(boost::forward<F>(f)), util::placeholders::_1)));
 
         // bind an on_completed handler to this future which will invoke the
         // continuation

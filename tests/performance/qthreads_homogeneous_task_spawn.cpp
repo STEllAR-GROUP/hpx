@@ -42,6 +42,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -80,13 +82,14 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-extern "C" aligned_t worker(
-    void* 
+extern "C" aligned_t worker_func(
+    void* p
     )
 {
+    boost::uint64_t const delay_ = reinterpret_cast<boost::uint64_t>(p);
+
     double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1. / (2. * i + 1.);
+    worker(delay_, &d);
 
     ++donecount;
 
@@ -109,7 +112,10 @@ int qthreads_main(
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            qthread_fork(&worker, NULL, NULL);
+        {
+            void* const ptr = &delay;
+            qthread_fork(&worker_func, ptr, NULL);
+        }
 
         // Yield until all our null qthreads are done.
         do {

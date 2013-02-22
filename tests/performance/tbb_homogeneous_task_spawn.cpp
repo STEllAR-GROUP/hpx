@@ -41,6 +41,8 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -76,14 +78,12 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct worker : tbb::task
+struct worker_func : tbb::task
 {
     tbb::task* execute()
     {
         double volatile d = 0.;
-        for (boost::uint64_t i = 0; i < delay; ++i)
-            d += 1. / (2. * i + 1.);
-
+        worker(delay, &d);
         return 0;
     }
 };
@@ -97,7 +97,7 @@ struct spawner : tbb::task
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
         {
-            worker& a = *new (tbb::task::allocate_child()) worker();
+            worker_func& a = *new (tbb::task::allocate_child()) worker_func();
 
             if (i == (tasks - 1))
                 spawn_and_wait_for_all(a);

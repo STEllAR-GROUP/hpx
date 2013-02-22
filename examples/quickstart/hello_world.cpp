@@ -13,6 +13,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/plugins/compression/snappy_serialization_filter.hpp>
 
 #include <vector>
 #include <list>
@@ -119,6 +120,7 @@ void hello_world_foreman()
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action.
 HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
+HPX_ACTION_USES_SNAPPY_COMPRESSION(hello_world_foreman_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////

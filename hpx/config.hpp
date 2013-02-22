@@ -177,7 +177,7 @@
 /// all other localities). This value can be changed at runtime by setting
 /// the configuration parameter:
 ///
-///   hpx.max_connections = ...
+///   hpx.parcel.max_connections = ...
 ///
 /// (or by setting the corresponding environment variable
 /// HPX_MAX_PARCEL_CONNECTIONS).
@@ -185,12 +185,24 @@
 #  define HPX_MAX_PARCEL_CONNECTIONS 512
 #endif
 
+/// This defines the number of outgoing shmem (parcel-) connections kept alive
+/// (to each of the other localities on the same node). This value can be changed
+/// at runtime by setting the configuration parameter:
+///
+///   hpx.parcel.shmem_data_buffer_cache_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE).
+#if !defined(HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE)
+#  define HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE 512
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
 /// each of the other localities). This value can be changed at runtime by
 /// setting the configuration parameter:
 ///
-///   hpx.max_connections_per_locality = ...
+///   hpx.parcel.max_connections_per_locality = ...
 ///
 /// (or by setting the corresponding environment variable
 /// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
@@ -198,7 +210,7 @@
 #  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
+
 /// This defines the number of AGAS address translations kept in the local
 /// cache on a per OS-thread basis (system wide used OS threads).
 #if !defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD)
@@ -295,6 +307,12 @@
 #  if defined(HPX_DEBUG)
 #    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1
 #  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// By default enable collecting queue wait times
+#if !defined(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
+#  define HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

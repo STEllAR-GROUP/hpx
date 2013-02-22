@@ -38,12 +38,12 @@ namespace hpx { namespace performance_counters { namespace server
 
         virtual bool start()
         {
-            return false;
+            return true;    // nothing to do
         }
 
         virtual bool stop()
         {
-            return false;
+            return true;    // nothing to do
         }
 
         virtual counter_info get_counter_info() const

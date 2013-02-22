@@ -73,7 +73,7 @@ namespace hpx { namespace components
         ///           initialize the newly allocated object.
         ///
         /// \return   Returns the GID of the first newly created component
-        ///           instance. 
+        ///           instance.
         virtual naming::gid_type create_with_args(
             HPX_STD_FUNCTION<void(void*)> const&) = 0;
 
@@ -143,12 +143,19 @@ namespace hpx { namespace util { namespace plugin
             componentname, factory)                                           \
     /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_APPLICATION_NAME)
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
         HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, factory)                    \
         HPX_REGISTER_REGISTRY_MODULE()                                        \
     /**/
+#else
+// in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
+// to nothing
+#define HPX_REGISTER_COMPONENT_MODULE()
+#endif
 
 #endif
 

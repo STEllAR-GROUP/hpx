@@ -9,11 +9,6 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
-/// \cond NOINTERNAL
-// FIXME: Make HPX work with the "decltype" result_of, and remove this #define!
-#define BOOST_RESULT_OF_USE_TR1
-/// \endcond
-
 #include <cstdlib>
 #include <vector>
 
@@ -192,8 +187,12 @@ namespace hpx
             depleted = 4,       /*!< thread has been depleted (deeply
                                      suspended, it is not known to the
                                      thread manager) */
-            terminated = 5      /*!< thread has been stopped an may be
+            terminated = 5,     /*!< thread has been stopped an may be
                                      garbage collected */
+            staged = 6          /*!< this is not a real thread state, but
+                                     allows to reference staged task descriptions,
+                                     which eventually will be converted into
+                                     thread objects */
         };
 
         /// \ cond NODETAIL
@@ -326,6 +325,11 @@ namespace hpx
 
         /// The function \a get_thread_count returns the number of currently
         /// known threads.
+        ///
+        /// \note If state == unknown this function will not only return the 
+        ///       number of currently existing threads, but will add the number
+        ///       of registered task descriptions (which have not been 
+        ///       converted into threads yet.
         HPX_API_EXPORT boost::int64_t get_thread_count(
             thread_state_enum state = unknown);
     }

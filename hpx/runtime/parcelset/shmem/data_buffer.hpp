@@ -221,9 +221,11 @@ namespace hpx { namespace parcelset { namespace shmem
     ///////////////////////////////////////////////////////////////////////////
     class data_buffer
     {
+    public:
         typedef boost::interprocess::vector<
             char, shmem_allocator_type> data_buffer_type;
 
+    private:
         struct data : public data_buffer_base
         {
             data(char const* segment_name, std::size_t size)

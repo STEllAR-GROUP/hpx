@@ -35,7 +35,7 @@ int hpx_main()
             argv[argcount++] = const_cast<char*>(args[i].data());
         }
         else if (6 == args[i].find("positional", 6)) {
-            std::string::size_type p = args[i].find_last_of("=");
+            std::string::size_type p = args[i].find_first_of("=");
             if (p != std::string::npos) {
                 args[i] = args[i].substr(p+1);
                 argv[argcount++] = const_cast<char*>(args[i].data());

@@ -116,6 +116,23 @@ namespace hpx { namespace parcelset
             return 0;     // by default no thread pool is used
         }
 
+        /// Return the given connection cache statistic
+        enum connection_cache_statistics_type
+        {
+            connection_cache_insertions = 0,
+            connection_cache_evictions = 1,
+            connection_cache_hits = 2,
+            connection_cache_misses = 3
+        };
+
+        virtual boost::int64_t
+        get_connection_cache_statistics(connection_cache_statistics_type) const
+        {
+            // by default this parcelport does not expose any conenction cache 
+            // statistics
+            return 0;
+        }
+
         /// Register an event handler to be called whenever a parcel has been
         /// received.
         ///
@@ -208,10 +225,10 @@ namespace hpx { namespace parcelset
             return parcels_sent_.total_bytes();
         }
 
-        /// total data (type only) sent (bytes)
-        std::size_t get_total_type_sent() const
+        /// total data (uncompressed) sent (bytes)
+        std::size_t get_raw_data_sent() const
         {
-            return parcels_sent_.total_type_bytes();
+            return parcels_sent_.total_raw_bytes();
         }
 
         /// total data received (bytes)
@@ -220,10 +237,10 @@ namespace hpx { namespace parcelset
             return parcels_received_.total_bytes();
         }
 
-        /// total data (type only) received (bytes)
-        std::size_t get_total_type_received() const
+        /// total data (uncompressed) received (bytes)
+        std::size_t get_raw_data_received() const
         {
-            return parcels_received_.total_type_bytes();
+            return parcels_received_.total_raw_bytes();
         }
 
         std::size_t get_pending_parcels_count() const

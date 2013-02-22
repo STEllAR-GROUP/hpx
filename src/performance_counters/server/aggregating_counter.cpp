@@ -15,75 +15,29 @@
 
 #include <boost/version.hpp>
 #include <boost/chrono/chrono.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/max.hpp>
-#include <boost/accumulators/statistics/min.hpp>
+
+#define BOOST_SPIRIT_USE_PHOENIX_V3
+#include <boost/spirit/include/qi_char.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/qi_operator.hpp>
+#include <boost/spirit/include/qi_parse.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
-    namespace detail
-    {
-        template <typename Statistic>
-        struct counter_type_from_statistic;
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::mean>
-        {
-            typedef boost::accumulators::tag::mean aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    boost::accumulators::mean(accum));
-            }
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::max>
-        {
-            typedef boost::accumulators::tag::max aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    (boost::accumulators::max)(accum));
-            }
-        };
-
-        template <>
-        struct counter_type_from_statistic<boost::accumulators::tag::min>
-        {
-            typedef boost::accumulators::tag::min aggregating_tag;
-            typedef boost::accumulators::accumulator_set<
-                double, boost::accumulators::stats<aggregating_tag>
-            > accumulator_type;
-
-            static boost::int64_t call(accumulator_type& accum)
-            {
-                return static_cast<boost::int64_t>(
-                    (boost::accumulators::min)(accum));
-            }
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Statistic>
     aggregating_counter<Statistic>::aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
-            boost::int64_t base_time_interval)
+            boost::uint64_t parameter1, boost::uint64_t parameter2)
       : base_type_holder(info),
         timer_(boost::bind(&aggregating_counter::evaluate, this_()),
-            1000 * base_time_interval, info.fullname_, true),
-        base_counter_name_(ensure_counter_prefix(base_counter_name))
+            1000 * parameter1, info.fullname_, true),
+        base_counter_name_(ensure_counter_prefix(base_counter_name)),
+        value_(detail::counter_type_from_statistic<Statistic>::create(parameter2)),
+        parameter1_(parameter1), parameter2_(parameter2)
     {
-        if (base_time_interval == 0) {
+        if (parameter1 == 0) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "aggregating_counter<Statistic>::aggregating_counter",
                 "base interval is specified to be zero");
@@ -93,15 +47,6 @@ namespace hpx { namespace performance_counters { namespace server
             HPX_THROW_EXCEPTION(bad_parameter,
                 "aggregating_counter<Statistic>::aggregating_counter",
                 "unexpected counter type specified for elapsed_time_counter");
-        }
-
-        // acquire the current value of the base counter
-        counter_value base_value;
-        if (evaluate_base_counter(base_value))
-        {
-            mutex_type::scoped_lock l(mtx_);
-            value_(static_cast<double>(base_value.value_));
-            prev_value_ = base_value;
         }
     }
 
@@ -113,16 +58,18 @@ namespace hpx { namespace performance_counters { namespace server
 
         hpx::performance_counters::counter_value value;
 
+        prev_value_.value_ = detail::counter_type_from_statistic<Statistic>::call(*value_);
+        prev_value_.status_ = status_new_data;
+        prev_value_.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
+        prev_value_.count_ = ++invocation_count_;
         value = prev_value_;                              // return value
-        value.value_ = detail::counter_type_from_statistic<Statistic>::call(value_);
-        value.status_ = status_new_data;
-        value.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
-        value.count_ = ++invocation_count_;
 
-        prev_value_ = value;
-
-        value_ = accumulator_type();                      // reset accumulator
-        value_(static_cast<double>(prev_value_.value_));  // start off with last base value
+        if (detail::counter_type_from_statistic<Statistic>::need_reset::value)
+        {
+            value_.reset(detail::counter_type_from_statistic<Statistic>::create(
+                parameter2_)); // reset accumulator
+            (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+        }
 
         return value;
     }
@@ -149,8 +96,35 @@ namespace hpx { namespace performance_counters { namespace server
         }
         else {
             mutex_type::scoped_lock l(mtx_);
-            value_(static_cast<double>(base_value.value_));          // accumulate new value
+            (*value_)(static_cast<double>(base_value.value_));          // accumulate new value
         }
+        return true;
+    }
+
+    template <typename Statistic>
+    bool aggregating_counter<Statistic>::ensure_base_counter()
+    {
+        // lock here to avoid checking out multiple reference counted GIDs
+        // from AGAS
+        mutex_type::scoped_lock l(mtx_);
+
+        if (!base_counter_id_) {
+            // get or create the base counter
+            error_code ec(lightweight);
+            base_counter_id_ = get_counter(base_counter_name_, ec);
+            if (HPX_UNLIKELY(ec || !base_counter_id_))
+            {
+                // base counter could not be retrieved
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "aggregating_counter<Statistic>::evaluate_base_counter",
+                    boost::str(boost::format(
+                        "could not get or create performance counter: '%s'") %
+                            base_counter_name_)
+                    )
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -158,30 +132,10 @@ namespace hpx { namespace performance_counters { namespace server
     bool aggregating_counter<Statistic>::evaluate_base_counter(
         counter_value& value)
     {
-        {
-            // lock here to avoid checking out multiple reference counted GIDs
-            // from AGAS
-            mutex_type::scoped_lock l(mtx_);
-
-            if (!base_counter_id_) {
-                // get or create the base counter
-                error_code ec(lightweight);
-                base_counter_id_ = get_counter(base_counter_name_, ec);
-                if (HPX_UNLIKELY(ec || !base_counter_id_))
-                {
-                    // base counter could not be retrieved
-                    HPX_THROW_EXCEPTION(bad_parameter,
-                        "aggregating_counter<Statistic>::evaluate_base_counter",
-                        boost::str(boost::format(
-                            "could not get or create performance counter: '%s'") %
-                                base_counter_name_)
-                        )
-                    return false;
-                }
-            }
-        }
-
         // query the actual value
+        if (!base_counter_id_ && !ensure_base_counter())
+            return false;
+
         value = stubs::performance_counter::get_value(base_counter_id_);
         return true;
     }
@@ -193,8 +147,24 @@ namespace hpx { namespace performance_counters { namespace server
     bool aggregating_counter<Statistic>::start()
     {
         if (!timer_.is_started()) {
+            // start base counter
+            if (!base_counter_id_ && !ensure_base_counter())
+                return false;
+
             bool result = stubs::performance_counter::start(base_counter_id_);
-            timer_.start();
+            if (result) {
+                // acquire the current value of the base counter
+                counter_value base_value;
+                if (evaluate_base_counter(base_value))
+                {
+                    mutex_type::scoped_lock l(mtx_);
+                    (*value_)(static_cast<double>(base_value.value_));
+                    prev_value_ = base_value;
+                }
+
+                // start counter
+                timer_.start();
+            }
             return result;
         }
         return false;
@@ -205,6 +175,9 @@ namespace hpx { namespace performance_counters { namespace server
     {
         if (timer_.is_started()) {
             timer_.stop();
+
+            if (!base_counter_id_ && !ensure_base_counter())
+                return false;
             return stubs::performance_counter::stop(base_counter_id_);
         }
         return false;
@@ -215,10 +188,23 @@ namespace hpx { namespace performance_counters { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        value_ = accumulator_type();                      // reset accumulator
-        value_(static_cast<double>(prev_value_.value_));  // start off with last base value
+        value_.reset(detail::counter_type_from_statistic<Statistic>::create(
+            parameter2_)); // reset accumulator
+        (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
     }
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
+    boost::accumulators::tag::mean>;
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
+    boost::accumulators::tag::median>;
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
+    boost::accumulators::tag::rolling_mean>;
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
+    boost::accumulators::tag::max>;
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
+    boost::accumulators::tag::min>;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Average
@@ -227,17 +213,34 @@ typedef hpx::components::managed_component<
         boost::accumulators::tag::mean>
 > average_count_counter_type;
 
-template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
-    boost::accumulators::tag::mean>;
-template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
-    boost::accumulators::tag::max>;
-template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
-    boost::accumulators::tag::min>;
-
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     average_count_counter_type, average_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// Rooling average
+typedef hpx::components::managed_component<
+    hpx::performance_counters::server::aggregating_counter<
+        boost::accumulators::tag::rolling_mean>
+> rolling_mean_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_mean_count_counter_type, rolling_mean_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_mean_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// Median
+typedef hpx::components::managed_component<
+    hpx::performance_counters::server::aggregating_counter<
+        boost::accumulators::tag::median>
+> median_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    median_count_counter_type, median_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(median_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max
@@ -289,20 +292,26 @@ namespace hpx { namespace performance_counters { namespace detail
                 get_counter_name(paths.parentinstancename_, base_name, ec);
                 if (ec) return naming::invalid_gid;
 
-                boost::int64_t interval = 1000;
+                std::vector<boost::int64_t> parameters;
                 if (!paths.parameters_.empty()) {
                     // try to interpret the additional parameter as interval
                     // time (ms)
-                    try {
-                        interval = boost::lexical_cast<boost::int64_t>(paths.parameters_);
-                    }
-                    catch (boost::bad_lexical_cast const& e) {
+                    namespace qi = boost::spirit::qi;
+                    if (!qi::parse(paths.parameters_.begin(), paths.parameters_.end(),
+                            qi::int_ % ',', parameters))
+                    {
                         HPX_THROWS_IF(ec, bad_parameter,
-                            "aggregating_counter_creator", e.what());
+                            "aggregating_counter_creator", 
+                            "invalid parameter specification for counter: " +
+                                paths.parameters_);
                         return naming::invalid_gid;
                     }
                 }
-                return create_aggregating_counter(info, base_name, interval, ec);
+                else {
+                    parameters.push_back(1000);       // sample interval
+                    parameters.push_back(10);         // rolling window
+                }
+                return create_aggregating_counter(info, base_name, parameters, ec);
             }
             break;
 

@@ -46,6 +46,8 @@
 #include <boost/random.hpp>
 #include <boost/ref.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -113,15 +115,14 @@ boost::uint64_t shuffler(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-extern "C" aligned_t worker(
+extern "C" aligned_t worker_func(
     void* p
     )
 {
     boost::uint64_t const delay_ = reinterpret_cast<boost::uint64_t>(p);
 
     double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay_; ++i)
-        d += 1 / (2. * i + 1);
+    worker(delay_, &d);
 
     ++donecount;
 
@@ -238,7 +239,7 @@ int qthreads_main(
         for (boost::uint64_t i = 0; i < tasks; ++i)
         { 
             void* const ptr = reinterpret_cast<void*>(payloads[i]);
-            qthread_fork(&worker, ptr, NULL);
+            qthread_fork(&worker_func, ptr, NULL);
         }
 
         ///////////////////////////////////////////////////////////////////////

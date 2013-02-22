@@ -19,7 +19,9 @@ namespace hpx { namespace util { namespace detail
     class protected_bind
     {
     public:
-        typedef typename F::result_type result_type;
+
+        template <typename>
+        struct result;
 
         // copy constructor
         protected_bind(protected_bind const& other)
@@ -55,89 +57,68 @@ namespace hpx { namespace util { namespace detail
             return *this;
         }
 
-        result_type operator()()
+        template <typename This>
+        struct result<This()>
+        {
+            typedef typename boost::result_of<F()>::type type;
+        };
+
+        BOOST_FORCEINLINE 
+        typename boost::result_of<F()>::type operator()()
         {
             return f_();
         }
 
-        result_type operator()() const
+        template <typename This>
+        struct result<This const ()>
+        {
+            typedef typename boost::result_of<F const ()>::type type;
+        };
+
+        BOOST_FORCEINLINE
+        typename boost::result_of<F const ()>::type operator()() const
         {
             return f_();
         }
 
-        template <typename A1>
-        result_type operator()(BOOST_FWD_REF(A1) a1)
-        {
-          return f_(boost::forward<A1>(a1));
-        }
-
-        template <typename A1>
-        result_type operator()(BOOST_FWD_REF(A1) a1) const
-        {
-            return f_(boost::forward<A1>(a1));
-        }
-
-        template <typename A1, typename A2>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2)
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2));
-        }
-
-        template <typename A1, typename A2>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2) const
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2));
-        }
-
-        template <typename A1, typename A2, typename A3>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2,
-            BOOST_FWD_REF(A3) a3)
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2),
-                boost::forward<A3>(a3));
-        }
-
-        template <typename A1, typename A2, typename A3>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2,
-            BOOST_FWD_REF(A3) a3) const
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2),
-                boost::forward<A3>(a3));
-        }
-
-        template <typename A1, typename A2, typename A3, typename A4>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2,
-            BOOST_FWD_REF(A3) a3, BOOST_FWD_REF(A4) a4)
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2),
-                boost::forward<A3>(a3), boost::forward<A4>(a4));
-        }
-
-        template <typename A1, typename A2, typename A3, typename A4>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2,
-            BOOST_FWD_REF(A3) a3, BOOST_FWD_REF(A4) a4) const
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2),
-                boost::forward<A3>(a3), boost::forward<A4>(a4));
-        }
-
-        template <typename A1, typename A2, typename A3, typename A4, typename A5>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2,
-            BOOST_FWD_REF(A3) a3, BOOST_FWD_REF(A4) a4, BOOST_FWD_REF(A5) a5)
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2),
-                boost::forward<A3>(a3), boost::forward<A4>(a4),
-                boost::forward<A5>(a5));
-        }
-
-        template <typename A1, typename A2, typename A3, typename A4, typename A5>
-        result_type operator()(BOOST_FWD_REF(A1) a1, BOOST_FWD_REF(A2) a2,
-            BOOST_FWD_REF(A3) a3, BOOST_FWD_REF(A4) a4, BOOST_FWD_REF(A5) a5) const
-        {
-            return f_(boost::forward<A1>(a1), boost::forward<A2>(a2),
-                boost::forward<A3>(a3), boost::forward<A4>(a4),
-                boost::forward<A5>(a5));
-        }
+#define HPX_UTIL_PROTECT_OPERATOR(Z, N, D)                                      \
+        template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>           \
+        struct result<This(BOOST_PP_ENUM_PARAMS(N, A))>                         \
+        {                                                                       \
+            typedef                                                             \
+                typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type  \
+                type;                                                           \
+        };                                                                      \
+                                                                                \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
+        BOOST_FORCEINLINE                                                       \
+        typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type          \
+        operator()(HPX_ENUM_FWD_ARGS(N, A, a))                                  \
+        {                                                                       \
+          return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+        }                                                                       \
+                                                                                \
+        template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>           \
+        struct result<This const (BOOST_PP_ENUM_PARAMS(N, A))>                  \
+        {                                                                       \
+            typedef                                                             \
+                typename boost::result_of<                                      \
+                    F const (BOOST_PP_ENUM_PARAMS(N, A))                        \
+                >::type                                                         \
+                type;                                                           \
+        };                                                                      \
+                                                                                \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
+        BOOST_FORCEINLINE                                                       \
+        typename boost::result_of<F const (BOOST_PP_ENUM_PARAMS(N, A))>::type   \
+        operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const                            \
+        {                                                                       \
+          return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+        }                                                                       \
+    /**/
+        
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
+                HPX_UTIL_PROTECT_OPERATOR, _)
 
     private:
         F f_;
@@ -153,5 +134,13 @@ namespace hpx { namespace util
         return detail::protected_bind<typename detail::remove_reference<F>::type>(boost::forward<F>(f));
     }
 }} // namespace hpx::util
+
+namespace boost {
+    template <typename F>
+    struct result_of<hpx::util::detail::protected_bind<F>()>
+    {
+        typedef typename result_of<F()>::type type;
+    };
+}
 
 #endif

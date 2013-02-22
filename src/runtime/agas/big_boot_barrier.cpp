@@ -430,7 +430,14 @@ void register_worker(registration_header const& header)
     util::runtime_configuration const& cfg = get_runtime().get_config();
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
         cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
-    agas_client.register_locality(header.locality, prefix, num_threads);
+    if (!agas_client.register_locality(header.locality, prefix, num_threads))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+            , "agas::register_worker"
+            , boost::str(boost::format(
+                "attempt to register locality %s more than once") % 
+                    header.locality));
+    }
 
     agas_client.get_id_range(header.locality, header.parcelport_allocation
                            , parcel_lower, parcel_upper);

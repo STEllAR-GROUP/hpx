@@ -40,6 +40,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
     void decode_message(parcelport&,
         boost::shared_ptr<std::vector<char> > buffer,
+        boost::uint64_t inbound_data_size,
         performance_counters::parcels::data_point receive_data);
 }}}
 
@@ -54,7 +55,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 parcelset::tcp::parcelport& parcelport)
-          : socket_(io_service), in_priority_(0), in_size_(0),
+          : socket_(io_service), in_priority_(0), in_size_(0), in_data_size_(0),
             in_buffer_(), parcelport_(parcelport)
         {}
 
@@ -87,11 +88,13 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             in_buffer_.reset(new std::vector<char>());
             in_priority_ = 0;
             in_size_ = 0;
+            in_data_size_ = 0;
 
             using boost::asio::buffer;
             std::vector<boost::asio::mutable_buffer> buffers;
             buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
             buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
+            buffers.push_back(buffer(&in_data_size_, sizeof(in_data_size_)));
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
@@ -123,11 +126,11 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             }
             else {
                 // Determine the length of the serialized data.
-                boost::uint64_t inbound_data_size = in_size_;
-                receive_data_.bytes_ = std::size_t(inbound_data_size);
+                boost::uint64_t inbound_size = in_size_;
+                receive_data_.bytes_ = std::size_t(inbound_size);
 
                 // Start an asynchronous call to receive the data.
-                in_buffer_->resize(static_cast<std::size_t>(inbound_data_size));
+                in_buffer_->resize(static_cast<std::size_t>(inbound_size));
                 void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;
@@ -178,7 +181,8 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                         boost::asio::placeholders::error, handler));
 
                 // add parcel data to incoming parcel queue
-                decode_message(parcelport_, data, receive_data);
+                boost::uint64_t inbound_data_size = in_data_size_;
+                decode_message(parcelport_, data, inbound_data_size, receive_data);
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
@@ -200,6 +204,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         /// buffer for incoming data
         boost::integer::ulittle8_t in_priority_;
         boost::integer::ulittle64_t in_size_;
+        boost::integer::ulittle64_t in_data_size_;
         boost::shared_ptr<std::vector<char> > in_buffer_;
         bool ack_;
 

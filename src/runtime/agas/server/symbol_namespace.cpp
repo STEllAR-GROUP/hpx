@@ -222,10 +222,10 @@ response symbol_namespace::bind(
 
     if (it != end)
     {
-        boost::uint16_t const credits = naming::get_credit_from_gid(gid);
+        boost::uint16_t const credits = naming::detail::get_credit_from_gid(gid);
         naming::gid_type raw_gid = it->second;
-        naming::strip_credit_from_gid(raw_gid);
-        naming::strip_credit_from_gid(gid);
+        naming::detail::strip_credit_from_gid(raw_gid);
+        naming::detail::strip_credit_from_gid(gid);
 
         // increase reference count
         if (raw_gid == gid)
@@ -234,10 +234,10 @@ response symbol_namespace::bind(
                 "symbol_namespace::bind, key(%1%), gid(%2%), old_credit(%3%), "
                 "new_credit(%4%)")
                 % key % gid
-                % naming::get_credit_from_gid(it->second)
-                % (naming::get_credit_from_gid(it->second) + credits));
+                % naming::detail::get_credit_from_gid(it->second)
+                % (naming::detail::get_credit_from_gid(it->second) + credits));
 
-            naming::add_credit_to_gid(it->second, credits);
+            naming::detail::add_credit_to_gid(it->second, credits);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -245,7 +245,7 @@ response symbol_namespace::bind(
             return response(symbol_ns_bind);
         }
 
-        naming::add_credit_to_gid(gid, credits);
+        naming::detail::add_credit_to_gid(gid, credits);
         LAGAS_(info) << (boost::format(
             "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)")
             % key % gid);
@@ -309,9 +309,9 @@ response symbol_namespace::resolve(
     naming::gid_type gid;
 
     // Is this entry reference counted?
-    if (naming::get_credit_from_gid(it->second) != 0)
+    if (naming::detail::get_credit_from_gid(it->second) != 0)
     {
-        gid = naming::split_credits_for_gid(it->second);
+        gid = naming::detail::split_credits_for_gid(it->second);
 
         LAGAS_(debug) << (boost::format(
             "symbol_namespace::resolve, split credits for entry, "
@@ -319,13 +319,13 @@ response symbol_namespace::resolve(
             % key % it->second % gid);
 
         // Credit exhaustion - we need to get more.
-        if (0 == naming::get_credit_from_gid(gid))
+        if (0 == naming::detail::get_credit_from_gid(gid))
         {
-            BOOST_ASSERT(1 == naming::get_credit_from_gid(it->second));
+            BOOST_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
             naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT);
 
-            naming::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
-            naming::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
 
             LAGAS_(debug) << (boost::format(
                 "symbol_namespace::resolve, incremented entry credits, "

@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_USE_SHMEM_PARCELPORT)
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -41,10 +41,14 @@ namespace hpx { namespace parcelset { namespace shmem
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
 #if defined(HPX_DEBUG)
+        // make sure that all parcels require the same serialization filter and
+        // that all of them go to the same locality
+        util::binary_filter* filter = pv[0].get_serialization_filter();
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
             BOOST_ASSERT(locality_id == destination());
+            BOOST_ASSERT(filter == p.get_serialization_filter());
         }
 #endif
 
@@ -61,7 +65,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // generate the name for this data_buffer
             std::string data_buffer_name(pv[0].get_parcel_id().to_string());
 
-            // clear and preallocate out_buffer_ ( or fetch from cache)
+            // clear and preallocate out_buffer_ (or fetch from cache)
             out_buffer_ = get_data_buffer((arg_size * 12) / 10 + 1024,
                 data_buffer_name);
 
@@ -71,7 +75,7 @@ namespace hpx { namespace parcelset { namespace shmem
             {
                 // Serialize the data
                 util::portable_binary_oarchive archive(
-                    out_buffer_.get_buffer(), boost::archive::no_header);
+                    out_buffer_.get_buffer(), 0, boost::archive::no_header);
 
                 std::size_t count = pv.size();
                 archive << count;
@@ -80,6 +84,8 @@ namespace hpx { namespace parcelset { namespace shmem
                 {
                     archive << p;
                 }
+
+                arg_size = archive.bytes_written();
             }
 
             // store the time required for serialization
@@ -89,7 +95,7 @@ namespace hpx { namespace parcelset { namespace shmem
             // We have to repackage all exceptions thrown by the
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -97,7 +103,7 @@ namespace hpx { namespace parcelset { namespace shmem
             return;
         }
         catch (boost::system::system_error const& e) {
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -106,7 +112,7 @@ namespace hpx { namespace parcelset { namespace shmem
             return;
         }
         catch (std::exception const& e) {
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "shmem::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -115,8 +121,8 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         send_data_.num_parcels_ = pv.size();
-        send_data_.bytes_ = out_buffer_.size();
-        send_data_.type_bytes_ = arg_size;
+        send_data_.bytes_ = arg_size;
+        send_data_.raw_bytes_ = out_buffer_.size();
     }
 }}}
 

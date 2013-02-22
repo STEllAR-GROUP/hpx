@@ -57,7 +57,7 @@ bool unregister_name(
 
     if (agas_.unregister_name(name, raw_gid, ec) && !ec)
     {
-        if (naming::get_credit_from_gid(raw_gid) != 0)
+        if (naming::detail::get_credit_from_gid(raw_gid) != 0)
             gid = naming::id_type(raw_gid, naming::id_type::managed);
         else
             gid = naming::id_type(raw_gid, naming::id_type::unmanaged);
@@ -113,7 +113,7 @@ bool resolve_name(
 
     if (agas_.resolve_name(name, raw_gid, ec) && !ec)
     {
-        if (naming::get_credit_from_gid(raw_gid) != 0)
+        if (naming::detail::get_credit_from_gid(raw_gid) != 0)
             gid = naming::id_type(raw_gid, naming::id_type::managed);
         else
             gid = naming::id_type(raw_gid, naming::id_type::unmanaged);

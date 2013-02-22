@@ -550,8 +550,6 @@ void gs(
 
             BOOST_FOREACH(hpx::lcos::future<object<data> > const & o, objects)
             {
-                using hpx::naming::strip_credit_from_gid;
-
                 object_grid(x, y) = o.get();
 
                 if(++x > n_x_block - 1)

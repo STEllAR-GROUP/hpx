@@ -13,6 +13,8 @@
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -36,14 +38,6 @@ using hpx::flush;
 boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
 bool header = true;
-
-///////////////////////////////////////////////////////////////////////////////
-void worker()
-{
-    double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1. / (2. * i + 1.);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -81,9 +75,9 @@ int hpx_main(
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&worker));
+            register_work(HPX_STD_BIND(&invoke_worker, delay));
 
-        // Reschedule hpx_main until all other px-threads have finished. We
+        // Reschedule hpx_main until all other hpx-threads have finished. We
         // should be resumed after most of the null px-threads have been
         // executed. If we haven't, we just reschedule ourselves again.
         do {

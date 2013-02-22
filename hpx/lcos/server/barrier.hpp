@@ -212,7 +212,7 @@ namespace hpx { namespace lcos { namespace server
             }
             catch (boost::exception const& be) {
                 // rethrow again, but this time using the native hpx mechanics
-                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_exception",
+                HPX_THROW_EXCEPTION(hpx::no_success, "barrier::set_exception",
                     boost::diagnostic_information(be));
             }
         }

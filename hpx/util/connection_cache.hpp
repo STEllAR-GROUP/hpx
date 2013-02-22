@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2012 Thomas Heller
 //  Copyright (c)      2012 Bryce Adelstein-Lelbach
 //
@@ -27,6 +27,7 @@
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -59,6 +60,10 @@ namespace hpx { namespace util
           , max_connections_per_locality_(max_connections_per_locality)
           , connections_(0)
           , shutting_down_(false)
+          , insertions_(0)
+          , evictions_(0)
+          , hits_(0)
+          , misses_(0)
         {
             if (max_connections_per_locality_ > max_connections_)
             {
@@ -107,12 +112,14 @@ namespace hpx { namespace util
                     connection_type result = boost::get<0>(it->second).front();
                     boost::get<0>(it->second).pop_front();
 
+                    ++hits_;
                     check_invariants();
                     return result;
                 }
             }
 
             // If we get here then the item is not in the cache.
+            ++misses_;
             check_invariants();
             return connection_type();
         }
@@ -156,6 +163,7 @@ namespace hpx { namespace util
                     conn = boost::get<0>(it->second).front();
                     boost::get<0>(it->second).pop_front();
 
+                    ++hits_;
                     check_invariants();
                     return true;
                 }
@@ -166,9 +174,17 @@ namespace hpx { namespace util
                 if (boost::get<1>(it->second) < max_connections_per_locality_)
                 {
                     // See if we have enough space or can make space available.
-                    // If we can't find or make space, give up.
-                    if (!free_space())
+
+                    // Note that if we don't have any space and there are no
+                    // outstanding connections for this locality, we grow the
+                    // cache size beyond its limit (hoping that it will be
+                    // reduced in size next time some connection is handed back
+                    // to the cache).
+
+                    if (!free_space() && boost::get<1>(it->second) != 0)
                     {
+                        // If we can't find or make space, give up.
+                        ++misses_;
                         check_invariants();
                         return false;
                     }
@@ -181,6 +197,7 @@ namespace hpx { namespace util
                     ++boost::get<1>(it->second);
                     ++connections_;
 
+                    ++insertions_;
                     check_invariants();
                     return true;
                 }
@@ -188,19 +205,22 @@ namespace hpx { namespace util
                 // We've reached the maximum number of connections for this
                 // locality, and none of them are checked into the cache, so
                 // we have to give up.
+                ++misses_;
                 check_invariants();
                 return false;
             }
 
-            // Key isn't in cache.
+            // Key (locality) isn't in cache.
 
             // See if we have enough space or can make space available.
-            // If we can't find or make space, give up.
-            if (!free_space())
-            {
-                check_invariants();
-                return false;
-            }
+
+            // Note that we ignore the outcome of free_space() here as we have 
+            // to guarantee to have space for the new connection as there are 
+            // no connections outstanding for this locality. If free_space 
+            // fails we grow the cache size beyond its limit (hoping that it 
+            // will be reduced in size next time some connection is handed back
+            // to the cache).
+            free_space();
 
             // Update LRU meta data.
             typename key_tracker_type::iterator kt =
@@ -215,6 +235,7 @@ namespace hpx { namespace util
             // Increase the overall connection counts.
             ++connections_;
 
+            ++insertions_;
             check_invariants();
             return true;
         }
@@ -278,7 +299,7 @@ namespace hpx { namespace util
         /// Destroys all connections in the cache, and resets all counts.
         ///
         /// \note Calling this function while connections are still checked out
-        ///       of the cache is a bad idea, and will violate this classes
+        ///       of the cache is a bad idea, and will violate this class'
         ///       invariants.
         void clear()
         {
@@ -286,6 +307,11 @@ namespace hpx { namespace util
             key_tracker_.clear();
             cache_.clear();
             connections_ = 0;
+
+            insertions_ = 0;
+            evictions_ = 0;
+            hits_ = 0;
+            misses_ = 0;
 
             // FIXME: This should probably throw instead of asserting, as it
             // can be triggered by caller error.
@@ -311,6 +337,7 @@ namespace hpx { namespace util
 
                 // correct counter to avoid assertions later on
                 connections_ -= boost::get<1>(it->second);
+                evictions_ += boost::get<1>(it->second);
 
                 // Erase entry if key exists in the cache.
                 cache_.erase(it);
@@ -319,6 +346,31 @@ namespace hpx { namespace util
             // FIXME: This should probably throw instead of asserting, as it
             // can be triggered by caller error.
             check_invariants();
+        }
+
+        // access statistics
+        boost::int64_t get_cache_insertions() const
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return insertions_;
+        }
+
+        boost::int64_t get_cache_evictions() const
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return evictions_;
+        }
+
+        boost::int64_t get_cache_hits() const
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return hits_;
+        }
+
+        boost::int64_t get_cache_misses() const
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return misses_;
         }
 
     private:
@@ -355,9 +407,6 @@ namespace hpx { namespace util
             // Overall connection count should be equal to the sum of connection
             // counts for all localities.
             BOOST_ASSERT(total_count == connections_);
-
-            // Check that we do not hold too many elements.
-            BOOST_ASSERT(connections_ <= max_connections_);
 
             // The list of key trackers should have the same size as the cache.
             BOOST_ASSERT(key_tracker_.size() == cache_.size());
@@ -401,7 +450,7 @@ namespace hpx { namespace util
                     }
 
                     // If we've gone through key_tracker_ and haven't found
-                    // anything evictable, then all the entries must be 
+                    // anything evictable, then all the entries must be
                     // currently checked out.
                     if (key_tracker_.end() == kt)
                         return false;
@@ -415,7 +464,8 @@ namespace hpx { namespace util
                 // Adjust the overall and per-locality connection count.
                 --boost::get<1>(ct->second);
                 --connections_;
-                break;
+
+                ++evictions_;
             }
 
             return true;
@@ -428,6 +478,12 @@ namespace hpx { namespace util
         cache_type cache_;
         size_type connections_;
         bool shutting_down_;
+
+        // statistics support
+        boost::int64_t insertions_;
+        boost::int64_t evictions_;
+        boost::int64_t hits_;
+        boost::int64_t misses_;
     };
 }}
 

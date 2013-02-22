@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
-#if defined(HPX_USE_SHMEM_PARCELPORT)
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
 #endif
 #include <hpx/util/io_service_pool.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset
 
         case connection_shmem:
             {
-#if defined(HPX_USE_SHMEM_PARCELPORT)
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
                 // Create shmem based parcelport only if allowed by the 
                 // configuration info.
                 std::string enable_shmem = 

@@ -12,7 +12,7 @@
 // D^2 U / Dt^2 = c^2  D^2 U / Dx^2
 //
 // The parameter alpha = c*dt/dx must be less than 1 to ensure the stability of the algorithm.
-// Discritizing the equation and solving for U(t+dt,x) yeilds
+// Discretizing the equation and solving for U(t+dt,x) yields
 // alpha^2 * (U(t,x+dx)+U(t,x-dx))+2(1-alpha^2)*U(t,x) - U(t-dt,x)
 //
 // For the first timestep, we approximate U(t-dt,x) by u(t+dt,x)-2*dt*du/dt(t,x)

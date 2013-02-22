@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +23,7 @@ using hpx::flush;
 
 struct hello_world_server : managed_component_base<hello_world_server>
 {
-    void print() const { cout << "hello world\n" << flush; } 
+    void print() const { cout << "hello world\n" << flush; }
 
     HPX_DEFINE_COMPONENT_CONST_ACTION(hello_world_server, print, print_action);
 };
@@ -37,7 +37,7 @@ HPX_REGISTER_ACTION(print_action);
 
 struct hello_world : client_base<hello_world, stub_base<hello_world_server> >
 {
-    void print() { async<print_action>(this->get_gid()).get(); } 
+    void print() { async<print_action>(this->get_gid()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,8 +47,8 @@ int main()
 
     hw.create(find_here());
 
-    hw.print();    
+    hw.print();
 
-    return 0; 
+    return 0;
 }
 

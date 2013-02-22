@@ -385,6 +385,8 @@ namespace hpx { namespace util
                 ("hpx:nodes", value<std::vector<std::string> >()->multitoken(),
                   "the (space separated) list of the nodes to use (usually "
                   "this is extracted from a node file)")
+                ("hpx:endnodes", "this can be used to end the list of nodes "
+                  "specified using the option --hpx:nodes")
                 ("hpx:ifsuffix", value<std::string>(),
                   "suffix to append to host names in order to resolve them "
                   "to the proper network interconnect")

@@ -14,6 +14,7 @@ usage()
     echo "Options:"
     echo "  -d    Directory where Boost should be built."
     echo "  -v    Version of Boost to build (format: X.YY.Z)"
+    echo "  -n    Don't download Boost (expects tarball named boost_X.YY.Z.tar.bz2 in the -d directory)"
     echo "  -x    Libraries to exclude (format: exclude0,exclude1...) [default: mpi,graph_parallel,python]"
     echo "  -t    Number of threads to use while building [default: number of processors]" 
     echo "  -c    Compiler [default: automatically detected]" 
@@ -27,6 +28,8 @@ DOT_VERSION=
 # Underscore version, e.g. X_YY_Z
 US_VERSION=
 
+DOWNLOAD=1
+
 # HPX does not need these, and they have external dependencies, so skip them.
 EXCLUDES=mpi,graph_parallel,python
 
@@ -37,10 +40,13 @@ COMPILER=
 
 ###############################################################################
 # Argument parsing
-while getopts “hd:v:x” OPTION; do case $OPTION in
+while getopts “hnt:d:v:c:x:” OPTION; do case $OPTION in
     h)
         usage
         exit 0
+        ;;
+    n)
+        DOWNLOAD=0
         ;;
     d)
         # Try to make the directories.
@@ -79,7 +85,7 @@ while getopts “hd:v:x” OPTION; do case $OPTION in
             exit 1
         fi
         ;;
-    x)
+    c)
         COMPILER=$OPTARG
         ;;
     ?)
@@ -123,13 +129,14 @@ error()
 
 cd $DIRECTORY
 
-wget downloads.sourceforge.net/sourceforge/boost/boost/$DOT_VERSION/boost_$US_VERSION.tar.bz2
-if ! [[ $? ]]; then echo "ERROR: Unable to download Boost"; error; fi
+if [[ $DOWNLOAD == "1" ]]; then
+    wget downloads.sourceforge.net/sourceforge/boost/boost/$DOT_VERSION/boost_$US_VERSION.tar.bz2
+    if ! [[ $? == "0" ]]; then echo "ERROR: Unable to download Boost"; error; fi
+fi
 
 tar -xf boost_$US_VERSION.tar.bz2
-if ! [[ $? ]]; then echo "ERROR: Unable to unpack Boost"; error; fi
+if ! [[ $? == "0" ]]; then echo "ERROR: Unable to unpack `pwd`/boost_$US_VERSION.tar.bz2"; error; fi
 
-rm boost_$US_VERSION.tar.bz2
 mv boost_$US_VERSION source
 
 cd $DIRECTORY/source
@@ -138,10 +145,10 @@ cd $DIRECTORY/source
 $DIRECTORY/source/bootstrap.sh $EXCLUDES $COMPILER
 
 $BJAM --stagedir=$DIRECTORY/debug/stage variant=debug -j${THREADS} 
-if ! [[ $? ]]; then echo "ERROR: Debug build of Boost failed"; error; fi
+if ! [[ $? == "0" ]]; then echo "ERROR: Debug build of Boost failed"; error; fi
 
 $BJAM --stagedir=$DIRECTORY/release/stage variant=release -j${THREADS}
-if ! [[ $? ]]; then echo "ERROR: Release build of Boost failed"; error; fi
+if ! [[ $? == "0" ]]; then echo "ERROR: Release build of Boost failed"; error; fi
 
 # Build the Boost.Wave preprocessor.
 cd $DIRECTORY/source/tools/wave/build

@@ -40,15 +40,6 @@ namespace interpolate3d { namespace server
         // component type used to encapsulate instances of this component
         typedef configuration wrapping_type;
 
-        ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
-        enum actions
-        {
-            configuration_init = 0,
-            configuration_get = 1
-        };
-
         // exposed functionality
         void init(std::string const& datafile, std::string const& symbolic_name,
             std::size_t num_instances);
@@ -59,13 +50,13 @@ namespace interpolate3d { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action3<
-            configuration, configuration_init,
+            configuration,
             std::string const&, std::string const&, std::size_t,
             &configuration::init
         > init_action;
 
         typedef hpx::actions::result_action0<
-            configuration const, config_data, configuration_get,
+            configuration const, config_data,
             &configuration::get
         > get_action;
 

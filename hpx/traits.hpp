@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -60,6 +60,10 @@ namespace hpx { namespace traits
     // Customization point for action stack size
     template <typename Action, typename Enable = void>
     struct action_stacksize;
+
+    // Customization for action serialization filter
+    template <typename Action, typename Enable = void>
+    struct action_serialization_filter;
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for type_size

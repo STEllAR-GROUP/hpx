@@ -3,14 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <stdexcept>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
+
+#include <stdexcept>
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
@@ -22,8 +22,8 @@ namespace hpx { namespace parcelset { namespace tcp
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
             performance_counters::parcels::gatherer& parcels_sent)
-      : socket_(io_service), out_priority_(0), out_size_(0), there_(locality_id),
-        parcels_sent_(parcels_sent), 
+      : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0),
+        there_(locality_id), parcels_sent_(parcels_sent),
         archive_flags_(boost::archive::no_header)
     {
 #ifdef BOOST_BIG_ENDIAN
@@ -43,19 +43,20 @@ namespace hpx { namespace parcelset { namespace tcp
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
-        // we choose the highest priority of all parcels for this message
-        threads::thread_priority priority = threads::thread_priority_default;
-
-        // collect argument sizes from parcels
-        std::size_t arg_size = 0;
-
 #if defined(HPX_DEBUG)
+        // make sure that all parcels go to the same locality
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
             BOOST_ASSERT(locality_id == destination());
         }
 #endif
+
+        // we choose the highest priority of all parcels for this message
+        threads::thread_priority priority = threads::thread_priority_default;
+
+        // collect argument sizes from parcels
+        std::size_t arg_size = 0;
 
         // guard against serialization errors
         try {
@@ -75,8 +76,15 @@ namespace hpx { namespace parcelset { namespace tcp
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(out_buffer_,
-                    archive_flags_);
+                util::binary_filter* filter = pv[0].get_serialization_filter();
+                int archive_flags = archive_flags_;
+                if (filter) {
+                    filter->set_max_compression_length(out_buffer_.capacity());
+                    archive_flags |= util::enable_compression;
+                }
+
+                util::portable_binary_oarchive archive(
+                    out_buffer_, filter, archive_flags);
 
                 std::size_t count = pv.size();
                 archive << count;
@@ -85,6 +93,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     archive << p;
                 }
+
+                arg_size = archive.bytes_written();
             }
 
             // store the time required for serialization
@@ -94,7 +104,7 @@ namespace hpx { namespace parcelset { namespace tcp
             // We have to repackage all exceptions thrown by the
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "tcp::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -102,7 +112,7 @@ namespace hpx { namespace parcelset { namespace tcp
             return;
         }
         catch (boost::system::system_error const& e) {
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "tcp::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -111,7 +121,7 @@ namespace hpx { namespace parcelset { namespace tcp
             return;
         }
         catch (std::exception const& e) {
-            HPX_RETHROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(serialization_error,
                 "tcp::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
@@ -121,10 +131,11 @@ namespace hpx { namespace parcelset { namespace tcp
 
         out_priority_ = boost::integer::ulittle8_t(priority);
         out_size_ = out_buffer_.size();
+        out_data_size_ = arg_size; 
 
         send_data_.num_parcels_ = pv.size();
-        send_data_.bytes_ = out_buffer_.size();
-        send_data_.type_bytes_ = arg_size;
+        send_data_.bytes_ = arg_size;
+        send_data_.raw_bytes_ = out_buffer_.size();
     }
 }}}
 

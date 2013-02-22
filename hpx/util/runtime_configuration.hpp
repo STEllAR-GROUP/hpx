@@ -60,6 +60,9 @@ namespace hpx { namespace util
         std::size_t get_max_connections_per_loc() const;
         std::size_t get_max_connections() const;
 
+        // Get the size of the shmem parcelport data buffer cache
+        std::size_t get_shmem_data_buffer_cache_size() const;
+
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size() const;
         std::size_t get_agas_local_cache_size_per_thread() const;

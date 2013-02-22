@@ -79,8 +79,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             naming::gid_type const& id_
           , boost::uint64_t count_ = 1
             )
-          : key_(naming::strip_credit_from_gid(id_)
-               , naming::strip_credit_from_gid(id_) + (count_ - 1))
+          : key_(naming::detail::get_stripped_gid(id_)
+               , naming::detail::get_stripped_gid(id_) + (count_ - 1))
         {
             BOOST_ASSERT(count_);
         }

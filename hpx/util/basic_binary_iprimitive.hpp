@@ -43,6 +43,8 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
+#include <hpx/util/binary_filter.hpp>
+
 #if !defined(BOOST_WINDOWS)
 #  pragma GCC visibility push(default)
 #endif
@@ -70,19 +72,32 @@ namespace hpx { namespace util
     protected:
         void load_binary(void* address, std::size_t count)
         {
-            if (current_+count > size_)
+            if (count)
             {
-                BOOST_THROW_EXCEPTION(
-                    boost::archive::archive_exception(
-                        boost::archive::archive_exception::input_stream_error,
-                        "archive data bstream is too short"));
-                return;
-            }
+                if (filter_) {
+                    filter_->load(address, count);
+                }
+                else {
+                    if (current_+count > size_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::input_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
+                    std::memcpy(address, &buffer_[current_], count);
+                    current_ += count;
 
-            if (count) 
-            {
-                std::memcpy(address, &buffer_[current_], count);
-                current_ += count;
+                    if (size_ < current_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::input_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
+                }
             }
         }
 
@@ -95,7 +110,9 @@ namespace hpx { namespace util
 
         char const* buffer_;
         std::size_t size_;
+        std::size_t decompressed_size_;
         std::size_t current_;
+        HPX_STD_UNIQUE_PTR<binary_filter> filter_;
 
         // return a pointer to the most derived class
         Archive* This()
@@ -137,7 +154,7 @@ namespace hpx { namespace util
         {
             std::size_t l;
             This()->load(l);
-            
+
 #if BOOST_WORKAROUND(_RWSTD_VER, BOOST_TESTED_AT(20101))
             if(NULL != ws.data())   // borland de-allocator fixup
 #endif
@@ -146,7 +163,7 @@ namespace hpx { namespace util
             // note breaking a rule here - is could be a problem on some platform
             if (l != 0)
             {
-                load_binary(const_cast<wchar_t *>(ws.data()), 
+                load_binary(const_cast<wchar_t *>(ws.data()),
                     l * sizeof(wchar_t) / sizeof(char));
             }
         }
@@ -155,8 +172,12 @@ namespace hpx { namespace util
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
         template <typename Vector>
-        basic_binary_iprimitive(Vector const& buffer, unsigned flags = 0)
-          : buffer_(buffer.data()), size_(buffer.size()),current_(0)
+        basic_binary_iprimitive(Vector const& buffer,
+                boost::uint64_t inbound_data_size, unsigned flags = 0)
+          : buffer_(buffer.data()),
+            size_(buffer.size()),
+            decompressed_size_(inbound_data_size),
+            current_(0)
         {
             init(flags);
         }
@@ -183,12 +204,35 @@ namespace hpx { namespace util
     #endif
         };
 
+        std::size_t bytes_read() const
+        {
+            return current_;
+        }
+
     protected:
         // the optimized load_array dispatches to load_binary
         template <typename T>
         void load_array(boost::serialization::array<T>& a, unsigned int)
         {
             load_binary(a.address(), a.count()*sizeof(T));
+        }
+
+        void set_filter(util::binary_filter* filter)
+        {
+            filter_.reset(filter);
+            if (filter) {
+                current_ = filter->init_decompression_data(&buffer_[current_],
+                    size_-current_, decompressed_size_);
+
+                if (decompressed_size_ < current_)
+                {
+                    BOOST_THROW_EXCEPTION(
+                        boost::archive::archive_exception(
+                            boost::archive::archive_exception::input_stream_error,
+                            "archive data bstream is too short"));
+                    return;
+                }
+            }
         }
     };
 }}

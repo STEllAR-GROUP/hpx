@@ -40,6 +40,8 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include "worker.hpp"
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -75,14 +77,6 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void worker()
-{
-    double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1. / (2. * i + 1.);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int omp_main(
     variables_map&
     )
@@ -99,7 +93,7 @@ int omp_main(
     {
         for (boost::uint64_t i = 0; i < tasks; ++i)
             #pragma omp task untied
-            worker();
+            invoke_worker(delay);
 
         // Yield until all work is done.
         #pragma omp taskwait
