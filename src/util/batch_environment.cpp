@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/format.hpp>
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -24,7 +25,7 @@ namespace hpx { namespace util
     // if it finds sufficient information to deduce its running as a batch job.
     bool batch_environment::found_batch_environment() const
     {
-        // All we have to do for now is to identify SLURM as PBS does not
+        // All we have to do for now is to identify SLURM, as PBS does not
         // provide sufficient environment variable to deduce all required
         // information.
         // (https://computing.llnl.gov/linux/slurm/srun.html)
@@ -104,8 +105,13 @@ namespace hpx { namespace util
                     }
                 }
             }
-            else if (debug_) {
-                std::cerr << "failed opening: " << nodefile << std::endl;
+            else {
+                if (debug_)
+                    std::cerr << "failed opening: " << nodefile << std::endl;
+
+                // raise hard error if nodefile could not be opened
+                throw std::logic_error(boost::str(boost::format(
+                    "Could not open nodefile: '%s'") % nodefile));
             }
         }
 
@@ -192,7 +198,7 @@ namespace hpx { namespace util
         char* tasks_per_node_env = std::getenv("SLURM_TASKS_PER_NODE");
 
         std::vector<std::size_t> tasks_per_node;
-        if(tasks_per_node_env)
+        if (tasks_per_node_env)
         {
             if (debug_) {
                 std::cerr << "SLURM tasks per node found: " << tasks_per_node_env
@@ -203,39 +209,39 @@ namespace hpx { namespace util
             std::string::iterator begin = tasks_per_node_str.begin();
             std::string::iterator end = tasks_per_node_str.end();
             int i = 0;
-            boost::spirit::qi::parse(
+
+            namespace qi = boost::spirit::qi;
+            namespace phoenix = boost::phoenix;
+
+            qi::parse(
                 begin
               , end
               , (
-                  (   boost::spirit::qi::int_
-                    >> boost::spirit::qi::lit('(')
-                    >> boost::spirit::qi::lit('x')
-                    >> boost::spirit::qi::int_
-                    >> boost::spirit::qi::lit(')'))[
-                           boost::phoenix::for_(
-                               boost::phoenix::ref(i) = 0
-                             , boost::phoenix::ref(i) != boost::spirit::qi::_2
-                             , ++boost::phoenix::ref(i)
+                  (   qi::int_ >> "(x" >> qi::int_ >> ')')[
+                           phoenix::for_(
+                               phoenix::ref(i) = 0
+                             , phoenix::ref(i) != qi::_2
+                             , ++phoenix::ref(i)
                            )
                            [
-                               boost::phoenix::push_back(
-                                   boost::phoenix::ref(tasks_per_node)
-                                 , boost::spirit::qi::_1
+                               phoenix::push_back(
+                                   phoenix::ref(tasks_per_node)
+                                 , qi::_1
                                )
                            ]
-                       ]
-                  | boost::spirit::qi::int_[
-                      boost::phoenix::push_back(
-                          boost::phoenix::ref(tasks_per_node)
-                        , boost::spirit::qi::_1
-                      )
-                    ]
+                  ]
+                | qi::int_[
+                        phoenix::push_back(
+                            phoenix::ref(tasks_per_node)
+                        , qi::_1
+                        )
+                  ]
                 ) % ','
             );
         }
 
-        if (slurm_nodelist_env) {
-
+        if (slurm_nodelist_env)
+        {
             if (debug_) {
                 std::cerr << "SLURM nodelist found: " << slurm_nodelist_env
                           << std::endl;
@@ -250,7 +256,7 @@ namespace hpx { namespace util
             std::size_t i = 0;
             for (tokenizer_type::iterator it = tok.begin (); it != end; ++it)
             {
-                if(!tasks_per_node.empty())
+                if (!tasks_per_node.empty())
                 {
                     for(std::size_t j = 0; j != tasks_per_node[j]; ++j)
                     {
