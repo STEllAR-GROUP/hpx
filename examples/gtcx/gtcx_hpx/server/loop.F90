@@ -910,7 +910,8 @@
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex& 
                   )
   !use global_parameters
   !use field_array
@@ -953,7 +954,13 @@
   integer  :: left_pe,right_pe
   integer  :: toroidal_domain_location,particle_domain_location
 
-  integer iflag,i,it,ij,j,k,n,iteration,mring,mindex,mtest,ierr
+  integer iflag
+
+  integer  :: mindex
+  integer,dimension(mgrid,mzeta) :: nindex
+  integer,dimension(mindex,mgrid,mzeta) :: indexp
+  real(kind=wp),dimension(mindex,mgrid,mzeta) :: ring
+
     end subroutine poisson
     subroutine pushe(icycle,irke,hpx4_bti,&
              t_gids, p_gids,&
@@ -1304,8 +1311,16 @@
   real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
+! Poisson thread safety
+  integer,dimension(:,:),allocatable :: nindex
+  integer,dimension(:,:,:),allocatable :: indexp
+  real(kind=wp),dimension(:,:,:),allocatable :: ring
+  integer  :: mindex
+
+
 ! local variables
   integer i
+  integer mring,mtest,nmem
 
   mype = hpx4_mype
   numberpe = hpx4_numberpe
@@ -1469,6 +1484,24 @@
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
               toroidal_domain_location,particle_domain_location) ! }}}
+
+  ! Poisson thread safety {{{
+  ! For thread safety in poisson, allocate this now
+  ! number of gyro-ring
+  mring=2
+
+  ! number of summation: maximum is 32*mring+1
+  mindex=32*mring+1
+
+  allocate(indexp(mindex,mgrid,mzeta),ring(mindex,mgrid,mzeta),&
+          nindex(mgrid,mzeta),STAT=mtest)
+  if (mtest /= 0) then
+!   hjw
+    nmem = (2*(mindex*mgrid*mzeta))+(mgrid*mzeta)
+!   write(0,*)mype,'*** Cannot allocate indexp: mtest=',mtest
+    write(0,*)mype,'*** indexp: Allocate Error: ',nmem, ' words mtest= ',mtest
+  endif
+  ! }}}
 
 ! main time loop
   do istep=1,mstep
@@ -1815,7 +1848,6 @@
                  ) ! }}}
 
 ! solve GK Poisson equation using adiabatic electron
-#if 0
          call poisson(0,hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters
@@ -1845,9 +1877,9 @@
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex&
                   )   ! }}}
-#endif
 
         do ihybrid=1,nhybrid
 ! smooth potential
@@ -2136,7 +2168,6 @@
                  ) ! }}}
 
 ! solve GK Poisson equation using non-adiabatic electron
-#if 0
          call poisson(1,hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters
@@ -2166,9 +2197,9 @@
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex&
                   )   ! }}}
-#endif
         enddo
      enddo
 
