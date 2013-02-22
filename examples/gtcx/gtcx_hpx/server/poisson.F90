@@ -152,7 +152,6 @@ subroutine poisson(iflag,hpx4_bti,&
   integer :: nmem
 ! hjw
 
-  integer :: master_flag
 !  save nindex,indexp,ring
 
 ! number of gyro-ring

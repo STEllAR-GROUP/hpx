@@ -54,16 +54,6 @@ subroutine set_random_zion(mi,rng_control,zion)
   integer,dimension(rng_s) :: seed
   type(rng_state) :: state
 
-  ! FIXME MATT
-  ! for the moment, there are still threadsafe issues with rng_number.  
-  ! so use the intrinsic generator for now
-  call random_number(zion(2,1:mi))
-  call random_number(zion(3,1:mi))
-  call random_number(zion(4,1:mi))
-  call random_number(zion(5,1:mi))
-  call random_number(zion(6,1:mi))
-  return
-
   if(rng_control==0)then
    ! Use Fortran's intrinsic random number generator
      call random_number(zion(2,1:mi))
