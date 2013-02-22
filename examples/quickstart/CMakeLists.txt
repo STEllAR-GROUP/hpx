@@ -39,7 +39,7 @@ set(component_ctors_FLAGS DEPENDENCIES iostreams_component)
 set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)
-set(hello_world_FLAGS DEPENDENCIES iostreams_component)
+set(hello_world_FLAGS DEPENDENCIES iostreams_component plugin_snappy_lib)
 set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(component_inheritance_FLAGS DEPENDENCIES iostreams_component)

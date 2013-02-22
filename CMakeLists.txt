@@ -176,39 +176,10 @@ else()
 endif()
 
 ###############################################################################
-# Configure compression
+# Configure compression and other plugins
 ###############################################################################
-hpx_option(HPX_USE_ZLIB_COMPRESSION BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_USE_ZLIB_COMPRESSION)
-  hpx_add_definitions(-DHPX_HAVE_ZLIB_COMPRESSION)
-  if(MSVC)
-    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams zlib)
-  else()
-    find_package(HPX_Zlib)
-    if(ZLIB_FOUND)
-      set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams)
-      hpx_include_sys_directories(${ZLIB_INCLUDE_DIR})
-      hpx_link_sys_directories(${ZLIB_LIBRARY_DIR})
-      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${ZLIB_LIBRARY})
-    endif()
-  endif()
-endif()
-
-hpx_option(HPX_USE_BZIP2_COMPRESSION BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_USE_BZIP2_COMPRESSION)
-  hpx_add_definitions(-DHPX_HAVE_BZIP2_COMPRESSION)
-  if(MSVC)
-    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams bzip2)
-  else()
-    find_package(HPX_BZip2)
-    if(BZIP2_FOUND)
-      set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams)
-      hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
-      hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
-      set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${BZIP2_LIBRARY})
-    endif()
-  endif()
-endif()
+add_hpx_pseudo_target(plugins)
+add_subdirectory(plugins)
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -315,9 +286,9 @@ endif()
 # Decide whether to use shared memory based parcelport (starting with Boost V1.52)
 ################################################################################
 if(${BOOST_MINOR_VERSION} GREATER 51)
-  hpx_option(HPX_USE_SHMEM_PARCELPORT BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
-  if(HPX_USE_SHMEM_PARCELPORT)
-    hpx_add_definitions(-DHPX_USE_SHMEM_PARCELPORT)
+  hpx_option(HPX_USE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
+  if(HPX_USE_PARCELPORT_SHMEM)
+    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_SHMEM)
   endif()
 endif()
 
@@ -1144,6 +1115,12 @@ if(HPX_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
+###############################################################################
+# Activate plugins
+###############################################################################
+add_plugin_modules()
+
+###############################################################################
 hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: ON)" ON ADVANCED)
 
 if(HPX_BUILD_TESTS)

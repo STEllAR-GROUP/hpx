@@ -78,8 +78,20 @@ namespace hpx { namespace util
             ~container_type()
             {
                 if (filter_) {
-                    current_ += filter_->flush(&cont_[current_],
-                        cont_.size()-current_);
+                    std::size_t written = 0;
+                    do {
+                        bool flushed = filter_->flush(&cont_[current_],
+                            cont_.size()-current_, written);
+
+                        current_ += written;
+                        if (flushed)
+                            break;
+
+                        // resize container
+                        cont_.resize(cont_.size()*2);
+
+                    } while (true);
+
                     cont_.resize(current_);         // truncate container
                 }
             }
@@ -95,8 +107,7 @@ namespace hpx { namespace util
                 {
                     cont_.resize(cont_.size() + count);
                     if (filter_) {
-                        current_ += filter_->save(&cont_[current_],
-                            cont_.size()-current_, address, count);
+                        filter_->save(address, count);
                     }
                     else {
                         std::memcpy(&cont_[current_], address, count);
@@ -185,7 +196,7 @@ namespace hpx { namespace util
 
         template <typename Container>
         basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
-          : size_(0), 
+          : size_(0),
             buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
         {
             init(flags);

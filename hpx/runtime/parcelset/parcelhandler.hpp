@@ -386,14 +386,14 @@ namespace hpx { namespace parcelset
         // total data sent (bytes)
         std::size_t get_data_sent(connection_type) const;
 
-        // total data (type only) sent (bytes)
-        std::size_t get_total_type_sent(connection_type) const;
+        // total data (uncompressed) sent (bytes)
+        std::size_t get_raw_data_sent(connection_type) const;
 
         // total data received (bytes)
         std::size_t get_data_received(connection_type) const;
 
-        // total data (type only) received (bytes)
-        std::size_t get_total_type_received(connection_type) const;
+        // total data (uncompressed) received (bytes)
+        std::size_t get_raw_data_received(connection_type) const;
 
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type) const;

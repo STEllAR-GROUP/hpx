@@ -3,14 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <stdexcept>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
+
+#include <stdexcept>
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
@@ -94,7 +94,7 @@ namespace hpx { namespace parcelset { namespace tcp
                     archive << p;
                 }
 
-                arg_size += archive.bytes_written();
+                arg_size = archive.bytes_written();
             }
 
             // store the time required for serialization
@@ -134,8 +134,8 @@ namespace hpx { namespace parcelset { namespace tcp
         out_data_size_ = arg_size; 
 
         send_data_.num_parcels_ = pv.size();
-        send_data_.bytes_ = out_buffer_.size();
-        send_data_.type_bytes_ = arg_size;
+        send_data_.bytes_ = arg_size;
+        send_data_.raw_bytes_ = out_buffer_.size();
     }
 }}}
 

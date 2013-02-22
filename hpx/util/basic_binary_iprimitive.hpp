@@ -75,8 +75,7 @@ namespace hpx { namespace util
             if (count)
             {
                 if (filter_) {
-                    current_ += filter_->load(address, count,
-                        &buffer_[current_], size_-current_);
+                    filter_->load(address, count);
                 }
                 else {
                     if (current_+count > size_)
@@ -89,15 +88,15 @@ namespace hpx { namespace util
                     }
                     std::memcpy(address, &buffer_[current_], count);
                     current_ += count;
-                }
 
-                if (size_ < current_)
-                {
-                    BOOST_THROW_EXCEPTION(
-                        boost::archive::archive_exception(
-                            boost::archive::archive_exception::input_stream_error,
-                            "archive data bstream is too short"));
-                    return;
+                    if (size_ < current_)
+                    {
+                        BOOST_THROW_EXCEPTION(
+                            boost::archive::archive_exception(
+                                boost::archive::archive_exception::input_stream_error,
+                                "archive data bstream is too short"));
+                        return;
+                    }
                 }
             }
         }
@@ -205,6 +204,11 @@ namespace hpx { namespace util
     #endif
         };
 
+        std::size_t bytes_read() const
+        {
+            return current_;
+        }
+
     protected:
         // the optimized load_array dispatches to load_binary
         template <typename T>
@@ -217,8 +221,17 @@ namespace hpx { namespace util
         {
             filter_.reset(filter);
             if (filter) {
-                filter->init_decompression_data(&buffer_[current_],
+                current_ = filter->init_decompression_data(&buffer_[current_],
                     size_-current_, decompressed_size_);
+
+                if (decompressed_size_ < current_)
+                {
+                    BOOST_THROW_EXCEPTION(
+                        boost::archive::archive_exception(
+                            boost::archive::archive_exception::input_stream_error,
+                            "archive data bstream is too short"));
+                    return;
+                }
             }
         }
     };

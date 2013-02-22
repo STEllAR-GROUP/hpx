@@ -7,8 +7,6 @@
 #define HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM
 
 #include <hpx/hpx_fwd.hpp>
-
-#if defined(HPX_HAVE_ZLIB_COMPRESSION)
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -24,7 +22,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
+namespace hpx { namespace plugins { namespace compression
 {
     namespace detail
     {
@@ -57,10 +55,9 @@ namespace hpx { namespace actions
         };
     }
 
-    struct HPX_EXPORT zlib_serialization_filter : public util::binary_filter
+    struct HPX_LIBRARY_EXPORT zlib_serialization_filter : public util::binary_filter
     {
-        zlib_serialization_filter(bool compress = false,
-                binary_filter::mode m = binary_filter::favor_speed)
+        zlib_serialization_filter(bool compress = false)
           : compdecomp_(compress), current_(0)
         {
             // The zlib serialization filter does not support the mode 
@@ -69,15 +66,13 @@ namespace hpx { namespace actions
         }
         ~zlib_serialization_filter();
 
-        std::size_t load(void* dst, std::size_t dst_count,
-            void const* src, std::size_t src_count);
-        std::size_t save(void* dst, std::size_t dst_count,
-            void const* src, std::size_t src_count);
-        std::size_t flush(void* dst, std::size_t dst_count);
+        void load(void* dst, std::size_t dst_count);
+        void save(void const* src, std::size_t src_count);
+        bool flush(void* dst, std::size_t dst_count, std::size_t& written);
 
         void set_max_compression_length(std::size_t size);
-        void init_decompression_data(char const* buffer, std::size_t size,
-            std::size_t decompressed_size);
+        std::size_t init_decompression_data(char const* buffer, 
+            std::size_t size, std::size_t decompressed_size);
 
         /// serialization support
         static void register_base();
@@ -97,14 +92,15 @@ namespace hpx { namespace actions
         std::vector<char> buffer_;
         std::size_t current_;
     };
-}}
+}}}
 
 #include <hpx/config/warnings_suffix.hpp>
 
-HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(hpx::actions::zlib_serialization_filter);
+HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
+    hpx::plugins::compression::zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_USES_FAST_ZLIB_COMPRESSION(action)                         \
+#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)                              \
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
@@ -114,21 +110,11 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(hpx::actions::zlib_serialization_fil
             /* instance returned from this function */                        \
             static util::binary_filter* call()                                \
             {                                                                 \
-                return new hpx::actions::zlib_serialization_filter(true,      \
-                    util::binary_filter::favor_speed);                        \
+                using namespace hpx::plugins::compression;                    \
+                return new zlib_serialization_filter(true);                   \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
 /**/
 
-#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)                              \
-    HPX_ACTION_USES_FAST_ZLIB_COMPRESSION(action)                             \
-/**/
-
-#else
-
-#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)
-#define HPX_ACTION_USES_FAST_ZLIB_COMPRESSION(action)
-
-#endif
 #endif

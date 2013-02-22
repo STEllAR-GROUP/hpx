@@ -610,7 +610,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
                     // complete received data with parcel count
                     receive_data.num_parcels_ = parcel_count;
-                    receive_data.type_bytes_ = inbound_data_size;
+                    receive_data.raw_bytes_ = archive.bytes_read();
                 }
 
                 // store the time required for serialization
