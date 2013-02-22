@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_USE_SHMEM_PARCELPORT)
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/stringstream.hpp>

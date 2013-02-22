@@ -4,22 +4,23 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-
-#if defined(HPX_HAVE_BZIP2_COMPRESSION)
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/compression/bzip2_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/void_cast.hpp>
+
+#include <hpx/plugins/compression/bzip2_serialization_filter.hpp>
 
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(hpx::actions::bzip2_serialization_filter);
-HPX_REGISTER_BASE_HELPER(hpx::actions::bzip2_serialization_filter,
+HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(
+    hpx::plugins::compression::bzip2_serialization_filter);
+HPX_REGISTER_BASE_HELPER(
+    hpx::plugins::compression::bzip2_serialization_filter,
     bzip2_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
+namespace hpx { namespace plugins { namespace compression
 {
     namespace detail
     {
@@ -45,6 +46,7 @@ namespace hpx { namespace actions
             char*& dest_begin, char* dest_end, bool flush)
         {
             using namespace boost::iostreams;
+            using namespace boost::iostreams::bzip2;
 
             if (!this->ready())
                 init();
@@ -52,16 +54,17 @@ namespace hpx { namespace actions
                 return false;
 
             this->before(src_begin, src_end, dest_begin, dest_end);
-            int result = this->compress(flush ? bzip2::finish : bzip2::run);
+            int result = this->compress(flush ? finish : run);
             this->after(src_begin, dest_begin);
             (bzip2_error::check)(result);
-            return !(eof_ = result == bzip2::stream_end);
+            return !(eof_ = result == stream_end);
         }
 
         bool bzip2_compdecomp::load(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end)
         {
             using namespace boost::iostreams;
+            using namespace boost::iostreams::bzip2;
 
             if (eof_) {
                 // reset the stream if there are more characters
@@ -75,11 +78,11 @@ namespace hpx { namespace actions
 
             this->before(src_begin, src_end, dest_begin, dest_end);
             int result = this->decompress();
-            if(result == bzip2::ok)
+            if(result == ok)
                 result = this->check_end(src_begin, dest_begin);
             this->after(src_begin, dest_begin);
             (bzip2_error::check)(result);
-            eof_ = result == bzip2::stream_end;
+            eof_ = result == stream_end;
             return true;
         }
 
@@ -97,7 +100,7 @@ namespace hpx { namespace actions
 
     bzip2_serialization_filter::~bzip2_serialization_filter()
     {
-        detail::guid_initialization<bzip2_serialization_filter>();
+        hpx::actions::detail::guid_initialization<bzip2_serialization_filter>();
     }
 
     void bzip2_serialization_filter::register_base()
@@ -164,8 +167,8 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t bzip2_serialization_filter::flush(void* dst,
-        std::size_t dst_count)
+    bool bzip2_serialization_filter::flush(void* dst, std::size_t dst_count,
+        std::size_t& written)
     {
         // compress everything in one go
         char* dst_begin = static_cast<char*>(dst);
@@ -173,13 +176,15 @@ namespace hpx { namespace actions
         if (compdecomp_.save(src_begin, src_begin+buffer_.size(),
                 dst_begin, dst_begin+dst_count, true))
         {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "bzip2_serialization_filter::flush",
-                "compression failure, flushing did not reach end of data");
-            return 0;
+            written = dst_begin-static_cast<char*>(dst)
+//             HPX_THROW_EXCEPTION(serialization_error,
+//                 "zlib_serialization_filter::flush",
+//                 "compression failure, flushing did not reach end of data");
+            return false;     // not enough space
         }
-        return dst_begin-static_cast<char*>(dst);
-    }
-}}
 
-#endif
+        written = dst_begin-static_cast<char*>(dst);
+        return true;
+    }
+}}}
+

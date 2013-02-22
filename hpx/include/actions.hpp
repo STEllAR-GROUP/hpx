@@ -14,8 +14,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/actions/compression/zlib_serialization_filter.hpp>
-#include <hpx/runtime/actions/compression/bzip2_serialization_filter.hpp>
 
 #endif
 

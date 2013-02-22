@@ -20,7 +20,8 @@ namespace hpx { namespace util
         // compression API
         virtual void set_max_compression_length(std::size_t size) = 0;
         virtual void save(void const* src, std::size_t src_count) = 0;
-        virtual std::size_t flush(void* dst, std::size_t dst_count) = 0;
+        virtual bool flush(void* dst, std::size_t dst_count, 
+            std::size_t& written) = 0;
 
         // decompression API
         virtual std::size_t init_decompression_data(char const* buffer,

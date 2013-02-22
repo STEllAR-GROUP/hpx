@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_USE_SHMEM_PARCELPORT)
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

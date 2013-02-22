@@ -4,22 +4,23 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-
-#if defined(HPX_HAVE_ZLIB_COMPRESSION)
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/compression/zlib_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/void_cast.hpp>
+
+#include <hpx/plugins/compression/zlib_serialization_filter.hpp>
 
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(hpx::actions::zlib_serialization_filter);
-HPX_REGISTER_BASE_HELPER(hpx::actions::zlib_serialization_filter,
+HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(
+    hpx::plugins::compression::zlib_serialization_filter);
+HPX_REGISTER_BASE_HELPER(
+    hpx::plugins::compression::zlib_serialization_filter,
     zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
+namespace hpx { namespace plugins { namespace compression
 {
     namespace detail
     {
@@ -39,24 +40,26 @@ namespace hpx { namespace actions
             char*& dest_begin, char* dest_end, bool flush)
         {
             using namespace boost::iostreams;
+            using namespace boost::iostreams::zlib;
 
             this->before(src_begin, src_end, dest_begin, dest_end);
-            int result = this->xdeflate(flush ? zlib::finish : zlib::no_flush);
+            int result = this->xdeflate(flush ? finish : no_flush);
             this->after(src_begin, dest_begin, true);
             (zlib_error::check)(result);
-            return !(eof_ = (result == zlib::stream_end ? true : false));
+            return !(eof_ = (result == stream_end ? true : false));
         }
 
         bool zlib_compdecomp::load(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end)
         {
             using namespace boost::iostreams;
+            using namespace boost::iostreams::zlib;
 
             this->before(src_begin, src_end, dest_begin, dest_end);
-            int result = this->xinflate(zlib::sync_flush);
+            int result = this->xinflate(sync_flush);
             this->after(src_begin, dest_begin, false);
             (zlib_error::check)(result);
-            return !(eof_ = (result == zlib::stream_end ? true : false));
+            return !(eof_ = (result == stream_end ? true : false));
         }
 
         void zlib_compdecomp::close()
@@ -68,7 +71,7 @@ namespace hpx { namespace actions
 
     zlib_serialization_filter::~zlib_serialization_filter()
     {
-        detail::guid_initialization<zlib_serialization_filter>();
+        hpx::actions::detail::guid_initialization<zlib_serialization_filter>();
     }
 
     void zlib_serialization_filter::register_base()
@@ -115,7 +118,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     void zlib_serialization_filter::load(void* dst, std::size_t dst_count)
     {
-        if (current_+dst_count > buffer_.size()) 
+        if (current_+dst_count > buffer_.size())
         {
             BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
@@ -129,7 +132,7 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void zlib_serialization_filter::save(void const* src, 
+    void zlib_serialization_filter::save(void const* src,
         std::size_t src_count)
     {
         char const* src_begin = static_cast<char const*>(src);
@@ -137,22 +140,26 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t zlib_serialization_filter::flush(void* dst,
-        std::size_t dst_count)
+    bool zlib_serialization_filter::flush(void* dst,
+        std::size_t dst_count, std::size_t& written)
     {
         // compress everything in one go
         char* dst_begin = static_cast<char*>(dst);
         char const* src_begin = buffer_.data();
-        if (compdecomp_.save(src_begin, src_begin+buffer_.size(),
-                dst_begin, dst_begin+dst_count, true))
-        {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "zlib_serialization_filter::flush",
-                "compression failure, flushing did not reach end of data");
-            return 0;
-        }
-        return dst_begin-static_cast<char*>(dst);
-    }
-}}
+        bool eof = compdecomp_.save(src_begin, src_begin+buffer_.size(),
+                dst_begin, dst_begin+dst_count, true);
 
-#endif
+        if (eof)
+        {
+            written = dst_begin-static_cast<char*>(dst);
+//             HPX_THROW_EXCEPTION(serialization_error,
+//                 "zlib_serialization_filter::flush",
+//                 "compression failure, flushing did not reach end of data");
+            return false;
+        }
+
+        written = dst_begin-static_cast<char*>(dst);
+        return true;
+    }
+}}}
+
