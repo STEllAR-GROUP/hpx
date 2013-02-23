@@ -26,13 +26,13 @@ macro(add_bzip2_module)
     hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
     hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
 
-    add_hpx_library(plugin_bzip2
+    add_hpx_library(compress_bzip2
       SOURCES ${hpx_SOURCE_DIR}/plugins/compression/bzip2/bzip2_serialization_filter.cpp
       HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/compression/bzip2_serialization_filter.hpp
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARY})
 
-    add_hpx_pseudo_dependencies(plugins.compression.bzip2 plugin_bzip2_lib)
+    add_hpx_pseudo_dependencies(plugins.compression.bzip2 compress_bzip2_lib)
   endif()
 endmacro()
 

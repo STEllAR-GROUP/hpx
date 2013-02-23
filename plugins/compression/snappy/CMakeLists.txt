@@ -18,13 +18,13 @@ macro(add_snappy_module)
     hpx_include_sys_directories(${SNAPPY_INCLUDE_DIR})
     hpx_link_sys_directories(${SNAPPY_LIBRARY_DIR})
 
-    add_hpx_library(plugin_snappy
+    add_hpx_library(compress_snappy
       SOURCES ${hpx_SOURCE_DIR}/plugins/compression/snappy/snappy_serialization_filter.cpp
       HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/compression/snappy_serialization_filter.hpp
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARY})
 
-    add_hpx_pseudo_dependencies(plugins.compression.snappy plugin_snappy_lib)
+    add_hpx_pseudo_dependencies(plugins.compression.snappy compress_snappy_lib)
   endif()
 endmacro()
 

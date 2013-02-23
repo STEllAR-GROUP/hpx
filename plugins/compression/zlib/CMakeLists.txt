@@ -26,12 +26,12 @@ macro(add_zlib_module)
     hpx_include_sys_directories(${ZLIB_INCLUDE_DIR})
     hpx_link_sys_directories(${ZLIB_LIBRARY_DIR})
 
-    add_hpx_library(plugin_zlib
+    add_hpx_library(compress_zlib
       SOURCES ${hpx_SOURCE_DIR}/plugins/compression/zlib/zlib_serialization_filter.cpp
       HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/compression/zlib_serialization_filter.hpp
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARY})
 
-    add_hpx_pseudo_dependencies(plugins.compression.zlib plugin_zlib_lib)
+    add_hpx_pseudo_dependencies(plugins.compression.zlib compress_zlib_lib)
   endif()
 endmacro()
