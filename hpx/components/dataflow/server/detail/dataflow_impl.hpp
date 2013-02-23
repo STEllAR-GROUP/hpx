@@ -279,7 +279,7 @@ namespace hpx { namespace traits
                 else
                 {
                     typedef typename lco_type::set_value_action action_type;
-                    result_type r =  d.get_value();
+                    result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
                 }
             }
@@ -313,8 +313,8 @@ namespace hpx { namespace traits
             */
 #endif
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
 
         void forward_results(remote_result & r)
@@ -336,6 +336,8 @@ namespace hpx { namespace traits
             }
         }
 
+        // This is called when some dataflow object connects to this one (i.e.
+        // requests to receive the output of this dataflow instance).
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -345,10 +347,12 @@ namespace hpx { namespace traits
                 << get_gid()
                 << " ";
 
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
 
                 if(!d.stores_value())
                 {
@@ -364,7 +368,6 @@ namespace hpx { namespace traits
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -391,8 +394,8 @@ namespace hpx { namespace traits
                 component_type;
 
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
 
         // Setting the slot for immediate values
