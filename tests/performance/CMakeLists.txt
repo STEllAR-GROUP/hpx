@@ -18,6 +18,7 @@ set(benchmarks
     function_object_wrapper_overhead
     hpx_tls_overhead
     hpx_homogeneous_task_spawn
+    hpx_homogeneous_timed_task_spawn
     hpx_heterogeneous_task_spawn
     native_tls_overhead
     print_heterogeneous_payloads
@@ -28,6 +29,11 @@ add_hpx_library(test_worker
     SOURCES worker.cpp
     HEADERS worker.hpp
     FOLDER "Benchmarks/Worker")
+    
+add_hpx_library(test_worker_timed
+    SOURCES worker_timed.cpp
+    HEADERS worker_timed.hpp
+    FOLDER "Benchmarks/Worker_Timed")
 
 if(MSVC)
   set(boost_library_dependencies)
@@ -42,7 +48,7 @@ if(OPENMP_FOUND)
      )
 
   set(openmp_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${boost_library_dependencies} test_worker_lib)
+      DEPENDENCIES ${boost_library_dependencies})
 endif()
 
 if(UNIX)
@@ -53,16 +59,21 @@ if(UNIX)
     set(benchmarks
         ${benchmarks}
         qthreads_homogeneous_task_spawn
+        qthreads_homogeneous_timed_task_spawn
         qthreads_heterogeneous_task_spawn
        )
 
     set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
         DEPENDENCIES ${boost_library_dependencies}
-                     ${QTHREADS_LIBRARY} test_worker_lib)
+                     ${QTHREADS_LIBRARY})
+
+	set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
+        DEPENDENCIES ${boost_library_dependencies}
+                     ${QTHREADS_LIBRARY})
 
     set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
         DEPENDENCIES ${boost_library_dependencies}
-                     ${QTHREADS_LIBRARY} test_worker_lib)
+                     ${QTHREADS_LIBRARY})
   endif()
 endif()
 
@@ -76,7 +87,7 @@ if(TBB_FOUND)
 
   set(tbb_homogeneous_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${TBB_LIBRARY} test_worker_lib)
+                   ${TBB_LIBRARY})
 endif()
 
 if(SWARM_FOUND)
@@ -89,7 +100,7 @@ if(SWARM_FOUND)
 
   set(swarm_homogeneous_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
-                   ${SWARM_LIBRARY} tests_worker_lib)
+                   ${SWARM_LIBRARY})
 endif()
 
 set(delay_baseline_FLAGS NOLIBS
@@ -112,6 +123,7 @@ set(hpx_tls_overhead_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
+set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 
