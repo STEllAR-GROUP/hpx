@@ -113,11 +113,14 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -136,6 +139,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -144,10 +149,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -162,7 +169,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -314,12 +320,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -338,6 +351,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -346,10 +361,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -364,7 +381,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -386,8 +402,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -607,12 +623,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -631,6 +654,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -639,10 +664,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -657,7 +684,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -679,8 +705,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -900,12 +926,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -924,6 +957,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -932,10 +967,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -950,7 +987,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -972,8 +1008,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -1193,12 +1229,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -1217,6 +1260,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1225,10 +1270,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -1243,7 +1290,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -1265,8 +1311,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -1486,12 +1532,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -1510,6 +1563,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1518,10 +1573,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -1536,7 +1593,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -1558,8 +1614,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -1779,12 +1835,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -1803,6 +1866,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1811,10 +1876,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -1829,7 +1896,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -1851,8 +1917,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -2072,12 +2138,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -2096,6 +2169,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2104,10 +2179,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -2122,7 +2199,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -2144,8 +2220,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -2365,12 +2441,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -2389,6 +2472,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2397,10 +2482,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -2415,7 +2502,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -2437,8 +2523,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -2658,12 +2744,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -2682,6 +2775,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2690,10 +2785,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -2708,7 +2805,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -2730,8 +2826,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -2951,12 +3047,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -2975,6 +3078,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2983,10 +3088,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -3001,7 +3108,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -3023,8 +3129,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -3244,12 +3350,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -3268,6 +3381,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3276,10 +3391,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -3294,7 +3411,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -3316,8 +3432,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -3537,12 +3653,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -3561,6 +3684,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3569,10 +3694,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -3587,7 +3714,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -3609,8 +3735,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -3830,12 +3956,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -3854,6 +3987,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3862,10 +3997,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -3880,7 +4017,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -3902,8 +4038,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -4123,12 +4259,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -4147,6 +4290,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4155,10 +4300,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -4173,7 +4320,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -4195,8 +4341,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <
@@ -4416,12 +4562,19 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
-            
+            BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
+            {
+                delete p;
+            }
+            future_slots.clear();
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
         void forward_results(remote_result & r)
         {
@@ -4440,6 +4593,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4448,10 +4603,12 @@
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
@@ -4466,7 +4623,6 @@
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -4488,8 +4644,8 @@
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
         
         template <

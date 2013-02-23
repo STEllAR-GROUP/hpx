@@ -249,12 +249,12 @@ namespace hpx { namespace traits
 #endif
 #if N > 0
             future_slots.reserve(N);
+
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             set_slot<N>(                                                        \
                 BOOST_PP_CAT(a, N)                                              \
               , typename hpx::traits::is_dataflow<BOOST_PP_CAT(A, N)>::type()); \
     /**/
-
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
 #undef HPX_LCOS_DATAFLOW_M0
 #endif
@@ -302,15 +302,17 @@ namespace hpx { namespace traits
 
         typedef typename Action::result_type remote_result;
 
+        // This is called by our action after it executed. The argument is what
+        // has been calculated by the action. The result has to be sent to all 
+        // connected dataflow instances.
         void set_value(BOOST_RV_REF(remote_result) r)
         {
 #if N > 0
-            /*
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
                 delete p;
             }
-            */
+            future_slots.clear();
 #endif
             remote_result tmp(r);
             result.set(boost::move(r));
