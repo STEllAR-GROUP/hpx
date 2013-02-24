@@ -16,6 +16,7 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
+#include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/type_size.hpp>
 
 #include <boost/version.hpp>
@@ -190,6 +191,9 @@ namespace hpx { namespace actions
         /// Return a pointer to the filter to be used while serializing an 
         /// instance of this action type.
         virtual util::binary_filter* get_serialization_filter() const = 0;
+
+        /// Return a pointer to the message handler to be used for this action.
+        virtual parcelset::policies::message_handler* get_message_handler() const = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -521,6 +525,12 @@ namespace hpx { namespace actions
         util::binary_filter* get_serialization_filter() const
         {
             return traits::action_serialization_filter<derived_type>::call();
+        }
+
+        /// Return a pointer to the message handler to be used for this action.
+        parcelset::policies::message_handler* get_message_handler() const
+        {
+            return traits::action_message_handler<derived_type>::call();
         }
 
     public:

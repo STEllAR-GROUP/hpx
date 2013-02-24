@@ -334,11 +334,15 @@ namespace hpx { namespace parcelset
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
 
-        // determine which parcelport to use for sending this parcel
+        // dispatch to the message handler which is associated with the
+        // encapsulated action
         connection_type t = find_appropriate_connection_type(addrs[0].locality_);
+        policies::message_handler* mh = p.get_message_handler();
+        if (mh) {
+            mh->put_parcel(find_parcelport(t), p, f);
+            return;
+        }
 
-        // send the parcel using the parcelport corresponding to the
-        // locality type of the destination
         find_parcelport(t)->put_parcel(p, f);
     }
 

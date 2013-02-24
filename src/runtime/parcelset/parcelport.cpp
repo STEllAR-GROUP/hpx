@@ -59,5 +59,23 @@ namespace hpx { namespace parcelset
 
         return boost::shared_ptr<parcelport>();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // default implementation, just forward to single parcel version
+    void parcelport::put_parcels(std::vector<parcel> const & parcels,
+            std::vector<write_handler_type> const& handlers)
+    {
+        if (parcels.size() != handlers.size())
+        {
+            HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
+                "mismatched number of parcels and handlers");
+            return;
+        }
+
+        for (std::size_t i = 0; i != parcels.size(); ++i)
+        {
+            put_parcel(parcels[i], handlers[i]);
+        }
+    }
 }}
 
