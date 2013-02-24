@@ -68,6 +68,17 @@ tool, see the __cmake_basic_usage__ section.
 
 [c++]
 
+[caution The `ccmake` user interface program which wraps `cmake` and visualizes
+        the current settings of the file `CMakeCache.txt` (that is where `cmake`
+        stores all build settings) can be invoked with command line arguments
+        in the same way as `cmake`. However, invoking `ccmake` this way does
+        yield different results than the equivalent `cmake` invocation. This
+        is a problem in `ccmake` which can cause subtle errors while building
+        __hpx__.
+
+        Our suggestion is not use command line arguments to `ccmake` to alter
+        the build configuration. Use the `cmake` command instead.]
+
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -288,8 +299,8 @@ variables are used more seldom and are mainly useful for debugging purposes.
     ]
     [[`HPX_USE_ZLIB_COMPRESSION:BOOL`]
      [Sets whether support for compressing parcels using the __zlib__ library will
-      be enabled or not. This variable is set to `OFF` by default. If you enable 
-      this option CMake will try to find the __zlib__ library, which might require 
+      be enabled or not. This variable is set to `OFF` by default. If you enable
+      this option CMake will try to find the __zlib__ library, which might require
       setting the CMake variable `ZLIB_ROOT`.]
     ]
 ]
