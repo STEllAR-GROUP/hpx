@@ -24,11 +24,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace compression
 {
-    struct HPX_LIBRARY_EXPORT snappy_serialization_filter 
+    struct HPX_LIBRARY_EXPORT snappy_serialization_filter
       : public util::binary_filter
     {
         snappy_serialization_filter(bool compress = false)
-          : compress_(compress), current_(0)
+          : current_(0), compress_(compress)
         {}
         ~snappy_serialization_filter();
 
@@ -37,7 +37,7 @@ namespace hpx { namespace plugins { namespace compression
         bool flush(void* dst, std::size_t dst_count, std::size_t& written);
 
         void set_max_compression_length(std::size_t size);
-        std::size_t init_decompression_data(char const* buffer, 
+        std::size_t init_decompression_data(char const* buffer,
             std::size_t size, std::size_t decompressed_size);
 
         /// serialization support
