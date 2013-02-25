@@ -86,7 +86,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
-    boost::uint64_t read_psm_vm()
+    boost::uint64_t read_psm_virtual()
     {
         using boost::spirit::ascii::space;
         typedef std::string::const_iterator iterator_type;
@@ -118,7 +118,7 @@ namespace hpx { namespace performance_counters { namespace memory
         if (!r) {
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
-                "hpx::performance_counters::memory::read_psm_vm",
+                "hpx::performance_counters::memory::read_psm_virtual",
                 boost::str(boost::format("failed to parse '%s'") % filename));
             return boost::uint64_t(-1);
         }

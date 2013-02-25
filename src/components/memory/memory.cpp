@@ -21,7 +21,7 @@ namespace hpx { namespace performance_counters { namespace memory
     {
         namespace pc = hpx::performance_counters;
         pc::install_counter_type(
-            "/runtime/memory/vm", &read_psm_vm,
+            "/runtime/memory/virtual", &read_psm_virtual,
             "returns the amount of virtual memory currently allocated by the "
             "referenced locality", "bytes"
         );

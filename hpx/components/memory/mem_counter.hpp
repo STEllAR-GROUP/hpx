@@ -11,7 +11,7 @@
 namespace hpx { namespace performance_counters { namespace memory
 {
     // returns virtual memory value
-    boost::uint64_t read_psm_vm();
+    boost::uint64_t read_psm_virtual();
 
     // returns resident memory value
     boost::uint64_t read_psm_resident();

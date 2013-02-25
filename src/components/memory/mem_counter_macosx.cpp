@@ -16,7 +16,7 @@ namespace hpx { namespace performance_counters { namespace memory
 {
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
-    boost::uint64_t read_psm_vm()
+    boost::uint64_t read_psm_virtual()
     {
         struct task_basic_info t_info;
         mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
@@ -27,7 +27,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 &t_info_count) != KERN_SUCCESS)
         {
             HPX_THROW_EXCEPTION(kernel_error,
-                "hpx::performance_counters::memory::read_psm_vm",
+                "hpx::performance_counters::memory::read_psm_virtual",
                 "task_info failed");
 
             return boost::uint64_t(-1);
@@ -49,7 +49,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 &t_info_count) != KERN_SUCCESS)
         {
             HPX_THROW_EXCEPTION(kernel_error,
-                "hpx::performance_counters::memory::read_psm_vm",
+                "hpx::performance_counters::memory::read_psm_virtual",
                 "task_info failed");
 
             return boost::uint64_t(-1);

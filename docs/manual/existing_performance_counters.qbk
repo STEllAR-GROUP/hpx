@@ -497,7 +497,7 @@ system and application performance.
          in nanoseconds.
         ]
     ]
-    [   [`/runtime/memory/vm`]
+    [   [`/runtime/memory/virtual`]
         [`locality#*/total`
 
           where:[br] `*` is the locality id of the locality the allocated
