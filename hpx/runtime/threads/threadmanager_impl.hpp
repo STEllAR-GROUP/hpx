@@ -276,7 +276,7 @@ namespace hpx { namespace threads
         ///                 function returns \a thread_state#active in this case.
         thread_state set_state(thread_id_type id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex = wait_signaled,
-            thread_priority priority = thread_priority_normal,
+            thread_priority priority = thread_priority_default,
             error_code& ec = throws);
 
         /// The get_state function is part of the thread related API. It
@@ -327,7 +327,7 @@ namespace hpx { namespace threads
         thread_id_type set_state (time_type const& expire_at,
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal,
+            thread_priority priority = thread_priority_default,
             error_code& ec = throws);
 
         /// \brief  Set the thread state of the \a thread referenced by the
@@ -350,7 +350,7 @@ namespace hpx { namespace threads
         thread_id_type set_state (duration_type const& expire_from_now,
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal,
+            thread_priority priority = thread_priority_default,
             error_code& ec = throws);
 
         /// The get_description function is part of the thread related API and

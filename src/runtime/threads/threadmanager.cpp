@@ -399,6 +399,12 @@ namespace hpx { namespace threads
             return thread_state(terminated);     // this thread has already been terminated
         }
 
+        // handle priority, restore original priority of thread, if needed
+        if (priority == thread_priority_default)
+            priority = thrd->get_priority();
+
+        BOOST_ASSERT(priority != thread_priority_default);
+
         thread_state previous_state;
         do {
             // action depends on the current state
@@ -830,6 +836,15 @@ namespace hpx { namespace threads
                 "NULL thread id encountered (timer_id)");
             return terminated;
         }
+
+        // handle priority, restore original priority of thread, if needed
+        if (priority == thread_priority_default)
+        {
+            // we know that the id is actually the pointer to the thread
+            thread_data* thrd = reinterpret_cast<thread_data*>(id);
+            priority = thrd->get_priority();
+        }
+        BOOST_ASSERT(priority != thread_priority_default);
 
         bool oldvalue = false;
         if (triggered->compare_exchange_strong(oldvalue, true)) //-V601

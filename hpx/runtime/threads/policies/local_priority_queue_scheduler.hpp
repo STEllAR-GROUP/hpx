@@ -227,7 +227,8 @@ namespace hpx { namespace threads { namespace policies
             {
                 bool result = high_priority_queues_[num_thread]->
                     get_next_thread(thrd, queue_size + num_thread);
-                if (result) return true;
+                if (result)
+                    return true;
             }
 
             // try to get the next thread from our own queue
@@ -240,7 +241,8 @@ namespace hpx { namespace threads { namespace policies
             {
                 bool result = low_priority_queue_.get_next_thread(
                     thrd, queue_size + high_priority_queue_size);
-                if (result) return true;
+                if (result)
+                    return true;
             }
 
             // steal thread from other queue, first try high priority queues,
