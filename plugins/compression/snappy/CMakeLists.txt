@@ -12,7 +12,7 @@ endif()
 
 macro(add_snappy_module)
   hpx_debug("add_zlib_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
-  if(SNAPPY_FOUND)
+  if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
     hpx_include_sys_directories(${SNAPPY_INCLUDE_DIR})
     hpx_link_sys_directories(${SNAPPY_LIBRARY_DIR})
 
@@ -24,7 +24,6 @@ macro(add_snappy_module)
 
     set_property(TARGET compress_snappy_lib APPEND
       PROPERTY COMPILE_DEFINITIONS
-      "HPX_HAVE_COMPRESSION_SNAPPY"
       "HPX_LIBRARY_EXPORTS")
 
     add_hpx_pseudo_dependencies(plugins.compression.snappy compress_snappy_lib)
