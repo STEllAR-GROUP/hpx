@@ -391,13 +391,22 @@ namespace hpx { namespace threads { namespace policies
                             return high_priority_queues_[num_thread]->get_thread_count(state);
                         break;
                     }
+
+                default:
+                case thread_priority_unknown:
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "local_priority_queue_scheduler::get_thread_count",
+                            "unknown thread priority value (thread_priority_unknown)");
+                        return 0;
+                    }
                 }
                 return 0;
             }
 
             // Return the cumulative count for all queues.
             switch (priority) {
-            case thread_priority_default: 
+            case thread_priority_default:
                 {
                     for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                         count += high_priority_queues_[i]->get_thread_count(state);
@@ -408,7 +417,7 @@ namespace hpx { namespace threads { namespace policies
                         count += queues_[i]->get_thread_count(state);
                 }
 
-            case thread_priority_low: 
+            case thread_priority_low:
                 return low_priority_queue_.get_thread_count(state);
 
             case thread_priority_normal:
@@ -418,11 +427,20 @@ namespace hpx { namespace threads { namespace policies
                     break;
                 }
 
-            case thread_priority_critical: 
+            case thread_priority_critical:
                 {
                     for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                         count += high_priority_queues_[i]->get_thread_count(state);
                     break;
+                }
+
+            default:
+            case thread_priority_unknown:
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "local_priority_queue_scheduler::get_thread_count",
+                        "unknown thread priority value (thread_priority_unknown)");
+                    return 0;
                 }
             }
             return count;
@@ -441,7 +459,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 BOOST_ASSERT(num_thread < queues_.size());
 
-                if (num_thread < high_priority_queues_.size()) 
+                if (num_thread < high_priority_queues_.size())
                 {
                     wait_time = high_priority_queues_[num_thread]->
                         get_average_thread_wait_time();
@@ -489,7 +507,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 BOOST_ASSERT(num_thread < queues_.size());
 
-                if (num_thread < high_priority_queues_.size()) 
+                if (num_thread < high_priority_queues_.size())
                 {
                     wait_time = high_priority_queues_[num_thread]->
                         get_average_task_wait_time();
