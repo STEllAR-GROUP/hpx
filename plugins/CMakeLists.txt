@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(plugin_categories
-    compression)
+    compression
+    parcel)
 
 foreach(category ${plugin_categories})
   add_hpx_pseudo_target(plugins.${category})
@@ -14,4 +15,5 @@ endforeach()
 
 macro(add_plugin_modules)
   add_compression_modules()
+  add_parcel_modules()
 endmacro()
