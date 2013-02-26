@@ -7,6 +7,7 @@
 set(tests
     command_line_arguments
     function_argument
+    function_serialization
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
