@@ -33,8 +33,12 @@ namespace hpx { namespace actions
     threads::thread_priority action_priority()
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        return static_cast<threads::thread_priority>(
-            traits::action_priority<action_type>::value);
+        threads::thread_priority priority = 
+            static_cast<threads::thread_priority>(
+                traits::action_priority<action_type>::value);
+        if (priority == threads::thread_priority_default)
+            priority = threads::thread_priority_normal;
+        return priority;
     }
 }}
 
