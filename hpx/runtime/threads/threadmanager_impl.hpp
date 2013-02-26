@@ -281,7 +281,7 @@ namespace hpx { namespace threads
             error_code& ec = throws);
 
         /// The get_state function is part of the thread related API. It
-        /// queries the state of one of the threads known to the threadmanager
+        /// queries the state of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be returned for.
@@ -290,21 +290,33 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
         thread_state get_state(thread_id_type id);
 
         /// The get_phase function is part of the thread related API. It
-        /// queries the phase of one of the threads known to the threadmanager
+        /// queries the phase of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the phase should
         ///                 be returned for.
         ///
         /// \returns        This function returns the current phase of the
         ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be ~0.
         std::size_t get_phase(thread_id_type id);
+
+        /// The get_priority function is part of the thread related API. It
+        /// queries the priority of one of the threads known to the thread manager
+        ///
+        /// \param id       [in] The thread id of the thread the phase should
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current priority of the
+        ///                 thread referenced by the \a id parameter. If the
+        ///                 thread is not known to the thread manager the return
+        ///                 value will be ~0.
+        thread_priority get_priority(thread_id_type id);
 
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (at the given time)

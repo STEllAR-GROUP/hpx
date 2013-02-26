@@ -68,19 +68,31 @@ namespace hpx { namespace threads
         virtual bool cleanup_terminated(bool delete_all = false) = 0;
 
         /// The get_phase function is part of the thread related API. It
-        /// queries the phase of one of the threads known to the threadmanager
+        /// queries the phase of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the phase should
         ///                 be returned for.
         ///
         /// \returns        This function returns the current phase of the
         ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be ~0.
         virtual std::size_t get_phase(thread_id_type id) = 0;
 
+        /// The get_priority function is part of the thread related API. It
+        /// queries the priority of one of the threads known to the thread manager
+        ///
+        /// \param id       [in] The thread id of the thread the phase should
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current priority of the
+        ///                 thread referenced by the \a id parameter. If the
+        ///                 thread is not known to the thread manager the return
+        ///                 value will be ~0.
+        virtual thread_priority get_priority(thread_id_type id) = 0;
+
         /// The get_state function is part of the thread related API. It
-        /// queries the state of one of the threads known to the threadmanager
+        /// queries the state of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be returned for.
@@ -89,13 +101,13 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
         virtual thread_state get_state(thread_id_type id) = 0;
 
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this
-        /// threadmanager.
+        /// thread manager.
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be modified for.
@@ -110,7 +122,7 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
         ///
         /// \note           If the thread referenced by the parameter \a id

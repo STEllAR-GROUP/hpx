@@ -329,6 +329,11 @@ namespace hpx
         }
 
         // extensions
+        threads::thread_priority get_priority()
+        {
+            return threads::get_thread_priority(threads::get_self_id());
+        }
+
         void interruption_point()
         {
             if (interruption_enabled() && interruption_requested())

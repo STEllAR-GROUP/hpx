@@ -117,6 +117,24 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_phase(id);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    threads::thread_priority get_thread_priority(thread_id_type id, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::get_thread_priority",
+                "global applier object is not accessible");
+            return threads::thread_priority_unknown;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return app->get_thread_manager().get_priority(id);
+    }
+
     void interrupt_thread(thread_id_type id, bool flag, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();

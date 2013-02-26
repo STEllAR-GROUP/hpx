@@ -491,6 +491,10 @@ namespace hpx { namespace threads
         {
             return priority_;
         }
+        void set_priority(thread_priority priority)
+        {
+            priority_ = priority;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Memory management

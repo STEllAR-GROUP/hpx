@@ -402,6 +402,8 @@ namespace hpx { namespace threads
         // handle priority, restore original priority of thread, if needed
         if (priority == thread_priority_default)
             priority = thrd->get_priority();
+        else if (new_state == pending)
+            thrd->set_priority(priority);
 
         BOOST_ASSERT(priority != thread_priority_default);
 
@@ -536,6 +538,17 @@ namespace hpx { namespace threads
         // we know that the id is actually the pointer to the thread
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd ? thrd->get_thread_phase() : std::size_t(~0);
+    }
+
+    /// The get_priority function is part of the thread related API. It
+    /// queries the priority of one of the threads known to the threadmanager_impl
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    thread_priority threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_priority(thread_id_type id)
+    {
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd ? thrd->get_priority() : thread_priority_unknown;
     }
 
     /// The get_description function is part of the thread related API and

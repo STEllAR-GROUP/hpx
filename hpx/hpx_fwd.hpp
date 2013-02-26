@@ -204,6 +204,7 @@ namespace hpx
         /// \enum thread_priority
         enum thread_priority
         {
+            thread_priority_unknown = -1,
             thread_priority_default = 0,      ///< use default priority
             thread_priority_low = 1,          ///< low thread priority
             thread_priority_normal = 2,       ///< normal thread priority (default)
