@@ -53,7 +53,8 @@ namespace hpx { namespace threads
 
         /// \brief return the number of PX-threads with the given state
         virtual boost::int64_t get_thread_count(
-            thread_state_enum state = unknown) const = 0;
+            thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default) const = 0;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -320,13 +321,13 @@ namespace hpx { namespace threads
         /// interruption point.
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
-        /// \param flag     [in] The flag encodes whether the thread should be 
+        /// \param flag     [in] The flag encodes whether the thread should be
         ///                 interrupted (if it is \a true), or 'uninterrupted'
         ///                 (if it is \a false).
         /// \param ec       [in,out] this represents the error status on exit,
         ///                 if this is pre-initialized to \a hpx#throws
         ///                 the function will throw on error instead.
-        virtual void interrupt(thread_id_type id, bool flag, 
+        virtual void interrupt(thread_id_type id, bool flag,
             error_code& ec = throws) = 0;
 
         /// The run_thread_exit_callbacks function is part of the thread related
@@ -374,11 +375,11 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         virtual void register_counter_types() = 0;
 
-        /// Returns of the number of the processing unit the given thread 
+        /// Returns of the number of the processing unit the given thread
         /// is allowed to run on
         virtual std::size_t get_pu_num(std::size_t) const = 0;
 
-        /// Return the mask for processing units the given thread is allowed 
+        /// Return the mask for processing units the given thread is allowed
         /// to run on.
         virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
 
@@ -409,7 +410,7 @@ namespace hpx { namespace threads
             std::size_t data, error_code& ec = throws) = 0;
 #endif
 
-        // Returns the mask identifying all processing units used by this 
+        // Returns the mask identifying all processing units used by this
         // thread manager.
         virtual mask_type get_used_processing_units() const = 0;
 

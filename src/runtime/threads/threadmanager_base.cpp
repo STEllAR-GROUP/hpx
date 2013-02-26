@@ -69,4 +69,10 @@ namespace hpx { namespace threads
     {
         return get_thread_manager().get_thread_count(state);
     }
+
+    boost::int64_t get_thread_count(thread_priority priority, 
+        thread_state_enum state)
+    {
+        return get_thread_manager().get_thread_count(state, priority);
+    }
 }}

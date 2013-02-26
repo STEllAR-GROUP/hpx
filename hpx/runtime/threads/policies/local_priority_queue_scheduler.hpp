@@ -354,6 +354,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1)) const
         {
             // Return thread count of one specific queue.
@@ -362,24 +363,68 @@ namespace hpx { namespace threads { namespace policies
             {
                 BOOST_ASSERT(num_thread < queues_.size());
 
-                if (num_thread < high_priority_queues_.size())
-                    count = high_priority_queues_[num_thread]->get_thread_count(state);
+                switch (priority) {
+                case thread_priority_default:
+                    {
+                        if (num_thread < high_priority_queues_.size())
+                            count = high_priority_queues_[num_thread]->get_thread_count(state);
 
-                if (queues_.size()-1 == num_thread)
-                    count += low_priority_queue_.get_thread_count(state);
+                        if (queues_.size()-1 == num_thread)
+                            count += low_priority_queue_.get_thread_count(state);
 
-                return count + queues_[num_thread]->get_thread_count(state);
+                        return count + queues_[num_thread]->get_thread_count(state);
+                    }
+
+                case thread_priority_low:
+                    {
+                        if (queues_.size()-1 == num_thread)
+                            return low_priority_queue_.get_thread_count(state);
+                        break;
+                    }
+
+                case thread_priority_normal:
+                    return queues_[num_thread]->get_thread_count(state);
+
+                case thread_priority_critical:
+                    {
+                        if (num_thread < high_priority_queues_.size())
+                            return high_priority_queues_[num_thread]->get_thread_count(state);
+                        break;
+                    }
+                }
+                return 0;
             }
 
             // Return the cumulative count for all queues.
-            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
-                count += high_priority_queues_[i]->get_thread_count(state);
+            switch (priority) {
+            case thread_priority_default: 
+                {
+                    for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                        count += high_priority_queues_[i]->get_thread_count(state);
 
-            count += low_priority_queue_.get_thread_count(state);
+                    count += low_priority_queue_.get_thread_count(state);
 
-            for (std::size_t i = 0; i < queues_.size(); ++i)
-                count += queues_[i]->get_thread_count(state);
+                    for (std::size_t i = 0; i < queues_.size(); ++i)
+                        count += queues_[i]->get_thread_count(state);
+                }
 
+            case thread_priority_low: 
+                return low_priority_queue_.get_thread_count(state);
+
+            case thread_priority_normal:
+                {
+                    for (std::size_t i = 0; i < queues_.size(); ++i)
+                        count += queues_[i]->get_thread_count(state);
+                    break;
+                }
+
+            case thread_priority_critical: 
+                {
+                    for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                        count += high_priority_queues_[i]->get_thread_count(state);
+                    break;
+                }
+            }
             return count;
         }
 
@@ -493,19 +538,19 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(num_thread < queues_.size());
 
             std::size_t added = 0;
+            bool result = true;
 
-//             if (num_thread < high_priority_queues_.size())
-//             {
-//                 // Convert high priority tasks to threads before attempting to
-//                 // steal from other OS thread.
-//                 bool result = high_priority_queues_[num_thread]->
-//                     wait_or_add_new(queues_size + num_thread, running,
-//                         idle_loop_count, added);
-//                 if (0 != added) return result;
-//             }
+            if (num_thread < high_priority_queues_.size()) {
+                // Convert high priority tasks to threads before attempting to
+                // steal from other OS thread.
+                result = high_priority_queues_[num_thread]->
+                    wait_or_add_new(queues_size + num_thread, running,
+                        idle_loop_count, added);
+                if (0 != added) return result;
+            }
 
-            bool result = queues_[num_thread]->wait_or_add_new(
-                num_thread, running, idle_loop_count, added);
+            result = queues_[num_thread]->wait_or_add_new(
+                num_thread, running, idle_loop_count, added) && result;
             if (0 != added) return result;
 
             if (queues_size-1 == num_thread) {

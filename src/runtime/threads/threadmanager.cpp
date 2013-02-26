@@ -38,7 +38,7 @@ namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
     // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it 
+    // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
     bool maintain_queue_wait_times = false;
 }}}
@@ -125,10 +125,10 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_thread_count(thread_state_enum state) const
+        get_thread_count(thread_state_enum state, thread_priority priority) const
     {
         mutex_type::scoped_lock lk(mtx_);
-        return scheduler_.get_thread_count(state);
+        return scheduler_.get_thread_count(state, priority);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1219,7 +1219,7 @@ namespace hpx { namespace threads
         // /threads{locality#%d/total}/wait-time/pending
         // /threads{locality#%d/worker-thread%d}/wait-time/pending
         if (paths.parentinstance_is_basename_) {
-            HPX_THROWS_IF(ec, bad_parameter, 
+            HPX_THROWS_IF(ec, bad_parameter,
                 "thread_wait_time_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
@@ -1269,7 +1269,7 @@ namespace hpx { namespace threads
         // /threads{locality#%d/total}/wait-time/pending
         // /threads{locality#%d/worker-thread%d}/wait-time/pending
         if (paths.parentinstance_is_basename_) {
-            HPX_THROWS_IF(ec, bad_parameter, 
+            HPX_THROWS_IF(ec, bad_parameter,
                 "task_wait_time_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
@@ -1482,48 +1482,60 @@ namespace hpx { namespace threads
             // /threads(locality#%d/total}/count/instantaneous/all
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/all
             { "count/instantaneous/all",
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown, -1),
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown,
+                  thread_priority_default, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown,
+                  thread_priority_default,
                   static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/active
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/active
             { "count/instantaneous/active",
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active, -1),
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active,
+                  thread_priority_default, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active,
+                  thread_priority_default,
                   static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/pending
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/pending
             { "count/instantaneous/pending",
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending, -1),
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending,
+                  thread_priority_default, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending,
+                  thread_priority_default,
                   static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/suspended
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/suspended
             { "count/instantaneous/suspended",
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended, -1),
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended,
+                  thread_priority_default, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended,
+                  thread_priority_default,
                   static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/terminated
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/terminated
             { "count/instantaneous/terminated",
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated, -1),
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated,
+                  thread_priority_default, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated,
+                  thread_priority_default,
                   static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
             // /threads(locality#%d/total}/count/instantaneous/staged
             // /threads(locality#%d/worker-thread%d}/count/instantaneous/staged
             { "count/instantaneous/staged",
-              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, staged, -1),
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, staged,
+                  thread_priority_default, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, staged,
+                  thread_priority_default,
                   static_cast<std::size_t>(paths.instanceindex_)),
               "worker-thread", shepherd_count
             },
@@ -1878,7 +1890,8 @@ namespace hpx { namespace threads
 
 #if HPX_DEBUG != 0
         // the last OS thread is allowed to exit only if no more PX threads exist
-        BOOST_ASSERT(!scheduler_.get_thread_count(unknown, num_thread));
+        BOOST_ASSERT(!scheduler_.get_thread_count(
+            unknown, thread_priority_default, num_thread));
 #endif
     }
 

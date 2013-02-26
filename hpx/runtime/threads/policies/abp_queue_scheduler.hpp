@@ -123,6 +123,7 @@ struct abp_queue_scheduler : boost::noncopyable
     ///////////////////////////////////////////////////////////////////////
     // Queries the current thread count of the queues.
     boost::int64_t get_thread_count(thread_state_enum state = unknown,
+        thread_priority priority = thread_priority_default,
         std::size_t num_thread = std::size_t(-1)) const
     {
         // Return thread count of one specific queue.

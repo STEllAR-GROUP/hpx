@@ -226,7 +226,8 @@ namespace hpx { namespace threads
         /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the threadmanager
-        boost::int64_t get_thread_count(thread_state_enum state = unknown) const;
+        boost::int64_t get_thread_count(thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default) const;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
