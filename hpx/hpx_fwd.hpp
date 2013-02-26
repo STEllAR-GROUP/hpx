@@ -198,12 +198,13 @@ namespace hpx
         /// \ cond NODETAIL
         ///   Please note that if you change the value of threads::terminated
         ///   above, you will need to adjust do_call(dummy<1> = 1) in
-        ///   util/coroutine /detail/coroutine_impl.hpp as well.
+        ///   util/coroutine/detail/coroutine_impl.hpp as well.
         /// \ endcond
 
         /// \enum thread_priority
         enum thread_priority
         {
+            thread_priority_unknown = -1,
             thread_priority_default = 0,      ///< use default priority
             thread_priority_low = 1,          ///< low thread priority
             thread_priority_normal = 2,       ///< normal thread priority (default)
@@ -326,12 +327,16 @@ namespace hpx
         /// The function \a get_thread_count returns the number of currently
         /// known threads.
         ///
-        /// \note If state == unknown this function will not only return the 
+        /// \note If state == unknown this function will not only return the
         ///       number of currently existing threads, but will add the number
-        ///       of registered task descriptions (which have not been 
-        ///       converted into threads yet.
+        ///       of registered task descriptions (which have not been
+        ///       converted into threads yet).
         HPX_API_EXPORT boost::int64_t get_thread_count(
             thread_state_enum state = unknown);
+
+        /// \copydoc get_thread_count(thread_state_enum state)
+        HPX_API_EXPORT boost::int64_t get_thread_count(
+            thread_priority priority, thread_state_enum state = unknown);
     }
 
     /// \namespace actions

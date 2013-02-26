@@ -26,6 +26,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <map>
+#include <algorithm>
 
 namespace hpx { namespace parcelset
 {
@@ -332,6 +333,7 @@ namespace hpx { namespace parcelset
             return find_parcelport(connection_tcpip)->here();
         }
 
+        ///////////////////////////////////////////////////////////////////////
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
         /// parcel-handler instance.

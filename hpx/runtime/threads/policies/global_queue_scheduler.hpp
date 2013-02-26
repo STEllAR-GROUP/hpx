@@ -74,6 +74,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1)) const
         {
             return queue_.get_thread_count(state);

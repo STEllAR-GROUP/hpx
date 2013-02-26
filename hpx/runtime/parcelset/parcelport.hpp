@@ -45,7 +45,7 @@ namespace hpx { namespace parcelset
 
     public:
         typedef HPX_STD_FUNCTION<
-              void(boost::system::error_code const&, std::size_t)
+            void(boost::system::error_code const&, std::size_t)
         > write_handler_type;
 
         typedef HPX_STD_FUNCTION<
@@ -79,10 +79,7 @@ namespace hpx { namespace parcelset
         /// function or function object gets invoked on completion of the send
         /// operation or on any error.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The
-        ///                 parcel \a p will be modified in place, as it will
-        ///                 get set the resolved destination address and parcel
-        ///                 id (if not already set).
+        /// \param p        [in] A reference to the parcel to send.
         /// \param f        [in] A function object to be invoked on successful
         ///                 completion or on errors. The signature of this
         ///                 function object is expected to be:
@@ -92,6 +89,24 @@ namespace hpx { namespace parcelset
         ///                   std::size_t bytes_written);
         /// \endcode
         virtual void put_parcel(parcel const & p, write_handler_type f) = 0;
+
+        /// Queues a list of parcels for transmission to another locality
+        ///
+        /// \note The function put_parcels() is asynchronous, the provided
+        /// functions or function objects get invoked on completion of the send
+        /// operation or on any error.
+        ///
+        /// \param parcels  [in] A reference to the list of parcels to send.
+        /// \param handlers [in] A list of function objects to be invoked on 
+        ///                 successful completion or on errors. The signature of 
+        ///                 these function objects is expected to be:
+        ///
+        /// \code
+        ///      void handler(boost::system::error_code const& err,
+        ///                   std::size_t bytes_written);
+        /// \endcode
+        virtual void put_parcels(std::vector<parcel> const & parcels,
+            std::vector<write_handler_type> const& handlers);
 
         /// Send an early parcel through the TCP parcelport
         ///

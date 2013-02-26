@@ -201,6 +201,8 @@ namespace hpx
         HPX_API_EXPORT void yield() BOOST_NOEXCEPT;
 
         // extensions
+        HPX_API_EXPORT threads::thread_priority get_priority();
+
         HPX_API_EXPORT void interruption_point();
         HPX_API_EXPORT bool interruption_enabled();
         HPX_API_EXPORT bool interruption_requested();

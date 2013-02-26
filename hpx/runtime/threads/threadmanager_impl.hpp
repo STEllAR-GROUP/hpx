@@ -226,7 +226,8 @@ namespace hpx { namespace threads
         /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the threadmanager
-        boost::int64_t get_thread_count(thread_state_enum state = unknown) const;
+        boost::int64_t get_thread_count(thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default) const;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -276,11 +277,11 @@ namespace hpx { namespace threads
         ///                 function returns \a thread_state#active in this case.
         thread_state set_state(thread_id_type id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex = wait_signaled,
-            thread_priority priority = thread_priority_normal,
+            thread_priority priority = thread_priority_default,
             error_code& ec = throws);
 
         /// The get_state function is part of the thread related API. It
-        /// queries the state of one of the threads known to the threadmanager
+        /// queries the state of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be returned for.
@@ -289,21 +290,33 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
         thread_state get_state(thread_id_type id);
 
         /// The get_phase function is part of the thread related API. It
-        /// queries the phase of one of the threads known to the threadmanager
+        /// queries the phase of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the phase should
         ///                 be returned for.
         ///
         /// \returns        This function returns the current phase of the
         ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be ~0.
         std::size_t get_phase(thread_id_type id);
+
+        /// The get_priority function is part of the thread related API. It
+        /// queries the priority of one of the threads known to the thread manager
+        ///
+        /// \param id       [in] The thread id of the thread the phase should
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current priority of the
+        ///                 thread referenced by the \a id parameter. If the
+        ///                 thread is not known to the thread manager the return
+        ///                 value will be ~0.
+        thread_priority get_priority(thread_id_type id);
 
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (at the given time)
@@ -327,7 +340,7 @@ namespace hpx { namespace threads
         thread_id_type set_state (time_type const& expire_at,
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal,
+            thread_priority priority = thread_priority_default,
             error_code& ec = throws);
 
         /// \brief  Set the thread state of the \a thread referenced by the
@@ -350,7 +363,7 @@ namespace hpx { namespace threads
         thread_id_type set_state (duration_type const& expire_from_now,
             thread_id_type id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_normal,
+            thread_priority priority = thread_priority_default,
             error_code& ec = throws);
 
         /// The get_description function is part of the thread related API and

@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    resume_priority
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration

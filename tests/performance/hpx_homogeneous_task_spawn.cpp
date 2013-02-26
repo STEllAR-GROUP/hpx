@@ -82,7 +82,7 @@ int hpx_main(
         // executed. If we haven't, we just reschedule ourselves again.
         do {
             suspend();
-        } while (get_thread_count() > 1);
+        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
 
         print_results(get_os_thread_count(), t.elapsed());
     }

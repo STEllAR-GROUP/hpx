@@ -65,6 +65,9 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_serialization_filter;
 
+    template <typename Action, typename Enable = void>
+    struct action_message_handler;
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for type_size
     template <typename T, typename Enable = void>
