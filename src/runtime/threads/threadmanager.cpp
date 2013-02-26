@@ -869,7 +869,7 @@ namespace hpx { namespace threads
         // then re-activate the thread holding the deadline_timer
         // REVIEW: Why do we ignore errors here?
         error_code ec(lightweight);    // do not throw
-        set_state(timer_id, pending, wait_timeout, thread_priority_normal, ec);
+        set_state(timer_id, pending, wait_timeout, priority, ec);
         return terminated;
     }
 
