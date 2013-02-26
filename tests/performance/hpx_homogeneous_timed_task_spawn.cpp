@@ -67,7 +67,7 @@ void print_results(
 // avoid having one single volatile variable to become a contention point
 int invoke_worker_timed(double delay_sec)
 {
-	volatile int i = 0;
+    volatile int i = 0;
     worker_timed(delay_sec, &i);
     return i;
 }
@@ -81,13 +81,13 @@ int hpx_main(
         header = false;
         
     // delay in seconds
-	delay_sec = (delay) * 1.0E-6;
-	
+    delay_sec = (delay) * 1.0E-6;
+    
     {
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
 
-		
+        
         // Start the clock.
         high_resolution_timer t;
 
