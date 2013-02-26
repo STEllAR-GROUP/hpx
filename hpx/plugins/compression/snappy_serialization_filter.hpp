@@ -7,6 +7,8 @@
 #define HPX_ACTION_SNAPPY_SERIALIZATION_FILTER_FEB_21_2013_0203PM
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_COMPRESSION_SNAPPY)
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -78,5 +80,11 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         };                                                                    \
     }}                                                                        \
 /**/
+
+#else
+
+#define HPX_ACTION_USES_SNAPPY_COMPRESSION(action)
+
+#endif
 
 #endif

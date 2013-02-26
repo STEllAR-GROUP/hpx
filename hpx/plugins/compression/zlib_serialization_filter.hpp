@@ -7,6 +7,9 @@
 #define HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_COMPRESSION_ZLIB)
+
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -116,5 +119,11 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         };                                                                    \
     }}                                                                        \
 /**/
+
+#else
+
+#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)
+
+#endif
 
 #endif

@@ -21,8 +21,6 @@ endif()
 macro(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
   if(BZIP2_FOUND)
-    hpx_add_definitions(-DHPX_LIBRARY_EXPORTS)
-
     hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
     hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
 
@@ -32,7 +30,16 @@ macro(add_bzip2_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARY})
 
+    set_property(TARGET compress_bzip2_lib APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      "HPX_HAVE_COMPRESSION_BZIP2"
+      "HPX_LIBRARY_EXPORTS")
+
     add_hpx_pseudo_dependencies(plugins.compression.bzip2 compress_bzip2_lib)
+
+    if(NOT HPX_NO_INSTALL)
+      hpx_library_install(compress_bzip2_lib lib/hpx)
+    endif()
   endif()
 endmacro()
 

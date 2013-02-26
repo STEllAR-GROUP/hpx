@@ -32,6 +32,15 @@ macro(add_zlib_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARY})
 
+    set_property(TARGET compress_zlib_lib APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      "HPX_HAVE_COMPRESSION_ZLIB"
+      "HPX_LIBRARY_EXPORTS")
+
     add_hpx_pseudo_dependencies(plugins.compression.zlib compress_zlib_lib)
+
+    if(NOT HPX_NO_INSTALL)
+      hpx_library_install(compress_zlib_lib lib/hpx)
+    endif()
   endif()
 endmacro()
