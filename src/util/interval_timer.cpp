@@ -122,7 +122,8 @@ namespace hpx { namespace util
         // create a new suspended thread
         id_ = hpx::applier::register_thread_plain(
             boost::bind(&interval_timer::evaluate, this, _1),
-            description_.c_str(), threads::suspended);
+            description_.c_str(), threads::suspended, true,
+            threads::thread_priority_critical);
 
         // schedule this thread to be run after the given amount of seconds
         threads::set_thread_state(id_,
