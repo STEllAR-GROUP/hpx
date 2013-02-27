@@ -10,13 +10,14 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/include/compression_zlib.hpp>
 
 #include <boost/serialization/access.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
-struct functor 
+struct functor
 {
     functor() {}
 
@@ -26,11 +27,12 @@ struct functor
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned int) {}
-}; 
+};
 
 void pass_functor(hpx::util::function<void()> const& f) {}
 
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action);
+HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
 
 void worker(hpx::util::function<void()> const& f)
 {
