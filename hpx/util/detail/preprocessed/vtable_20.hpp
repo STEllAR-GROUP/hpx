@@ -22,18 +22,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R()
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R()
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -98,18 +86,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void()
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void()
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -178,18 +154,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -254,18 +218,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -334,18 +286,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -410,18 +350,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -490,18 +418,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -566,18 +482,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -646,18 +550,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -722,18 +614,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -802,18 +682,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -878,18 +746,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -958,18 +814,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1034,18 +878,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1114,18 +946,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1190,18 +1010,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1270,18 +1078,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1346,18 +1142,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1426,18 +1210,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1502,18 +1274,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1582,18 +1342,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1658,18 +1406,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1738,18 +1474,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1814,18 +1538,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1894,18 +1606,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -1970,18 +1670,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2050,18 +1738,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2126,18 +1802,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2206,18 +1870,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2282,18 +1934,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2362,18 +2002,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2438,18 +2066,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2518,18 +2134,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2594,18 +2198,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2674,18 +2266,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2750,18 +2330,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2830,18 +2398,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2906,18 +2462,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -2986,18 +2530,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3062,18 +2594,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3142,18 +2662,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3218,18 +2726,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3298,18 +2794,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3374,18 +2858,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3454,18 +2926,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3530,18 +2990,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3610,18 +3058,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -3686,18 +3122,6 @@
           , OArchive
         >
         {
-            static vtable_ptr_base<
-                void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
-                    >::template get<IArchive, OArchive>();
-            }
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);

@@ -22,7 +22,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -32,8 +31,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -46,7 +44,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -69,7 +66,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -79,8 +75,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -93,7 +88,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -116,7 +110,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -126,8 +119,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -140,7 +132,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -163,7 +154,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -173,8 +163,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -187,7 +176,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -210,7 +198,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -220,8 +207,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -234,7 +220,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -257,7 +242,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -267,8 +251,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -281,7 +264,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -304,7 +286,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -314,8 +295,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -328,7 +308,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -351,7 +330,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -361,8 +339,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -375,7 +352,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -398,7 +374,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -408,8 +383,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -422,7 +396,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -445,7 +418,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -455,8 +427,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -469,7 +440,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -492,7 +462,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -502,8 +471,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -516,7 +484,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -539,7 +506,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -549,8 +515,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -563,7 +528,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -586,7 +550,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -596,8 +559,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -610,7 +572,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -633,7 +594,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -643,8 +603,7 @@ namespace hpx { namespace util { namespace detail {
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {}
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
     template <
         typename R
@@ -657,7 +616,6 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        virtual vtable_ptr_base * get_ptr() = 0;
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);

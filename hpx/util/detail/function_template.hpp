@@ -165,10 +165,7 @@ namespace hpx { namespace util
             }
             else
             {
-                typename base_type::vtable_ptr_type *p = 0;
-                ar >> p;
-                this->vptr = p->get_ptr();
-                delete p;
+                ar >> this->vptr;
                 this->vptr->load_object(&this->object, ar, version);
             }
         }

@@ -110,11 +110,6 @@ namespace hpx { namespace util { namespace detail {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
 
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
-
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -125,7 +120,7 @@ namespace hpx { namespace util { namespace detail {
         }
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -164,11 +159,6 @@ namespace hpx { namespace util { namespace detail {
             base_type::clone = Vtable::clone;
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
-        }
-
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
         }
     };
 }}}
