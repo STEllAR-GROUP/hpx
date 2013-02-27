@@ -290,6 +290,179 @@ public:
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_oarchive)
 BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_oarchive)
 
+///////////////////////////////////////////////////////////////////////////////
+// We provide a specialization for the oserializer for pointer types to
+// disable the warning produced by Boost.Serialization when pointers are
+// serialized with tracking disabled.
+
+#include <boost/archive/detail/oserializer.hpp>
+
+namespace boost { namespace archive { namespace detail
+{
+    template <>
+    struct save_pointer_type<hpx::util::portable_binary_oarchive>
+    {
+        typedef hpx::util::portable_binary_oarchive archive_type;
+
+        struct abstract
+        {
+            template <typename T>
+            static const basic_pointer_oserializer*
+            register_type(archive_type& /* ar */)
+            {
+                // it has? to be polymorphic
+                BOOST_STATIC_ASSERT(boost::is_polymorphic<T>::value);
+                return NULL;
+            }
+        };
+
+        struct non_abstract
+        {
+            template <typename T>
+            static const basic_pointer_oserializer* 
+            register_type(archive_type& ar)
+            {
+                return ar.register_type(static_cast<T*>(NULL));
+            }
+        };
+
+        template <typename T>
+        static const basic_pointer_oserializer*
+        register_type(archive_type &ar, T& /*t*/)
+        {
+            // there should never be any need to save an abstract polymorphic
+            // class pointer.  Inhibiting code generation for this
+            // permits abstract base classes to be used - note: exception
+            // virtual serialize functions used for plug-ins
+            typedef
+                BOOST_DEDUCED_TYPENAME mpl::eval_if<
+                    boost::serialization::is_abstract<T>,
+                    mpl::identity<abstract>,
+                    mpl::identity<non_abstract>
+                >::type typex;
+            return typex::template register_type<T>(ar);
+        }
+
+        struct non_polymorphic
+        {
+            template <typename T>
+            static void save(archive_type &ar, T& t)
+            {
+                const basic_pointer_oserializer & bpos =
+                    boost::serialization::singleton<
+                        pointer_oserializer<archive_type, T>
+                    >::get_const_instance();
+                // save the requested pointer type
+                ar.save_pointer(&t, &bpos);
+            }
+        };
+
+        struct polymorphic
+        {
+            template <typename T>
+            static void save(archive_type &ar,T& t)
+            {
+                BOOST_DEDUCED_TYPENAME
+                boost::serialization::type_info_implementation<T>::type const
+                & i = boost::serialization::singleton<
+                    BOOST_DEDUCED_TYPENAME
+                    boost::serialization::type_info_implementation<T>::type
+                >::get_const_instance();
+
+                boost::serialization::extended_type_info const * const this_type = & i;
+
+                // retrieve the true type of the object pointed to
+                // if this assertion fails its an error in this library
+                BOOST_ASSERT(NULL != this_type);
+
+                const boost::serialization::extended_type_info * true_type =
+                    i.get_derived_extended_type_info(t);
+
+                // note:if this exception is thrown, be sure that derived pointer
+                // is either registered or exported.
+                if (NULL == true_type) {
+                    boost::serialization::throw_exception(
+                        archive_exception(
+                            archive_exception::unregistered_class,
+                            "derived class not registered or exported"
+                        )
+                    );
+                }
+
+                // if its not a pointer to a more derived type
+                const void *vp = static_cast<const void *>(&t);
+                if(*this_type == *true_type){
+                    const basic_pointer_oserializer * bpos = register_type(ar, t);
+                    ar.save_pointer(vp, bpos);
+                    return;
+                }
+                // convert pointer to more derived type. if this is thrown
+                // it means that the base/derived relationship hasn't be registered
+                vp = serialization::void_downcast(
+                    *true_type,
+                    *this_type,
+                    static_cast<const void *>(&t)
+                );
+                if(NULL == vp){
+                    boost::serialization::throw_exception(
+                        archive_exception(
+                            archive_exception::unregistered_cast,
+                            true_type->get_debug_info(),
+                            this_type->get_debug_info()
+                        )
+                    );
+                }
+
+                // since true_type is valid, and this only gets made if the
+                // pointer oserializer object has been created, this should never
+                // fail
+                const basic_pointer_oserializer * bpos
+                    = static_cast<const basic_pointer_oserializer *>(
+                        boost::serialization::singleton<
+                            archive_serializer_map<archive_type>
+                        >::get_const_instance().find(*true_type)
+                    );
+                BOOST_ASSERT(NULL != bpos);
+                if(NULL == bpos)
+                    boost::serialization::throw_exception(
+                        archive_exception(
+                            archive_exception::unregistered_class,
+                            "derived class not registered or exported"
+                        )
+                    );
+                ar.save_pointer(vp, bpos);
+            }
+        };
+
+        template <typename T>
+        static void save(archive_type& ar, const T& t)
+        {
+            check_pointer_level<T>();
+            //check_pointer_tracking<T>();      // this has to be disabled to avoid warnings
+            typedef BOOST_DEDUCED_TYPENAME mpl::eval_if<
+                is_polymorphic<T>,
+                mpl::identity<polymorphic>,
+                mpl::identity<non_polymorphic>
+            >::type type;
+            type::save(ar, const_cast<T &>(t));
+        }
+
+        template <typename TPtr>
+        static void invoke(archive_type& ar, const TPtr t)
+        {
+            register_type(ar, *t);
+            if (NULL == t){
+                basic_oarchive & boa
+                    = boost::serialization::smart_cast_reference<basic_oarchive &>(ar);
+                boa.save_null_pointer();
+                save_access::end_preamble(ar);
+                return;
+            }
+            save(ar, *t);
+        }
+    };
+}}}
+
 #if defined(_MSC_VER)
 #pragma warning( pop )
 #endif
