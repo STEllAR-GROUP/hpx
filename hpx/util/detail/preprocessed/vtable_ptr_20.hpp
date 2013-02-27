@@ -50,6 +50,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -99,6 +103,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+       
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -141,6 +159,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -190,6 +212,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -232,6 +268,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -281,6 +321,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -323,6 +377,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -372,6 +430,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -414,6 +486,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -463,6 +539,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -505,6 +595,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -554,6 +648,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -596,6 +704,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -645,6 +757,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -687,6 +813,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -736,6 +866,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -778,6 +922,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -827,6 +975,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -869,6 +1031,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -918,6 +1084,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -960,6 +1140,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1009,6 +1193,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1051,6 +1249,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1100,6 +1302,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1142,6 +1358,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1191,6 +1411,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1233,6 +1467,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1282,6 +1520,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1324,6 +1576,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1373,6 +1629,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1415,6 +1685,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1464,6 +1738,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1506,6 +1794,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1555,6 +1847,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1597,6 +1903,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1646,6 +1956,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1688,6 +2012,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1737,6 +2065,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1779,6 +2121,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1828,6 +2174,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1870,6 +2230,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -1919,6 +2283,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -1961,6 +2339,10 @@ namespace hpx { namespace util { namespace detail {
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -2010,6 +2392,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -2051,6 +2447,10 @@ namespace hpx { namespace util { namespace detail {
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
+        }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
         }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
@@ -2101,6 +2501,20 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -2142,6 +2556,10 @@ namespace hpx { namespace util { namespace detail {
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
+        }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
         }
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
@@ -2192,3 +2610,17 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}

@@ -13,6 +13,19 @@
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/mpl/int.hpp>
+
+namespace hpx { namespace util { namespace detail {
+
+    struct vtable_ptr_virtbase
+    {
+        virtual ~vtable_ptr_virtbase() {}
+    };
+
+}}}
+
+BOOST_CLASS_TRACKING(hpx::util::detail::vtable_ptr_virtbase,
+    boost::serialization::track_never)
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable_ptr_base.hpp>
@@ -59,8 +72,11 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
+
+        virtual vtable_ptr_base * get_ptr() = 0;
 
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
@@ -96,6 +112,22 @@ namespace hpx { namespace util { namespace detail {
         R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
     };
 }}}
+
+namespace boost { namespace serialization {
+
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename IArchive
+      , typename OArchive
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr_base<
+        R(BOOST_PP_ENUM_PARAMS(N, A)), IArchive, OArchive
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+
+}}
 
 #undef N
 #endif

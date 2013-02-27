@@ -94,6 +94,19 @@ namespace hpx { namespace util { namespace detail {
           , OArchive
         >
         {
+            static vtable_ptr_base<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<IArchive, OArchive>();
+            }
+
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -168,6 +181,19 @@ namespace hpx { namespace util { namespace detail {
           , OArchive
         >
         {
+            static vtable_ptr_base<
+                void(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , void(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<IArchive, OArchive>();
+            }
+
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -251,6 +277,19 @@ namespace hpx { namespace util { namespace detail {
           , OArchive
         >
         {
+            static vtable_ptr_base<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<IArchive, OArchive>();
+            }
+
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
@@ -325,6 +364,19 @@ namespace hpx { namespace util { namespace detail {
           , OArchive
         >
         {
+            static vtable_ptr_base<
+                void(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , void(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<IArchive, OArchive>();
+            }
+
             static boost::detail::sp_typeinfo const & get_type()
             {
                 return BOOST_SP_TYPEID(Functor);
