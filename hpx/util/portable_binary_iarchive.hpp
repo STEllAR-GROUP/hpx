@@ -257,7 +257,7 @@ protected:
 
 public:
     template <typename Vector>
-    portable_binary_iarchive(Vector const& buffer, 
+    portable_binary_iarchive(Vector const& buffer,
             boost::uint64_t inbound_data_size, unsigned flags = 0)
       : primitive_base_t(buffer, inbound_data_size, flags),
         archive_base_t(flags),
@@ -321,6 +321,111 @@ public:
 // required by export in boost version > 1.34
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(hpx::util::portable_binary_iarchive)
 BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_iarchive)
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost { namespace archive { namespace detail
+{
+    template <>
+    struct load_pointer_type<hpx::util::portable_binary_iarchive>
+    {
+        typedef hpx::util::portable_binary_iarchive archive_type;
+
+        struct abstract
+        {
+            template <typename T>
+            static const basic_pointer_iserializer*
+            register_type(archive_type & /* ar */)
+            {
+                // it has? to be polymorphic
+                BOOST_STATIC_ASSERT(boost::is_polymorphic< T >::value);
+                return static_cast<basic_pointer_iserializer *>(NULL);
+             }
+        };
+
+        struct non_abstract
+        {
+            template <typename T>
+            static const basic_pointer_iserializer*
+            register_type(archive_type& ar)
+            {
+                return ar.register_type(static_cast<T *>(NULL));
+            }
+        };
+
+        template <typename T>
+        static const basic_pointer_iserializer*
+        register_type(archive_type &ar, const T & /*t*/)
+        {
+            // there should never be any need to load an abstract polymorphic
+            // class pointer.  Inhibiting code generation for this
+            // permits abstract base classes to be used - note: exception
+            // virtual serialize functions used for plug-ins
+            typedef BOOST_DEDUCED_TYPENAME
+                mpl::eval_if<
+                    boost::serialization::is_abstract<const T>,
+                    boost::mpl::identity<abstract>,
+                    boost::mpl::identity<non_abstract>
+                >::type typex;
+            return typex::template register_type< T >(ar);
+        }
+
+        template <typename T>
+        static T * pointer_tweak(
+            const boost::serialization::extended_type_info & eti,
+            void const * const t,
+            const T &)
+        {
+            // tweak the pointer back to the base class
+            return static_cast<T *>(
+                const_cast<void *>(
+                    boost::serialization::void_upcast(
+                        eti,
+                        boost::serialization::singleton<
+                            BOOST_DEDUCED_TYPENAME
+                            boost::serialization::type_info_implementation< T >::type
+                        >::get_const_instance(),
+                        t
+                    )
+                )
+            );
+        }
+
+        template <typename T>
+        static void check_load(T& /* t */)
+        {
+            check_pointer_level< T >();
+            // check_pointer_tracking< T >();      // this has to be disabled to avoid warnings
+        }
+
+        static const basic_pointer_iserializer *
+        find(const boost::serialization::extended_type_info & type)
+        {
+            return static_cast<const basic_pointer_iserializer *>(
+                archive_serializer_map<archive_type>::find(type)
+            );
+        }
+
+        template <typename Tptr>
+        static void invoke(archive_type & ar, Tptr & t)
+        {
+            check_load(*t);
+            const basic_pointer_iserializer * bpis_ptr = register_type(ar, *t);
+            const basic_pointer_iserializer * newbpis_ptr = ar.load_pointer(
+                // note major hack here !!!
+                // I tried every way to convert Tptr &t (where Tptr might
+                // include const) to void * &.  This is the only way
+                // I could make it work. RR
+                (void * & )t,
+                bpis_ptr,
+                find
+            );
+            // if the pointer isn't that of the base class
+            if (newbpis_ptr != bpis_ptr){
+                t = pointer_tweak(newbpis_ptr->get_eti(), t, *t);
+            }
+        }
+    };
+}}}
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
