@@ -193,7 +193,8 @@ namespace hpx { namespace actions
         virtual util::binary_filter* get_serialization_filter() const = 0;
 
         /// Return a pointer to the message handler to be used for this action.
-        virtual parcelset::policies::message_handler* get_message_handler() const = 0;
+        virtual parcelset::policies::message_handler* get_message_handler(
+            parcelset::parcelhandler* ph) const = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -528,9 +529,10 @@ namespace hpx { namespace actions
         }
 
         /// Return a pointer to the message handler to be used for this action.
-        parcelset::policies::message_handler* get_message_handler() const
+        parcelset::policies::message_handler* get_message_handler(
+            parcelset::parcelhandler* ph) const
         {
-            return traits::action_message_handler<derived_type>::call();
+            return traits::action_message_handler<derived_type>::call(ph);
         }
 
     public:

@@ -194,9 +194,10 @@ namespace hpx { namespace parcelset
                 return action_->get_serialization_filter();
             }
 
-            policies::message_handler* get_message_handler() const
+            policies::message_handler* get_message_handler(
+                parcelset::parcelhandler* ph) const
             {
-                return action_->get_message_handler();
+                return action_->get_message_handler(ph);
             }
 
         private:
@@ -374,9 +375,9 @@ namespace hpx { namespace parcelset
             return data_->get_serialization_filter();
         }
 
-        policies::message_handler* get_message_handler() const
+        policies::message_handler* get_message_handler(parcelset::parcelhandler* ph) const
         {
-            return data_->get_message_handler();
+            return data_->get_message_handler(ph);
         }
 
         // generate unique parcel id

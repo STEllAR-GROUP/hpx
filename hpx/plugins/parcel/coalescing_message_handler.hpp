@@ -7,8 +7,15 @@
 #define HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_PARCEL_COALESCING)
+
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+
+#include <boost/preprocessor/stringize.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
@@ -25,37 +32,35 @@ namespace hpx { namespace plugins { namespace parcel
         void put_parcel(parcelset::parcelport* set, parcelset::parcel& p,
             write_handler_type f);
 
-        template <typename Action>
-        static parcelset::policies::message_handler* 
-            get_message_handler(std::size_t num);
-
     private:
         std::size_t buffer_size_;
     };
-
-    template <typename Action>
-    static parcelset::policies::message_handler* 
-        coalescing_message_handler::get_message_handler(std::size_t num)
-    {
-        util::reinitializable_static<coalescing_message_handler> handler(num);
-        return &handler.get();
-    }
 }}}
 
+#include <hpx/config/warnings_suffix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_USES_MESSAGE_COALESCING(action, num)                       \
+#define HPX_ACTION_USES_MESSAGE_COALESCING(action_type, num)                  \
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_message_handler<action>                                 \
+        struct action_message_handler<action_type>                            \
         {                                                                     \
-            static parcelset::policies::message_handler* call()               \
+            static parcelset::policies::message_handler* call(                \
+                parcelset::parcelhandler* ph)                                 \
             {                                                                 \
-                return coalescing_message_handler::                           \
-                    get_message_handler<action>(num);                         \
+                return ph->get_message_handler<                               \
+                    hpx::plugins::parcel::coalescing_message_handler          \
+                >(BOOST_PP_STRINGIZE(action_type), num);                      \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
 /**/
+
+#else
+
+#define HPX_ACTION_USES_MESSAGE_COALESCING(action_type, num)
+
+#endif
 
 #endif

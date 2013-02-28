@@ -11,9 +11,17 @@ set(tests
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
+
 if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
-  set(function_serialization_FLAGS DEPENDENCIES compress_zlib_lib)
+  set(function_serialization_dependencies
+    compress_zlib_lib)
 endif()
+if(HPX_USE_PARCEL_COALESCING)
+  set(function_serialization_dependencies
+    ${function_serialization_dependencies}
+    parcel_coalescing_lib)
+endif()
+set(function_serialization_FLAGS DEPENDENCIES ${function_serialization_dependencies})
 
 foreach(test ${tests})
   set(sources

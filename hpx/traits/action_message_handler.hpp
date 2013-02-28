@@ -20,7 +20,7 @@ namespace hpx { namespace traits
     struct action_message_handler
     {
         // return a new instance of a serialization filter
-        static parcelset::policies::message_handler* call()
+        static parcelset::policies::message_handler* call(parcelset::parcelhandler*)
         {
             return 0;   // by default actions don't have a message_handler
         }

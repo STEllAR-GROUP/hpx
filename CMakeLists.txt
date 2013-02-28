@@ -191,6 +191,10 @@ if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
   hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
 endif()
 
+if(HPX_USE_PARCEL_COALESCING)
+  hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
+endif()
+
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)

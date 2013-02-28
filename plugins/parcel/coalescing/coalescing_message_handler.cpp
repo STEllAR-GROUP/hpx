@@ -19,7 +19,7 @@ namespace hpx { namespace plugins { namespace parcel
     {
     }
 
-    void coalescing_message_handler::put_parcel(parcelset::parcelport* set, 
+    void coalescing_message_handler::put_parcel(parcelset::parcelport* set,
         parcelset::parcel& p, write_handler_type f)
     {
         set->put_parcel(p, f);

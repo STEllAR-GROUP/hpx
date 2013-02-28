@@ -66,6 +66,10 @@ namespace hpx { namespace parcelset
 
         void rethrow_exception();
 
+        //
+        typedef std::map<std::string, boost::shared_ptr<policies::message_handler> >
+            message_handler_map;
+
     public:
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
@@ -355,6 +359,30 @@ namespace hpx { namespace parcelset
         util::io_service_pool* get_thread_pool(char const* name);
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename MessageHandler>
+        policies::message_handler* get_message_handler(char const* action,
+            std::size_t num_messages)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            message_handler_map::iterator it = handlers_.find(action);
+            if (it == handlers_.end()) {
+                boost::shared_ptr<policies::message_handler> p(
+                    new MessageHandler(num_messages));
+
+                std::pair<message_handler_map::iterator, bool> r =
+                    handlers_.insert(message_handler_map::value_type(action, p));
+                if (!r.second) {
+                    HPX_THROW_EXCEPTION(internal_server_error,
+                        "parcelhandler::get_message_handler", 
+                        "could not store newly created message handler");
+                    return 0;
+                }
+                it = r.first;
+            }
+            return (*it).second.get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // Performance counter data
 
         // number of parcels sent
@@ -436,6 +464,9 @@ namespace hpx { namespace parcelset
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
         bool use_alternative_parcelports_;
+
+        /// Store message handlers for actions
+        message_handler_map handlers_;
     };
 }}
 

@@ -337,7 +337,7 @@ namespace hpx { namespace parcelset
         // dispatch to the message handler which is associated with the
         // encapsulated action
         connection_type t = find_appropriate_connection_type(addrs[0].locality_);
-        policies::message_handler* mh = p.get_message_handler();
+        policies::message_handler* mh = p.get_message_handler(this);
         if (mh) {
             mh->put_parcel(find_parcelport(t), p, f);
             return;
