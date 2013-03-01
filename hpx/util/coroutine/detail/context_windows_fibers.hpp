@@ -239,14 +239,14 @@ namespace hpx { namespace util { namespace coroutines
 
       typedef boost::atomic<boost::int64_t> counter_type;
 
-      static boost::uint64_t get_stack_recycle_counter(bool reset)
+      static counter_type& get_stack_recycle_counter()
       {
           static counter_type counter(0);
-          return util::get_and_reset_value(counter, reset);
+          return counter;
       }
       static boost::uint64_t get_stack_recycle_count(bool reset)
       {
-          return get_stack_recycle_counter(reset);
+          return util::get_and_reset_value(get_stack_recycle_counter(), reset);
       }
       static boost::uint64_t increment_stack_recycle_count()
       {
