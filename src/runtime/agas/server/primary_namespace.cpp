@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <list>
 
@@ -320,7 +321,7 @@ response primary_namespace::allocate(
         // Check for overflow.
         if (upper.get_msb() != lower.get_msb())
         {
-            // Check for address space exhaustion (we currently use 80 bis of 
+            // Check for address space exhaustion (we currently use 80 bis of
             // the gid for the actual id)
             if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
             {
@@ -1296,7 +1297,7 @@ response primary_namespace::resolved_localities(
                                        , end = partitions_.end();
 
     for (; it != end; ++it) {
-        boost::fusion::vector2<naming::gid_type, gva> r = 
+        boost::fusion::vector2<naming::gid_type, gva> r =
             resolve_gid_locked(
                 naming::get_gid_from_locality_id(at_c<0>(it->second)), ec);
 
@@ -1406,7 +1407,7 @@ response primary_namespace::get_num_localities(
 { // {{{ get_num_localities implementation
     mutex_type::scoped_lock l(mutex_);
 
-    boost::uint32_t num_localities = 
+    boost::uint32_t num_localities =
         static_cast<boost::uint32_t>(partitions_.size());
 
     LAGAS_(info) << (boost::format(
@@ -1429,7 +1430,7 @@ response primary_namespace::get_num_threads(
     std::vector<boost::uint32_t> num_threads;
 
     partition_table_type::iterator end = partitions_.end();
-    for (partition_table_type::iterator it = partitions_.begin(); 
+    for (partition_table_type::iterator it = partitions_.begin();
          it != end; ++it)
     {
         using boost::fusion::at_c;
@@ -1491,45 +1492,45 @@ response primary_namespace::statistics_counter(
 
     typedef primary_namespace::counter_data cd;
 
-    HPX_STD_FUNCTION<boost::int64_t()> get_data_func;
+    HPX_STD_FUNCTION<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
             break;
         case primary_ns_bind_gid:
-            get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = boost::bind(&cd::get_resolve_gid_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_locality_count, &counter_data_, ::_1);
             break;
         case primary_ns_free:
-            get_data_func = boost::bind(&cd::get_free_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_free_count, &counter_data_, ::_1);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_non_blocking:
-            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_count, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_sync:
-            get_data_func = boost::bind(&cd::get_change_credit_sync_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_change_credit_sync_count, &counter_data_, ::_1);
             break;
         case primary_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_localities_count, &counter_data_, ::_1);
             break;
         case primary_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolved_localities_count, &counter_data_, ::_1);
             break;
         case primary_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
             break;
         case primary_ns_num_threads:
-            get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1541,40 +1542,40 @@ response primary_namespace::statistics_counter(
     else {
         switch (code) {
         case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
             break;
         case primary_ns_bind_gid:
-            get_data_func = boost::bind(&cd::get_bind_gid_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = boost::bind(&cd::get_resolve_gid_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_locality_time, &counter_data_, ::_1);
             break;
         case primary_ns_free:
-            get_data_func = boost::bind(&cd::get_free_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_free_time, &counter_data_, ::_1);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_non_blocking:
-            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_time, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_sync:
-            get_data_func = boost::bind(&cd::get_change_credit_sync_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_change_credit_sync_time, &counter_data_, ::_1);
             break;
         case primary_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_localities_time, &counter_data_, ::_1);
             break;
         case primary_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolved_localities_time, &counter_data_, ::_1);
             break;
         case primary_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
             break;
         case primary_ns_num_threads:
-            get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1602,149 +1603,149 @@ response primary_namespace::statistics_counter(
 }
 
 // access current counter values
-boost::int64_t primary_namespace::counter_data::get_allocate_count() const
+boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return allocate_.count_;
+    return util::get_and_reset_value(allocate_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_bind_gid_count() const
+boost::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_gid_.count_;
+    return util::get_and_reset_value(bind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_count() const
+boost::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_gid_.count_;
+    return util::get_and_reset_value(resolve_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_locality_count() const
+boost::int64_t primary_namespace::counter_data::get_resolve_locality_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_locality_.count_;
+    return util::get_and_reset_value(resolve_locality_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_free_count() const
+boost::int64_t primary_namespace::counter_data::get_free_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return free_.count_;
+    return util::get_and_reset_value(free_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_count() const
+boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_gid_.count_;
+    return util::get_and_reset_value(unbind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_count() const
+boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return change_credit_non_blocking_.count_;
+    return util::get_and_reset_value(change_credit_non_blocking_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_sync_count() const
+boost::int64_t primary_namespace::counter_data::get_change_credit_sync_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return change_credit_sync_.count_;
+    return util::get_and_reset_value(change_credit_sync_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_localities_count() const
+boost::int64_t primary_namespace::counter_data::get_localities_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return localities_.count_;
+    return util::get_and_reset_value(localities_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_num_localities_count() const
+boost::int64_t primary_namespace::counter_data::get_num_localities_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_localities_.count_;
+    return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_num_threads_count() const
+boost::int64_t primary_namespace::counter_data::get_num_threads_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_threads_.count_;
+    return util::get_and_reset_value(num_threads_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolved_localities_count() const
+boost::int64_t primary_namespace::counter_data::get_resolved_localities_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolved_localities_.count_;
+    return util::get_and_reset_value(resolved_localities_.count_, reset);
 }
 
 // access execution time counters
-boost::int64_t primary_namespace::counter_data::get_allocate_time() const
+boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return allocate_.time_;
+    return util::get_and_reset_value(allocate_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_bind_gid_time() const
+boost::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_gid_.time_;
+    return util::get_and_reset_value(bind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_time() const
+boost::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_gid_.time_;
+    return util::get_and_reset_value(resolve_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_locality_time() const
+boost::int64_t primary_namespace::counter_data::get_resolve_locality_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_locality_.time_;
+    return util::get_and_reset_value(resolve_locality_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_free_time() const
+boost::int64_t primary_namespace::counter_data::get_free_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return free_.time_;
+    return util::get_and_reset_value(free_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_time() const
+boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_gid_.time_;
+    return util::get_and_reset_value(unbind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_time() const
+boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return change_credit_non_blocking_.time_;
+    return util::get_and_reset_value(change_credit_non_blocking_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_sync_time() const
+boost::int64_t primary_namespace::counter_data::get_change_credit_sync_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return change_credit_sync_.time_;
+    return util::get_and_reset_value(change_credit_sync_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_localities_time() const
+boost::int64_t primary_namespace::counter_data::get_localities_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return localities_.time_;
+    return util::get_and_reset_value(localities_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_num_localities_time() const
+boost::int64_t primary_namespace::counter_data::get_num_localities_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_localities_.time_;
+    return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_num_threads_time() const
+boost::int64_t primary_namespace::counter_data::get_num_threads_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_threads_.time_;
+    return util::get_and_reset_value(num_threads_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolved_localities_time() const
+boost::int64_t primary_namespace::counter_data::get_resolved_localities_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolved_localities_.time_;
+    return util::get_and_reset_value(resolved_localities_.time_, reset);
 }
 
 // increment counter values

@@ -19,10 +19,10 @@ namespace hpx { namespace performance_counters { namespace stubs
     }
 
     lcos::future<counter_value> performance_counter::get_value_async(
-        naming::id_type const& targetid)
+        naming::id_type const& targetid, bool reset)
     {
         typedef server::base_performance_counter::get_counter_value_action action_type;
-        return hpx::async<action_type>(targetid);
+        return hpx::async<action_type>(targetid, reset);
     }
 
     counter_info performance_counter::get_info(naming::id_type const& targetid,
@@ -32,9 +32,9 @@ namespace hpx { namespace performance_counters { namespace stubs
     }
 
     counter_value performance_counter::get_value(naming::id_type const& targetid,
-        error_code& ec)
+        bool reset, error_code& ec)
     {
-        return get_value_async(targetid).get(ec);
+        return get_value_async(targetid, reset).get(ec);
     }
 
     lcos::future<bool> performance_counter::start_async(
@@ -51,6 +51,14 @@ namespace hpx { namespace performance_counters { namespace stubs
         return hpx::async<action_type>(targetid);
     }
 
+    lcos::future<void> performance_counter::reset_async(
+        naming::id_type const& targetid)
+    {
+        typedef server::base_performance_counter::reset_counter_value_action
+            action_type;
+        return hpx::async<action_type>(targetid);
+    }
+
     bool performance_counter::start(naming::id_type const& targetid,
         error_code& ec)
     {
@@ -61,5 +69,11 @@ namespace hpx { namespace performance_counters { namespace stubs
         error_code& ec)
     {
         return stop_async(targetid).get(ec);
+    }
+
+    void performance_counter::reset(naming::id_type const& targetid,
+        error_code& ec)
+    {
+        reset_async(targetid).get(ec);
     }
 }}}

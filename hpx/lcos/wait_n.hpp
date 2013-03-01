@@ -267,7 +267,7 @@ namespace hpx
     std::vector<HPX_STD_TUPLE<int, lcos::future<
         typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
     > > >
-    wait_n(Iterator begin, Iterator end)
+    wait_n(Iterator begin, Iterator end, error_code& ec = throws)
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<
             typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
@@ -275,45 +275,47 @@ namespace hpx
 
         lcos::future<result_type> f = wait_n(begin, end);
         if (!f.valid()) {
-            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
 
-        return f.get();
+        return f.get(ec);
     }
 
     template <typename T>
     std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
     wait_n(std::size_t n, BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<T> >))) lazy_values)
+        std::vector<lcos::future<T> >))) lazy_values,
+        error_code& ec = throws)
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > result_type;
 
         lcos::future<result_type> f = when_n(lazy_values);
         if (!f.valid()) {
-            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
 
-        return f.get();
+        return f.get(ec);
     }
 
     template <typename T>
     std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
-    wait_n(std::size_t n, std::vector<lcos::future<T> > const& lazy_values)
+    wait_n(std::size_t n, std::vector<lcos::future<T> > const& lazy_values,
+        error_code& ec = throws)
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > result_type;
 
         lcos::future<result_type> f = when_n(lazy_values);
         if (!f.valid()) {
-            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
 
-        return f.get();
+        return f.get(ec);
     }
 }
 
@@ -373,19 +375,20 @@ namespace hpx
 
     template <typename T>
     std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
-    wait_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _))
+    wait_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _),
+        error_code& ec = throws)
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > result_type;
 
         lcos::future<result_type> f = when_n(
             BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_VAR, _));
         if (!f.valid()) {
-            HPX_THROW_EXCEPTION(uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
 
-        return f.get();
+        return f.get(ec);
     }
 }
 

@@ -26,14 +26,21 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
-            boost::int64_t interval, std::string const& dest);  
+            boost::int64_t interval, std::string const& dest);
 
         void start();
         bool evaluate();
+        void terminate();
+
+        void start_counters(error_code& ec = throws);
+        void stop_counters(error_code& ec = throws);
+        void reset_counters(error_code& ec = throws);
+        bool evaluate_counters(bool reset = false, 
+            char const* description = 0, error_code& ec = throws);
 
     protected:
         void find_counters();
-        bool find_counter(performance_counters::counter_info const& info, 
+        bool find_counter(performance_counters::counter_info const& info,
             error_code& ec);
 
         template <typename Stream>

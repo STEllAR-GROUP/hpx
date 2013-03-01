@@ -421,16 +421,23 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-    static boost::uint64_t get_allocation_count_all()
+    static boost::uint64_t get_allocation_count_all(bool reset)
     {
         boost::uint64_t count = 0;
-        for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i)
+        for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i) {
             count += m_allocation_counters.get(i).load();
+            if (reset)
+                m_allocation_counters.get(i).store(0);
+        }
         return count;
     }
-    static boost::uint64_t get_allocation_count(std::size_t heap_num)
+    static boost::uint64_t get_allocation_count(std::size_t heap_num, bool reset)
     {
-        return m_allocation_counters.get(heap_num).load();
+        boost::uint64_t result = m_allocation_counters.get(heap_num).load();
+
+        if (reset)
+            m_allocation_counters.get(heap_num).store(0);
+        return result;
     }
 
     static boost::uint64_t increment_allocation_count(std::size_t heap_num)

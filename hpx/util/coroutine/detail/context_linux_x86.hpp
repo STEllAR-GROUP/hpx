@@ -20,12 +20,14 @@
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
-#include <boost/detail/atomic_count.hpp>
+#include <boost/atomic.hpp>
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/posix_utility.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 /*
  * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
@@ -223,16 +225,16 @@ namespace hpx { namespace util { namespace coroutines
           increment_stack_recycle_count();
       }
 
-      typedef boost::detail::atomic_count counter_type;
+      typedef boost::atomic<boost::int64_t> counter_type;
 
       static counter_type& get_stack_unbind_counter()
       {
           static counter_type counter(0);
           return counter;
       }
-      static boost::uint64_t get_stack_unbind_count()
+      static boost::uint64_t get_stack_unbind_count(bool reset)
       {
-          return get_stack_unbind_counter();
+          return util::get_and_reset_value(get_stack_unbind_counter(), reset);
       }
       static boost::uint64_t increment_stack_unbind_count()
       {
@@ -244,9 +246,9 @@ namespace hpx { namespace util { namespace coroutines
           static counter_type counter(0);
           return counter;
       }
-      static boost::uint64_t get_stack_recycle_count()
+      static boost::uint64_t get_stack_recycle_count(bool reset)
       {
-          return get_stack_recycle_counter();
+          return util::get_and_reset_value(get_stack_recycle_counter(), reset);
       }
       static boost::uint64_t increment_stack_recycle_count()
       {

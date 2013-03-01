@@ -62,11 +62,7 @@ namespace hpx { namespace plugins { namespace compression
     {
         zlib_serialization_filter(bool compress = false)
           : compdecomp_(compress), current_(0)
-        {
-            // The zlib serialization filter does not support the mode 
-            // 'favour_memorysize'.
-            BOOST_ASSERT(m == binary_filter::favor_speed);
-        }
+        {}
         ~zlib_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);

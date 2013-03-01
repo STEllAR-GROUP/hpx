@@ -358,55 +358,55 @@ namespace hpx { namespace parcelset
         // Performance counter data
 
         // number of parcels sent
-        std::size_t get_parcel_send_count(connection_type) const;
+        std::size_t get_parcel_send_count(connection_type, bool) const;
 
         // number of messages sent
-        std::size_t get_message_send_count(connection_type) const;
+        std::size_t get_message_send_count(connection_type, bool) const;
 
         // number of parcels received
-        std::size_t get_parcel_receive_count(connection_type) const;
+        std::size_t get_parcel_receive_count(connection_type, bool) const;
 
         // number of messages received
-        std::size_t get_message_receive_count(connection_type) const;
+        std::size_t get_message_receive_count(connection_type, bool) const;
 
         // the total time it took for all sends, from async_write to the
         // completion handler (nanoseconds)
-        boost::int64_t get_sending_time(connection_type) const;
+        boost::int64_t get_sending_time(connection_type, bool) const;
 
         // the total time it took for all receives, from async_read to the
         // completion handler (nanoseconds)
-        boost::int64_t get_receiving_time(connection_type) const;
+        boost::int64_t get_receiving_time(connection_type, bool) const;
 
         // the total time it took for all sender-side serialization operations
         // (nanoseconds)
-        boost::int64_t get_sending_serialization_time(connection_type) const;
+        boost::int64_t get_sending_serialization_time(connection_type, bool) const;
 
         // the total time it took for all receiver-side serialization
         // operations (nanoseconds)
-        boost::int64_t get_receiving_serialization_time(connection_type) const;
+        boost::int64_t get_receiving_serialization_time(connection_type, bool) const;
 
         // total data sent (bytes)
-        std::size_t get_data_sent(connection_type) const;
+        std::size_t get_data_sent(connection_type, bool) const;
 
         // total data (uncompressed) sent (bytes)
-        std::size_t get_raw_data_sent(connection_type) const;
+        std::size_t get_raw_data_sent(connection_type, bool) const;
 
         // total data received (bytes)
-        std::size_t get_data_received(connection_type) const;
+        std::size_t get_data_received(connection_type, bool) const;
 
         // total data (uncompressed) received (bytes)
-        std::size_t get_raw_data_received(connection_type) const;
+        std::size_t get_raw_data_received(connection_type, bool) const;
 
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
-            parcelport::connection_cache_statistics_type stat_type) const;
+            parcelport::connection_cache_statistics_type stat_type, bool) const;
 
     protected:
-        std::size_t get_incoming_queue_length() const
+        std::size_t get_incoming_queue_length(bool /*reset*/) const
         {
             return parcels_->get_queue_length();
         }
 
-        std::size_t get_outgoing_queue_length() const;
+        std::size_t get_outgoing_queue_length(bool reset) const;
 
         connection_type find_appropriate_connection_type(naming::locality dest);
 

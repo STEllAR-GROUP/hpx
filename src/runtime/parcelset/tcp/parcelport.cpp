@@ -650,20 +650,20 @@ namespace hpx { namespace parcelset { namespace tcp
 
     /// Return the given connection cache statistic
     boost::int64_t parcelport::get_connection_cache_statistics(
-        connection_cache_statistics_type t) const
+        connection_cache_statistics_type t, bool reset)
     {
         switch (t) {
         case connection_cache_insertions:
-            return connection_cache_.get_cache_insertions();
+            return connection_cache_.get_cache_insertions(reset);
 
         case connection_cache_evictions:
-            return connection_cache_.get_cache_evictions();
+            return connection_cache_.get_cache_evictions(reset);
 
         case connection_cache_hits:
-            return connection_cache_.get_cache_hits();
+            return connection_cache_.get_cache_hits(reset);
 
         case connection_cache_misses:
-            return connection_cache_.get_cache_misses();
+            return connection_cache_.get_cache_misses(reset);
 
         default:
             break;

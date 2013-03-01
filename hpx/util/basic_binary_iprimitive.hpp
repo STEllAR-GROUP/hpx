@@ -74,7 +74,7 @@ namespace hpx { namespace util
         {
             if (count)
             {
-                if (filter_) {
+                if (filter_.get()) {
                     filter_->load(address, count);
                 }
                 else {

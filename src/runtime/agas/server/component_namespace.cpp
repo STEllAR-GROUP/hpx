@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/foreach.hpp>
 
@@ -635,30 +636,30 @@ response component_namespace::statistics_counter(
 
     typedef component_namespace::counter_data cd;
 
-    HPX_STD_FUNCTION<boost::int64_t()> get_data_func;
+    HPX_STD_FUNCTION<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case component_ns_bind_prefix:
-            get_data_func = boost::bind(&cd::get_bind_prefix_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_prefix_count, &counter_data_, ::_1);
             break;
         case component_ns_bind_name:
-            get_data_func = boost::bind(&cd::get_bind_name_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_name_count, &counter_data_, ::_1);
             break;
         case component_ns_resolve_id:
-            get_data_func = boost::bind(&cd::get_resolve_id_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_id_count, &counter_data_, ::_1);
             break;
         case component_ns_unbind_name:
-            get_data_func = boost::bind(&cd::get_unbind_name_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_unbind_name_count, &counter_data_, ::_1);
             break;
         case component_ns_iterate_types:
-            get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_, ::_1);
             break;
         case component_ns_get_component_type_name:
-            get_data_func = boost::bind(&cd::get_component_type_name_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_component_type_name_count, &counter_data_, ::_1);
             break;
         case component_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -670,25 +671,25 @@ response component_namespace::statistics_counter(
     else {
         switch (code) {
         case component_ns_bind_prefix:
-            get_data_func = boost::bind(&cd::get_bind_prefix_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_prefix_time, &counter_data_, ::_1);
             break;
         case component_ns_bind_name:
-            get_data_func = boost::bind(&cd::get_bind_name_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_name_time, &counter_data_, ::_1);
             break;
         case component_ns_resolve_id:
-            get_data_func = boost::bind(&cd::get_resolve_id_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_id_time, &counter_data_, ::_1);
             break;
         case component_ns_unbind_name:
-            get_data_func = boost::bind(&cd::get_unbind_name_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_unbind_name_time, &counter_data_, ::_1);
             break;
         case component_ns_iterate_types:
-            get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_, ::_1);
             break;
         case component_ns_get_component_type_name:
-            get_data_func = boost::bind(&cd::get_component_type_name_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_component_type_name_time, &counter_data_, ::_1);
             break;
         case component_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -716,89 +717,89 @@ response component_namespace::statistics_counter(
 } // }}}
 
 // access current counter values
-boost::int64_t component_namespace::counter_data::get_bind_prefix_count() const
+boost::int64_t component_namespace::counter_data::get_bind_prefix_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_prefix_.count_;
+    return util::get_and_reset_value(bind_prefix_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_bind_name_count() const
+boost::int64_t component_namespace::counter_data::get_bind_name_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_name_.count_;
+    return util::get_and_reset_value(bind_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_resolve_id_count() const
+boost::int64_t component_namespace::counter_data::get_resolve_id_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_id_.count_;
+    return util::get_and_reset_value(resolve_id_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_name_count() const
+boost::int64_t component_namespace::counter_data::get_unbind_name_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_name_.count_;
+    return util::get_and_reset_value(unbind_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_iterate_types_count() const
+boost::int64_t component_namespace::counter_data::get_iterate_types_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return iterate_types_.count_;
+    return util::get_and_reset_value(iterate_types_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_component_type_name_count() const
+boost::int64_t component_namespace::counter_data::get_component_type_name_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return get_component_type_name_.count_;
+    return util::get_and_reset_value(get_component_type_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_num_localities_count() const
+boost::int64_t component_namespace::counter_data::get_num_localities_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_localities_.count_;
+    return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
 // access execution time counters
-boost::int64_t component_namespace::counter_data::get_bind_prefix_time() const
+boost::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_prefix_.time_;
+    return util::get_and_reset_value(bind_prefix_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_bind_name_time() const
+boost::int64_t component_namespace::counter_data::get_bind_name_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_name_.time_;
+    return util::get_and_reset_value(bind_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_resolve_id_time() const
+boost::int64_t component_namespace::counter_data::get_resolve_id_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_id_.time_;
+    return util::get_and_reset_value(resolve_id_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_name_time() const
+boost::int64_t component_namespace::counter_data::get_unbind_name_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_name_.time_;
+    return util::get_and_reset_value(unbind_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_iterate_types_time() const
+boost::int64_t component_namespace::counter_data::get_iterate_types_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return iterate_types_.time_;
+    return util::get_and_reset_value(iterate_types_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_component_type_name_time() const
+boost::int64_t component_namespace::counter_data::get_component_type_name_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return get_component_type_name_.time_;
+    return util::get_and_reset_value(get_component_type_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_num_localities_time() const
+boost::int64_t component_namespace::counter_data::get_num_localities_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return num_localities_.time_;
+    return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
 // increment counter values

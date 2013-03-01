@@ -352,10 +352,10 @@ private:
         );
 
     // Helper functions to access the current cache statistics
-    std::size_t get_cache_hits() const;
-    std::size_t get_cache_misses() const;
-    std::size_t get_cache_evictions() const;
-    std::size_t get_cache_insertions() const;
+    std::size_t get_cache_hits(bool);
+    std::size_t get_cache_misses(bool);
+    std::size_t get_cache_evictions(bool);
+    std::size_t get_cache_insertions(bool);
 
 public:
     response service(

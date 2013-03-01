@@ -647,7 +647,7 @@
   real(kind=wp) etracer,ptracer(4)
     end subroutine pushi
     subroutine diagnosis(hpx4_bti,&
-             t_gids, p_gids,&
+             t_gids, p_gids,xnormal,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -758,6 +758,8 @@
   real(kind=wp),dimension(:),allocatable :: hfluxpsi
   real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
   real(kind=wp) etracer,ptracer(4)
+  
+  real(kind=wp) xnormal(mflux)
     end subroutine diagnosis
     subroutine shifti(hpx4_bti,&
              t_gids, p_gids,&
@@ -829,7 +831,7 @@
   integer  :: toroidal_domain_location,particle_domain_location
     end subroutine shifti
     subroutine collision(hpx4_bti,&
-             t_gids, p_gids,&
+             t_gids, p_gids,maxwell,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -860,6 +862,7 @@
   TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
   integer,dimension(:),allocatable :: t_gids
   integer,dimension(:),allocatable :: p_gids
+  real(kind=wp) maxwell(100001)
 !  global parameters
   integer :: ihistory,snapout,maxmpsi
   integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -1317,6 +1320,11 @@
   real(kind=wp),dimension(:,:,:),allocatable :: ring
   integer  :: mindex
 
+! diagnosis thread safety
+  real(kind=wp) xnormal(mflux)
+
+! collision thread safety
+  real(kind=wp) maxwell(100001)
 
 ! local variables
   integer i
@@ -1649,7 +1657,7 @@
 
         if(idiag==0)then
            call diagnosis(hpx4_bti,& ! {{{
-             t_gids, p_gids,&
+             t_gids, p_gids, xnormal, &
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -1731,7 +1739,7 @@
 ! collisions
         if(irk==2 .and. do_collision) then
           call collision(hpx4_bti,& ! {{{
-             t_gids, p_gids,&
+             t_gids, p_gids, maxwell,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&

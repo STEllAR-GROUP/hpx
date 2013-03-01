@@ -139,7 +139,7 @@ namespace hpx { namespace threads { namespace policies
             return num_thread;
         }
 
-        std::size_t get_num_stolen_threads() const
+        std::size_t get_num_stolen_threads(bool reset) const
         {
             return 0;
         }
@@ -350,7 +350,7 @@ namespace hpx { namespace threads { namespace policies
         // Queries the current thread count of the queues.
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const
         {
             // Return thread count of one specific queue.
             boost::int64_t result = 0;

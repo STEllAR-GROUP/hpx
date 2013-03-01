@@ -11,6 +11,8 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/mpl/int.hpp>
+
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
@@ -125,7 +127,7 @@ namespace hpx { namespace util { namespace detail {
         }
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -165,13 +167,25 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+
+namespace boost { namespace serialization {
+
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(BOOST_PP_ENUM_PARAMS(N, A)), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+
+}}
 
 #undef N
 

@@ -27,7 +27,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     raw_counter::raw_counter(counter_info const& info,
-            HPX_STD_FUNCTION<boost::int64_t()> f)
+            HPX_STD_FUNCTION<boost::int64_t(bool)> f)
       : base_type_holder(info), f_(f)
     {
         if (info.type_ != counter_raw) {
@@ -38,16 +38,22 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     hpx::performance_counters::counter_value
-        raw_counter::get_counter_value()
+        raw_counter::get_counter_value(bool reset)
     {
         hpx::performance_counters::counter_value value;
-        value.value_ = f_();                // gather the current value
+        value.value_ = f_(reset);               // gather the current value
+        reset_ = false;
         value.scaling_ = 1;
         value.scale_inverse_ = false;
         value.status_ = status_new_data;
         value.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         value.count_ = ++invocation_count_;
         return value;
+    }
+
+    void raw_counter::reset_counter_value()
+    {
+        f_(true);
     }
 }}}
 

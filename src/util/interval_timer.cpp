@@ -20,9 +20,11 @@ namespace hpx { namespace util
     {}
 
     interval_timer::interval_timer(HPX_STD_FUNCTION<bool()> const& f,
+            HPX_STD_FUNCTION<void()> const& on_term,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
-      : f_(f), microsecs_(microsecs), id_(0), description_(description),
+      : f_(f), on_term_(on_term),
+        microsecs_(microsecs), id_(0), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false)
     {}
@@ -79,6 +81,8 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
+            if (on_term_)
+                on_term_();
             stop_locked();
         }
     }
@@ -106,7 +110,7 @@ namespace hpx { namespace util
 
         {
             util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            result = f_();                     // invoke the supplied function
+            result = f_();            // invoke the supplied function
         }
 
         if (result)

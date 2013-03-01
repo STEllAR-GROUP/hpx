@@ -782,7 +782,7 @@ namespace hpx { namespace util
             env_type;                                                           \
         env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                           \
         return                                                                  \
-            (get_pointer(detail::eval(env, a0))->*f)                            \
+            (get_pointer(detail::eval(env, arg0))->*f)                          \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
     }                                                                           \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
@@ -796,7 +796,7 @@ namespace hpx { namespace util
             env_type;                                                           \
         env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                           \
         return                                                                  \
-            (get_pointer(detail::eval(env, a0))->*f)                            \
+            (get_pointer(detail::eval(env, arg0))->*f)                          \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
     }                                                                           \
 /**/

@@ -1,5 +1,5 @@
 subroutine collision(hpx4_bti,&
-             t_gids, p_gids,&
+             t_gids, p_gids,maxwell,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -52,6 +52,9 @@ subroutine collision(hpx4_bti,&
   real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
         zelectron0,zelectron1
 
+! thread safety collision
+  real(kind=wp) maxwell(100001)
+
   integer,parameter :: neop=32,neot=1,neoz=1
 
   integer m,mcell(mi),ip,jt,kz,ierror,k,icount
@@ -59,10 +62,10 @@ subroutine collision(hpx4_bti,&
            phix,dphi,f,g,h,sp,sn,dp,dn,dpn,delu,delv2,delm(neop*neot*neoz),&
            dele(neop*neot*neoz),marker(neop*neot*neoz),v3,v5,zeff,&
            ddum(neop*neot*neoz),den_electron,tem_ion,aspecie,psimin,psimax
-  real(kind=wp) maxwell(100001)
+ ! real(kind=wp) maxwell(100001)
   real(kind=wp) :: r2psi
   
-  save maxwell
+ ! save maxwell
 
 ! read maxwell.dat  
   if(istep==ndiag)then

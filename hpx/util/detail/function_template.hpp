@@ -20,6 +20,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/decay.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -165,10 +166,13 @@ namespace hpx { namespace util
             }
             else
             {
-                typename base_type::vtable_ptr_type *p = 0;
-                ar >> p;
-                this->vptr = p->get_ptr();
-                delete p;
+                typedef typename base_type::vtable_ptr_type vtable_ptr_type;
+
+                vtable_ptr_type* ptr = 0;
+                ar >> ptr;
+
+                boost::scoped_ptr<vtable_ptr_type> p(ptr);
+                this->vptr = ptr->get_ptr();
                 this->vptr->load_object(&this->object, ar, version);
             }
         }
@@ -177,6 +181,7 @@ namespace hpx { namespace util
         {
             bool is_empty = this->empty();
             ar & is_empty;
+
             if(!this->empty())
             {
                 ar << this->vptr;
