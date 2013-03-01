@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_deque.hpp>
@@ -118,10 +119,7 @@ namespace hpx { namespace threads { namespace policies
 
         std::size_t get_num_stolen_threads(bool reset)
         {
-            std::size_t result = stolen_threads_;
-            if (reset)
-                stolen_threads_ = 0;
-            return result;
+            return util::get_and_reset_value(stolen_threads_, reset);
         }
 
         ///////////////////////////////////////////////////////////////////////////
