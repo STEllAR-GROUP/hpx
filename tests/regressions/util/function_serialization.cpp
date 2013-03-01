@@ -39,8 +39,6 @@ void worker(hpx::util::function<void()> const& f)
 
     std::vector<hpx::id_type> targets = hpx::find_remote_localities();
 
-    hpx::reset_active_counters();
-
     for (std::size_t j = 0; j < 100; ++j)
     {
         for (std::size_t i = 0; i < targets.size(); ++i)
@@ -49,7 +47,7 @@ void worker(hpx::util::function<void()> const& f)
         }
     }
 
-    hpx::evaluate_active_counters("---");
+    hpx::evaluate_active_counters(true, "---");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -235,7 +235,8 @@ namespace hpx { namespace util
         wait_all(reset, ec);
     }
 
-    bool query_counters::evaluate_counters(char const* description, error_code& ec)
+    bool query_counters::evaluate_counters(bool reset,
+        char const* description, error_code& ec)
     {
         if (timer_.is_terminated())
         {
