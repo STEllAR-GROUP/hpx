@@ -10,15 +10,6 @@
 
 namespace hpx
 {
-    namespace detail
-    {
-        
-        template <typename F, typename ResultOf = boost::result_of<F> >
-        struct create_future
-        {
-            typedef lcos::future<typename ResultOf::type> type;
-        };
-    }
     
     
     
