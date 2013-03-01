@@ -214,8 +214,8 @@ namespace hpx
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
         void reset_active_counters(error_code& ec = throws);
-        void evaluate_active_counters(char const* description = 0,
-            error_code& ec = throws);
+        void evaluate_active_counters(bool reset = false, 
+            char const* description = 0, error_code& ec = throws);
 
     protected:
         void init_tss();

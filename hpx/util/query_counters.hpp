@@ -35,8 +35,8 @@ namespace hpx { namespace util
         void start_counters(error_code& ec = throws);
         void stop_counters(error_code& ec = throws);
         void reset_counters(error_code& ec = throws);
-        bool evaluate_counters(char const* description = 0,
-            error_code& ec = throws);
+        bool evaluate_counters(bool reset = false, 
+            char const* description = 0, error_code& ec = throws);
 
     protected:
         void find_counters();

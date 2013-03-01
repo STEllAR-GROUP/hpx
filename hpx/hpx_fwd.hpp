@@ -1098,7 +1098,9 @@ namespace hpx
     /// \brief Query all active performance counters, optionally naming the
     ///        point in code marked by this function,
     ///
-    /// \param description [in] this is a optional value naming the point in
+    /// \param reset       [in] this is an optional falg allowing to reset
+    ///                    the counter value after it has been evaluated.
+    /// \param description [in] this is an optional value naming the point in
     ///                    the code marked by the call to this function.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
@@ -1116,8 +1118,8 @@ namespace hpx
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option --hpx:print-counter)
-    HPX_API_EXPORT void evaluate_active_counters(char const* description = 0,
-        error_code& ec = throws);
+    HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
+        char const* description = 0, error_code& ec = throws);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

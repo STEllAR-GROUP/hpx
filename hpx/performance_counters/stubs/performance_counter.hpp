@@ -19,7 +19,7 @@ namespace hpx { namespace performance_counters { namespace stubs
         static lcos::future<counter_info> get_info_async(
             naming::id_type const& targetid);
         static lcos::future<counter_value> get_value_async(
-            naming::id_type const& targetid);
+            naming::id_type const& targetid, bool reset = false);
 
         static counter_info get_info(naming::id_type const& targetid,
             error_code& ec = throws);
@@ -40,9 +40,10 @@ namespace hpx { namespace performance_counters { namespace stubs
 
         template <typename T>
         static T
-        get_typed_value(naming::id_type const& targetid, error_code& ec = throws)
+        get_typed_value(naming::id_type const& targetid, bool reset = false,
+            error_code& ec = throws)
         {
-            counter_value value = get_value(targetid);
+            counter_value value = get_value(targetid, reset);
             return value.get_value<T>(ec);
         }
     };

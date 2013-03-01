@@ -19,10 +19,10 @@ namespace hpx { namespace performance_counters { namespace stubs
     }
 
     lcos::future<counter_value> performance_counter::get_value_async(
-        naming::id_type const& targetid)
+        naming::id_type const& targetid, bool reset)
     {
         typedef server::base_performance_counter::get_counter_value_action action_type;
-        return hpx::async<action_type>(targetid);
+        return hpx::async<action_type>(targetid, reset);
     }
 
     counter_info performance_counter::get_info(naming::id_type const& targetid,

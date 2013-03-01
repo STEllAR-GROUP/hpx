@@ -53,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace server
 
     template <typename Statistic>
     hpx::performance_counters::counter_value
-        aggregating_counter<Statistic>::get_counter_value()
+        aggregating_counter<Statistic>::get_counter_value(bool reset)
     {
         mutex_type::scoped_lock l(mtx_);
 
@@ -65,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace server
         prev_value_.count_ = ++invocation_count_;
         value = prev_value_;                              // return value
 
-        if (detail::counter_type_from_statistic<Statistic>::need_reset::value)
+        if (reset || detail::counter_type_from_statistic<Statistic>::need_reset::value)
         {
             value_.reset(detail::counter_type_from_statistic<Statistic>::create(
                 parameter2_)); // reset accumulator

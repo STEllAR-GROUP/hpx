@@ -28,7 +28,7 @@ namespace hpx { namespace performance_counters { namespace server
 {
     raw_counter::raw_counter(counter_info const& info,
             HPX_STD_FUNCTION<boost::int64_t(bool)> f)
-      : base_type_holder(info), f_(f), reset_(false)
+      : base_type_holder(info), f_(f)
     {
         if (info.type_ != counter_raw) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -38,10 +38,10 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     hpx::performance_counters::counter_value
-        raw_counter::get_counter_value()
+        raw_counter::get_counter_value(bool reset)
     {
         hpx::performance_counters::counter_value value;
-        value.value_ = f_(reset_);               // gather the current value
+        value.value_ = f_(reset);               // gather the current value
         reset_ = false;
         value.scaling_ = 1;
         value.scale_inverse_ = false;
@@ -53,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace server
 
     void raw_counter::reset_counter_value()
     {
-        reset_ = true;
+        f_(true);
     }
 }}}
 

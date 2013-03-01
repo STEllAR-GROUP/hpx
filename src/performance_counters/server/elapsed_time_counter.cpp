@@ -38,7 +38,7 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     hpx::performance_counters::counter_value
-        elapsed_time_counter::get_counter_value()
+        elapsed_time_counter::get_counter_value(bool)
     {
         // gather the current value
         boost::int64_t now = static_cast<boost::int64_t>(hpx::get_system_uptime());

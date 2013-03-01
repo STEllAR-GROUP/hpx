@@ -82,9 +82,9 @@ namespace hpx { namespace performance_counters { namespace server
             return this->get_counter_info();
         }
 
-        counter_value get_counter_value_nonvirt()
+        counter_value get_counter_value_nonvirt(bool reset)
         {
-            return this->get_counter_value();
+            return this->get_counter_value(reset);
         }
 
         void set_counter_value_nonvirt(counter_value const& info)
@@ -120,8 +120,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
-        typedef hpx::actions::result_action0<
-            base_performance_counter, counter_value,
+        typedef hpx::actions::result_action1<
+            base_performance_counter, counter_value, bool,
             &base_performance_counter::get_counter_value_nonvirt
         > get_counter_value_action;
 

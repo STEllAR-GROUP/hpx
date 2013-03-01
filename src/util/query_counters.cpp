@@ -8,6 +8,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/stringstream.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -234,7 +235,8 @@ namespace hpx { namespace util
         wait_all(reset, ec);
     }
 
-    bool query_counters::evaluate_counters(char const* description, error_code& ec)
+    bool query_counters::evaluate_counters(bool reset,
+        char const* description, error_code& ec)
     {
         if (timer_.is_terminated())
         {
@@ -263,34 +265,28 @@ namespace hpx { namespace util
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
         std::vector<future<performance_counters::counter_value> > values;
+
         values.reserve(ids_.size());
         for (std::size_t i = 0; i < ids_.size(); ++i)
-            values.push_back(performance_counter::get_value_async(ids_[i]));
+            values.push_back(performance_counter::get_value_async(ids_[i], reset));
+
+        util::osstream output;
+        if (description)
+            output << description << std::endl;
 
         // wait for all values to be returned
         wait_all(values, ec);
 
-        if (description) {
-            if (destination_is_cout) {
-                std::cout << description << std::endl;
-            }
-            else {
-                std::ofstream out(destination_, std::ios_base::app);
-                out << description << std::endl;
-            }
-        }
-
-        // print the values
+        // Output the performance counter value.
         for (std::size_t i = 0; i < values.size(); ++i)
-        {
-            // Output the performance counter value.
-            if (destination_is_cout) {
-                print_value(std::cout, names_[i], values[i].get(), uoms_[i]);
-            }
-            else {
-                std::ofstream out(destination_, std::ios_base::app);
-                print_value(out, names_[i], values[i].get(), uoms_[i]);
-            }
+            print_value(output, names_[i], values[i].get(), uoms_[i]);
+
+        if (destination_is_cout) {
+            std::cout << util::osstream_get_string(output);
+        }
+        else {
+            std::ofstream out(destination_, std::ios_base::app);
+            out << util::osstream_get_string(output);
         }
 
         return true;

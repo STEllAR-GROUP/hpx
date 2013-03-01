@@ -235,10 +235,11 @@ namespace hpx
             active_counters_->reset_counters(ec);
     }
 
-    void runtime::evaluate_active_counters(char const* description, error_code& ec)
+    void runtime::evaluate_active_counters(bool reset, 
+        char const* description, error_code& ec)
     {
         if (active_counters_.get())
-            active_counters_->evaluate_counters(description, ec);
+            active_counters_->evaluate_counters(reset, description, ec);
     }
 
     /// \brief Register all performance counter types related to this runtime
@@ -695,11 +696,11 @@ namespace hpx
         }
     }
 
-    void evaluate_active_counters(char const* description, error_code& ec)
+    void evaluate_active_counters(bool reset, char const* description, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            rt->evaluate_active_counters(description, ec);
+            rt->evaluate_active_counters(reset, description, ec);
         }
         else {
             HPX_THROWS_IF(ec, invalid_status, "evaluate_active_counters",
