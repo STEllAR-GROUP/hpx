@@ -125,9 +125,9 @@ namespace hpx { namespace util
         if (!ec) {
             double elapsed = static_cast<double>(value.time_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
-                << "[s]," << val;
+                << ",[s]," << val;
             if (!uom.empty())
-                out << "[" << uom << "]";
+                out << ",(" << uom << ")";
             out << "\n";
         }
         else {
