@@ -32,9 +32,9 @@ namespace hpx { namespace performance_counters { namespace stubs
     }
 
     counter_value performance_counter::get_value(naming::id_type const& targetid,
-        error_code& ec)
+        bool reset, error_code& ec)
     {
-        return get_value_async(targetid).get(ec);
+        return get_value_async(targetid, reset).get(ec);
     }
 
     lcos::future<bool> performance_counter::start_async(

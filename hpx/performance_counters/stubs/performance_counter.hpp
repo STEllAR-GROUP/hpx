@@ -24,7 +24,7 @@ namespace hpx { namespace performance_counters { namespace stubs
         static counter_info get_info(naming::id_type const& targetid,
             error_code& ec = throws);
         static counter_value get_value(naming::id_type const& targetid,
-            error_code& ec = throws);
+            bool reset = false, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<bool> start_async(naming::id_type const& targetid);
