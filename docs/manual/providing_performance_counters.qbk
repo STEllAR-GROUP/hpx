@@ -29,16 +29,23 @@ then will be called whenever a consumer queries this counter. Currently, this
 type of Performance Counter can only be used to expose integer values. The
 expected signature of this function is:
 
-    boost::int64_t some_performance_data();
+    boost::int64_t some_performance_data(bool reset);
+
+The argument `bool reset` (which is supplied by the runtime system when the 
+function is invoked) specifies whether the counter value should be reset after 
+evaluating the current value (if applicable).
 
 For instance, here is such a function returning how often it was invoked:
 
     // The atomic variable 'counter' ensures the thread safety of the counter.
     boost::atomic<boost::int64_t> counter(0);
 
-    boost::int64_t some_performance_data()
+    boost::int64_t some_performance_data(bool reset)
     {
-        return ++counter;
+        boost::int64_t result = ++counter;
+        if (reset)
+            counter = 0;
+        return result;
     }
 
 This example function exposes a linearly increasing value as our performance

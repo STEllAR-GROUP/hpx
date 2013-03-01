@@ -656,6 +656,11 @@ namespace boost { namespace cache
             return statistics_;
         }
 
+        statistics_type& get_statistics()
+        {
+            return statistics_;
+        }
+
     protected:
         ///////////////////////////////////////////////////////////////////////
         // Free some space in the cache

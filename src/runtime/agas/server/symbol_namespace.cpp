@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 namespace hpx { namespace agas
 {
@@ -453,21 +454,21 @@ response symbol_namespace::statistics_counter(
 
     typedef symbol_namespace::counter_data cd;
 
-    HPX_STD_FUNCTION<boost::int64_t()> get_data_func;
+    HPX_STD_FUNCTION<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case symbol_ns_bind:
-            get_data_func = boost::bind(&cd::get_bind_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_count, &counter_data_, ::_1);
             break;
         case symbol_ns_resolve:
-            get_data_func = boost::bind(&cd::get_resolve_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_count, &counter_data_, ::_1);
             break;
         case symbol_ns_unbind:
-            get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_count, &counter_data_);
+            get_data_func = boost::bind(&cd::get_iterate_names_count, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -479,16 +480,16 @@ response symbol_namespace::statistics_counter(
     else {
         switch (code) {
         case symbol_ns_bind:
-            get_data_func = boost::bind(&cd::get_bind_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_bind_time, &counter_data_, ::_1);
             break;
         case symbol_ns_resolve:
-            get_data_func = boost::bind(&cd::get_resolve_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_resolve_time, &counter_data_, ::_1);
             break;
         case symbol_ns_unbind:
-            get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_time, &counter_data_);
+            get_data_func = boost::bind(&cd::get_iterate_names_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -516,53 +517,53 @@ response symbol_namespace::statistics_counter(
 } // }}}
 
 // access current counter values
-boost::int64_t symbol_namespace::counter_data::get_bind_count() const
+boost::int64_t symbol_namespace::counter_data::get_bind_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_.count_;
+    return util::get_and_reset_value(bind_.count_, reset);
 }
 
-boost::int64_t symbol_namespace::counter_data::get_resolve_count() const
+boost::int64_t symbol_namespace::counter_data::get_resolve_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_.count_;
+    return util::get_and_reset_value(resolve_.count_, reset);
 }
 
-boost::int64_t symbol_namespace::counter_data::get_unbind_count() const
+boost::int64_t symbol_namespace::counter_data::get_unbind_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_.count_;
+    return util::get_and_reset_value(unbind_.count_, reset);
 }
 
-boost::int64_t symbol_namespace::counter_data::get_iterate_names_count() const
+boost::int64_t symbol_namespace::counter_data::get_iterate_names_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return iterate_names_.count_;
+    return util::get_and_reset_value(iterate_names_.count_, reset);
 }
 
 // access execution time counters
-boost::int64_t symbol_namespace::counter_data::get_bind_time() const
+boost::int64_t symbol_namespace::counter_data::get_bind_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return bind_.time_;
+    return util::get_and_reset_value(bind_.time_, reset);
 }
 
-boost::int64_t symbol_namespace::counter_data::get_resolve_time() const
+boost::int64_t symbol_namespace::counter_data::get_resolve_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return resolve_.time_;
+    return util::get_and_reset_value(resolve_.time_, reset);
 }
 
-boost::int64_t symbol_namespace::counter_data::get_unbind_time() const
+boost::int64_t symbol_namespace::counter_data::get_unbind_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return unbind_.time_;
+    return util::get_and_reset_value(unbind_.time_, reset);
 }
 
-boost::int64_t symbol_namespace::counter_data::get_iterate_names_time() const
+boost::int64_t symbol_namespace::counter_data::get_iterate_names_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return iterate_names_.time_;
+    return util::get_and_reset_value(iterate_names_.time_, reset);
 }
 
 // increment counter values

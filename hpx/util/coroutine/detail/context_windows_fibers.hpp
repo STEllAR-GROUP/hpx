@@ -40,7 +40,7 @@
 #include <boost/system/system_error.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/detail/atomic_count.hpp>
+#include <boost/atomic.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/exception.hpp>
@@ -233,19 +233,22 @@ namespace hpx { namespace util { namespace coroutines
 
       void rebind_stack()
       {
-        increment_stack_recycle_count();
+          increment_stack_recycle_count();
       }
 
-      typedef boost::detail::atomic_count counter_type;
+      typedef boost::atomic<boost::int64_t> counter_type;
 
       static counter_type& get_stack_recycle_counter()
       {
           static counter_type counter(0);
           return counter;
       }
-      static boost::uint64_t get_stack_recycle_count()
+      static boost::uint64_t get_stack_recycle_count(bool reset)
       {
-          return get_stack_recycle_counter();
+          boost::int64_t result = get_stack_recycle_counter();
+          if (reset)
+              get_stack_recycle_counter() = 0;
+          return result;
       }
       static boost::uint64_t increment_stack_recycle_count()
       {

@@ -45,7 +45,7 @@
 
 #include <boost/config.hpp>
 #include <boost/assert.hpp>
-#include <boost/detail/atomic_count.hpp>
+#include <boost/atomic.hpp>
 
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500)
 
@@ -244,9 +244,9 @@ namespace hpx { namespace util { namespace coroutines {
                 increment_stack_recycle_count();
         }
 
-        typedef boost::detail::atomic_count counter_type;
+        typedef boost::atomic<boost::int64_t> counter_type;
 
-        static boost::uint64_t get_stack_unbind_count()
+        static boost::uint64_t get_stack_unbind_count(bool reset)
         {
             return 0;
         }
@@ -256,9 +256,12 @@ namespace hpx { namespace util { namespace coroutines {
             static counter_type counter(0);
             return counter;
         }
-        static boost::uint64_t get_stack_recycle_count()
+        static boost::uint64_t get_stack_recycle_count(bool reset)
         {
-            return get_stack_recycle_counter();
+            boost::int64_t result = get_stack_recycle_counter();
+            if (reset)
+                get_stack_recycle_counter() = 0;
+            return result;
         }
         static boost::uint64_t increment_stack_recycle_count()
         {

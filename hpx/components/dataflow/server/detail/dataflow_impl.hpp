@@ -50,10 +50,10 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
     /// counter function declarations
     
-    HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count();
-    HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count();
-    HPX_COMPONENT_EXPORT boost::int64_t get_fired_count();
-    HPX_COMPONENT_EXPORT boost::int64_t get_destructed_count();
+    HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count(bool);
+    HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count(bool);
+    HPX_COMPONENT_EXPORT boost::int64_t get_fired_count(bool);
+    HPX_COMPONENT_EXPORT boost::int64_t get_destructed_count(bool);
     HPX_COMPONENT_EXPORT void update_constructed_count();
     HPX_COMPONENT_EXPORT void update_initialized_count();
     HPX_COMPONENT_EXPORT void update_fired_count();

@@ -15,7 +15,7 @@ namespace hpx { namespace performance_counters { namespace memory
 {
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
-    boost::uint64_t read_psm_virtual()
+    boost::uint64_t read_psm_virtual(bool)
     {
         PROCESS_MEMORY_COUNTERS_EX pmc;
         std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));
@@ -53,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
     ///////////////////////////////////////////////////////////////////////////
     // returns resident memory value
-    boost::uint64_t read_psm_resident()
+    boost::uint64_t read_psm_resident(bool)
     {
         PROCESS_MEMORY_COUNTERS_EX pmc;
         std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));

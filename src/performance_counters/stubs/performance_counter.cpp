@@ -51,6 +51,14 @@ namespace hpx { namespace performance_counters { namespace stubs
         return hpx::async<action_type>(targetid);
     }
 
+    lcos::future<void> performance_counter::reset_async(
+        naming::id_type const& targetid)
+    {
+        typedef server::base_performance_counter::reset_counter_value_action
+            action_type;
+        return hpx::async<action_type>(targetid);
+    }
+
     bool performance_counter::start(naming::id_type const& targetid,
         error_code& ec)
     {
@@ -61,5 +69,11 @@ namespace hpx { namespace performance_counters { namespace stubs
         error_code& ec)
     {
         return stop_async(targetid).get(ec);
+    }
+
+    void performance_counter::reset(naming::id_type const& targetid,
+        error_code& ec)
+    {
+        reset_async(targetid).get(ec);
     }
 }}}

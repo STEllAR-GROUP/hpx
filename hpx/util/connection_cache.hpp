@@ -349,28 +349,28 @@ namespace hpx { namespace util
         }
 
         // access statistics
-        boost::int64_t get_cache_insertions() const
+        boost::int64_t get_cache_insertions(bool reset)
         {
             mutex_type::scoped_lock lock(mtx_);
-            return insertions_;
+            return util::get_and_reset_value(insertions_, reset);
         }
 
-        boost::int64_t get_cache_evictions() const
+        boost::int64_t get_cache_evictions(bool reset)
         {
             mutex_type::scoped_lock lock(mtx_);
-            return evictions_;
+            return util::get_and_reset_value(evictions_, reset);
         }
 
-        boost::int64_t get_cache_hits() const
+        boost::int64_t get_cache_hits(bool reset)
         {
             mutex_type::scoped_lock lock(mtx_);
-            return hits_;
+            return util::get_and_reset_value(hits_, reset);
         }
 
-        boost::int64_t get_cache_misses() const
+        boost::int64_t get_cache_misses(bool reset)
         {
             mutex_type::scoped_lock lock(mtx_);
-            return misses_;
+            return util::get_and_reset_value(misses_, reset);
         }
 
     private:

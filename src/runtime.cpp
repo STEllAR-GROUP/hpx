@@ -17,6 +17,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/query_counters.hpp>
 
 #include <iostream>
 #include <vector>
@@ -215,6 +216,31 @@ namespace hpx
         return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::start_active_counters(error_code& ec)
+    {
+        if (active_counters_.get())
+            active_counters_->start_counters(ec);
+    }
+
+    void runtime::stop_active_counters(error_code& ec)
+    {
+        if (active_counters_.get())
+            active_counters_->stop_counters(ec);
+    }
+
+    void runtime::reset_active_counters(error_code& ec)
+    {
+        if (active_counters_.get())
+            active_counters_->reset_counters(ec);
+    }
+
+    void runtime::evaluate_active_counters(char const* description, error_code& ec)
+    {
+        if (active_counters_.get())
+            active_counters_->evaluate_counters(description, ec);
+    }
+
     /// \brief Register all performance counter types related to this runtime
     ///        instance
     void runtime::register_counter_types()
@@ -236,7 +262,7 @@ namespace hpx
             { "/statistics/rolling_average", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
-              "name: /statistics{<base_counter_name>}/average",
+              "name: /statistics{<base_counter_name>}/rolling_averaging",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::aggregating_counter_creator,
               &performance_counters::default_counter_discoverer,
@@ -247,7 +273,7 @@ namespace hpx
             { "/statistics/median", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
-              "name: /statistics{<base_counter_name>}/average",
+              "name: /statistics{<base_counter_name>}/median",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::aggregating_counter_creator,
               &performance_counters::default_counter_discoverer,
@@ -630,6 +656,55 @@ namespace hpx
     hpx::util::io_service_pool* get_thread_pool(char const* name)
     {
         return get_runtime().get_thread_pool(name);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void start_active_counters(error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            rt->start_active_counters(ec);
+        }
+        else {
+            HPX_THROWS_IF(ec, invalid_status, "start_active_counters",
+                "the runtime system is not available at this time");
+        }
+    }
+
+    void stop_active_counters(error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            rt->stop_active_counters(ec);
+        }
+        else {
+            HPX_THROWS_IF(ec, invalid_status, "stop_active_counters",
+                "the runtime system is not available at this time");
+        }
+    }
+
+    void reset_active_counters(error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            rt->reset_active_counters(ec);
+        }
+        else {
+            HPX_THROWS_IF(ec, invalid_status, "reset_active_counters",
+                "the runtime system is not available at this time");
+        }
+    }
+
+    void evaluate_active_counters(char const* description, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            rt->evaluate_active_counters(description, ec);
+        }
+        else {
+            HPX_THROWS_IF(ec, invalid_status, "evaluate_active_counters",
+                "the runtime system is not available at this time");
+        }
     }
 }
 

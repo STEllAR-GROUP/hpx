@@ -15,9 +15,12 @@
 // The atomic variable 'counter' ensures the thread safety of the counter.
 boost::atomic<boost::int64_t> counter(0);
 
-boost::int64_t some_performance_data()
+boost::int64_t some_performance_data(bool reset)
 {
-    return ++counter;
+    boost::int64_t result = ++counter;
+    if (reset)
+        counter = 0;
+    return result;
 }
 
 void register_counter_type()

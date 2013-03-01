@@ -16,7 +16,7 @@ namespace hpx { namespace performance_counters { namespace memory
 {
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
-    boost::uint64_t read_psm_virtual()
+    boost::uint64_t read_psm_virtual(bool)
     {
         struct task_basic_info t_info;
         mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
@@ -38,7 +38,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
     ///////////////////////////////////////////////////////////////////////////
     // returns resident memory value
-    boost::uint64_t read_psm_resident()
+    boost::uint64_t read_psm_resident(bool)
     {
         struct task_basic_info t_info;
         mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;

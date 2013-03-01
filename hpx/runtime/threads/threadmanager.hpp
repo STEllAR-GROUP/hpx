@@ -396,7 +396,7 @@ namespace hpx { namespace threads
         virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
 
         virtual boost::int64_t get_executed_threads(
-            std::size_t num = std::size_t(-1)) const = 0;
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         /// The get_thread_data function is part of the thread related

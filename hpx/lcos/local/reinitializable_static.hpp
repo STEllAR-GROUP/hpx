@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
 
         reinitializable_static()
         {
-            // rely on ADL to find the proper call_once
+            // do not rely on ADL to find the proper call_once
             lcos::local::call_once(constructed_,
                 &reinitializable_static::default_constructor);
         }
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename U>
         reinitializable_static(U const& val)
         {
-            // rely on ADL to find the proper call_once
+            // do not rely on ADL to find the proper call_once
             lcos::local::call_once(constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));

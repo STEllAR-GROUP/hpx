@@ -61,7 +61,7 @@ namespace hpx { namespace threads
         ///
         threadmanager_impl(util::io_service_pool& timer_pool,
             scheduling_policy_type& scheduler,
-            notification_policy_type& notifier, 
+            notification_policy_type& notifier,
             std::size_t num_threads);
         ~threadmanager_impl();
 
@@ -179,7 +179,7 @@ namespace hpx { namespace threads
         /// interruption point.
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
-        /// \param flag     [in] The flag encodes whether the thread should be 
+        /// \param flag     [in] The flag encodes whether the thread should be
         ///                 interrupted (if it is \a true), or 'uninterrupted'
         ///                 (if it is \a false).
         /// \param ec       [in,out] this represents the error status on exit,
@@ -225,7 +225,7 @@ namespace hpx { namespace threads
 
         /// \brief return the number of HPX-threads with the given state
         ///
-        /// \note This function lock the internal OS lock in the threadmanager
+        /// \note This function lock the internal OS lock in the thread manager
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default) const;
 
@@ -384,7 +384,7 @@ namespace hpx { namespace threads
         char const* set_lco_description(thread_id_type id, char const* desc = 0);
 
         /// The function get_thread_backtrace is part of the thread related API
-        /// allows to query the currently stored thread back trace (which is 
+        /// allows to query the currently stored thread back trace (which is
         /// captured during thread suspension).
         ///
         /// \param id         [in] The thread id of the thread being queried.
@@ -393,8 +393,8 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         ///
         /// \returns          This function returns the currently captured stack
-        ///                   back trace of the thread referenced by the \a id 
-        ///                   parameter. If the thread is not known to the 
+        ///                   back trace of the thread referenced by the \a id
+        ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
         util::backtrace const* get_backtrace(thread_id_type id) const;
         util::backtrace const* set_backtrace(thread_id_type id, util::backtrace const* bt = 0);
@@ -405,27 +405,27 @@ namespace hpx { namespace threads
         ///
         /// \param id       [in] The thread id of the thread to query.
         ///
-        /// \returns        This function returns the thread specific data 
+        /// \returns        This function returns the thread specific data
         ///                 pointer or zero if none is set.
-        std::size_t get_thread_data(thread_id_type id, 
+        std::size_t get_thread_data(thread_id_type id,
             error_code& ec = throws) const;
 
         /// The set_thread_data function is part of the thread related
         /// API. It sets the currently stored thread specific data pointer.
         ///
         /// \param id       [in] The thread id of the thread to query.
-        /// \param data     [in] The thread specific data pointer to set for 
+        /// \param data     [in] The thread specific data pointer to set for
         ///                 the given thread.
         ///
-        /// \returns        This function returns the previously set thread 
+        /// \returns        This function returns the previously set thread
         ///                 specific data pointer or zero if none was set.
         std::size_t set_thread_data(thread_id_type id,
             std::size_t data, error_code& ec = throws);
 #endif
 
         /// Get percent maintenance time in main thread-manager loop.
-        boost::int64_t avg_idle_rate() const;
-        boost::int64_t avg_idle_rate(std::size_t num_thread) const;
+        boost::int64_t avg_idle_rate(bool reset);
+        boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
     protected:
         // this is the thread function executing the work items in the queue
@@ -453,7 +453,8 @@ namespace hpx { namespace threads
             scheduler_.on_error(num_thread, e);
         }
 
-        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const;
+        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1),
+            bool reset = false);
 
     protected:
         /// This thread function is used by the at_timer thread below to trigger
@@ -489,21 +490,21 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         void register_counter_types();
 
-        /// Returns of the number of the processing units the given thread 
+        /// Returns of the number of the processing units the given thread
         /// is allowed to run on
         std::size_t get_pu_num(std::size_t num_thread) const
         {
             return scheduler_.get_pu_num(num_thread);
         }
 
-        /// Return the mask for processing units the given thread is allowed 
+        /// Return the mask for processing units the given thread is allowed
         /// to run on.
         mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
             return scheduler_.get_pu_mask(topology, num_thread);
         }
 
-        // Returns the mask identifying all processing units used by this 
+        // Returns the mask identifying all processing units used by this
         // thread manager.
         mask_type get_used_processing_units() const
         {
@@ -549,7 +550,7 @@ namespace hpx { namespace threads
         // tfunc_impl timers
         std::vector<boost::uint64_t> exec_times, tfunc_times;
 
-        // Stores the mask identifying all processing units used by this 
+        // Stores the mask identifying all processing units used by this
         // thread manager.
         threads::mask_type used_processing_units_;
     };

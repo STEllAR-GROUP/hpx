@@ -22,6 +22,7 @@
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/serialization/version.hpp>
 
@@ -49,28 +50,32 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     // the counter data instance
     dataflow_counter_data dataflow_counter_data_;
 
-    boost::int64_t get_constructed_count()
+    boost::int64_t get_constructed_count(bool reset)
     {
         lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
-        return dataflow_counter_data_.constructed_;
+        return util::get_and_reset_value(
+            dataflow_counter_data_.constructed_, reset);
     }
 
-    boost::int64_t get_initialized_count()
+    boost::int64_t get_initialized_count(bool reset)
     {
         lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
-        return dataflow_counter_data_.initialized_;
+        return util::get_and_reset_value(
+            dataflow_counter_data_.initialized_, reset);
     }
 
-    boost::int64_t get_fired_count()
+    boost::int64_t get_fired_count(bool reset)
     {
         lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
-        return dataflow_counter_data_.fired_;
+        return util::get_and_reset_value(
+            dataflow_counter_data_.fired_, reset);
     }
 
-    boost::int64_t get_destructed_count()
+    boost::int64_t get_destructed_count(bool reset)
     {
         lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
-        return dataflow_counter_data_.destructed_;
+        return util::get_and_reset_value(
+            dataflow_counter_data_.destructed_, reset);
     }
 
     void update_constructed_count()

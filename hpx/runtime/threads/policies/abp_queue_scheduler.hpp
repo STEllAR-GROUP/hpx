@@ -97,9 +97,12 @@ struct abp_queue_scheduler : boost::noncopyable
         return num_thread;
     }
 
-    std::size_t get_num_stolen_threads() const
+    std::size_t get_num_stolen_threads(bool reset)
     {
-        return stolen_threads_;
+        std::size_t result = stolen_threads_;
+        if (reset)
+            stolen_threads_ = 0;
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -124,7 +127,7 @@ struct abp_queue_scheduler : boost::noncopyable
     // Queries the current thread count of the queues.
     boost::int64_t get_thread_count(thread_state_enum state = unknown,
         thread_priority priority = thread_priority_default,
-        std::size_t num_thread = std::size_t(-1)) const
+        std::size_t num_thread = std::size_t(-1), bool reset = false) const
     {
         // Return thread count of one specific queue.
         if (std::size_t(-1) != num_thread)

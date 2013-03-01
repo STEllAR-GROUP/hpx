@@ -27,6 +27,7 @@ namespace hpx { namespace util
             boost::int64_t interval, std::string const& dest)
       : names_(names), destination_(dest),
         timer_(boost::bind(&query_counters::evaluate, this_()),
+            boost::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary
@@ -125,9 +126,9 @@ namespace hpx { namespace util
         if (!ec) {
             double elapsed = static_cast<double>(value.time_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
-                << "[s]," << val;
+                << ",[s]," << val;
             if (!uom.empty())
-                out << "[" << uom << "]";
+                out << ",[" << uom << "]";
             out << "\n";
         }
         else {
@@ -137,9 +138,108 @@ namespace hpx { namespace util
 
     bool query_counters::evaluate()
     {
+        return evaluate_counters();
+    }
+
+    void query_counters::terminate()
+    {
+        ids_.clear();      // give up control over all performance counters
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void query_counters::start_counters(error_code& ec)
+    {
+        bool has_been_started = false;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            has_been_started = !ids_.empty();
+        }
+
+        if (!has_been_started)
+        {
+            // start has not been called yet
+            HPX_THROWS_IF(ec, invalid_status,
+                "query_counters::start_counters",
+                "The counters to be evaluated have not been initialized yet");
+            return;
+        }
+
+        // Query the performance counters.
+        using performance_counters::stubs::performance_counter;
+        std::vector<future<bool> > started;
+
+        started.reserve(ids_.size());
+        for (std::size_t i = 0; i < ids_.size(); ++i)
+            started.push_back(performance_counter::start_async(ids_[i]));
+
+        // wait for all counters to be started
+        wait_all(started, ec);
+    }
+
+    void query_counters::stop_counters(error_code& ec)
+    {
+        bool has_been_started = false;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            has_been_started = !ids_.empty();
+        }
+
+        if (!has_been_started)
+        {
+            // start has not been called yet
+            HPX_THROWS_IF(ec, invalid_status,
+                "query_counters::stop_counters",
+                "The counters to be evaluated have not been initialized yet");
+            return;
+        }
+
+        // Query the performance counters.
+        using performance_counters::stubs::performance_counter;
+        std::vector<future<bool> > stopped;
+
+        stopped.reserve(ids_.size());
+        for (std::size_t i = 0; i < ids_.size(); ++i)
+            stopped.push_back(performance_counter::stop_async(ids_[i]));
+
+        // wait for all counters to be started
+        wait_all(stopped, ec);
+    }
+
+    void query_counters::reset_counters(error_code& ec)
+    {
+        bool has_been_started = false;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            has_been_started = !ids_.empty();
+        }
+
+        if (!has_been_started)
+        {
+            // start has not been called yet
+            HPX_THROWS_IF(ec, invalid_status,
+                "query_counters::reset_counters",
+                "The counters to be evaluated have not been initialized yet");
+            return;
+        }
+
+        // Query the performance counters.
+        using performance_counters::stubs::performance_counter;
+        std::vector<future<void> > reset;
+
+        reset.reserve(ids_.size());
+        for (std::size_t i = 0; i < ids_.size(); ++i)
+            reset.push_back(performance_counter::reset_async(ids_[i]));
+
+        // wait for all counters to be started
+        wait_all(reset, ec);
+    }
+
+    bool query_counters::evaluate_counters(char const* description, error_code& ec)
+    {
         if (timer_.is_terminated())
         {
             // just do nothing as we're about to terminate the application
+            ids_.clear();       // free all held performance counters
             return false;
         }
 
@@ -154,7 +254,7 @@ namespace hpx { namespace util
         if (!has_been_started)
         {
             // start has not been called yet
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROWS_IF(ec, invalid_status,
                 "query_counters::evaluate",
                 "The counters to be evaluated have not been initialized yet");
             return false;
@@ -168,7 +268,17 @@ namespace hpx { namespace util
             values.push_back(performance_counter::get_value_async(ids_[i]));
 
         // wait for all values to be returned
-        wait_all(values);
+        wait_all(values, ec);
+
+        if (description) {
+            if (destination_is_cout) {
+                std::cout << description << std::endl;
+            }
+            else {
+                std::ofstream out(destination_, std::ios_base::app);
+                out << description << std::endl;
+            }
+        }
 
         // print the values
         for (std::size_t i = 0; i < values.size(); ++i)

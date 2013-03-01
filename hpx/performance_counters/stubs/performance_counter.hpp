@@ -29,10 +29,13 @@ namespace hpx { namespace performance_counters { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<bool> start_async(naming::id_type const& targetid);
         static lcos::future<bool> stop_async(naming::id_type const& targetid);
+        static lcos::future<void> reset_async(naming::id_type const& targetid);
 
         static bool start(naming::id_type const& targetid,
             error_code& ec = throws);
         static bool stop(naming::id_type const& targetid,
+            error_code& ec = throws);
+        static void reset(naming::id_type const& targetid,
             error_code& ec = throws);
 
         template <typename T>

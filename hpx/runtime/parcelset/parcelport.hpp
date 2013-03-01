@@ -97,8 +97,8 @@ namespace hpx { namespace parcelset
         /// operation or on any error.
         ///
         /// \param parcels  [in] A reference to the list of parcels to send.
-        /// \param handlers [in] A list of function objects to be invoked on 
-        ///                 successful completion or on errors. The signature of 
+        /// \param handlers [in] A list of function objects to be invoked on
+        ///                 successful completion or on errors. The signature of
         ///                 these function objects is expected to be:
         ///
         /// \code
@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(parcel& p) 
+        virtual void send_early_parcel(parcel& p)
         {
             BOOST_ASSERT(false);    // is implemented in tcp::parcelport only
         }
@@ -141,9 +141,9 @@ namespace hpx { namespace parcelset
         };
 
         virtual boost::int64_t
-        get_connection_cache_statistics(connection_cache_statistics_type) const
+        get_connection_cache_statistics(connection_cache_statistics_type, bool reset) const
         {
-            // by default this parcelport does not expose any conenction cache 
+            // by default this parcelport does not expose any conenction cache
             // statistics
             return 0;
         }
@@ -183,82 +183,82 @@ namespace hpx { namespace parcelset
         /// Performance counter data
 
         /// number of parcels sent
-        std::size_t get_parcel_send_count() const
+        std::size_t get_parcel_send_count(bool reset)
         {
-            return parcels_sent_.num_parcels();
+            return parcels_sent_.num_parcels(reset);
         }
 
         /// number of messages sent
-        std::size_t get_message_send_count() const
+        std::size_t get_message_send_count(bool reset)
         {
-            return parcels_sent_.num_messages();
+            return parcels_sent_.num_messages(reset);
         }
 
         /// number of parcels received
-        std::size_t get_parcel_receive_count() const
+        std::size_t get_parcel_receive_count(bool reset)
         {
-            return parcels_received_.num_parcels();
+            return parcels_received_.num_parcels(reset);
         }
 
         /// number of messages received
-        std::size_t get_message_receive_count() const
+        std::size_t get_message_receive_count(bool reset)
         {
-            return parcels_received_.num_messages();
+            return parcels_received_.num_messages(reset);
         }
 
         /// the total time it took for all sends, from async_write to the
         /// completion handler (nanoseconds)
-        boost::int64_t get_sending_time() const
+        boost::int64_t get_sending_time(bool reset)
         {
-            return parcels_sent_.total_time();
+            return parcels_sent_.total_time(reset);
         }
 
         /// the total time it took for all receives, from async_read to the
         /// completion handler (nanoseconds)
-        boost::int64_t get_receiving_time() const
+        boost::int64_t get_receiving_time(bool reset)
         {
-            return parcels_received_.total_time();
+            return parcels_received_.total_time(reset);
         }
 
         /// the total time it took for all sender-side serialization operations
         /// (nanoseconds)
-        boost::int64_t get_sending_serialization_time() const
+        boost::int64_t get_sending_serialization_time(bool reset)
         {
-            return parcels_sent_.total_serialization_time();
+            return parcels_sent_.total_serialization_time(reset);
         }
 
         /// the total time it took for all receiver-side serialization
         /// operations (nanoseconds)
-        boost::int64_t get_receiving_serialization_time() const
+        boost::int64_t get_receiving_serialization_time(bool reset)
         {
-            return parcels_received_.total_serialization_time();
+            return parcels_received_.total_serialization_time(reset);
         }
 
         /// total data sent (bytes)
-        std::size_t get_data_sent() const
+        std::size_t get_data_sent(bool reset)
         {
-            return parcels_sent_.total_bytes();
+            return parcels_sent_.total_bytes(reset);
         }
 
         /// total data (uncompressed) sent (bytes)
-        std::size_t get_raw_data_sent() const
+        std::size_t get_raw_data_sent(bool reset)
         {
-            return parcels_sent_.total_raw_bytes();
+            return parcels_sent_.total_raw_bytes(reset);
         }
 
         /// total data received (bytes)
-        std::size_t get_data_received() const
+        std::size_t get_data_received(bool reset)
         {
-            return parcels_received_.total_bytes();
+            return parcels_received_.total_bytes(reset);
         }
 
         /// total data (uncompressed) received (bytes)
-        std::size_t get_raw_data_received() const
+        std::size_t get_raw_data_received(bool reset)
         {
-            return parcels_received_.total_raw_bytes();
+            return parcels_received_.total_raw_bytes(reset);
         }
 
-        std::size_t get_pending_parcels_count() const
+        std::size_t get_pending_parcels_count(bool /*reset*/)
         {
             util::spinlock::scoped_lock l(mtx_);
             return pending_parcels_.size();

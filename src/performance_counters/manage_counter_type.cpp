@@ -68,7 +68,7 @@ namespace hpx { namespace performance_counters
     // provide the data in a way, which will uninstall it automatically during
     // shutdown.
     counter_status install_counter_type(std::string const& name,
-        HPX_STD_FUNCTION<boost::int64_t()> const& counter_value,
+        HPX_STD_FUNCTION<boost::int64_t(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
         return install_counter_type(name, counter_raw, helptext,
