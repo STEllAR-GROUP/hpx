@@ -42,7 +42,7 @@ namespace performance_counters { namespace sine { namespace server
     }
 
     hpx::performance_counters::counter_value
-        sine_counter::get_counter_value()
+        sine_counter::get_counter_value(bool reset)
     {
         boost::int64_t const scaling = 100000;
 
@@ -52,6 +52,8 @@ namespace performance_counters { namespace sine { namespace server
         {
             mutex_type::scoped_lock mtx(mtx_);
             value.value_ = boost::int64_t(current_value_ * scaling);
+            if (reset)
+                current_value_ = 0;
             value.time_ = evaluated_at_;
         }
 
