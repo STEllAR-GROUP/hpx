@@ -56,7 +56,7 @@ void print_results(
     std::string const delay_str = boost::str(boost::format("%lu,") % delay);
 
     cout << ( boost::format("%-21s %-21s %-21s %10.12s, %10.12s\n")
-            % cores_str % tasks_str % delay_str 
+            % cores_str % tasks_str % delay_str
             % walltime % (walltime / tasks)) << flush;
 }
 
@@ -71,22 +71,22 @@ int hpx_main(
     {
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
-    
-    	delay_s = (delay) * 1e-6; //delay in seconds*/
 
-		//cout << flush; //don't delete this keeps the worker time from being shortened
-  					         			
+        delay_s = (delay) * 1e-6; //delay in seconds*/
+
+        //cout << flush; //don't delete this keeps the worker time from being shortened
+
         // Start the clock.
         high_resolution_timer t;
-      	for (boost::uint64_t i = 0; i < tasks; ++i)
-      	        register_work(HPX_STD_BIND(&worker, delay, &d));
-        	    
+        for (boost::uint64_t i = 0; i < tasks; ++i)
+                register_work(HPX_STD_BIND(&worker, delay, &d));
+
         // Reschedule hpx_main until all other px-threads have finished. We
         // should be resumed after most of the null px-threads have been
         // executed. If we haven't, we just reschedule ourselves again.
         do {
             suspend();
-        } while (get_thread_count() > 1);
+        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
 
         print_results(get_os_thread_count(), t.elapsed());
     }
@@ -111,12 +111,12 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "time in micro-seconds to delay")
-        
+
         ( "no-header"
         , "do not print out the csv header row")
         ;
-     
-   	
+
+
     // Initialize and run HPX.
     return init(cmdline, argc, argv);
 }
