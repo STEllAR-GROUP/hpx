@@ -27,6 +27,9 @@ namespace hpx { namespace util
     public:
         interval_timer();
         interval_timer(HPX_STD_FUNCTION<bool()> const& f,
+            boost::int64_t microsecs, std::string const& description, 
+            bool pre_shutdown = false);
+        interval_timer(HPX_STD_FUNCTION<bool()> const& f,
             HPX_STD_FUNCTION<void()> const& on_term, boost::int64_t microsecs,
                 std::string const& description, bool pre_shutdown = false);
         ~interval_timer();
