@@ -25,7 +25,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
-    class base_result_action0<Component, Result, F, Derived>
+    class base_result_action0 HPX_SPECIALIZE((<Component, Result, F, Derived>))
       : public action<Component, Result, hpx::util::tuple0<>, Derived>
     {
     public:
@@ -103,10 +103,31 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
+    namespace detail
+    {
+        template <typename Obj, typename Result>
+        struct synthesize_const_mf<Obj, Result (*)()>
+        {
+            typedef Result (Obj::*type)() const;
+        };
+
+        template <typename Obj, typename Result>
+        struct synthesize_const_mf<Obj, Result (Obj::*)() const>
+        {
+            typedef Result (Obj::*type)() const;
+        };
+
+        template <typename Result>
+        typename boost::mpl::identity<Result (*)()>::type
+        replicate_type(Result (*p)());
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, Result (Component::*F)(),
         typename Derived>
-    struct result_action0<Component, Result, F, Derived>
+    struct result_action0 HPX_SPECIALIZE((<Component, Result, F, Derived>))
       : base_result_action0<Component, Result, F,
             typename detail::action_type<
                 result_action0<Component, Result, F>, Derived
@@ -119,6 +140,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::false_>
@@ -129,10 +151,20 @@ namespace hpx { namespace actions
         > type;
     };
 
+    template <typename Component, typename Result,
+        Result (Component::*F)() const, typename Derived>
+    struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::false_>
+      : result_action0<Component const, Result, F, Derived>
+    {
+        typedef result_action0<
+            Component const, Result, F, Derived
+        > type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, Result (Component::*F)(),
         typename Derived>
-    struct direct_result_action0<Component, Result, F, Derived>
+    struct direct_result_action0 HPX_SPECIALIZE((<Component, Result, F, Derived>))
       : public base_result_action0<Component, Result, F,
             typename detail::action_type<
                 direct_result_action0<Component, Result, F>, Derived
@@ -166,6 +198,7 @@ namespace hpx { namespace actions
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     struct make_action<Result (Component::*)(), F, Derived, boost::mpl::true_>
@@ -177,10 +210,20 @@ namespace hpx { namespace actions
         > type;
     };
 
+    template <typename Component, typename Result,
+        Result (Component::*F)() const, typename Derived>
+    struct make_action<Result (Component::*)() const, F, Derived, boost::mpl::true_>
+      : direct_result_action0<Component const, Result, F, Derived>
+    {
+        typedef direct_result_action0<
+            Component const, Result, F, Derived
+        > type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
     template <typename Component, void (Component::*F)(), typename Derived>
-    class base_action0<Component, F, Derived>
+    class base_action0 HPX_SPECIALIZE((<Component, F, Derived>))
       : public action<Component, util::unused_type,
             hpx::util::tuple0<>, Derived>
     {
@@ -261,7 +304,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, void (Component::*F)(), typename Derived>
-    struct action0<Component, F, Derived>
+    struct action0 HPX_SPECIALIZE((<Component, F, Derived>))
       : base_action0<Component, F,
             typename detail::action_type<
                 action0<Component, F>, Derived
@@ -274,6 +317,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::false_>
       : action0<Component, F, Derived>
@@ -283,9 +327,18 @@ namespace hpx { namespace actions
         > type;
     };
 
+    template <typename Component, void (Component::*F)() const, typename Derived>
+    struct make_action<void (Component::*)() const, F, Derived, boost::mpl::false_>
+      : action0<Component const, F, Derived>
+    {
+        typedef action0<
+            Component const, F, Derived
+        > type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, void (Component::*F)(), typename Derived>
-    struct direct_action0<Component, F, Derived>
+    struct direct_action0 HPX_SPECIALIZE((<Component, F, Derived>))
       : base_action0<Component, F,
             typename detail::action_type<
                 direct_action0<Component, F>, Derived
@@ -319,12 +372,22 @@ namespace hpx { namespace actions
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, void (Component::*F)(), typename Derived>
     struct make_action<void (Component::*)(), F, Derived, boost::mpl::true_>
       : direct_action0<Component, F, Derived>
     {
         typedef direct_action0<
             Component, F, Derived
+        > type;
+    };
+
+    template <typename Component, void (Component::*F)() const, typename Derived>
+    struct make_action<void (Component::*)() const, F, Derived, boost::mpl::true_>
+      : direct_action0<Component const, F, Derived>
+    {
+        typedef direct_action0<
+            Component const, F, Derived
         > type;
     };
 
@@ -438,9 +501,106 @@ namespace hpx { namespace actions
         HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name      \
     /**/
 
+/// \def HPX_DEFINE_COMPONENT_CONST_ACTION(component, func, action_type)
+///
+/// \brief Registers a const member function of a component as an action type
+/// with HPX
+///
+/// The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used to register a
+/// const member function of a component as an action type named \a action_type.
+///
+/// The parameter \a component is the type of the component exposing the const
+/// member function \a func which should be associated with the newly defined
+/// action type. The parameter \p action_type is the name of the action type to
+/// register with HPX.
+///
+/// \par Example:
+///
+/// \code
+///       namespace app
+///       {
+///           // Define a simple component exposing one action 'print_greating'
+///           class HPX_COMPONENT_EXPORT server
+///             : public hpx::components::simple_component_base<server>
+///           {
+///               void print_greating() const
+///               {
+///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
+///               }
+///
+///               // Component actions need to be declared, this also defines the
+///               // type 'print_greating_action' representing the action.
+///               HPX_DEFINE_COMPONENT_CONST_ACTION(server, print_greating, print_greating_action);
+///           };
+///       }
+/// \endcode
+///
+/// \note This macro should be used for const member functions only. Use
+/// the macro \a HPX_DEFINE_COMPONENT_ACTION for non-const member functions.
+///
+/// The first argument must provide the type name of the component the
+/// action is defined for.
+///
+/// The second argument must provide the member function name the action
+/// should wrap.
+///
+/// \note The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used with 2 or
+/// 3 arguments. The third argument is optional.
+///
+/// The default value for the third argument (the typename of the defined
+/// action) is derived from the name of the function (as passed as the second
+/// argument) by appending '_action'. The third argument can be omitted only
+/// if the first argument with an appended suffix '_action' resolves to a valid,
+/// unqualified C++ type name.
+///
+#define HPX_DEFINE_COMPONENT_CONST_ACTION(...)                                \
+    HPX_DEFINE_COMPONENT_CONST_ACTION_(__VA_ARGS__)                           \
+/**/
+
+/// \cond NOINTERNAL
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_(...)                               \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DEFINE_COMPONENT_CONST_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)     \
+    )(__VA_ARGS__))                                                           \
+
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_2(component, func)                  \
+    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type            \
+        BOOST_PP_CAT(func, _action)                                           \
+    /**/
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_3(component, func, action_type)     \
+    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func)::type action_type\
+    /**/
+/// \endcond
+
+/// \cond NOINTERNAL
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(...)                         \
+    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_(__VA_ARGS__)                    \
+/**/
+
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_(...)                        \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    )(__VA_ARGS__))                                                           \
+
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_2(component, func)           \
+    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type     \
+        BOOST_PP_CAT(func, _type)                                             \
+    /**/
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_3(component, func, action_type)\
+    typedef HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, func)::type     \
+        action_type                                                           \
+    /**/
+
 ///////////////////////////////////////////////////////////////////////////////
-// bring in the rest of the implementations
-#include <hpx/runtime/actions/component_non_const_action_implementations.hpp>
+// same as above, just for template functions
+#define HPX_DEFINE_COMPONENT_CONST_ACTION_TPL(component, func, name)          \
+    typedef typename                                                          \
+        HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, func)::type name       \
+    /**/
+#define HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION_TPL(component, func, name)   \
+    typedef typename                                                          \
+        HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name\
+    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register the action templates with serialization.

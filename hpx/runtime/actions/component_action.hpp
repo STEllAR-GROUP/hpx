@@ -19,6 +19,7 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -59,8 +60,18 @@ namespace hpx { namespace actions
     struct direct_action0;
 }}
 
-#include <hpx/runtime/actions/component_non_const_action.hpp>
+///////////////////////////////////////////////////////////////////////////////
+// Fully conforming compilers (like clang) require a full separate set of 
+// specializations for const component actions
+#if defined(__clang__)
+#define HPX_SPECIALIZE(x)   HPX_UTIL_STRIP(x)
 #include <hpx/runtime/actions/component_const_action.hpp>
+#else
+#define HPX_SPECIALIZE(x)
+#endif
+
+#include <hpx/runtime/actions/component_non_const_action.hpp>
+#include <hpx/runtime/actions/component_action_implementations.hpp>
 
 #endif
 

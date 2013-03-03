@@ -37,8 +37,14 @@
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-#include <hpx/runtime/actions/preprocessed/component_non_const_action_implementations.hpp>
+///////////////////////////////////////////////////////////////////////////////
+// Fully conforming compilers (like clang) require a full separate set of 
+// specializations for const component actions
+#if defined(__clang__)
 #include <hpx/runtime/actions/preprocessed/component_const_action_implementations.hpp>
+#endif
+
+#include <hpx/runtime/actions/preprocessed/component_non_const_action_implementations.hpp>
 
 #endif
 
