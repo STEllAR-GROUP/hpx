@@ -19,7 +19,7 @@ boost::int64_t some_performance_data(bool reset)
 {
     boost::int64_t result = ++counter;
     if (reset)
-        counter = 0;
+        counter.store(0);
     return result;
 }
 
