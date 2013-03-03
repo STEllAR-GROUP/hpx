@@ -20,18 +20,24 @@ endif()
 
 macro(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
-  if(ZLIB_FOUND)
-    hpx_add_definitions(-DHPX_LIBRARY_EXPORTS)
-
+  if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
     hpx_include_sys_directories(${ZLIB_INCLUDE_DIR})
     hpx_link_sys_directories(${ZLIB_LIBRARY_DIR})
 
-    add_hpx_library(plugin_zlib
+    add_hpx_library(compress_zlib
       SOURCES ${hpx_SOURCE_DIR}/plugins/compression/zlib/zlib_serialization_filter.cpp
       HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/compression/zlib_serialization_filter.hpp
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARY})
 
-    add_hpx_pseudo_dependencies(plugins.compression.zlib plugin_zlib_lib)
+    set_property(TARGET compress_zlib_lib APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      "HPX_LIBRARY_EXPORTS")
+
+    add_hpx_pseudo_dependencies(plugins.compression.zlib compress_zlib_lib)
+
+    if(NOT HPX_NO_INSTALL)
+      hpx_library_install(compress_zlib_lib lib/hpx)
+    endif()
   endif()
 endmacro()

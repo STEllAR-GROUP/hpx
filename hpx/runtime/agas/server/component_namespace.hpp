@@ -95,21 +95,21 @@ struct HPX_EXPORT component_namespace :
 
     public:
       // access current counter values
-      boost::int64_t get_bind_prefix_count() const;
-      boost::int64_t get_bind_name_count() const;
-      boost::int64_t get_resolve_id_count() const;
-      boost::int64_t get_unbind_name_count() const;
-      boost::int64_t get_iterate_types_count() const;
-      boost::int64_t get_component_type_name_count() const;
-      boost::int64_t get_num_localities_count() const;
+      boost::int64_t get_bind_prefix_count(bool);
+      boost::int64_t get_bind_name_count(bool);
+      boost::int64_t get_resolve_id_count(bool);
+      boost::int64_t get_unbind_name_count(bool);
+      boost::int64_t get_iterate_types_count(bool);
+      boost::int64_t get_component_type_name_count(bool);
+      boost::int64_t get_num_localities_count(bool);
 
-      boost::int64_t get_bind_prefix_time() const;
-      boost::int64_t get_bind_name_time() const;
-      boost::int64_t get_resolve_id_time() const;
-      boost::int64_t get_unbind_name_time() const;
-      boost::int64_t get_iterate_types_time() const;
-      boost::int64_t get_component_type_name_time() const;
-      boost::int64_t get_num_localities_time() const;
+      boost::int64_t get_bind_prefix_time(bool);
+      boost::int64_t get_bind_name_time(bool);
+      boost::int64_t get_resolve_id_time(bool);
+      boost::int64_t get_unbind_name_time(bool);
+      boost::int64_t get_iterate_types_time(bool);
+      boost::int64_t get_component_type_name_time(bool);
+      boost::int64_t get_num_localities_time(bool);
 
       // increment counter values
       void increment_bind_prefix_count();

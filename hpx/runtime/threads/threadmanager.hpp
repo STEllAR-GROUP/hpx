@@ -53,7 +53,8 @@ namespace hpx { namespace threads
 
         /// \brief return the number of PX-threads with the given state
         virtual boost::int64_t get_thread_count(
-            thread_state_enum state = unknown) const = 0;
+            thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default) const = 0;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -67,19 +68,31 @@ namespace hpx { namespace threads
         virtual bool cleanup_terminated(bool delete_all = false) = 0;
 
         /// The get_phase function is part of the thread related API. It
-        /// queries the phase of one of the threads known to the threadmanager
+        /// queries the phase of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the phase should
         ///                 be returned for.
         ///
         /// \returns        This function returns the current phase of the
         ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be ~0.
         virtual std::size_t get_phase(thread_id_type id) = 0;
 
+        /// The get_priority function is part of the thread related API. It
+        /// queries the priority of one of the threads known to the thread manager
+        ///
+        /// \param id       [in] The thread id of the thread the phase should
+        ///                 be returned for.
+        ///
+        /// \returns        This function returns the current priority of the
+        ///                 thread referenced by the \a id parameter. If the
+        ///                 thread is not known to the thread manager the return
+        ///                 value will be ~0.
+        virtual thread_priority get_priority(thread_id_type id) = 0;
+
         /// The get_state function is part of the thread related API. It
-        /// queries the state of one of the threads known to the threadmanager
+        /// queries the state of one of the threads known to the thread manager
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be returned for.
@@ -88,13 +101,13 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
         virtual thread_state get_state(thread_id_type id) = 0;
 
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this
-        /// threadmanager.
+        /// thread manager.
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be modified for.
@@ -109,7 +122,7 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
         ///
         /// \note           If the thread referenced by the parameter \a id
@@ -320,13 +333,13 @@ namespace hpx { namespace threads
         /// interruption point.
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
-        /// \param flag     [in] The flag encodes whether the thread should be 
+        /// \param flag     [in] The flag encodes whether the thread should be
         ///                 interrupted (if it is \a true), or 'uninterrupted'
         ///                 (if it is \a false).
         /// \param ec       [in,out] this represents the error status on exit,
         ///                 if this is pre-initialized to \a hpx#throws
         ///                 the function will throw on error instead.
-        virtual void interrupt(thread_id_type id, bool flag, 
+        virtual void interrupt(thread_id_type id, bool flag,
             error_code& ec = throws) = 0;
 
         /// The run_thread_exit_callbacks function is part of the thread related
@@ -374,16 +387,16 @@ namespace hpx { namespace threads
         /// thread-manager instance.
         virtual void register_counter_types() = 0;
 
-        /// Returns of the number of the processing unit the given thread 
+        /// Returns of the number of the processing unit the given thread
         /// is allowed to run on
         virtual std::size_t get_pu_num(std::size_t) const = 0;
 
-        /// Return the mask for processing units the given thread is allowed 
+        /// Return the mask for processing units the given thread is allowed
         /// to run on.
         virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
 
         virtual boost::int64_t get_executed_threads(
-            std::size_t num = std::size_t(-1)) const = 0;
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         /// The get_thread_data function is part of the thread related
@@ -409,7 +422,7 @@ namespace hpx { namespace threads
             std::size_t data, error_code& ec = throws) = 0;
 #endif
 
-        // Returns the mask identifying all processing units used by this 
+        // Returns the mask identifying all processing units used by this
         // thread manager.
         virtual mask_type get_used_processing_units() const = 0;
 

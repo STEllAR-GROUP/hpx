@@ -96,7 +96,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         /// Return the given connection cache statistic
         boost::int64_t get_connection_cache_statistics(
-            connection_cache_statistics_type t) const;
+            connection_cache_statistics_type t, bool reset);
 
     protected:
         // helper functions for receiving parcels

@@ -137,7 +137,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     naming::gid_type locality_raw_counter_creator(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
+        HPX_STD_FUNCTION<boost::int64_t(bool)> const& f, error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;

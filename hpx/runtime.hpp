@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/static_reinit.hpp>
+#include <hpx/util/query_counters.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -202,6 +203,20 @@ namespace hpx
         /// return zero.
         virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
 
+        ///////////////////////////////////////////////////////////////////////
+        // management API for active performance counters
+        void register_query_counters(
+            boost::shared_ptr<util::query_counters> active_counters)
+        {
+            active_counters_ = active_counters;
+        }
+
+        void start_active_counters(error_code& ec = throws);
+        void stop_active_counters(error_code& ec = throws);
+        void reset_active_counters(error_code& ec = throws);
+        void evaluate_active_counters(bool reset = false, 
+            char const* description = 0, error_code& ec = throws);
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -219,6 +234,7 @@ namespace hpx
 
         util::runtime_configuration ini_;
         boost::shared_ptr<performance_counters::registry> counters_;
+        boost::shared_ptr<util::query_counters> active_counters_;
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;

@@ -9,7 +9,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
-namespace hpx { namespace lcos { namespace server { namespace detail 
+namespace hpx { namespace lcos { namespace server { namespace detail
 {
     struct component_wrapper_base
     {
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         typedef components::managed_component<T> component_type;
 
         component_type * component_ptr;
-        
+
         component_wrapper()
         {
             T * t = new T;

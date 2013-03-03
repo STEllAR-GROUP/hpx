@@ -367,7 +367,7 @@ system and application performance.
           option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the averageidle rate for the given worker thread(s) on the
+        [Returns the average idle rate for the given worker thread(s) on the
          given locality. The idle rate is defined as the ratio of the time
          spent on scheduling and management tasks and the overall time spent
          executing work since the application started.]
@@ -497,7 +497,7 @@ system and application performance.
          in nanoseconds.
         ]
     ]
-    [   [`/runtime/memory/vm`]
+    [   [`/runtime/memory/virtual`]
         [`locality#*/total`
 
           where:[br] `*` is the locality id of the locality the allocated

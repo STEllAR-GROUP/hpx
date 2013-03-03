@@ -50,10 +50,10 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
     /// counter function declarations
     
-    HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count();
-    HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count();
-    HPX_COMPONENT_EXPORT boost::int64_t get_fired_count();
-    HPX_COMPONENT_EXPORT boost::int64_t get_destructed_count();
+    HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count(bool);
+    HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count(bool);
+    HPX_COMPONENT_EXPORT boost::int64_t get_fired_count(bool);
+    HPX_COMPONENT_EXPORT boost::int64_t get_destructed_count(bool);
     HPX_COMPONENT_EXPORT void update_constructed_count();
     HPX_COMPONENT_EXPORT void update_initialized_count();
     HPX_COMPONENT_EXPORT void update_fired_count();
@@ -249,12 +249,12 @@ namespace hpx { namespace traits
 #endif
 #if N > 0
             future_slots.reserve(N);
+
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             set_slot<N>(                                                        \
                 BOOST_PP_CAT(a, N)                                              \
               , typename hpx::traits::is_dataflow<BOOST_PP_CAT(A, N)>::type()); \
     /**/
-
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
 #undef HPX_LCOS_DATAFLOW_M0
 #endif
@@ -279,7 +279,7 @@ namespace hpx { namespace traits
                 else
                 {
                     typedef typename lco_type::set_value_action action_type;
-                    result_type r =  d.get_value();
+                    result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
                 }
             }
@@ -302,19 +302,21 @@ namespace hpx { namespace traits
 
         typedef typename Action::result_type remote_result;
 
+        // This is called by our action after it executed. The argument is what
+        // has been calculated by the action. The result has to be sent to all 
+        // connected dataflow instances.
         void set_value(BOOST_RV_REF(remote_result) r)
         {
 #if N > 0
-            /*
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
                 delete p;
             }
-            */
+            future_slots.clear();
 #endif
             remote_result tmp(r);
-            forward_results(tmp);
             result.set(boost::move(r));
+            forward_results(tmp);
         }
 
         void forward_results(remote_result & r)
@@ -336,6 +338,8 @@ namespace hpx { namespace traits
             }
         }
 
+        // This is called when some dataflow object connects to this one (i.e.
+        // requests to receive the output of this dataflow instance).
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -345,10 +349,12 @@ namespace hpx { namespace traits
                 << get_gid()
                 << " ";
 
+            lcos::local::spinlock::scoped_lock l(mtx);
             if(!result.is_empty())
             {
                 data_type d;
                 result.read(d);
+                l.unlock();
 
                 if(!d.stores_value())
                 {
@@ -364,7 +370,6 @@ namespace hpx { namespace traits
             }
             else
             {
-                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -391,8 +396,8 @@ namespace hpx { namespace traits
                 component_type;
 
             component_type * c = new component_type(this, boost::forward<A>(a));
-            (*c)->connect_();
             future_slots.push_back(c);
+            (*c)->connect_();
         };
 
         // Setting the slot for immediate values

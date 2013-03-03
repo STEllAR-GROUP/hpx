@@ -124,7 +124,7 @@ namespace hpx { namespace lcos { namespace detail
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
                 threads::set_thread_state(id, threads::pending,
-                    threads::wait_abort, threads::thread_priority_normal, ec);
+                    threads::wait_abort, threads::thread_priority_default, ec);
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
                         << get_thread_state_name(thrd->get_state())
@@ -457,7 +457,7 @@ namespace hpx { namespace lcos { namespace detail
                 write_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending,
-                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                    threads::wait_timeout, threads::thread_priority_default, ec);
 
                 set_full_locked(ec);    // state_ = full
                 if (ec) return false;
@@ -478,7 +478,7 @@ namespace hpx { namespace lcos { namespace detail
                 read_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending,
-                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                    threads::wait_timeout, threads::thread_priority_default, ec);
                 if (ec) return false;
 
                 ++full_empty_counter_data_.set_full_;
@@ -492,7 +492,7 @@ namespace hpx { namespace lcos { namespace detail
                 read_and_empty_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending,
-                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                    threads::wait_timeout, threads::thread_priority_default, ec);
                 if (ec) return false;
 
                 set_empty_locked(ec);   // state_ = empty

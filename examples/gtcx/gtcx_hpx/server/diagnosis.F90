@@ -1,5 +1,5 @@
 subroutine diagnosis(hpx4_bti,&
-             t_gids, p_gids,&
+             t_gids, p_gids,xnormal,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -150,6 +150,10 @@ subroutine diagnosis(hpx4_bti,&
   real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
   real(kind=wp) etracer,ptracer(4)
 
+  ! diagnosis thread safety
+  real(kind=wp) xnormal(mflux)
+
+  ! local variables
   real(kind=wp) f1, f2, FOM, expected
   integer numpe, ierr
 
@@ -157,7 +161,7 @@ subroutine diagnosis(hpx4_bti,&
   integer i,j,k,ij,m,ierror
   real(kind=wp) r,b,g,q,kappa,fdum(21),adum(21),ddum(mpsi),ddumtmp(mpsi),tracer(6),&
        tmptracer(6), &
-       tmarker,xnormal(mflux),rfac,dum,epotential,vthi,vthe,tem_inv
+       tmarker,rfac,dum,epotential,vthi,vthe,tem_inv
   real(kind=wp),external :: boozer2x,boozer2z,bfield,psi2r
   character(len=11) cdum
 
@@ -339,6 +343,7 @@ subroutine diagnosis(hpx4_bti,&
   fdum(21)=particles_energy(2)
 
   !call MPI_REDUCE(fdum,adum,21,mpi_Rsize,MPI_SUM,0,MPI_COMM_WORLD,ierror)
+
   call comm_reduce_cmm(hpx4_bti,fdum,adum,21,0)
 
 ! radial envelope of fluctuation intensity

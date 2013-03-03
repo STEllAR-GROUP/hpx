@@ -13,6 +13,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -115,9 +116,9 @@ namespace hpx { namespace threads { namespace policies
             return affinity_data_.get_pu_num(num_thread);
         }
 
-        std::size_t get_num_stolen_threads() const
+        std::size_t get_num_stolen_threads(bool reset)
         {
-            return stolen_threads_;
+            return util::get_and_reset_value(stolen_threads_, reset);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -141,7 +142,8 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
-            std::size_t num_thread = std::size_t(-1)) const
+            thread_priority priority = thread_priority_default,
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const
         {
             // Return thread count of one specific queue.
             if (std::size_t(-1) != num_thread)

@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace local
                     // forcefully abort thread, do not throw
                     error_code ec(lightweight);
                     threads::set_thread_state(id, threads::pending,
-                        threads::wait_abort, threads::thread_priority_normal, ec);
+                        threads::wait_abort, threads::thread_priority_default, ec);
                     if (ec) {
                         LERR_(fatal) << "~barrier: could not abort thread"
                             << get_thread_state_name(thrd->get_state())

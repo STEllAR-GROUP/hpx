@@ -26,8 +26,8 @@ namespace performance_counters { namespace sine { namespace server
     sine_counter::sine_counter(hpx::performance_counters::counter_info const& info)
       : hpx::performance_counters::base_performance_counter<sine_counter>(info),
         current_value_(0),
-        timer_(boost::bind(&sine_counter::evaluate, this), 1000000,
-            "sine example performance counter")
+        timer_(boost::bind(&sine_counter::evaluate, this),
+            1000000, "sine example performance counter")
     {
     }
 
@@ -41,8 +41,8 @@ namespace performance_counters { namespace sine { namespace server
         return timer_.stop();
     }
 
-    hpx::performance_counters::counter_value 
-        sine_counter::get_counter_value()
+    hpx::performance_counters::counter_value
+        sine_counter::get_counter_value(bool reset)
     {
         boost::int64_t const scaling = 100000;
 
@@ -52,6 +52,8 @@ namespace performance_counters { namespace sine { namespace server
         {
             mutex_type::scoped_lock mtx(mtx_);
             value.value_ = boost::int64_t(current_value_ * scaling);
+            if (reset)
+                current_value_ = 0;
             value.time_ = evaluated_at_;
         }
 

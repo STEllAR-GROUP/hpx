@@ -371,6 +371,9 @@ namespace hpx
 
                 // schedule to start all counters
                 rt.add_startup_function(boost::bind(&print_counters, qc));
+
+                // register the query_counters object with the runtime system
+                rt.register_query_counters(qc);
             }
             else if (vm.count("hpx:print-counter-interval")) {
                 throw std::logic_error("Invalid command line option "

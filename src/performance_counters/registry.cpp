@@ -254,20 +254,39 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::int64_t wrap_counter(boost::int64_t* p)
+    boost::int64_t wrap_counter(boost::int64_t* p, bool reset)
     {
-        return *p;
+        boost::int64_t result = *p;
+        *p = 0;
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::create_raw_counter_value(counter_info const& info,
         boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        return create_raw_counter(info, boost::bind(wrap_counter, countervalue), id, ec);
+        HPX_STD_FUNCTION<boost::int64_t(bool)> func(
+            boost::bind(wrap_counter, countervalue, ::_1));
+        return create_raw_counter(info, func, id, ec);
+    }
+
+    static boost::int64_t 
+    wrap_raw_counter(HPX_STD_FUNCTION<boost::int64_t()> const& f, bool)
+    {
+        return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
         HPX_STD_FUNCTION<boost::int64_t()> const& f, naming::gid_type& id,
+        error_code& ec)
+    {
+        HPX_STD_FUNCTION<boost::int64_t(bool)> func(
+            boost::bind(&wrap_raw_counter, f, ::_1));
+        return create_raw_counter(info, func, id, ec);
+    }
+
+    counter_status registry::create_raw_counter(counter_info const& info,
+        HPX_STD_FUNCTION<boost::int64_t(bool)> const& f, naming::gid_type& id,
         error_code& ec)
     {
         // create canonical type name

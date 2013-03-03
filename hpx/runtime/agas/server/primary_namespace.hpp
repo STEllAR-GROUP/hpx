@@ -151,31 +151,31 @@ struct HPX_EXPORT primary_namespace :
 
     public:
       // access current counter values
-      boost::int64_t get_allocate_count() const;
-      boost::int64_t get_bind_gid_count() const;
-      boost::int64_t get_resolve_gid_count() const;
-      boost::int64_t get_resolve_locality_count() const;
-      boost::int64_t get_free_count() const;
-      boost::int64_t get_unbind_gid_count() const;
-      boost::int64_t get_change_credit_non_blocking_count() const;
-      boost::int64_t get_change_credit_sync_count() const;
-      boost::int64_t get_localities_count() const;
-      boost::int64_t get_num_localities_count() const;
-      boost::int64_t get_num_threads_count() const;
-      boost::int64_t get_resolved_localities_count() const;
+      boost::int64_t get_allocate_count(bool);
+      boost::int64_t get_bind_gid_count(bool);
+      boost::int64_t get_resolve_gid_count(bool);
+      boost::int64_t get_resolve_locality_count(bool);
+      boost::int64_t get_free_count(bool);
+      boost::int64_t get_unbind_gid_count(bool);
+      boost::int64_t get_change_credit_non_blocking_count(bool);
+      boost::int64_t get_change_credit_sync_count(bool);
+      boost::int64_t get_localities_count(bool);
+      boost::int64_t get_num_localities_count(bool);
+      boost::int64_t get_num_threads_count(bool);
+      boost::int64_t get_resolved_localities_count(bool);
 
-      boost::int64_t get_allocate_time() const;
-      boost::int64_t get_bind_gid_time() const;
-      boost::int64_t get_resolve_gid_time() const;
-      boost::int64_t get_resolve_locality_time() const;
-      boost::int64_t get_free_time() const;
-      boost::int64_t get_unbind_gid_time() const;
-      boost::int64_t get_change_credit_non_blocking_time() const;
-      boost::int64_t get_change_credit_sync_time() const;
-      boost::int64_t get_localities_time() const;
-      boost::int64_t get_num_localities_time() const;
-      boost::int64_t get_num_threads_time() const;
-      boost::int64_t get_resolved_localities_time() const;
+      boost::int64_t get_allocate_time(bool);
+      boost::int64_t get_bind_gid_time(bool);
+      boost::int64_t get_resolve_gid_time(bool);
+      boost::int64_t get_resolve_locality_time(bool);
+      boost::int64_t get_free_time(bool);
+      boost::int64_t get_unbind_gid_time(bool);
+      boost::int64_t get_change_credit_non_blocking_time(bool);
+      boost::int64_t get_change_credit_sync_time(bool);
+      boost::int64_t get_localities_time(bool);
+      boost::int64_t get_num_localities_time(bool);
+      boost::int64_t get_num_threads_time(bool);
+      boost::int64_t get_resolved_localities_time(bool);
 
       // increment counter values
       void increment_allocate_count();

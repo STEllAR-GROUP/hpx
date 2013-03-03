@@ -27,6 +27,24 @@
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
 
+namespace hpx { namespace detail
+{
+#if defined(__clang__)
+    template <typename F, typename Result = typename boost::result_of<F>::type>
+    struct create_future
+    {
+        typedef lcos::future<Result> type;
+    };
+#else
+    // Defer the evaluation of result_of during the SFINAE checks below
+    template <typename F, typename ResultOf = boost::result_of<F> >
+    struct create_future
+    {
+        typedef lcos::future<typename ResultOf::type> type;
+    };
+#endif
+}}
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/preprocessed/async.hpp>
 #else
@@ -38,16 +56,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    namespace detail
-    {
-        // Defer the evaluation of result_of during the SFINAE checks below
-        template <typename F, typename ResultOf = boost::result_of<F> >
-        struct create_future
-        {
-            typedef lcos::future<typename ResultOf::type> type;
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.

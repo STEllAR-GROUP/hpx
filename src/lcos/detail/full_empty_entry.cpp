@@ -8,6 +8,7 @@
 #include <hpx/lcos/detail/full_empty_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
@@ -17,29 +18,34 @@ namespace hpx { namespace lcos { namespace detail
     // the counter data instance
     full_empty_counter_data full_empty_counter_data_;
 
-    boost::int64_t get_constructed_count()
+    boost::int64_t get_constructed_count(bool reset)
     {
-        return full_empty_counter_data_.constructed_;
+        return util::get_and_reset_value(
+            full_empty_counter_data_.constructed_, reset);
     }
 
-    boost::int64_t get_destructed_count()
+    boost::int64_t get_destructed_count(bool reset)
     {
-        return full_empty_counter_data_.destructed_;
+        return util::get_and_reset_value(
+            full_empty_counter_data_.destructed_, reset);
     }
 
-    boost::int64_t get_read_enqueued_count()
+    boost::int64_t get_read_enqueued_count(bool reset)
     {
-        return full_empty_counter_data_.read_enqueued_;
+        return util::get_and_reset_value(
+            full_empty_counter_data_.read_enqueued_, reset);
     }
 
-    boost::int64_t get_read_dequeued_count()
+    boost::int64_t get_read_dequeued_count(bool reset)
     {
-        return full_empty_counter_data_.read_dequeued_;
+        return util::get_and_reset_value(
+            full_empty_counter_data_.read_dequeued_, reset);
     }
 
-    boost::int64_t get_set_full_count()
+    boost::int64_t get_set_full_count(bool reset)
     {
-        return full_empty_counter_data_.set_full_;
+        return util::get_and_reset_value(
+            full_empty_counter_data_.set_full_, reset);
     }
 
     // call this to register all counter types for full_empty entries

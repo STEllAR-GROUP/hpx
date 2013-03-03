@@ -647,7 +647,7 @@
   real(kind=wp) etracer,ptracer(4)
     end subroutine pushi
     subroutine diagnosis(hpx4_bti,&
-             t_gids, p_gids,&
+             t_gids, p_gids,xnormal,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -758,6 +758,8 @@
   real(kind=wp),dimension(:),allocatable :: hfluxpsi
   real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
   real(kind=wp) etracer,ptracer(4)
+  
+  real(kind=wp) xnormal(mflux)
     end subroutine diagnosis
     subroutine shifti(hpx4_bti,&
              t_gids, p_gids,&
@@ -829,7 +831,7 @@
   integer  :: toroidal_domain_location,particle_domain_location
     end subroutine shifti
     subroutine collision(hpx4_bti,&
-             t_gids, p_gids,&
+             t_gids, p_gids,maxwell,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -860,6 +862,7 @@
   TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
   integer,dimension(:),allocatable :: t_gids
   integer,dimension(:),allocatable :: p_gids
+  real(kind=wp) maxwell(100001)
 !  global parameters
   integer :: ihistory,snapout,maxmpsi
   integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -910,7 +913,8 @@
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex& 
                   )
   !use global_parameters
   !use field_array
@@ -953,7 +957,13 @@
   integer  :: left_pe,right_pe
   integer  :: toroidal_domain_location,particle_domain_location
 
-  integer iflag,i,it,ij,j,k,n,iteration,mring,mindex,mtest,ierr
+  integer iflag
+
+  integer  :: mindex
+  integer,dimension(mgrid,mzeta) :: nindex
+  integer,dimension(mindex,mgrid,mzeta) :: indexp
+  real(kind=wp),dimension(mindex,mgrid,mzeta) :: ring
+
     end subroutine poisson
     subroutine pushe(icycle,irke,hpx4_bti,&
              t_gids, p_gids,&
@@ -1304,8 +1314,21 @@
   real(kind=wp),dimension(:,:,:),allocatable :: ptracked
   integer,dimension(:),allocatable :: ntrackp
 
+! Poisson thread safety
+  integer,dimension(:,:),allocatable :: nindex
+  integer,dimension(:,:,:),allocatable :: indexp
+  real(kind=wp),dimension(:,:,:),allocatable :: ring
+  integer  :: mindex
+
+! diagnosis thread safety
+  real(kind=wp) xnormal(mflux)
+
+! collision thread safety
+  real(kind=wp) maxwell(100001)
+
 ! local variables
   integer i
+  integer mring,mtest,nmem
 
   mype = hpx4_mype
   numberpe = hpx4_numberpe
@@ -1470,6 +1493,24 @@
               left_pe,right_pe,&
               toroidal_domain_location,particle_domain_location) ! }}}
 
+  ! Poisson thread safety {{{
+  ! For thread safety in poisson, allocate this now
+  ! number of gyro-ring
+  mring=2
+
+  ! number of summation: maximum is 32*mring+1
+  mindex=32*mring+1
+
+  allocate(indexp(mindex,mgrid,mzeta),ring(mindex,mgrid,mzeta),&
+          nindex(mgrid,mzeta),STAT=mtest)
+  if (mtest /= 0) then
+!   hjw
+    nmem = (2*(mindex*mgrid*mzeta))+(mgrid*mzeta)
+!   write(0,*)mype,'*** Cannot allocate indexp: mtest=',mtest
+    write(0,*)mype,'*** indexp: Allocate Error: ',nmem, ' words mtest= ',mtest
+  endif
+  ! }}}
+
 ! main time loop
   do istep=1,mstep
      if ( mype .eq. 0 ) print*,' step ', istep
@@ -1616,7 +1657,7 @@
 
         if(idiag==0)then
            call diagnosis(hpx4_bti,& ! {{{
-             t_gids, p_gids,&
+             t_gids, p_gids, xnormal, &
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -1698,7 +1739,7 @@
 ! collisions
         if(irk==2 .and. do_collision) then
           call collision(hpx4_bti,& ! {{{
-             t_gids, p_gids,&
+             t_gids, p_gids, maxwell,&
 ! global parameters
                        ihistory,snapout,maxmpsi,&
           mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
@@ -1815,7 +1856,6 @@
                  ) ! }}}
 
 ! solve GK Poisson equation using adiabatic electron
-#if 0
          call poisson(0,hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters
@@ -1845,9 +1885,9 @@
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex&
                   )   ! }}}
-#endif
 
         do ihybrid=1,nhybrid
 ! smooth potential
@@ -2136,7 +2176,6 @@
                  ) ! }}}
 
 ! solve GK Poisson equation using non-adiabatic electron
-#if 0
          call poisson(1,hpx4_bti,& ! {{{
              t_gids, p_gids,&
 ! global parameters
@@ -2166,9 +2205,9 @@
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex&
                   )   ! }}}
-#endif
         enddo
      enddo
 

@@ -175,13 +175,16 @@ namespace hpx { namespace performance_counters { namespace server
             boost::uint64_t parameter1, boost::uint64_t parameter2);
 
         /// Overloads from the base_counter base class.
-        hpx::performance_counters::counter_value get_counter_value();
+        hpx::performance_counters::counter_value
+            get_counter_value(bool reset = false);
 
         bool start();
 
         bool stop();
 
         void reset_counter_value();
+
+        void on_terminate() {}
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed

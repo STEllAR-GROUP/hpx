@@ -139,7 +139,7 @@ namespace hpx { namespace threads { namespace policies
             return num_thread;
         }
 
-        std::size_t get_num_stolen_threads() const
+        std::size_t get_num_stolen_threads(bool reset) const
         {
             return 0;
         }
@@ -349,35 +349,94 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
-            std::size_t num_thread = std::size_t(-1)) const
+            thread_priority priority = thread_priority_default,
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const
         {
             // Return thread count of one specific queue.
+            boost::int64_t result = 0;
             if (std::size_t(-1) != num_thread)
             {
                 BOOST_ASSERT(num_thread < queues_.size());
 
-                boost::int64_t result = 0;
-                if (num_thread < high_priority_queues_.size())
-                {
-                    result = high_priority_queues_[num_thread]->get_thread_count(state);
+                switch (priority) {
+                case thread_priority_default:
+                    {
+                        if (num_thread < high_priority_queues_.size())
+                            result = high_priority_queues_[num_thread]->get_thread_count(state);
+
+                        if (queues_.size()-1 == num_thread)
+                            result += low_priority_queue_.get_thread_count(state);
+
+                        return result + queues_[num_thread]->get_thread_count(state);
+                    }
+
+                case thread_priority_low:
+                    {
+                        if (queues_.size()-1 == num_thread)
+                            return low_priority_queue_.get_thread_count(state);
+                        break;
+                    }
+
+                case thread_priority_normal:
+                    return queues_[num_thread]->get_thread_count(state);
+
+                case thread_priority_critical:
+                    {
+                        if (num_thread < high_priority_queues_.size())
+                            return high_priority_queues_[num_thread]->get_thread_count(state);
+                        break;
+                    }
+
+                default:
+                case thread_priority_unknown:
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "local_periodic_priority_scheduler::get_thread_count",
+                            "unknown thread priority value (thread_priority_unknown)");
+                        return 0;
+                    }
                 }
-                if (queues_.size()-1 == num_thread)
-                {
-                    result += low_priority_queue_.get_thread_count(state);
-                }
-                return result + queues_[num_thread]->get_thread_count(state);
             }
 
             // Return the cumulative count for all queues.
-            boost::int64_t result = 0;
-            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
-                result += high_priority_queues_[i]->get_thread_count(state);
+            switch (priority) {
+            case thread_priority_default:
+                {
+                    for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                        result += high_priority_queues_[i]->get_thread_count(state);
 
-            result += low_priority_queue_.get_thread_count(state);
+                    result += low_priority_queue_.get_thread_count(state);
 
-            for (std::size_t i = 0; i < queues_.size(); ++i)
-                result += queues_[i]->get_thread_count(state);
+                    for (std::size_t i = 0; i < queues_.size(); ++i)
+                        result += queues_[i]->get_thread_count(state);
+                }
 
+            case thread_priority_low:
+                return low_priority_queue_.get_thread_count(state);
+
+            case thread_priority_normal:
+                {
+                    for (std::size_t i = 0; i < queues_.size(); ++i)
+                        result += queues_[i]->get_thread_count(state);
+                    break;
+                }
+
+            case thread_priority_critical:
+                {
+                    for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                        result += high_priority_queues_[i]->get_thread_count(state);
+                    break;
+                }
+
+            default:
+            case thread_priority_unknown:
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "local_periodic_priority_scheduler::get_thread_count",
+                        "unknown thread priority value (thread_priority_unknown)");
+                    return 0;
+                }
+            }
             return result;
         }
 

@@ -82,15 +82,15 @@ struct HPX_EXPORT symbol_namespace :
 
     public:
       // access current counter values
-      boost::int64_t get_bind_count() const;
-      boost::int64_t get_resolve_count() const;
-      boost::int64_t get_unbind_count() const;
-      boost::int64_t get_iterate_names_count() const;
+      boost::int64_t get_bind_count(bool);
+      boost::int64_t get_resolve_count(bool);
+      boost::int64_t get_unbind_count(bool);
+      boost::int64_t get_iterate_names_count(bool);
 
-      boost::int64_t get_bind_time() const;
-      boost::int64_t get_resolve_time() const;
-      boost::int64_t get_unbind_time() const;
-      boost::int64_t get_iterate_names_time() const;
+      boost::int64_t get_bind_time(bool);
+      boost::int64_t get_resolve_time(bool);
+      boost::int64_t get_unbind_time(bool);
+      boost::int64_t get_iterate_names_time(bool);
 
       // increment counter values
       void increment_bind_count();

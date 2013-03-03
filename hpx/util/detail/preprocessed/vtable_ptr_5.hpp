@@ -63,7 +63,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -101,12 +101,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+       
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -162,7 +172,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -200,12 +210,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -261,7 +281,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -299,12 +319,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -360,7 +390,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -398,12 +428,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -459,7 +499,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -497,12 +537,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -558,7 +608,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -596,12 +646,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -657,7 +717,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -695,12 +755,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -756,7 +826,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -794,12 +864,22 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
@@ -855,7 +935,7 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
@@ -893,9 +973,19 @@ namespace hpx { namespace util { namespace detail {
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
-        virtual base_type * get_ptr()
-        {
-            return Vtable::get_ptr();
-        }
     };
 }}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}

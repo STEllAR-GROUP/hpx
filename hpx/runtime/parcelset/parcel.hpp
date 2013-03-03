@@ -18,6 +18,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/binary_filter.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -193,6 +194,11 @@ namespace hpx { namespace parcelset
                 return action_->get_serialization_filter();
             }
 
+            policies::message_handler* get_message_handler() const
+            {
+                return action_->get_message_handler();
+            }
+
         private:
             friend std::ostream& operator<< (std::ostream& os, parcel_data const& req);
 
@@ -366,6 +372,11 @@ namespace hpx { namespace parcelset
         util::binary_filter* get_serialization_filter() const
         {
             return data_->get_serialization_filter();
+        }
+
+        policies::message_handler* get_message_handler() const
+        {
+            return data_->get_message_handler();
         }
 
         // generate unique parcel id

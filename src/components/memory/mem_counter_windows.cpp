@@ -15,7 +15,7 @@ namespace hpx { namespace performance_counters { namespace memory
 {
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
-    boost::uint64_t read_psm_vm()
+    boost::uint64_t read_psm_virtual(bool)
     {
         PROCESS_MEMORY_COUNTERS_EX pmc;
         std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));
@@ -35,7 +35,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 (LPTSTR) &buffer, 0, NULL))
             {
                 HPX_THROW_EXCEPTION(kernel_error,
-                    "hpx::performance_counters::memory::read_psm_vm",
+                    "hpx::performance_counters::memory::read_psm_virtual",
                     boost::str(boost::format("format message failed with %x (while "
                         "retrieving message for %x)") % GetLastError() % hr));
                 return boost::uint64_t(-1);
@@ -44,7 +44,7 @@ namespace hpx { namespace performance_counters { namespace memory
             std::string msg(static_cast<char*>(buffer));
             LocalFree(buffer);
             HPX_THROW_EXCEPTION(kernel_error,
-                "hpx::performance_counters::memory::read_psm_vm", msg);
+                "hpx::performance_counters::memory::read_psm_virtual", msg);
             return boost::uint64_t(-1);
         }
 
@@ -53,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
     ///////////////////////////////////////////////////////////////////////////
     // returns resident memory value
-    boost::uint64_t read_psm_resident()
+    boost::uint64_t read_psm_resident(bool)
     {
         PROCESS_MEMORY_COUNTERS_EX pmc;
         std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));

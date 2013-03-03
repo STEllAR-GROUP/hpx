@@ -161,6 +161,7 @@ namespace hpx { namespace threads
             backtrace_(0),
 #endif
             pool_(&pool),
+            priority_(init_data.priority),
             requested_interrupt_(false),
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
@@ -486,6 +487,15 @@ namespace hpx { namespace threads
         }
 #endif
 
+        thread_priority get_priority() const
+        {
+            return priority_;
+        }
+        void set_priority(thread_priority priority)
+        {
+            priority_ = priority;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Memory management
         static void* operator new(std::size_t size, pool_type&);
@@ -590,6 +600,8 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         pool_type* pool_;
+
+        thread_priority priority_;
 
         bool requested_interrupt_;
         bool enabled_interrupt_;

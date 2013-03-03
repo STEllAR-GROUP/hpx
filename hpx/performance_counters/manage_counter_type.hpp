@@ -112,7 +112,7 @@ namespace hpx { namespace performance_counters
     ///       have to register each counter type on every locality where a
     ///       corresponding performance counter will be created.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
-        HPX_STD_FUNCTION<boost::int64_t()> const& counter_value,
+        HPX_STD_FUNCTION<boost::int64_t(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
         error_code& ec = throws);
 

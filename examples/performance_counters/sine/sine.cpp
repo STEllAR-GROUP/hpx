@@ -26,7 +26,7 @@ namespace performance_counters { namespace sine
 {
     ///////////////////////////////////////////////////////////////////////////
     // This function will be invoked whenever the implicit counter is queried.
-    boost::int64_t immediate_sine()
+    boost::int64_t immediate_sine(bool reset)
     {
         static boost::uint64_t started_at =
             hpx::util::high_resolution_clock::now();

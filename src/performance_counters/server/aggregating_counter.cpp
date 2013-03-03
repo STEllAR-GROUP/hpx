@@ -32,6 +32,7 @@ namespace hpx { namespace performance_counters { namespace server
             boost::uint64_t parameter1, boost::uint64_t parameter2)
       : base_type_holder(info),
         timer_(boost::bind(&aggregating_counter::evaluate, this_()),
+            boost::bind(&aggregating_counter::on_terminate, this_()),
             1000 * parameter1, info.fullname_, true),
         base_counter_name_(ensure_counter_prefix(base_counter_name)),
         value_(detail::counter_type_from_statistic<Statistic>::create(parameter2)),
@@ -52,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace server
 
     template <typename Statistic>
     hpx::performance_counters::counter_value
-        aggregating_counter<Statistic>::get_counter_value()
+        aggregating_counter<Statistic>::get_counter_value(bool reset)
     {
         mutex_type::scoped_lock l(mtx_);
 
@@ -64,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace server
         prev_value_.count_ = ++invocation_count_;
         value = prev_value_;                              // return value
 
-        if (detail::counter_type_from_statistic<Statistic>::need_reset::value)
+        if (reset || detail::counter_type_from_statistic<Statistic>::need_reset::value)
         {
             value_.reset(detail::counter_type_from_statistic<Statistic>::create(
                 parameter2_)); // reset accumulator

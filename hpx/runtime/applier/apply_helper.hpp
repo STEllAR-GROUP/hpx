@@ -19,6 +19,16 @@
 namespace hpx { namespace applier { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    inline threads::thread_priority
+        fix_priority(threads::thread_priority priority)
+    {
+        return hpx::actions::detail::thread_priority<
+            static_cast<threads::thread_priority>(traits::action_priority<Action>::value)
+        >::call(priority);
+    }
+
+    ///////////////////////////////////////////////////////////////////////
     template <typename Action,
         typename DirectExecute = typename Action::direct_execution>
     struct apply_helper;
@@ -35,7 +45,7 @@ namespace hpx { namespace applier { namespace detail
                 boost::move(Action::construct_thread_function(
                     lva, boost::forward<Arguments>(args))),
                 actions::detail::get_action_name<Action>(), lva,
-                threads::pending, priority, std::size_t(-1), 
+                threads::pending, fix_priority<Action>(priority), std::size_t(-1),
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
         }
@@ -49,7 +59,7 @@ namespace hpx { namespace applier { namespace detail
                 boost::move(Action::construct_thread_function(c, lva,
                     boost::forward<Arguments>(args))),
                 actions::detail::get_action_name<Action>(), lva,
-                threads::pending, priority, std::size_t(-1), 
+                threads::pending, fix_priority<Action>(priority), std::size_t(-1),
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
         }

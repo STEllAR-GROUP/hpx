@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2011-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,8 +58,8 @@ addressing_service::addressing_service(
 naming::locality const& addressing_service::get_here() const
 {
     if (!here_) {
-        BOOST_ASSERT(get_runtime_ptr() && 
-            get_runtime().get_state() >= runtime::state_initialized && 
+        BOOST_ASSERT(get_runtime_ptr() &&
+            get_runtime().get_state() >= runtime::state_initialized &&
             get_runtime().get_state() < runtime::state_stopped);
         here_ = get_runtime().here();
     }
@@ -150,10 +150,10 @@ void addressing_service::adjust_local_cache_size()
 //     {
 //         util::runtime_configuration const& cfg = get_runtime().get_config();
 //         std::size_t local_cache_size = cfg.get_agas_local_cache_size();
-//         std::size_t local_cache_size_per_thread = 
+//         std::size_t local_cache_size_per_thread =
 //             cfg.get_agas_local_cache_size_per_thread();
-// 
-//         gva_cache_.reserve((std::max)(local_cache_size, 
+//
+//         gva_cache_.reserve((std::max)(local_cache_size,
 //             local_cache_size_per_thread * get_num_overall_threads()));
 //     }
 } // }}}
@@ -413,7 +413,7 @@ bool addressing_service::get_localities(
     }
 } // }}}
 
-lcos::future<std::vector<naming::locality> > 
+lcos::future<std::vector<naming::locality> >
     addressing_service::get_resolved_localities_async()
 { // {{{ get_locality_ids implementation
     naming::id_type const target = bootstrap_primary_namespace_id();
@@ -729,8 +729,8 @@ bool addressing_service::get_id_range(
 
             checkout_promise_type cf(hosted->promise_pool_, f);
             if (0 == f) {
-                HPX_THROWS_IF(ec, invalid_status, 
-                    "addressing_service::get_id_range", 
+                HPX_THROWS_IF(ec, invalid_status,
+                    "addressing_service::get_id_range",
                     "could not check out future object instance during bootstrap");
                 return false;
             }
@@ -813,8 +813,8 @@ bool addressing_service::bind_range(
 
             checkout_promise_type cf(hosted->promise_pool_, f);
             if (0 == f) {
-                HPX_THROWS_IF(ec, invalid_status, 
-                    "addressing_service::bind_range", 
+                HPX_THROWS_IF(ec, invalid_status,
+                    "addressing_service::bind_range",
                     "could not check out future object instance during bootstrap");
                 return false;
             }
@@ -1420,11 +1420,11 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-static void correct_credit_on_failure(future<bool> f, naming::id_type id, 
+static void correct_credit_on_failure(future<bool> f, naming::id_type id,
     boost::uint16_t mutable_gid_credit, boost::uint16_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
-    if (f.has_exception() && mutable_gid_credit != 0) 
+    if (f.has_exception() && mutable_gid_credit != 0)
         naming::detail::add_credit_to_gid(id.get_gid(), new_gid_credit);
 }
 
@@ -1463,7 +1463,7 @@ lcos::future<bool> addressing_service::register_name_async(
     using HPX_STD_PLACEHOLDERS::_1;
     f.then(
         HPX_STD_BIND(correct_credit_on_failure, _1, id,
-            naming::detail::get_credit_from_gid(mutable_gid), 
+            naming::detail::get_credit_from_gid(mutable_gid),
             naming::detail::get_credit_from_gid(new_gid))
     );
     return f;
@@ -1848,42 +1848,42 @@ bool addressing_service::retrieve_statistics_counter(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
-std::size_t addressing_service::get_cache_hits() const
+std::size_t addressing_service::get_cache_hits(bool reset)
 {
     mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().hits();
+    return gva_cache_.get_statistics().hits(reset);
 }
 
-std::size_t addressing_service::get_cache_misses() const
+std::size_t addressing_service::get_cache_misses(bool reset)
 {
     mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().misses();
+    return gva_cache_.get_statistics().misses(reset);
 }
 
-std::size_t addressing_service::get_cache_evictions() const
+std::size_t addressing_service::get_cache_evictions(bool reset)
 {
     mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().evictions();
+    return gva_cache_.get_statistics().evictions(reset);
 }
 
-std::size_t addressing_service::get_cache_insertions() const
+std::size_t addressing_service::get_cache_insertions(bool reset)
 {
     mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().insertions();
+    return gva_cache_.get_statistics().insertions(reset);
 }
 
 /// Install performance counter types exposing properties from the local cache.
 void addressing_service::register_counter_types()
 { // {{{
     // install
-    HPX_STD_FUNCTION<boost::int64_t()> cache_hits(
-        boost::bind(&addressing_service::get_cache_hits, this));
-    HPX_STD_FUNCTION<boost::int64_t()> cache_misses(
-        boost::bind(&addressing_service::get_cache_misses, this));
-    HPX_STD_FUNCTION<boost::int64_t()> cache_evictions(
-        boost::bind(&addressing_service::get_cache_evictions, this));
-    HPX_STD_FUNCTION<boost::int64_t()> cache_insertions(
-        boost::bind(&addressing_service::get_cache_insertions, this));
+    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_hits(
+        boost::bind(&addressing_service::get_cache_hits, this, ::_1));
+    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_misses(
+        boost::bind(&addressing_service::get_cache_misses, this, ::_1));
+    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_evictions(
+        boost::bind(&addressing_service::get_cache_evictions, this, ::_1));
+    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insertions(
+        boost::bind(&addressing_service::get_cache_insertions, this, ::_1));
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {

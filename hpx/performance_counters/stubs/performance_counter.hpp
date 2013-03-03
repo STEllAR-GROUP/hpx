@@ -19,27 +19,31 @@ namespace hpx { namespace performance_counters { namespace stubs
         static lcos::future<counter_info> get_info_async(
             naming::id_type const& targetid);
         static lcos::future<counter_value> get_value_async(
-            naming::id_type const& targetid);
+            naming::id_type const& targetid, bool reset = false);
 
         static counter_info get_info(naming::id_type const& targetid,
             error_code& ec = throws);
         static counter_value get_value(naming::id_type const& targetid,
-            error_code& ec = throws);
+            bool reset = false, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<bool> start_async(naming::id_type const& targetid);
         static lcos::future<bool> stop_async(naming::id_type const& targetid);
+        static lcos::future<void> reset_async(naming::id_type const& targetid);
 
         static bool start(naming::id_type const& targetid,
             error_code& ec = throws);
         static bool stop(naming::id_type const& targetid,
             error_code& ec = throws);
+        static void reset(naming::id_type const& targetid,
+            error_code& ec = throws);
 
         template <typename T>
         static T
-        get_typed_value(naming::id_type const& targetid, error_code& ec = throws)
+        get_typed_value(naming::id_type const& targetid, bool reset = false,
+            error_code& ec = throws)
         {
-            counter_value value = get_value(targetid);
+            counter_value value = get_value(targetid, reset);
             return value.get_value<T>(ec);
         }
     };

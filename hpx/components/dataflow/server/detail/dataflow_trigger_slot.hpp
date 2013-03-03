@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             , slot(s)
         {
         }
-        
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             dataflow_sink->set_slot(
@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                   , slot
                 );
         }
-        
+
         void connect_()
         {
             BOOST_ASSERT(get_gid());

@@ -9,6 +9,8 @@
 
 namespace hpx { namespace util { namespace detail {
 
+    struct vtable_ptr_virtbase;
+
     template <
         typename Sig
       , typename IArchive

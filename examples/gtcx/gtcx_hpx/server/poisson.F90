@@ -27,7 +27,8 @@ subroutine poisson(iflag,hpx4_bti,&
               partd_comm,nproc_partd,myrank_partd,&
               toroidal_comm,nproc_toroidal,myrank_toroidal,&
               left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location&
+              toroidal_domain_location,particle_domain_location,&
+              nindex,indexp,ring,mindex&
                   )
   !use global_parameters
   !use field_array
@@ -130,10 +131,18 @@ subroutine poisson(iflag,hpx4_bti,&
   integer  :: left_pe,right_pe
   integer  :: toroidal_domain_location,particle_domain_location
 
-  integer iflag,i,it,ij,j,k,n,iteration,mring,mindex,mtest,ierr
-  integer,dimension(:,:),allocatable :: nindex
-  integer,dimension(:,:,:),allocatable :: indexp
-  real(kind=wp),dimension(:,:,:),allocatable :: ring
+! Poisson thread safety
+  integer  :: mindex
+  integer,dimension(mgrid,mzeta) :: nindex
+  integer,dimension(mindex,mgrid,mzeta) :: indexp
+  real(kind=wp),dimension(mindex,mgrid,mzeta) :: ring
+
+
+! Local variables
+  integer iflag,i,it,ij,j,k,n,iteration,mring,mtest,ierr
+!  integer,dimension(:,:),allocatable :: nindex
+!  integer,dimension(:,:,:),allocatable :: indexp
+!  real(kind=wp),dimension(:,:,:),allocatable :: ring
   real(kind=wp) gamma,tmp,prms,perr(mgrid)
   real(kind=wp) ptilde(mgrid),phitmp(mgrid),dentmp(mgrid)
 
@@ -143,13 +152,13 @@ subroutine poisson(iflag,hpx4_bti,&
   integer :: nmem
 ! hjw
 
-  save nindex,indexp,ring
+!  save nindex,indexp,ring
 
 ! number of gyro-ring
   mring=2
 
 ! number of summation: maximum is 32*mring+1
-  mindex=32*mring+1
+  !mindex=32*mring+1
 !  mindex=53
 
 ! gamma=0.75: max. resolution for k=0.577
@@ -158,17 +167,16 @@ subroutine poisson(iflag,hpx4_bti,&
 
 ! initialize poisson solver
   if(istep==1 .and. irk==1 .and. iflag==0)then
-     allocate(indexp(mindex,mgrid,mzeta),ring(mindex,mgrid,mzeta),&
-          nindex(mgrid,mzeta),STAT=mtest)
-     if (mtest /= 0) then
-! hjw
-     nmem = (2*(mindex*mgrid*mzeta))+(mgrid*mzeta)
-!     write(0,*)mype,'*** Cannot allocate indexp: mtest=',mtest
-      write(0,*)mype,'*** indexp: Allocate Error: ',nmem, ' words mtest= ',mtest
-! hjw
-        !call MPI_ABORT(MPI_COMM_WORLD,1,ierr)
-     endif
-
+!     allocate(indexp(mindex,mgrid,mzeta),ring(mindex,mgrid,mzeta),&
+!          nindex(mgrid,mzeta),STAT=mtest)
+!     if (mtest /= 0) then
+!! hjw
+!     nmem = (2*(mindex*mgrid*mzeta))+(mgrid*mzeta)
+!!     write(0,*)mype,'*** Cannot allocate indexp: mtest=',mtest
+!      write(0,*)mype,'*** indexp: Allocate Error: ',nmem, ' words mtest= ',mtest
+!! hjw
+!        !call MPI_ABORT(MPI_COMM_WORLD,1,ierr)
+!     endif
 
 ! initialize
      call poisson_initial(mring,mindex,nindex,indexp,ring,&

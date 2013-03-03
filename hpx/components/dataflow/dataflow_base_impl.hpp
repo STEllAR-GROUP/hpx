@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         friend class boost::serialization::access;
-        
+
         boost::detail::atomic_count count_;
 
         template <typename Archive>
@@ -56,10 +56,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             naming::id_type id;
             ar & id;
-
-            lcos::promise<naming::id_type, naming::gid_type> p;
-            p.set_local_data(id);
-            gid_promise = p.get_future();
+            gid_promise = lcos::make_future(id);
         }
 
         template <typename Archive>
@@ -70,16 +67,16 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-    
-    friend void intrusive_ptr_add_ref(dataflow_base_impl * p)
-    {
-        ++p->count_;
-    }
-    friend void intrusive_ptr_release(dataflow_base_impl * p)
-    {
-        if (0 == --p->count_)
-            delete p;
-    }
+
+        friend void intrusive_ptr_add_ref(dataflow_base_impl * p)
+        {
+            ++p->count_;
+        }
+        friend void intrusive_ptr_release(dataflow_base_impl * p)
+        {
+            if (0 == --p->count_)
+                delete p;
+        }
     };
 }}}
 

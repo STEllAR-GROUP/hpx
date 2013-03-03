@@ -57,7 +57,7 @@ int hpx_main(variables_map& vm)
 
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        event e; 
+        event e;
 
         boost::atomic<std::size_t> c(0);
 
@@ -67,10 +67,12 @@ int hpx_main(variables_map& vm)
                 (&local_event_test, boost::ref(e), boost::ref(c)));
 
         // Release all the threads.
-        e.set(); 
+        e.set();
 
-        // Wait for all the our threads to finish executing. 
-        do { suspend(); } while (get_thread_count() > 1);
+        // Wait for all the our threads to finish executing.
+        do {
+            suspend();
+        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
 
         HPX_TEST_EQ(pxthreads, c);
 

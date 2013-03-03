@@ -26,7 +26,11 @@ namespace hpx { namespace util
     {
     public:
         interval_timer();
-        interval_timer(HPX_STD_FUNCTION<bool()> const& f, boost::int64_t microsecs,
+        interval_timer(HPX_STD_FUNCTION<bool()> const& f,
+            boost::int64_t microsecs, std::string const& description, 
+            bool pre_shutdown = false);
+        interval_timer(HPX_STD_FUNCTION<bool()> const& f,
+            HPX_STD_FUNCTION<void()> const& on_term, boost::int64_t microsecs,
                 std::string const& description, bool pre_shutdown = false);
         ~interval_timer();
 
@@ -53,6 +57,7 @@ namespace hpx { namespace util
 
         mutable mutex_type mtx_;
         HPX_STD_FUNCTION<bool()> f_;  ///< function to call
+        HPX_STD_FUNCTION<void()> on_term_;  ///< function to call on termination
         boost::int64_t microsecs_;       ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer

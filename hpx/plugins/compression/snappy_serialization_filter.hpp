@@ -7,6 +7,8 @@
 #define HPX_ACTION_SNAPPY_SERIALIZATION_FILTER_FEB_21_2013_0203PM
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_COMPRESSION_SNAPPY)
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -24,11 +26,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace compression
 {
-    struct HPX_LIBRARY_EXPORT snappy_serialization_filter 
+    struct HPX_LIBRARY_EXPORT snappy_serialization_filter
       : public util::binary_filter
     {
         snappy_serialization_filter(bool compress = false)
-          : compress_(compress), current_(0)
+          : current_(0), compress_(compress)
         {}
         ~snappy_serialization_filter();
 
@@ -37,7 +39,7 @@ namespace hpx { namespace plugins { namespace compression
         bool flush(void* dst, std::size_t dst_count, std::size_t& written);
 
         void set_max_compression_length(std::size_t size);
-        std::size_t init_decompression_data(char const* buffer, 
+        std::size_t init_decompression_data(char const* buffer,
             std::size_t size, std::size_t decompressed_size);
 
         /// serialization support
@@ -78,5 +80,11 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         };                                                                    \
     }}                                                                        \
 /**/
+
+#else
+
+#define HPX_ACTION_USES_SNAPPY_COMPRESSION(action)
+
+#endif
 
 #endif

@@ -571,6 +571,11 @@ namespace hpx { namespace performance_counters
         naming::gid_type create_raw_counter(counter_info const&,
             HPX_STD_FUNCTION<boost::int64_t()> const&, error_code&);
 
+        // Helper function for creating counters encapsulating a function
+        // returning the counter value.
+        naming::gid_type create_raw_counter(counter_info const&,
+            HPX_STD_FUNCTION<boost::int64_t(bool)> const&, error_code&);
+
         // Helper function for creating a new performance counter instance
         // based on a given counter value.
         naming::gid_type create_raw_counter_value(counter_info const&,

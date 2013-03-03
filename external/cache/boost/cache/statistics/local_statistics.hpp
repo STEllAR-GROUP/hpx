@@ -17,10 +17,30 @@ namespace boost { namespace cache { namespace statistics
           : hits_(0), misses_(0), insertions_(0), evictions_(0)
         {}
 
-        std::size_t hits() const { return hits_; }
-        std::size_t misses() const { return misses_; }
-        std::size_t insertions() const { return insertions_; }
-        std::size_t evictions() const { return evictions_; }
+        std::size_t get_and_reset(std::size_t & value, bool reset)
+        {
+            std::size_t result = value;
+            if (reset)
+                value = 0;
+            return result;
+        }
+
+        std::size_t hits(bool reset = false)
+        {
+            return get_and_reset(hits_, reset);
+        }
+        std::size_t misses(bool reset = false)
+        {
+            return get_and_reset(misses_, reset);
+        }
+        std::size_t insertions(bool reset = false)
+        {
+            return get_and_reset(insertions_, reset);
+        }
+        std::size_t evictions(bool reset = false)
+        {
+            return get_and_reset(evictions_, reset);
+        }
 
         /// \brief  The function \a got_hit will be called by a cache instance
         ///         whenever a entry got touched.

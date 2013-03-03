@@ -7,6 +7,9 @@
 #define HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_COMPRESSION_ZLIB)
+
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -59,11 +62,7 @@ namespace hpx { namespace plugins { namespace compression
     {
         zlib_serialization_filter(bool compress = false)
           : compdecomp_(compress), current_(0)
-        {
-            // The zlib serialization filter does not support the mode 
-            // 'favour_memorysize'.
-            BOOST_ASSERT(m == binary_filter::favor_speed);
-        }
+        {}
         ~zlib_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);
@@ -116,5 +115,11 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         };                                                                    \
     }}                                                                        \
 /**/
+
+#else
+
+#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)
+
+#endif
 
 #endif
