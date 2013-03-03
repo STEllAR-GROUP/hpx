@@ -430,7 +430,7 @@ namespace hpx { namespace actions
         void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         typename Derived>
     struct BOOST_PP_CAT(action, N) HPX_SPECIALIZE((<Component,
-            BOOST_PP_ENUM_PARAMS(N, T) F, Derived>))
+            BOOST_PP_ENUM_PARAMS(N, T), F, Derived>))
       : BOOST_PP_CAT(base_action, N)<
             Component, BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<

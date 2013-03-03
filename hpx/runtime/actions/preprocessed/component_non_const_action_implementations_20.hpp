@@ -322,7 +322,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0),
         typename Derived>
     struct action1 HPX_SPECIALIZE((<Component,
-            T0 F, Derived>))
+            T0, F, Derived>))
       : base_action1<
             Component, T0, F,
             typename detail::action_type<
@@ -758,7 +758,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1),
         typename Derived>
     struct action2 HPX_SPECIALIZE((<Component,
-            T0 , T1 F, Derived>))
+            T0 , T1, F, Derived>))
       : base_action2<
             Component, T0 , T1, F,
             typename detail::action_type<
@@ -1194,7 +1194,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2),
         typename Derived>
     struct action3 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 F, Derived>))
+            T0 , T1 , T2, F, Derived>))
       : base_action3<
             Component, T0 , T1 , T2, F,
             typename detail::action_type<
@@ -1630,7 +1630,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3),
         typename Derived>
     struct action4 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 F, Derived>))
+            T0 , T1 , T2 , T3, F, Derived>))
       : base_action4<
             Component, T0 , T1 , T2 , T3, F,
             typename detail::action_type<
@@ -2066,7 +2066,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4),
         typename Derived>
     struct action5 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 F, Derived>))
+            T0 , T1 , T2 , T3 , T4, F, Derived>))
       : base_action5<
             Component, T0 , T1 , T2 , T3 , T4, F,
             typename detail::action_type<
@@ -2502,7 +2502,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5),
         typename Derived>
     struct action6 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
       : base_action6<
             Component, T0 , T1 , T2 , T3 , T4 , T5, F,
             typename detail::action_type<
@@ -2938,7 +2938,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
         typename Derived>
     struct action7 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
       : base_action7<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6, F,
             typename detail::action_type<
@@ -3374,7 +3374,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
         typename Derived>
     struct action8 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
       : base_action8<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F,
             typename detail::action_type<
@@ -3810,7 +3810,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
         typename Derived>
     struct action9 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
       : base_action9<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F,
             typename detail::action_type<
@@ -4246,7 +4246,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
         typename Derived>
     struct action10 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
       : base_action10<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F,
             typename detail::action_type<
@@ -4682,7 +4682,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10),
         typename Derived>
     struct action11 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10, F, Derived>))
       : base_action11<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10, F,
             typename detail::action_type<
@@ -5118,7 +5118,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11),
         typename Derived>
     struct action12 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11, F, Derived>))
       : base_action12<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11, F,
             typename detail::action_type<
@@ -5554,7 +5554,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12),
         typename Derived>
     struct action13 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12, F, Derived>))
       : base_action13<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12, F,
             typename detail::action_type<
@@ -5990,7 +5990,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13),
         typename Derived>
     struct action14 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13, F, Derived>))
       : base_action14<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13, F,
             typename detail::action_type<
@@ -6426,7 +6426,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14),
         typename Derived>
     struct action15 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14, F, Derived>))
       : base_action15<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14, F,
             typename detail::action_type<
@@ -6862,7 +6862,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15),
         typename Derived>
     struct action16 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15, F, Derived>))
       : base_action16<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15, F,
             typename detail::action_type<
@@ -7298,7 +7298,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16),
         typename Derived>
     struct action17 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16, F, Derived>))
       : base_action17<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16, F,
             typename detail::action_type<
@@ -7734,7 +7734,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17),
         typename Derived>
     struct action18 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17, F, Derived>))
       : base_action18<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17, F,
             typename detail::action_type<
@@ -8170,7 +8170,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18),
         typename Derived>
     struct action19 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18, F, Derived>))
       : base_action19<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18, F,
             typename detail::action_type<
@@ -8606,7 +8606,7 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19),
         typename Derived>
     struct action20 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 F, Derived>))
+            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19, F, Derived>))
       : base_action20<
             Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19, F,
             typename detail::action_type<

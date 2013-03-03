@@ -282,7 +282,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0,
         void (Component::*F)(T0) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action1<Component const,
             T0, F, Derived>
       : base_action1<
@@ -606,7 +606,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action2<Component const,
             T0 , T1, F, Derived>
       : base_action2<
@@ -930,7 +930,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action3<Component const,
             T0 , T1 , T2, F, Derived>
       : base_action3<
@@ -1254,7 +1254,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action4<Component const,
             T0 , T1 , T2 , T3, F, Derived>
       : base_action4<
@@ -1578,7 +1578,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action5<Component const,
             T0 , T1 , T2 , T3 , T4, F, Derived>
       : base_action5<
@@ -1902,7 +1902,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action6<Component const,
             T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
       : base_action6<
@@ -2226,7 +2226,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action7<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
       : base_action7<
@@ -2550,7 +2550,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action8<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
       : base_action8<
@@ -2874,7 +2874,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action9<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
       : base_action9<
@@ -3198,7 +3198,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action10<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
       : base_action10<
@@ -3522,7 +3522,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action11<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10, F, Derived>
       : base_action11<
@@ -3846,7 +3846,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action12<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11, F, Derived>
       : base_action12<
@@ -4170,7 +4170,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action13<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12, F, Derived>
       : base_action13<
@@ -4494,7 +4494,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action14<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13, F, Derived>
       : base_action14<
@@ -4818,7 +4818,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action15<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14, F, Derived>
       : base_action15<
@@ -5142,7 +5142,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action16<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15, F, Derived>
       : base_action16<
@@ -5466,7 +5466,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action17<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16, F, Derived>
       : base_action17<
@@ -5790,7 +5790,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action18<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17, F, Derived>
       : base_action18<
@@ -6114,7 +6114,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action19<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18, F, Derived>
       : base_action19<
@@ -6438,7 +6438,7 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19) const,
-        typename Derived = detail::this_type>
+        typename Derived>
     struct direct_action20<Component const,
             T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19, F, Derived>
       : base_action20<
