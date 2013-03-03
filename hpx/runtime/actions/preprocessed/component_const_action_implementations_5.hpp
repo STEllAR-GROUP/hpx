@@ -45,12 +45,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing component action("
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
-                                    (get_lva<Component>::call(lva)) << ")";
+                                    (get_lva<Component const>::call(lva)) << ")";
                     
                     
                     
                     
-                    (get_lva<Component>::call(lva)->*F)(
+                    (get_lva<Component const>::call(lva)->*F)(
                         boost::move(arg0));
                 }
                 catch (hpx::exception const& e) {
@@ -59,7 +59,7 @@ namespace hpx { namespace actions
                             << "Unhandled exception while executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                                (get_lva<Component const>::call(lva)) << "): " << e.what();
                         
                         hpx::report_error(boost::current_exception());
                     }
@@ -97,7 +97,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -115,7 +115,7 @@ namespace hpx { namespace actions
             T0, F,
             typename detail::action_type<
                 result_action1<
-                    Component, Result, T0, F>,
+                    Component const, Result, T0, F>,
                 Derived
             >::type>
     {
@@ -254,7 +254,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -369,12 +369,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing component action("
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
-                                    (get_lva<Component>::call(lva)) << ")";
+                                    (get_lva<Component const>::call(lva)) << ")";
                     
                     
                     
                     
-                    (get_lva<Component>::call(lva)->*F)(
+                    (get_lva<Component const>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1));
                 }
                 catch (hpx::exception const& e) {
@@ -383,7 +383,7 @@ namespace hpx { namespace actions
                             << "Unhandled exception while executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                                (get_lva<Component const>::call(lva)) << "): " << e.what();
                         
                         hpx::report_error(boost::current_exception());
                     }
@@ -421,7 +421,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -439,7 +439,7 @@ namespace hpx { namespace actions
             T0 , T1, F,
             typename detail::action_type<
                 result_action2<
-                    Component, Result, T0 , T1, F>,
+                    Component const, Result, T0 , T1, F>,
                 Derived
             >::type>
     {
@@ -578,7 +578,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -693,12 +693,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing component action("
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
-                                    (get_lva<Component>::call(lva)) << ")";
+                                    (get_lva<Component const>::call(lva)) << ")";
                     
                     
                     
                     
-                    (get_lva<Component>::call(lva)->*F)(
+                    (get_lva<Component const>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
                 }
                 catch (hpx::exception const& e) {
@@ -707,7 +707,7 @@ namespace hpx { namespace actions
                             << "Unhandled exception while executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                                (get_lva<Component const>::call(lva)) << "): " << e.what();
                         
                         hpx::report_error(boost::current_exception());
                     }
@@ -745,7 +745,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -763,7 +763,7 @@ namespace hpx { namespace actions
             T0 , T1 , T2, F,
             typename detail::action_type<
                 result_action3<
-                    Component, Result, T0 , T1 , T2, F>,
+                    Component const, Result, T0 , T1 , T2, F>,
                 Derived
             >::type>
     {
@@ -902,7 +902,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -1017,12 +1017,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing component action("
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
-                                    (get_lva<Component>::call(lva)) << ")";
+                                    (get_lva<Component const>::call(lva)) << ")";
                     
                     
                     
                     
-                    (get_lva<Component>::call(lva)->*F)(
+                    (get_lva<Component const>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
                 }
                 catch (hpx::exception const& e) {
@@ -1031,7 +1031,7 @@ namespace hpx { namespace actions
                             << "Unhandled exception while executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                                (get_lva<Component const>::call(lva)) << "): " << e.what();
                         
                         hpx::report_error(boost::current_exception());
                     }
@@ -1069,7 +1069,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -1087,7 +1087,7 @@ namespace hpx { namespace actions
             T0 , T1 , T2 , T3, F,
             typename detail::action_type<
                 result_action4<
-                    Component, Result, T0 , T1 , T2 , T3, F>,
+                    Component const, Result, T0 , T1 , T2 , T3, F>,
                 Derived
             >::type>
     {
@@ -1226,7 +1226,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -1341,12 +1341,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing component action("
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
-                                    (get_lva<Component>::call(lva)) << ")";
+                                    (get_lva<Component const>::call(lva)) << ")";
                     
                     
                     
                     
-                    (get_lva<Component>::call(lva)->*F)(
+                    (get_lva<Component const>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
                 }
                 catch (hpx::exception const& e) {
@@ -1355,7 +1355,7 @@ namespace hpx { namespace actions
                             << "Unhandled exception while executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                                (get_lva<Component const>::call(lva)) << "): " << e.what();
                         
                         hpx::report_error(boost::current_exception());
                     }
@@ -1393,7 +1393,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -1411,7 +1411,7 @@ namespace hpx { namespace actions
             T0 , T1 , T2 , T3 , T4, F,
             typename detail::action_type<
                 result_action5<
-                    Component, Result, T0 , T1 , T2 , T3 , T4, F>,
+                    Component const, Result, T0 , T1 , T2 , T3 , T4, F>,
                 Derived
             >::type>
     {
@@ -1550,7 +1550,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };

@@ -92,12 +92,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing component action("
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
-                                    (get_lva<Component>::call(lva)) << ")";
+                                    (get_lva<Component const>::call(lva)) << ")";
                     // The arguments are moved here. This function is called from a
                     // bound functor. In order to do true perfect forwarding in an
                     // asynchronous operation. These bound variables must be moved
                     // out of the bound object.
-                    (get_lva<Component>::call(lva)->*F)(
+                    (get_lva<Component const>::call(lva)->*F)(
                         HPX_ENUM_MOVE_ARGS(N, arg));
                 }
                 catch (hpx::exception const& e) {
@@ -106,7 +106,7 @@ namespace hpx { namespace actions
                             << "Unhandled exception while executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                                (get_lva<Component const>::call(lva)) << "): " << e.what();
 
                         // report this error to the console in any case
                         hpx::report_error(boost::current_exception());
@@ -149,7 +149,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
@@ -168,7 +168,7 @@ namespace hpx { namespace actions
             BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(result_action, N)<
-                    Component, Result, BOOST_PP_ENUM_PARAMS(N, T), F>,
+                    Component const, Result, BOOST_PP_ENUM_PARAMS(N, T), F>,
                 Derived
             >::type>
     {
@@ -320,7 +320,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
+                        cont, F, get_lva<Component const>::call(lva),
                         boost::forward<Arguments>(args)), lva));
         }
     };
