@@ -28,7 +28,7 @@
 
 namespace hpx { namespace detail
 {
-#if !defined(BOOST_MSVC)
+#if defined(__clang__)
     template <typename F, typename Result = typename boost::result_of<F>::type>
     struct create_future
     {
