@@ -22,6 +22,7 @@
 
 #include <boost/detail/workaround.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/utility/result_of.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/cat.hpp>
