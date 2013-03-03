@@ -50,12 +50,16 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         hpxla
        )
   endif()
-endif()
-
-if(${BOOST_MINOR_VERSION} GREATER 46)
+  if(${GCC_VERSION} GREATER 040699 AND ${BOOST_MINOR_VERSION} GREATER 46)
+    set(subdirs ${subdirs}
+        geometry
+        )
+  endif()
+else()
   set(subdirs ${subdirs}
+      hpxla
       geometry
-     )
+      )
 endif()
 
 foreach(subdir ${subdirs})
