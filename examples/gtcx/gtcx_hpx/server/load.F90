@@ -51,6 +51,7 @@ subroutine load(&
            etracer,ptracer &
                )
   use precision
+  use rngdef
   implicit none
   interface ! {{{
     subroutine restart_write(&
@@ -193,18 +194,20 @@ subroutine load(&
       real(kind=wp),dimension(:,:,:),allocatable :: ptracked
       integer,dimension(:),allocatable :: ntrackp
     end subroutine tag_particles
-    subroutine set_random_zion(mi,rng_control,zion)
+    subroutine set_random_zion(mi,rng_control,zion,state)
       use precision
       use rng
       implicit none
       integer mi,rng_control
+      type(rng_state) :: state
       real(kind=wp),dimension(:,:),allocatable :: zion
     end subroutine set_random_zion
-    subroutine rand_num_gen_init(rng_control,mype,irun,stdout)
+    subroutine rand_num_gen_init(rng_control,mype,irun,stdout,state)
       use precision
       use rng
       implicit none
       integer mype,rng_control,irun,stdout
+      type(rng_state) :: state
     end subroutine rand_num_gen_init
   end interface ! }}}
 
@@ -264,6 +267,8 @@ subroutine load(&
    real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
    real(kind=wp) etracer,ptracer(4)
 
+! local variables
+  type(rng_state) :: state
   integer i,m,ierr
   real(kind=wp) :: c0=2.515517,c1=0.802853,c2=0.010328,&
               d1=1.432788,d2=0.189269,d3=0.001308
@@ -271,7 +276,7 @@ subroutine load(&
               vthi,cost,b,upara,eperp,cmratio,z4tmp
 
 ! Initialize random number generator
-  call rand_num_gen_init(rng_control,mype,irun,stdout)
+  call rand_num_gen_init(rng_control,mype,irun,stdout,state)
 
 ! restart from previous runs
   if(irun /= 0)then
@@ -367,7 +372,7 @@ subroutine load(&
                                       ntrackp)
 
 ! Set zion(2:6,1:mi) to uniformly distributed random values between 0 and 1
-  call set_random_zion(mi,rng_control,zion)
+  call set_random_zion(mi,rng_control,zion,state)
 
 ! poloidal: uniform in alpha=theta_0+r*sin(alpha_0), theta_0=theta+r*sin(theta)
   do m=1,mi                

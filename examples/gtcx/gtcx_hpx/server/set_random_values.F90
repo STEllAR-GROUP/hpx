@@ -1,4 +1,4 @@
-subroutine rand_num_gen_init(rng_control,mype,irun,stdout)
+subroutine rand_num_gen_init(rng_control,mype,irun,stdout,state)
   use precision
   use rng
   implicit none
@@ -33,18 +33,18 @@ subroutine rand_num_gen_init(rng_control,mype,irun,stdout)
    ! Initialize the random number generator
      call rng_init(seed,state)
 
-  else
-   ! Set seed to current time
-     call rng_set_seed(seed)
-   ! Advance seed according to process number
-     call rng_step_seed(seed,mype)
-   ! Initialize random number generator
-     call rng_init(seed,state)
+  !else
+  ! ! Set seed to current time
+  !   call rng_set_seed(seed)
+  ! ! Advance seed according to process number
+  !   call rng_step_seed(seed,mype)
+  ! ! Initialize random number generator
+  !   call rng_init(seed,state)
   endif
 
 end subroutine rand_num_gen_init
 
-subroutine set_random_zion(mi,rng_control,zion)
+subroutine set_random_zion(mi,rng_control,zion,state)
   use precision
   use rng
   implicit none
