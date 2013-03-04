@@ -1506,8 +1506,8 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads(locality#%d/total}/count/instantaneous/all
-            // /threads(locality#%d/worker-thread%d}/count/instantaneous/all
+            // /threads{locality#%d/total}/count/instantaneous/all
+            // /threads{locality#%d/worker-thread%d}/count/instantaneous/all
             { "count/instantaneous/all",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown,
                   thread_priority_default, std::size_t(-1), _1),
@@ -1516,8 +1516,8 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads(locality#%d/total}/count/instantaneous/active
-            // /threads(locality#%d/worker-thread%d}/count/instantaneous/active
+            // /threads{locality#%d/total}/count/instantaneous/active
+            // /threads{locality#%d/worker-thread%d}/count/instantaneous/active
             { "count/instantaneous/active",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active,
                   thread_priority_default, std::size_t(-1), _1),
@@ -1526,8 +1526,8 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads(locality#%d/total}/count/instantaneous/pending
-            // /threads(locality#%d/worker-thread%d}/count/instantaneous/pending
+            // /threads{locality#%d/total}/count/instantaneous/pending
+            // /threads{locality#%d/worker-thread%d}/count/instantaneous/pending
             { "count/instantaneous/pending",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending,
                   thread_priority_default, std::size_t(-1), _1),
@@ -1536,8 +1536,8 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads(locality#%d/total}/count/instantaneous/suspended
-            // /threads(locality#%d/worker-thread%d}/count/instantaneous/suspended
+            // /threads{locality#%d/total}/count/instantaneous/suspended
+            // /threads{locality#%d/worker-thread%d}/count/instantaneous/suspended
             { "count/instantaneous/suspended",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended,
                   thread_priority_default, std::size_t(-1), _1),
@@ -1556,8 +1556,8 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads(locality#%d/total}/count/instantaneous/staged
-            // /threads(locality#%d/worker-thread%d}/count/instantaneous/staged
+            // /threads{locality#%d/total}/count/instantaneous/staged
+            // /threads{locality#%d/worker-thread%d}/count/instantaneous/staged
             { "count/instantaneous/staged",
               HPX_STD_BIND(&spt::get_thread_count, &scheduler_, staged,
                   thread_priority_default, std::size_t(-1), _1),
@@ -1566,31 +1566,30 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads(locality#%d/total}/count/stack-recycles
+            // /threads{locality#%d/total}/count/stack-recycles
             { "count/stack-recycles",
               HPX_STD_BIND(&coroutine_type::impl_type::get_stack_recycle_count, _1),
               HPX_STD_FUNCTION<boost::uint64_t(bool)>(), "", 0
             },
 #if !defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
-            // /threads(locality#%d/total}/count/stack-unbinds
+            // /threads{locality#%d/total}/count/stack-unbinds
             { "count/stack-unbinds",
               HPX_STD_BIND(&coroutine_type::impl_type::get_stack_unbind_count, _1),
               HPX_STD_FUNCTION<boost::uint64_t(bool)>(), "", 0
             },
 #endif
-            // /threads(locality#%d/total}/count/objects
-            // /threads(locality#%d/allocator%d)/count/objects
+            // /threads{locality#%d/total}/count/objects
+            // /threads{locality#%d/allocator%d}/count/objects
             { "count/objects",
               &coroutine_type::impl_type::get_allocation_count_all,
               HPX_STD_BIND(&coroutine_type::impl_type::get_allocation_count,
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "allocator", HPX_COROUTINE_NUM_ALL_HEAPS
             },
-            // /threads(locality#%d/total}/count/stolen
+            // /threads{locality#%d/total}/count/stolen
             { "count/stolen",
               &coroutine_type::impl_type::get_allocation_count_all,
-              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_, _1),
-              "worker-thread", shepherd_count
+              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_, _1), "", 0
             },
         };
         std::size_t const data_size = sizeof(data)/sizeof(data[0]);
