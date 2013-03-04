@@ -39,8 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // bring in all other arities for actions
-#include <hpx/runtime/actions/preprocessed/component_const_action_implementations.hpp>
-#include <hpx/runtime/actions/preprocessed/component_non_const_action_implementations.hpp>
+#include <hpx/runtime/actions/component_const_action_implementations.hpp>
+#include <hpx/runtime/actions/component_non_const_action_implementations.hpp>
 
 #endif
 
