@@ -23,6 +23,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -214,10 +215,10 @@ namespace hpx { namespace util
 
             // See if we have enough space or can make space available.
 
-            // Note that we ignore the outcome of free_space() here as we have 
-            // to guarantee to have space for the new connection as there are 
-            // no connections outstanding for this locality. If free_space 
-            // fails we grow the cache size beyond its limit (hoping that it 
+            // Note that we ignore the outcome of free_space() here as we have
+            // to guarantee to have space for the new connection as there are
+            // no connections outstanding for this locality. If free_space
+            // fails we grow the cache size beyond its limit (hoping that it
             // will be reduced in size next time some connection is handed back
             // to the cache).
             free_space();
