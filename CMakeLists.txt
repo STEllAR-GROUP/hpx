@@ -939,6 +939,13 @@ else()
   endif()
 
   ##############################################################################
+  # Clang-only configuration
+  ##############################################################################
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    hpx_use_flag_if_available(-Wno-cast-align)
+  endif()
+
+  ##############################################################################
   # x86-64 specific configuration
   hpx_option(HPX_MICROACRH_OPTIMIZATIONS BOOL
              "Allow microarchitecture-specific optimizations (Default: OFF)"
