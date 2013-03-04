@@ -794,7 +794,7 @@ end subroutine setup
     irun=0                 ! 0 for initial run, any non-zero value for restart
     mstep=150             ! # of time steps
     msnap=1                ! # of snapshots
-    ndiag=1                ! do diag when mod(istep,ndiag)=0
+    ndiag=4                ! do diag when mod(istep,ndiag)=0
     nonlinear=1.0          ! 1.0 nonlinear run, 0.0 linear run
     nhybrid=0              ! 0: adiabatic electron, >1: kinetic electron
     paranl=0.0             ! 1: keep parallel nonlinearity
