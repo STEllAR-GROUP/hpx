@@ -38,12 +38,8 @@
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fully conforming compilers (like clang) require a full separate set of 
-// specializations for const component actions
-#if defined(__clang__)
+// bring in all other arities for actions
 #include <hpx/runtime/actions/preprocessed/component_const_action_implementations.hpp>
-#endif
-
 #include <hpx/runtime/actions/preprocessed/component_non_const_action_implementations.hpp>
 
 #endif
@@ -58,46 +54,27 @@
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result,
-        BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
+    template <typename F, F funcptr, typename Derived>
     class BOOST_PP_CAT(base_result_action, N);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result,
-        BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct BOOST_PP_CAT(result_action, N);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, typename Result,
-        BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct BOOST_PP_CAT(direct_result_action, N);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>
+    template <typename F, F funcptr, typename Derived>
     class BOOST_PP_CAT(base_action, N);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct BOOST_PP_CAT(action, N);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct BOOST_PP_CAT(direct_action, N);
 }}
 

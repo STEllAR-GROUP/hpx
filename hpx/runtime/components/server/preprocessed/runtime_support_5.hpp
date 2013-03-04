@@ -16,12 +16,9 @@ namespace hpx { namespace components { namespace server
        >
     struct create_component_action0
       : ::hpx::actions::result_action0<
-            runtime_support
-          , naming::gid_type
-           
+            naming::gid_type (runtime_support::*)()
           , &runtime_support::create_component0<
-                Component
-               >
+                Component >
           , create_component_action0<
                 Component > >
     {};
@@ -29,9 +26,7 @@ namespace hpx { namespace components { namespace server
        >
     struct create_component_direct_action0
       : ::hpx::actions::direct_result_action0<
-            runtime_support
-          , naming::gid_type
-           
+            naming::gid_type (runtime_support::*)()
           , &runtime_support::create_component0<
                 Component >
           , create_component_direct_action0<
@@ -92,12 +87,9 @@ namespace hpx { namespace components { namespace server
       , typename A0>
     struct create_component_action1
       : ::hpx::actions::result_action1<
-            runtime_support
-          , naming::gid_type
-          , A0
+            naming::gid_type (runtime_support::*)(A0)
           , &runtime_support::create_component1<
-                Component
-              , A0>
+                Component , A0>
           , create_component_action1<
                 Component , A0> >
     {};
@@ -105,9 +97,7 @@ namespace hpx { namespace components { namespace server
       , typename A0>
     struct create_component_direct_action1
       : ::hpx::actions::direct_result_action1<
-            runtime_support
-          , naming::gid_type
-          , A0
+            naming::gid_type (runtime_support::*)(A0)
           , &runtime_support::create_component1<
                 Component , A0>
           , create_component_direct_action1<
@@ -168,12 +158,9 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1>
     struct create_component_action2
       : ::hpx::actions::result_action2<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1
+            naming::gid_type (runtime_support::*)(A0 , A1)
           , &runtime_support::create_component2<
-                Component
-              , A0 , A1>
+                Component , A0 , A1>
           , create_component_action2<
                 Component , A0 , A1> >
     {};
@@ -181,9 +168,7 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1>
     struct create_component_direct_action2
       : ::hpx::actions::direct_result_action2<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1
+            naming::gid_type (runtime_support::*)(A0 , A1)
           , &runtime_support::create_component2<
                 Component , A0 , A1>
           , create_component_direct_action2<
@@ -244,12 +229,9 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1 , typename A2>
     struct create_component_action3
       : ::hpx::actions::result_action3<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1 , A2
+            naming::gid_type (runtime_support::*)(A0 , A1 , A2)
           , &runtime_support::create_component3<
-                Component
-              , A0 , A1 , A2>
+                Component , A0 , A1 , A2>
           , create_component_action3<
                 Component , A0 , A1 , A2> >
     {};
@@ -257,9 +239,7 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1 , typename A2>
     struct create_component_direct_action3
       : ::hpx::actions::direct_result_action3<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1 , A2
+            naming::gid_type (runtime_support::*)(A0 , A1 , A2)
           , &runtime_support::create_component3<
                 Component , A0 , A1 , A2>
           , create_component_direct_action3<
@@ -320,12 +300,9 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1 , typename A2 , typename A3>
     struct create_component_action4
       : ::hpx::actions::result_action4<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1 , A2 , A3
+            naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3)
           , &runtime_support::create_component4<
-                Component
-              , A0 , A1 , A2 , A3>
+                Component , A0 , A1 , A2 , A3>
           , create_component_action4<
                 Component , A0 , A1 , A2 , A3> >
     {};
@@ -333,9 +310,7 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1 , typename A2 , typename A3>
     struct create_component_direct_action4
       : ::hpx::actions::direct_result_action4<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1 , A2 , A3
+            naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3)
           , &runtime_support::create_component4<
                 Component , A0 , A1 , A2 , A3>
           , create_component_direct_action4<
@@ -396,12 +371,9 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     struct create_component_action5
       : ::hpx::actions::result_action5<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1 , A2 , A3 , A4
+            naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4)
           , &runtime_support::create_component5<
-                Component
-              , A0 , A1 , A2 , A3 , A4>
+                Component , A0 , A1 , A2 , A3 , A4>
           , create_component_action5<
                 Component , A0 , A1 , A2 , A3 , A4> >
     {};
@@ -409,9 +381,7 @@ namespace hpx { namespace components { namespace server
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     struct create_component_direct_action5
       : ::hpx::actions::direct_result_action5<
-            runtime_support
-          , naming::gid_type
-          , A0 , A1 , A2 , A3 , A4
+            naming::gid_type (runtime_support::*)(A0 , A1 , A2 , A3 , A4)
           , &runtime_support::create_component5<
                 Component , A0 , A1 , A2 , A3 , A4>
           , create_component_direct_action5<

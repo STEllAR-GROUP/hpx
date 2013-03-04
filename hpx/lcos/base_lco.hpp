@@ -94,11 +94,8 @@ namespace hpx { namespace lcos
         ///
         /// The \a set_event_action may be used to unconditionally trigger any
         /// LCO instances, it carries no additional parameters.
-//         HPX_COMPONENT_DIRECT_ACTION(base_lco, set_event_nonvirt,
-//             set_event_action);
-        typedef hpx::actions::direct_action0<
-            base_lco, &base_lco::set_event_nonvirt
-        > set_event_action;
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_event_nonvirt,
+            set_event_action);
 
         /// The \a set_exception_action may be used to transfer arbitrary error
         /// information from the remote site to the LCO instance specified as
@@ -107,31 +104,20 @@ namespace hpx { namespace lcos
         /// \param boost::exception_ptr
         ///               [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-//         HPX_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,
-//             set_exception_action);
-        typedef hpx::actions::direct_action1<
-            base_lco, boost::exception_ptr const&,
-            &base_lco::set_exception_nonvirt
-        > set_exception_action;
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,
+            set_exception_action);
 
         /// The \a connect_action may be used to
-//         HPX_COMPONENT_DIRECT_ACTION(base_lco, connect_nonvirt, connect_action);
-        typedef hpx::actions::direct_action1<
-            base_lco, naming::id_type const&,
-            &base_lco::connect_nonvirt
-        > connect_action;
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, connect_nonvirt,
+            connect_action);
 
         /// The \a set_exception_action may be used to
-//         HPX_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
-//             disconnect_action);
-        typedef hpx::actions::direct_action1<
-            base_lco, naming::id_type const&,
-            &base_lco::disconnect_nonvirt
-        > disconnect_action;
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
+            disconnect_action);
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {

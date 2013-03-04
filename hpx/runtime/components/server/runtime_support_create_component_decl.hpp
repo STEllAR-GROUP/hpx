@@ -35,9 +35,9 @@
 
 #define N BOOST_PP_ITERATION()
 
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>
-        naming::gid_type BOOST_PP_CAT(create_component, N)(
-            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>
+    naming::gid_type BOOST_PP_CAT(create_component, N)(
+        BOOST_PP_ENUM_BINARY_PARAMS(N, A, a));
 
 #undef N
 

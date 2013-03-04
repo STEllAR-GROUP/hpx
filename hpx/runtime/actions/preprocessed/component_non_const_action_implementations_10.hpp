@@ -13,11 +13,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0,
+        typename Component, typename Result, typename T0,
         Result (Component::*F)(T0), typename Derived>
-    class base_result_action1 HPX_SPECIALIZE((<Component, Result,
-            T0, F, Derived>))
+    class base_result_action1<
+            Result (Component::*)(T0), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
@@ -104,18 +103,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0,
-        Result (Component::*F)(T0),
-        typename Derived>
-    struct result_action1 HPX_SPECIALIZE((<Component, Result,
-            T0, F, Derived>))
+        typename Component, typename Result, typename T0,
+        Result (Component::*F)(T0), typename Derived>
+    struct result_action1<
+            Result (Component::*)(T0), F, Derived>
       : base_result_action1<
-            Component, Result,
-            T0, F,
+            Result (Component::*)(T0), F,
             typename detail::action_type<
                 result_action1<
-                    Component, Result, T0, F>,
+                    Result (Component::*)(T0), F, Derived>,
                 Derived
             >::type>
     {
@@ -125,32 +121,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0,
+    template <
+        typename Component, typename Result, typename T0,
         Result (Component::*F)(T0), typename Derived>
     struct make_action<Result (Component::*)(T0),
             F, Derived, boost::mpl::false_>
       : result_action1<
-            Component, Result,
-            T0, F, Derived>
+            Result (Component::*)(T0), F, Derived>
     {
         typedef result_action1<
-            Component, Result,
-            T0, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0,
-        Result (Component::*F)(T0) const, typename Derived>
-    struct make_action<Result (Component::*)(T0) const,
-            F, Derived, boost::mpl::false_>
-      : result_action1<
-            Component const, Result,
-            T0, F, Derived>
-    {
-        typedef result_action1<
-            Component const, Result,
-            T0, F, Derived
+            Result (Component::*)(T0), F, Derived
         > type;
     };
     
@@ -160,14 +140,13 @@ namespace hpx { namespace actions
         typename T0,
         Result (Component::*F)(T0),
         typename Derived>
-    struct direct_result_action1 HPX_SPECIALIZE((<Component, Result,
-            T0, F, Derived>))
+    struct direct_result_action1<
+            Result (Component::*)(T0), F, Derived>
       : base_result_action1<
-            Component, Result,
-            T0, F,
+            Result (Component::*)(T0), F,
             typename detail::action_type<
                 direct_result_action1<
-                    Component, Result, T0, F>,
+                    Result (Component::*)(T0), F, Derived>,
                     Derived
             >::type>
     {
@@ -197,32 +176,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0,
+    template <
+        typename Component, typename Result, typename T0,
         Result (Component::*F)(T0), typename Derived>
     struct make_action<Result (Component::*)(T0),
             F, Derived, boost::mpl::true_>
       : direct_result_action1<
-            Component, Result,
-            T0, F, Derived>
+            Result (Component::*)(T0), F, Derived>
     {
         typedef direct_result_action1<
-            Component, Result,
-            T0, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0,
-        Result (Component::*F)(T0) const, typename Derived>
-    struct make_action<Result (Component::*)(T0) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action1<
-            Component const, Result,
-            T0, F, Derived>
-    {
-        typedef direct_result_action1<
-            Component const, Result,
-            T0, F, Derived
+            Result (Component::*)(T0), F, Derived
         > type;
     };
     
@@ -230,8 +193,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0,
         void (Component::*F)(T0), typename Derived>
-    class base_action1 HPX_SPECIALIZE((<Component,
-            T0, F, Derived>))
+    class base_action1<
+            void (Component::*)(T0), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
@@ -321,13 +284,13 @@ namespace hpx { namespace actions
         typename Component, typename T0,
         void (Component::*F)(T0),
         typename Derived>
-    struct action1 HPX_SPECIALIZE((<Component,
-            T0, F, Derived>))
+    struct action1<
+            void (Component::*)(T0), F, Derived>
       : base_action1<
-            Component, T0, F,
+            void (Component::*)(T0), F,
             typename detail::action_type<
                 action1<
-                    Component, T0, F>,
+                    void (Component::*)(T0), F, Derived>,
                 Derived
             >::type>
     {
@@ -337,30 +300,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0,
+    template <
+        typename Component, typename T0,
         void (Component::*F)(T0), typename Derived>
     struct make_action<void (Component::*)(T0),
             F, Derived, boost::mpl::false_>
       : action1<
-            Component,
-            T0, F, Derived>
+            void (Component::*)(T0), F, Derived>
     {
         typedef action1<
-            Component,
-            T0, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0,
-        void (Component::*F)(T0) const, typename Derived>
-    struct make_action<void (Component::*)(T0) const,
-            F, Derived, boost::mpl::false_>
-      : action1<
-            Component const,
-            T0, F, Derived>
-    {
-        typedef action1<
-            Component const,
-            T0, F, Derived
+            void (Component::*)(T0), F, Derived
         > type;
     };
     
@@ -368,13 +317,13 @@ namespace hpx { namespace actions
         typename Component, typename T0,
         void (Component::*F)(T0),
         typename Derived>
-    struct direct_action1 HPX_SPECIALIZE((<Component,
-            T0, F, Derived>))
+    struct direct_action1<
+            void (Component::*)(T0), F, Derived>
       : base_action1<
-            Component, T0, F,
+            void (Component::*)(T0), F,
             typename detail::action_type<
                 direct_action1<
-                    Component, T0, F>,
+                    void (Component::*)(T0), F, Derived>,
                     Derived
             >::type>
     {
@@ -405,30 +354,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0,
+    template <
+        typename Component, typename T0,
         void (Component::*F)(T0), typename Derived>
     struct make_action<void (Component::*)(T0),
             F, Derived, boost::mpl::true_>
       : direct_action1<
-            Component,
-            T0, F, Derived>
+            void (Component::*)(T0), F, Derived>
     {
         typedef direct_action1<
-            Component,
-            T0, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0,
-        void (Component::*F)(T0) const, typename Derived>
-    struct make_action<void (Component::*)(T0) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action1<
-            Component const,
-            T0, F, Derived>
-    {
-        typedef direct_action1<
-            Component const,
-            T0, F, Derived
+            void (Component::*)(T0), F, Derived
         > type;
     };
     
@@ -438,10 +373,10 @@ namespace hpx { namespace actions
         typename T0,
         void (Component::*F)(T0),
         typename Derived>
-    struct result_action1<Component, void,
-            T0, F, Derived>
-      : action1<Component,
-            T0, F, Derived>
+    struct result_action1<
+            void (Component::*)(T0), F, Derived>
+      : action1<
+            void (Component::*)(T0), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -449,11 +384,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1,
+        typename Component, typename Result, typename T0 , typename T1,
         Result (Component::*F)(T0 , T1), typename Derived>
-    class base_result_action2 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1, F, Derived>))
+    class base_result_action2<
+            Result (Component::*)(T0 , T1), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
@@ -540,18 +474,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1,
-        Result (Component::*F)(T0 , T1),
-        typename Derived>
-    struct result_action2 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1,
+        Result (Component::*F)(T0 , T1), typename Derived>
+    struct result_action2<
+            Result (Component::*)(T0 , T1), F, Derived>
       : base_result_action2<
-            Component, Result,
-            T0 , T1, F,
+            Result (Component::*)(T0 , T1), F,
             typename detail::action_type<
                 result_action2<
-                    Component, Result, T0 , T1, F>,
+                    Result (Component::*)(T0 , T1), F, Derived>,
                 Derived
             >::type>
     {
@@ -561,32 +492,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1,
+    template <
+        typename Component, typename Result, typename T0 , typename T1,
         Result (Component::*F)(T0 , T1), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1),
             F, Derived, boost::mpl::false_>
       : result_action2<
-            Component, Result,
-            T0 , T1, F, Derived>
+            Result (Component::*)(T0 , T1), F, Derived>
     {
         typedef result_action2<
-            Component, Result,
-            T0 , T1, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1,
-        Result (Component::*F)(T0 , T1) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1) const,
-            F, Derived, boost::mpl::false_>
-      : result_action2<
-            Component const, Result,
-            T0 , T1, F, Derived>
-    {
-        typedef result_action2<
-            Component const, Result,
-            T0 , T1, F, Derived
+            Result (Component::*)(T0 , T1), F, Derived
         > type;
     };
     
@@ -596,14 +511,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1,
         Result (Component::*F)(T0 , T1),
         typename Derived>
-    struct direct_result_action2 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1, F, Derived>))
+    struct direct_result_action2<
+            Result (Component::*)(T0 , T1), F, Derived>
       : base_result_action2<
-            Component, Result,
-            T0 , T1, F,
+            Result (Component::*)(T0 , T1), F,
             typename detail::action_type<
                 direct_result_action2<
-                    Component, Result, T0 , T1, F>,
+                    Result (Component::*)(T0 , T1), F, Derived>,
                     Derived
             >::type>
     {
@@ -633,32 +547,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1,
+    template <
+        typename Component, typename Result, typename T0 , typename T1,
         Result (Component::*F)(T0 , T1), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1),
             F, Derived, boost::mpl::true_>
       : direct_result_action2<
-            Component, Result,
-            T0 , T1, F, Derived>
+            Result (Component::*)(T0 , T1), F, Derived>
     {
         typedef direct_result_action2<
-            Component, Result,
-            T0 , T1, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1,
-        Result (Component::*F)(T0 , T1) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action2<
-            Component const, Result,
-            T0 , T1, F, Derived>
-    {
-        typedef direct_result_action2<
-            Component const, Result,
-            T0 , T1, F, Derived
+            Result (Component::*)(T0 , T1), F, Derived
         > type;
     };
     
@@ -666,8 +564,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1), typename Derived>
-    class base_action2 HPX_SPECIALIZE((<Component,
-            T0 , T1, F, Derived>))
+    class base_action2<
+            void (Component::*)(T0 , T1), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
@@ -757,13 +655,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1),
         typename Derived>
-    struct action2 HPX_SPECIALIZE((<Component,
-            T0 , T1, F, Derived>))
+    struct action2<
+            void (Component::*)(T0 , T1), F, Derived>
       : base_action2<
-            Component, T0 , T1, F,
+            void (Component::*)(T0 , T1), F,
             typename detail::action_type<
                 action2<
-                    Component, T0 , T1, F>,
+                    void (Component::*)(T0 , T1), F, Derived>,
                 Derived
             >::type>
     {
@@ -773,30 +671,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1,
+    template <
+        typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1), typename Derived>
     struct make_action<void (Component::*)(T0 , T1),
             F, Derived, boost::mpl::false_>
       : action2<
-            Component,
-            T0 , T1, F, Derived>
+            void (Component::*)(T0 , T1), F, Derived>
     {
         typedef action2<
-            Component,
-            T0 , T1, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1,
-        void (Component::*F)(T0 , T1) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1) const,
-            F, Derived, boost::mpl::false_>
-      : action2<
-            Component const,
-            T0 , T1, F, Derived>
-    {
-        typedef action2<
-            Component const,
-            T0 , T1, F, Derived
+            void (Component::*)(T0 , T1), F, Derived
         > type;
     };
     
@@ -804,13 +688,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1),
         typename Derived>
-    struct direct_action2 HPX_SPECIALIZE((<Component,
-            T0 , T1, F, Derived>))
+    struct direct_action2<
+            void (Component::*)(T0 , T1), F, Derived>
       : base_action2<
-            Component, T0 , T1, F,
+            void (Component::*)(T0 , T1), F,
             typename detail::action_type<
                 direct_action2<
-                    Component, T0 , T1, F>,
+                    void (Component::*)(T0 , T1), F, Derived>,
                     Derived
             >::type>
     {
@@ -841,30 +725,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1,
+    template <
+        typename Component, typename T0 , typename T1,
         void (Component::*F)(T0 , T1), typename Derived>
     struct make_action<void (Component::*)(T0 , T1),
             F, Derived, boost::mpl::true_>
       : direct_action2<
-            Component,
-            T0 , T1, F, Derived>
+            void (Component::*)(T0 , T1), F, Derived>
     {
         typedef direct_action2<
-            Component,
-            T0 , T1, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1,
-        void (Component::*F)(T0 , T1) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action2<
-            Component const,
-            T0 , T1, F, Derived>
-    {
-        typedef direct_action2<
-            Component const,
-            T0 , T1, F, Derived
+            void (Component::*)(T0 , T1), F, Derived
         > type;
     };
     
@@ -874,10 +744,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1,
         void (Component::*F)(T0 , T1),
         typename Derived>
-    struct result_action2<Component, void,
-            T0 , T1, F, Derived>
-      : action2<Component,
-            T0 , T1, F, Derived>
+    struct result_action2<
+            void (Component::*)(T0 , T1), F, Derived>
+      : action2<
+            void (Component::*)(T0 , T1), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -885,11 +755,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
-    class base_result_action3 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2, F, Derived>))
+    class base_result_action3<
+            Result (Component::*)(T0 , T1 , T2), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
@@ -976,18 +845,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2,
-        Result (Component::*F)(T0 , T1 , T2),
-        typename Derived>
-    struct result_action3 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2,
+        Result (Component::*F)(T0 , T1 , T2), typename Derived>
+    struct result_action3<
+            Result (Component::*)(T0 , T1 , T2), F, Derived>
       : base_result_action3<
-            Component, Result,
-            T0 , T1 , T2, F,
+            Result (Component::*)(T0 , T1 , T2), F,
             typename detail::action_type<
                 result_action3<
-                    Component, Result, T0 , T1 , T2, F>,
+                    Result (Component::*)(T0 , T1 , T2), F, Derived>,
                 Derived
             >::type>
     {
@@ -997,32 +863,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::false_>
       : result_action3<
-            Component, Result,
-            T0 , T1 , T2, F, Derived>
+            Result (Component::*)(T0 , T1 , T2), F, Derived>
     {
         typedef result_action3<
-            Component, Result,
-            T0 , T1 , T2, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2,
-        Result (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2) const,
-            F, Derived, boost::mpl::false_>
-      : result_action3<
-            Component const, Result,
-            T0 , T1 , T2, F, Derived>
-    {
-        typedef result_action3<
-            Component const, Result,
-            T0 , T1 , T2, F, Derived
+            Result (Component::*)(T0 , T1 , T2), F, Derived
         > type;
     };
     
@@ -1032,14 +882,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2),
         typename Derived>
-    struct direct_result_action3 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2, F, Derived>))
+    struct direct_result_action3<
+            Result (Component::*)(T0 , T1 , T2), F, Derived>
       : base_result_action3<
-            Component, Result,
-            T0 , T1 , T2, F,
+            Result (Component::*)(T0 , T1 , T2), F,
             typename detail::action_type<
                 direct_result_action3<
-                    Component, Result, T0 , T1 , T2, F>,
+                    Result (Component::*)(T0 , T1 , T2), F, Derived>,
                     Derived
             >::type>
     {
@@ -1069,32 +918,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2,
         Result (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::true_>
       : direct_result_action3<
-            Component, Result,
-            T0 , T1 , T2, F, Derived>
+            Result (Component::*)(T0 , T1 , T2), F, Derived>
     {
         typedef direct_result_action3<
-            Component, Result,
-            T0 , T1 , T2, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2,
-        Result (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action3<
-            Component const, Result,
-            T0 , T1 , T2, F, Derived>
-    {
-        typedef direct_result_action3<
-            Component const, Result,
-            T0 , T1 , T2, F, Derived
+            Result (Component::*)(T0 , T1 , T2), F, Derived
         > type;
     };
     
@@ -1102,8 +935,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2), typename Derived>
-    class base_action3 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2, F, Derived>))
+    class base_action3<
+            void (Component::*)(T0 , T1 , T2), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
@@ -1193,13 +1026,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2),
         typename Derived>
-    struct action3 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2, F, Derived>))
+    struct action3<
+            void (Component::*)(T0 , T1 , T2), F, Derived>
       : base_action3<
-            Component, T0 , T1 , T2, F,
+            void (Component::*)(T0 , T1 , T2), F,
             typename detail::action_type<
                 action3<
-                    Component, T0 , T1 , T2, F>,
+                    void (Component::*)(T0 , T1 , T2), F, Derived>,
                 Derived
             >::type>
     {
@@ -1209,30 +1042,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::false_>
       : action3<
-            Component,
-            T0 , T1 , T2, F, Derived>
+            void (Component::*)(T0 , T1 , T2), F, Derived>
     {
         typedef action3<
-            Component,
-            T0 , T1 , T2, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2,
-        void (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2) const,
-            F, Derived, boost::mpl::false_>
-      : action3<
-            Component const,
-            T0 , T1 , T2, F, Derived>
-    {
-        typedef action3<
-            Component const,
-            T0 , T1 , T2, F, Derived
+            void (Component::*)(T0 , T1 , T2), F, Derived
         > type;
     };
     
@@ -1240,13 +1059,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2),
         typename Derived>
-    struct direct_action3 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2, F, Derived>))
+    struct direct_action3<
+            void (Component::*)(T0 , T1 , T2), F, Derived>
       : base_action3<
-            Component, T0 , T1 , T2, F,
+            void (Component::*)(T0 , T1 , T2), F,
             typename detail::action_type<
                 direct_action3<
-                    Component, T0 , T1 , T2, F>,
+                    void (Component::*)(T0 , T1 , T2), F, Derived>,
                     Derived
             >::type>
     {
@@ -1277,30 +1096,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2),
             F, Derived, boost::mpl::true_>
       : direct_action3<
-            Component,
-            T0 , T1 , T2, F, Derived>
+            void (Component::*)(T0 , T1 , T2), F, Derived>
     {
         typedef direct_action3<
-            Component,
-            T0 , T1 , T2, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2,
-        void (Component::*F)(T0 , T1 , T2) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action3<
-            Component const,
-            T0 , T1 , T2, F, Derived>
-    {
-        typedef direct_action3<
-            Component const,
-            T0 , T1 , T2, F, Derived
+            void (Component::*)(T0 , T1 , T2), F, Derived
         > type;
     };
     
@@ -1310,10 +1115,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2,
         void (Component::*F)(T0 , T1 , T2),
         typename Derived>
-    struct result_action3<Component, void,
-            T0 , T1 , T2, F, Derived>
-      : action3<Component,
-            T0 , T1 , T2, F, Derived>
+    struct result_action3<
+            void (Component::*)(T0 , T1 , T2), F, Derived>
+      : action3<
+            void (Component::*)(T0 , T1 , T2), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -1321,11 +1126,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
-    class base_result_action4 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3, F, Derived>))
+    class base_result_action4<
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
@@ -1412,18 +1216,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3,
-        Result (Component::*F)(T0 , T1 , T2 , T3),
-        typename Derived>
-    struct result_action4 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3,
+        Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
+    struct result_action4<
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>
       : base_result_action4<
-            Component, Result,
-            T0 , T1 , T2 , T3, F,
+            Result (Component::*)(T0 , T1 , T2 , T3), F,
             typename detail::action_type<
                 result_action4<
-                    Component, Result, T0 , T1 , T2 , T3, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>,
                 Derived
             >::type>
     {
@@ -1433,32 +1234,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::false_>
       : result_action4<
-            Component, Result,
-            T0 , T1 , T2 , T3, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>
     {
         typedef result_action4<
-            Component, Result,
-            T0 , T1 , T2 , T3, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3,
-        Result (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3) const,
-            F, Derived, boost::mpl::false_>
-      : result_action4<
-            Component const, Result,
-            T0 , T1 , T2 , T3, F, Derived>
-    {
-        typedef result_action4<
-            Component const, Result,
-            T0 , T1 , T2 , T3, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived
         > type;
     };
     
@@ -1468,14 +1253,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3),
         typename Derived>
-    struct direct_result_action4 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3, F, Derived>))
+    struct direct_result_action4<
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>
       : base_result_action4<
-            Component, Result,
-            T0 , T1 , T2 , T3, F,
+            Result (Component::*)(T0 , T1 , T2 , T3), F,
             typename detail::action_type<
                 direct_result_action4<
-                    Component, Result, T0 , T1 , T2 , T3, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>,
                     Derived
             >::type>
     {
@@ -1505,32 +1289,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3,
         Result (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::true_>
       : direct_result_action4<
-            Component, Result,
-            T0 , T1 , T2 , T3, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived>
     {
         typedef direct_result_action4<
-            Component, Result,
-            T0 , T1 , T2 , T3, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3,
-        Result (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action4<
-            Component const, Result,
-            T0 , T1 , T2 , T3, F, Derived>
-    {
-        typedef direct_result_action4<
-            Component const, Result,
-            T0 , T1 , T2 , T3, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3), F, Derived
         > type;
     };
     
@@ -1538,8 +1306,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
-    class base_action4 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3, F, Derived>))
+    class base_action4<
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
@@ -1629,13 +1397,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3),
         typename Derived>
-    struct action4 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3, F, Derived>))
+    struct action4<
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
       : base_action4<
-            Component, T0 , T1 , T2 , T3, F,
+            void (Component::*)(T0 , T1 , T2 , T3), F,
             typename detail::action_type<
                 action4<
-                    Component, T0 , T1 , T2 , T3, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3), F, Derived>,
                 Derived
             >::type>
     {
@@ -1645,30 +1413,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::false_>
       : action4<
-            Component,
-            T0 , T1 , T2 , T3, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
     {
         typedef action4<
-            Component,
-            T0 , T1 , T2 , T3, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
-        void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3) const,
-            F, Derived, boost::mpl::false_>
-      : action4<
-            Component const,
-            T0 , T1 , T2 , T3, F, Derived>
-    {
-        typedef action4<
-            Component const,
-            T0 , T1 , T2 , T3, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived
         > type;
     };
     
@@ -1676,13 +1430,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3),
         typename Derived>
-    struct direct_action4 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3, F, Derived>))
+    struct direct_action4<
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
       : base_action4<
-            Component, T0 , T1 , T2 , T3, F,
+            void (Component::*)(T0 , T1 , T2 , T3), F,
             typename detail::action_type<
                 direct_action4<
-                    Component, T0 , T1 , T2 , T3, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3), F, Derived>,
                     Derived
             >::type>
     {
@@ -1713,30 +1467,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3),
             F, Derived, boost::mpl::true_>
       : direct_action4<
-            Component,
-            T0 , T1 , T2 , T3, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
     {
         typedef direct_action4<
-            Component,
-            T0 , T1 , T2 , T3, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3,
-        void (Component::*F)(T0 , T1 , T2 , T3) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action4<
-            Component const,
-            T0 , T1 , T2 , T3, F, Derived>
-    {
-        typedef direct_action4<
-            Component const,
-            T0 , T1 , T2 , T3, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived
         > type;
     };
     
@@ -1746,10 +1486,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3,
         void (Component::*F)(T0 , T1 , T2 , T3),
         typename Derived>
-    struct result_action4<Component, void,
-            T0 , T1 , T2 , T3, F, Derived>
-      : action4<Component,
-            T0 , T1 , T2 , T3, F, Derived>
+    struct result_action4<
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
+      : action4<
+            void (Component::*)(T0 , T1 , T2 , T3), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -1757,11 +1497,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
-    class base_result_action5 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>))
+    class base_result_action5<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
@@ -1848,18 +1587,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4),
-        typename Derived>
-    struct result_action5 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
+    struct result_action5<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : base_result_action5<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F,
             typename detail::action_type<
                 result_action5<
-                    Component, Result, T0 , T1 , T2 , T3 , T4, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>,
                 Derived
             >::type>
     {
@@ -1869,32 +1605,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::false_>
       : result_action5<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
     {
         typedef result_action5<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4) const,
-            F, Derived, boost::mpl::false_>
-      : result_action5<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
-    {
-        typedef result_action5<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived
         > type;
     };
     
@@ -1904,14 +1624,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4),
         typename Derived>
-    struct direct_result_action5 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>))
+    struct direct_result_action5<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : base_result_action5<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F,
             typename detail::action_type<
                 direct_result_action5<
-                    Component, Result, T0 , T1 , T2 , T3 , T4, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>,
                     Derived
             >::type>
     {
@@ -1941,32 +1660,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::true_>
       : direct_result_action5<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
     {
         typedef direct_result_action5<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action5<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
-    {
-        typedef direct_result_action5<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived
         > type;
     };
     
@@ -1974,8 +1677,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
-    class base_action5 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived>))
+    class base_action5<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
@@ -2065,13 +1768,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4),
         typename Derived>
-    struct action5 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived>))
+    struct action5<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : base_action5<
-            Component, T0 , T1 , T2 , T3 , T4, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F,
             typename detail::action_type<
                 action5<
-                    Component, T0 , T1 , T2 , T3 , T4, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>,
                 Derived
             >::type>
     {
@@ -2081,30 +1784,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::false_>
       : action5<
-            Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
     {
         typedef action5<
-            Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4) const,
-            F, Derived, boost::mpl::false_>
-      : action5<
-            Component const,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
-    {
-        typedef action5<
-            Component const,
-            T0 , T1 , T2 , T3 , T4, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived
         > type;
     };
     
@@ -2112,13 +1801,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4),
         typename Derived>
-    struct direct_action5 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived>))
+    struct direct_action5<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
       : base_action5<
-            Component, T0 , T1 , T2 , T3 , T4, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F,
             typename detail::action_type<
                 direct_action5<
-                    Component, T0 , T1 , T2 , T3 , T4, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>,
                     Derived
             >::type>
     {
@@ -2149,30 +1838,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4),
             F, Derived, boost::mpl::true_>
       : direct_action5<
-            Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
     {
         typedef direct_action5<
-            Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action5<
-            Component const,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
-    {
-        typedef direct_action5<
-            Component const,
-            T0 , T1 , T2 , T3 , T4, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived
         > type;
     };
     
@@ -2182,10 +1857,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4),
         typename Derived>
-    struct result_action5<Component, void,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
-      : action5<Component,
-            T0 , T1 , T2 , T3 , T4, F, Derived>
+    struct result_action5<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
+      : action5<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -2193,11 +1868,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
-    class base_result_action6 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
+    class base_result_action6<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple6<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
@@ -2284,18 +1958,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5),
-        typename Derived>
-    struct result_action6 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
+    struct result_action6<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : base_result_action6<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F,
             typename detail::action_type<
                 result_action6<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>,
                 Derived
             >::type>
     {
@@ -2305,32 +1976,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5),
             F, Derived, boost::mpl::false_>
       : result_action6<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
     {
         typedef result_action6<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5) const,
-            F, Derived, boost::mpl::false_>
-      : result_action6<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
-    {
-        typedef result_action6<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived
         > type;
     };
     
@@ -2340,14 +1995,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5),
         typename Derived>
-    struct direct_result_action6 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
+    struct direct_result_action6<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : base_result_action6<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F,
             typename detail::action_type<
                 direct_result_action6<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>,
                     Derived
             >::type>
     {
@@ -2377,32 +2031,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5),
             F, Derived, boost::mpl::true_>
       : direct_result_action6<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
     {
         typedef direct_result_action6<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action6<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
-    {
-        typedef direct_result_action6<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived
         > type;
     };
     
@@ -2410,8 +2048,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
-    class base_action6 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
+    class base_action6<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple6<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
@@ -2501,13 +2139,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5),
         typename Derived>
-    struct action6 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
+    struct action6<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : base_action6<
-            Component, T0 , T1 , T2 , T3 , T4 , T5, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F,
             typename detail::action_type<
                 action6<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>,
                 Derived
             >::type>
     {
@@ -2517,30 +2155,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5),
             F, Derived, boost::mpl::false_>
       : action6<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
     {
         typedef action6<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5) const,
-            F, Derived, boost::mpl::false_>
-      : action6<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
-    {
-        typedef action6<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived
         > type;
     };
     
@@ -2548,13 +2172,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5),
         typename Derived>
-    struct direct_action6 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>))
+    struct direct_action6<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
       : base_action6<
-            Component, T0 , T1 , T2 , T3 , T4 , T5, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F,
             typename detail::action_type<
                 direct_action6<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>,
                     Derived
             >::type>
     {
@@ -2585,30 +2209,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5),
             F, Derived, boost::mpl::true_>
       : direct_action6<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
     {
         typedef direct_action6<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action6<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
-    {
-        typedef direct_action6<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived
         > type;
     };
     
@@ -2618,10 +2228,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5),
         typename Derived>
-    struct result_action6<Component, void,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
-      : action6<Component,
-            T0 , T1 , T2 , T3 , T4 , T5, F, Derived>
+    struct result_action6<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
+      : action6<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -2629,11 +2239,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
-    class base_result_action7 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
+    class base_result_action7<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple7<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
@@ -2720,18 +2329,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
-        typename Derived>
-    struct result_action7 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
+    struct result_action7<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : base_result_action7<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F,
             typename detail::action_type<
                 result_action7<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>,
                 Derived
             >::type>
     {
@@ -2741,32 +2347,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
             F, Derived, boost::mpl::false_>
       : result_action7<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
     {
         typedef result_action7<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const,
-            F, Derived, boost::mpl::false_>
-      : result_action7<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
-    {
-        typedef result_action7<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived
         > type;
     };
     
@@ -2776,14 +2366,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
         typename Derived>
-    struct direct_result_action7 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
+    struct direct_result_action7<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : base_result_action7<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F,
             typename detail::action_type<
                 direct_result_action7<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>,
                     Derived
             >::type>
     {
@@ -2813,32 +2402,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
             F, Derived, boost::mpl::true_>
       : direct_result_action7<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
     {
         typedef direct_result_action7<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action7<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
-    {
-        typedef direct_result_action7<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived
         > type;
     };
     
@@ -2846,8 +2419,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
-    class base_action7 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
+    class base_action7<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple7<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
@@ -2937,13 +2510,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
         typename Derived>
-    struct action7 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
+    struct action7<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : base_action7<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F,
             typename detail::action_type<
                 action7<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>,
                 Derived
             >::type>
     {
@@ -2953,30 +2526,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
             F, Derived, boost::mpl::false_>
       : action7<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
     {
         typedef action7<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const,
-            F, Derived, boost::mpl::false_>
-      : action7<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
-    {
-        typedef action7<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived
         > type;
     };
     
@@ -2984,13 +2543,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
         typename Derived>
-    struct direct_action7 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>))
+    struct direct_action7<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
       : base_action7<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F,
             typename detail::action_type<
                 direct_action7<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>,
                     Derived
             >::type>
     {
@@ -3021,30 +2580,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
             F, Derived, boost::mpl::true_>
       : direct_action7<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
     {
         typedef direct_action7<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action7<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
-    {
-        typedef direct_action7<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived
         > type;
     };
     
@@ -3054,10 +2599,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6),
         typename Derived>
-    struct result_action7<Component, void,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
-      : action7<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6, F, Derived>
+    struct result_action7<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
+      : action7<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -3065,11 +2610,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
-    class base_result_action8 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
+    class base_result_action8<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple8<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
@@ -3156,18 +2700,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
-        typename Derived>
-    struct result_action8 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
+    struct result_action8<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : base_result_action8<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F,
             typename detail::action_type<
                 result_action8<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>,
                 Derived
             >::type>
     {
@@ -3177,32 +2718,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
             F, Derived, boost::mpl::false_>
       : result_action8<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
     {
         typedef result_action8<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const,
-            F, Derived, boost::mpl::false_>
-      : result_action8<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
-    {
-        typedef result_action8<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived
         > type;
     };
     
@@ -3212,14 +2737,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
         typename Derived>
-    struct direct_result_action8 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
+    struct direct_result_action8<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : base_result_action8<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F,
             typename detail::action_type<
                 direct_result_action8<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>,
                     Derived
             >::type>
     {
@@ -3249,32 +2773,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
             F, Derived, boost::mpl::true_>
       : direct_result_action8<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
     {
         typedef direct_result_action8<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action8<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
-    {
-        typedef direct_result_action8<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived
         > type;
     };
     
@@ -3282,8 +2790,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
-    class base_action8 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
+    class base_action8<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple8<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
@@ -3373,13 +2881,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
         typename Derived>
-    struct action8 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
+    struct action8<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : base_action8<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F,
             typename detail::action_type<
                 action8<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>,
                 Derived
             >::type>
     {
@@ -3389,30 +2897,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
             F, Derived, boost::mpl::false_>
       : action8<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
     {
         typedef action8<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const,
-            F, Derived, boost::mpl::false_>
-      : action8<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
-    {
-        typedef action8<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived
         > type;
     };
     
@@ -3420,13 +2914,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
         typename Derived>
-    struct direct_action8 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>))
+    struct direct_action8<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
       : base_action8<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F,
             typename detail::action_type<
                 direct_action8<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>,
                     Derived
             >::type>
     {
@@ -3457,30 +2951,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
             F, Derived, boost::mpl::true_>
       : direct_action8<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
     {
         typedef direct_action8<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action8<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
-    {
-        typedef direct_action8<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived
         > type;
     };
     
@@ -3490,10 +2970,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7),
         typename Derived>
-    struct result_action8<Component, void,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
-      : action8<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7, F, Derived>
+    struct result_action8<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
+      : action8<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -3501,11 +2981,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
-    class base_result_action9 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
+    class base_result_action9<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple9<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
@@ -3592,18 +3071,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
-        typename Derived>
-    struct result_action9 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
+    struct result_action9<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : base_result_action9<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F,
             typename detail::action_type<
                 result_action9<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>,
                 Derived
             >::type>
     {
@@ -3613,32 +3089,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
             F, Derived, boost::mpl::false_>
       : result_action9<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
     {
         typedef result_action9<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const,
-            F, Derived, boost::mpl::false_>
-      : result_action9<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
-    {
-        typedef result_action9<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived
         > type;
     };
     
@@ -3648,14 +3108,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
         typename Derived>
-    struct direct_result_action9 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
+    struct direct_result_action9<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : base_result_action9<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F,
             typename detail::action_type<
                 direct_result_action9<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>,
                     Derived
             >::type>
     {
@@ -3685,32 +3144,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
             F, Derived, boost::mpl::true_>
       : direct_result_action9<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
     {
         typedef direct_result_action9<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action9<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
-    {
-        typedef direct_result_action9<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived
         > type;
     };
     
@@ -3718,8 +3161,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
-    class base_action9 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
+    class base_action9<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple9<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
@@ -3809,13 +3252,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
         typename Derived>
-    struct action9 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
+    struct action9<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : base_action9<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F,
             typename detail::action_type<
                 action9<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>,
                 Derived
             >::type>
     {
@@ -3825,30 +3268,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
             F, Derived, boost::mpl::false_>
       : action9<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
     {
         typedef action9<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const,
-            F, Derived, boost::mpl::false_>
-      : action9<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
-    {
-        typedef action9<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived
         > type;
     };
     
@@ -3856,13 +3285,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
         typename Derived>
-    struct direct_action9 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>))
+    struct direct_action9<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
       : base_action9<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F,
             typename detail::action_type<
                 direct_action9<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>,
                     Derived
             >::type>
     {
@@ -3893,30 +3322,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
             F, Derived, boost::mpl::true_>
       : direct_action9<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
     {
         typedef direct_action9<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action9<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
-    {
-        typedef direct_action9<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived
         > type;
     };
     
@@ -3926,10 +3341,10 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8),
         typename Derived>
-    struct result_action9<Component, void,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
-      : action9<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8, F, Derived>
+    struct result_action9<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
+      : action9<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), F, Derived>
     {};
 }}
 namespace hpx { namespace actions
@@ -3937,11 +3352,10 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
-    class base_result_action10 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
+    class base_result_action10<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : public action<
             Component, Result,
             hpx::util::tuple10<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
@@ -4028,18 +3442,15 @@ namespace hpx { namespace actions
     
     
     template <
-        typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
-        typename Derived>
-    struct result_action10 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
+        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
+    struct result_action10<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : base_result_action10<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F,
             typename detail::action_type<
                 result_action10<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>,
                 Derived
             >::type>
     {
@@ -4049,32 +3460,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
             F, Derived, boost::mpl::false_>
       : result_action10<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
     {
         typedef result_action10<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const,
-            F, Derived, boost::mpl::false_>
-      : result_action10<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
-    {
-        typedef result_action10<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived
         > type;
     };
     
@@ -4084,14 +3479,13 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
         typename Derived>
-    struct direct_result_action10 HPX_SPECIALIZE((<Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
+    struct direct_result_action10<
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : base_result_action10<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F,
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F,
             typename detail::action_type<
                 direct_result_action10<
-                    Component, Result, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F>,
+                    Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>,
                     Derived
             >::type>
     {
@@ -4121,32 +3515,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
+    template <
+        typename Component, typename Result, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
     struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
             F, Derived, boost::mpl::true_>
       : direct_result_action10<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
     {
         typedef direct_result_action10<
-            Component, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
-        > type;
-    };
-    template <typename Component, typename Result,
-        typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        Result (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const, typename Derived>
-    struct make_action<Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const,
-            F, Derived, boost::mpl::true_>
-      : direct_result_action10<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
-    {
-        typedef direct_result_action10<
-            Component const, Result,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
+            Result (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived
         > type;
     };
     
@@ -4154,8 +3532,8 @@ namespace hpx { namespace actions
     template <
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
-    class base_action10 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
+    class base_action10<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : public action<
             Component, util::unused_type,
             hpx::util::tuple10<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
@@ -4245,13 +3623,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
         typename Derived>
-    struct action10 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
+    struct action10<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : base_action10<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F,
             typename detail::action_type<
                 action10<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>,
                 Derived
             >::type>
     {
@@ -4261,30 +3639,16 @@ namespace hpx { namespace actions
         typedef boost::mpl::false_ direct_execution;
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
             F, Derived, boost::mpl::false_>
       : action10<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
     {
         typedef action10<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const,
-            F, Derived, boost::mpl::false_>
-      : action10<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
-    {
-        typedef action10<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived
         > type;
     };
     
@@ -4292,13 +3656,13 @@ namespace hpx { namespace actions
         typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
         typename Derived>
-    struct direct_action10 HPX_SPECIALIZE((<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>))
+    struct direct_action10<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
       : base_action10<
-            Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F,
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F,
             typename detail::action_type<
                 direct_action10<
-                    Component, T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F>,
+                    void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>,
                     Derived
             >::type>
     {
@@ -4329,30 +3693,16 @@ namespace hpx { namespace actions
         }
     };
     
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
+    template <
+        typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
     struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
             F, Derived, boost::mpl::true_>
       : direct_action10<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
     {
         typedef direct_action10<
-            Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
-        > type;
-    };
-    template <typename Component, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
-        void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const, typename Derived>
-    struct make_action<void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9) const,
-            F, Derived, boost::mpl::true_>
-      : direct_action10<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
-    {
-        typedef direct_action10<
-            Component const,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived
         > type;
     };
     
@@ -4362,9 +3712,9 @@ namespace hpx { namespace actions
         typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9,
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9),
         typename Derived>
-    struct result_action10<Component, void,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
-      : action10<Component,
-            T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9, F, Derived>
+    struct result_action10<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
+      : action10<
+            void (Component::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), F, Derived>
     {};
 }}

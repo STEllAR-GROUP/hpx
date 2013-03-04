@@ -31,45 +31,33 @@ namespace hpx { namespace actions
     // declarations for main templates
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        Result (Component::*F)(), typename Derived>
+    template <typename F, F funcptr, typename Derived>
     class base_result_action0;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        Result (Component::*F)(), typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct result_action0;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        Result (Component::*F)(), typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct direct_result_action0;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(), typename Derived>
+    template <typename F, F funcptr, typename Derived>
     class base_action0;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(),
-        typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct action0;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, void (Component::*F)(),
-        typename Derived = detail::this_type>
+    template <typename F, F funcptr, typename Derived = detail::this_type>
     struct direct_action0;
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fully conforming compilers (like clang) require a full separate set of 
-// specializations for const component actions
-#if defined(__clang__)
-#define HPX_SPECIALIZE(x)   HPX_UTIL_STRIP(x)
+// bring in nullary actions and all other arities
 #include <hpx/runtime/actions/component_const_action.hpp>
-#else
-#define HPX_SPECIALIZE(x)
-#endif
-
 #include <hpx/runtime/actions/component_non_const_action.hpp>
 #include <hpx/runtime/actions/component_action_implementations.hpp>
 

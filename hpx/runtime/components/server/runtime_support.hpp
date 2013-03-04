@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -181,11 +181,8 @@ namespace hpx { namespace components { namespace server
         // directly to avoid a deadlock condition inside the thread manager
         // waiting for this thread to finish, which waits for the thread
         // manager to exit
-        typedef hpx::actions::direct_result_action0<
-            runtime_support, util::section,
-            &runtime_support::get_config
-        > get_config_action;
-        
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config);
+
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, insert_agas_cache_entry);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter);
@@ -481,12 +478,9 @@ namespace hpx { namespace components { namespace server
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>
     struct BOOST_PP_CAT(create_component_action, N)
       : BOOST_PP_CAT( ::hpx::actions::result_action, N)<
-            runtime_support
-          , naming::gid_type
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
+            naming::gid_type (runtime_support::*)(BOOST_PP_ENUM_PARAMS(N, A))
           , &runtime_support::BOOST_PP_CAT(create_component, N)<
-                Component
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>
+                Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>
           , BOOST_PP_CAT(create_component_action, N)<
                 Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)> >
     {};
@@ -495,9 +489,7 @@ namespace hpx { namespace components { namespace server
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>
     struct BOOST_PP_CAT(create_component_direct_action, N)
       : BOOST_PP_CAT( ::hpx::actions::direct_result_action, N)<
-            runtime_support
-          , naming::gid_type
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
+            naming::gid_type (runtime_support::*)(BOOST_PP_ENUM_PARAMS(N, A))
           , &runtime_support::BOOST_PP_CAT(create_component, N)<
                 Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>
           , BOOST_PP_CAT(create_component_direct_action, N)<
