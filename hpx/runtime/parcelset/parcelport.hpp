@@ -141,7 +141,7 @@ namespace hpx { namespace parcelset
         };
 
         virtual boost::int64_t
-        get_connection_cache_statistics(connection_cache_statistics_type, bool reset) const
+        get_connection_cache_statistics(connection_cache_statistics_type, bool reset)
         {
             // by default this parcelport does not expose any conenction cache
             // statistics
