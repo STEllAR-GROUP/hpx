@@ -8,7 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/locality_result.hpp>
@@ -50,17 +49,8 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action2<
-            binpacking_factory const, remote_result_type,
-            components::component_type, std::size_t,
-            &binpacking_factory::create_components
-        > create_components_action;
-
-        typedef hpx::actions::result_action3<
-            binpacking_factory const, remote_result_type,
-            components::component_type, std::size_t, std::string const&,
-            &binpacking_factory::create_components_counterbased
-        > create_components_counterbased_action;
+        HPX_DEFINE_COMPONENT_CONST_ACTION(binpacking_factory, create_components);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(binpacking_factory, create_components_counterbased);
     };
 }}}
 

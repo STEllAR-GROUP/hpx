@@ -113,42 +113,29 @@ namespace hpx { namespace performance_counters { namespace server
 
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
-        typedef hpx::actions::result_action0<
-            base_performance_counter const, counter_info,
-            &base_performance_counter::get_counter_info_nonvirt
-        > get_counter_info_action;
+        HPX_DEFINE_COMPONENT_CONST_ACTION(base_performance_counter,
+            get_counter_info_nonvirt, get_counter_info_action);
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
-        typedef hpx::actions::result_action1<
-            base_performance_counter, counter_value, bool,
-            &base_performance_counter::get_counter_value_nonvirt
-        > get_counter_value_action;
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
+            get_counter_value_nonvirt, get_counter_value_action);
 
         /// The \a set_counter_value_action
-        typedef hpx::actions::action1<
-            base_performance_counter,
-            counter_value const&,
-            &base_performance_counter::set_counter_value_nonvirt
-        > set_counter_value_action;
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
+            set_counter_value_nonvirt, set_counter_value_action);
 
         /// The \a reset_counter_value_action
-        typedef hpx::actions::action0<
-            base_performance_counter,
-            &base_performance_counter::reset_counter_value_nonvirt
-        > reset_counter_value_action;
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
+            reset_counter_value_nonvirt, reset_counter_value_action);
 
         /// The \a start_action
-        typedef hpx::actions::result_action0<
-            base_performance_counter, bool,
-            &base_performance_counter::start_nonvirt
-        > start_action;
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
+            start_nonvirt, start_action);
 
         /// The \a stop_action
-        typedef hpx::actions::result_action0<
-            base_performance_counter, bool,
-            &base_performance_counter::stop_nonvirt
-        > stop_action;
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
+            stop_nonvirt, stop_action);
 
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
