@@ -1513,7 +1513,7 @@
 
 ! main time loop
   do istep=1,mstep
-     if ( mype .eq. 0 ) print*,' step ', istep
+     !if ( mype .eq. 0 ) print*,' step ', istep
      do irk=1,2
 ! idiag=0: do time history diagnosis
        idiag=mod(irk+1,2)+mod(istep,ndiag)    
