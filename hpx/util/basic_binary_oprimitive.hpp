@@ -77,7 +77,7 @@ namespace hpx { namespace util
             {}
             ~container_type()
             {
-                if (filter_) {
+                if (filter_.get()) {
                     std::size_t written = 0;
                     do {
                         bool flushed = filter_->flush(&cont_[current_],
@@ -106,7 +106,7 @@ namespace hpx { namespace util
                 if (count != 0)
                 {
                     cont_.resize(cont_.size() + count);
-                    if (filter_) {
+                    if (filter_.get()) {
                         filter_->save(address, count);
                     }
                     else {
