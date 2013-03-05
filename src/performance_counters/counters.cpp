@@ -707,7 +707,8 @@ namespace hpx { namespace performance_counters
             std::vector<counter_info> counter_infos;
             counter_status status = discover_counter_type(p.parentinstancename_,
                 counter_infos, discover_counters_full, ec);
-            if (ec) return false;
+            if (!status_is_valid(status) || ec)
+                return false;
 
             counter_info i = info;
             BOOST_FOREACH(counter_info& basei, counter_infos)
