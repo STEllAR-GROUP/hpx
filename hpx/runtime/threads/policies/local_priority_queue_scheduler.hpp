@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -103,8 +102,7 @@ namespace hpx { namespace threads { namespace policies
             affinity_data_(init.num_queues_, init.pu_offset_, init.pu_step_,
                 init.affinity_domain_, init.affinity_desc_),
             numa_sensitive_(init.numa_sensitive_),
-            topology_(get_topology()),
-            stolen_threads_(0)
+            topology_(get_topology())
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
@@ -138,9 +136,31 @@ namespace hpx { namespace threads { namespace policies
             return affinity_data_.get_pu_num(num_thread);
         }
 
-        std::size_t get_num_stolen_threads(bool reset)
+        std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset)
         {
-            return util::get_and_reset_value(stolen_threads_, reset);
+            std::size_t num_stolen_threads = 0;
+            if (num_thread == std::size_t(-1)) 
+            {
+                for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                    num_stolen_threads +=
+                        high_priority_queues_[i]->get_num_stolen_threads(reset);
+
+                num_stolen_threads += low_priority_queue_.get_num_stolen_threads(reset);
+
+                for (std::size_t i = 0; i < queues_.size(); ++i)
+                    num_stolen_threads += queues_[i]->get_num_stolen_threads(reset);
+                return num_stolen_threads;
+            }
+
+            if (num_thread < high_priority_queues_.size())
+                num_stolen_threads =
+                    high_priority_queues_[num_thread]->get_num_stolen_threads(reset);
+
+            if (num_thread == queues_.size()-1)
+                num_stolen_threads += low_priority_queue_.get_num_stolen_threads(reset);
+
+            num_stolen_threads += queues_[num_thread]->get_num_stolen_threads(reset);
+            return num_stolen_threads;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -253,7 +273,7 @@ namespace hpx { namespace threads { namespace policies
                 if (high_priority_queues_[idx]->
                         get_next_thread(thrd, queue_size + idx))
                 {
-                    ++stolen_threads_;
+                    high_priority_queues_[idx]->increment_num_stolen_threads();
                     return true;
                 }
             }
@@ -263,7 +283,7 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t idx = (i + num_thread) % queue_size;
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
                 {
-                    ++stolen_threads_;
+                    queues_[idx]->increment_num_stolen_threads();
                     return true;
                 }
             }
@@ -599,7 +619,7 @@ namespace hpx { namespace threads { namespace policies
                         running, idle_loop_count, added, queues_[i]) && result;
                     if (0 != added)
                     {
-                        stolen_threads_ += added;
+                        queues_[num_thread]->increment_num_stolen_threads(added);
                         return result;
                     }
                 }
@@ -612,7 +632,7 @@ namespace hpx { namespace threads { namespace policies
                     idle_loop_count, added, queues_[idx]) && result;
                 if (0 != added)
                 {
-                    stolen_threads_ += added;
+                    queues_[num_thread]->increment_num_stolen_threads(added);
                     return result;
                 }
             }
@@ -684,7 +704,6 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
-        boost::atomic<std::size_t> stolen_threads_;
     };
 }}}
 

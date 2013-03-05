@@ -115,9 +115,17 @@ namespace hpx { namespace threads { namespace policies
             return affinity_data_.get_pu_num(num_thread);
         }
 
-        std::size_t get_num_stolen_threads(bool reset)
+        std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset)
         {
-            return util::get_and_reset_value(stolen_threads_, reset);
+            std::size_t num_stolen_threads = 0;
+            if (num_thread == std::size_t(-1)) 
+            {
+                for (std::size_t i = 0; i < queues_.size(); ++i)
+                    num_stolen_threads += queues_[i]->get_num_stolen_threads(reset);
+                return num_stolen_threads;
+            }
+
+            return queues_[num_thread]->get_num_stolen_threads(reset);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -255,7 +263,7 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t idx = (i + num_thread) % queues_.size();
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
                 {
-                    ++stolen_threads_;
+                    queues_[idx]->increment_num_stolen_threads();
                     return true;
                 }
             }
@@ -327,7 +335,7 @@ namespace hpx { namespace threads { namespace policies
                             running, idle_loop_count, added, queues_[idx]) && result;
                         if (0 != added)
                         {
-                            stolen_threads_ += added;
+                            queues_[num_thread]->increment_num_stolen_threads(added);
                             return result;
                         }
                     }
@@ -340,7 +348,7 @@ namespace hpx { namespace threads { namespace policies
                         idle_loop_count, added, queues_[idx]) && result;
                     if (0 != added)
                     {
-                        stolen_threads_ += added;
+                        queues_[num_thread]->increment_num_stolen_threads(added);
                         return result;
                     }
                 }
@@ -408,7 +416,6 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
-        boost::atomic<std::size_t> stolen_threads_;
     };
 }}}
 

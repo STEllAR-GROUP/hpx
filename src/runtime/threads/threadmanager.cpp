@@ -1587,9 +1587,13 @@ namespace hpx { namespace threads
               "allocator", HPX_COROUTINE_NUM_ALL_HEAPS
             },
             // /threads{locality#%d/total}/count/stolen
+            // /threads{locality#%d/worker-thread%d}/count/stolen
             { "count/stolen",
-              &coroutine_type::impl_type::get_allocation_count_all,
-              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_, _1), "", 0
+              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_,
+                  std::size_t(-1), _1),
+              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
             },
         };
         std::size_t const data_size = sizeof(data)/sizeof(data[0]);
@@ -1724,7 +1728,7 @@ namespace hpx { namespace threads
               "returns the overall number of HPX-threads stolen from neighboring"
               "schedulers for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator,
-              &performance_counters::locality_counter_discoverer,
+              &performance_counters::locality_thread_counter_discoverer,
               ""
             },
         };
