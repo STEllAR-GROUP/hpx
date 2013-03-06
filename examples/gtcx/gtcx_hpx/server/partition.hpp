@@ -108,6 +108,29 @@ namespace gtcx { namespace server
         void partd_allgather(double *in,double *out, int* size);
         void set_partd_allgather_data(std::size_t which,
                 std::size_t generation, std::vector<double> const& data);
+        void future_diagnosis(double *xnormal, 
+                       int *ihistory,
+                  int *mpsi,int *mthetamax,int *mzeta,int *mzetamax,
+                  int *istep,int *ndiag,int *ntracer,int *mstep,int *mstepall,int *stdout,int *mype,int *numberpe,
+                  int *nbound,int *irun,
+                  int *nhybrid,
+                  double *a0,double *a1,double *a,double *q0,double *q1,double *q2,double *kappati,
+                  double *gyroradius,
+                  double *tite,double *rc,double *rw,double *qion,double *qelectron,double *aion,double *aelectron,
+                                     int *mtheta,int *mi,int *me,int *mgrid,int *nparam,int *mimax,int *memax,
+                  double *zion,double *zion0,double *zelectron,double *zelectron0,
+                  int *myrank_partd,int *igrid,double *gradt,double *phi,double *Total_field_energy,
+                  int *mflux,int *num_mode,
+                  double *efluxi,double *efluxe,double *pfluxi,double *pfluxe,double *dflowi,double *dflowe,
+                  double *entropyi,double *entropye,double *efield,double *eradial,double *particles_energy,
+                  double *eflux,double *rmarker,double *etracer,double *ptracer
+                );
+        void future_diagnosis_finish();
+        void set_future_diagnosis(std::size_t which, std::size_t generation,
+                                  std::vector<int> const& int_arguments,
+                  std::vector<double> const& double_arguments,
+                  std::vector< std::vector<int> > const& int_arrays,
+                  std::vector< std::vector<double> > const& double_arrays);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -130,6 +153,7 @@ namespace gtcx { namespace server
         HPX_DEFINE_COMPONENT_ACTION(partition, set_int_sndrecv_data, set_int_sndrecv_data_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_real_params, set_real_params_action);
         HPX_DEFINE_COMPONENT_ACTION(partition, set_partd_allgather_data, set_partd_allgather_data_action);
+        HPX_DEFINE_COMPONENT_ACTION(partition, set_future_diagnosis, set_future_diagnosis_action);
 
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -160,6 +184,8 @@ namespace gtcx { namespace server
 //        hpx::future<void> int_sndrecv_future_;
 //        hpx::lcos::local::trigger int_sndrecv_gate_;
         and_gate_type partd_allgather_gate_;
+        and_gate_type future_diagnosis_gate_;
+        hpx::future<void> future_diagnosis_f_;
 
         std::vector<hpx::naming::id_type> components_;
         mutable mutex_type mtx_;
@@ -253,6 +279,10 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     gtcx::server::partition::set_partd_allgather_data_action,
     gtcx_point_set_partd_allgather_data_action);
+
+HPX_REGISTER_ACTION_DECLARATION(
+    gtcx::server::partition::set_future_diagnosis_action,
+    gtcx_point_set_future_diagnosis_action);
 
 #endif
 

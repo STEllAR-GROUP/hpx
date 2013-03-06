@@ -1,50 +1,30 @@
 subroutine diagnosis(hpx4_bti,&
-             t_gids, p_gids,xnormal,&
+                     xnormal,&
 ! global parameters
-                       ihistory,snapout,maxmpsi,&
-          mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-       istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-       mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-       ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile,&
-           nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-       flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-       zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron,&
+                       ihistory,&
+          mpsi,mthetamax,mzeta,mzetamax,&
+       istep,ndiag,ntracer,mstep,mstepall,stdout,mype,numberpe,&
+       nbound,irun,&
+       nhybrid,&
+       a0,a1,a,q0,q1,q2,kappati,&
+       gyroradius,&
+       tite,rc,rw,qion,qelectron,aion,aelectron,&
                                        mtheta, &
-                                       deltat, &
-           do_collision, &
 ! particle array
-                                      kzion,kzelectron,jtelectron0,jtelectron1,&
-                                        jtion0,jtion1,&
-                                       wzion,wzelectron,wpelectron,&
-       wtelectron0,wtelectron1, &
-                                        wpion,wtion0,wtion1,&
                                          zion,zion0,zelectron,&
-        zelectron0,zelectron1, &
+        zelectron0, &
 ! particle decomp
-              ntoroidal,npartdom,&
-              partd_comm,nproc_partd,myrank_partd,&
-              toroidal_comm,nproc_toroidal,myrank_toroidal,&
-              left_pe,right_pe,&
-              toroidal_domain_location,particle_domain_location, &
+              myrank_partd,&
 ! field array
-                      mmpsi, &
-                                      itran,igrid, &
-                                          jtp1,jtp2,&
-                                       phi00,phip00,rtemi,rteme,rden,qtinv,&
-       pmarki,pmarke,zonali,zonale,gradt,&
-                                         phi,densityi,densitye,markeri,&
-       markere,pgyro,tgyro,dtemper,heatflux,phit,&
-                                           evector,wtp1,wtp2,phisave,&
+                                      igrid, &
+                                      gradt, &
+                                      phi,&
               Total_field_energy, &
 ! diagnosis array
-                       mflux,num_mode,m_poloidal,&
-          nmode,mmode,&
-           efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+                       mflux,num_mode,&
+           efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy,eflux,&
-       rmarker,rdtemi,rdteme,pfluxpsi,&
-       amp_mode, &
-                                       hfluxpsi,&
-                                           eigenmode,&
+       rmarker,&
            etracer,ptracer)
 
   !use global_parameters
@@ -61,93 +41,47 @@ subroutine diagnosis(hpx4_bti,&
 
   implicit none
   interface ! {{{
-    subroutine err_check(f1,f2,numpe,&
-! global parameters
-                          ihistory,snapout,maxmpsi,&
-             mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-          istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-          mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-          ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile,&
-              nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-          flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-          zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron,&
-                                          mtheta, &
-                                          deltat, &
-              do_collision)
+    subroutine err_check(f1,f2,numberpe,stdout)
       !use global_parameters
       use precision
       implicit none
 !     global parameters
-     integer :: ihistory,snapout,maxmpsi
-     integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-          istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-          mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-          ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-     real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-          flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-          zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
-     integer,dimension(:),allocatable :: mtheta
-     real(kind=wp),dimension(:),allocatable :: deltat
-     logical  do_collision
-
       real(kind=wp) f1, f2, FOM, expected
-      integer numpe, ierr
+      integer numberpe, ierr,stdout
     end subroutine err_check
   end interface ! }}}
 
-  integer,dimension(:),allocatable :: t_gids
-  integer,dimension(:),allocatable :: p_gids
   TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
 
 !  global parameters
-  integer :: ihistory,snapout,maxmpsi
-  integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-       istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-       mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-       ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-       flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-       zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
+  integer :: ihistory
+  integer mpsi,mthetamax,mzeta,mzetamax,&
+       istep,ndiag,ntracer,mstep,mstepall,stdout,mype,numberpe,&
+       nbound,irun,&
+       nhybrid
+  real(kind=wp) a0,a1,a,q0,q1,q2,kappati,&
+       gyroradius,&
+       tite,rc,rw,qion,qelectron,aion,aelectron
   integer,dimension(:),allocatable :: mtheta
-  real(kind=wp),dimension(:),allocatable :: deltat
-  logical  do_collision
 
 ! particle array
-  integer,dimension(:),allocatable :: kzion,kzelectron,jtelectron0,jtelectron1
-  integer,dimension(:,:),allocatable :: jtion0,jtion1
-  real(kind=wp),dimension(:),allocatable :: wzion,wzelectron,wpelectron,&
-       wtelectron0,wtelectron1
-  real(kind=wp),dimension(:,:),allocatable :: wpion,wtion0,wtion1
   real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
-        zelectron0,zelectron1
+        zelectron0
 
 ! particle decomp
-  integer  :: ntoroidal,npartdom
-  integer  :: partd_comm,nproc_partd,myrank_partd
-  integer  :: toroidal_comm,nproc_toroidal,myrank_toroidal
-  integer  :: left_pe,right_pe
-  integer  :: toroidal_domain_location,particle_domain_location
+  integer  :: myrank_partd
 
 ! field array
-  integer :: mmpsi
-  integer,dimension(:),allocatable :: itran,igrid
-  integer,dimension(:,:,:),allocatable :: jtp1,jtp2
-  real(kind=wp),dimension(:),allocatable :: phi00,phip00,rtemi,rteme,rden,qtinv,&
-       pmarki,pmarke,zonali,zonale,gradt
-  real(kind=wp),dimension(:,:),allocatable :: phi,densityi,densitye,markeri,&
-       markere,pgyro,tgyro,dtemper,heatflux,phit
-  real(kind=wp),dimension(:,:,:),allocatable :: evector,wtp1,wtp2,phisave
+  integer,dimension(:),allocatable :: igrid
+  real(kind=wp),dimension(:),allocatable :: gradt
+  real(kind=wp),dimension(:,:),allocatable :: phi
   real(kind=wp) :: Total_field_energy(3)
 
 ! diagnosis array
-  integer :: mflux,num_mode,m_poloidal
-  integer nmode(num_mode),mmode(num_mode)
-  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,ddeni,ddene,dflowi,dflowe,&
+  integer :: mflux,num_mode
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
-       rmarker(mflux),rdtemi(mflux),rdteme(mflux),pfluxpsi(mflux),&
-       amp_mode(2,num_mode,2)
-  real(kind=wp),dimension(:),allocatable :: hfluxpsi
-  real(kind=wp),dimension(:,:,:),allocatable :: eigenmode
+       rmarker(mflux)
   real(kind=wp) etracer,ptracer(4)
 
   ! diagnosis thread safety
@@ -419,20 +353,7 @@ subroutine diagnosis(hpx4_bti,&
      write(stdout,*)' Step ',istep,' thermal flux: ',fdum(10)
      write(stdout,*)istep,Total_field_energy(1:3),fdum(15),fdum(16),fdum(17),fdum(18),fdum(19)
      if(istep>=mstep)then
-        !call err_check(fdum(1),fdum(19),numberpe)
-        call err_check(f1,f2,numpe,&
-! global parameters
-                       ihistory,snapout,maxmpsi,&
-          mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-       istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-       mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-       ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile,&
-           nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-       flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-       zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron,&
-                                       mtheta, &
-                                       deltat, &
-           do_collision)
+        call err_check(fdum(1),fdum(19),numberpe,stdout)
      endif
          
      !call FLUSH(stdout)
@@ -451,36 +372,14 @@ subroutine diagnosis(hpx4_bti,&
 
 end subroutine diagnosis
 
-   subroutine err_check(f1,f2,numpe,&
-! global parameters
-                       ihistory,snapout,maxmpsi,&
-          mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-       istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-       mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-       ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile,&
-           nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-       flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-       zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron,&
-                                       mtheta, &
-                                       deltat, &
-           do_collision)
+   subroutine err_check(f1,f2,numberpe,stdout)
    !use global_parameters
    use precision
    implicit none
-!  global parameters
-  integer :: ihistory,snapout,maxmpsi
-  integer mi,mimax,me,me1,memax,mgrid,mpsi,mthetamax,mzeta,mzetamax,&
-       istep,ndiag,ntracer,msnap,mstep,mstepall,stdout,mype,numberpe,&
-       mode00,nbound,irun,iload,irk,idiag,ncycle,mtdiag,idiag1,idiag2,&
-       ntracer1,nhybrid,ihybrid,nparam,rng_control,limit_vpara,fixed_Tprofile
-  real(kind=wp) nonlinear,paranl,a0,a1,a,q0,q1,q2,pi,tstep,kappati,kappate,kappan,&
-       flow0,flow1,flow2,ulength,utime,gyroradius,deltar,deltaz,zetamax,&
-       zetamin,umax,tite,rc,rw,tauii,qion,qelectron,aion,aelectron
-  integer,dimension(:),allocatable :: mtheta
-  real(kind=wp),dimension(:),allocatable :: deltat
-  logical  do_collision
 
    real(kind=wp) f1, f2, FOM, expected
+   integer numberpe
+   integer stdout
    integer numpe, ierr
    real(kind=wp) correct(3), diff
 
@@ -511,3 +410,21 @@ end subroutine diagnosis
 102 format(' This Run       : ',e15.8)
 103 format(' Difference:    : ',e15.8)
 end subroutine err_check
+
+subroutine test_diagnosis(hpx4_bti,&
+                          xnormal, mflux, &
+                       ihistory,&
+          mpsi,mthetamax,mzeta,mzetamax)
+  use, intrinsic :: iso_c_binding, only : c_ptr
+  use precision
+  TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
+
+!  global parameters
+  integer mflux
+  integer :: ihistory
+  integer mpsi,mthetamax,mzeta,mzetamax
+  ! diagnosis thread safety
+  real(kind=wp) xnormal(mflux)
+
+  print*,' INSIDE TEST DIAGNOSIS '
+end subroutine test_diagnosis

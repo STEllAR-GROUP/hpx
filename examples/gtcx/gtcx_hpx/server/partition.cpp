@@ -19,6 +19,47 @@
 #include <fstream>
 
 extern "C" {
+            void FNAME(future_diagnosis_cmm) (void *pfoo,double *xnormal,
+                  int *ihistory,
+                  int *mpsi,int *mthetamax,int *mzeta,int *mzetamax,
+                  int *istep,int *ndiag,int *ntracer,int *mstep,int *mstepall,int *stdout,int *mype,int *numberpe,
+                  int *nbound,int *irun,
+                  int *nhybrid,
+                  double *a0,double *a1,double *a,double *q0,double *q1,double *q2,double *kappati,
+                  double *gyroradius,
+                  double *tite,double *rc,double *rw,double *qion,double *qelectron,double *aion,double *aelectron,
+                                     int *mtheta,int *mi,int *me,int *mgrid,int *nparam,int *mimax,int *memax,
+                  double *zion, double *zion0, double *zelectron, double *zelectron0,
+                  int *myrank_partd,int *igrid,double *gradt,double *phi,double *Total_field_energy,
+                  int *mflux,int *num_mode,
+                  double *efluxi,double *efluxe,double *pfluxi,double *pfluxe,double *dflowi,double *dflowe,
+                  double *entropyi,double *entropye,double *efield,double *eradial,double *particles_energy,
+                  double *eflux,double *rmarker,double *etracer,double *ptracer
+                           ) {
+              gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+              ptr_to_class->future_diagnosis(xnormal,
+                                       ihistory,
+                                     mpsi,mthetamax,mzeta,mzetamax,
+                                     istep,ndiag,ntracer,mstep,mstepall,stdout,mype,numberpe,
+                                     nbound,irun,
+                                     nhybrid,
+                                     a0, a1, a,q0,q1, q2,kappati,
+                                     gyroradius,
+                                     tite,rc,rw,qion,qelectron,aion,aelectron,
+                                     mtheta,mi,me,mgrid,nparam,mimax,memax,
+                                     zion,zion0,zelectron,zelectron0,
+                                     myrank_partd,igrid,gradt,phi,Total_field_energy,
+                                     mflux,num_mode,
+                                     efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,
+                                     entropyi,entropye,efield,eradial,particles_energy,eflux,
+                                     rmarker,
+                                     etracer,ptracer
+                                     );
+              return; };
+            void FNAME(future_diagnosis_finish_cmm) (void *pfoo) {
+              gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
+              ptr_to_class->future_diagnosis_finish();
+              return; };
             void FNAME(int_allgather_cmm) (void *pfoo,int *in,int *out,int *length) {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
                     ptr_to_class->int_comm_allgather(in,out,length);
@@ -42,6 +83,32 @@ extern "C" {
                     ptr_to_class->set_toroidal_cmm(send,length,myrank_toroidal);
                     return; };
             void FNAME(loop)(void* opaque_ptr_to_class, int *,int *);
+            void FNAME(test_diagnosis)(void* opaque_ptr_to_class, 
+                                       const double *,int *, int *, int *, int *,int *, int *);
+            void FNAME(diagnosis)(void* opaque_ptr_to_class, 
+                                  double *,
+                                  int *,
+                                  int *, int *, int *, int *,
+                                  int *, int *, int *, int *, int *, int *,int *, int *,
+                                  int *, int *,
+                                  int *,
+                                  double *, double *, double *, double *, double *, double *, double *, 
+                                  double *,
+                                  double *, double *, double *, double *, double *, double *, double *,
+                                  int *,
+                                  double *, double *, double *,
+                                  double *,
+                                  int *,
+                                  int *,
+                                  double *,
+                                  double *,
+                                  double *,
+                                  int *, int *,
+                                  double *, double *, double *, double *, double *, double *,
+                                  double *, double *, double *, double *, double *, double *,
+                                  double *,
+                                  double *, double *
+                                 );
             void FNAME(sndrecv_toroidal_cmm) (void* pfoo,double *send, int *send_size,
                                                double *receive,int *receive_size,int *dest) {
                     gtcx::server::partition *ptr_to_class = *static_cast<gtcx::server::partition**>(pfoo);
@@ -244,6 +311,240 @@ namespace gtcx { namespace server
 
 
 
+    void partition::future_diagnosis(double *xnormal,
+                           int *ihistory,
+                  int *mpsi,int *mthetamax,int *mzeta,int *mzetamax,
+                  int *istep,int *ndiag,int *ntracer,int *mstep,int *mstepall,int *stdout,int *mype,int *numberpe,
+                  int *nbound,int *irun,
+                  int *nhybrid,
+                  double *a0,double *a1,double *a,double *q0,double *q1,double *q2,double *kappati,
+                  double *gyroradius,
+                  double *tite,double *rc,double *rw,double *qion,double *qelectron,double *aion,double *aelectron,
+                                     int *mtheta,int *mi,int *me,int *mgrid,int *nparam,int *mimax,int *memax,
+                  double *zion, double *zion0, double *zelectron, double *zelectron0,
+                  int *myrank_partd,int *igrid,double *gradt,double *phi,double *Total_field_energy,
+                  int *mflux,int *num_mode,
+                  double *efluxi,double *efluxe,double *pfluxi,double *pfluxe,double *dflowi,double *dflowe,
+                  double *entropyi,double *entropye,double *efield,double *eradial,double *particles_energy,
+                  double *eflux,double *rmarker,double *etracer,double *ptracer
+                                     )
+    {
+      // synchronize with all operations to finish
+      std::size_t generation = 0;
+      future_diagnosis_f_ = future_diagnosis_gate_.get_future(1,
+          &generation);
+
+      // Copy arguments to serializable structures
+      int c_mflux = *mflux;
+      int c_mpsi = *mpsi;
+      int c_mi = *mi;
+      int c_me = *me;
+      int c_mzeta = *mzeta;
+      int c_mgrid = *mgrid;
+      int c_nparam = *nparam;
+      int c_mimax = *mimax;
+      int c_memax = *memax;
+      std::vector<double> c_xnormal(xnormal, xnormal+c_mflux);
+      std::vector<int> c_mtheta(mtheta, mtheta+(c_mpsi+1));
+      std::vector<int> c_igrid(igrid, igrid+(c_mpsi+1));
+      std::vector<double> c_gradt(gradt, gradt+c_mpsi);
+      std::vector<double> c_phi(phi,phi+(c_mzeta+1)*c_mgrid);
+      std::vector<double> c_Total_field_energy(Total_field_energy,Total_field_energy+3);
+
+      std::vector<double> c_zion(zion, zion+c_nparam*c_mimax);
+      std::vector<double> c_zion0(zion0, zion0+c_nparam*c_mimax);
+      std::vector<double> c_zelectron;
+      std::vector<double> c_zelectron0;
+      if ( *nhybrid > 0 ) {
+        c_zelectron.resize(6*c_memax);
+        c_zelectron0.resize(6*c_memax);
+        for (std::size_t i=0;i<6*c_memax;i++) {
+          c_zelectron[i] = zelectron[i];
+          c_zelectron0[i] = zelectron0[i];
+        }
+      }
+      std::vector<double> c_particles_energy(particles_energy, particles_energy+2);
+      std::vector<double> c_eflux(eflux, eflux+c_mflux);
+      std::vector<double> c_rmarker(rmarker, rmarker+c_mflux);
+      std::vector<double> c_ptracer(ptracer, ptracer+4);
+
+      std::vector<int> int_arguments;
+      std::vector<double> double_arguments;
+      std::vector< std::vector<int> > int_arrays;
+      std::vector< std::vector<double> > double_arrays;
+      
+      int_arguments.resize(19);
+      int_arguments[0] = *ihistory;
+      int_arguments[1] = *mpsi;
+      int_arguments[2] = *mthetamax;
+      int_arguments[3] = *mzeta;
+      int_arguments[4] = *mzetamax;
+      int_arguments[5] = *istep;
+      int_arguments[6] = *ndiag;
+      int_arguments[7] = *ntracer;
+      int_arguments[8] = *mstep;
+      int_arguments[9] = *mstepall;
+      int_arguments[10] = *stdout;
+      int_arguments[11] = *mype;
+      int_arguments[12] = *numberpe;
+      int_arguments[13] = *nbound;
+      int_arguments[14] = *irun;
+      int_arguments[15] = *nhybrid;
+      int_arguments[16] = *myrank_partd;
+      int_arguments[17] = *mflux;
+      int_arguments[18] = *num_mode;
+
+      double_arguments.resize(26);
+      double_arguments[0] = *a0;
+      double_arguments[1] = *a1;
+      double_arguments[2] = *a;
+      double_arguments[3] = *q0;
+      double_arguments[4] = *q1;
+      double_arguments[5] = *q2;
+      double_arguments[6] = *kappati;
+      double_arguments[7] = *gyroradius;
+      double_arguments[8] = *tite;
+      double_arguments[9] = *rc;
+      double_arguments[10] = *rw;
+      double_arguments[11] = *qion;
+      double_arguments[12] = *qelectron;
+      double_arguments[13] = *aion;
+      double_arguments[14] = *aelectron;
+      double_arguments[15] = *efluxi;
+      double_arguments[16] = *efluxe;
+      double_arguments[17] = *pfluxi;
+      double_arguments[18] = *pfluxe;
+      double_arguments[19] = *dflowi;
+      double_arguments[20] = *dflowe;
+      double_arguments[21] = *entropyi;
+      double_arguments[22] = *entropye;
+      double_arguments[23] = *efield;
+      double_arguments[24] = *eradial;
+      double_arguments[25] = *etracer;
+
+      int_arrays.resize(2);
+      int_arrays[0] = c_mtheta;
+      int_arrays[1] = c_igrid;
+
+      double_arrays.resize(12);
+      double_arrays[0] = c_xnormal;
+      double_arrays[1] = c_zion;
+      double_arrays[2] = c_zion0;
+      double_arrays[3] = c_zelectron;
+      double_arrays[4] = c_zelectron0;
+      double_arrays[5] = c_gradt;
+      double_arrays[6] = c_phi;
+      double_arrays[7] = c_Total_field_energy;
+      double_arrays[8] = c_particles_energy;
+      double_arrays[9] = c_eflux;
+      double_arrays[10] = c_rmarker;
+      double_arrays[11] = c_ptracer;
+
+      set_future_diagnosis_action set_fda;
+      hpx::apply(set_fda, components_[item_], item_, generation,
+                int_arguments, double_arguments,int_arrays,double_arrays);
+
+    }
+
+    void partition::set_future_diagnosis(std::size_t which, std::size_t generation,
+                  std::vector<int> const& int_arguments,
+                  std::vector<double> const& double_arguments,
+                  std::vector< std::vector<int> > const& int_arrays,
+                  std::vector< std::vector<double> > const& double_arrays
+                   )
+    {
+        future_diagnosis_gate_.synchronize(generation, "point::set_future_diagnosis");
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+            int mflux = int_arguments[17];
+            int ihistory = int_arguments[0];
+            int mpsi = int_arguments[1];
+            int mthetamax = int_arguments[2];
+            int mzeta = int_arguments[3];
+            int mzetamax = int_arguments[4];
+            //std::vector< double > xnormal = double_arrays[0];
+            FNAME(test_diagnosis)(static_cast<void*>(this), 
+                             &(double_arrays[0][0]), // xnormal
+                             &mflux, // mflux
+                             &ihistory, // ihistory
+                             &mpsi, // mpsi
+                             &mthetamax, // mthetamax
+                             &mzeta, // mzeta
+                             &mzetamax);// mzetamax
+#if 0
+            FNAME(diagnosis)(static_cast<void*>(this), 
+                             &*double_arrays[0].begin(), // xnormal
+                             &(int_arguments[0]), // ihistory
+                             &(int_arguments[1]), // mpsi
+                             &(int_arguments[2]), // mthetamax
+                             &(int_arguments[3]), // mzeta
+                             &(int_arguments[4]), // mzetamax
+                             &(int_arguments[5]), // istep
+                             &(int_arguments[6]), // ndiag
+                             &(int_arguments[7]), // ntracer
+                             &(int_arguments[8]), // mstep
+                             &(int_arguments[9]), // mstepall
+                             &(int_arguments[10]), // stdout
+                             &(int_arguments[11]), // mype
+                             &(int_arguments[12]), // numberpe
+                             &(int_arguments[13]), // nbound
+                             &(int_arguments[14]), // irun
+                             &(int_arguments[15]), // nhybrid
+                             &(double_arguments[0]), // a0
+                             &(double_arguments[1]), // a1
+                             &(double_arguments[2]), // a
+                             &(double_arguments[3]), // q0
+                             &(double_arguments[4]), // q1
+                             &(double_arguments[5]), // q2
+                             &(double_arguments[6]), // kappati
+                             &(double_arguments[7]), // gyroradius
+                             &(double_arguments[8]), // tite
+                             &(double_arguments[9]), // rc
+                             &(double_arguments[10]), // rw
+                             &(double_arguments[11]), // qion
+                             &(double_arguments[12]), // qelectron
+                             &(double_arguments[13]), // aion
+                             &(double_arguments[14]), // aelectron
+                             &*int_arrays[0].begin(), // mtheta
+                             &*double_arrays[1].begin(), // zion
+                             &*double_arrays[2].begin(), // zion0
+                             &*double_arrays[3].begin(), // zelectron
+                             &*double_arrays[4].begin(), // zelectron0
+                             &(int_arguments[16]), // myrank_partd
+                             &*int_arrays[1].begin(), // igrid
+                             &*double_arrays[5].begin(), // gradt
+                             &*double_arrays[6].begin(), // phi
+                             &*double_arrays[7].begin(), // Total_field_energy
+                             &(int_arguments[17]), // mflux
+                             &(int_arguments[18]), // num_mode
+                             &(double_arguments[15]), // efluxi
+                             &(double_arguments[16]), // efluxe
+                             &(double_arguments[17]), // pfluxi
+                             &(double_arguments[18]), // pfluxe
+                             &(double_arguments[19]), // dflowi
+                             &(double_arguments[20]), // dflowe
+                             &(double_arguments[21]), // entropyi
+                             &(double_arguments[22]), // entropye
+                             &(double_arguments[23]), // efield
+                             &(double_arguments[24]), // eradial
+                             &*double_arrays[8].begin(), // particles_energy
+                             &*double_arrays[9].begin(), // eflux
+                             &*double_arrays[10].begin(), // rmarker
+                             &(double_arguments[25]), // etracer
+                             &*double_arrays[11].begin() // ptracer
+                            );
+            std::cout << " call diagnosis here HELLO WORLD TEST from " << which << std::endl;
+#endif
+        }
+
+        future_diagnosis_gate_.set(0);         // trigger corresponding and-gate input
+    }
+
+    void partition::future_diagnosis_finish()
+    {
+      future_diagnosis_f_.get();
+    }
 
 
 

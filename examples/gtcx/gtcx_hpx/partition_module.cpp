@@ -94,3 +94,7 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     gtcx_partition_type::wrapped_type::set_partd_allgather_data_action,
     gtcx_partition_set_partd_allgather_data_action);
+
+HPX_REGISTER_ACTION(
+    gtcx_partition_type::wrapped_type::set_future_diagnosis_action,
+    gtcx_partition_set_future_diagnosis_action);
