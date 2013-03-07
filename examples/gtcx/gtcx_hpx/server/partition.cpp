@@ -84,30 +84,31 @@ extern "C" {
                     return; };
             void FNAME(loop)(void* opaque_ptr_to_class, int *,int *);
             void FNAME(test_diagnosis)(void* opaque_ptr_to_class, 
-                                       const double *,int *, int *, int *, int *,int *, int *);
-            void FNAME(diagnosis)(void* opaque_ptr_to_class, 
-                                  double *,
-                                  int *,
-                                  int *, int *, int *, int *,
-                                  int *, int *, int *, int *, int *, int *,int *, int *,
-                                  int *, int *,
-                                  int *,
-                                  double *, double *, double *, double *, double *, double *, double *, 
-                                  double *,
-                                  double *, double *, double *, double *, double *, double *, double *,
-                                  int *,
-                                  double *, double *, double *,
-                                  double *,
-                                  int *,
-                                  int *,
-                                  double *,
-                                  double *,
-                                  double *,
-                                  int *, int *,
-                                  double *, double *, double *, double *, double *, double *,
-                                  double *, double *, double *, double *, double *, double *,
-                                  double *,
-                                  double *, double *
+                                       const double *,const int *, const int *);
+            void FNAME(diagnosis_future)(void* opaque_ptr_to_class, 
+                                  const double *,
+                                  const int *,
+                                  const int *, const int *, const int *, const int *,
+                                  const int *, const int *, const int *, const int *, const int *, const int *,const int *, const int *,
+                                  const int *, const int *,
+                                  const int *,
+                                  const double *, const double *, const double *, const double *, const double *, const double *, const double *, 
+                                  const double *,
+                                  const double *, const double *, const double *, const double *, const double *, const double *, const double *,
+                                  const int *,
+                                  const double *, const double *, const double *,
+                                  const double *,
+                                  const int *,
+                                  const int *,
+                                  const double *,
+                                  const double *,
+                                  const double *,
+                                  const int *, const int *,
+                                  const double *, const double *, const double *, const double *, const double *, const double *,
+                                  const double *, const double *, const double *, const double *, const double *, const double *,
+                                  const double *,
+                                  const double *, const double *,
+                                  const int *, const int *, const int *, const int *
                                  );
             void FNAME(sndrecv_toroidal_cmm) (void* pfoo,double *send, int *send_size,
                                                double *receive,int *receive_size,int *dest) {
@@ -373,7 +374,7 @@ namespace gtcx { namespace server
       std::vector< std::vector<int> > int_arrays;
       std::vector< std::vector<double> > double_arrays;
       
-      int_arguments.resize(19);
+      int_arguments.resize(21);
       int_arguments[0] = *ihistory;
       int_arguments[1] = *mpsi;
       int_arguments[2] = *mthetamax;
@@ -393,6 +394,10 @@ namespace gtcx { namespace server
       int_arguments[16] = *myrank_partd;
       int_arguments[17] = *mflux;
       int_arguments[18] = *num_mode;
+      int_arguments[19] = *nparam;
+      int_arguments[20] = *mimax;
+      int_arguments[21] = *memax;
+      int_arguments[22] = *mgrid;
 
       double_arguments.resize(26);
       double_arguments[0] = *a0;
@@ -443,7 +448,6 @@ namespace gtcx { namespace server
       set_future_diagnosis_action set_fda;
       hpx::apply(set_fda, components_[item_], item_, generation,
                 int_arguments, double_arguments,int_arrays,double_arrays);
-
     }
 
     void partition::set_future_diagnosis(std::size_t which, std::size_t generation,
@@ -456,7 +460,8 @@ namespace gtcx { namespace server
         future_diagnosis_gate_.synchronize(generation, "point::set_future_diagnosis");
 
         {
-            mutex_type::scoped_lock l(mtx_);
+            //mutex_type::scoped_lock l(mtx_);
+#if 0
             int mflux = int_arguments[17];
             int ihistory = int_arguments[0];
             int mpsi = int_arguments[1];
@@ -465,16 +470,12 @@ namespace gtcx { namespace server
             int mzetamax = int_arguments[4];
             //std::vector< double > xnormal = double_arrays[0];
             FNAME(test_diagnosis)(static_cast<void*>(this), 
+                             &(double_arrays[0][0]), // zion0
+                             &(int_arguments[19]), // nparam
+                             &(int_arguments[20])); // mimax
+#endif
+            FNAME(diagnosis_future)(static_cast<void*>(this), 
                              &(double_arrays[0][0]), // xnormal
-                             &mflux, // mflux
-                             &ihistory, // ihistory
-                             &mpsi, // mpsi
-                             &mthetamax, // mthetamax
-                             &mzeta, // mzeta
-                             &mzetamax);// mzetamax
-#if 0
-            FNAME(diagnosis)(static_cast<void*>(this), 
-                             &*double_arrays[0].begin(), // xnormal
                              &(int_arguments[0]), // ihistory
                              &(int_arguments[1]), // mpsi
                              &(int_arguments[2]), // mthetamax
@@ -506,16 +507,16 @@ namespace gtcx { namespace server
                              &(double_arguments[12]), // qelectron
                              &(double_arguments[13]), // aion
                              &(double_arguments[14]), // aelectron
-                             &*int_arrays[0].begin(), // mtheta
-                             &*double_arrays[1].begin(), // zion
-                             &*double_arrays[2].begin(), // zion0
-                             &*double_arrays[3].begin(), // zelectron
-                             &*double_arrays[4].begin(), // zelectron0
+                             &(int_arrays[0][0]), // mtheta
+                             &(double_arrays[1][0]), // zion
+                             &(double_arrays[2][0]), // zion0
+                             &(double_arrays[3][0]), // zelectron
+                             &(double_arrays[4][0]), // zelectron0
                              &(int_arguments[16]), // myrank_partd
-                             &*int_arrays[1].begin(), // igrid
-                             &*double_arrays[5].begin(), // gradt
-                             &*double_arrays[6].begin(), // phi
-                             &*double_arrays[7].begin(), // Total_field_energy
+                             &(int_arrays[1][0]), // igrid
+                             &(double_arrays[5][0]), // gradt
+                             &(double_arrays[6][0]), // phi
+                             &(double_arrays[7][0]), // Total_field_energy
                              &(int_arguments[17]), // mflux
                              &(int_arguments[18]), // num_mode
                              &(double_arguments[15]), // efluxi
@@ -528,14 +529,17 @@ namespace gtcx { namespace server
                              &(double_arguments[22]), // entropye
                              &(double_arguments[23]), // efield
                              &(double_arguments[24]), // eradial
-                             &*double_arrays[8].begin(), // particles_energy
-                             &*double_arrays[9].begin(), // eflux
-                             &*double_arrays[10].begin(), // rmarker
+                             &(double_arrays[8][0]), // particles_energy
+                             &(double_arrays[9][0]), // eflux
+                             &(double_arrays[10][0]), // rmarker
                              &(double_arguments[25]), // etracer
-                             &*double_arrays[11].begin() // ptracer
+                             &(double_arrays[11][0]), // ptracer
+                             &(int_arguments[19]), // nparam
+                             &(int_arguments[20]), // mimax
+                             &(int_arguments[21]), // memax
+                             &(int_arguments[22]) // mgrid
                             );
-            std::cout << " call diagnosis here HELLO WORLD TEST from " << which << std::endl;
-#endif
+
         }
 
         future_diagnosis_gate_.set(0);         // trigger corresponding and-gate input

@@ -719,6 +719,79 @@
   ! diagnosis thread safety
   real(kind=wp) xnormal(mflux)
   end subroutine diagnosis
+    subroutine prep_diagnosis(hpx4_bti,&
+                       xnormal,&
+! global parameters
+                       ihistory,&
+          mpsi,mthetamax,mzeta,mzetamax,&
+       istep,ndiag,ntracer,mstep,mstepall,stdout,mype,numberpe,&
+       nbound,irun,&
+       nhybrid,&
+       a0,a1,a,q0,q1,q2,kappati,&
+       gyroradius,&
+       tite,rc,rw,qion,qelectron,aion,aelectron,&
+                                       mtheta, &
+! particle array
+                                         zion,zion0,zelectron,&
+        zelectron0, &
+! particle decomp
+              myrank_partd,&
+! field array
+                                      igrid, &
+                                      gradt, &
+                                      phi,&
+              Total_field_energy, &
+! diagnosis array
+                       mflux,num_mode,&
+           efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,&
+       entropyi,entropye,efield,eradial,particles_energy,eflux,&
+       rmarker,&
+           etracer,ptracer)
+     use, intrinsic :: iso_c_binding, only : c_ptr
+  use precision
+#ifdef __INTEL_COMPILER
+  ! The Intel compiler has FLUSH in a special module
+  use IFPORT
+#endif
+
+  implicit none
+
+  TYPE(C_PTR), INTENT(IN), VALUE :: hpx4_bti
+
+!  global parameters
+  integer :: ihistory
+  integer mpsi,mthetamax,mzeta,mzetamax,&
+       istep,ndiag,ntracer,mstep,mstepall,stdout,mype,numberpe,&
+       nbound,irun,&
+       nhybrid
+  real(kind=wp) a0,a1,a,q0,q1,q2,kappati,&
+       gyroradius,&
+       tite,rc,rw,qion,qelectron,aion,aelectron
+  integer,dimension(:),allocatable :: mtheta
+
+! particle array
+  real(kind=wp),dimension(:,:),allocatable :: zion,zion0,zelectron,&
+        zelectron0
+
+! particle decomp
+  integer  :: myrank_partd
+
+! field array
+  integer,dimension(:),allocatable :: igrid
+  real(kind=wp),dimension(:),allocatable :: gradt
+  real(kind=wp),dimension(:,:),allocatable :: phi
+  real(kind=wp) :: Total_field_energy(3)
+
+! diagnosis array
+  integer :: mflux,num_mode
+  real(kind=wp) efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,&
+       entropyi,entropye,efield,eradial,particles_energy(2),eflux(mflux),&
+       rmarker(mflux)
+  real(kind=wp) etracer,ptracer(4)
+
+  ! diagnosis thread safety
+  real(kind=wp) xnormal(mflux)
+  end subroutine prep_diagnosis
 
 !    subroutine diagnosis(hpx4_bti,&
 !                          xnormal,&
@@ -1403,7 +1476,7 @@
   integer mring,mtest,nmem
   integer algorithm_change
 
-  algorithm_change = 0
+  algorithm_change = 1
 
   mype = hpx4_mype
   numberpe = hpx4_numberpe
@@ -1764,11 +1837,41 @@
        rmarker,&
            etracer,ptracer) ! }}}
           else
-
+            if ( istep == ndiag ) then
+              ! this is only called once
+            call prep_diagnosis(hpx4_bti,&  ! {{{
+                  xnormal,&
+! global parameters
+                       ihistory,&
+          mpsi,mthetamax,mzeta,mzetamax,&
+       istep,ndiag,ntracer,mstep,mstepall,stdout,mype,numberpe,&
+       nbound,irun,&
+       nhybrid,&
+       a0,a1,a,q0,q1,q2,kappati,&
+       gyroradius,&
+       tite,rc,rw,qion,qelectron,aion,aelectron,&
+                                       mtheta, &
+! particle array
+                                         zion,zion0,zelectron,&
+        zelectron0, &
+! particle decomp
+              myrank_partd,&
+! field array
+                                      igrid, &
+                                      gradt, &
+                                      phi,&
+              Total_field_energy, &
+! diagnosis array
+                       mflux,num_mode,&
+           efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,&
+       entropyi,entropye,efield,eradial,particles_energy,eflux,&
+       rmarker,&
+           etracer,ptracer) ! }}}
+            endif
             if ( firstcall == 0 ) then
               call future_diagnosis_finish_cmm(hpx4_bti)
             end if 
-            call future_diagnosis_cmm(hpx4_bti,xnormal, &
+            call future_diagnosis_cmm(hpx4_bti,xnormal, & ! {{{
 ! global parameters
                        ihistory,&
           mpsi,mthetamax,mzeta,mzetamax,&
@@ -1794,7 +1897,7 @@
            efluxi,efluxe,pfluxi,pfluxe,dflowi,dflowe,&
        entropyi,entropye,efield,eradial,particles_energy,eflux,&
        rmarker,&
-           etracer,ptracer) 
+           etracer,ptracer)  ! }}}
             firstcall = 0
           endif
         endif
