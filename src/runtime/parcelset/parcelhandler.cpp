@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset
     {
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
         std::string enable_shmem =
-            get_config_entry("hpx.parcel.use_shmem_parcelport", "0");
+            get_config_entry("hpx.parcel.shmem.enable", "0");
 
         if (boost::lexical_cast<int>(enable_shmem)) {
             // we use the provided information to decide what types of parcel-ports

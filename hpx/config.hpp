@@ -189,7 +189,7 @@
 /// (to each of the other localities on the same node). This value can be changed
 /// at runtime by setting the configuration parameter:
 ///
-///   hpx.parcel.shmem_data_buffer_cache_size = ...
+///   hpx.parcel.shmem.data_buffer_cache_size = ...
 ///
 /// (or by setting the corresponding environment variable
 /// HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE).
