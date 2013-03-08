@@ -32,6 +32,10 @@ using hpx::threads::get_thread_count;
 
 using hpx::util::high_resolution_timer;
 
+using hpx::reset_active_counters;
+using hpx::evaluate_active_counters;
+using hpx::stop_active_counters;
+
 using hpx::cout;
 using hpx::flush;
 
@@ -87,6 +91,9 @@ int hpx_main(
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
 
+        // Reset performance counters (if specified on command line)
+		reset_active_counters();
+        
         // Start the clock.
         high_resolution_timer t;
 
@@ -100,7 +107,13 @@ int hpx_main(
             suspend();
         } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
 
-        print_results(get_os_thread_count(), t.elapsed());
+		// Stop the clock
+		double time_elapsed=t.elapsed();
+		
+		// Evaluate Performance Counters
+		evaluate_active_counters();
+
+        print_results(get_os_thread_count(), time_elapsed);
     }
 
     return finalize();
