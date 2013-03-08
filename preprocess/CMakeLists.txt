@@ -45,6 +45,7 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/deferred_packaged_task_constructors.hpp"
   "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"
+  "hpx/runtime/actions/gcc44/component_action_implementations.hpp"
   "hpx/runtime/actions/component_const_action_implementations.hpp"
   "hpx/runtime/actions/component_non_const_action_implementations.hpp"
   "hpx/runtime/actions/construct_continuation_function_objects.hpp"
@@ -57,7 +58,8 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/applier/apply_implementations_callback.hpp"
   "hpx/runtime/applier/apply_continue.hpp"
   "hpx/runtime/components/new.hpp"
-  "hpx/runtime/components/server/runtime_support.hpp"
+  "hpx/runtime/components/server/runtime_support_implementations.hpp"
+  "hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp"
   "hpx/runtime/components/server/create_component_with_args.hpp"
   "hpx/runtime/components/server/runtime_support_create_component_decl.hpp")
 foreach(file ${action_argument_limit_preprocessing_files})

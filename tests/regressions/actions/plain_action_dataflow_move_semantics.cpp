@@ -347,7 +347,7 @@ int hpx_main(variables_map&)
         ), is_local ? 0u : 0u);
         */
 
-#if defined(__GNUC__) && (HPX_GCC_VERSION < 40500)
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
         HPX_TEST_EQ((
             return_move_object<
                 return_non_movable_object_action, non_movable_object

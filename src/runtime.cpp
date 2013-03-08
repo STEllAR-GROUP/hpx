@@ -259,6 +259,17 @@ namespace hpx
               ""
             },
 
+            // stddev counter
+            { "/statistics/stddev", performance_counters::counter_aggregating,
+              "returns the standard deviation value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/stddev",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+
             // rolling_averaging counter
             { "/statistics/rolling_average", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "

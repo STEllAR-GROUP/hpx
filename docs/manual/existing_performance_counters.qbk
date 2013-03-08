@@ -133,7 +133,7 @@ system and application performance.
         ]
         [None]
         [Returns the overall number of bytes transferred (see `<operation>`,
-         e.g. `sent` or `received`, possibly compressed) for the specified 
+         e.g. `sent` or `received`, possibly compressed) for the specified
          `<connection_type>` by the given locality.
 
          The performance counters for the conenction type `shmem` are available
@@ -533,6 +533,17 @@ system and application performance.
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.]
+    ]
+    [   [`/statistics/stddev`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current standard deviation (stddev) value calculated based
+         on the values queried from the underlying counter (the one specified
+         as the instance name).]
+        [Any parameter will be interpreted as the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the
+         default.]
     ]
     [   [`/statistics/rolling_average`]
         [Any full performance counter name. The referenced performance counter

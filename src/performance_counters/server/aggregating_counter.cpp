@@ -199,6 +199,8 @@ namespace hpx { namespace performance_counters { namespace server
 template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::mean>;
 template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
+    boost::accumulators::tag::variance>;
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::median>;
 template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::rolling_mean>;
@@ -218,6 +220,18 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     average_count_counter_type, average_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// Variance
+typedef hpx::components::managed_component<
+    hpx::performance_counters::server::aggregating_counter<
+        boost::accumulators::tag::variance>
+> variance_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    variance_count_counter_type, variance_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rooling average

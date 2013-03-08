@@ -35,7 +35,10 @@ if(UNIX)
 
     # Warn about casting that violates qualifiers or alignment
     hpx_use_flag_if_available(-Wcast-qual)
-    hpx_use_flag_if_available(-Wcast-align)
+    if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+      # Clang is overeager in reporting cast alignment problems in Boost
+      hpx_use_flag_if_available(-Wcast-align)
+    endif()
 
     hpx_use_flag_if_available(-Werror=trampolines)
     hpx_use_flag_if_available(-Werror=parentheses)

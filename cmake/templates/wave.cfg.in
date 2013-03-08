@@ -61,7 +61,6 @@
 -NLBT_
 #
 -NHPX_UTIL_STRIP
--NHPX_SPECIALIZE
 
 #
 # We inhibit expanding this because it otherwise generates some funky
