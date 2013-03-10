@@ -175,8 +175,18 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void parcelhandler::flush_buffers(bool stop_buffering)
+    {
+        message_handler_map::iterator end = handlers_.end();
+        for (message_handler_map::iterator it = handlers_.begin(); it != end; ++it)
+        {
+            (*it).second->flush(stop_buffering);
+        }
+    }
+
     void parcelhandler::stop(bool blocking)
     {
+        // now stop all parcel ports
         BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
         {
             if (pp) pp->stop(blocking);
@@ -337,9 +347,11 @@ namespace hpx { namespace parcelset
         // dispatch to the message handler which is associated with the
         // encapsulated action
         connection_type t = find_appropriate_connection_type(addrs[0].locality_);
-        policies::message_handler* mh = p.get_message_handler(this);
+        policies::message_handler* mh = 
+            p.get_message_handler(this, addrs[0].locality_, t);
+
         if (mh) {
-            mh->put_parcel(find_parcelport(t), p, f);
+            mh->put_parcel(p, f);
             return;
         }
 

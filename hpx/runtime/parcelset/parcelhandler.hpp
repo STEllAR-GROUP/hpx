@@ -67,8 +67,10 @@ namespace hpx { namespace parcelset
         void rethrow_exception();
 
         //
-        typedef std::map<std::string, boost::shared_ptr<policies::message_handler> >
-            message_handler_map;
+        typedef std::pair<naming::locality, std::string> handler_key_type;
+        typedef std::map<
+            handler_key_type, boost::shared_ptr<policies::message_handler> >
+        message_handler_map;
 
     public:
         typedef parcelport::read_handler_type read_handler_type;
@@ -98,6 +100,9 @@ namespace hpx { namespace parcelset
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
+
+        /// \ brief flush all parcel buffers
+        void flush_buffers(bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -361,16 +366,18 @@ namespace hpx { namespace parcelset
         ///////////////////////////////////////////////////////////////////////
         template <typename MessageHandler>
         policies::message_handler* get_message_handler(char const* action,
-            std::size_t num_messages)
+            std::size_t num_messages, naming::locality const& loc, 
+            connection_type t)
         {
             mutex_type::scoped_lock l(mtx_);
-            message_handler_map::iterator it = handlers_.find(action);
+            handler_key_type key(loc, action);
+            message_handler_map::iterator it = handlers_.find(key);
             if (it == handlers_.end()) {
                 boost::shared_ptr<policies::message_handler> p(
-                    new MessageHandler(num_messages));
+                    new MessageHandler(num_messages, find_parcelport(t)));
 
                 std::pair<message_handler_map::iterator, bool> r =
-                    handlers_.insert(message_handler_map::value_type(action, p));
+                    handlers_.insert(message_handler_map::value_type(key, p));
                 if (!r.second) {
                     HPX_THROW_EXCEPTION(internal_server_error,
                         "parcelhandler::get_message_handler", 

@@ -12,6 +12,7 @@
 
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 
@@ -26,14 +27,17 @@ namespace hpx { namespace plugins { namespace parcel
         typedef parcelset::policies::message_handler::write_handler_type
             write_handler_type;
 
-        coalescing_message_handler(std::size_t num);
+        coalescing_message_handler(std::size_t num, parcelset::parcelport* set);
         ~coalescing_message_handler();
 
-        void put_parcel(parcelset::parcelport* set, parcelset::parcel& p,
-            write_handler_type f);
+        void put_parcel(parcelset::parcel& p, write_handler_type const& f);
+
+        void flush(bool stop_buffering = false);
 
     private:
-        std::size_t buffer_size_;
+        parcelset::parcelport* pp_;
+        detail::message_buffer buffer_;
+        bool stopped_;
     };
 }}}
 
@@ -47,11 +51,12 @@ namespace hpx { namespace plugins { namespace parcel
         struct action_message_handler<action_type>                            \
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
-                parcelset::parcelhandler* ph)                                 \
+                parcelset::parcelhandler* ph, naming::locality const& loc,    \
+                parcelset::connection_type t)                                 \
             {                                                                 \
                 return ph->get_message_handler<                               \
                     hpx::plugins::parcel::coalescing_message_handler          \
-                >(BOOST_PP_STRINGIZE(action_type), num);                      \
+                >(BOOST_PP_STRINGIZE(action_type), num, loc, t);              \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
