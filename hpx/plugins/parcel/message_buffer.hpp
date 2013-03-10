@@ -32,6 +32,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
             singleton_buffer = 3
         };
 
+
         message_buffer()
           : max_messages_(0)
         {}
@@ -74,7 +75,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         void operator()(parcelset::parcelport* set)
         {
-            message_buffer buff;
+            message_buffer buff (max_messages_);
 
             {
                 mutex_type::scoped_lock l(mtx_);
@@ -93,13 +94,13 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
             int result = normal;
             if (messages_.empty())
-                result |= first_message;
+                result = first_message;
 
             messages_.push_back(p);
             handlers_.push_back(f);
 
-            if (messages_.size() == max_messages_)
-                result |= buffer_now_full;
+            if (messages_.size() >= max_messages_)
+                result = buffer_now_full;
 
             return message_buffer_append_state(result);
         }
@@ -135,7 +136,8 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
     protected:
         void flush(parcelset::parcelport* set)
         {
-            set->put_parcels(messages_, handlers_);
+            if (!messages_.empty())
+                set->put_parcels(messages_, handlers_);
         }
 
     private:
@@ -145,5 +147,3 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         std::size_t max_messages_;
     };
 }}}}
-
-#endif

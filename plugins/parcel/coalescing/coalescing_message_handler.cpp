@@ -46,7 +46,7 @@ namespace hpx { namespace plugins { namespace parcel
         default:
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_message_handler::put_parcel",
-                "");
+                "unexpected return value from message_buffer::append");
             return;
         }
     }
