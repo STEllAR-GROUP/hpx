@@ -7,6 +7,7 @@
 #define HPX_PARCELSET_IBVERBS_SERVER_HPP
 
 #include <hpx/runtime/parcelset/ibverbs/messages.hpp>
+#include <tcmalloc.h>
 
 namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
     struct server
@@ -65,6 +66,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             if(id_)
             {
                 rdma_disconnect(id_);
+                id_ = 0;
             }
 
             size_ = 0;
@@ -222,6 +224,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     else
                     {
                         size_ = len;
+                        id_ = id;
                         // We don't do anything here, the handler takes care of
                         // sending the next message and register the next receive as
                         // we need to copy stuff out of the rdma buffer first

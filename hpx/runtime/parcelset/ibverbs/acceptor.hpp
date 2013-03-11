@@ -285,6 +285,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             }
             else
             {
+                /*
                 sockaddr_in addr;
 
                 memset(&addr, 0, sizeof(addr));
@@ -294,6 +295,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     addr.sin_family = AF_INET;
                     addr.sin_addr.s_addr = htons(ep.address().to_v4().to_ulong());
                 }
+                std::cout << ep.address().to_v4().to_string() << "\n";
+                */
 
                 event_channel_ = rdma_create_event_channel();
                 if(!event_channel_)
@@ -315,10 +318,21 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     return;
                 }
 
-                ret = rdma_bind_addr(listener_, reinterpret_cast<sockaddr *>(&addr));
+                std::string host = ep.address().to_v4().to_string();
+                std::string port = boost::lexical_cast<std::string>(ep.port());
 
+                //std::cout << host << " " << port << "\n";
+                addrinfo *addr;
+
+                getaddrinfo(host.c_str(), port.c_str(), NULL, &addr);
+
+                ret = rdma_bind_addr(listener_, addr->ai_addr);
+
+                freeaddrinfo(addr);
                 if(ret)
                 {
+                    int err = errno;
+                    std::cout << strerror(err) << "\n";
                     rdma_destroy_id(listener_);
                     rdma_destroy_event_channel(event_channel_);
                     // FIXME: better error here

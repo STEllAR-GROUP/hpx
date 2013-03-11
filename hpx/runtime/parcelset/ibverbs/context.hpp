@@ -361,21 +361,13 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 {
                     boost::system::error_code ec;
                     std::size_t size = impl->write(data_, ec);
-                    hpx::applier::register_thread_nullary(
-                        HPX_STD_BIND(
-                            handler_, ec, size
-                        ), "ibverbs write handler"
-                        , threads::pending, true
-                        , threads::thread_priority_critical);
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, ec, size));
                 }
                 else
                 {
-                    hpx::applier::register_thread_nullary(
-                        HPX_STD_BIND(
-                            handler_, boost::asio::error::operation_aborted, 0
-                        ), "ibverbs write handler (operation aborted)"
-                        , threads::pending, true
-                        , threads::thread_priority_critical);
+                    io_service_.post(boost::asio::detail::bind_handler(
+                        handler_, boost::asio::error::operation_aborted, 0));
                 }
             }
 
@@ -556,12 +548,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 boost::make_shared<operation_type>(
                     impl, this->get_io_service(), data, handler));
 
-            hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(
-                    &operation_type::call, op
-                ), "ibverbs::detail::write_operation::call"
-                , threads::pending, true
-                , threads::thread_priority_critical);
+            this->get_io_service().post(boost::bind(
+                &operation_type::call, op));
         }
         
 
@@ -882,6 +870,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 }
             }
             ibv_req_notify_cq(cq, 0);
+            
 
             k = 0;
             message_type m = MSG_RETRY;
@@ -974,13 +963,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
                 BOOST_ASSERT(connection_.size_ > 0);
                 BOOST_ASSERT(connection_.size_ <= connection_.buffer_size_);
-
+                
                 std::copy(
                     connection_.buffer_
                   , connection_.buffer_ + connection_.size_
-                  , data_itr
+                  , data.begin() + bytes_read
                 );
-                data_itr += bytes_read;
 
                 bytes_read += connection_.size_;
                 connection_.post_receive();
@@ -1039,7 +1027,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 
                 std::vector<char>::const_iterator
                     next_data_itr = data_itr + chunk_size;
-                std::copy(data_itr, next_data_itr, connection_.buffer_);
+
+                char * buffer_itr = connection_.buffer_;
+                std::copy(data_itr, next_data_itr, buffer_itr);
+
                 data_itr = next_data_itr;
                 HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
             }
