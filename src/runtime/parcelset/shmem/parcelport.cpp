@@ -445,7 +445,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "tcp::parcelport::get_connection_cache_statistics",
+            "shmem::parcelport::get_connection_cache_statistics",
             "invalid connection cache statistics type");
         return 0;
     }
