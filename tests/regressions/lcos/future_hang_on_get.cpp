@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#define HPX_LIMIT 6
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/plain_actions.hpp>
@@ -78,26 +80,26 @@ double null_function(
 ///////////////////////////////////////////////////////////////////////////////
 double null_tree(
     boost::uint64_t seed
-  , boost::uint64_t children
   , boost::uint64_t depth
   , boost::uint64_t max_depth
+  , boost::uint64_t children
   , boost::uint64_t delay_iterations
+  , boost::uint32_t num_localities
     );
 
 HPX_PLAIN_ACTION(null_tree, null_tree_action);
 
 double null_tree(
     boost::uint64_t seed
-  , boost::uint64_t children
   , boost::uint64_t depth
   , boost::uint64_t max_depth
+  , boost::uint64_t children
   , boost::uint64_t delay_iterations
+  , boost::uint32_t num_localities
     ) 
 {
     if (depth == max_depth)
         return null_function(seed, delay_iterations);
-
-    hpx::id_type const here = hpx::find_here();
 
     double d = 0.;
 
@@ -108,8 +110,15 @@ double null_tree(
 
     for (boost::uint64_t j = 0; j < children; ++j)
     {
-        futures.push_back(hpx::async<null_tree_action>
-            (here, j + p, children, depth + 1, max_depth, delay_iterations)); 
+        hpx::id_type const target
+            = hpx::naming::get_id_from_locality_id((j + p) % num_localities);
+
+        futures.push_back(hpx::async<null_tree_action>(target, j + p, depth + 1
+                                                     , max_depth
+                                                     , children
+                                                     , delay_iterations
+                                                     , num_localities
+                                                       )); 
     }
 
     null_function(seed, delay_iterations);
@@ -136,6 +145,8 @@ int hpx_main(
 
         bool verbose = vm.count("verbose") != 0;
 
+        boost::uint32_t num_localities = hpx::find_all_localities().size();
+
         hpx::id_type const here = hpx::find_here();
 
         double d = 0.;
@@ -144,8 +155,12 @@ int hpx_main(
             ; ((test_runs == 0) ? true : (i < test_runs))
             ; ++i) 
         {
-            d += hpx::async<null_tree_action>
-                (here, 0, children, 1, max_depth, delay_iterations).get(); 
+            d += hpx::async<null_tree_action>(here, 0, 1
+                                            , max_depth
+                                            , children
+                                            , delay_iterations
+                                            , num_localities
+                                              ).get(); 
 
             if (verbose)
                 std::cout << (boost::format("%016u : %f\n") % i % d)
