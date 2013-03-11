@@ -396,7 +396,7 @@ namespace hpx { namespace util
             if(NULL != sec)
             {
                 std::string cfg_max_connections(
-                    sec->get_entry("max_connections_cache_size",
+                    sec->get_entry("max_connections",
                         HPX_MAX_PARCEL_CONNECTIONS));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
