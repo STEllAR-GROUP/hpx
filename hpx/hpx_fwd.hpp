@@ -102,6 +102,7 @@ namespace hpx
             connection_tcpip = 0,
             connection_shmem = 1,
             connection_portals4 = 2,
+            connection_ibverbs = 3,
             connection_last
         };
 

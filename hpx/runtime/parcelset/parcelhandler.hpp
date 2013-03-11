@@ -360,6 +360,11 @@ namespace hpx { namespace parcelset
             use_alternative_parcelports_ = true;
         }
 
+        void disable_alternative_parcelports()
+        {
+            use_alternative_parcelports_ = false;
+        }
+
         /// Return the reference to an existing io_service
         util::io_service_pool* get_thread_pool(char const* name);
 

@@ -111,6 +111,11 @@ namespace hpx { namespace util
             "enable=${HPX_USE_SHMEM_PARCELPORT:0}",
             "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
 
+            "[hpx.parcel.ibverbs]",
+            "enable=${HPX_USE_IBVERBS_PARCELPORT:0}",
+            "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:4096}",
+            "sync_threshold=${HPX_PARCEL_IBVERBS_SYNC_THRESHOLD:0}",
+
             // predefine command line aliases
             "[hpx.commandline]",
             "-a = --hpx:agas",

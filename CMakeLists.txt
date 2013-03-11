@@ -306,6 +306,19 @@ if(${BOOST_MINOR_VERSION} GREATER 51)
 endif()
 
 ################################################################################
+# Decide whether to use rdma based ibverbs parcelport
+################################################################################
+find_package(HPX_Ibverbs)
+find_package(HPX_Rdmacm)
+if(IBVERBS_FOUND AND RDMACM_FOUND)
+  hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+  if(HPX_USE_PARCELPORT_IBVERBS)
+    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_IBVERBS)
+  endif()
+endif()
+
+
+################################################################################
 # Logging configuration
 ################################################################################
 hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)
