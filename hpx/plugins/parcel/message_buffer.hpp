@@ -147,3 +147,5 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         std::size_t max_messages_;
     };
 }}}}
+
+#endif
