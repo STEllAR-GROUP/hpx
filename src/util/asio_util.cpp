@@ -93,13 +93,13 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    void split_ip_address(std::string const& v, std::string& host,
+    bool split_ip_address(std::string const& v, std::string& host,
         boost::uint16_t& port)
     {
         std::string::size_type p = v.find_first_of(":");
 
         std::string tmp_host;
-        boost::uint16_t tmp_port = HPX_INITIAL_IP_PORT;
+        boost::uint16_t tmp_port = 0;
 
         try {
             if (p != std::string::npos) {
@@ -117,10 +117,9 @@ namespace hpx { namespace util
             }
         }
         catch (boost::bad_lexical_cast const& /*e*/) {
-            std::cerr << "hpx::init: illegal port number given: "
-                      << v.substr(p+1)
-                      << ", using default value instead: "
-                      << port << std::endl;
+            // port number is invalid
+            return false;
         }
+        return true;
     }
 }}
