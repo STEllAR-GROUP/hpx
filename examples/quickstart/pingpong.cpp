@@ -29,6 +29,7 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
     // received vector in
     if (--counter == 0) return;
 
+
     // send it to remote locality (to), and wait until it is received
     std::vector<double> data(in);
 
@@ -61,8 +62,9 @@ int hpx_main(boost::program_options::variables_map &b_arg)
     std::size_t const vsize = b_arg["vsize"].as<std::size_t>();
     std::size_t const numiter = b_arg["numiter"].as<std::size_t>() * 2;
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    hpx::naming::id_type to = localities.back(); // send to last element
+    std::vector<hpx::naming::id_type> localities = hpx::find_remote_localities();
+
+    hpx::naming::id_type to = localities[0]; // send to last element
 
     // test sending messages back and forth using a larger vector as one of 
     // the arguments
