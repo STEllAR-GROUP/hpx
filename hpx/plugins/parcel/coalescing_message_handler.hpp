@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/interval_timer.hpp>
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -24,19 +24,29 @@ namespace hpx { namespace plugins { namespace parcel
     struct HPX_LIBRARY_EXPORT coalescing_message_handler
       : parcelset::policies::message_handler
     {
+    private:
+        coalescing_message_handler* this_() { return this; }
+
+    public:
         typedef parcelset::policies::message_handler::write_handler_type
             write_handler_type;
 
-        coalescing_message_handler(std::size_t num, parcelset::parcelport* set);
+        coalescing_message_handler(char const* action_name, 
+            parcelset::parcelport* set, std::size_t num, std::size_t interval = 100);
         ~coalescing_message_handler();
 
         void put_parcel(parcelset::parcel& p, write_handler_type const& f);
 
         void flush(bool stop_buffering = false);
 
+    protected:
+        bool timer_flush();
+
     private:
         parcelset::parcelport* pp_;
         detail::message_buffer buffer_;
+        util::interval_timer timer_;
+        boost::int64_t interval_;
         bool stopped_;
     };
 }}}

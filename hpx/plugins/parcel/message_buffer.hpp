@@ -119,11 +119,17 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
             handlers_.clear();
         }
 
-        size_t size() const
+        std::size_t size() const
         {
             mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(messages_.size() == handlers_.size());
             return messages_.size();
+        }
+
+        double fill_ratio() const
+        {
+            mutex_type::scoped_lock l(mtx_);
+            return double(messages_.size()) / max_messages_;
         }
 
         void swap(message_buffer& o)

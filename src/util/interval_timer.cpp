@@ -39,7 +39,7 @@ namespace hpx { namespace util
         is_terminated_(false)
     {}
 
-    bool interval_timer::start()
+    bool interval_timer::start(bool evaluate_)
     {
         mutex_type::scoped_lock l(mtx_);
         if (!is_started_) {
@@ -57,7 +57,11 @@ namespace hpx { namespace util
                 l.unlock();
             }
 
-            evaluate(threads::wait_signaled);
+            if (evaluate_)
+                evaluate(threads::wait_signaled);
+            else
+                schedule_thread();
+
             return true;
         }
         return false;
@@ -110,12 +114,12 @@ namespace hpx { namespace util
     threads::thread_state_enum interval_timer::evaluate(
         threads::thread_state_ex_enum statex)
     {
+        mutex_type::scoped_lock l(mtx_);
+
         if (statex == threads::wait_abort || 0 == microsecs_)
             return threads::terminated;        // object has been finalized, exit
 
-        mutex_type::scoped_lock l(mtx_);
         id_ = 0;
-
         bool result = false;
 
         {
@@ -125,6 +129,9 @@ namespace hpx { namespace util
 
         if (result)
             schedule_thread();        // wait and repeat
+        else
+            is_started_ = false;
+
         return threads::terminated;   // do not re-schedule this thread
     }
 

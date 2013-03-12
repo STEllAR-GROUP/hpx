@@ -374,7 +374,7 @@ namespace hpx { namespace parcelset
             message_handler_map::iterator it = handlers_.find(key);
             if (it == handlers_.end()) {
                 boost::shared_ptr<policies::message_handler> p(
-                    new MessageHandler(num_messages, find_parcelport(t)));
+                    new MessageHandler(action, find_parcelport(t), num_messages));
 
                 std::pair<message_handler_map::iterator, bool> r =
                     handlers_.insert(message_handler_map::value_type(key, p));
