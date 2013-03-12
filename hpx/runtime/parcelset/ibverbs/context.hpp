@@ -225,16 +225,16 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 {
                     boost::system::error_code ec;
 
-                    bool ret = simpl_->try_read_ready(ec);
-                    if (!ret && !ec) {
+                    std::size_t size = simpl_->try_read_data(data_, ec);
+                    if (size == 0 && !ec) {
                         // repost this handler
                         io_service_.post(boost::bind(
                             &read_operation::call, this->shared_from_this()));
                     }
                     else if(!ec) {
                         // post reading of size
-                        io_service_.post(boost::bind(
-                            &read_operation::read_size, this->shared_from_this()));
+                        io_service_.post(boost::asio::detail::bind_handler(
+                            handler_, ec, data_.size()));
                     }
                 }
                 else
@@ -246,88 +246,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             }
 
         private:
-            void read_size() const
-            {
-                if (simpl_)
-                {
-                    boost::system::error_code ec;
-
-                    std::size_t size = simpl_->try_read_size(ec);
-                    if (size == 0 && !ec) {
-                        // repost this handler
-                        io_service_.post(boost::bind(
-                            &read_operation::read_size, this->shared_from_this()));
-                    }
-                    else if(!ec) {
-                        // post reading of data
-                        data_.resize(size);
-                        io_service_.post(boost::bind(
-                            &read_operation::read_data, this->shared_from_this()));
-                    }
-                }
-                else
-                {
-                    simpl_.reset();
-                    io_service_.post(boost::asio::detail::bind_handler(
-                        handler_, boost::asio::error::operation_aborted, 0));
-                }
-            }
-
-            void read_data() const
-            {
-                if (simpl_)
-                {
-                    boost::system::error_code ec;
-
-                    std::size_t size = simpl_->try_read_data(data_, ec);
-                    if (size == 0 && !ec) {
-                        // repost this handler
-                        io_service_.post(boost::bind(
-                            &read_operation::read_data, this->shared_from_this()));
-                    }
-                    else if(!ec) {
-                        // post read done
-                        data_.resize(size);
-                        io_service_.post(boost::bind(
-                            &read_operation::read_done, this->shared_from_this()));
-
-                    }
-                }
-                else
-                {
-                    simpl_.reset();
-                    io_service_.post(boost::asio::detail::bind_handler(
-                        handler_, boost::asio::error::operation_aborted, 0));
-                }
-            }
-
-            void read_done() const
-            {
-                if (simpl_)
-                {
-                    boost::system::error_code ec;
-
-                    bool ret = simpl_->try_read_done(ec);
-                    if (!ret && !ec) {
-                        // repost this handler
-                        io_service_.post(boost::bind(
-                            &read_operation::read_done, this->shared_from_this()));
-                    }
-                    else if(!ec) {
-                        simpl_.reset();
-                        // successfully read next message
-                        io_service_.post(boost::asio::detail::bind_handler(
-                            handler_, ec, data_.size()));
-                        
-                    }
-                }
-                else
-                {
-                    simpl_.reset();
-                    io_service_.post(boost::asio::detail::bind_handler(
-                        handler_, boost::asio::error::operation_aborted, 0));
-                }
-            }
             
             boost::weak_ptr<Implementation> impl_;
             mutable boost::shared_ptr<Implementation> simpl_;
@@ -598,6 +516,19 @@ namespace hpx { namespace parcelset { namespace ibverbs
         void on_connection(rdma_cm_id * id)
         {
             connection_.on_connection(id);
+            
+            /*
+            boost::system::error_code ec;
+            connection_.post_receive();
+            message_type m = next_wc(ec, true);
+            if(ec) return;
+            if(m != MSG_DATA)
+            {
+                std::cout << "server on connection got something weird\n";
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+            }
+            std::cout << "server connection created\n";
+            */
         }
 
         void on_completion(ibv_wc * wc)
@@ -820,11 +751,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         message_type next_wc(boost::system::error_code &ec, bool retry)
         {
-            ++executing_operation_;
-            BOOST_SCOPE_EXIT_TPL(&executing_operation_) {
-                --executing_operation_;
-            } BOOST_SCOPE_EXIT_END
-
             pollfd pfd;
             pfd.fd = comp_channel_->fd;
             pfd.events = POLLIN;
@@ -834,6 +760,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             std::size_t k = 0;
             do
             {
+                /*
                 if (close_operation_.load() || !ctx_) {
                     HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                     return MSG_INVALID;
@@ -844,6 +771,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
                     return MSG_INVALID;
                 }
+                */
                 ret = poll(&pfd, 1, 1);
                 hpx::util::detail::yield_k(k, "hpx::parcelset::ibverbs::context::next_wc");
                 if(ret == 0 && !retry) return MSG_RETRY;
@@ -864,10 +792,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
             ibv_ack_cq_events(cq, 1);
             if(ret == -1)
             {
+                /*
                 if (close_operation_.load() || !ctx_) {
                     HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                     return MSG_INVALID;
                 }
+                */
             }
             ibv_req_notify_cq(cq, 0);
             
@@ -876,6 +806,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             message_type m = MSG_RETRY;
             while(m == MSG_RETRY)
             {
+                /*
                 if (close_operation_.load() || !ctx_) {
                     HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                     return MSG_INVALID;
@@ -886,6 +817,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
                     return MSG_INVALID;
                 }
+                */
                 if(ibv_poll_cq(cq, 1, &wc))
                 {
                     if(wc.status == IBV_WC_SUCCESS)
@@ -917,35 +849,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             return false;
         }
 
-
-        bool try_read_ready(boost::system::error_code &ec)
-        {
-            ++executing_operation_;
-            BOOST_SCOPE_EXIT_TPL(&executing_operation_) {
-                --executing_operation_;
-            } BOOST_SCOPE_EXIT_END
-            if(is_closed(ec)) return false;
-            // receive message that marks the start of new data
-            connection_.size_ = 0;
-            HPX_IBVERBS_NEXT_WC(ec, MSG_READY, false, false);
-            BOOST_ASSERT(connection_.size_ == 0);
-            return true;
-        }
-
-        std::size_t try_read_size(boost::system::error_code &ec)
-        {
-            ++executing_operation_;
-            BOOST_SCOPE_EXIT_TPL(&executing_operation_) {
-                --executing_operation_;
-            } BOOST_SCOPE_EXIT_END
-            if(is_closed(ec)) return 0;
-            // receive message that sets the size of the incoming data
-            connection_.size_ = 0;
-            HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, false);
-            BOOST_ASSERT(connection_.size_ > 0);
-            return connection_.size_;
-        }
-
         // read, write, and acknowledge operations
         std::size_t try_read_data(std::vector<char>& data, boost::system::error_code &ec)
         {
@@ -954,44 +857,79 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 --executing_operation_;
             } BOOST_SCOPE_EXIT_END
             if(is_closed(ec)) return 0;
+            
+            connection_.post_receive();
 
-            std::vector<char>::iterator data_itr = data.begin();
+            //std::cout << "try read data ...\n";
 
-            for(std::size_t bytes_read = 0; bytes_read < data.size();)
+            HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, false);
+            //BOOST_ASSERT(connection_.size_ > 0);
+
+            boost::uint64_t total_len = 0;
+            std::memcpy(&total_len, connection_.buffer_, sizeof(boost::uint64_t));
+
+            boost::uint64_t chunk_size = 0;
+            std::memcpy(&chunk_size, connection_.buffer_ + sizeof(boost::uint64_t), sizeof(boost::uint64_t));
+
+            //std::cout << "got len: " << total_len << " " << chunk_size << "\n";
+
+            data.resize(total_len);
+
+            //std::vector<char>::iterator data_itr = data.begin();
+            char * data_ptr = &data[0];
+
+            std::memcpy(
+                data_ptr
+              , connection_.buffer_ + 2 * sizeof(boost::uint64_t)
+              , chunk_size
+            );
+
+            if(chunk_size == total_len)
             {
-                connection_.size_ = ~0u;
-                HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
-                BOOST_ASSERT(connection_.size_ > 0);
-                BOOST_ASSERT(connection_.size_ <= connection_.buffer_size_);
-                
-                std::copy(
-                    connection_.buffer_
-                  , connection_.buffer_ + connection_.size_
-                  , data.begin() + bytes_read
-                );
-
-                bytes_read += connection_.size_;
+                //std::cout << "reading finished ... sending done ...\n";
+                connection_.msg_->id = MSG_DONE;
+                connection_.send_message();
+            }
+            else
+            {
                 connection_.post_receive();
                 connection_.msg_->id = MSG_DATA;
                 connection_.send_message();
+
+                data_ptr += chunk_size;
+                for(std::size_t bytes_read = chunk_size; bytes_read < total_len;)
+                {
+                    //std::cout << "get remaining chunks ...\n";
+                    HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
+                    chunk_size = 0;
+                    std::memcpy(&chunk_size, connection_.buffer_, sizeof(boost::uint64_t));
+                    //std::cout << "get remaining chunks len: " << total_len << " " << chunk_size << "\n";
+
+                    std::memcpy(
+                        data_ptr
+                      , connection_.buffer_ + sizeof(boost::uint64_t)
+                      , chunk_size
+                    );
+                    data_ptr += chunk_size;
+                    bytes_read += chunk_size;
+
+                    if(bytes_read >= data.size())
+                    {
+                        //std::cout << "finished ... reading done ...\n";
+                        connection_.msg_->id = MSG_DONE;
+                        connection_.send_message();
+                    }
+                    else
+                    {
+                        connection_.post_receive();
+                        connection_.msg_->id = MSG_DATA;
+                        connection_.send_message();
+                    }
+                }
             }
-            BOOST_ASSERT(connection_.size_ > 0);
+
             HPX_IBVERBS_RESET_EC(ec);
             return data.size();
-        }
-
-        bool try_read_done(boost::system::error_code &ec)
-        {
-            ++executing_operation_;
-            BOOST_SCOPE_EXIT_TPL(&executing_operation_) {
-                --executing_operation_;
-            } BOOST_SCOPE_EXIT_END
-            if(is_closed(ec)) return false;
-            connection_.size_ = ~0u;
-            HPX_IBVERBS_NEXT_WC(ec, MSG_DONE, false, false);
-            BOOST_ASSERT(connection_.size_ == 0);
-            HPX_IBVERBS_RESET_EC(ec);
-            return true;
         }
 
         std::size_t write(std::vector<char> const& data, boost::system::error_code &ec)
@@ -1000,44 +938,77 @@ namespace hpx { namespace parcelset { namespace ibverbs
             BOOST_SCOPE_EXIT_TPL(&executing_operation_) {
                 --executing_operation_;
             } BOOST_SCOPE_EXIT_END
+
             if (close_operation_.load() || !ctx_) {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                 return 0;
             }
 
-            std::size_t total_len = data.size();
+            boost::uint64_t total_len = data.size();
 
-            // receive ready message from server
-            connection_.size_ = total_len;
-            HPX_IBVERBS_NEXT_WC(ec, MSG_READY, 0, true);
-            std::vector<char>::const_iterator data_itr = data.begin();
+            std::memcpy(connection_.buffer_, &total_len, sizeof(total_len));
+
+            boost::uint64_t bytes_sent = 0;
+            boost::uint64_t chunk_size = std::min(connection_.buffer_size_ - 2 * sizeof(boost::uint64_t), total_len);
             
-            //connection_.size = 0;
-            for(std::size_t bytes_sent = 0;
+            std::memcpy(connection_.buffer_ + sizeof(boost::uint64_t), &chunk_size, sizeof(boost::uint64_t));
+
+            const char * data_ptr = &data[0];
+            
+            std::memcpy(connection_.buffer_ + 2 * sizeof(boost::uint64_t), data_ptr, chunk_size);
+
+            connection_.write_remote(chunk_size + 2 * sizeof(boost::uint64_t));
+            connection_.post_receive();
+
+            //std::cout << "send len: " << total_len << "(" << chunk_size << ") " << sizeof(total_len) << "\n";
+
+            bytes_sent += chunk_size;
+            data_ptr += chunk_size;
+
+            for(;
                 bytes_sent < total_len;
-                bytes_sent += connection_.buffer_size_
+                //bytes_sent += connection_.buffer_size_
             )
             {
-                std::size_t
-                    chunk_size = std::min(connection_.buffer_size_, total_len - bytes_sent);
-
-                BOOST_ASSERT(chunk_size);
-
-                connection_.size_ = chunk_size;
-                
-                std::vector<char>::const_iterator
-                    next_data_itr = data_itr + chunk_size;
-
-                char * buffer_itr = connection_.buffer_;
-                std::copy(data_itr, next_data_itr, buffer_itr);
-
-                data_itr = next_data_itr;
+                //std::cout << "waiting for ready from server ...\n";
                 HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
-            }
-            connection_.size_ = 0;
-            HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
+                chunk_size = std::min(connection_.buffer_size_ - sizeof(boost::uint64_t), total_len - bytes_sent);
+                std::memcpy(connection_.buffer_, &chunk_size, sizeof(boost::uint64_t));
+                
+                //std::cout << "sending len: " << bytes_sent << " (" << chunk_size << ") " << sizeof(total_len) << "\n";
 
+                std::memcpy(connection_.buffer_ + sizeof(boost::uint64_t), data_ptr, chunk_size);
+                /*
+                message_type m = next_wc(ec, true);
+                if(ec) return 0;
+                if(m == MSG_DATA)
+                {
+                    std::cout << "writing got data ... good\n";
+                }
+                else if(m == MSG_DONE)
+                {
+                    std::cout << "writing got done ... strange\n";
+                    connection_.post_receive();
+                    continue;
+                }
+                else
+                {
+                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+                    return 0;
+                }
+                */
+                connection_.write_remote(chunk_size + sizeof(boost::uint64_t));
+                connection_.post_receive();
+                //std::cout << "sent next chunk ...\n";
+
+                bytes_sent += chunk_size;
+                data_ptr += chunk_size;
+            }
+
+            //std::cout << "waiting for done from server ...\n";
             HPX_IBVERBS_NEXT_WC(ec, MSG_DONE, 0, true);
+            //std::cout << "writing finished ... got done\n";
+            HPX_IBVERBS_RESET_EC(ec);
             return total_len;
         }
 

@@ -78,14 +78,14 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             size_ = 0;
         }
 
-        void post_receive(rdma_cm_id * id)
+        void post_receive(rdma_cm_id * id = NULL)
         {
             struct ibv_recv_wr wr, *bad_wr = NULL;
             struct ibv_sge sge;
                 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
             
-            wr.wr_id = (uintptr_t)id;
+            wr.wr_id = (uintptr_t)id_;
             wr.sg_list = &sge;
             wr.num_sge = 1;
 
@@ -93,7 +93,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             sge.length = sizeof(message);
             sge.lkey = msg_mr_->lkey;
 
-            int ret = ibv_post_recv(id->qp, &wr, &bad_wr);
+            int ret = ibv_post_recv(id_->qp, &wr, &bad_wr);
             if(ret)
             {
             }
@@ -114,7 +114,8 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 // FIXME: error
             }
 
-            post_receive(id);
+            id_ = id;
+            post_receive();
         }
 
         void on_connect(rdma_cm_id * id)
@@ -122,7 +123,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             id_ = id;
         }
 
-        void write_remote(rdma_cm_id * id = NULL, std::size_t chunk_size = 0, bool no_data = true)
+        void write_remote(std::size_t chunk_size = 0, bool no_data = true)
         {
             ibv_send_wr wr, *bad_wr = NULL;
             ibv_sge sge;
@@ -131,8 +132,8 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             wr.wr_id = (uintptr_t)id_;
             wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
+            //wr.opcode = IBV_WR_RDMA_WRITE;
             wr.send_flags = IBV_SEND_SIGNALED;
-            wr.imm_data = htonl(chunk_size);
             wr.wr.rdma.remote_addr = peer_addr_;
             wr.wr.rdma.rkey = peer_rkey_;
 
@@ -150,15 +151,23 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             {
             }
         }
-
-        void send_next_chunk(rdma_cm_id * id, std::size_t chunk_size)
-        {
-            write_remote(id, chunk_size);
-        }
         
         message_type on_completion(ibv_wc * wc)
         {
-            rdma_cm_id * id = (rdma_cm_id *)(uintptr_t)(wc->wr_id);
+            //rdma_cm_id * id = (rdma_cm_id *)(uintptr_t)(wc->wr_id);
+            /*
+            switch(wc->opcode)
+            {
+                case IBV_WC_SEND: std::cout << "client IBV_WC_SEND\n"; break;
+                case IBV_WC_RDMA_WRITE: std::cout << "client IBV_WC_RDMA_WRITE\n"; break;
+                case IBV_WC_RDMA_READ: std::cout << "client IBV_WC_RDMA_READ\n"; break;
+                case IBV_WC_COMP_SWAP: std::cout << "client IBV_WC_COMP_SWAP\n"; break;
+                case IBV_WC_FETCH_ADD: std::cout << "client IBV_WC_FETCH_ADD\n"; break;
+                case IBV_WC_BIND_MW: std::cout << "client IBV_WC_BIND_MW\n"; break;
+                case IBV_WC_RECV: std::cout << "client IBV_WC_RECV\n"; break;
+                case IBV_WC_RECV_RDMA_WITH_IMM: std::cout << "client IBV_WC_RECV_RDMA_WITH_IMM\n"; break;
+            }
+            */
             if(wc->opcode & IBV_WC_RECV)
             {
                 switch(msg_->id)
@@ -166,21 +175,21 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     case MSG_MR:
                         peer_addr_ = msg_->addr;
                         peer_rkey_ = msg_->rkey;
-                        write_remote(id, 0);
-                        post_receive(id);
+                        //write_remote(id, 0);
+                        //post_receive(id);
                         return MSG_MR;
                     case MSG_READY:
-                        BOOST_ASSERT(size_ != 0);
-                        write_remote(id, size_, false);
-                        post_receive(id);
+                        BOOST_ASSERT(false);
                         return MSG_READY;
                     case MSG_DATA:
-                        write_remote(id, size_);
+                        /*
+                        write_remote(size_);
                         post_receive(id);
+                        */
                         return MSG_DATA;
                     case MSG_DONE:
-                        write_remote(id, 0);
-                        post_receive(id);
+                        //write_remote(0);
+                        //post_receive(id);
                         return MSG_DONE;
                 }
                 return MSG_INVALID;

@@ -113,34 +113,20 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
             
-            if(id == NULL)
-            {
-                BOOST_ASSERT(id_);
-                wr.wr_id = (uintptr_t)id_;
-            }
-            else
-            {
-                wr.wr_id = (uintptr_t)id;
-            }
+            BOOST_ASSERT(id_);
+            wr.wr_id = (uintptr_t)id_;
             wr.opcode = IBV_WR_SEND;
             wr.sg_list = &sge;
             wr.num_sge = 1;
             wr.send_flags = IBV_SEND_SIGNALED;
 
             sge.addr = (uintptr_t)msg_;
-            sge.length = sizeof(hpx::parcelset::ibverbs::message);
+            sge.length = sizeof(message);
             sge.lkey = msg_mr_->lkey;
 
             int ret = 0;
-            if(id == NULL)
-            {
-                BOOST_ASSERT(id_);
-                ret = ibv_post_send(id_->qp, &wr, &bad_wr);
-            }
-            else
-            {
-                ret = ibv_post_send(id->qp, &wr, &bad_wr);
-            }
+            BOOST_ASSERT(id_);
+            ret = ibv_post_send(id_->qp, &wr, &bad_wr);
             if(ret)
             {
                 // FIXME: error
@@ -178,7 +164,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         void on_connection(rdma_cm_id *id)
         {
             id_ = id;
-            msg_->id = hpx::parcelset::ibverbs::message_type::MSG_MR;
+            msg_->id = MSG_MR;
             msg_->addr = (uintptr_t)buffer_mr_->addr;
             msg_->rkey = buffer_mr_->rkey;
 
@@ -188,14 +174,29 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         message_type on_completion(ibv_wc * wc)
         {
             rdma_cm_id * id = (rdma_cm_id *)(uintptr_t)(wc->wr_id);
-            if (wc->opcode == IBV_WC_RECV_RDMA_WITH_IMM)
+            /*
+            switch(wc->opcode)
             {
-                boost::uint32_t len = ntohl(wc->imm_data);
+                case IBV_WC_SEND: std::cout << "server IBV_WC_SEND\n"; break;
+                case IBV_WC_RDMA_WRITE: std::cout << "server IBV_WC_RDMA_WRITE\n"; break;
+                case IBV_WC_RDMA_READ: std::cout << "server IBV_WC_RDMA_READ\n"; break;
+                case IBV_WC_COMP_SWAP: std::cout << "server IBV_WC_COMP_SWAP\n"; break;
+                case IBV_WC_FETCH_ADD: std::cout << "server IBV_WC_FETCH_ADD\n"; break;
+                case IBV_WC_BIND_MW: std::cout << "server IBV_WC_BIND_MW\n"; break;
+                case IBV_WC_RECV: std::cout << "server IBV_WC_RECV\n"; break;
+                case IBV_WC_RECV_RDMA_WITH_IMM: std::cout << "server IBV_WC_RECV_RDMA_WITH_IMM\n"; break;
+            }
+            */
+            if(wc->opcode == IBV_WC_RECV_RDMA_WITH_IMM)
+            {
+                //boost::uint32_t len = ntohl(wc->imm_data);
 
+#if 0
                 if(len == 0)
                 {
                     if(size_ == 0)
                     {
+                        BOOST_ASSERT(false);
                         size_ = 0;
                         post_receive(id);
                         msg_->id = MSG_READY;
@@ -204,6 +205,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     }
                     else
                     {
+                        BOOST_ASSERT(false);
                         size_ = 0;
                         post_receive(id);
                         msg_->id = MSG_DONE;
@@ -216,9 +218,12 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     if(size_ == 0)
                     {
                         size_ = len;
+                        id_ = id;
+                        /*
                         post_receive(id);
                         msg_->id = MSG_DATA;
                         send_message(id);
+                        */
                         return MSG_DATA;
                     }
                     else
@@ -232,6 +237,10 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     }
                 }
                 return MSG_INVALID;
+#endif
+                //size_ = len;
+                id_ = id;
+                return MSG_DATA;
             }
             return MSG_RETRY;
         }
