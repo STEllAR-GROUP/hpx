@@ -371,24 +371,8 @@ namespace hpx { namespace parcelset { namespace shmem
     {
         parcelport_connection_ptr client_connection;
 
-        bool got_cache_space = false;
-
-        for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-        {
-            // Get a connection or reserve space for a new connection.
-            if (connection_cache_.get_or_reserve(l, client_connection))
-            {
-                got_cache_space = true;
-                break;
-            }
-
-            // Wait for a really short amount of time.
-            this_thread::suspend();
-        }
-
-        // If we didn't get a connection or permission to create one (which is
-        // unlikely), bail.
-        if (!got_cache_space)
+        // Get a connection or reserve space for a new connection.
+        if (!connection_cache_.get_or_reserve(l, client_connection))
         {
             if (&ec != &throws)
                 ec = make_success_code();

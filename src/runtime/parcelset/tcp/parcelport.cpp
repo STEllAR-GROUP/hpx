@@ -526,7 +526,7 @@ namespace hpx { namespace parcelset { namespace tcp
     {
         naming::locality const& l = p.get_destination_locality();
         error_code ec;
-        parcelport_connection_ptr client_connection = get_connection(l, ec);
+        parcelport_connection_ptr client_connection = get_connection_wait(l, ec);
 
         if (ec) {
             // all errors during early parcel handling are fatal
@@ -537,11 +537,12 @@ namespace hpx { namespace parcelset { namespace tcp
 
         BOOST_ASSERT(client_connection );
         client_connection->set_parcel(p);
-        client_connection->async_write(early_write_handler, early_pending_parcel_handler);
+        client_connection->async_write(early_write_handler,
+            early_pending_parcel_handler);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport_connection_ptr parcelport::get_connection(
+    parcelport_connection_ptr parcelport::get_connection_wait(
         naming::locality const& l, error_code& ec)
     {
         parcelport_connection_ptr client_connection;
@@ -557,18 +558,44 @@ namespace hpx { namespace parcelset { namespace tcp
             }
 
             // Wait for a really short amount of time.
-            this_thread::suspend();
+            boost::this_thread::sleep(boost::get_system_time() +
+                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
         // If we didn't get a connection or permission to create one (which is
         // unlikely), bail.
         if (!got_cache_space)
         {
+            HPX_THROWS_IF(ec, invalid_status, "parcelport::get_connection_wait",
+                "didn't get a connection slot from connection cache, bailing out");
+            return client_connection;
+        }
+
+        return get_connection(l, client_connection, ec);
+    }
+
+    parcelport_connection_ptr parcelport::get_connection(
+        naming::locality const& l, error_code& ec)
+    {
+        parcelport_connection_ptr client_connection;
+
+        // Get a connection or reserve space for a new connection.
+        if (!connection_cache_.get_or_reserve(l, client_connection))
+        {
+            // if no slot is available it's not a problem as the parcel will
+            // sent out whenever the next connection is returned to the cache
             if (&ec != &throws)
                 ec = make_success_code();
             return client_connection;
         }
 
+        return get_connection(l, client_connection, ec);
+    }
+
+    parcelport_connection_ptr parcelport::get_connection(
+        naming::locality const& l, parcelport_connection_ptr client_connection,
+        error_code& ec)
+    {
         // Check if we need to create the new connection.
         if (!client_connection)
         {
@@ -596,10 +623,15 @@ namespace hpx { namespace parcelset { namespace tcp
                     if (!error)
                         break;
 
-                    // wait for a really short amount of time (usually 100 ms)
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    // wait for a really short amount of time
+                    if (hpx::threads::get_self_ptr()) {
+                        this_thread::suspend();
+                    }
+                    else {
+                        boost::this_thread::sleep(boost::get_system_time() +
+                            boost::posix_time::milliseconds(
+                                HPX_NETWORK_RETRIES_SLEEP));
+                    }
                 }
                 catch (boost::system::system_error const& e) {
                     client_connection->socket().close();
