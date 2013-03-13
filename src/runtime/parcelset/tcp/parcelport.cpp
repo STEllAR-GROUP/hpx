@@ -391,31 +391,35 @@ namespace hpx { namespace parcelset { namespace tcp
             return;
         }
 
-        std::vector<parcel> parcels;
-        std::vector<write_handler_type> handlers;
-
+        while (true)
         {
-            util::spinlock::scoped_lock l(mtx_);
-            iterator it = pending_parcels_.find(locality_id);
+            std::vector<parcel> parcels;
+            std::vector<write_handler_type> handlers;
 
-            if (it != pending_parcels_.end())
             {
-                BOOST_ASSERT(it->first == locality_id);
-                std::swap(parcels, it->second.first);
-                std::swap(handlers, it->second.second);
-            }
-        }
+                util::spinlock::scoped_lock l(mtx_);
+                iterator it = pending_parcels_.find(locality_id);
 
-        // If the parcels didn't get sent by another connection ...
-        if (!parcels.empty() && !handlers.empty())
-        {
+                if (it != pending_parcels_.end())
+                {
+                    BOOST_ASSERT(it->first == locality_id);
+                    std::swap(parcels, it->second.first);
+                    std::swap(handlers, it->second.second);
+
+                    if (parcels.empty())
+                    {
+                        // if no parcels are pending re-add the connection to
+                        // the cache
+                        BOOST_ASSERT(handlers.empty());
+                        BOOST_ASSERT(locality_id == client_connection->destination());
+                        connection_cache_.reclaim(locality_id, client_connection);
+                        break;
+                    }
+                }
+            }
+
+            // send parcels if they didn't get sent by another connection
             send_pending_parcels(client_connection, parcels, handlers);
-        }
-        else
-        {
-            // ... or re-add the stuff to the cache
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 
@@ -424,35 +428,39 @@ namespace hpx { namespace parcelset { namespace tcp
         naming::locality const& locality_id,
         parcelport_connection_ptr client_connection)
     {
-        std::vector<parcel> parcels;
-        std::vector<write_handler_type> handlers;
-
         typedef pending_parcels_map::iterator iterator;
 
-        util::spinlock::scoped_lock l(mtx_);
-        iterator it = pending_parcels_.find(locality_id);
-
-        if (it != pending_parcels_.end())
+        while(true)
         {
-            std::swap(parcels, it->second.first);
-            std::swap(handlers, it->second.second);
-        }
+            std::vector<parcel> parcels;
+            std::vector<write_handler_type> handlers;
 
-        if (!parcels.empty() && !handlers.empty())
-        {
-            // Create a new thread which sends parcels that might still be
-            // pending.
+            {
+                util::spinlock::scoped_lock l(mtx_);
+                iterator it = pending_parcels_.find(locality_id);
+
+                if (it != pending_parcels_.end())
+                {
+                    std::swap(parcels, it->second.first);
+                    std::swap(handlers, it->second.second);
+
+                    if (parcels.empty())
+                    {
+                        // Give this connection back to the cache as it's not
+                        // needed anymore.
+                        BOOST_ASSERT(handlers.empty());
+                        BOOST_ASSERT(locality_id == client_connection->destination());
+                        connection_cache_.reclaim(locality_id, client_connection);
+                        break;
+                    }
+                }
+            }
+
+            // Create a new thread which sends parcels that are still pending.
             hpx::applier::register_thread_nullary(
                 HPX_STD_BIND(&parcelport::send_pending_parcels, this,
                     client_connection, boost::move(parcels),
                     boost::move(handlers)), "send_pending_parcels");
-        }
-        else
-        {
-            // Give this connection back to the cache as it's not needed
-            // anymore.
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
         }
     }
 
