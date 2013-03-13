@@ -88,8 +88,8 @@ namespace hpx { namespace parcelset { namespace tcp
         /// operation or on any error.
         ///
         /// \param parcels  [in] A reference to the list of parcels to send.
-        /// \param handlers [in] A list of function objects to be invoked on 
-        ///                 successful completion or on errors. The signature of 
+        /// \param handlers [in] A list of function objects to be invoked on
+        ///                 successful completion or on errors. The signature of
         ///                 these function objects is expected to be:
         ///
         /// \code
@@ -149,6 +149,9 @@ namespace hpx { namespace parcelset { namespace tcp
 
         parcelport_connection_ptr get_connection(naming::locality const& l,
             parcelport_connection_ptr client_connection, error_code& ec = throws);
+
+        void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
+            parcelport_connection_ptr const& client_connection);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.

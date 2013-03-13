@@ -283,6 +283,10 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
     protected:
+        void report_potential_connection_error(naming::locality const& locality_id,
+            naming::gid_type const& parcel_id, error_code const& ec);
+
+    protected:
         /// mutex for all of the member data
         mutable util::spinlock mtx_;
 
