@@ -419,14 +419,37 @@ system and application performance.
     [   [`/threads/count/stolen`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the unbind
-          (madvise) operations should be queried for. The locality id is a
+          where:[br] `*` is the locality id of the locality the number of
+          'stole' threads should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
         [None]
         [Returns the total number of __hpx__-threads 'stolen' from a
          neighboring worker thread (these threads are executed by a
          different worker thread than they were initially scheduled on).]
+    ]
+    [   [`/threads/count/objects`]
+        [`locality#*/total` or[br]
+         `locality#*/allocator#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the current
+          (cumulative) number of all created __hpx__-thread objects should be
+          queried for. The locality id (given by `*`) is a (zero based) number
+          identifying the locality.
+
+          `allocator#*` is defining the number of the allocator instance
+          using which the threads have been created. __hpx__ uses a varying
+          number of allocators to create (and recycle) __hpx__-thread objects,
+          most likely these counters are of use for debugging purposes only.
+          The allocator id (given by `*`) is a (zero based) number identifying
+          the allocator to query.
+        ]
+        [None]
+        [Returns the total number of __hpx__-thread objects created. Note that
+         thread objects are reused to improve system performance, thus this
+         number does not reflect the number of actually executed (retired)
+         __hpx__-threads.]
     ]
 ]
 
