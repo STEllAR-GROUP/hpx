@@ -107,7 +107,7 @@ namespace hpx { namespace util
 #endif
 
             // shmem related settings
-            "[hpx.parcel.shmem]"
+            "[hpx.parcel.shmem]",
             "enable=${HPX_USE_SHMEM_PARCELPORT:0}",
             "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
 
