@@ -130,7 +130,7 @@ namespace hpx { namespace util
                 << ",[s]," << val;
             if (!uom.empty())
                 out << ",[" << uom << "]";
-            out << "\n";
+            out << "\n"; 
         }
         else {
             out << "invalid\n";
@@ -282,7 +282,7 @@ namespace hpx { namespace util
             print_value(output, names_[i], values[i].get(), uoms_[i]);
 
         if (destination_is_cout) {
-            std::cout << util::osstream_get_string(output);
+            std::cout << util::osstream_get_string(output) << std::flush;
         }
         else {
             std::ofstream out(destination_, std::ios_base::app);
