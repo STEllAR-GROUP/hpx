@@ -1352,17 +1352,30 @@ namespace hpx { namespace threads
 
             if (p.instancename_.empty())
             {
-                p.instancename_ = "allocator#*";
+                p.instancename_ = "total";
                 p.instanceindex_ = -1;
             }
 
             status = get_counter_name(p, i.fullname_, ec);
             if (!status_is_valid(status) || !f(i, ec) || ec)
                 return false;
-        }
-        else if (p.instancename_ == "allocator#*") {
-            BOOST_ASSERT(mode == performance_counters::discover_counters_full);
 
+            p.instancename_ = "allocator#*";
+            p.instanceindex_ = -1;
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        if (p.instancename_ == "total" && p.instanceindex_ == -1)
+        {
+            // overall counter
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (p.instancename_ == "allocator#*") 
+        {
             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
             {
                 p.instancename_ = "allocator";
