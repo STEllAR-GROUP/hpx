@@ -335,20 +335,6 @@ namespace hpx { namespace util
                 static fxn_ptr_type static_table;
 
                 return &static_table;
-
-#if 0
-                static fxn_ptr_table<Char, IArchive, OArchive> static_table =
-                {
-                    fxns<is_small>::template type<T, Char>::get_type,
-                    fxns<is_small>::template type<T, Char>::static_delete,
-                    fxns<is_small>::template type<T, Char>::destruct,
-                    fxns<is_small>::template type<T, Char>::clone,
-                    fxns<is_small>::template type<T, Char>::move,
-                    fxns<is_small>::template type<T, Char>::stream_in,
-                    fxns<is_small>::template type<T, Char>::stream_out
-                };
-                return &static_table;
-#endif
             }
         };
 
