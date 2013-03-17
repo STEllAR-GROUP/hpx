@@ -430,7 +430,7 @@ namespace hpx { namespace util
 
             while (connections_ >= max_connections_)
             {
-                // Find the least recent used keys data.
+                // Find the least recently used keys data.
                 const typename cache_type::iterator ct = cache_.find(*kt);
                 BOOST_ASSERT(ct != cache_.end());
 
