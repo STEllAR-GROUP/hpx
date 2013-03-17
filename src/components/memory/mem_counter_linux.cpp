@@ -18,7 +18,7 @@
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -30,143 +30,127 @@
 #include <iterator>
 #include <vector>
 
+BOOST_FUSION_DEFINE_STRUCT(
+    (hpx)(performance_counters)(memory),
+    proc_statm,
+    (boost::uint64_t,   size)
+    (boost::uint64_t,   resident)
+    (boost::uint64_t,   share)
+    (boost::uint64_t,   text)
+    (boost::uint64_t,   lib)
+    (boost::uint64_t,   data)
+    (boost::uint64_t,   dt)
+    )
+
 namespace hpx { namespace performance_counters { namespace memory
 {
     namespace qi = boost::spirit::qi;
     namespace ascii = boost::spirit::ascii;
 
-    struct proc_statm
+    template <typename Iterator>
+    struct proc_statm_grammar
+      : qi::grammar<Iterator, proc_statm(), ascii::space_type>
     {
-        proc_statm()
-          : size(0), resident(0), share(0), text(0), lib(0), data(0), dt(0)
+        proc_statm_grammar()
+          : proc_statm_grammar::base_type(start)
+        {
+            start =  uint64_t_
+                  >> uint64_t_
+                  >> uint64_t_
+                  >> uint64_t_
+                  >> uint64_t_
+                  >> uint64_t_
+                  >> uint64_t_
+                  ;
+        }
+    
+        qi::rule<Iterator, proc_statm(), ascii::space_type> start;
+    
+        qi::uint_parser<boost::uint64_t> uint64_t_;
+    };
+
+    struct ifstream_raii
+    {
+        ifstream_raii(char const* file, std::ios_base::openmode mode)
+            : stm(file, mode)
         {}
 
-        boost::uint64_t size;
-        boost::uint64_t resident;
-        boost::uint64_t share;
-        boost::uint64_t text;
-        boost::uint64_t lib;
-        boost::uint64_t data;
-        boost::uint64_t dt;
-    };
-}}}
-
-BOOST_FUSION_ADAPT_STRUCT(
-    hpx::performance_counters::memory::proc_statm,
-    (boost::uint64_t, size)
-    (boost::uint64_t, resident)
-    (boost::uint64_t, share)
-    (boost::uint64_t, text)
-    (boost::uint64_t, lib)
-    (boost::uint64_t, data)
-    (boost::uint64_t, dt)
-)
-
-namespace hpx { namespace performance_counters { namespace memory
-{
-    template <typename Iterator>
-    struct proc_statm_parser : qi::grammar<Iterator, proc_statm(), ascii::space_type>
-    {
-        proc_statm_parser() : proc_statm_parser::base_type(start)
+        ~ifstream_raii()
         {
-            using qi::ulong_;
-
-            start = ulong_
-                >> ulong_
-                >> ulong_
-                >> ulong_
-                >> ulong_
-                >> ulong_
-                >> ulong_
-                ;
+            if (stm.is_open())
+                stm.close();
         }
 
-        qi::rule<Iterator, proc_statm(), ascii::space_type> start;
+        std::ifstream& get()
+        {
+            return stm;
+        }
+
+      private:
+        std::ifstream stm;
     };
+
+    bool read_proc_statm(proc_statm& ps, boost::int32_t pid)
+    {
+        std::string filename
+            = boost::str(boost::format("/proc/%1%/statm") % pid);
+    
+        ifstream_raii in(filename.c_str(), std::ios_base::in);
+    
+        if (!in.get())
+            return false;
+    
+        in.get().unsetf(std::ios::skipws); // No white space skipping!
+    
+        typedef boost::spirit::basic_istream_iterator<char> iterator;
+    
+        iterator it(in.get()), end;
+    
+        proc_statm_grammar<iterator> p;
+    
+        if (!qi::phrase_parse(it, end, p, ascii::space, ps))
+            return false;
+        else
+            return true;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    // returns virtual memory value
+    // Returns virtual memory usage.
     boost::uint64_t read_psm_virtual(bool)
     {
-        using boost::spirit::ascii::space;
-        typedef std::string::const_iterator iterator_type;
-        typedef proc_statm_parser<iterator_type> proc_statm_parser;
+        proc_statm ps;
 
-        proc_statm_parser psg;
-        std::string in_string;
-        boost::uint32_t pid = getpid();
-        std::string filename = boost::str(boost::format("/proc/%1%/statm") % pid);
-
+        if (!read_proc_statm(ps, getpid()))
         {
-            std::ifstream infile(filename.c_str());
-            if (!infile.is_open())
-            {
-                HPX_THROW_EXCEPTION(
-                    hpx::bad_request,
-                    "hpx::performance_counters::memory::read_psm_resident",
-                    boost::str(boost::format("unable to open statm file '%s'") % filename));
-                return boost::uint64_t(-1);
-            }
-
-            infile >> in_string;
-        }
-
-        proc_statm psm;
-        iterator_type itr = in_string.begin();
-        iterator_type end = in_string.end();
-        bool r = phrase_parse(itr, end, psg, space, psm);
-        if (!r) {
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_virtual",
-                boost::str(boost::format("failed to parse '%s'") % filename));
+                boost::str( boost::format("failed to parse '/proc/%1%/statm'")
+                          % getpid()));
             return boost::uint64_t(-1);
         }
 
-        // psm.size is in pages, but we need to return the number of bytes
-        return psm.size * EXEC_PAGESIZE;
+        // ps.size is in pages, but we need to return the number of bytes.
+        return ps.size * EXEC_PAGESIZE;
     }
 
-    // returns resident memory value
+    // Returns resident memory usage.
     boost::uint64_t read_psm_resident(bool)
     {
-        using boost::spirit::ascii::space;
-        typedef std::string::const_iterator iterator_type;
-        typedef proc_statm_parser<iterator_type> proc_statm_parser;
+        proc_statm ps;
 
-        proc_statm_parser psg;
-        std::string in_string;
-        boost::uint32_t pid = getpid();
-        std::string filename = boost::str(boost::format("/proc/%1%/statm") % pid);
-
+        if (!read_proc_statm(ps, getpid()))
         {
-            std::ifstream infile(filename.c_str());
-            if (!infile.is_open())
-            {
-                HPX_THROW_EXCEPTION(
-                    hpx::bad_request,
-                    "hpx::performance_counters::memory::read_psm_resident",
-                    boost::str(boost::format("unable to open statm file '%s'") % filename));
-                return boost::uint64_t(-1);
-            }
-
-            infile >> in_string;
-        }
-
-        proc_statm psm;
-        iterator_type itr = in_string.begin();
-        iterator_type end = in_string.end();
-        bool r = phrase_parse(itr, end, psg, space, psm);
-        if (!r) {
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_resident",
-                boost::str(boost::format("failed to parse '%s'") % filename));
+                boost::str( boost::format("failed to parse '/proc/%1%/statm'")
+                          % getpid()));
             return boost::uint64_t(-1);
         }
 
-        // psm.resident is in pages, but we need to return the number of bytes
-        return psm.resident * EXEC_PAGESIZE;
+        // ps.resident is in pages, but we need to return the number of bytes.
+        return ps.resident * EXEC_PAGESIZE;
     }
 }}}
 
