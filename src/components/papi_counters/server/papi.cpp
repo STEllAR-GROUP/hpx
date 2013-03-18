@@ -221,7 +221,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // counting is not enabled here; it has to be started explicitly
     }
 
-    hpx::performance_counters::counter_value papi_counter::get_counter_value()
+    hpx::performance_counters::counter_value papi_counter::get_counter_value(bool reset)
     {
         thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
 
