@@ -78,9 +78,9 @@ private:
 /* FIXME: pointer arithmetic still missing */
 
 template<typename T>
-class atomic<T *> : private detail::atomic::internal_atomic<intptr_t> {
+class atomic<T *> : private detail::atomic::internal_atomic<void *, sizeof(void *), int> {
 public:
-    typedef detail::atomic::internal_atomic<intptr_t> super;
+    typedef detail::atomic::internal_atomic<void *, sizeof(void *), int> super;
 
     atomic() {}
     explicit atomic(T * p) : super(static_cast<intptr_t>(p)) {}
