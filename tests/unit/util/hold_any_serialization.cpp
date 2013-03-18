@@ -29,7 +29,6 @@ namespace std
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
-using hpx::util::hold_any;
 using hpx::util::basic_hold_any;
 
 using hpx::init;
@@ -252,7 +251,7 @@ int hpx_main(variables_map& vm)
 
         small_object const f(17);
 
-        basic_hold_any<char, test_iarchive, test_oarchive> any(f);
+        basic_hold_any<test_iarchive, test_oarchive> any(f);
 
         out(testfile, any);
         in(testfile, any);
@@ -266,7 +265,7 @@ int hpx_main(variables_map& vm)
 
         big_object const f(5, 12);
 
-        basic_hold_any<char, test_iarchive, test_oarchive> any(f);
+        basic_hold_any<test_iarchive, test_oarchive> any(f);
 
         out(testfile, any);
         in(testfile, any);

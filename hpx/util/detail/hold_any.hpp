@@ -9,7 +9,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
     The class hpx::util::detail::hold_any is built based on boost::spirit::hold_any class.
-    It adds support for serialization.
+    It adds support for HPX serialization.
 ==============================================================================*/
 #ifndef HPX_UTIL_HOLD_ANY_HPP
 #define HPX_UTIL_HOLD_ANY_HPP
@@ -73,7 +73,7 @@ namespace hpx { namespace util
         struct get_table;
 
         // serializable function pointer table
-        template <typename Char, typename IArchive, typename OArchive>
+        template <typename IArchive, typename OArchive, typename Char>
         struct fxn_ptr_table
         {
             virtual fxn_ptr_table * get_ptr() = 0;
@@ -94,7 +94,7 @@ namespace hpx { namespace util
 
         // function pointer table
         template <typename Char>
-        struct fxn_ptr_table<Char, void, void>
+        struct fxn_ptr_table<void, void, Char>
         {
             virtual fxn_ptr_table * get_ptr() = 0;
             boost::detail::sp_typeinfo const& (*get_type)();
@@ -113,15 +113,17 @@ namespace hpx { namespace util
         template <>
         struct fxns<boost::mpl::true_>
         {
-            template<typename T, typename Char
-            , typename IArchive, typename OArchive
+            template<typename T
+            , typename IArchive
+            , typename OArchive
+            , typename Char
             >
             struct type
             {
-                static fxn_ptr_table<Char, IArchive, OArchive> *get_ptr()
+                static fxn_ptr_table<IArchive, OArchive, Char> *get_ptr()
                 {
                     return detail::hold_any::get_table<T>::
-                        template get<Char, IArchive, OArchive>();
+                        template get<IArchive, OArchive, Char>();
                 }
 
                 static boost::detail::sp_typeinfo const& get_type()
@@ -179,15 +181,17 @@ namespace hpx { namespace util
         template <>
         struct fxns<boost::mpl::false_>
         {
-            template<typename T, typename Char
-            , typename IArchive, typename OArchive
+            template<typename T            
+            , typename IArchive
+            , typename OArchive
+            , typename Char
             >
             struct type
             {
-                static fxn_ptr_table<Char, IArchive, OArchive> *get_ptr()
+                static fxn_ptr_table<IArchive, OArchive, Char> *get_ptr()
                 {
                     return detail::hold_any::get_table<T>::
-                        template get<Char, IArchive, OArchive>();
+                        template get<IArchive, OArchive, Char>();
                 }
                 static boost::detail::sp_typeinfo const& get_type()
                 {
@@ -241,11 +245,11 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Char, typename IArchive, typename OArchive, typename Vtable>
+        template <typename IArchive, typename OArchive, typename Vtable, typename Char>
         struct fxn_ptr
-          : fxn_ptr_table<Char, IArchive, OArchive>
+          : fxn_ptr_table<IArchive, OArchive, Char>
         {
-            typedef fxn_ptr_table<Char, IArchive, OArchive> base_type;
+            typedef fxn_ptr_table<IArchive, OArchive, Char> base_type;
 
             fxn_ptr()
             {
@@ -287,11 +291,11 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename Char, typename Vtable>
-        struct fxn_ptr<Char, void, void, Vtable>
-          : fxn_ptr_table<Char, void, void>
+        template <typename Vtable, typename Char>
+        struct fxn_ptr<void, void, Vtable, Char>
+          : fxn_ptr_table<void, void, Char>
         {
-            typedef fxn_ptr_table<Char, void, void> base_type;
+            typedef fxn_ptr_table<void, void, Char> base_type;
 
             fxn_ptr()
             {
@@ -316,17 +320,17 @@ namespace hpx { namespace util
         {
             typedef boost::mpl::bool_<(sizeof(T) <= sizeof(void*))> is_small;
 
-            template <typename Char, typename IArchive, typename OArchive>
-            static fxn_ptr_table<Char, IArchive, OArchive>* get()
+            template <typename IArchive, typename OArchive, typename Char>
+            static fxn_ptr_table<IArchive, OArchive, Char>* get()
             {
 
                 typedef
                     typename fxns<is_small>::
-                        template type<T, Char, IArchive, OArchive>
+                        template type<T, IArchive, OArchive, Char>
                     fxn_type;
 
                 typedef
-                    fxn_ptr<Char, IArchive, OArchive, fxn_type>
+                    fxn_ptr<IArchive, OArchive, fxn_type, Char>
                     fxn_ptr_type;
 
                 static fxn_ptr_type static_table;
@@ -367,21 +371,22 @@ namespace hpx { namespace util
             return o;
         }
     }} // namespace hpx::util::detail::hold_any
-}}
+}}  // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure hold_any serialization is properly initialized
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Char, typename IArchive, typename OArchive, typename Vtable>)
-  , (hpx::util::detail::hold_any::fxn_ptr<Char, IArchive, OArchive, Vtable>)
+    (template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
+  , (hpx::util::detail::hold_any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
 )
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Char
-        , typename IArchive = portable_binary_iarchive
-        , typename OArchive = portable_binary_oarchive>
+    template <typename IArchive = portable_binary_iarchive
+    , typename OArchive = portable_binary_oarchive
+    , typename Char = char
+    >
     class basic_hold_any
     {
     public:
@@ -389,7 +394,7 @@ namespace hpx { namespace util
         template <typename T>
         explicit basic_hold_any(T const& x)
           : table(detail::hold_any::get_table<T>::
-                template get<Char, IArchive, OArchive>()), object(0)
+                template get<IArchive, OArchive, Char>()), object(0)
         {
             if (hpx::util::detail::hold_any::get_table<T>::is_small::value)
                 new (&object) T(x);
@@ -399,14 +404,14 @@ namespace hpx { namespace util
 
         basic_hold_any()
           : table(detail::hold_any::get_table<detail::hold_any::empty>::
-                template get<Char, IArchive, OArchive>()),
+                template get<IArchive, OArchive, Char>()),
             object(0)
         {
         }
 
         basic_hold_any(basic_hold_any const& x)
           : table(detail::hold_any::get_table<detail::hold_any::empty>::
-                template get<Char, IArchive, OArchive>()),
+                template get<IArchive, OArchive, Char>()),
             object(0)
         {
             assign(x);
@@ -439,8 +444,8 @@ namespace hpx { namespace util
         basic_hold_any& assign(T const& x)
         {
             // are we copying between the same type?
-            detail::hold_any::fxn_ptr_table<Char, IArchive, OArchive>* x_table =
-                detail::hold_any::get_table<T>::template get<Char, IArchive, OArchive>();
+            detail::hold_any::fxn_ptr_table<IArchive, OArchive, Char>* x_table =
+                detail::hold_any::get_table<T>::template get<IArchive, OArchive, Char>();
 
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
@@ -510,7 +515,7 @@ namespace hpx { namespace util
         bool empty() const
         {
             return table == detail::hold_any::get_table<detail::hold_any::empty>::
-                template get<Char, IArchive, OArchive>();
+                template get<IArchive, OArchive, Char>();
         }
 
         void reset()
@@ -519,7 +524,7 @@ namespace hpx { namespace util
             {
                 table->static_delete(&object);
                 table = detail::hold_any::get_table<detail::hold_any::empty>::
-                    template get<Char, IArchive, OArchive>();
+                    template get<IArchive, OArchive, Char>();
                 object = 0;
             }
         }
@@ -528,18 +533,18 @@ namespace hpx { namespace util
         // type has a corresponding operator defined, which is completely safe
         // because spirit::hold_any is used only in contexts where these operators
         // do exist
-        template <typename Char_, typename IArchive_, typename OArchive_>
+        template <typename IArchive_, typename OArchive_, typename Char_>
         friend inline std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_hold_any<Char_, IArchive_, OArchive_>& obj)
+            basic_hold_any<IArchive_, OArchive_, Char_>& obj)
         {
             return obj.table->stream_in(i, &obj.object);
         }
 
-        template <typename Char_, typename IArchive_, typename OArchive_>
+        template <typename IArchive_, typename OArchive_, typename Char_>
         friend inline std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_hold_any<Char_, IArchive_, OArchive_> const& obj)
+            basic_hold_any<IArchive_, OArchive_, Char_> const& obj)
         {
             return obj.table->stream_out(o, &obj.object);
         }
@@ -559,7 +564,7 @@ namespace hpx { namespace util
             }
             else
             {
-                typename detail::hold_any::fxn_ptr_table<Char, IArchive, OArchive> *p = 0;
+                typename detail::hold_any::fxn_ptr_table<IArchive, OArchive, Char> *p = 0;
                 ar >> p;
                 table = p->get_ptr();
                 delete p;
@@ -582,28 +587,30 @@ namespace hpx { namespace util
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
-        template <typename T, typename Char_
-            , typename IArchive_, typename OArchive_
+        template <typename T
+        , typename IArchive_
+        , typename OArchive_
+        , typename Char_
         >
-        friend T* any_cast(basic_hold_any<Char_, IArchive_, OArchive_> *);
+        friend T* any_cast(basic_hold_any<IArchive_, OArchive_, Char_> *);
 #else
     public: // types (public so any_cast can be non-friend)
 #endif
         // fields
-        detail::hold_any::fxn_ptr_table<Char, IArchive, OArchive>* table;
+        detail::hold_any::fxn_ptr_table<IArchive, OArchive, Char>* table;
         void* object;
     };
 
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Char>
-    class basic_hold_any<Char, void, void>
+    template <typename Char> // default is char
+    class basic_hold_any<void, void, Char>
     {
     public:
         // constructors
         template <typename T>
         explicit basic_hold_any(T const& x)
-          : table(hpx::util::detail::hold_any::get_table<T>::template get<Char, void, void>()), object(0)
+          : table(hpx::util::detail::hold_any::get_table<T>::template get<void, void, Char>()), object(0)
         {
             if (hpx::util::detail::hold_any::get_table<T>::is_small::value)
                 new (&object) T(x);
@@ -612,13 +619,13 @@ namespace hpx { namespace util
         }
 
         basic_hold_any()
-          : table(hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<Char, void, void>()),
+          : table(hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<void, void, Char>()),
             object(0)
         {
         }
 
         basic_hold_any(basic_hold_any const& x)
-          : table(hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<Char, void, void>()),
+          : table(hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<void, void, Char>()),
             object(0)
         {
             assign(x);
@@ -651,8 +658,8 @@ namespace hpx { namespace util
         basic_hold_any& assign(T const& x)
         {
             // are we copying between the same type?
-            hpx::util::detail::hold_any::fxn_ptr_table<Char, void, void>* x_table =
-                hpx::util::detail::hold_any::get_table<T>::template get<Char, void, void>();
+            hpx::util::detail::hold_any::fxn_ptr_table<void, void, Char>* x_table =
+                hpx::util::detail::hold_any::get_table<T>::template get<void, void, Char>();
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
                 table->destruct(&object);    // first destruct the old content
@@ -720,7 +727,7 @@ namespace hpx { namespace util
 
         bool empty() const
         {
-            return table == hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<Char, void, void>();
+            return table == hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<void, void, Char>();
         }
 
         void reset()
@@ -728,7 +735,7 @@ namespace hpx { namespace util
             if (!empty())
             {
                 table->static_delete(&object);
-                table = hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<Char, void, void>();
+                table = hpx::util::detail::hold_any::get_table<hpx::util::detail::hold_any::empty>::template get<void, void, Char>();
                 object = 0;
             }
         }
@@ -739,34 +746,38 @@ namespace hpx { namespace util
     // do exist
         template <typename Char_>
         friend inline std::basic_istream<Char_>&
-        operator>> (std::basic_istream<Char_>& i, basic_hold_any<Char_, void, void>& obj)
+        operator>> (std::basic_istream<Char_>& i, basic_hold_any<void, void, Char_>& obj)
         {
             return obj.table->stream_in(i, &obj.object);
         }
 
         template <typename Char_>
         friend inline std::basic_ostream<Char_>&
-        operator<< (std::basic_ostream<Char_>& o, basic_hold_any<Char_, void, void> const& obj)
+        operator<< (std::basic_ostream<Char_>& o, basic_hold_any<void, void, Char_> const& obj)
         {
             return obj.table->stream_out(o, &obj.object);
         }
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
-        template <typename T, typename Char_>
-        friend T* any_cast_nonser(basic_hold_any<Char_, void, void> *);
+        template <typename T
+        , typename IArchive_
+        , typename OArchive_
+        , typename Char_
+        >
+        friend T* any_cast(basic_hold_any<IArchive_, OArchive_, Char_> *);
 #else
     public: // types (public so any_cast can be non-friend)
 #endif
         // fields
-        hpx::util::detail::hold_any::fxn_ptr_table<Char, void, void>* table;
+        hpx::util::detail::hold_any::fxn_ptr_table<void, void, Char>* table;
         void* object;
     };
     ///////////////////////////////////////////////////////////////////////////
 
     // boost::any-like casting
-    template <typename T, typename Char, typename IArchive, typename OArchive>
-    inline T* any_cast (basic_hold_any<Char, IArchive, OArchive>* operand)
+    template <typename T, typename IArchive, typename OArchive, typename Char>
+    inline T* any_cast (basic_hold_any<IArchive, OArchive, Char>* operand)
     {
         if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
             return hpx::util::detail::hold_any::get_table<T>::is_small::value ?
@@ -776,14 +787,14 @@ namespace hpx { namespace util
         return 0;
     }
 
-    template <typename T, typename Char, typename IArchive, typename OArchive>
-    inline T const* any_cast(basic_hold_any<Char, IArchive, OArchive> const* operand)
+    template <typename T, typename IArchive, typename OArchive, typename Char>
+    inline T const* any_cast(basic_hold_any<IArchive, OArchive, Char> const* operand)
     {
-        return any_cast<T>(const_cast<basic_hold_any<Char, IArchive, OArchive>*>(operand));
+        return any_cast<T>(const_cast<basic_hold_any<IArchive, OArchive, Char>*>(operand));
     }
 
-    template <typename T, typename Char, typename IArchive, typename OArchive>
-    T any_cast(basic_hold_any<Char, IArchive, OArchive>& operand)
+    template <typename T, typename IArchive, typename OArchive, typename Char>
+    T any_cast(basic_hold_any<IArchive, OArchive, Char>& operand)
     {
         typedef BOOST_DEDUCED_TYPENAME hpx::util::detail::remove_reference<T>::type nonref;
 
@@ -803,8 +814,8 @@ namespace hpx { namespace util
         return *result;
     }
 
-    template <typename T, typename Char, typename IArchive, typename OArchive>
-    T const& any_cast(basic_hold_any<Char, IArchive, OArchive> const& operand)
+    template <typename T, typename IArchive, typename OArchive, typename Char>
+    T const& any_cast(basic_hold_any<IArchive, OArchive, Char> const& operand)
     {
         typedef BOOST_DEDUCED_TYPENAME hpx::util::detail::remove_reference<T>::type nonref;
 
@@ -814,71 +825,16 @@ namespace hpx { namespace util
         BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
 #endif
 
-        return any_cast<nonref const&>(const_cast<basic_hold_any<Char, IArchive, OArchive> &>(operand));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-
-    // boost::any-like casting non-serialized versions
-    template <typename T, typename Char>
-    inline T* any_cast_nonser (basic_hold_any<Char, void, void>* operand)
-    {
-        if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
-            return hpx::util::detail::hold_any::get_table<T>::is_small::value ?
-                reinterpret_cast<T*>(&operand->object) :
-                reinterpret_cast<T*>(operand->object);
-        }
-        return 0;
-    }
-
-    template <typename T, typename Char>
-    inline T const* any_cast_nonser(basic_hold_any<Char, void, void> const* operand)
-    {
-        return any_cast_nonser<T>(const_cast<basic_hold_any<Char, void, void>*>(operand));
-    }
-
-    template <typename T, typename Char>
-    T any_cast_nonser(basic_hold_any<Char, void, void>& operand)
-    {
-        typedef BOOST_DEDUCED_TYPENAME hpx::util::detail::remove_reference<T>::type nonref;
-
-#ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-        // If 'nonref' is still reference type, it means the user has not
-        // specialized 'remove_reference'.
-
-        // Please use BOOST_BROKEN_COMPILER_TYPE_TRAITS_SPECIALIZATION macro
-        // to generate specialization of remove_reference for your class
-        // See type traits library documentation for details
-        BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
-#endif
-
-        nonref* result = any_cast_nonser<nonref>(&operand);
-        if(!result)
-            boost::throw_exception(bad_any_cast(operand.type(), BOOST_SP_TYPEID(T)));
-        return *result;
-    }
-
-    template <typename T, typename Char>
-    T const& any_cast_nonser(basic_hold_any<Char, void, void> const& operand)
-    {
-        typedef BOOST_DEDUCED_TYPENAME hpx::util::detail::remove_reference<T>::type nonref;
-
-#ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-        // The comment in the above version of 'any_cast' explains when this
-        // assert is fired and what to do.
-        BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
-#endif
-
-        return any_cast_nonser<nonref const&>(const_cast<basic_hold_any<Char, void, void> &>(operand));
+        return any_cast<nonref const&>(const_cast<basic_hold_any<IArchive, OArchive, Char> &>(operand));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    typedef basic_hold_any<char> hold_any;
-    typedef basic_hold_any<wchar_t> whold_any;
+    typedef basic_hold_any<portable_binary_iarchive, portable_binary_oarchive> hold_any;
+    typedef basic_hold_any<portable_binary_iarchive, portable_binary_oarchive, wchar_t> whold_any;
 
-    typedef basic_hold_any<char, void, void> hold_any_nonser;
-    typedef basic_hold_any<wchar_t, void, void> whold_any_nonser;
+    typedef basic_hold_any<void, void, char> hold_any_nonser;
+    typedef basic_hold_any<void, void, wchar_t> whold_any_nonser;
 
 }}    // namespace hpx::util
 

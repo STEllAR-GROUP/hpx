@@ -16,7 +16,6 @@ using boost::program_options::options_description;
 using hpx::util::hold_any;
 using hpx::util::hold_any_nonser;
 using hpx::util::any_cast;
-using hpx::util::any_cast_nonser;
 
 using hpx::init;
 using hpx::finalize;
@@ -223,7 +222,6 @@ int hpx_main(variables_map& vm)
 
             hold_any any1(f);
             hold_any any2(any1);
-//            hold_any any3 = any1;
             hold_any any3;
             any3 = any1;
 
@@ -263,9 +261,9 @@ int hpx_main(variables_map& vm)
             hold_any_nonser any2_nonser(any1_nonser);
             hold_any_nonser any3_nonser = any1_nonser;
 
-            (any_cast_nonser<small_object>(any1_nonser)) (2);
-            (any_cast_nonser<small_object>(any2_nonser)) (4);
-            (any_cast_nonser<small_object>(any3_nonser)) (6);
+            (any_cast<small_object>(any1_nonser)) (2);
+            (any_cast<small_object>(any2_nonser)) (4);
+            (any_cast<small_object>(any3_nonser)) (6);
 
         }
 
@@ -281,9 +279,9 @@ int hpx_main(variables_map& vm)
             hold_any_nonser any2_nonser(any1_nonser);
             hold_any_nonser any3_nonser = any1_nonser;
 
-            (any_cast_nonser<big_object>(any1_nonser)) (3,4);
-            (any_cast_nonser<big_object>(any2_nonser)) (5,6);
-            (any_cast_nonser<big_object>(any3_nonser)) (7,8);
+            (any_cast<big_object>(any1_nonser)) (3,4);
+            (any_cast<big_object>(any2_nonser)) (5,6);
+            (any_cast<big_object>(any3_nonser)) (7,8);
         }
     }
 
