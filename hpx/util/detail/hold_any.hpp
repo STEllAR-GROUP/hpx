@@ -35,6 +35,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 
 #include <stdexcept>
@@ -256,10 +257,8 @@ namespace hpx { namespace util
                 base_type::stream_in = Vtable::stream_in;
                 base_type::stream_out = Vtable::stream_out;
 
-#if 0
                 // make sure the global gets instantiated;
                 hpx::actions::detail::guid_initialization<fxn_ptr>();
-#endif
             }
 
             virtual base_type * get_ptr()
@@ -267,12 +266,10 @@ namespace hpx { namespace util
                 return Vtable::get_ptr();
             }
 
-#if 0
             static void register_base()
             {
                 util::void_cast_register_nonvirt<fxn_ptr, base_type>();
             }
-#endif
 
             void save_object(void *const* object, OArchive & ar, unsigned)
             {
@@ -370,7 +367,17 @@ namespace hpx { namespace util
             return o;
         }
     }} // namespace hpx::util::detail::hold_any
+}}
 
+///////////////////////////////////////////////////////////////////////////////
+// Make sure hold_any serialization is properly initialized
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Char, typename IArchive, typename OArchive, typename Vtable>)
+  , (hpx::util::detail::hold_any::fxn_ptr<Char, IArchive, OArchive, Vtable>)
+)
+
+namespace hpx { namespace util
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Char
         , typename IArchive = portable_binary_iarchive
