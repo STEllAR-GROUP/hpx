@@ -13,6 +13,7 @@ set(subdirs
     allgather
     async_io
     balancing
+    bcast
     bfs
     bright_future
     cancelable_action
