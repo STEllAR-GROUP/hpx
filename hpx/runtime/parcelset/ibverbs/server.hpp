@@ -173,75 +173,11 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         
         message_type on_completion(ibv_wc * wc)
         {
-            rdma_cm_id * id = (rdma_cm_id *)(uintptr_t)(wc->wr_id);
-            /*
-            switch(wc->opcode)
-            {
-                case IBV_WC_SEND: std::cout << "server IBV_WC_SEND\n"; break;
-                case IBV_WC_RDMA_WRITE: std::cout << "server IBV_WC_RDMA_WRITE\n"; break;
-                case IBV_WC_RDMA_READ: std::cout << "server IBV_WC_RDMA_READ\n"; break;
-                case IBV_WC_COMP_SWAP: std::cout << "server IBV_WC_COMP_SWAP\n"; break;
-                case IBV_WC_FETCH_ADD: std::cout << "server IBV_WC_FETCH_ADD\n"; break;
-                case IBV_WC_BIND_MW: std::cout << "server IBV_WC_BIND_MW\n"; break;
-                case IBV_WC_RECV: std::cout << "server IBV_WC_RECV\n"; break;
-                case IBV_WC_RECV_RDMA_WITH_IMM: std::cout << "server IBV_WC_RECV_RDMA_WITH_IMM\n"; break;
-            }
-            */
             if(wc->opcode == IBV_WC_RECV_RDMA_WITH_IMM)
             {
-                //boost::uint32_t len = ntohl(wc->imm_data);
-
-#if 0
-                if(len == 0)
-                {
-                    if(size_ == 0)
-                    {
-                        BOOST_ASSERT(false);
-                        size_ = 0;
-                        post_receive(id);
-                        msg_->id = MSG_READY;
-                        send_message(id);
-                        return MSG_READY;
-                    }
-                    else
-                    {
-                        BOOST_ASSERT(false);
-                        size_ = 0;
-                        post_receive(id);
-                        msg_->id = MSG_DONE;
-                        send_message(id);
-                        return MSG_DONE;
-                    }
-                }
-                else
-                {
-                    if(size_ == 0)
-                    {
-                        size_ = len;
-                        id_ = id;
-                        /*
-                        post_receive(id);
-                        msg_->id = MSG_DATA;
-                        send_message(id);
-                        */
-                        return MSG_DATA;
-                    }
-                    else
-                    {
-                        size_ = len;
-                        id_ = id;
-                        // We don't do anything here, the handler takes care of
-                        // sending the next message and register the next receive as
-                        // we need to copy stuff out of the rdma buffer first
-                        return MSG_DATA;
-                    }
-                }
-                return MSG_INVALID;
-#endif
-                //size_ = len;
-                id_ = id;
                 return MSG_DATA;
             }
+            post_receive();
             return MSG_RETRY;
         }
         

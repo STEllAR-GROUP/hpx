@@ -13,7 +13,6 @@ namespace hpx { namespace parcelset { namespace ibverbs {
         MSG_INVALID = 0,
         MSG_RETRY = 1,
         MSG_MR = 2,
-        MSG_READY = 3,
         MSG_DATA = 4,
         MSG_DONE = 5
     };

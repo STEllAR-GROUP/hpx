@@ -77,8 +77,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
         {
             /// Increment sends and begin timer.
             send_data_.time_ = timer_.elapsed_nanoseconds();
-            /// Increment sends and begin timer.
-            send_data_.time_ = timer_.elapsed_nanoseconds();
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
@@ -128,7 +126,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
             parcels_sent_.add_data(send_data_);
 
             // now we can give this connection back to the cache
-            //reclaim_data_buffer(out_buffer_);
+            out_buffer_.clear();
+            out_priority_ = 0;
+            out_size_ = 0;
+            out_data_size_ = 0;
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -142,23 +143,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
 
     protected:
-#if 0
-        data_buffer get_data_buffer(std::size_t size, std::string const& name)
-        {
-            data_buffer buffer;
-            if (cache_.get(size, buffer))
-                return buffer;
-
-            return data_buffer(name.c_str(), size);
-        }
-
-        void reclaim_data_buffer(data_buffer& buffer)
-        {
-            cache_.add(buffer.size(), buffer);
-            buffer.resize(0);
-            buffer.reset();
-        }
-#endif
 
     private:
         /// Window for the parcelport_connection.

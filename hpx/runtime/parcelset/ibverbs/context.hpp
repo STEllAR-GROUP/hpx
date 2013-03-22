@@ -220,26 +220,28 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             void call() const
             {
-                simpl_ = impl_.lock();
-                if (simpl_)
+                implementation_type impl = impl_.lock();
+                if (impl)
                 {
                     boost::system::error_code ec;
 
-                    std::size_t size = simpl_->try_read_data(data_, ec);
+                    std::size_t size = impl->try_read_data(data_, ec);
                     if (size == 0 && !ec) {
                         // repost this handler
                         io_service_.post(boost::bind(
                             &read_operation::call, this->shared_from_this()));
                     }
                     else if(!ec) {
+                        /*
                         // post reading of size
                         io_service_.post(boost::asio::detail::bind_handler(
                             handler_, ec, data_.size()));
+                        */
+                        handler_(ec, data_.size());
                     }
                 }
                 else
                 {
-                    simpl_.reset();
                     io_service_.post(boost::asio::detail::bind_handler(
                         handler_, boost::asio::error::operation_aborted, 0));
                 }
@@ -248,7 +250,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
         private:
             
             boost::weak_ptr<Implementation> impl_;
-            mutable boost::shared_ptr<Implementation> simpl_;
             boost::asio::io_service &io_service_;
             std::vector<char>& data_;
             Handler handler_;
@@ -279,8 +280,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 {
                     boost::system::error_code ec;
                     std::size_t size = impl->write(data_, ec);
+                    /*
                     io_service_.post(boost::asio::detail::bind_handler(
                         handler_, ec, size));
+                    */
+                    handler_(ec, size);
                 }
                 else
                 {
@@ -516,19 +520,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
         void on_connection(rdma_cm_id * id)
         {
             connection_.on_connection(id);
-            
-            /*
-            boost::system::error_code ec;
-            connection_.post_receive();
-            message_type m = next_wc(ec, true);
-            if(ec) return;
-            if(m != MSG_DATA)
-            {
-                std::cout << "server on connection got something weird\n";
-                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
-            }
-            std::cout << "server connection created\n";
-            */
         }
 
         void on_completion(ibv_wc * wc)
@@ -760,21 +751,9 @@ namespace hpx { namespace parcelset { namespace ibverbs
             std::size_t k = 0;
             do
             {
-                /*
-                if (close_operation_.load() || !ctx_) {
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
-                    return MSG_INVALID;
-                }
-
-                if (aborted_.load()) {
-                    aborted_.store(false);
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
-                    return MSG_INVALID;
-                }
-                */
                 ret = poll(&pfd, 1, 1);
-                hpx::util::detail::yield_k(k, "hpx::parcelset::ibverbs::context::next_wc");
                 if(ret == 0 && !retry) return MSG_RETRY;
+                hpx::util::detail::yield_k(k, "hpx::parcelset::ibverbs::context::next_wc");
                 k++;
             } while (ret == 0);
             if(ret < 0)
@@ -792,12 +771,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             ibv_ack_cq_events(cq, 1);
             if(ret == -1)
             {
-                /*
-                if (close_operation_.load() || !ctx_) {
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
-                    return MSG_INVALID;
-                }
-                */
             }
             ibv_req_notify_cq(cq, 0);
             
@@ -806,18 +779,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             message_type m = MSG_RETRY;
             while(m == MSG_RETRY)
             {
-                /*
-                if (close_operation_.load() || !ctx_) {
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
-                    return MSG_INVALID;
-                }
-
-                if (aborted_.load()) {
-                    aborted_.store(false);
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
-                    return MSG_INVALID;
-                }
-                */
                 if(ibv_poll_cq(cq, 1, &wc))
                 {
                     if(wc.status == IBV_WC_SUCCESS)
@@ -833,8 +794,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 }
                 // As this loop might spin quite a while, we are implementing
                 // an exponential backup strategy
-                hpx::util::detail::yield_k(k, "hpx::parcelset::ibverbs::context::next_wc");
                 if(m == MSG_RETRY && !retry) return MSG_RETRY;
+                hpx::util::detail::yield_k(k, "hpx::parcelset::ibverbs::context::next_wc");
                 ++k;
             }
             return m;
@@ -965,10 +926,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             bytes_sent += chunk_size;
             data_ptr += chunk_size;
 
-            for(;
-                bytes_sent < total_len;
-                //bytes_sent += connection_.buffer_size_
-            )
+            while(bytes_sent < total_len)
             {
                 //std::cout << "waiting for ready from server ...\n";
                 HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 0, true);
@@ -978,25 +936,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 //std::cout << "sending len: " << bytes_sent << " (" << chunk_size << ") " << sizeof(total_len) << "\n";
 
                 std::memcpy(connection_.buffer_ + sizeof(boost::uint64_t), data_ptr, chunk_size);
-                /*
-                message_type m = next_wc(ec, true);
-                if(ec) return 0;
-                if(m == MSG_DATA)
-                {
-                    std::cout << "writing got data ... good\n";
-                }
-                else if(m == MSG_DONE)
-                {
-                    std::cout << "writing got done ... strange\n";
-                    connection_.post_receive();
-                    continue;
-                }
-                else
-                {
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
-                    return 0;
-                }
-                */
+                
                 connection_.write_remote(chunk_size + sizeof(boost::uint64_t));
                 connection_.post_receive();
                 //std::cout << "sent next chunk ...\n";
