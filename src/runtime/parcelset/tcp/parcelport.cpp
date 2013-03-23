@@ -255,7 +255,7 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 #endif
 
-        // enqueue the outgoing parcel ...
+        // enqueue the outgoing parcels ...
         {
             util::spinlock::scoped_lock l(mtx_);
 
@@ -274,31 +274,7 @@ namespace hpx { namespace parcelset { namespace tcp
         if (!client_connection)
         {
             if (ec)
-            {
-                // If there was an error, we might be safe if there are no parcels
-                // to be sent anymore (some other thread already picked them up)
-                // or if there are parcels, but the parcel we were about to sent
-                // has been already processed.
-                util::spinlock::scoped_lock l(mtx_);
-
-                iterator it = pending_parcels_.find(locality_id);
-                if (it != pending_parcels_.end())
-                {
-                    map_second_type& data = it->second;
-
-                    std::vector<parcel>::iterator end = data.first.end();
-                    std::vector<write_handler_type>::iterator fit = data.second.begin();
-                    for (std::vector<parcel>::iterator pit = data.first.begin();
-                         pit != end; ++pit, ++fit)
-                    {
-                        if ((*pit).get_parcel_id() == parcel_id)
-                        {
-                            // our parcel is still here, bailing out
-                            throw hpx::detail::access_exception(ec);
-                        }
-                    }
-                }
-            }
+                report_potential_connection_error(locality_id, parcel_id, ec);
 
             // We can safely return if no connection is available at this point.
             // As soon as a connection becomes available it checks for pending
@@ -306,32 +282,7 @@ namespace hpx { namespace parcelset { namespace tcp
             return;
         }
 
-        std::vector<parcel> parcels_;
-        std::vector<write_handler_type> handlers_;
-
-        {
-            util::spinlock::scoped_lock l(mtx_);
-            iterator it = pending_parcels_.find(locality_id);
-
-            if (it != pending_parcels_.end())
-            {
-                BOOST_ASSERT(it->first == locality_id);
-                std::swap(parcels_, it->second.first);
-                std::swap(handlers_, it->second.second);
-            }
-        }
-
-        // If the parcels didn't get sent by another connection ...
-        if (!parcels_.empty() && !handlers_.empty())
-        {
-            send_pending_parcels(client_connection, parcels_, handlers_);
-        }
-        else
-        {
-            // ... or re-add the stuff to the cache
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
-        }
+        send_parcels_or_reclaim_connection(locality_id, client_connection);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -359,37 +310,23 @@ namespace hpx { namespace parcelset { namespace tcp
         if (!client_connection)
         {
             if (ec)
-            {
-                // If there was an error, we might be safe if there are no parcels
-                // to be sent anymore (some other thread already picked them up)
-                // or if there are parcels, but the parcel we were about to sent
-                // has been already processed.
-                util::spinlock::scoped_lock l(mtx_);
-
-                iterator it = pending_parcels_.find(locality_id);
-                if (it != pending_parcels_.end())
-                {
-                    map_second_type& data = it->second;
-
-                    std::vector<parcel>::iterator end = data.first.end();
-                    std::vector<write_handler_type>::iterator fit = data.second.begin();
-                    for (std::vector<parcel>::iterator pit = data.first.begin();
-                         pit != end; ++pit, ++fit)
-                    {
-                        if ((*pit).get_parcel_id() == parcel_id)
-                        {
-                            // our parcel is still here, bailing out
-                            throw hpx::detail::access_exception(ec);
-                        }
-                    }
-                }
-            }
+                report_potential_connection_error(locality_id, parcel_id, ec);
 
             // We can safely return if no connection is available at this point.
             // As soon as a connection becomes available it checks for pending
             // parcels and sends those out.
             return;
         }
+
+        send_parcels_or_reclaim_connection(locality_id, client_connection);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void parcelport::send_parcels_or_reclaim_connection(
+        naming::locality const& locality_id, 
+        parcelport_connection_ptr const& client_connection)
+    {
+        typedef pending_parcels_map::iterator iterator;
 
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
@@ -403,20 +340,21 @@ namespace hpx { namespace parcelset { namespace tcp
                 BOOST_ASSERT(it->first == locality_id);
                 std::swap(parcels, it->second.first);
                 std::swap(handlers, it->second.second);
+
+                if (parcels.empty())
+                {
+                    // if no parcels are pending re-add the connection to
+                    // the cache
+                    BOOST_ASSERT(handlers.empty());
+                    BOOST_ASSERT(locality_id == client_connection->destination());
+                    connection_cache_.reclaim(locality_id, client_connection);
+                    return;
+                }
             }
         }
 
-        // If the parcels didn't get sent by another connection ...
-        if (!parcels.empty() && !handlers.empty())
-        {
-            send_pending_parcels(client_connection, parcels, handlers);
-        }
-        else
-        {
-            // ... or re-add the stuff to the cache
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
-        }
+        // send parcels if they didn't get sent by another connection
+        send_pending_parcels(client_connection, parcels, handlers);
     }
 
     void parcelport::send_pending_parcels_trampoline(
@@ -424,36 +362,37 @@ namespace hpx { namespace parcelset { namespace tcp
         naming::locality const& locality_id,
         parcelport_connection_ptr client_connection)
     {
+        typedef pending_parcels_map::iterator iterator;
+
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
 
-        typedef pending_parcels_map::iterator iterator;
-
-        util::spinlock::scoped_lock l(mtx_);
-        iterator it = pending_parcels_.find(locality_id);
-
-        if (it != pending_parcels_.end())
         {
-            std::swap(parcels, it->second.first);
-            std::swap(handlers, it->second.second);
+            util::spinlock::scoped_lock l(mtx_);
+            iterator it = pending_parcels_.find(locality_id);
+
+            if (it != pending_parcels_.end())
+            {
+                std::swap(parcels, it->second.first);
+                std::swap(handlers, it->second.second);
+
+                if (parcels.empty())
+                {
+                    // Give this connection back to the cache as it's not
+                    // needed anymore.
+                    BOOST_ASSERT(handlers.empty());
+                    BOOST_ASSERT(locality_id == client_connection->destination());
+                    connection_cache_.reclaim(locality_id, client_connection);
+                    return;
+                }
+            }
         }
 
-        if (!parcels.empty() && !handlers.empty())
-        {
-            // Create a new thread which sends parcels that might still be
-            // pending.
-            hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(&parcelport::send_pending_parcels, this,
-                    client_connection, boost::move(parcels),
-                    boost::move(handlers)), "send_pending_parcels");
-        }
-        else
-        {
-            // Give this connection back to the cache as it's not needed
-            // anymore.
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
-        }
+        // Create a new thread which sends parcels that are still pending.
+        hpx::applier::register_thread_nullary(
+            HPX_STD_BIND(&parcelport::send_pending_parcels, this,
+                client_connection, boost::move(parcels),
+                boost::move(handlers)), "send_pending_parcels");
     }
 
     void parcelport::send_pending_parcels(
@@ -526,7 +465,7 @@ namespace hpx { namespace parcelset { namespace tcp
     {
         naming::locality const& l = p.get_destination_locality();
         error_code ec;
-        parcelport_connection_ptr client_connection = get_connection(l, ec);
+        parcelport_connection_ptr client_connection = get_connection_wait(l, ec);
 
         if (ec) {
             // all errors during early parcel handling are fatal
@@ -537,11 +476,12 @@ namespace hpx { namespace parcelset { namespace tcp
 
         BOOST_ASSERT(client_connection );
         client_connection->set_parcel(p);
-        client_connection->async_write(early_write_handler, early_pending_parcel_handler);
+        client_connection->async_write(early_write_handler,
+            early_pending_parcel_handler);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport_connection_ptr parcelport::get_connection(
+    parcelport_connection_ptr parcelport::get_connection_wait(
         naming::locality const& l, error_code& ec)
     {
         parcelport_connection_ptr client_connection;
@@ -557,18 +497,44 @@ namespace hpx { namespace parcelset { namespace tcp
             }
 
             // Wait for a really short amount of time.
-            this_thread::suspend();
+            boost::this_thread::sleep(boost::get_system_time() +
+                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
         // If we didn't get a connection or permission to create one (which is
         // unlikely), bail.
         if (!got_cache_space)
         {
+            HPX_THROWS_IF(ec, invalid_status, "parcelport::get_connection_wait",
+                "didn't get a connection slot from connection cache, bailing out");
+            return client_connection;
+        }
+
+        return get_connection(l, client_connection, ec);
+    }
+
+    parcelport_connection_ptr parcelport::get_connection(
+        naming::locality const& l, error_code& ec)
+    {
+        parcelport_connection_ptr client_connection;
+
+        // Get a connection or reserve space for a new connection.
+        if (!connection_cache_.get_or_reserve(l, client_connection))
+        {
+            // if no slot is available it's not a problem as the parcel will
+            // sent out whenever the next connection is returned to the cache
             if (&ec != &throws)
                 ec = make_success_code();
             return client_connection;
         }
 
+        return get_connection(l, client_connection, ec);
+    }
+
+    parcelport_connection_ptr parcelport::get_connection(
+        naming::locality const& l, parcelport_connection_ptr client_connection,
+        error_code& ec)
+    {
         // Check if we need to create the new connection.
         if (!client_connection)
         {
@@ -596,10 +562,15 @@ namespace hpx { namespace parcelset { namespace tcp
                     if (!error)
                         break;
 
-                    // wait for a really short amount of time (usually 100 ms)
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    // wait for a really short amount of time
+                    if (hpx::threads::get_self_ptr()) {
+                        this_thread::suspend();
+                    }
+                    else {
+                        boost::this_thread::sleep(boost::get_system_time() +
+                            boost::posix_time::milliseconds(
+                                HPX_NETWORK_RETRIES_SLEEP));
+                    }
                 }
                 catch (boost::system::system_error const& e) {
                     client_connection->socket().close();

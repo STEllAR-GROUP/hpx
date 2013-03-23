@@ -111,8 +111,14 @@ namespace hpx { namespace util
         std::string agas_host;
         boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
         if (vm.count("hpx:agas")) {
-            util::split_ip_address(
-                vm["hpx:agas"].as<std::string>(), agas_host, agas_port);
+            if (!util::split_ip_address(
+                vm["hpx:agas"].as<std::string>(), agas_host, agas_port))
+            {
+                std::cerr
+                    << "hpx::init: command line warning: illegal port "
+                        "number given, using default value instead."
+                    << std::endl;
+            }
         }
 
         // Check command line arguments.
@@ -309,8 +315,16 @@ namespace hpx { namespace util
             std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
         }
 
-        if (vm.count("hpx:hpx"))
-            util::split_ip_address(vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port);
+        if (vm.count("hpx:hpx")) {
+            if (!util::split_ip_address(vm["hpx:hpx"].as<std::string>(), 
+                    hpx_host, hpx_port))
+            {
+                std::cerr
+                    << "hpx::init: command line warning: illegal port "
+                        "number given, using default value instead."
+                    << std::endl;
+            }
+        }
 
         queuing_ = "priority_local";
         if (vm.count("hpx:queuing"))
@@ -611,7 +625,7 @@ namespace hpx { namespace util
             }
 
             std::string affinity_desc;
-            std::vector<std::string> bind_affinity = 
+            std::vector<std::string> bind_affinity =
                 vm_["hpx:bind"].as<std::vector<std::string> >();
             BOOST_FOREACH(std::string const& s, bind_affinity)
             {
@@ -620,7 +634,7 @@ namespace hpx { namespace util
                 affinity_desc += s;
             }
 
-            threads::print_affinity_options(std::cout, num_threads_, 
+            threads::print_affinity_options(std::cout, num_threads_,
                 affinity_desc);
             return 1;
         }

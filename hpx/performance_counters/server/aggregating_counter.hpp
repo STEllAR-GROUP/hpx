@@ -13,6 +13,7 @@
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/max.hpp>
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
@@ -51,6 +52,28 @@ namespace hpx { namespace performance_counters { namespace server
             {
                 return static_cast<boost::int64_t>(
                     boost::accumulators::mean(accum));
+            }
+
+            typedef boost::mpl::false_ need_reset;
+        };
+
+        template <>
+        struct counter_type_from_statistic<boost::accumulators::tag::variance>
+        {
+            typedef boost::accumulators::tag::variance aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            static accumulator_type* create(boost::uint64_t parameter2)
+            {
+                return new accumulator_type();
+            }
+
+            static boost::int64_t call(accumulator_type& accum)
+            {
+                return static_cast<boost::int64_t>(
+                    sqrt(boost::accumulators::variance(accum)));
             }
 
             typedef boost::mpl::false_ need_reset;

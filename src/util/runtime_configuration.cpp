@@ -105,8 +105,11 @@ namespace hpx { namespace util
 #else
             "endian_out=${HPX_ENDIAN_OUT:little}",
 #endif
-            "use_shmem_parcelport=${HPX_USE_SHMEM_PARCELPORT:0}",
-            "shmem_data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
+
+            // shmem related settings
+            "[hpx.parcel.shmem]",
+            "enable=${HPX_USE_SHMEM_PARCELPORT:0}",
+            "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -393,7 +396,7 @@ namespace hpx { namespace util
             if(NULL != sec)
             {
                 std::string cfg_max_connections(
-                    sec->get_entry("max_connections_cache_size",
+                    sec->get_entry("max_connections",
                         HPX_MAX_PARCEL_CONNECTIONS));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
@@ -406,11 +409,11 @@ namespace hpx { namespace util
     {
         if (has_section("hpx.parcel"))
         {
-            util::section const * sec = get_section("hpx.parcel");
+            util::section const * sec = get_section("hpx.parcel.shmem");
             if(NULL != sec)
             {
                 std::string cfg_shmem_data_buffer_cache_size(
-                    sec->get_entry("shmem_data_buffer_cache_size",
+                    sec->get_entry("data_buffer_cache_size",
                         HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE));
 
                 return boost::lexical_cast<std::size_t>(cfg_shmem_data_buffer_cache_size);

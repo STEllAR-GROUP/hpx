@@ -25,6 +25,7 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -147,16 +148,16 @@ namespace hpx { namespace util { namespace coroutines
                     increment_stack_recycle_count();
             }
 
-            typedef boost::detail::atomic_count counter_type;
+            typedef boost::atomic<boost::int64_t> counter_type;
 
             static counter_type& get_stack_recycle_counter()
             {
                 static counter_type counter(0);
                 return counter;
             }
-            static boost::uint64_t get_stack_recycle_count()
+            static boost::uint64_t get_stack_recycle_count(bool reset)
             {
-                return get_stack_recycle_counter();
+                return util::get_and_reset_value(get_stack_recycle_counter(), reset);
             }
             static boost::uint64_t increment_stack_recycle_count()
             {

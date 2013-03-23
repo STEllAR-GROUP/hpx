@@ -89,21 +89,8 @@ namespace hpx { namespace components { namespace server
             partition_info const& info) const;
 
         ///////////////////////////////////////////////////////////////////////
-        // Each of the exposed functions needs to be encapsulated into a action
-        // type, allowing to generate all require boilerplate code for threads,
-        // serialization, etc.
-        typedef hpx::actions::result_action2<
-            distributing_factory const, remote_result_type,
-            components::component_type, std::size_t,
-            &distributing_factory::create_components
-        > create_components_action;
-
-        typedef hpx::actions::result_action4<
-            distributing_factory const, remote_result_type,
-            components::component_type, std::size_t,
-            std::size_t, partition_info const&,
-            &distributing_factory::create_partitioned
-        > create_partitioned_action;
+        HPX_DEFINE_COMPONENT_CONST_ACTION(distributing_factory, create_components);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(distributing_factory, create_partitioned);
     };
 }}}
 

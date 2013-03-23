@@ -141,7 +141,7 @@ namespace hpx { namespace parcelset
         };
 
         virtual boost::int64_t
-        get_connection_cache_statistics(connection_cache_statistics_type, bool reset) const
+        get_connection_cache_statistics(connection_cache_statistics_type, bool reset)
         {
             // by default this parcelport does not expose any conenction cache
             // statistics
@@ -281,6 +281,10 @@ namespace hpx { namespace parcelset
             util::runtime_configuration const& cfg,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
+
+    protected:
+        void report_potential_connection_error(naming::locality const& locality_id,
+            naming::gid_type const& parcel_id, error_code const& ec);
 
     protected:
         /// mutex for all of the member data

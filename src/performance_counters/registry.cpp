@@ -456,6 +456,14 @@ namespace hpx { namespace performance_counters
                 gid = components::server::create_with_args<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0);
             }
+            else if (p.countername_ == "stddev") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::aggregating_counter<
+                        boost::accumulators::tag::variance>
+                > counter_t;
+                gid = components::server::create_with_args<counter_t>(
+                    complemented_info, base_counter_name, sample_interval, 0);
+            }
             else if (p.countername_ == "rolling_average") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::aggregating_counter<

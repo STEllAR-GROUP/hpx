@@ -686,6 +686,43 @@ namespace hpx { namespace performance_counters
         }
 
         ///////////////////////////////////////////////////////////////////////
+        inline bool is_thread_kind(std::string const& pattern)
+        {
+            return pattern.find("-thread#*") == pattern.size() - 9;
+        }
+
+        inline std::string get_thread_kind(std::string const& pattern)
+        {
+            BOOST_ASSERT(is_thread_kind(pattern));
+            return pattern.substr(0, pattern.find_last_of('-'));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// Expand all wild-cards in a counter base name (for aggregate counters)
+        bool expand_basecounter(
+            counter_info& info, counter_path_elements& p,
+            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        {
+            // discover all base names
+            std::vector<counter_info> counter_infos;
+            counter_status status = discover_counter_type(p.parentinstancename_,
+                counter_infos, discover_counters_full, ec);
+            if (!status_is_valid(status) || ec)
+                return false;
+
+            counter_info i = info;
+            BOOST_FOREACH(counter_info& basei, counter_infos)
+            {
+                p.parentinstancename_ = basei.fullname_;
+                counter_status status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
+            return true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // expand main counter name
         bool expand_counter_info_threads(
             counter_info& i, counter_path_elements& p,
             HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
@@ -699,17 +736,6 @@ namespace hpx { namespace performance_counters
                     return false;
             }
             return true;
-        }
-
-        inline bool is_thread_kind(std::string const& pattern)
-        {
-            return pattern.find("-thread#*") == pattern.size() - 9;
-        }
-
-        inline std::string get_thread_kind(std::string const& pattern)
-        {
-            BOOST_ASSERT(is_thread_kind(pattern));
-            return pattern.substr(0, pattern.find_last_of('-'));
         }
 
         bool expand_counter_info_localities(
@@ -737,7 +763,6 @@ namespace hpx { namespace performance_counters
                         return false;
                 }
             }
-
             return true;
         }
     }
@@ -748,15 +773,22 @@ namespace hpx { namespace performance_counters
     bool expand_counter_info(counter_info const& info,
         HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
     {
-        counter_info i = info;
-
-        // first expand "locality*"
         counter_path_elements p;
-        counter_status status = get_counter_path_elements(i.fullname_, p, ec);
+        counter_status status = get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
+        // A '*' wild-card as the instance name is equivalent to no instance
+        // name at all.
+        if (p.parentinstancename_ == "*")
+        {
+            BOOST_ASSERT(p.parentinstanceindex_ == -1);
+            p.parentinstancename_.clear();
+        }
+
+        // first expand "locality*"
         if (p.parentinstancename_ == "locality#*")
         {
+            counter_info i = info;
             p.parentinstancename_ = "locality";
             return detail::expand_counter_info_localities(i, p, f, ec);
         }
@@ -764,8 +796,16 @@ namespace hpx { namespace performance_counters
         // now expand "<...>-thread#*"
         if (detail::is_thread_kind(p.instancename_))
         {
+            counter_info i = info;
             p.instancename_ = detail::get_thread_kind(p.instancename_) + "-thread";
             return detail::expand_counter_info_threads(i, p, f, ec);
+        }
+
+        // handle wild-cards in aggregate counters
+        if (p.parentinstance_is_basename_)
+        {
+            counter_info i = info;
+            return detail::expand_basecounter(i, p, f, ec);
         }
 
         // everything else is handled directly

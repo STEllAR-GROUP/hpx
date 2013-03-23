@@ -184,11 +184,11 @@ namespace hpx { namespace util { namespace coroutines
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     std::size_t get_thread_data() const
     {
-        return m_pimpl->get_thread_data();
+        return m_pimpl.get() ? m_pimpl->get_thread_data() : 0;
     }
     std::size_t set_thread_data(std::size_t data)
     {
-        return m_pimpl->set_thread_data(data);
+        return m_pimpl.get() ? m_pimpl->set_thread_data(data) : 0;
     }
 #endif
 

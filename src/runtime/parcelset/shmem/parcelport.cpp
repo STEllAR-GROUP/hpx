@@ -251,31 +251,7 @@ namespace hpx { namespace parcelset { namespace shmem
         if (!client_connection)
         {
             if (ec)
-            {
-                // If there was an error, we might be safe if there are no parcels
-                // to be sent anymore (some other thread already picked them up)
-                // or if there are parcels, but the parcel we were about to sent
-                // has been already processed.
-                util::spinlock::scoped_lock l(mtx_);
-
-                iterator it = pending_parcels_.find(locality_id);
-                if (it != pending_parcels_.end())
-                {
-                    map_second_type& data = it->second;
-
-                    std::vector<parcel>::iterator end = data.first.end();
-                    std::vector<write_handler_type>::iterator fit = data.second.begin();
-                    for (std::vector<parcel>::iterator pit = data.first.begin();
-                         pit != end; ++pit, ++fit)
-                    {
-                        if ((*pit).get_parcel_id() == parcel_id)
-                        {
-                            // our parcel is still here, bailing out
-                            throw hpx::detail::access_exception(ec);
-                        }
-                    }
-                }
-            }
+                report_potential_connection_error(locality_id, parcel_id, ec);
 
             // We can safely return if no connection is available at this point.
             // As soon as a connection becomes available it checks for pending
@@ -295,20 +271,21 @@ namespace hpx { namespace parcelset { namespace shmem
                 BOOST_ASSERT(it->first == locality_id);
                 std::swap(parcels, it->second.first);
                 std::swap(handlers, it->second.second);
+
+                if (parcels.empty())
+                {
+                    // if no parcels are pending re-add the connection to
+                    // the cache
+                    BOOST_ASSERT(handlers.empty());
+                    BOOST_ASSERT(locality_id == client_connection->destination());
+                    connection_cache_.reclaim(locality_id, client_connection);
+                    return;
+                }
             }
         }
 
-        // If the parcels didn't get sent by another connection ...
-        if (!parcels.empty() && !handlers.empty())
-        {
-            send_pending_parcels(client_connection, parcels, handlers);
-        }
-        else
-        {
-            // ... or re-add the connection to the cache
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
-        }
+        // send parcels if they didn't get sent by another connection
+        send_pending_parcels(client_connection, parcels, handlers);
     }
 
     void parcelport::send_pending_parcels_trampoline(
@@ -316,36 +293,38 @@ namespace hpx { namespace parcelset { namespace shmem
         naming::locality const& locality_id,
         parcelport_connection_ptr client_connection)
     {
+        typedef pending_parcels_map::iterator iterator;
+
         std::vector<parcel> parcels;
         std::vector<write_handler_type> handlers;
 
-        typedef pending_parcels_map::iterator iterator;
-
-        util::spinlock::scoped_lock l(mtx_);
-        iterator it = pending_parcels_.find(locality_id);
-
-        if (it != pending_parcels_.end())
         {
-            std::swap(parcels, it->second.first);
-            std::swap(handlers, it->second.second);
+            util::spinlock::scoped_lock l(mtx_);
+            iterator it = pending_parcels_.find(locality_id);
+
+            if (it != pending_parcels_.end())
+            {
+                BOOST_ASSERT(it->first == locality_id);
+                std::swap(parcels, it->second.first);
+                std::swap(handlers, it->second.second);
+
+                if (parcels.empty())
+                {
+                    // Give this connection back to the cache as it's not
+                    // needed anymore.
+                    BOOST_ASSERT(handlers.empty());
+                    BOOST_ASSERT(locality_id == client_connection->destination());
+                    connection_cache_.reclaim(locality_id, client_connection);
+                    return;
+                }
+            }
         }
 
-        if (!ec && !parcels.empty() && !handlers.empty())
-        {
-            // Create a new thread which sends parcels that might still be
-            // pending.
-            hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(&parcelport::send_pending_parcels, this,
-                    client_connection, boost::move(parcels),
-                    boost::move(handlers)), "send_pending_parcels");
-        }
-        else
-        {
-            // Give this connection back to the cache as it's not needed
-            // anymore.
-            BOOST_ASSERT(locality_id == client_connection->destination());
-            connection_cache_.reclaim(locality_id, client_connection);
-        }
+        // Create a new thread which sends parcels that are still pending.
+        hpx::applier::register_thread_nullary(
+            HPX_STD_BIND(&parcelport::send_pending_parcels, this,
+                client_connection, boost::move(parcels),
+                boost::move(handlers)), "send_pending_parcels");
     }
 
     void parcelport::send_pending_parcels(
@@ -371,24 +350,8 @@ namespace hpx { namespace parcelset { namespace shmem
     {
         parcelport_connection_ptr client_connection;
 
-        bool got_cache_space = false;
-
-        for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-        {
-            // Get a connection or reserve space for a new connection.
-            if (connection_cache_.get_or_reserve(l, client_connection))
-            {
-                got_cache_space = true;
-                break;
-            }
-
-            // Wait for a really short amount of time.
-            this_thread::suspend();
-        }
-
-        // If we didn't get a connection or permission to create one (which is
-        // unlikely), bail.
-        if (!got_cache_space)
+        // Get a connection or reserve space for a new connection.
+        if (!connection_cache_.get_or_reserve(l, client_connection))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -501,7 +464,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
                 {
                     // De-serialize the parcel data
-                    data_buffer::data_buffer_type const& buffer = 
+                    data_buffer::data_buffer_type const& buffer =
                         parcel_data.get_buffer();
                     util::portable_binary_iarchive archive(
                         buffer, buffer.size(), boost::archive::no_header);

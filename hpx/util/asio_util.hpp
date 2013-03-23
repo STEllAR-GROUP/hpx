@@ -29,7 +29,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    HPX_API_EXPORT void split_ip_address(std::string const& v, std::string& host,
+    HPX_API_EXPORT bool split_ip_address(std::string const& v, std::string& host,
         boost::uint16_t& port);
 }}
 

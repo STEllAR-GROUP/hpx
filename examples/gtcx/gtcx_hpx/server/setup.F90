@@ -850,7 +850,7 @@ end subroutine setup
     tauii=-1.0             ! -1.0: no collisions, 1.0: collisions
     track_particles=0      ! 1: keep track of some particles
     nptrack=0              ! track nptrack particles every time step
-    rng_control=0          ! controls seed and algorithm for random num. gen.
+    rng_control=1          ! controls seed and algorithm for random num. gen.
                            ! rng_control>0 uses the portable random num. gen.
 
 ! mode diagnostic: 8 modes.

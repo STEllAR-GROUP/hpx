@@ -256,6 +256,34 @@ sections, one for each component.
       constant `HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY` (`4`)]]
 ]
 
+The following setting relate to the shared memory parcelport (which is usable 
+for cmmunication between two localities on the same node). These settings take
+effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
+(the equivalent cmake variable has the same name, and has to be set to `ON`).
+
+[teletype]
+``
+    [hpx.parcel.shmem]
+    enable = ${HPX_USE_SHMEM_PARCELPORT:0}
+    data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
+``
+[c++]
+
+[table:ini_hpx_parcel_shmem
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.parcel.shmem.enable`]
+     [Enable the use of the shared memory parcelport for connections between 
+      localities running on the same node. Note that the initial bootstrap 
+      of the overall __hpx__ application will still be performed using the 
+      default TCP connections.]
+     [static information, the connections are disabled by default.]]
+    [[`hpx.parcel.shmem.data_buffer_cache_size`]
+     [This property specifies the number of cached data buffers used for 
+      interprocess communication between localities on the same node.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE` (`512`)]]
+]
+
 ['[*The `hpx.agas` Configuration Section]]
 
 [teletype]

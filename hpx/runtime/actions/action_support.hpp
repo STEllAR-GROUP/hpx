@@ -731,7 +731,7 @@ namespace hpx { namespace actions
 #if defined(HPX_HAVE_CXX11_DECLTYPE)
 #  define HPX_TYPEOF(x)       decltype(x)
 #  define HPX_TYPEOF_TPL(x)   decltype(x)
-#elif HPX_GCC_VERSION <= 40400
+#elif defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
 #  define HPX_TYPEOF(x)       __typeof__(x)
 #  define HPX_TYPEOF_TPL(x)   __typeof__(x)
 #else

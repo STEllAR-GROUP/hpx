@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -356,6 +357,7 @@ namespace hpx { namespace threads { namespace policies
             new_tasks_wait_count_(0),
 #endif
             memory_pool_(64),
+            stolen_threads_(0),
             add_new_logger_("thread_queue::add_new")
         {}
 
@@ -400,6 +402,16 @@ namespace hpx { namespace threads { namespace policies
             return work_items_wait_ / count;
         }
 #endif
+
+        std::size_t get_num_stolen_threads(bool reset)
+        {
+            return util::get_and_reset_value(stolen_threads_, reset);
+        }
+
+        void increment_num_stolen_threads(std::size_t num = 1)
+        {
+            stolen_threads_ += num;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
@@ -702,23 +714,21 @@ namespace hpx { namespace threads { namespace policies
         void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
 
     private:
-        mutable mutex_type mtx_;            ///< mutex protecting the members
+        mutable mutex_type mtx_;                    ///< mutex protecting the members
 
-        thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
-
-        work_items_type work_items_;        ///< list of active work items
+        thread_map_type thread_map_;                ///< mapping of thread id's to HPX-threads
+        work_items_type work_items_;                ///< list of active work items
 
         boost::atomic<boost::int64_t> work_items_count_;       ///< count of active work items
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-        boost::atomic<boost::int64_t> work_items_wait_;        ///< overall wait time of workitems
-        boost::atomic<boost::int64_t> work_items_wait_count_;  ///< overall number of workitems in queue
+        boost::atomic<boost::int64_t> work_items_wait_;        ///< overall wait time of work items
+        boost::atomic<boost::int64_t> work_items_wait_count_;  ///< overall number of work items in queue
 #endif
-
-        thread_id_queue_type terminated_items_;   ///< list of terminated threads
+        thread_id_queue_type terminated_items_;     ///< list of terminated threads
         boost::atomic<boost::int64_t> terminated_items_count_; ///< count of terminated items
 
-        std::size_t max_count_;             ///< maximum number of existing PX-threads
-        task_items_type new_tasks_;         ///< list of new tasks to run
+        std::size_t max_count_;                     ///< maximum number of existing PX-threads
+        task_items_type new_tasks_;                 ///< list of new tasks to run
 
         boost::atomic<boost::int64_t> new_tasks_count_;        ///< count of new tasks to run
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
@@ -726,9 +736,10 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<boost::int64_t> new_tasks_wait_count_;   ///< overall number tasks waited
 #endif
 
-        threads::thread_pool memory_pool_;  ///< OS thread local memory pools for
-                                            ///< PX-threads
+        threads::thread_pool memory_pool_;          ///< OS thread local memory pools for
+                                                    ///< HPX-threads
 
+        boost::atomic<boost::int64_t> stolen_threads_;        ///< count of threads stolen of this queue
         util::block_profiler<add_new_tag> add_new_logger_;
     };
 }}}

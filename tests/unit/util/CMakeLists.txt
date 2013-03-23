@@ -6,6 +6,8 @@
 set(tests
     bind_action
     function
+    hold_any
+    hold_any_serialization
     merging_map
    )
 

@@ -1,0 +1,2 @@
+This example illustrates a broadcast and sendrecv with a user defined workload.
+Code written and maintained by Matt Anderson (anderson.matthew.w@gmail.com).

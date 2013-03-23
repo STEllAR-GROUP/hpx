@@ -22,15 +22,25 @@ endif()
 
 macro(get_boost_compiler_version)
   if(NOT BOOST_COMPILER_VERSION_FOUND)
-  set(BOOST_COMPILER_VERSION_FOUND ON CACHE INTERNAL "Boost compiler version was found.")
+    set(BOOST_COMPILER_VERSION_FOUND ON CACHE INTERNAL "Boost compiler version was found.")
 
-  exec_program(${CMAKE_CXX_COMPILER}
-    ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
-    OUTPUT_VARIABLE BOOST_COMPILER_VERSION_NUMBER)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+        OR "${CMAKE_CXX_COMPILER}" MATCHES "clang")
+      # clang -dumpversion emulates GCC 4.2.1, instead we use --version
+      exec_program(${CMAKE_CXX_COMPILER}
+        ARGS ${CMAKE_CXX_COMPILER_ARG1} --version
+        OUTPUT_VARIABLE BOOST_COMPILER_VERSION_NUMBER)
 
-  string(REGEX REPLACE "([0-9])\\.([0-9])(\\.[0-9])?" "\\1\\2"
-    BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
+      string(REGEX REPLACE "clang version ([0-9])\\.([0-9]) .*" "\\1\\2"
+        BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
+    else()
+      exec_program(${CMAKE_CXX_COMPILER}
+        ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
+        OUTPUT_VARIABLE BOOST_COMPILER_VERSION_NUMBER)
 
+      string(REGEX REPLACE "([0-9])\\.([0-9])(\\.[0-9])?" "\\1\\2"
+        BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
+    endif()
   endif()
 endmacro()
 
