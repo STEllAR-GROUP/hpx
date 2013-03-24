@@ -296,7 +296,7 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread which should be
     ///                   interrupted.
-    /// \param flag       [in] The flag encodes whether the thread should be 
+    /// \param flag       [in] The flag encodes whether the thread should be
     ///                   interrupted (if it is \a true), or 'uninterrupted'
     ///                   (if it is \a false).
     /// \param ec         [in,out] this represents the error status on exit,
@@ -315,6 +315,24 @@ namespace hpx { namespace threads
     {
         interrupt_thread(id, true, ec);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Interrupt the current thread at this point if it was canceled. This
+    /// will throw a thread_interrupted exception, which will cancel the thread.
+    ///
+    /// \param id         [in] The thread id of the thread which should be
+    ///                   interrupted.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    HPX_API_EXPORT void interruption_point(thread_id_type id,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return priority of the given thread

@@ -37,6 +37,8 @@ namespace hpx { namespace util
         bool start(bool evaluate_ = true);
         bool stop();
 
+        bool restart();
+
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
 

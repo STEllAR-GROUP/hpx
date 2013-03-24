@@ -336,19 +336,7 @@ namespace hpx
 
         void interruption_point()
         {
-            if (interruption_enabled() && interruption_requested())
-            {
-                // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
-                util::force_error_on_lock();
-
-                // now interrupt this thread
-                HPX_THROW_EXCEPTION(thread_interrupted,
-                    "hpx::thread::interruption_point",
-                    "hpx::this_thread::interruption_point: "
-                    "thread aborts itself due to requested thread interruption");
-            }
+            threads::interruption_point(threads::get_self_id());
         }
 
         bool interruption_enabled()

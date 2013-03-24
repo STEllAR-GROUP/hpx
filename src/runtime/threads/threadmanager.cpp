@@ -733,6 +733,26 @@ namespace hpx { namespace threads
         }
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        interruption_point(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::interruption_point",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd)
+            thrd->interruption_point();      // notify thread
+    }
+
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -884,8 +904,7 @@ namespace hpx { namespace threads
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
-                "threadmanager_impl::at_timer",
-                "NULL thread id encountered");
+                "threadmanager_impl::at_timer", "NULL thread id encountered");
             return terminated;
         }
 
@@ -901,7 +920,7 @@ namespace hpx { namespace threads
         thread_init_data data(
             boost::bind(&threadmanager_impl::wake_timer_thread, this, id,
                 newstate, newstate_ex, priority, self_id, triggered),
-            "wake_timer", 0, priority);
+            "wake_timer", 0, thread_priority_critical);
         thread_id_type wake_id = register_thread(data, suspended, true);
 
         // create timer firing in correspondence with given time
@@ -909,7 +928,7 @@ namespace hpx { namespace threads
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(boost::bind(&threadmanager_impl::set_state, this, wake_id,
-            pending, wait_timeout, priority, boost::ref(throws)));
+            pending, wait_timeout, thread_priority_critical, boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
@@ -951,7 +970,7 @@ namespace hpx { namespace threads
 
         thread_init_data data(
             boost::bind(f, this, expire_at, id, newstate, newstate_ex, priority),
-            "at_timer (expire at)", 0, priority);
+            "at_timer (expire at)", 0, thread_priority_critical);
         return register_thread(data, pending, true, ec);
     }
 
@@ -979,7 +998,7 @@ namespace hpx { namespace threads
 
         thread_init_data data(
             boost::bind(f, this, from_now, id, newstate, newstate_ex, priority),
-            "at_timer (from now)", 0, priority);
+            "at_timer (from now)", 0, thread_priority_critical);
         return register_thread(data, pending, true, ec);
     }
 

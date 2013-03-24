@@ -43,9 +43,12 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         case detail::message_buffer::normal:
+            timer_.restart();           // restart timer
             break;
 
         case detail::message_buffer::buffer_now_full:
+            timer_.stop();              // interrupt timer
+
             BOOST_ASSERT(NULL != pp_);
             buffer_(pp_);               // 'invoke' the buffer
             break;
@@ -61,13 +64,7 @@ namespace hpx { namespace plugins { namespace parcel
     bool coalescing_message_handler::timer_flush()
     {
         // adjust timer if needed
-        if (buffer_.size()) {
-            double ratio = buffer_.fill_ratio();
-            if (ratio > 0.0 && ratio <= 0.1)
-                timer_.slow_down(interval_*10);
-            else if (ratio > 0.9)
-                timer_.speed_up(interval_/10);
-
+        if (!buffer_.empty()) {
             flush();
             return true;        // restart timer
         }

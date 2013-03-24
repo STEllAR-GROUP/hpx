@@ -342,6 +342,17 @@ namespace hpx { namespace threads
         virtual void interrupt(thread_id_type id, bool flag,
             error_code& ec = throws) = 0;
 
+        /// Interrupt the current thread at this point if it was canceled. This
+        /// will throw a thread_interrupted exception, which will cancel the thread.
+        ///
+        /// \param id         [in] The thread id of the thread which should be
+        ///                   interrupted.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual void interruption_point(thread_id_type id,
+            error_code& ec = throws) = 0;
+
         /// The run_thread_exit_callbacks function is part of the thread related
         /// API. It runs all exit functions for one of the threads.
         ///

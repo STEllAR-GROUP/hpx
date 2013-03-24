@@ -202,9 +202,13 @@ namespace hpx { namespace threads
         ///                 thread's scheduling status.
         thread_state_enum operator()()
         {
+            if (requested_interrupt_)       // benign data race
+                interruption_point();       // interrupt thread if needed
+
             thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
+
             return coroutine_(current_state_ex);
         }
 
@@ -552,6 +556,8 @@ namespace hpx { namespace threads
             }
             requested_interrupt_ = flag;
         }
+
+        void interruption_point();
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         std::size_t get_thread_data() const

@@ -91,6 +91,25 @@ namespace hpx { namespace threads
         }
     }
 
+    void thread_data::interruption_point()
+    {
+        mutex_type::scoped_lock l(this);
+        if (enabled_interrupt_ && requested_interrupt_)
+        {
+            l.unlock();
+
+            // Verify that there are no more registered locks for this
+            // OS-thread. This will throw if there are still any locks
+            // held.
+            util::force_error_on_lock();
+
+            // now interrupt this thread
+            HPX_THROW_EXCEPTION(thread_interrupted,
+                "hpx::threads::thread_data::interruption_point",
+                "thread aborts itself due to requested thread interruption");
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()
     {

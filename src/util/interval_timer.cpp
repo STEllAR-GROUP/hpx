@@ -67,6 +67,26 @@ namespace hpx { namespace util
         return false;
     }
 
+    bool interval_timer::restart()
+    {
+        if (!is_started_)
+            return start();
+
+        mutex_type::scoped_lock l(mtx_);
+
+        // interrupt timer thread, if needed
+        if (id_) {
+            error_code ec(lightweight);       // avoid throwing on error
+            threads::set_thread_state(id_, threads::pending,
+                threads::wait_abort, threads::thread_priority_critical, ec);
+            id_ = 0;
+        }
+
+        // reschedule evaluation thread
+        schedule_thread();
+        return true;
+    }
+
     bool interval_timer::stop()
     {
         mutex_type::scoped_lock l(mtx_);
