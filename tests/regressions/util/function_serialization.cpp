@@ -31,7 +31,7 @@ void pass_functor(hpx::util::function<void()> const& f) {}
 
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action);
 HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
-HPX_ACTION_USES_MESSAGE_COALESCING(pass_functor_action, 80);
+HPX_ACTION_USES_MESSAGE_COALESCING(pass_functor_action);
 
 void worker(hpx::util::function<void()> const& f)
 {

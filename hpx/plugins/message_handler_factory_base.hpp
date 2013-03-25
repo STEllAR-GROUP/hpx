@@ -6,7 +6,7 @@
 #if !defined(HPX_MESSAGE_HANDLER_FACTORY_BASE_MAR_24_2013_0339PM)
 #define HPX_MESSAGE_HANDLER_FACTORY_BASE_MAR_24_2013_0339PM
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 
 #include <hpx/util/plugin.hpp>
@@ -27,7 +27,9 @@ namespace hpx { namespace plugins
         ///
         /// return Returns the newly created instance of the message handler 
         ///        supported by this factory
-        virtual parcelset::policies::message_handler* create() = 0;
+        virtual parcelset::policies::message_handler* create(
+            char const* action, parcelset::parcelport* pp,
+            std::size_t num_messages, std::size_t interval) = 0;
     };
 }}
 

@@ -33,6 +33,10 @@ namespace hpx { namespace plugins
     template <typename MessageHandler>
     struct message_handler_factory : public message_handler_factory_base
     {
+        message_handler_factory()
+          : isenabled_(false)
+        {}
+
         /// \brief Construct a new factory instance
         ///
         /// \param global   [in] The pointer to a \a hpx#util#section instance
@@ -67,10 +71,12 @@ namespace hpx { namespace plugins
         ///
         /// return Returns the newly created instance of the message handler 
         ///        supported by this factory
-        parcelset::policies::message_handler* create()
+        parcelset::policies::message_handler* create(char const* action,
+            parcelset::parcelport* pp, std::size_t num_messages, 
+            std::size_t interval)
         {
             if (isenabled_)
-                return new MessageHandler;
+                return new MessageHandler(action, pp, num_messages, interval);
             return 0;
         }
 

@@ -595,6 +595,8 @@ namespace hpx
     /// \namespace util
     namespace util
     {
+        struct binary_filter;
+
         class HPX_EXPORT section;
         class HPX_EXPORT runtime_configuration;
         class HPX_EXPORT io_service_pool;

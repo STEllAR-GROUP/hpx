@@ -12,6 +12,8 @@
 
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/interval_timer.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
+
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -55,7 +57,25 @@ namespace hpx { namespace plugins { namespace parcel
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_USES_MESSAGE_COALESCING(action_type, num)                  \
+#define HPX_ACTION_USES_MESSAGE_COALESCING(...)                               \
+    HPX_ACTION_USES_MESSAGE_COALESCING_(__VA_ARGS__)                          \
+/**/
+
+#define HPX_ACTION_USES_MESSAGE_COALESCING_(...)                              \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_ACTION_USES_MESSAGE_COALESCING_, HPX_UTIL_PP_NARG(__VA_ARGS__)    \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_ACTION_USES_MESSAGE_COALESCING_1(action_type)                     \
+    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, 50, 100)                \
+/**/
+
+#define HPX_ACTION_USES_MESSAGE_COALESCING_2(action_type, num)                \
+    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, num, 100)               \
+/**/
+
+#define HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, num, interval)      \
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
@@ -67,7 +87,7 @@ namespace hpx { namespace plugins { namespace parcel
             {                                                                 \
                 return ph->get_message_handler(                               \
                     BOOST_PP_STRINGIZE(action_type),                          \
-                    "coalescing_message_handler", num, loc, t);               \
+                    "coalescing_message_handler", num, interval, loc, t);     \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
