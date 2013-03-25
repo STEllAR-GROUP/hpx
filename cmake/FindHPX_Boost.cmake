@@ -33,7 +33,7 @@ macro(get_boost_compiler_version)
 
       string(REGEX REPLACE "clang version ([0-9])\\.([0-9]) .*" "\\1\\2"
         BOOST_COMPILER_VERSION_NUMBER ${BOOST_COMPILER_VERSION_NUMBER})
-    else()
+    elseif(NOT MSVC)
       exec_program(${CMAKE_CXX_COMPILER}
         ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
         OUTPUT_VARIABLE BOOST_COMPILER_VERSION_NUMBER)
