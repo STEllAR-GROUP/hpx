@@ -18,8 +18,6 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -353,8 +351,6 @@ namespace hpx {
         naming::resolver_client agas_client_;
         parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
-        components::server::memory memory_;
-        components::server::runtime_support runtime_support_;
         applier::applier applier_;
         actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;

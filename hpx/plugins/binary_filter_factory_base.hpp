@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_MESSAGE_HANDLER_FACTORY_BASE_MAR_24_2013_0339PM)
-#define HPX_MESSAGE_HANDLER_FACTORY_BASE_MAR_24_2013_0339PM
+#if !defined(HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM)
+#define HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM
 
 #include <hpx/config.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace plugins
         ///
         /// return Returns the newly created instance of the binary filter
         ///        supported by this factory
-        virtual util::binary_filter* create() = 0;
+        virtual util::binary_filter* create(bool compress) = 0;
     };
 }}
 

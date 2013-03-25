@@ -235,11 +235,27 @@ namespace hpx
             active_counters_->reset_counters(ec);
     }
 
-    void runtime::evaluate_active_counters(bool reset, 
+    void runtime::evaluate_active_counters(bool reset,
         char const* description, error_code& ec)
     {
         if (active_counters_.get())
             active_counters_->evaluate_counters(reset, description, ec);
+    }
+
+    parcelset::policies::message_handler* runtime::create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec)
+    {
+        return runtime_support_.create_message_handler(message_handler_type, 
+            action, pp, num_messages, interval, ec);
+    }
+
+    util::binary_filter* runtime::create_binary_filter(
+        char const* binary_filter_type, bool compress, error_code& ec)
+    {
+        return runtime_support_.create_binary_filter(binary_filter_type, 
+            compress, ec);
     }
 
     /// \brief Register all performance counter types related to this runtime
@@ -717,6 +733,38 @@ namespace hpx
             HPX_THROWS_IF(ec, invalid_status, "evaluate_active_counters",
                 "the runtime system is not available at this time");
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a message handler plugin
+    parcelset::policies::message_handler* create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            return rt->create_message_handler(message_handler_type, action,
+                pp, num_messages, interval, ec);
+        }
+
+        HPX_THROWS_IF(ec, invalid_status, "create_message_handler",
+            "the runtime system is not available at this time");
+        return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a binary filter plugin
+    util::binary_filter* create_binary_filter(char const* binary_filter_type,
+        bool compress, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            return rt->create_binary_filter(binary_filter_type, compress, ec);
+
+        HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
+            "the runtime system is not available at this time");
+        return 0;
     }
 }
 

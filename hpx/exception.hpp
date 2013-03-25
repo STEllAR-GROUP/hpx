@@ -92,6 +92,7 @@ namespace hpx
         thread_not_interruptable = 45,              ///<
         duplicate_component_id = 46,                ///< The component type has already been registered
         unknown_error = 47,                         ///< An unknown error occurred
+        bad_plugin_type = 48,                       ///< The specified plugin type is not known or otherwise invalid
 
         /// \cond NOINTERNAL
         last_error,

@@ -74,8 +74,8 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
             /* instance returned from this function */                        \
             static util::binary_filter* call()                                \
             {                                                                 \
-                using namespace hpx::plugins::compression;                    \
-                return new snappy_serialization_filter(true);                 \
+                return hpx::create_binary_filter(                             \
+                    "snappy_serialization_filter", true);                     \
             }                                                                 \
         };                                                                    \
     }}                                                                        \

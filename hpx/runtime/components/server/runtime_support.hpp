@@ -43,6 +43,7 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef lcos::local::spinlock component_map_mutex_type;
+        typedef lcos::local::spinlock plugin_map_mutex_type;
         typedef boost::mutex mutex_type;
 
         struct component_factory
@@ -274,6 +275,14 @@ namespace hpx { namespace components { namespace server
             return boost::move(f);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        parcelset::policies::message_handler* create_message_handler(
+            char const* message_handler_type, char const* action,
+            parcelset::parcelport* pp, std::size_t num_messages,
+            std::size_t interval, error_code& ec);
+        util::binary_filter* create_binary_filter(
+            char const* binary_filter_type, bool compress, error_code& ec);
+
     protected:
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,
@@ -303,6 +312,8 @@ namespace hpx { namespace components { namespace server
         bool terminated_;
 
         component_map_mutex_type cm_mtx_;
+        plugin_map_mutex_type p_mtx_;
+
         component_map_type components_;
         plugin_map_type plugins_;
 

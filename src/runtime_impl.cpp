@@ -127,8 +127,6 @@ namespace hpx {
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
-        memory_(),
-        runtime_support_(),
         applier_(parcel_handler_, *thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_)

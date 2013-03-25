@@ -1128,15 +1128,34 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a message handler plugin
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     HPX_API_EXPORT parcelset::policies::message_handler* create_message_handler(
         char const* message_handler_type, char const* action,
-        parcelset::parcelport* pp, std::size_t num_messages, std::size_t interval);
+        parcelset::parcelport* pp, std::size_t num_messages, 
+        std::size_t interval, error_code& ec = throws);
 
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
     HPX_API_EXPORT util::binary_filter* create_binary_filter(
-        char const* binary_filter_type, bool compress);
+        char const* binary_filter_type, bool compress, error_code& ec = throws);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

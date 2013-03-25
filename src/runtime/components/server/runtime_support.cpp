@@ -32,6 +32,9 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/parse_command_line.hpp>
 
+#include <hpx/plugins/message_handler_factory_base.hpp>
+#include <hpx/plugins/binary_filter_factory_base.hpp>
+
 #include <algorithm>
 #include <set>
 
@@ -154,19 +157,19 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::create_component",
+                "runtime_support::bulk_create_components",
                 hpx::util::osstream_get_string(strm));
             return ids;
         }
 
+        l.unlock();
+
     // create new component instance
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
-            ids.reserve(count);
-            for (std::size_t i = 0; i < count; ++i)
-                ids.push_back(factory->create());
-        }
+
+        ids.reserve(count);
+        for (std::size_t i = 0; i < count; ++i)
+            ids.push_back(factory->create());
 
     // log result if requested
         if (LHPX_ENABLED(info))
@@ -478,6 +481,8 @@ namespace hpx { namespace components { namespace server
             // now delete the entry
             components_.erase(curr);
         }
+
+        plugins_.clear();       // unload all plugins
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -714,6 +719,107 @@ namespace hpx { namespace components { namespace server
         {
             apply(act, id, rt->here());
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    parcelset::policies::message_handler*
+    runtime_support::create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec)
+    {
+        // locate the factory for the requested plugin type
+        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+
+        plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
+        if (it == plugins_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            hpx::util::osstream strm;
+            strm << "attempt to create message handler plugin instance of "
+                    "invalid/unknown type: " << message_handler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_message_handler",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        l.unlock();
+
+        // create new component instance
+        boost::shared_ptr<plugins::message_handler_factory_base> factory(
+            boost::static_pointer_cast<plugins::message_handler_factory_base>(
+                (*it).second.first));
+
+        parcelset::policies::message_handler* mh = factory->create(action,
+            pp, num_messages, interval);
+        if (0 == mh) {
+            hpx::util::osstream strm;
+            strm << "couldn't to create message handler plugin of type: " 
+                 << message_handler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_message_handler",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // log result if requested
+        if (LHPX_ENABLED(info))
+        {
+            LRT_(info) << "successfully created message handler plugin of type: "
+                       << message_handler_type;
+        }
+        return mh;
+    }
+
+    util::binary_filter* runtime_support::create_binary_filter(
+        char const* binary_filter_type, bool compress, error_code& ec)
+    {
+        // locate the factory for the requested plugin type
+        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+
+        plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
+        if (it == plugins_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            hpx::util::osstream strm;
+            strm << "attempt to create binary filter plugin instance of "
+                    "invalid/unknown type: " << binary_filter_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_binary_filter",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        l.unlock();
+
+        // create new component instance
+        boost::shared_ptr<plugins::binary_filter_factory_base> factory(
+            boost::static_pointer_cast<plugins::binary_filter_factory_base>(
+                (*it).second.first));
+
+        util::binary_filter* bf = factory->create(compress);
+        if (0 == bf) {
+            hpx::util::osstream strm;
+            strm << "couldn't to create binary filter plugin of type: " 
+                 << binary_filter_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_binary_filter",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // log result if requested
+        if (LHPX_ENABLED(info))
+        {
+            LRT_(info) << "successfully binary filter handler plugin of type: "
+                       << binary_filter_type;
+        }
+        return bf;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -997,7 +1103,7 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            if (0 != component_ini && "0" != component_ini->get_entry("no_factory", "0")) 
+            if (0 != component_ini && "0" != component_ini->get_entry("no_factory", "0"))
                 return false;
 
             // get the factory
