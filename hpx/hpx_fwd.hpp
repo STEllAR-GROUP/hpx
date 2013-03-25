@@ -114,13 +114,16 @@ namespace hpx
         namespace server
         {
             class parcelport_queue;
-            struct parcelhandler_queue_base;
+        }
 
-            namespace policies
-            {
-                struct global_parcelhandler_queue;
-                typedef global_parcelhandler_queue parcelhandler_queue;
-            }
+        struct parcelhandler_queue_base;
+
+        namespace policies
+        {
+            struct global_parcelhandler_queue;
+            typedef global_parcelhandler_queue parcelhandler_queue;
+
+            struct message_handler;
         }
     }
 
@@ -1120,6 +1123,18 @@ namespace hpx
     ///           line option --hpx:print-counter)
     HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
         char const* description = 0, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a message handler plugin
+    HPX_API_EXPORT parcelset::policies::message_handler* create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages, std::size_t interval);
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a binary filter plugin
+    HPX_API_EXPORT util::binary_filter* create_binary_filter(
+        char const* binary_filter_type, bool compress);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

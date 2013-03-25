@@ -8,9 +8,16 @@
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/void_cast.hpp>
 
+#include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/compression/bzip2_serialization_filter.hpp>
 
 #include <boost/format.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_PLUGIN_MODULE();
+HPX_REGISTER_PLUGIN_REGISTRY(
+    hpx::plugins::compression::bzip2_serialization_filter,
+    bzip2_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(

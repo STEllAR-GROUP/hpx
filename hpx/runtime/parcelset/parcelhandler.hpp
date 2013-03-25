@@ -364,30 +364,10 @@ namespace hpx { namespace parcelset
         util::io_service_pool* get_thread_pool(char const* name);
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename MessageHandler>
         policies::message_handler* get_message_handler(char const* action,
-            std::size_t num_messages, naming::locality const& loc, 
-            connection_type t)
-        {
-            mutex_type::scoped_lock l(mtx_);
-            handler_key_type key(loc, action);
-            message_handler_map::iterator it = handlers_.find(key);
-            if (it == handlers_.end()) {
-                boost::shared_ptr<policies::message_handler> p(
-                    new MessageHandler(action, find_parcelport(t), num_messages));
-
-                std::pair<message_handler_map::iterator, bool> r =
-                    handlers_.insert(message_handler_map::value_type(key, p));
-                if (!r.second) {
-                    HPX_THROW_EXCEPTION(internal_server_error,
-                        "parcelhandler::get_message_handler", 
-                        "could not store newly created message handler");
-                    return 0;
-                }
-                it = r.first;
-            }
-            return (*it).second.get();
-        }
+            char const* message_handler_type, std::size_t num_messages,
+             std::size_t interval, naming::locality const& loc, 
+             connection_type t);
 
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data
@@ -463,7 +443,7 @@ namespace hpx { namespace parcelset
         /// queue of incoming parcels
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
 
-        /// Anyexception thrown earlier on one of the ASIO threads is stored here
+        /// Any exception thrown earlier on one of the ASIO threads is stored here
         mutex_type mtx_;
         boost::exception_ptr exception_;
 

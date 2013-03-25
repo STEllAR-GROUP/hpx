@@ -347,7 +347,7 @@ namespace hpx { namespace parcelset
         // dispatch to the message handler which is associated with the
         // encapsulated action
         connection_type t = find_appropriate_connection_type(addrs[0].locality_);
-        policies::message_handler* mh = 
+        policies::message_handler* mh =
             p.get_message_handler(this, addrs[0].locality_, t);
 
         if (mh) {
@@ -382,6 +382,40 @@ namespace hpx { namespace parcelset
             mutex_type::scoped_lock l(mtx_);
             exception_ = exception;
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    policies::message_handler* parcelhandler::get_message_handler(
+        char const* action, char const* message_handler_type,
+        std::size_t num_messages, std::size_t interval,
+        naming::locality const& loc, connection_type t)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        handler_key_type key(loc, action);
+        message_handler_map::iterator it = handlers_.find(key);
+        if (it == handlers_.end()) {
+            boost::shared_ptr<policies::message_handler> p(
+                hpx::create_message_handler(message_handler_type, action,
+                find_parcelport(t), num_messages, interval));
+
+            if (!p.get()) {
+                HPX_THROW_EXCEPTION(internal_server_error,
+                    "parcelhandler::get_message_handler",
+                    "could not create new message handler");
+                return 0;
+            }
+
+            std::pair<message_handler_map::iterator, bool> r =
+                handlers_.insert(message_handler_map::value_type(key, p));
+            if (!r.second) {
+                HPX_THROW_EXCEPTION(internal_server_error,
+                    "parcelhandler::get_message_handler",
+                    "could not store newly created message handler");
+                return 0;
+            }
+            it = r.first;
+        }
+        return (*it).second.get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -489,7 +523,7 @@ namespace hpx { namespace parcelset
 
     // connection stack statistics
     boost::int64_t parcelhandler::get_connection_cache_statistics(
-        connection_type pp_type, 
+        connection_type pp_type,
         parcelport::connection_cache_statistics_type stat_type, bool reset) const
     {
         error_code ec(lightweight);

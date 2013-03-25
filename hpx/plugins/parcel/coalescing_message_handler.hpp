@@ -31,8 +31,9 @@ namespace hpx { namespace plugins { namespace parcel
         typedef parcelset::policies::message_handler::write_handler_type
             write_handler_type;
 
-        coalescing_message_handler(char const* action_name, 
-            parcelset::parcelport* set, std::size_t num, std::size_t interval = 100);
+        coalescing_message_handler(char const* action_name,
+            parcelset::parcelport* pp, std::size_t num,
+            std::size_t interval = 100);
         ~coalescing_message_handler();
 
         void put_parcel(parcelset::parcel& p, write_handler_type const& f);
@@ -64,9 +65,9 @@ namespace hpx { namespace plugins { namespace parcel
                 parcelset::parcelhandler* ph, naming::locality const& loc,    \
                 parcelset::connection_type t)                                 \
             {                                                                 \
-                return ph->get_message_handler<                               \
-                    hpx::plugins::parcel::coalescing_message_handler          \
-                >(BOOST_PP_STRINGIZE(action_type), num, loc, t);              \
+                return ph->get_message_handler(                               \
+                    BOOST_PP_STRINGIZE(action_type),                          \
+                    "coalescing_message_handler", num, loc, t);               \
             }                                                                 \
         };                                                                    \
     }}                                                                        \

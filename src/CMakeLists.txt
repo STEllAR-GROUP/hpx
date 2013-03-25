@@ -168,6 +168,9 @@ add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
   EXCLUDE ".*_binary_.*[.]hpp"
   APPEND)
+add_hpx_library_headers(hpx
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/plugins/*.hpp"
+  APPEND)
 
 # libhpx_init headers
 #add_hpx_library_headers(hpx_init

@@ -354,9 +354,9 @@ namespace hpx {
         parcelset::parcelhandler parcel_handler_;
         util::detail::init_logging init_logging_;
         components::server::memory memory_;
+        components::server::runtime_support runtime_support_;
         applier::applier applier_;
         actions::action_manager action_manager_;
-        components::server::runtime_support runtime_support_;
         boost::signals2::scoped_connection default_error_sink_;
     };
 }

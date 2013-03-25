@@ -32,7 +32,8 @@ macro(add_zlib_module)
 
     set_property(TARGET compress_zlib_lib APPEND
       PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS")
+      "HPX_LIBRARY_EXPORTS"
+      "HPX_PLUGIN_NAME=compression_zlib")
 
     add_hpx_pseudo_dependencies(plugins.compression.zlib compress_zlib_lib)
 

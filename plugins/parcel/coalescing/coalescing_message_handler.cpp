@@ -6,7 +6,14 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
+#include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_PLUGIN_MODULE();
+HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
+    hpx::plugins::parcel::coalescing_message_handler,
+    coalescing_message_handler);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel

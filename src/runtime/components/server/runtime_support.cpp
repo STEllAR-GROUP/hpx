@@ -109,12 +109,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support(
-            naming::gid_type const& prefix, naming::resolver_client& agas_client,
-            applier::applier& applier)
+    runtime_support::runtime_support()
       : stopped_(false), terminated_(false)
-    {
-    }
+    {}
 
     ///////////////////////////////////////////////////////////////////////////
     // return, whether more than one instance of the given component can be
@@ -647,10 +644,13 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_components()
     {
         // load components now that AGAS is up
-        get_runtime().get_config().load_components();
-        return load_components(get_runtime().get_config(),
-            get_runtime().get_agas_client().local_locality(),
-            get_runtime().get_agas_client());
+        util::runtime_configuration& ini = get_runtime().get_config();
+        ini.load_components();
+
+        naming::resolver_client& client = get_runtime().get_agas_client();
+        bool result = load_components(ini, client.local_locality(), client);
+
+        return load_plugins(ini) && result;
     }
 
     void runtime_support::call_startup_functions(bool pre_startup)
@@ -831,7 +831,7 @@ namespace hpx { namespace components { namespace server
             }
             catch (hpx::exception const& e) {
                 LRT_(warning) << "caught exception while loading " << instance
-                              << ", " << get_hpx_category().message(e.get_error())
+                              << ", " << e.get_error_code().get_message()
                               << ": " << e.what();
                 if (e.get_error_code().value() == hpx::commandline_option_error)
                 {
@@ -849,8 +849,8 @@ namespace hpx { namespace components { namespace server
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 boost::program_options::variables_map vm;
 
-                util::parse_commandline(ini, options, unknown_cmd_line, vm, 
-                    std::size_t(-1), util::rethrow_on_error, 
+                util::parse_commandline(ini, options, unknown_cmd_line, vm,
+                    std::size_t(-1), util::rethrow_on_error,
                     get_runtime_mode_from_name(runtime_mode));
             }
 
@@ -997,58 +997,206 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0")) {
-                // get the factory
-                hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
-                    "factory");
+            if (0 != component_ini && "0" != component_ini->get_entry("no_factory", "0")) 
+                return false;
 
-                // create the component factory object, if not disabled
-                boost::shared_ptr<component_factory_base> factory (
-                    pf.create(instance, glob_ini, component_ini, isenabled));
+            // get the factory
+            hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
+                "factory");
 
-                component_type t = factory->get_component_type(
-                    prefix, agas_client);
-                if (0 == t) {
-                    LRT_(info) << "component refused to load: "  << instance;
-                    return false;   // module refused to load
-                }
+            // create the component factory object, if not disabled
+            boost::shared_ptr<component_factory_base> factory (
+                pf.create(instance, glob_ini, component_ini, isenabled));
 
-                // store component factory and module for later use
-                component_factory_type data(factory, d, isenabled);
-                std::pair<component_map_type::iterator, bool> p =
-                    components_.insert(component_map_type::value_type(t, data));
-
-                if (components::get_derived_type(t) != 0) {
-                // insert three component types, the base type, the derived
-                // type and the combined one.
-                    if (p.second) {
-                        p = components_.insert(component_map_type::value_type(
-                                components::get_derived_type(t), data));
-                    }
-                    if (p.second) {
-                        components_.insert(component_map_type::value_type(
-                                components::get_base_type(t), data));
-                    }
-                }
-
-                if (!p.second) {
-                    LRT_(fatal) << "duplicate component id: " << instance
-                        << ": " << components::get_component_type_name(t);
-                    return false;   // duplicate component id?
-                }
-
-                LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                           << ": " << instance << ": "
-                           << components::get_component_type_name(t);
+            component_type t = factory->get_component_type(
+                prefix, agas_client);
+            if (0 == t) {
+                LRT_(info) << "component refused to load: "  << instance;
+                return false;   // module refused to load
             }
 
+            // store component factory and module for later use
+            component_factory_type data(factory, d, isenabled);
+            std::pair<component_map_type::iterator, bool> p =
+                components_.insert(component_map_type::value_type(t, data));
+
+            if (components::get_derived_type(t) != 0) {
+            // insert three component types, the base type, the derived
+            // type and the combined one.
+                if (p.second) {
+                    p = components_.insert(component_map_type::value_type(
+                            components::get_derived_type(t), data));
+                }
+                if (p.second) {
+                    components_.insert(component_map_type::value_type(
+                            components::get_base_type(t), data));
+                }
+            }
+
+            if (!p.second) {
+                LRT_(fatal) << "duplicate component id: " << instance
+                    << ": " << components::get_component_type_name(t);
+                return false;   // duplicate component id?
+            }
+
+            LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                        << ": " << instance << ": "
+                        << components::get_component_type_name(t);
+
             // make sure startup/shutdown registration is called once for each
-            // module
+            // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options);
                 load_startup_shutdown_functions(d);
             }
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                          << ": " << instance << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                          << ": " << instance << ": " << e.what();
+            return false;
+        }
+        return true;    // component got loaded
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Load all components from the ini files found in the configuration
+    bool runtime_support::load_plugins(util::section& ini)
+    {
+        // load all components as described in the configuration information
+        if (!ini.has_section("hpx.plugins")) {
+            LRT_(info) << "No plugins found/loaded.";
+            return true;     // no plugins to load
+        }
+
+        // each shared library containing components may have an ini section
+        //
+        // # mandatory section describing the component module
+        // [hpx.plugins.instance_name]
+        //  name = ...           # the name of this component module
+        //  path = ...           # the path where to find this component module
+        //  enabled = false      # optional (default is assumed to be true)
+        //
+        // # optional section defining additional properties for this module
+        // [hpx.plugins.instance_name.settings]
+        //  key = value
+        //
+        util::section* sec = ini.get_section("hpx.plugins");
+        if (NULL == sec)
+        {
+            LRT_(error) << "NULL section found";
+            return false;     // something bad happened
+        }
+
+        util::section::section_map const& s = (*sec).get_sections();
+        typedef util::section::section_map::const_iterator iterator;
+        iterator end = s.end();
+        for (iterator i = s.begin (); i != end; ++i)
+        {
+            namespace fs = boost::filesystem;
+
+            // the section name is the instance name of the component
+            util::section const& sect = i->second;
+            std::string instance (sect.get_name());
+            std::string component;
+
+            if (i->second.has_entry("name"))
+                component = sect.get_entry("name");
+            else
+                component = instance;
+
+            bool isenabled = true;
+            if (sect.has_entry("enabled")) {
+                std::string tmp = sect.get_entry("enabled");
+                boost::algorithm::to_lower (tmp);
+                if (tmp == "no" || tmp == "false" || tmp == "0") {
+                    LRT_(info) << "plugin factory disabled: " << instance;
+                    isenabled = false;     // this component has been disabled
+                }
+            }
+
+            fs::path lib;
+            try {
+                if (sect.has_entry("path"))
+                    lib = hpx::util::create_path(sect.get_entry("path"));
+                else
+                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
+
+                // first, try using the path as the full path to the library
+                if (!load_plugin(ini, instance, component, lib, isenabled))
+                {
+                    // build path to component to load
+                    std::string libname(HPX_MAKE_DLL_STRING(component));
+                    lib /= hpx::util::create_path(libname);
+                    if (!load_plugin(ini, instance, component, lib, isenabled))
+                    {
+                        continue;   // next please :-P
+                    }
+                }
+            }
+            catch (hpx::exception const& e) {
+                LRT_(warning) << "caught exception while loading " << instance
+                              << ", " << e.get_error_code().get_message()
+                              << ": " << e.what();
+            }
+        } // for
+        return true;
+    }
+
+    bool runtime_support::load_plugin(util::section& ini,
+        std::string const& instance, std::string const& plugin,
+        boost::filesystem::path lib, bool isenabled)
+    {
+        namespace fs = boost::filesystem;
+        if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
+            return false;
+
+        try {
+            // get the handle of the library
+            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
+
+            // initialize the factory instance using the preferences from the
+            // ini files
+            util::section const* glob_ini = NULL;
+            if (ini.has_section("settings"))
+                glob_ini = ini.get_section("settings");
+
+            util::section const* plugin_ini = NULL;
+            std::string plugin_section("hpx.plugins." + instance);
+            if (ini.has_section(plugin_section))
+                plugin_ini = ini.get_section(plugin_section);
+
+            if (0 != plugin_ini && "0" != plugin_ini->get_entry("no_factory", "0"))
+                return false;
+
+            // get the factory
+            hpx::util::plugin::plugin_factory<plugins::plugin_factory_base>
+                pf (d, "factory");
+
+            // create the component factory object, if not disabled
+            boost::shared_ptr<plugins::plugin_factory_base> factory (
+                pf.create(instance, glob_ini, plugin_ini, isenabled));
+
+            // store component factory and module for later use
+            plugin_factory_type data(factory, d, isenabled);
+            std::pair<plugin_map_type::iterator, bool> p =
+                plugins_.insert(plugin_map_type::value_type(instance, data));
+
+            if (!p.second) {
+                LRT_(fatal) << "duplicate plugin type: " << instance;
+                return false;   // duplicate component id?
+            }
+
+            LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                        << ": " << instance;
         }
         catch (hpx::exception const&) {
             throw;

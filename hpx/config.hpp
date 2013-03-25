@@ -412,6 +412,15 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_PLUGIN_NAME)
+#  define HPX_PLUGIN_NAME hpx
+#endif
+
+#if !defined(HPX_PLUGIN_STRING)
+#  define HPX_PLUGIN_STRING BOOST_PP_STRINGIZE(HPX_PLUGIN_NAME)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_PREFIX)
 #  define HPX_PLUGIN_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
 #endif

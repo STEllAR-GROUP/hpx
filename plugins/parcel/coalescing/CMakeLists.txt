@@ -17,7 +17,8 @@ macro(add_coalescing_module)
 
     set_property(TARGET compress_zlib_lib APPEND
       PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS")
+      "HPX_LIBRARY_EXPORTS"
+      "HPX_PLUGIN_NAME=message_coalescing")
 
     add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
   endif()

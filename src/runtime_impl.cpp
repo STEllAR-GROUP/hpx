@@ -127,10 +127,11 @@ namespace hpx {
         parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
+        memory_(),
+        runtime_support_(),
         applier_(parcel_handler_, *thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_),
-        runtime_support_(parcel_handler_.get_locality(), agas_client_, applier_)
+        action_manager_(applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);

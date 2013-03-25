@@ -58,7 +58,8 @@ namespace hpx { namespace plugins { namespace compression
         };
     }
 
-    struct HPX_LIBRARY_EXPORT zlib_serialization_filter : public util::binary_filter
+    struct HPX_LIBRARY_EXPORT zlib_serialization_filter 
+      : public util::binary_filter
     {
         zlib_serialization_filter(bool compress = false)
           : compdecomp_(compress), current_(0)
