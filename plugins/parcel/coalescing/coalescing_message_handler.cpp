@@ -9,6 +9,30 @@
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
+#include <boost/lexical_cast.hpp>
+
+namespace hpx { namespace plugins
+{
+    // Inject additional configuration data into the factory registry for this
+    // type. This information ends up in the system wide configuration database
+    // under the plugin specific section:
+    //
+    //      [hpx.plugins.coalescing_message_handler]
+    //      ...
+    //      num_messages = 50
+    //      interval = 100
+    //
+    template <>
+    struct plugin_config_data<hpx::plugins::parcel::coalescing_message_handler>
+    {
+        static char const* call()
+        {
+            return "num_messages = 50\n"
+                   "interval = 100";
+        }
+    };
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE();
 HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
@@ -18,14 +42,35 @@ HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel
 {
+    namespace detail
+    {
+        std::size_t get_num_messages(std::size_t num_messages)
+        {
+            if (std::size_t(-1) != num_messages)
+                return num_messages;
+
+            return boost::lexical_cast<std::size_t>(hpx::get_config_entry(
+                "hpx.plugins.coalescing_message_handler.num_messages", 50));
+        }
+
+        std::size_t get_interval(std::size_t interval)
+        {
+            if (std::size_t(-1) != interval)
+                return interval;
+
+            return boost::lexical_cast<std::size_t>(hpx::get_config_entry(
+                "hpx.plugins.coalescing_message_handler.interval", 100));
+        }
+    }
+
     coalescing_message_handler::coalescing_message_handler(
             char const* action_name, parcelset::parcelport* pp, std::size_t num,
             std::size_t interval)
-      : buffer_(num), pp_(pp),
+      : buffer_(detail::get_num_messages(num)), pp_(pp),
+        interval_(detail::get_interval(interval)),
         timer_(boost::bind(&coalescing_message_handler::timer_flush, this_()),
             boost::bind(&coalescing_message_handler::flush, this_(), true),
-            interval, action_name, true),
-        interval_(interval),
+            interval_, action_name, true),
         stopped_(false)
     {}
 

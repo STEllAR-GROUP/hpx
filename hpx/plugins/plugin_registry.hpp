@@ -19,6 +19,8 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #include <string>
 #include <vector>
@@ -26,6 +28,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
 {
+    template <typename Plugin>
+    struct plugin_config_data
+    {
+        // by default no additional config data is injected into the factory
+        static char const* call()
+        {
+            return 0;
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_registry provides a minimal implementation of a
     /// plugin's registry. If no additional functionality is required this
@@ -58,6 +70,11 @@ namespace hpx { namespace plugins
             fillini += std::string("path = ") +
                 util::find_prefix(HPX_PLUGIN_STRING) + "/lib/hpx";
             fillini += "enabled = 1";
+
+            char const* more = plugin_config_data<Plugin>::call();
+            if (more)
+                boost::split(fillini, more, boost::is_any_of("\n"));
+
             return true;
         }
     };
@@ -78,13 +95,13 @@ namespace hpx { namespace plugins
 /**/
 
 #define HPX_REGISTER_PLUGIN_REGISTRY_2(PluginType, pluginname)                \
+    template struct hpx::plugins::plugin_registry<PluginType >;               \
     typedef hpx::plugins::plugin_registry<PluginType>                         \
         pluginname ## _plugin_registry_type;                                  \
     HPX_REGISTER_PLUGIN_BASE_REGISTRY(                                        \
         pluginname ## _plugin_registry_type, pluginname)                      \
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
         pluginname ## _plugin_registry_type, pluginname)                      \
-    template struct hpx::plugins::plugin_registry<PluginType >;               \
 /**/
 
 #endif

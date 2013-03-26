@@ -34,8 +34,8 @@ namespace hpx { namespace plugins { namespace parcel
             write_handler_type;
 
         coalescing_message_handler(char const* action_name,
-            parcelset::parcelport* pp, std::size_t num,
-            std::size_t interval = 100);
+            parcelset::parcelport* pp, std::size_t num = std::size_t(-1),
+            std::size_t interval = std::size_t(-1));
         ~coalescing_message_handler();
 
         void put_parcel(parcelset::parcel& p, write_handler_type const& f);
@@ -48,8 +48,8 @@ namespace hpx { namespace plugins { namespace parcel
     private:
         parcelset::parcelport* pp_;
         detail::message_buffer buffer_;
-        util::interval_timer timer_;
         boost::int64_t interval_;
+        util::interval_timer timer_;
         bool stopped_;
     };
 }}}
@@ -69,12 +69,12 @@ namespace hpx { namespace plugins { namespace parcel
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_1(action_type)                     \
     HPX_ACTION_USES_MESSAGE_COALESCING_4(action_type,                         \
-        BOOST_PP_STRINGIZE(action_type), 50, 100)                             \
+        BOOST_PP_STRINGIZE(action_type), std::size_t(-1), std::size_t(-1))    \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_2(action_type, num)                \
     HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type,                         \
-        BOOST_PP_STRINGIZE(action_type), num, 100)                            \
+        BOOST_PP_STRINGIZE(action_type), num, std::size_t(-1))                \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, num, interval)      \
