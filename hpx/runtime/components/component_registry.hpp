@@ -16,9 +16,13 @@
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/find_prefix.hpp>
 
+#include <hpx/traits/component_config_data.hpp>
+
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -55,18 +59,25 @@ namespace hpx { namespace components
             fillini += "name = " HPX_COMPONENT_STRING;
             fillini += std::string("path = ") +
                 util::find_prefix(HPX_COMPONENT_STRING) + "/lib/hpx";
-            switch (state)
-            {
-                case factory_enabled:
-                    fillini += "enabled = 1";
-                    break;
-                case factory_disabled:
-                    fillini += "enabled = 0";
-                    break;
-                case factory_check:
-                    fillini += "enabled = $[hpx.components.load_external]";
-                    break;
-            };
+
+            switch (state) {
+            case factory_enabled:
+                fillini += "enabled = 1";
+                break;
+            case factory_disabled:
+                fillini += "enabled = 0";
+                break;
+            case factory_check:
+                fillini += "enabled = $[hpx.components.load_external]";
+                break;
+            }
+
+            char const* more = traits::component_config_data<Component>::call();
+            if (more) {
+                std::vector<std::string> data;
+                boost::split(data, more, boost::is_any_of("\n"));
+                std::copy(data.begin(), data.end(), std::back_inserter(fillini));
+            }
             return true;
         }
     };

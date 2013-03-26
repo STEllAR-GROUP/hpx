@@ -16,6 +16,8 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
+#include <hpx/traits/plugin_config_data.hpp>
+
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
@@ -28,16 +30,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
 {
-    template <typename Plugin>
-    struct plugin_config_data
-    {
-        // by default no additional config data is injected into the factory
-        static char const* call()
-        {
-            return 0;
-        }
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_registry provides a minimal implementation of a
     /// plugin's registry. If no additional functionality is required this
@@ -71,7 +63,7 @@ namespace hpx { namespace plugins
                 util::find_prefix(HPX_PLUGIN_STRING) + "/lib/hpx";
             fillini += "enabled = 1";
 
-            char const* more = plugin_config_data<Plugin>::call();
+            char const* more = traits::plugin_config_data<Plugin>::call();
             if (more) {
                 std::vector<std::string> data;
                 boost::split(data, more, boost::is_any_of("\n"));

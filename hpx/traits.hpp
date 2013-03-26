@@ -80,6 +80,13 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
     struct is_component;
+
+    template <typename Plugin, typename Enable = void>
+    struct component_config_data;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Plugin, typename Enable = void>
+    struct plugin_config_data;
 }}
 
 #endif

@@ -11,7 +11,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-namespace hpx { namespace plugins
+namespace hpx { namespace traits
 {
     // Inject additional configuration data into the factory registry for this
     // type. This information ends up in the system wide configuration database
