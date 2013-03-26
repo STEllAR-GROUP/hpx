@@ -9,6 +9,7 @@
 #include <hpx/util/void_cast.hpp>
 
 #include <hpx/plugins/plugin_registry.hpp>
+#include <hpx/plugins/binary_filter_factory.hpp>
 #include <hpx/plugins/compression/snappy_serialization_filter.hpp>
 
 #include <boost/format.hpp>
@@ -17,7 +18,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE();
-HPX_REGISTER_PLUGIN_REGISTRY(
+HPX_REGISTER_BINARY_FILTER_FACTORY(
     hpx::plugins::compression::snappy_serialization_filter,
     snappy_serialization_filter);
 

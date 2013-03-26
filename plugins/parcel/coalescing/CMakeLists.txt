@@ -15,10 +15,10 @@ macro(add_coalescing_module)
       HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/parcel/coalescing_message_handler.hpp
       FOLDER "Core/Plugins/MessageHandler")
 
-    set_property(TARGET compress_zlib_lib APPEND
+    set_property(TARGET parcel_coalescing_lib APPEND
       PROPERTY COMPILE_DEFINITIONS
       "HPX_LIBRARY_EXPORTS"
-      "HPX_PLUGIN_NAME=message_coalescing")
+      "HPX_PLUGIN_NAME=parcel_coalescing")
 
     add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
   endif()

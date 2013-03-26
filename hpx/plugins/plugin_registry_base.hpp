@@ -41,15 +41,15 @@ namespace hpx { namespace plugins
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the components.
 #define HPX_REGISTER_PLUGIN_BASE_REGISTRY(PluginType, name)                   \
-        HPX_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                  \
-            hpx::plugins::plugin_registry_base, PluginType, name, plugin)     \
-    /**/
+    HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                               \
+        hpx::plugins::plugin_registry_base, PluginType, name, plugin)         \
+/**/
 
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
-#define HPX_REGISTER_PLUGIN_MODULE()                                          \
-        HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, plugin)                     \
-    /**/
+#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                 \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, plugin)                  \
+/**/
 
 #endif
 

@@ -25,7 +25,7 @@ macro(add_snappy_module)
     set_property(TARGET compress_snappy_lib APPEND
       PROPERTY COMPILE_DEFINITIONS
       "HPX_LIBRARY_EXPORTS"
-      "HPX_PLUGIN_NAME=compression_snappy")
+      "HPX_PLUGIN_NAME=compress_snappy")
 
     add_hpx_pseudo_dependencies(plugins.compression.snappy compress_snappy_lib)
 

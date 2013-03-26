@@ -13,6 +13,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/ini.hpp>
 
+#include <hpx/plugins/parcel/coalescing_message_handler.hpp>
+
 #if defined(HPX_HAVE_CXX11)
 #include <type_traits>
 #else
@@ -136,5 +138,11 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::connect_action, base_connect_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::disconnect_action, base_disconnect_action)
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_ACTION_USES_MESSAGE_COALESCING(
+    hpx::lcos::base_lco::set_event_action, "lco_set_value_action", 50, 100)
+HPX_ACTION_USES_MESSAGE_COALESCING(
+    hpx::lcos::base_lco::set_exception_action, "lco_set_value_action", 50, 100)
 
 #endif

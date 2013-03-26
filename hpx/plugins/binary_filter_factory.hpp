@@ -86,10 +86,10 @@ namespace hpx { namespace plugins
 /// Hpx.Plugin.
 #define HPX_REGISTER_BINARY_FILTER_FACTORY(BinaryFilter, pluginname)          \
     HPX_REGISTER_BINARY_FILTER_FACTORY_BASE(                                  \
-        hpx::plugins::message_handler_factory<BinaryFilter>, pluginname)      \
+        hpx::plugins::binary_filter_factory<BinaryFilter>, pluginname)        \
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
-        hpx::plugins::message_handler_factory<BinaryFilter>, pluginname)      \
-    template struct hpx::plugins::message_handler_factory<BinaryFilter>;      \
+        hpx::plugins::binary_filter_factory<BinaryFilter>, pluginname)        \
+    template struct hpx::plugins::binary_filter_factory<BinaryFilter>;        \
     HPX_REGISTER_PLUGIN_REGISTRY_2(BinaryFilter, pluginname)                  \
 /**/
 

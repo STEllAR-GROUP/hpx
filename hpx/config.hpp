@@ -420,9 +420,13 @@
 #  define HPX_PLUGIN_STRING BOOST_PP_STRINGIZE(HPX_PLUGIN_NAME)
 #endif
 
+#if !defined(HPX_PLUGIN_PLUGIN_PREFIX)
+#  define HPX_PLUGIN_PLUGIN_PREFIX HPX_MANGLE_NAME(HPX_PLUGIN_NAME)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_PLUGIN_PREFIX)
-#  define HPX_PLUGIN_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
+#if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
+#  define HPX_PLUGIN_COMPONENT_PREFIX HPX_MANGLE_NAME(HPX_COMPONENT_NAME)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

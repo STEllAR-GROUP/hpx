@@ -33,10 +33,6 @@ namespace hpx { namespace plugins
     template <typename MessageHandler>
     struct message_handler_factory : public message_handler_factory_base
     {
-        message_handler_factory()
-          : isenabled_(false)
-        {}
-
         /// \brief Construct a new factory instance
         ///
         /// \param global   [in] The pointer to a \a hpx#util#section instance

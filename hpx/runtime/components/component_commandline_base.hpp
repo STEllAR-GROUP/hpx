@@ -43,17 +43,17 @@ namespace hpx { namespace components
 /// component factory with Hpx.Plugin. This macro has to be used for each of
 /// the components.
 #define HPX_REGISTER_COMMANDLINE_REGISTRY(RegistryType, componentname)        \
-        HPX_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                  \
-            hpx::components::component_commandline_base, RegistryType,        \
-            componentname, commandline_options)                               \
-    /**/
+    HPX_PLUGIN_EXPORT(HPX_PLUGIN_COMPONENT_PREFIX,                            \
+        hpx::components::component_commandline_base, RegistryType,            \
+        componentname, commandline_options)                                   \
+/**/
 
 /// The macro \a HPX_REGISTER_COMMANDLINE_OPTIONS is used to define the
 /// required Hpx.Plugin entry point for the command line option registry.
 /// This macro has to be used in not more than one compilation unit of a
 /// component module.
 #define HPX_REGISTER_COMMANDLINE_OPTIONS()                                    \
-        HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, commandline_options)        \
-    /**/
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, commandline_options)  \
+/**/
 
 #endif

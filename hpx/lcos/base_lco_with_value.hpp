@@ -145,11 +145,10 @@ namespace hpx { namespace lcos
 
 namespace hpx { namespace traits
 {
+    // define component type data base entry generator
     template <typename Result, typename RemoteResult, typename Enable>
     struct component_type_database<
-            hpx::lcos::base_lco_with_value<Result, RemoteResult>
-          , Enable
-        >
+        hpx::lcos::base_lco_with_value<Result, RemoteResult>, Enable>
     {
         static components::component_type get()
         {
@@ -173,6 +172,9 @@ namespace hpx { namespace traits
     HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(                                \
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
+    HPX_ACTION_USES_MESSAGE_COALESCING(                                         \
+        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
+        "lco_set_value_action", 50, 100)                                        \
 /**/
 
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE(Value, Name)                           \

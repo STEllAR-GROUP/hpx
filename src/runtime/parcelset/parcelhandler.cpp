@@ -58,6 +58,14 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    policies::message_handler* get_message_handler(
+        parcelhandler* ph, char const* action, char const* type, std::size_t num,
+        std::size_t interval, naming::locality const& loc, connection_type t)
+    {
+        return ph->get_message_handler(action, type, num, interval, loc, t);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.

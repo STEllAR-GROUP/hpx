@@ -292,29 +292,32 @@ namespace hpx { namespace util
                     // get the component factory
                     std::string curr_fullname(curr.parent_path().string());
                     load_component_factory(d, ini, curr_fullname, name);
-                    load_plugin_factory(d, ini, curr_fullname, name);
-
-                    continue;   // handle next module
                 }
                 catch (std::logic_error const& e) {
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
-                    continue;   // handle next module
                 }
                 catch (std::exception const& e) {
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
-                    continue;   // handle next module
                 }
 
-// FIXME: make sure this isn't needed anymore for sure
-            // if something went wrong while reading the registry, just use
-            // some default settings
-//                 util::section sec;
-//                 sec.add_entry("name", name);
-//                 sec.add_entry("path", libs);
-//                 sec.add_entry("isdefault", "true");
-//                 components_sec->add_section(name, sec);
+                try {
+                    // get the handle of the library
+                    hpx::util::plugin::dll d(curr.string(), name);
+
+                    // get the component factory
+                    std::string curr_fullname(curr.parent_path().string());
+                    load_plugin_factory(d, ini, curr_fullname, name);
+                }
+                catch (std::logic_error const& e) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": " << e.what();
+                }
+                catch (std::exception const& e) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": " << e.what();
+                }
             }
         }
         catch (fs::filesystem_error const& /*e*/) {

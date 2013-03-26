@@ -68,14 +68,22 @@ namespace hpx { namespace plugins { namespace parcel
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_1(action_type)                     \
-    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, 50, 100)                \
+    HPX_ACTION_USES_MESSAGE_COALESCING_4(action_type,                         \
+        BOOST_PP_STRINGIZE(action_type), 50, 100)                             \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_2(action_type, num)                \
-    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, num, 100)               \
+    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type,                         \
+        BOOST_PP_STRINGIZE(action_type), num, 100)                            \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type, num, interval)      \
+    HPX_ACTION_USES_MESSAGE_COALESCING_3(action_type,                         \
+        BOOST_PP_STRINGIZE(action_type), num, interval)                       \
+/**/
+
+#define HPX_ACTION_USES_MESSAGE_COALESCING_4(                                 \
+        action_type, action_name, num, interval)                              \
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
@@ -85,8 +93,7 @@ namespace hpx { namespace plugins { namespace parcel
                 parcelset::parcelhandler* ph, naming::locality const& loc,    \
                 parcelset::connection_type t)                                 \
             {                                                                 \
-                return ph->get_message_handler(                               \
-                    BOOST_PP_STRINGIZE(action_type),                          \
+                return parcelset::get_message_handler(ph, action_name,        \
                     "coalescing_message_handler", num, interval, loc, t);     \
             }                                                                 \
         };                                                                    \

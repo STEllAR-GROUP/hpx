@@ -105,8 +105,6 @@ namespace hpx
             connection_last
         };
 
-        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
-
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
         class HPX_API_EXPORT parcelhandler;
@@ -125,6 +123,11 @@ namespace hpx
 
             struct message_handler;
         }
+
+        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
+        HPX_API_EXPORT policies::message_handler* get_message_handler(
+            parcelhandler* ph, char const* name, char const* type, std::size_t num,
+            std::size_t interval, naming::locality const& l, connection_type t);
     }
 
     /// \namespace threads
@@ -1139,7 +1142,7 @@ namespace hpx
     ///           hpx::exception.
     HPX_API_EXPORT parcelset::policies::message_handler* create_message_handler(
         char const* message_handler_type, char const* action,
-        parcelset::parcelport* pp, std::size_t num_messages, 
+        parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec = throws);
 
 
