@@ -191,9 +191,8 @@ if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
   hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
 endif()
 
-if(HPX_USE_PARCEL_COALESCING)
-  hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
-endif()
+# Parcel coalescing is used by the main HPX library, enable it always
+hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
