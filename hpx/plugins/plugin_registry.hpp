@@ -72,9 +72,11 @@ namespace hpx { namespace plugins
             fillini += "enabled = 1";
 
             char const* more = plugin_config_data<Plugin>::call();
-            if (more)
-                boost::split(fillini, more, boost::is_any_of("\n"));
-
+            if (more) {
+                std::vector<std::string> data;
+                boost::split(data, more, boost::is_any_of("\n"));
+                std::copy(data.begin(), data.end(), std::back_inserter(fillini));
+            }
             return true;
         }
     };
