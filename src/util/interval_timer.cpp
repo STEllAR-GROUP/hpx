@@ -42,8 +42,6 @@ namespace hpx { namespace util
     {
         mutex_type::scoped_lock l(mtx_);
         if (!is_started_) {
-            is_started_ = true;
-
             if (first_start_) {
                 first_start_ = false;
                 l.unlock();
@@ -58,8 +56,10 @@ namespace hpx { namespace util
 
             if (evaluate_)
                 evaluate(threads::wait_signaled);
-            else
+            else {
+                mutex_type::scoped_lock l(mtx_);
                 schedule_thread();
+            }
 
             return true;
         }
@@ -74,11 +74,15 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
 
         // interrupt timer thread, if needed
-        if (id_) {
-            error_code ec(lightweight);       // avoid throwing on error
-            threads::set_thread_state(id_, threads::pending,
-                threads::wait_abort, threads::thread_priority_critical, ec);
-            id_ = 0;
+        if (is_started_) {
+            is_started_ = false;
+
+            if (id_) {
+                error_code ec(lightweight);       // avoid throwing on error
+                threads::set_thread_state(id_, threads::pending,
+                    threads::wait_abort, threads::thread_priority_critical, ec);
+                id_ = 0;
+            }
         }
 
         // reschedule evaluation thread
@@ -133,24 +137,31 @@ namespace hpx { namespace util
     threads::thread_state_enum interval_timer::evaluate(
         threads::thread_state_ex_enum statex)
     {
-        mutex_type::scoped_lock l(mtx_);
+        try {
+            mutex_type::scoped_lock l(mtx_);
 
-        if (statex == threads::wait_abort || 0 == microsecs_)
-            return threads::terminated;        // object has been finalized, exit
-
-        id_ = 0;
-        bool result = false;
-
-        {
-            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            result = f_();            // invoke the supplied function
-        }
-
-        if (result)
-            schedule_thread();        // wait and repeat
-        else
+            id_ = 0;
             is_started_ = false;
 
+            if (statex == threads::wait_abort || 0 == microsecs_)
+                return threads::terminated;        // object has been finalized, exit
+
+            bool result = false;
+
+            {
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                result = f_();            // invoke the supplied function
+            }
+
+            // some other thread might already have started the timer
+            if (0 == id_ && result)
+                schedule_thread();        // wait and repeat
+        }
+        catch (hpx::exception const& e){
+            // the lock above might throw yield_aborted
+            if (e.get_error() != yield_aborted)
+                throw;
+        }
         return threads::terminated;   // do not re-schedule this thread
     }
 
@@ -170,6 +181,8 @@ namespace hpx { namespace util
             boost::posix_time::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
             threads::thread_priority_critical);
+
+        is_started_ = true;
     }
 }}
 
