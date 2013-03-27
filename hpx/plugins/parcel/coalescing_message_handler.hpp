@@ -100,9 +100,29 @@ namespace hpx { namespace plugins { namespace parcel
     }}                                                                        \
 /**/
 
+#define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(                           \
+        action_type, action_name, num, interval)                              \
+    namespace hpx { namespace traits                                          \
+    {                                                                         \
+        template <>                                                           \
+        struct action_message_handler<action_type>                            \
+        {                                                                     \
+            static parcelset::policies::message_handler* call(                \
+                parcelset::parcelhandler* ph, naming::locality const& loc,    \
+                parcelset::connection_type t)                                 \
+            {                                                                 \
+                error_code ec(lightweight);                                   \
+                return parcelset::get_message_handler(ph, action_name,        \
+                    "coalescing_message_handler", num, interval, loc, t, ec); \
+            }                                                                 \
+        };                                                                    \
+    }}                                                                        \
+/**/
+
 #else
 
-#define HPX_ACTION_USES_MESSAGE_COALESCING(action_type, num)
+#define HPX_ACTION_USES_MESSAGE_COALESCING(...)
+#define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(...)
 
 #endif
 

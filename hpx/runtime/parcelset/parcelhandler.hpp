@@ -367,7 +367,7 @@ namespace hpx { namespace parcelset
         policies::message_handler* get_message_handler(char const* action,
             char const* message_handler_type, std::size_t num_messages,
              std::size_t interval, naming::locality const& loc,
-             connection_type t);
+             connection_type t, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data

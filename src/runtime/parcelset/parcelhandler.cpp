@@ -60,9 +60,10 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     policies::message_handler* get_message_handler(
         parcelhandler* ph, char const* action, char const* type, std::size_t num,
-        std::size_t interval, naming::locality const& loc, connection_type t)
+        std::size_t interval, naming::locality const& loc, connection_type t,
+        error_code& ec)
     {
-        return ph->get_message_handler(action, type, num, interval, loc, t);
+        return ph->get_message_handler(action, type, num, interval, loc, t, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -396,7 +397,7 @@ namespace hpx { namespace parcelset
     policies::message_handler* parcelhandler::get_message_handler(
         char const* action, char const* message_handler_type,
         std::size_t num_messages, std::size_t interval,
-        naming::locality const& loc, connection_type t)
+        naming::locality const& loc, connection_type t, error_code& ec)
     {
         mutex_type::scoped_lock l(mtx_);
         handler_key_type key(loc, action);
@@ -404,25 +405,25 @@ namespace hpx { namespace parcelset
         if (it == handlers_.end()) {
             boost::shared_ptr<policies::message_handler> p(
                 hpx::create_message_handler(message_handler_type, action,
-                find_parcelport(t), num_messages, interval));
+                find_parcelport(t), num_messages, interval, ec));
 
-            if (!p.get()) {
-                HPX_THROW_EXCEPTION(internal_server_error,
-                    "parcelhandler::get_message_handler",
-                    "could not create new message handler");
-                return 0;
-            }
+            if (ec || !p.get())
+                return 0;           // no message handler available
 
             std::pair<message_handler_map::iterator, bool> r =
                 handlers_.insert(message_handler_map::value_type(key, p));
             if (!r.second) {
-                HPX_THROW_EXCEPTION(internal_server_error,
+                HPX_THROWS_IF(ec, internal_server_error,
                     "parcelhandler::get_message_handler",
                     "could not store newly created message handler");
                 return 0;
             }
             it = r.first;
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return (*it).second.get();
     }
 

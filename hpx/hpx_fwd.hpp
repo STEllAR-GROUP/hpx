@@ -127,7 +127,8 @@ namespace hpx
         HPX_API_EXPORT std::string get_connection_type_name(connection_type);
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type, std::size_t num,
-            std::size_t interval, naming::locality const& l, connection_type t);
+            std::size_t interval, naming::locality const& l, connection_type t,
+            error_code& ec = throws);
     }
 
     /// \namespace threads
