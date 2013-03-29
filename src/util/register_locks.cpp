@@ -96,6 +96,7 @@ namespace hpx { namespace util
             // we create a log message if there are still registered locks for
             // this OS-thread
             if (!held_locks.empty()) {
+                BOOST_ASSERT(false);
                 std::string back_trace(hpx::detail::backtrace());
                 if (back_trace.empty()) {
                     LERR_(debug)

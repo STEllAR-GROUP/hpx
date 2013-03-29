@@ -2,6 +2,7 @@
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
+//  Copyright (c) 2011-2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +12,7 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
+#include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -27,31 +29,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace tcp
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        struct call_for_each
-        {
-            typedef void result_type;
-
-            typedef std::vector<parcelport::write_handler_type> data_type;
-            data_type fv_;
-
-            call_for_each(data_type const& fv)
-              : fv_(fv)
-            {}
-
-            result_type operator()(
-                boost::system::error_code const& e,
-                std::size_t bytes_written) const
-            {
-                BOOST_FOREACH(parcelport::write_handler_type f, fv_)
-                {
-                    f(e, bytes_written);
-                }
-            }
-        };
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
@@ -127,7 +104,7 @@ namespace hpx { namespace parcelset { namespace tcp
         if (errors.get_error_count() == tried) {
             // all attempts failed
             HPX_THROW_EXCEPTION(network_error,
-                "tcp::parcelport::parcelport", errors.get_message());
+                "tcp::parcelport::run", errors.get_message());
             return false;
         }
 
@@ -420,7 +397,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // ... start an asynchronous write operation now.
         client_connection->async_write(
-            detail::call_for_each(handlers),
+            hpx::parcelset::detail::call_for_each(handlers),
             boost::bind(&parcelport::send_pending_parcels_trampoline, this,
                 boost::asio::placeholders::error, ::_2, ::_3));
     }

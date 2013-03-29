@@ -12,6 +12,7 @@
 
 #include <hpx/runtime/parcelset/ibverbs/context.hpp>
 #include <hpx/runtime/parcelset/ibverbs/messages.hpp>
+#include <hpx/runtime/parcelset/ibverbs/data_buffer.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -94,7 +95,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             if(out_buffer_.size() > sync_threshold_)
             {
-                context_.async_write(out_buffer_,//buffers,
+                context_.async_write(boost::ref(out_buffer_),//buffers,
                     boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, ::_2,
                         boost::make_tuple(handler, parcel_postprocess)));
@@ -124,12 +125,31 @@ namespace hpx { namespace parcelset { namespace ibverbs
             // complete data point and push back onto gatherer
             send_data_.time_ = timer_.elapsed_nanoseconds() - send_data_.time_;
             parcels_sent_.add_data(send_data_);
+            
 
-            // now we can give this connection back to the cache
+            // now handle the acknowledgment byte which is sent by the receiver
+            void (parcelport_connection::*f)(boost::system::error_code const&,
+                      boost::tuple<Handler, ParcelPostprocess>)
+                = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
+
+            if(out_buffer_.size() > sync_threshold_)
+            {
+                context_.async_read_ack(boost::bind(f, shared_from_this(), 
+                    boost::asio::placeholders::error, handler));
+            }
+            else
+            {
+                boost::system::error_code ec;
+                context_.read_ack(ec);
+                handle_read_ack(ec, handler);
+            }
+        }
+
+        template <typename Handler, typename ParcelPostprocess>
+        void handle_read_ack(boost::system::error_code const& e,
+            boost::tuple<Handler, ParcelPostprocess> handler)
+        {
             out_buffer_.clear();
-            out_priority_ = 0;
-            out_size_ = 0;
-            out_data_size_ = 0;
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -142,7 +162,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             boost::get<1>(handler)(e, there_, shared_from_this());
         }
 
-    protected:
 
     private:
         /// Window for the parcelport_connection.
@@ -153,7 +172,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         boost::integer::ulittle8_t out_priority_;
         boost::integer::ulittle64_t out_size_;
         boost::integer::ulittle64_t out_data_size_;
-        std::vector<char> out_buffer_;
+        data_buffer out_buffer_;
 
         /// the other (receiving) end of this connection
         naming::locality there_;

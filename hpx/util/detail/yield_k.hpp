@@ -14,7 +14,7 @@
 namespace hpx { namespace util { namespace detail {
     inline void yield_k(std::size_t k, const char *thread_name)
     {
-        if(k < 4)
+        if (k < 4) //-V112
         {}
 #if defined(BOOST_SMT_PAUSE)
         else if(k < 16)

@@ -48,9 +48,14 @@ namespace hpx { namespace parcelset { namespace ibverbs
         else {
             BOOST_ASSERT(endian_out =="little" || endian_out == "big");
         }
+
         boost::system::error_code ec;
         std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
-        context_.set_buffer_size(boost::lexical_cast<std::size_t>(buffer_size_str), ec);
+        
+        std::size_t buffer_size = boost::lexical_cast<std::size_t>(buffer_size_str);
+        char * mr_buffer = context_.set_buffer_size(buffer_size, ec);
+
+        out_buffer_.set_mr_buffer(mr_buffer, buffer_size);
 
         std::string sync_threshold_str = get_config_entry("hpx.parcel.ibverbs.sync_threshold", "0");
         sync_threshold_ = boost::lexical_cast<std::size_t>(sync_threshold_str);
@@ -62,12 +67,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
 #if defined(HPX_DEBUG)
         // make sure that all parcels require the same serialization filter and
         // that all of them go to the same locality
-        util::binary_filter* filter = pv[0].get_serialization_filter();
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
             BOOST_ASSERT(locality_id == destination());
-            BOOST_ASSERT(filter == p.get_serialization_filter());
         }
 #endif
         // we choose the highest priority of all parcels for this message
@@ -79,9 +82,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
         // guard against serialization errors
         try {
             out_buffer_.clear();
+
             BOOST_FOREACH(parcel const & p, pv)
             {
                 arg_size += traits::get_type_size(p);
+                priority = (std::max)(p.get_thread_priority(), priority);
             }
 
             out_buffer_.reserve(arg_size*2);
@@ -121,7 +126,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             // serialization library as otherwise we will loose the
             // e.what() description of the problem.
             HPX_THROW_EXCEPTION(serialization_error,
-                "shmem::parcelport_connection::set_parcel",
+                "ibverbs::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::archive::archive_exception: %s") % e.what()));
@@ -129,7 +134,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
         catch (boost::system::system_error const& e) {
             HPX_THROW_EXCEPTION(serialization_error,
-                "shmem::parcelport_connection::set_parcel",
+                "ibverbs::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "boost::system::system_error: %d (%s)") %
@@ -138,7 +143,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
         catch (std::exception const& e) {
             HPX_THROW_EXCEPTION(serialization_error,
-                "shmem::parcelport_connection::set_parcel",
+                "ibverbs::parcelport_connection::set_parcel",
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "std::exception: %s") % e.what()));

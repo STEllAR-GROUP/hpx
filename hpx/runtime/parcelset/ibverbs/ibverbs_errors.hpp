@@ -67,11 +67,27 @@ namespace hpx { namespace parcelset { namespace ibverbs
     if (&ec != &boost::system::throws) ec = boost::system::error_code();        \
 /**/
 
-#define HPX_IBVERBS_NEXT_WC(ec, state, ret, retry)                              \
+#define HPX_IBVERBS_NEXT_WC(ec, state, N, ret, retry)                           \
+    BOOST_PP_CAT(HPX_IBVERBS_NEXT_WC_, retry) (ec, state, N, ret)               \
+/**/
+
+#define HPX_IBVERBS_NEXT_WC_true(ec, state, N, ret)                             \
     {                                                                           \
-        message_type m = next_wc(ec, retry);                                    \
+        message_type m = next_wc<true, N>::call(this, ec);                      \
         if(ec) return ret;                                                      \
-        if(m == MSG_RETRY && !retry)                                            \
+        if(m != state)                                                          \
+        {                                                                       \
+            HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);               \
+            return ret;                                                         \
+        }                                                                       \
+    }
+/**/
+
+#define HPX_IBVERBS_NEXT_WC_false(ec, state, N, ret)                            \
+    {                                                                           \
+        message_type m = next_wc<false, N>::call(this, ec);                     \
+        if(ec) return ret;                                                      \
+        if(m == MSG_RETRY)                                                      \
         {                                                                       \
             return ret;                                                         \
         }                                                                       \
@@ -81,6 +97,5 @@ namespace hpx { namespace parcelset { namespace ibverbs
             return ret;                                                         \
         }                                                                       \
     }
-/**/
 
 #endif

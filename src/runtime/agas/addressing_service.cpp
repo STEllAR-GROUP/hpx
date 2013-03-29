@@ -349,7 +349,10 @@ bool addressing_service::get_console_locality(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(lock);
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+        }
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
@@ -771,8 +774,8 @@ bool addressing_service::get_id_range(
             // execute the action (synchronously)
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
-
-            cf.set_ok();
+            
+            cf->set_ok();
         }
 
         error const s = rep.get_status();

@@ -471,8 +471,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(event.event == RDMA_CM_EVENT_ESTABLISHED)
             {
                 conn->context().on_connection(event.id);
-                mutex_type::scoped_lock lk(mtx_);
-                accepted_connections_.insert(conn);
+                {
+                    mutex_type::scoped_lock lk(mtx_);
+                    accepted_connections_.insert(conn);
+                }
                 HPX_IBVERBS_RESET_EC(ec);
                 return true;
             }

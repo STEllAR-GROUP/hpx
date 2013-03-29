@@ -16,13 +16,18 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
           : buffer_(0)
           , buffer_size_(0)
           , buffer_mr_(0)
-          , msg_(0)
-          , msg_mr_(0)
+          , server_msg_(0)
+          , server_msg_mr_(0)
+          , client_msg_(0)
+          , client_msg_mr_(0)
           , size_(0)
           , id_(0)
         {
             int ret = 0;
-            ret = posix_memalign(reinterpret_cast<void **>(&msg_), EXEC_PAGESIZE, sizeof(message));
+            ret = posix_memalign(reinterpret_cast<void **>(&server_msg_), EXEC_PAGESIZE, sizeof(message));
+            BOOST_ASSERT(ret == 0);
+            
+            ret = posix_memalign(reinterpret_cast<void **>(&client_msg_), EXEC_PAGESIZE, sizeof(message));
             BOOST_ASSERT(ret == 0);
         }
 
@@ -34,20 +39,28 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 free(buffer_);
                 buffer_ = 0;
             }
-            if(msg_)
+            if(server_msg_)
             {
-                free(msg_);
-                msg_ = 0;
+                free(server_msg_);
+                server_msg_ = 0;
+            }
+            if(client_msg_)
+            {
+                free(client_msg_);
+                client_msg_ = 0;
             }
         }
 
-        void set_buffer_size(std::size_t buffer_size, boost::system::error_code &ec)
+        char * set_buffer_size(std::size_t buffer_size, boost::system::error_code &ec)
         {
             BOOST_ASSERT(buffer_ == 0);
             int ret = 0;
             buffer_size_ = buffer_size;
             ret = posix_memalign(reinterpret_cast<void **>(&buffer_), EXEC_PAGESIZE, buffer_size_);
             BOOST_ASSERT(ret == 0);
+            boost::uint64_t header[2] = {0};
+            std::memcpy(buffer_, header, sizeof(header));
+            return buffer_;
         }
 
         void close()
@@ -57,10 +70,15 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 ibv_dereg_mr(buffer_mr_);
                 buffer_mr_ = 0;
             }
-            if(msg_mr_)
+            if(server_msg_mr_)
             {
-                ibv_dereg_mr(msg_mr_);
-                msg_mr_ = 0;
+                ibv_dereg_mr(server_msg_mr_);
+                server_msg_mr_ = 0;
+            }
+            if(client_msg_mr_)
+            {
+                ibv_dereg_mr(client_msg_mr_);
+                client_msg_mr_ = 0;
             }
 
             if(id_)
@@ -72,41 +90,32 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             size_ = 0;
         }
 
-        void post_receive(rdma_cm_id * id = NULL)
+        void post_receive()
         {
             struct ibv_recv_wr wr, *bad_wr = NULL;
+            struct ibv_sge sge;
 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
 
-            if(id == NULL)
-            {
-                BOOST_ASSERT(id_);
-                wr.wr_id = (uintptr_t)id_;
-            }
-            else
-            {
-                wr.wr_id = (uintptr_t)id;
-            }
-            wr.sg_list = NULL;
-            wr.num_sge = 0;
+            BOOST_ASSERT(id_);
+            wr.wr_id = (uintptr_t)id_;
+            wr.sg_list = &sge;
+            wr.num_sge = 1;
+
+            sge.addr = (uintptr_t)client_msg_;
+            sge.length = sizeof(message);
+            sge.lkey = client_msg_mr_->lkey;
 
             int ret = 0;
-            if(id == NULL)
-            {
-                BOOST_ASSERT(id_);
-                ret = ibv_post_recv(id_->qp, &wr, &bad_wr);
-            }
-            else
-            {
-                ret = ibv_post_recv(id->qp, &wr, &bad_wr);
-            }
+            BOOST_ASSERT(id_);
+            ret = ibv_post_recv(id_->qp, &wr, &bad_wr);
             if(ret)
             {
                 // FIXME: error
             }
         }
 
-        void send_message(rdma_cm_id * id = NULL)
+        void send_message()
         {
             struct ibv_send_wr wr, *bad_wr = NULL;
             struct ibv_sge sge;
@@ -120,9 +129,9 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             wr.num_sge = 1;
             wr.send_flags = IBV_SEND_SIGNALED;
 
-            sge.addr = (uintptr_t)msg_;
+            sge.addr = (uintptr_t)server_msg_;
             sge.length = sizeof(message);
-            sge.lkey = msg_mr_->lkey;
+            sge.lkey = server_msg_mr_->lkey;
 
             int ret = 0;
             BOOST_ASSERT(id_);
@@ -131,6 +140,12 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             {
                 // FIXME: error
             }
+        }
+
+        void send_ready()
+        {
+            server_msg_->id = MSG_DONE;
+            send_message();
         }
         
         void on_preconnect(rdma_cm_id * id, ibv_pd * pd)
@@ -147,37 +162,110 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             {
                 // FIXME: error
             }
-            msg_mr_ = ibv_reg_mr(
+            server_msg_mr_ = ibv_reg_mr(
                 pd
-              , msg_
+              , server_msg_
               , sizeof(hpx::parcelset::ibverbs::message)
               , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
             );
-            if(!msg_mr_)
+            if(!server_msg_mr_)
+            {
+                // FIXME: error
+            }
+            client_msg_mr_ = ibv_reg_mr(
+                pd
+              , client_msg_
+              , sizeof(hpx::parcelset::ibverbs::message)
+              , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+            );
+            if(!client_msg_mr_)
             {
                 // FIXME: error
             }
 
-            post_receive(id);
+            id_ = id;
+
+            //post_receive();
         }
 
         void on_connection(rdma_cm_id *id)
         {
             id_ = id;
-            msg_->id = MSG_MR;
-            msg_->addr = (uintptr_t)buffer_mr_->addr;
-            msg_->rkey = buffer_mr_->rkey;
+            server_msg_->id = MSG_MR;
+            server_msg_->addr = (uintptr_t)buffer_mr_->addr;
+            server_msg_->rkey = buffer_mr_->rkey;
 
-            send_message(id);
+            send_message();
         }
         
         message_type on_completion(ibv_wc * wc)
         {
+            /*
+            std::cout << "server opcode: ";
+            switch (wc->opcode)
+            {
+                case IBV_WC_SEND:
+                    std::cout << "IBV_WC_SEND\n";
+                    break;
+                case IBV_WC_RDMA_WRITE:
+                    std::cout << "IBV_WC_RDMA_WRITE\n";
+                    break;
+                case IBV_WC_RDMA_READ:
+                    std::cout << "IBV_WC_RDMA_READ\n";
+                    break;
+                case IBV_WC_COMP_SWAP:
+                    std::cout << "IBV_WC_COMP_SWAP\n";
+                    break;
+                case IBV_WC_FETCH_ADD:
+                    std::cout << "IBV_WC_FETCH_ADD\n";
+                    break;
+                case IBV_WC_BIND_MW:
+                    std::cout << "IBV_WC_BIND_MW\n";
+                    break;
+                case IBV_WC_RECV:
+                    std::cout << "IBV_WC_RECV\n";
+                    break;
+                case IBV_WC_RECV_RDMA_WITH_IMM:
+                    std::cout << "IBV_WC_RDMA_WRITE\n";
+                    break;
+            }
+            */
+
+            if(wc->opcode == IBV_WC_RECV)
+            {
+                //std::cout << client_msg_->id << "\n";
+                switch(client_msg_->id)
+                {
+                    case MSG_DATA:
+                        return MSG_DATA;
+                    default:
+                        return MSG_INVALID;
+                }
+            }
+
+            if(wc->opcode == IBV_WC_SEND)
+            {
+                //std::cout << server_msg_->id << "\n";
+                switch(server_msg_->id)
+                {
+                    case MSG_DONE:
+                        return MSG_DONE;
+                    case MSG_DATA:
+                        return MSG_DATA;
+                    case MSG_MR:
+                        return MSG_MR;
+                    default:
+                        return MSG_INVALID;
+                }
+            }
+
+            /*
             if(wc->opcode == IBV_WC_RECV_RDMA_WITH_IMM)
             {
                 return MSG_DATA;
             }
-            post_receive();
+            */
+            //post_receive();
             return MSG_RETRY;
         }
         
@@ -189,8 +277,11 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         std::size_t buffer_size_;
         ibv_mr *buffer_mr_;
 
-        message *msg_;
-        ibv_mr *msg_mr_;
+        message *server_msg_;
+        ibv_mr *server_msg_mr_;
+
+        message *client_msg_;
+        ibv_mr *client_msg_mr_;
 
         std::size_t size_;
 
