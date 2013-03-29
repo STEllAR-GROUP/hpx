@@ -349,7 +349,10 @@ bool addressing_service::get_console_locality(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
+        {
+            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(lock);
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+        }
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
@@ -748,6 +751,9 @@ bool addressing_service::get_id_range(
         {
             // WARNING: this deadlocks if AGAS is unresponsive and all response
             // futures are checked out and pending.
+            
+            // wait for the semaphore to become available
+            lock_semaphore lock(hosted->promise_pool_semaphore_);
 
             // get a future
             typedef checkout_promise<
@@ -768,7 +774,7 @@ bool addressing_service::get_id_range(
                 return false;
             }
 
-            // execute the action (synchronously)
+            // executing the action (synchronously)
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
             

@@ -674,7 +674,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             ibv_ack_cq_events(cq, N);
             ibv_req_notify_cq(cq, 0);
             
-
             int n = ibv_poll_cq(cq, N, wc);
             if(n)
             {
@@ -736,7 +735,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             HPX_IBVERBS_NEXT_WC(ec, MSG_MR, 1, , true);
             //std::cout << __LINE__ << "\n";
             //std::cout << typeid(connection_).name() << " got MR notification ...\n";
-            connection_.post_receive();
         }
 
         void on_completion(ibv_wc * wc)
@@ -1074,6 +1072,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     }
                 }
             }
+            
+            {
+                boost::uint64_t tmp[2] = {0};
+                std::memcpy(connection_.buffer_, tmp, sizeof(tmp));
+            }
 
             //std::cout << "reading done ...\n";
             
@@ -1144,8 +1147,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             else
             {
                 const char * data_ptr = data.begin();
-                    
-                //std::cout << "writing next chunk of " << header[1] << " byte\n";
                 
                 std::memcpy(connection_.buffer_ + 2 * sizeof(boost::uint64_t), data_ptr, header[1]);
 
