@@ -172,6 +172,9 @@ namespace hpx { namespace traits
     HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(                                \
         Value                                                                   \
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
+/**/
+
+/*
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(                                 \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
