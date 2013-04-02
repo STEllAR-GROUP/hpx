@@ -8,7 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/move.hpp>
 
 #include <vector>
@@ -21,8 +20,6 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
     {
         BOOST_COPYABLE_AND_MOVABLE(message_buffer);
 
-        typedef lcos::local::spinlock mutex_type;
-
     public:
         enum message_buffer_append_state
         {
@@ -31,7 +28,6 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
             buffer_now_full = 2,
             singleton_buffer = 3
         };
-
 
         message_buffer()
           : max_messages_(0)
@@ -75,21 +71,13 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         void operator()(parcelset::parcelport* set)
         {
-            message_buffer buff (max_messages_);
-
-            {
-                mutex_type::scoped_lock l(mtx_);
-                std::swap(buff, *this);
-            }
-
-            buff.flush(set);
+            if (!messages_.empty())
+                set->put_parcels(messages_, handlers_);
         }
 
         message_buffer_append_state append(parcelset::parcel& p,
             parcelset::parcelport::write_handler_type const& f)
         {
-            mutex_type::scoped_lock l(mtx_);
-
             BOOST_ASSERT(messages_.size() == handlers_.size());
 
             int result = normal;
@@ -107,28 +95,24 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         bool empty() const
         {
-            mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(messages_.size() == handlers_.size());
             return messages_.empty();
         }
 
         void clear()
         {
-            mutex_type::scoped_lock l(mtx_);
             messages_.clear();
             handlers_.clear();
         }
 
         std::size_t size() const
         {
-            mutex_type::scoped_lock l(mtx_);
             BOOST_ASSERT(messages_.size() == handlers_.size());
             return messages_.size();
         }
 
         double fill_ratio() const
         {
-            mutex_type::scoped_lock l(mtx_);
             return double(messages_.size()) / max_messages_;
         }
 
@@ -139,15 +123,9 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
             std::swap(handlers_, o.handlers_);
         }
 
-    protected:
-        void flush(parcelset::parcelport* set)
-        {
-            if (!messages_.empty())
-                set->put_parcels(messages_, handlers_);
-        }
+        std::size_t capacity() const { return max_messages_; }
 
     private:
-        mutable mutex_type mtx_;
         std::vector<parcelset::parcel> messages_;
         std::vector<parcelset::parcelport::write_handler_type> handlers_;
         std::size_t max_messages_;

@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
@@ -29,6 +30,8 @@ namespace hpx { namespace plugins { namespace parcel
     private:
         coalescing_message_handler* this_() { return this; }
 
+        typedef lcos::local::spinlock mutex_type;
+
     public:
         typedef parcelset::policies::message_handler::write_handler_type
             write_handler_type;
@@ -36,7 +39,6 @@ namespace hpx { namespace plugins { namespace parcel
         coalescing_message_handler(char const* action_name,
             parcelset::parcelport* pp, std::size_t num = std::size_t(-1),
             std::size_t interval = std::size_t(-1));
-        ~coalescing_message_handler();
 
         void put_parcel(parcelset::parcel& p, write_handler_type const& f);
 
@@ -44,8 +46,10 @@ namespace hpx { namespace plugins { namespace parcel
 
     protected:
         bool timer_flush();
+        void flush(mutex_type::scoped_lock& l, bool stop_buffering);
 
     private:
+        mutable mutex_type mtx_;
         parcelset::parcelport* pp_;
         detail::message_buffer buffer_;
         boost::int64_t interval_;

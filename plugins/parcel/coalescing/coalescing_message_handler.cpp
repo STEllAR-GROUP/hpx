@@ -70,17 +70,17 @@ namespace hpx { namespace plugins { namespace parcel
         interval_(detail::get_interval(interval)),
         timer_(boost::bind(&coalescing_message_handler::timer_flush, this_()),
             boost::bind(&coalescing_message_handler::flush, this_(), true),
-            interval_, action_name, true),
+            interval_, std::string(action_name) + "_timer", true),
         stopped_(false)
-    {}
-
-    coalescing_message_handler::~coalescing_message_handler()
     {}
 
     void coalescing_message_handler::put_parcel(parcelset::parcel& p,
         write_handler_type const& f)
     {
+        mutex_type::scoped_lock l(mtx_);
         if (stopped_) {
+            l.unlock();
+
             // this instance should not buffer parcels anymore
             pp_->put_parcel(p, f);
             return;
@@ -95,14 +95,11 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         case detail::message_buffer::normal:
-            timer_.restart();           // restart timer
+            timer_.restart(false);      // restart timer
             break;
 
         case detail::message_buffer::buffer_now_full:
-            timer_.stop();              // interrupt timer
-
-            BOOST_ASSERT(NULL != pp_);
-            buffer_(pp_);               // 'invoke' the buffer
+            flush(l, false);
             break;
 
         default:
@@ -116,10 +113,9 @@ namespace hpx { namespace plugins { namespace parcel
     bool coalescing_message_handler::timer_flush()
     {
         // adjust timer if needed
-        if (!buffer_.empty()) {
-            flush();
-            return true;        // restart timer
-        }
+        mutex_type::scoped_lock l(mtx_);
+        if (!buffer_.empty())
+            flush(l, false);
 
         // do not restart timer for now, will be restarted on next parcel
         return false;
@@ -127,10 +123,27 @@ namespace hpx { namespace plugins { namespace parcel
 
     void coalescing_message_handler::flush(bool stop_buffering)
     {
-        if (stop_buffering)
+        mutex_type::scoped_lock l(mtx_);
+        flush(l, stop_buffering);
+    }
+
+    void coalescing_message_handler::flush(mutex_type::scoped_lock& l,
+        bool stop_buffering)
+    {
+        if (!stopped_ && stop_buffering) {
             stopped_ = true;
+            timer_.stop();              // interrupt timer
+        }
+
+        if (buffer_.empty())
+            return;
+
+        detail::message_buffer buff (buffer_.capacity());
+        std::swap(buff, buffer_);
+
+        l.unlock();
 
         BOOST_ASSERT(NULL != pp_);
-        buffer_(pp_);                   // 'invoke' the buffer
+        buff(pp_);                   // 'invoke' the buffer
     }
 }}}

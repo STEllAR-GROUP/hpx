@@ -41,23 +41,25 @@ namespace hpx { namespace util
     bool interval_timer::start(bool evaluate_)
     {
         mutex_type::scoped_lock l(mtx_);
+        if (is_terminated_)
+            return false;
+
         if (!is_started_) {
             if (first_start_) {
                 first_start_ = false;
-                l.unlock();
+
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
                     register_shutdown_function(boost::bind(&interval_timer::terminate, this));
             }
-            else {
-                l.unlock();
-            }
 
-            if (evaluate_)
+            if (evaluate_) {
+                l.unlock();
                 evaluate(threads::wait_signaled);
+            }
             else {
-                mutex_type::scoped_lock l(mtx_);
                 schedule_thread();
             }
 
@@ -66,27 +68,27 @@ namespace hpx { namespace util
         return false;
     }
 
-    bool interval_timer::restart()
+    bool interval_timer::restart(bool evaluate_)
     {
         if (!is_started_)
-            return start();
+            return start(evaluate_);
 
         mutex_type::scoped_lock l(mtx_);
 
-        // interrupt timer thread, if needed
-        if (is_started_) {
-            is_started_ = false;
+        if (is_terminated_)
+            return false;
 
-            if (id_) {
-                error_code ec(lightweight);       // avoid throwing on error
-                threads::set_thread_state(id_, threads::pending,
-                    threads::wait_abort, threads::thread_priority_critical, ec);
-                id_ = 0;
-            }
-        }
+        // interrupt timer thread, if needed
+        stop_locked();
 
         // reschedule evaluation thread
-        schedule_thread();
+        if (evaluate_) {
+            l.unlock();
+            evaluate(threads::wait_signaled);
+        }
+        else {
+            schedule_thread();
+        }
         return true;
     }
 
@@ -109,6 +111,7 @@ namespace hpx { namespace util
             }
             return true;
         }
+
         BOOST_ASSERT(id_ == 0);
         return false;
     }
@@ -118,9 +121,12 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
-            if (on_term_)
-                on_term_();
             stop_locked();
+
+            if (on_term_) {
+                l.unlock();
+                on_term_();
+            }
         }
     }
 
@@ -140,11 +146,14 @@ namespace hpx { namespace util
         try {
             mutex_type::scoped_lock l(mtx_);
 
+            if (is_terminated_ || statex == threads::wait_abort || 0 == microsecs_)
+                return threads::terminated;        // object has been finalized, exit
+
+            if (id_ != 0 && id_ != threads::get_self_id())
+                return threads::terminated;        // obsolete timer thread
+
             id_ = 0;
             is_started_ = false;
-
-            if (statex == threads::wait_abort || 0 == microsecs_)
-                return threads::terminated;        // object has been finalized, exit
 
             bool result = false;
 
@@ -154,8 +163,10 @@ namespace hpx { namespace util
             }
 
             // some other thread might already have started the timer
-            if (0 == id_ && result)
+            if (0 == id_ && result) {
+                BOOST_ASSERT(!is_started_);
                 schedule_thread();        // wait and repeat
+            }
         }
         catch (hpx::exception const& e){
             // the lock above might throw yield_aborted
