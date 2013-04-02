@@ -3,17 +3,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(compression_plugins
+set(parcel_plugins
     coalescing)
 
-foreach(type ${compression_plugins})
-  add_hpx_pseudo_target(plugins.compression.${type})
+foreach(type ${parcel_plugins})
+  add_hpx_pseudo_target(plugins.parcel.${type})
   add_subdirectory(${type})
-  add_hpx_pseudo_dependencies(plugins.compression plugins.compression.${type})
+  add_hpx_pseudo_dependencies(plugins.parcel plugins.parcel.${type})
 endforeach()
 
 macro(add_parcel_modules)
-  add_hpx_pseudo_target(plugins.parcel.coalescing)
   add_coalescing_module()
-  add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
 endmacro()

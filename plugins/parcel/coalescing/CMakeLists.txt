@@ -18,5 +18,11 @@ macro(add_coalescing_module)
       PROPERTY COMPILE_DEFINITIONS
       "HPX_LIBRARY_EXPORTS"
       "HPX_PLUGIN_NAME=parcel_coalescing")
+
+  add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
+
+  if(NOT HPX_NO_INSTALL)
+    hpx_library_install(parcel_coalescing_lib lib/hpx)
+  endif()
 endmacro()
 
