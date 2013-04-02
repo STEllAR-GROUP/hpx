@@ -13,5 +13,7 @@ foreach(type ${compression_plugins})
 endforeach()
 
 macro(add_parcel_modules)
+  add_hpx_pseudo_target(plugins.parcel.coalescing)
   add_coalescing_module()
+  add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing_lib)
 endmacro()
