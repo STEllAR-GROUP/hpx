@@ -67,10 +67,10 @@ namespace hpx { namespace plugins { namespace parcel
             char const* action_name, parcelset::parcelport* pp, std::size_t num,
             std::size_t interval)
       : buffer_(detail::get_num_messages(num)), pp_(pp),
-        interval_(detail::get_interval(interval)),
         timer_(boost::bind(&coalescing_message_handler::timer_flush, this_()),
             boost::bind(&coalescing_message_handler::flush, this_(), true),
-            interval_, std::string(action_name) + "_timer", true),
+            detail::get_interval(interval), std::string(action_name) + "_timer",
+            true),
         stopped_(false)
     {}
 

@@ -52,7 +52,6 @@ namespace hpx { namespace plugins { namespace parcel
         mutable mutex_type mtx_;
         parcelset::parcelport* pp_;
         detail::message_buffer buffer_;
-        boost::int64_t interval_;
         util::interval_timer timer_;
         bool stopped_;
     };
