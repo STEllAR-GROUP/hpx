@@ -42,15 +42,15 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         {}
 
         message_buffer(message_buffer const& rhs)
-          : max_messages_(rhs.max_messages_),
-            messages_(rhs.messages_),
-            handlers_(rhs.handlers_)
+          : messages_(rhs.messages_),
+            handlers_(rhs.handlers_),
+            max_messages_(rhs.max_messages_)
         {}
 
         message_buffer(BOOST_RV_REF(message_buffer) rhs)
-          : max_messages_(rhs.max_messages_),
-            messages_(boost::move(rhs.messages_)),
-            handlers_(boost::move(rhs.handlers_))
+          : messages_(boost::move(rhs.messages_)),
+            handlers_(boost::move(rhs.handlers_)),
+            max_messages_(rhs.max_messages_)
         {}
 
         message_buffer& operator=(BOOST_COPY_ASSIGN_REF(message_buffer) rhs)
