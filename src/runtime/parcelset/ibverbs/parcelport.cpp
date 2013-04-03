@@ -516,7 +516,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 {
                     // De-serialize the parcel data
                     util::portable_binary_iarchive archive(parcel_data,
-                        inbound_data_size, boost::archive::no_header);
+                        parcel_data.size(), boost::archive::no_header);
 
                     std::size_t parcel_count = 0;
 

@@ -89,7 +89,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 priority = (std::max)(p.get_thread_priority(), priority);
             }
 
-            out_buffer_.reserve(arg_size*2);
+            //out_buffer_.reserve(arg_size*2);
 
             // mark start of serialization
             util::high_resolution_timer timer;

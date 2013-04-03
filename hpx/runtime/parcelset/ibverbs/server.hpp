@@ -233,7 +233,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             if(wc->opcode == IBV_WC_RECV)
             {
-                //std::cout << client_msg_->id << "\n";
+                //std::cout << "server IBV_WC_RECV: " << client_msg_->id << "\n";
                 switch(client_msg_->id)
                 {
                     case MSG_DATA:
@@ -255,17 +255,11 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     case MSG_MR:
                         return MSG_MR;
                     default:
-                        return MSG_INVALID;
+                        return MSG_RETRY;
                 }
+                return MSG_RETRY;
             }
 
-            /*
-            if(wc->opcode == IBV_WC_RECV_RDMA_WITH_IMM)
-            {
-                return MSG_DATA;
-            }
-            */
-            //post_receive();
             return MSG_RETRY;
         }
         

@@ -140,6 +140,61 @@ namespace hpx { namespace parcelset
         parcels_->set_parcelhandler(this);
 
         attach_parcelport(pp, false);
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
+        std::string enable_shmem =
+            get_config_entry("hpx.parcel.shmem.enable", "0");
+
+        if (boost::lexical_cast<int>(enable_shmem)) {
+            /*
+            // we use the provided information to decide what types of parcel-ports
+            // are needed
+
+            // if there is just one locality, we need no additional network at all
+            if (1 == localities.size())
+                return;
+
+            // if there are more localities sharing the same network node, we need
+            // to instantiate the shmem parcel-port
+            std::size_t here_count = 0;
+            std::string here_(here().get_address());
+            BOOST_FOREACH(naming::locality const& t, localities)
+            {
+                if (t.get_address() == here_)
+                    ++here_count;
+            }
+
+            if (here_count > 1) {
+            */{
+                util::io_service_pool* pool =
+                    pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
+                BOOST_ASSERT(0 != pool);
+
+                attach_parcelport(parcelport::create(
+                    connection_shmem, hpx::get_config(),
+                    pool->get_on_start_thread(), pool->get_on_stop_thread()));
+            }
+        }
+#endif
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        std::string enable_ibverbs =
+            get_config_entry("hpx.parcel.ibverbs.enable", "0");
+
+        if (boost::lexical_cast<int>(enable_ibverbs)) {
+            /*
+            // if there is just one locality, we need no additional network at all
+            if (1 == localities.size())
+                return;
+            */
+                
+            util::io_service_pool* pool =
+                pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
+            BOOST_ASSERT(0 != pool);
+
+            attach_parcelport(parcelport::create(
+                connection_ibverbs, hpx::get_config(),
+                pool->get_on_start_thread(), pool->get_on_stop_thread()));
+        }
+#endif
     }
 
     // find and return the specified parcelport
@@ -276,6 +331,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::set_resolved_localities(
         std::vector<naming::locality> const& localities)
     {
+/*
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
         std::string enable_shmem =
             get_config_entry("hpx.parcel.shmem.enable", "0");
@@ -327,6 +383,7 @@ namespace hpx { namespace parcelset
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
         }
 #endif
+*/
     }
 
     /// Return the reference to an existing io_service

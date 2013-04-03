@@ -147,26 +147,38 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
         void write_remote(std::size_t chunk_size)
         {
-            ibv_send_wr wr, *bad_wr = NULL;
-            ibv_sge sge;
+            ibv_send_wr wr[2], *bad_wr = NULL;
+            ibv_sge sge[2];
 
-            std::memset(&wr, 0, sizeof(wr));
+            std::memset(wr, 0, sizeof(wr));
 
-            wr.wr_id = (uintptr_t)id_;
-            //wr.opcode = IBV_WR_RDMA_WRITE_WITH_IMM;
-            wr.opcode = IBV_WR_RDMA_WRITE;
-            wr.send_flags = IBV_SEND_SIGNALED;
-            wr.wr.rdma.remote_addr = peer_addr_;
-            wr.wr.rdma.rkey = peer_rkey_;
+            wr[0].wr_id = (uintptr_t)id_;
+            wr[0].opcode = IBV_WR_RDMA_WRITE;
+            wr[0].send_flags = IBV_SEND_SIGNALED;
+            wr[0].wr.rdma.remote_addr = peer_addr_;
+            wr[0].wr.rdma.rkey = peer_rkey_;
 
-            wr.sg_list = &sge;
-            wr.num_sge = 1;
+            wr[0].sg_list = &sge[0];
+            wr[0].num_sge = 1;
+            
+            wr[0].next = &wr[1];
 
-            sge.addr = (uintptr_t)buffer_;
-            sge.length = chunk_size;
-            sge.lkey = buffer_mr_->lkey;
+            sge[0].addr = (uintptr_t)buffer_;
+            sge[0].length = chunk_size;
+            sge[0].lkey = buffer_mr_->lkey;
+            
+            wr[1].wr_id = (uintptr_t)id_;
+            wr[1].opcode = IBV_WR_SEND;
+            wr[1].sg_list = &sge[1];
+            wr[1].num_sge = 1;
+            wr[1].send_flags = IBV_SEND_SIGNALED;
 
-            int ret = ibv_post_send(id_->qp, &wr, &bad_wr);
+            client_msg_->id = MSG_DATA;
+            sge[1].addr = (uintptr_t)client_msg_;
+            sge[1].length = sizeof(message);
+            sge[1].lkey = client_msg_mr_->lkey;
+
+            int ret = ibv_post_send(id_->qp, &wr[0], &bad_wr);
             if(ret)
             {
             }
@@ -231,6 +243,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     break;
             }
             */
+
             if(wc->opcode == IBV_WC_RECV)
             {
                 //std::cout << server_msg_->id << "\n";
@@ -251,7 +264,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             /*
             if(wc->opcode == IBV_WC_SEND)
             {
-                return MSG_DONE;
+                return MSG_RETRY;
             }
             
             if(wc->opcode == IBV_WC_RDMA_WRITE)

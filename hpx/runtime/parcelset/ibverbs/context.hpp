@@ -624,7 +624,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             ibv_req_notify_cq(cq, 0);
             
 
-            //k = 0;
             message_type m = MSG_RETRY;
             while(m == MSG_RETRY)
             {
@@ -642,9 +641,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
                         return MSG_INVALID;
                     }
                 }
-                // As this loop might spin quite a while, we are implementing
-                // an exponential backup strategy
-                //hpx::util::detail::yield_k(k, "hpx::parcelset::ibverbs::context::next_wc");
             }
             return m;
         }
@@ -679,7 +675,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             ibv_req_notify_cq(cq, 0);
             
 
-            //k = 0;
             int n = ibv_poll_cq(cq, N, wc);
             if(n)
             {
@@ -741,7 +736,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             HPX_IBVERBS_NEXT_WC(ec, MSG_MR, 1, , true);
             //std::cout << __LINE__ << "\n";
             //std::cout << typeid(connection_).name() << " got MR notification ...\n";
-            //connection_.post_receive();
+            connection_.post_receive();
         }
 
         void on_completion(ibv_wc * wc)
@@ -1003,20 +998,16 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 --executing_operation_;
             } BOOST_SCOPE_EXIT_END
             if(is_closed(ec)) return 0;
+                
+            //std::cout << __LINE__ << "\n";
+            HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 1, 0, false);
+            //std::cout << __LINE__ << "\n";
+
+            connection_.post_receive();
             
             boost::uint64_t header[2] = {0};
             
-            int k = 0;
-            while(k < 4096)
-            {
-                std::memcpy(header, connection_.buffer_, sizeof(header));
-                if(header[0] != 0)
-                {
-                    break;
-                }
-                ++k;
-            }
-            if(header[0] == 0) return 0;
+            std::memcpy(header, connection_.buffer_, sizeof(header));
             //std::cout << "reading "<< header[0] << " byte\n";
 
             data.resize(header[0]);
@@ -1024,15 +1015,19 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(!data.zero_copy_)
             {
                 char * data_ptr = data.begin();
+                BOOST_ASSERT(data_ptr != data.mr_buffer_);
+
+                BOOST_ASSERT(header[1]);
 
                 std::memcpy(
                     data_ptr
                   , connection_.buffer_ + 2 * sizeof(boost::uint64_t)
                   , header[1]
                 );
+                    
+                //std::cout << "reading next chunk of " << header[1] << " byte\n";
                 
                 boost::uint64_t chunk_size = 0;
-                std::memcpy(connection_.buffer_, &chunk_size, sizeof(chunk_size));
 
                 connection_.server_msg_->id = MSG_DATA;
                 connection_.send_message();
@@ -1045,22 +1040,31 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
                 for(std::size_t bytes_read = header[1]; bytes_read < header[0];)
                 {
+                    //std::cout << __LINE__ << "\n";
+                    HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 1, 0, true);
+                    //std::cout << __LINE__ << "\n";
+                    
+                    connection_.post_receive();
+                        
                     std::memcpy(&chunk_size, connection_.buffer_, sizeof(boost::uint64_t));
-                    if(chunk_size == 0) continue;
                     //std::cout << "reading next chunk of " << chunk_size << " byte\n";
+                    
+                    BOOST_ASSERT(chunk_size);
 
                     std::memcpy(
                         data_ptr
                       , buffer_ptr
                       , chunk_size
                     );
+
                     data_ptr += chunk_size;
                     bytes_read += chunk_size;
+                    
+                    BOOST_ASSERT(data.size() >= bytes_read);
 
                     if(bytes_read < header[0])
                     {
-                        chunk_size = 0;
-                        std::memcpy(connection_.buffer_, &chunk_size, sizeof(chunk_size));
+                        //std::cout << "send ready\n";
                         //connection_.post_receive();
                         connection_.server_msg_->id = MSG_DATA;
                         connection_.send_message();
@@ -1070,6 +1074,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     }
                 }
             }
+
+            //std::cout << "reading done ...\n";
             
             {
                 boost::uint64_t tmp[2] = {0};
@@ -1138,6 +1144,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
             else
             {
                 const char * data_ptr = data.begin();
+                    
+                //std::cout << "writing next chunk of " << header[1] << " byte\n";
                 
                 std::memcpy(connection_.buffer_ + 2 * sizeof(boost::uint64_t), data_ptr, header[1]);
 
@@ -1149,15 +1157,15 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
                 char * buffer_ptr = connection_.buffer_ + sizeof(boost::uint64_t);
 
-                while(bytes_sent < header[0])
+                while(bytes_sent != header[0])
                 {
                     //std::cout << __LINE__ << "\n";
-                    HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 2, 0, true);
+                    HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 3, 0, true);
                     //std::cout << __LINE__ << "\n";
                     boost::uint64_t chunk_size
                         = std::min(
-                            connection_.buffer_size_
-                          , header[0] - bytes_sent + sizeof(boost::uint64_t)
+                            connection_.buffer_size_ - sizeof(boost::uint64_t)
+                          , header[0] - bytes_sent
                         );
                     //std::cout << "writing next chunk of " << chunk_size << " byte\n";
 
@@ -1166,12 +1174,14 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     std::memcpy(buffer_ptr, data_ptr, chunk_size);
                     
                     connection_.post_receive();
-                    connection_.write_remote(chunk_size);
+                    connection_.write_remote(chunk_size + sizeof(boost::uint64_t));
 
                     bytes_sent += chunk_size;
                     data_ptr += chunk_size;
                 }
             }
+            
+            //std::cout << "writing done ...\n";
 
             HPX_IBVERBS_RESET_EC(ec);
             return header[0];
@@ -1191,7 +1201,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             }
             
             //std::cout << __LINE__ << "\n";
-            HPX_IBVERBS_NEXT_WC(ec, MSG_DONE, 2, false, false);
+            HPX_IBVERBS_NEXT_WC(ec, MSG_DONE, 3, false, false);
             //std::cout << __LINE__ << "\n";
 
             HPX_IBVERBS_RESET_EC(ec);
@@ -1206,6 +1216,9 @@ namespace hpx { namespace parcelset { namespace ibverbs
             build_qp_attr(&qp_attr);
 
             int ret = rdma_create_qp(id, pd_, &qp_attr);
+
+            //std::cout << "max inline data: " << qp_attr.cap.max_inline_data << "\n";
+            
             if(ret)
             {
                 close(ec);
@@ -1307,7 +1320,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             qp_attr->cap.max_send_wr = 10;
             qp_attr->cap.max_recv_wr = 10;
-            qp_attr->cap.max_send_sge = 1;
+            qp_attr->cap.max_send_sge = 2;
             qp_attr->cap.max_recv_sge = 1;
         }
 

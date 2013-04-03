@@ -30,6 +30,11 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#if defined(_POSIX_VERSION)
+#include <sys/syscall.h>
+#include <sys/resource.h>
+#endif
+
 #include <numeric>
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
@@ -1106,6 +1111,22 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc(std::size_t num_thread)
     {
+        
+        // Setting priority of worker threads to a lower priority, this needs to
+        // be done in order to give the parcel pool threads higher priority
+#if defined(_POSIX_VERSION)
+        {
+            pid_t tid;
+            tid = syscall(SYS_gettid);
+            int ret = setpriority(PRIO_PROCESS, tid, 19);
+            if(ret != 0)
+            {
+                HPX_THROW_EXCEPTION(no_success,
+                    "threadmanager_impl::run", "setpriority returned an error");
+            }
+        }
+#endif
+
         // wait for all threads to start up before before starting px work
         startup_->wait();
 
@@ -1926,6 +1947,9 @@ namespace hpx { namespace threads
                     scheduler_.destroy_thread(thrd, busy_loop_count);
 
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
+                // If we idle for some time, yield control to the OS scheduler
+                // so other threads (like for example the parcelpool threads)
+                // may be scheduled
             }
 
             // if nothing else has to be done either wait or terminate
@@ -1969,6 +1993,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(bad_parameter,
                 "threadmanager_impl::run", "number of threads is zero");
         }
+
 
         mutex_type::scoped_lock lk(mtx_);
         if (!threads_.empty() || (state_.load() == running))

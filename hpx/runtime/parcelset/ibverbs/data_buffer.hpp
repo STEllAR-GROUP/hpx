@@ -9,6 +9,7 @@
 namespace hpx { namespace parcelset { namespace ibverbs
 {
     struct data_buffer
+        : boost::noncopyable
     {
 
         static const std::size_t mr_buffer_offset = 2 * sizeof(boost::uint64_t);
@@ -31,7 +32,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 return mr_buffer_size_;
             }
             else
@@ -45,7 +46,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 return size_;
             }
             else
@@ -57,7 +58,24 @@ namespace hpx { namespace parcelset { namespace ibverbs
         void reserve(std::size_t size)
         {
             
-            if(size > mr_buffer_size_)
+            if(size < mr_buffer_size_)
+            {
+                BOOST_ASSERT(mr_buffer_);
+                if(zero_copy_ == false)
+                {
+                    if(data_.size() > 0)
+                    {
+                        std::memcpy(
+                            mr_buffer_
+                          , &data_[0]
+                          , data_.size()
+                        );
+                        data_.clear();
+                    }
+                    zero_copy_ = true;
+                }
+            }
+            else
             {
                 data_.reserve(size);
                 if(zero_copy_ == true)
@@ -77,47 +95,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     zero_copy_ = false;
                 }
             }
-            else
-            {
-                BOOST_ASSERT(mr_buffer_);
-                if(zero_copy_ == false)
-                {
-                    if(data_.size() > 0)
-                    {
-                        std::memcpy(
-                            mr_buffer_
-                          , &data_[0]
-                          , data_.size()
-                        );
-                        data_.clear();
-                    }
-                    zero_copy_ = true;
-                }
-            }
         }
 
         void resize(std::size_t size)
         {
-            if(size > mr_buffer_size_)
-            {
-                data_.resize(size);
-                if(zero_copy_ == true)
-                {
-                    BOOST_ASSERT(mr_buffer_);
-                    BOOST_ASSERT(size_ <= mr_buffer_size_);
-                    if(size_ > 0)
-                    {
-                        std::memcpy(
-                            &data_[0]
-                          , mr_buffer_
-                          , size_
-                        );
-                        size_ = 0;
-                    }
-                    zero_copy_ = false;
-                }
-            }
-            else
+            if(size < mr_buffer_size_)
             {
                 BOOST_ASSERT(mr_buffer_);
                 if(zero_copy_ == false)
@@ -134,8 +116,27 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     zero_copy_ = true;
                 }
                 size_ = size;
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
+            }
+            else
+            {
+                data_.resize(size);
+                if(zero_copy_ == true)
+                {
+                    BOOST_ASSERT(mr_buffer_);
+                    BOOST_ASSERT(size_ < mr_buffer_size_);
+                    if(size_ > 0)
+                    {
+                        std::memcpy(
+                            &data_[0]
+                          , mr_buffer_
+                          , size_
+                        );
+                        size_ = 0;
+                    }
+                    zero_copy_ = false;
+                }
             }
         }
 
@@ -144,7 +145,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return mr_buffer_;
             }
@@ -159,7 +160,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return mr_buffer_;
             }
@@ -176,7 +177,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 BOOST_ASSERT(mr_buffer_);
                 BOOST_ASSERT(idx < mr_buffer_size_);
                 BOOST_ASSERT(idx < size_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return *(mr_buffer_ + idx);
             }
@@ -193,7 +194,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 BOOST_ASSERT(mr_buffer_);
                 BOOST_ASSERT(idx < mr_buffer_size_);
                 BOOST_ASSERT(idx < size_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return *(mr_buffer_ + idx);
             }
@@ -208,7 +209,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return mr_buffer_;
             }
@@ -223,7 +224,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return mr_buffer_;
             }
@@ -238,7 +239,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return mr_buffer_ + size_;
             }
@@ -253,7 +254,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             if(zero_copy_)
             {
                 BOOST_ASSERT(mr_buffer_);
-                BOOST_ASSERT(size_ <= mr_buffer_size_);
+                BOOST_ASSERT(size_ < mr_buffer_size_);
                 BOOST_ASSERT(size_ > 0);
                 return mr_buffer_ + size_;
             }

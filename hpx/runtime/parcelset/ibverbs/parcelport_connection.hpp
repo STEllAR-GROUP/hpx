@@ -93,19 +93,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
 
-            if(out_buffer_.size() > sync_threshold_)
-            {
-                context_.async_write(boost::ref(out_buffer_),//buffers,
-                    boost::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error, ::_2,
-                        boost::make_tuple(handler, parcel_postprocess)));
-            }
-            else
-            {
-                boost::system::error_code ec;
-                std::size_t size = context_.write(out_buffer_, ec);
-                handle_write(ec, size, boost::make_tuple(handler, parcel_postprocess));
-            }
+            context_.async_write(out_buffer_,//buffers,
+                boost::bind(f, shared_from_this(),
+                    boost::asio::placeholders::error, ::_2,
+                    boost::make_tuple(handler, parcel_postprocess)));
         }
 
         naming::locality const& destination() const
@@ -119,8 +110,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
-            // just call initial handler
-            boost::get<0>(handler)(e, bytes);
 
             // complete data point and push back onto gatherer
             send_data_.time_ = timer_.elapsed_nanoseconds() - send_data_.time_;
@@ -132,23 +121,18 @@ namespace hpx { namespace parcelset { namespace ibverbs
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
 
-            if(out_buffer_.size() > sync_threshold_)
-            {
-                context_.async_read_ack(boost::bind(f, shared_from_this(), 
-                    boost::asio::placeholders::error, handler));
-            }
-            else
-            {
-                boost::system::error_code ec;
-                context_.read_ack(ec);
-                handle_read_ack(ec, handler);
-            }
+            context_.async_read_ack(boost::bind(f, shared_from_this(), 
+                boost::asio::placeholders::error, handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
         void handle_read_ack(boost::system::error_code const& e,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
+            
+            // just call initial handler
+            boost::get<0>(handler)(e, out_buffer_.size());
+
             out_buffer_.clear();
 
             send_data_.bytes_ = 0;
