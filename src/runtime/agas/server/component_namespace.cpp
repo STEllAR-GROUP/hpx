@@ -108,17 +108,26 @@ response component_namespace::service(
         case component_ns_statistics_counter:
             return statistics_counter(req, ec);
 
-        case primary_ns_allocate:
+        case locality_ns_allocate:
+        case locality_ns_free:
+        case locality_ns_localities:
+        case locality_ns_num_localities:
+        case locality_ns_num_threads:
+        case locality_ns_resolve_locality:
+        case locality_ns_resolved_localities:
+        {
+            LAGAS_(warning) <<
+                "component_namespace::service, redirecting request to "
+                "locality_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        case primary_ns_route:
         case primary_ns_bind_gid:
         case primary_ns_resolve_gid:
-        case primary_ns_free:
         case primary_ns_unbind_gid:
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
-        case primary_ns_localities:
-        case primary_ns_num_localities:
-        case primary_ns_num_threads:
-        case primary_ns_resolved_localities:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

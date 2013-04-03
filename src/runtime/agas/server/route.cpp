@@ -15,6 +15,14 @@
 namespace hpx { namespace agas { namespace server
 {
 
+response primary_namespace::route(
+    request const& req
+  , error_code& ec
+    )
+{
+    return response();
+}
+
 bool primary_namespace::route(
     parcelset::parcel const& p
   , error_code& ec

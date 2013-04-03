@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -64,49 +64,49 @@ struct HPX_EXPORT symbol_namespace :
     // data structure holding all counters for the omponent_namespace component
     struct counter_data :  boost::noncopyable
     {
-      typedef lcos::local::spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
-      struct api_counter_data
-      {
+        struct api_counter_data
+        {
         api_counter_data()
-          : count_(0)
-          , time_(0)
+            : count_(0)
+            , time_(0)
         {}
 
         boost::int64_t count_;
         boost::int64_t time_;
-      };
+        };
 
-      counter_data()
-      {}
+        counter_data()
+        {}
 
     public:
-      // access current counter values
-      boost::int64_t get_bind_count(bool);
-      boost::int64_t get_resolve_count(bool);
-      boost::int64_t get_unbind_count(bool);
-      boost::int64_t get_iterate_names_count(bool);
+        // access current counter values
+        boost::int64_t get_bind_count(bool);
+        boost::int64_t get_resolve_count(bool);
+        boost::int64_t get_unbind_count(bool);
+        boost::int64_t get_iterate_names_count(bool);
 
-      boost::int64_t get_bind_time(bool);
-      boost::int64_t get_resolve_time(bool);
-      boost::int64_t get_unbind_time(bool);
-      boost::int64_t get_iterate_names_time(bool);
+        boost::int64_t get_bind_time(bool);
+        boost::int64_t get_resolve_time(bool);
+        boost::int64_t get_unbind_time(bool);
+        boost::int64_t get_iterate_names_time(bool);
 
-      // increment counter values
-      void increment_bind_count();
-      void increment_resolve_count();
-      void increment_unbind_count();
-      void increment_iterate_names_count();
+        // increment counter values
+        void increment_bind_count();
+        void increment_resolve_count();
+        void increment_unbind_count();
+        void increment_iterate_names_count();
 
     private:
-      friend struct update_time_on_exit;
-      friend struct symbol_namespace;
+        friend struct update_time_on_exit;
+        friend struct symbol_namespace;
 
-      mutable mutex_type mtx_;
-      api_counter_data bind_;               // symbol_ns_bind
-      api_counter_data resolve_;            // symbol_ns_resolve
-      api_counter_data unbind_;             // symbol_ns_unbind
-      api_counter_data iterate_names_;      // symbol_ns_iterate_names
+        mutable mutex_type mtx_;
+        api_counter_data bind_;               // symbol_ns_bind
+        api_counter_data resolve_;            // symbol_ns_resolve
+        api_counter_data unbind_;             // symbol_ns_unbind
+        api_counter_data iterate_names_;      // symbol_ns_iterate_names
     };
     counter_data counter_data_;
 

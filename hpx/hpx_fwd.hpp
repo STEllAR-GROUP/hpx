@@ -478,14 +478,17 @@ namespace hpx
             // An LCO representing a value which may not have been computed yet.
             component_promise = ((6 << 16) | component_base_lco_with_value),
 
+            // AGAS locality services.
+            component_agas_locality_namespace = 7,
+
             // AGAS primary address resolution services.
-            component_agas_primary_namespace = 7,
+            component_agas_primary_namespace = 8,
 
             // AGAS global type system.
-            component_agas_component_namespace = 8,
+            component_agas_component_namespace = 9,
 
             // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 9,
+            component_agas_symbol_namespace = 10,
 
             component_last,
             component_first_dynamic = component_last,

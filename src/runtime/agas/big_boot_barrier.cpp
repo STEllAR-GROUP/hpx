@@ -148,6 +148,7 @@ struct notification_header
       , naming::gid_type const& response_upper_gid_
       , naming::gid_type const& parcelport_lower_gid_
       , naming::gid_type const& parcelport_upper_gid_
+      , naming::address const& locality_ns_address_
       , naming::address const& primary_ns_address_
       , naming::address const& component_ns_address_
       , naming::address const& symbol_ns_address_
@@ -159,6 +160,7 @@ struct notification_header
       , response_upper_gid(response_upper_gid_)
       , parcelport_lower_gid(parcelport_lower_gid_)
       , parcelport_upper_gid(parcelport_upper_gid_)
+      , locality_ns_address(locality_ns_address_)
       , primary_ns_address(primary_ns_address_)
       , component_ns_address(component_ns_address_)
       , symbol_ns_address(symbol_ns_address_)
@@ -171,6 +173,7 @@ struct notification_header
     naming::gid_type response_upper_gid;
     naming::gid_type parcelport_lower_gid;
     naming::gid_type parcelport_upper_gid;
+    naming::address locality_ns_address;
     naming::address primary_ns_address;
     naming::address component_ns_address;
     naming::address symbol_ns_address;
@@ -185,6 +188,7 @@ struct notification_header
         ar & response_upper_gid;
         ar & parcelport_lower_gid;
         ar & parcelport_upper_gid;
+        ar & locality_ns_address;
         ar & primary_ns_address;
         ar & component_ns_address;
         ar & symbol_ns_address;
@@ -305,22 +309,25 @@ void register_console(registration_header const& header)
 
     agas::register_name("/locality(console)", prefix);
 
+    naming::address locality_addr(get_runtime().here(),
+        server::locality_namespace::get_component_type(),
+            static_cast<void*>(&agas_client.bootstrap->locality_ns_server_));
     naming::address primary_addr(get_runtime().here(),
         server::primary_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
+            static_cast<void*>(&agas_client.bootstrap->primary_ns_server_));
     naming::address component_addr(get_runtime().here(),
         server::component_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->component_ns_server));
+            static_cast<void*>(&agas_client.bootstrap->component_ns_server_));
     naming::address symbol_addr(get_runtime().here(),
         server::symbol_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
+            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
     actions::base_action* p =
         new actions::transfer_action<notify_console_action>(
             notification_header(
                 prefix, header.response_heap_address, header.response_heap_ptr,
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
-                primary_addr, component_addr, symbol_addr));
+                locality_addr, primary_addr, component_addr, symbol_addr));
 
     HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
         (boost::bind(&big_boot_barrier::apply
@@ -356,12 +363,13 @@ void notify_console(notification_header const& header)
     }
 
     // set our prefix
-    agas_client.local_locality(header.prefix);
+    agas_client.set_local_locality(header.prefix);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local router
+    agas_client.locality_ns_addr_ = header.locality_ns_address;
     agas_client.primary_ns_addr_ = header.primary_ns_address;
     agas_client.component_ns_addr_ = header.component_ns_address;
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
@@ -388,16 +396,22 @@ void notify_console(notification_header const& header)
     response_heap_type::get_heap().add_heap(p);
 
     // set up the future pools
-    naming::resolver_client::promise_pool_type& promise_pool
-        = agas_client.hosted->promise_pool_;
+    naming::resolver_client::locality_promise_pool_type& locality_promise_pool
+        = agas_client.hosted->locality_promise_pool_;
+    naming::resolver_client::primary_promise_pool_type& primary_promise_pool
+        = agas_client.hosted->primary_promise_pool_;
 
     util::runtime_configuration const& ini_ = get_runtime().get_config();
 
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
-        promise_pool.enqueue(
+    {
+        locality_promise_pool.enqueue(
+            new lcos::packaged_action<server::locality_namespace::service_action>);
+        primary_promise_pool.enqueue(
             new lcos::packaged_action<server::primary_namespace::service_action>);
+    }
 }
 
 // remote call to AGAS
@@ -466,22 +480,25 @@ void register_worker(registration_header const& header)
                          , header.response_heap_address
                          , header.response_heap_offset);
 
+    naming::address locality_addr(get_runtime().here(),
+        server::locality_namespace::get_component_type(),
+            static_cast<void*>(&agas_client.bootstrap->locality_ns_server_));
     naming::address primary_addr(get_runtime().here(),
         server::primary_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->primary_ns_server));
+            static_cast<void*>(&agas_client.bootstrap->primary_ns_server_));
     naming::address component_addr(get_runtime().here(),
         server::component_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->component_ns_server));
+            static_cast<void*>(&agas_client.bootstrap->component_ns_server_));
     naming::address symbol_addr(get_runtime().here(),
         server::symbol_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server));
+            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
     actions::base_action* p =
         new actions::transfer_action<notify_console_action>(
             notification_header(
                 prefix, header.response_heap_address, header.response_heap_ptr,
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
-                primary_addr, component_addr, symbol_addr));
+                locality_addr, primary_addr, component_addr, symbol_addr));
 
     // FIXME: This could screw with startup.
 
@@ -520,12 +537,13 @@ void notify_worker(notification_header const& header)
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
     // set our prefix
-    agas_client.local_locality(header.prefix);
+    agas_client.set_local_locality(header.prefix);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
+    agas_client.locality_ns_addr_ = header.locality_ns_address;
     agas_client.primary_ns_addr_ = header.primary_ns_address;
     agas_client.component_ns_addr_ = header.component_ns_address;
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
@@ -552,16 +570,22 @@ void notify_worker(notification_header const& header)
     response_heap_type::get_heap().add_heap(p);
 
     // set up the future pools
-    naming::resolver_client::promise_pool_type& promise_pool
-        = agas_client.hosted->promise_pool_;
+    naming::resolver_client::locality_promise_pool_type& locality_promise_pool
+        = agas_client.hosted->locality_promise_pool_;
+    naming::resolver_client::primary_promise_pool_type& primary_promise_pool
+        = agas_client.hosted->primary_promise_pool_;
 
     util::runtime_configuration const& ini_ = get_runtime().get_config();
 
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
-        promise_pool.enqueue(
+    {
+        locality_promise_pool.enqueue(
+            new lcos::packaged_action<server::locality_namespace::service_action>);
+        primary_promise_pool.enqueue(
             new lcos::packaged_action<server::primary_namespace::service_action>);
+    }
 }
 // }}}
 

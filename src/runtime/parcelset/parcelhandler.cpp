@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset
 
         // AGAS v2 registers itself in the client before the parcelhandler
         // is booted.
-        locality_ = resolver_.local_locality();
+        locality_ = resolver_.get_local_locality();
 
         parcels_->set_parcelhandler(this);
 

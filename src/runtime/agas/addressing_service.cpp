@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -76,54 +76,66 @@ void addressing_service::launch_bootstrap(
     const naming::gid_type here
         = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
+    const naming::gid_type locality_gid = bootstrap_locality_namespace_gid();
     const naming::gid_type primary_gid = bootstrap_primary_namespace_gid();
     const naming::gid_type component_gid = bootstrap_component_namespace_gid();
     const naming::gid_type symbol_gid = bootstrap_symbol_namespace_gid();
 
+    gva locality_gva(ep,
+        server::locality_namespace::get_component_type(), 1U,
+            static_cast<void*>(&bootstrap->locality_ns_server_));
     gva primary_gva(ep,
         server::primary_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->primary_ns_server));
+            static_cast<void*>(&bootstrap->primary_ns_server_));
     gva component_gva(ep,
         server::component_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->component_ns_server));
+            static_cast<void*>(&bootstrap->component_ns_server_));
     gva symbol_gva(ep,
         server::symbol_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->symbol_ns_server));
+            static_cast<void*>(&bootstrap->symbol_ns_server_));
 
+    locality_ns_addr_ = naming::address(ep,
+        server::locality_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->locality_ns_server_));
     primary_ns_addr_ = naming::address(ep,
         server::primary_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->primary_ns_server));
+            static_cast<void*>(&bootstrap->primary_ns_server_));
     component_ns_addr_ = naming::address(ep,
         server::component_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->component_ns_server));
+            static_cast<void*>(&bootstrap->component_ns_server_));
     symbol_ns_addr_ = naming::address(ep,
         server::symbol_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->symbol_ns_server));
+            static_cast<void*>(&bootstrap->symbol_ns_server_));
 
-    local_locality(here);
+    set_local_locality(here);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
         ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
+
+    request locality_req(locality_ns_allocate, ep, 4, num_threads);
+    bootstrap->locality_ns_server_.remote_service(locality_req);
+
     request reqs[] =
     {
-        request(primary_ns_allocate, ep, 3, num_threads)
+        request(primary_ns_bind_gid, locality_gid, locality_gva)
       , request(primary_ns_bind_gid, primary_gid, primary_gva)
       , request(primary_ns_bind_gid, component_gid, component_gva)
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
-        bootstrap->primary_ns_server.remote_service(reqs[i]);
+        bootstrap->primary_ns_server_.remote_service(reqs[i]);
 
-    bootstrap->symbol_ns_server.remote_service(
+    bootstrap->symbol_ns_server_.remote_service(
         request(symbol_ns_bind, "/locality(agas#0)", here));
 
-    if (runtime_type == runtime_mode_console)
-        bootstrap->symbol_ns_server.remote_service(
+    if (is_console()) {
+        bootstrap->symbol_ns_server_.remote_service(
             request(symbol_ns_bind, "/locality(console)", here));
+    }
 
     naming::gid_type lower, upper;
     get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
@@ -166,25 +178,22 @@ response addressing_service::service(
     if (req.get_action_code() & primary_ns_service)
     {
         if (is_bootstrap())
-            return bootstrap->primary_ns_server.service(req, ec);
-        else
-            return hosted->primary_ns_.service(req, action_priority_, ec);
+            return bootstrap->primary_ns_server_.service(req, ec);
+        return hosted->primary_ns_.service(req, action_priority_, ec);
     }
 
     else if (req.get_action_code() & component_ns_service)
     {
         if (is_bootstrap())
-            return bootstrap->component_ns_server.service(req, ec);
-        else
-            return hosted->component_ns_.service(req, action_priority_, ec);
+            return bootstrap->component_ns_server_.service(req, ec);
+        return hosted->component_ns_.service(req, action_priority_, ec);
     }
 
     else if (req.get_action_code() & symbol_ns_service)
     {
         if (is_bootstrap())
-            return bootstrap->symbol_ns_server.service(req, ec);
-        else
-            return hosted->symbol_ns_.service(req, action_priority_, ec);
+            return bootstrap->symbol_ns_server_.service(req, ec);
+        return hosted->symbol_ns_.service(req, action_priority_, ec);
     }
 
     HPX_THROWS_IF(ec, bad_action_code
@@ -203,9 +212,9 @@ std::vector<response> addressing_service::bulk_service(
     // route the requests to other namespaces (and the other namespaces would
     // also route requests intended for the primary namespace).
     if (is_bootstrap())
-        return bootstrap->primary_ns_server.bulk_service(req, ec);
-    else
-        return hosted->primary_ns_.bulk_service(req, action_priority_, ec);
+        return bootstrap->primary_ns_server_.bulk_service(req, ec);
+
+    return hosted->primary_ns_.bulk_service(req, action_priority_, ec);
 } // }}}
 
 bool addressing_service::register_locality(
@@ -216,13 +225,13 @@ bool addressing_service::register_locality(
     )
 { // {{{
     try {
-        request req(primary_ns_allocate, ep, 0, num_threads);
+        request req(locality_ns_allocate, ep, 0, num_threads);
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->locality_ns_server_.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+            rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -243,13 +252,13 @@ boost::uint32_t addressing_service::resolve_locality(
     )
 { // {{{
     try {
-        request req(primary_ns_resolve_locality, ep);
+        request req(locality_ns_resolve_locality, ep);
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->locality_ns_server_.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+            rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return 0;
@@ -270,13 +279,13 @@ bool addressing_service::unregister_locality(
     )
 { // {{{
     try {
-        request req(primary_ns_free, ep);
+        request req(locality_ns_free, ep);
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->locality_ns_server_.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+            rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -304,7 +313,7 @@ bool addressing_service::get_console_locality(
 
         if (is_console())
         {
-            prefix = local_locality();
+            prefix = get_local_locality();
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -324,7 +333,7 @@ bool addressing_service::get_console_locality(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
@@ -363,7 +372,7 @@ bool addressing_service::get_localities(
             response rep;
 
             if (is_bootstrap())
-                rep = bootstrap->component_ns_server.service(req, ec);
+                rep = bootstrap->component_ns_server_.service(req, ec);
             else
                 rep = hosted->component_ns_.service(req, action_priority_, ec);
 
@@ -384,13 +393,13 @@ bool addressing_service::get_localities(
 
         else
         {
-            request req(primary_ns_localities);
+            request req(locality_ns_localities);
             response rep;
 
             if (is_bootstrap())
-                rep = bootstrap->primary_ns_server.service(req, ec);
+                rep = bootstrap->locality_ns_server_.service(req, ec);
             else
-                rep = hosted->primary_ns_.service(req, action_priority_, ec);
+                rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -415,10 +424,10 @@ bool addressing_service::get_localities(
 
 lcos::future<std::vector<naming::locality> >
     addressing_service::get_resolved_localities_async()
-{ // {{{ get_locality_ids implementation
-    naming::id_type const target = bootstrap_primary_namespace_id();
-    request req(primary_ns_resolved_localities);
-    return stubs::primary_namespace::service_async<
+{ // {{{ get_resolved_localities_async implementation
+    naming::id_type const target = bootstrap_locality_namespace_id();
+    request req(locality_ns_resolved_localities);
+    return stubs::locality_namespace::service_async<
         std::vector<naming::locality> >(target, req);
 } //}}}
 
@@ -431,13 +440,13 @@ boost::uint32_t addressing_service::get_num_localities(
     try {
         if (type == components::component_invalid)
         {
-            request req(primary_ns_num_localities, type);
+            request req(locality_ns_num_localities, type);
             response rep;
 
             if (is_bootstrap())
-                rep = bootstrap->primary_ns_server.service(req, ec);
+                rep = bootstrap->locality_ns_server_.service(req, ec);
             else
-                rep = hosted->primary_ns_.service(req, action_priority_, ec);
+                rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return boost::uint32_t(-1);
@@ -449,7 +458,7 @@ boost::uint32_t addressing_service::get_num_localities(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->component_ns_server.service(req, ec);
+            rep = bootstrap->component_ns_server_.service(req, ec);
         else
             rep = hosted->component_ns_.service(req, action_priority_, ec);
 
@@ -470,9 +479,9 @@ lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
 { // {{{ get_num_localities implementation
     if (type == components::component_invalid)
     {
-        naming::id_type const target = bootstrap_primary_namespace_id();
-        request req(primary_ns_num_localities, type);
-        return stubs::primary_namespace::service_async<boost::uint32_t>(target, req);
+        naming::id_type const target = bootstrap_locality_namespace_id();
+        request req(locality_ns_num_localities, type);
+        return stubs::locality_namespace::service_async<boost::uint32_t>(target, req);
     }
 
     naming::id_type const target = bootstrap_component_namespace_id();
@@ -486,13 +495,13 @@ boost::uint32_t addressing_service::get_num_overall_threads(
     )
 { // {{{ get_num_overall_threads implementation
     try {
-        request req(primary_ns_num_threads);
+        request req(locality_ns_num_threads);
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->locality_ns_server_.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+            rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return boost::uint32_t(-1);
@@ -507,9 +516,9 @@ boost::uint32_t addressing_service::get_num_overall_threads(
 
 lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
 { // {{{
-    naming::id_type const target = bootstrap_primary_namespace_id();
-    request req(primary_ns_num_threads);
-    return stubs::primary_namespace::service_async<boost::uint32_t>(target, req);
+    naming::id_type const target = bootstrap_locality_namespace_id();
+    request req(locality_ns_num_threads);
+    return stubs::locality_namespace::service_async<boost::uint32_t>(target, req);
 } // }}}
 
 std::vector<boost::uint32_t> addressing_service::get_num_threads(
@@ -517,13 +526,13 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
     )
 { // {{{ get_num_threads implementation
     try {
-        request req(primary_ns_num_threads);
+        request req(locality_ns_num_threads);
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->locality_ns_server_.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+            rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return std::vector<boost::uint32_t>();
@@ -538,9 +547,9 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
 
 lcos::future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
 { // {{{
-    naming::id_type const target = bootstrap_primary_namespace_id();
-    request req(primary_ns_num_threads);
-    return stubs::primary_namespace::service_async<
+    naming::id_type const target = bootstrap_locality_namespace_id();
+    request req(locality_ns_num_threads);
+    return stubs::locality_namespace::service_async<
         std::vector<boost::uint32_t> >(target, req);
 } // }}}
 
@@ -555,7 +564,7 @@ components::component_type addressing_service::get_component_id(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->component_ns_server.service(req, ec);
+            rep = bootstrap->component_ns_server_.service(req, ec);
         else
             rep = hosted->component_ns_.service(req, action_priority_, ec);
 
@@ -579,7 +588,7 @@ void addressing_service::iterate_types(
         request req(component_ns_iterate_types, f);
 
         if (is_bootstrap())
-            bootstrap->component_ns_server.service(req, ec);
+            bootstrap->component_ns_server_.service(req, ec);
         else
             hosted->component_ns_.service(req, action_priority_, ec);
     }
@@ -598,7 +607,7 @@ std::string addressing_service::get_component_type_name(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->component_ns_server.service(req, ec);
+            rep = bootstrap->component_ns_server_.service(req, ec);
         else
             rep = hosted->component_ns_.service(req, action_priority_, ec);
 
@@ -621,7 +630,7 @@ components::component_type addressing_service::register_factory(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->component_ns_server.service(req, ec);
+            rep = bootstrap->component_ns_server_.service(req, ec);
         else
             rep = hosted->component_ns_.service(req, action_priority_, ec);
 
@@ -642,9 +651,8 @@ bool addressing_service::route_parcel(
     )
 {
     if (is_bootstrap())
-        return bootstrap->primary_ns_server.route(p, ec);
-    else
-        return hosted->primary_ns_.route(p, action_priority_, ec);
+        return bootstrap->primary_ns_server_.route(p, ec);
+    return hosted->primary_ns_.route(p, action_priority_, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -701,17 +709,17 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::packaged_action<server::primary_namespace::service_action>
+    typedef lcos::packaged_action<server::locality_namespace::service_action>
         future_type;
 
     future_type* f = 0;
 
     try {
-        request req(primary_ns_allocate, ep, count, boost::uint32_t(-1));
+        request req(locality_ns_allocate, ep, count, boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->locality_ns_server_.service(req, ec);
 
         else
         {
@@ -723,11 +731,11 @@ bool addressing_service::get_id_range(
 
             // get a future
             typedef checkout_promise<
-                promise_pool_type
+                locality_promise_pool_type
               , future_type
             > checkout_promise_type;
 
-            checkout_promise_type cf(hosted->promise_pool_, f);
+            checkout_promise_type cf(hosted->locality_promise_pool_, f);
             if (0 == f) {
                 HPX_THROWS_IF(ec, invalid_status,
                     "addressing_service::get_id_range",
@@ -736,7 +744,7 @@ bool addressing_service::get_id_range(
             }
 
             // execute the action (synchronously)
-            f->apply(bootstrap_primary_namespace_id(), req);
+            f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
 
             cf.set_ok();
@@ -762,7 +770,7 @@ bool addressing_service::get_id_range(
         // future for the pool, and let the old future stay in memory.
         if (!is_bootstrap() && f)
         {
-            hosted->promise_pool_.enqueue(new future_type);
+            hosted->locality_promise_pool_.enqueue(new future_type);
             f->set_exception(boost::current_exception());
         }
 
@@ -795,7 +803,7 @@ bool addressing_service::bind_range(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->primary_ns_server_.service(req, ec);
 
         else
         {
@@ -807,11 +815,11 @@ bool addressing_service::bind_range(
 
             // get a future
             typedef checkout_promise<
-                promise_pool_type
+                primary_promise_pool_type
               , future_type
             > checkout_promise_type;
 
-            checkout_promise_type cf(hosted->promise_pool_, f);
+            checkout_promise_type cf(hosted->primary_promise_pool_, f);
             if (0 == f) {
                 HPX_THROWS_IF(ec, invalid_status,
                     "addressing_service::bind_range",
@@ -855,7 +863,7 @@ bool addressing_service::bind_range(
         // explanation.
         if (!is_bootstrap() && f)
         {
-            hosted->promise_pool_.enqueue(new future_type);
+            hosted->primary_promise_pool_.enqueue(new future_type);
             f->set_exception(boost::current_exception());
         }
 
@@ -876,7 +884,7 @@ bool addressing_service::unbind_range(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->primary_ns_server_.service(req, ec);
         else
             rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
@@ -885,7 +893,7 @@ bool addressing_service::unbind_range(
 
         // I'm afraid that this will break the first form of paged caching,
         // so it's commented out for now.
-        //mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
+        //cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
         //gva_erase_policy ep(lower_id, count);
         //hosted->gva_cache_.erase(ep);
 
@@ -1008,7 +1016,7 @@ bool addressing_service::is_local_lva_encoded_address(
 {
     // NOTE: This should still be migration safe.
     return naming::detail::strip_credit_from_gid(id.get_msb())
-        == local_locality().get_msb();
+        == get_local_locality().get_msb();
 }
 
 bool addressing_service::resolve_locally_known_addresses(
@@ -1025,6 +1033,7 @@ bool addressing_service::resolve_locally_known_addresses(
         // An LSB of 0 references the runtime support component
         if (!rts_lva_)
             rts_lva_ = get_runtime().get_runtime_support_lva();
+
         if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
         {
             addr.type_ = components::component_runtime_support;
@@ -1044,6 +1053,14 @@ bool addressing_service::resolve_locally_known_addresses(
     }
 
     // authoritative AGAS component address resolution
+    else if (id == bootstrap_locality_namespace_gid())
+    {
+        addr = locality_ns_addr_;
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+
     else if (id == bootstrap_primary_namespace_gid())
     {
         addr = primary_ns_addr_;
@@ -1091,7 +1108,7 @@ bool addressing_service::resolve_full(
 
         {
             if (is_bootstrap())
-                rep = bootstrap->primary_ns_server.service(req, ec);
+                rep = bootstrap->primary_ns_server_.service(req, ec);
             else
                 rep = hosted->primary_ns_.service(req, action_priority_, ec);
         }
@@ -1153,7 +1170,7 @@ bool addressing_service::resolve_cached(
 
     // first look up the requested item in the cache
     gva_cache_key k(id);
-    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     gva_cache_key idbase;
     gva_cache_type::entry_type e;
 
@@ -1242,7 +1259,7 @@ bool addressing_service::resolve_full(
 
         std::vector<response> reps;
         if (is_bootstrap())
-            reps = bootstrap->primary_ns_server.bulk_service(reqs, ec);
+            reps = bootstrap->primary_ns_server_.bulk_service(reqs, ec);
         else
             reps = hosted->primary_ns_.bulk_service(reqs, action_priority_, ec);
 
@@ -1353,7 +1370,7 @@ void addressing_service::incref(
 
         // REVIEW: Should we do fire-and-forget here as well?
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
+            rep = bootstrap->primary_ns_server_.service(req, ec);
         else
             rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
@@ -1408,7 +1425,7 @@ bool addressing_service::register_name(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
@@ -1481,7 +1498,7 @@ bool addressing_service::unregister_name(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
@@ -1520,7 +1537,7 @@ bool addressing_service::resolve_name(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
@@ -1559,7 +1576,7 @@ bool addressing_service::iterate_ids(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
@@ -1592,7 +1609,7 @@ void addressing_service::insert_cache_entry(
             ( boost::format("inserting entry into cache, gid(%1%), count(%2%)")
             % gid % count);
 
-        mutex_type::scoped_lock lock(gva_cache_mtx_);
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
         const gva_cache_key key(gid, count);
 
@@ -1655,7 +1672,7 @@ void addressing_service::update_cache_entry(
                 "GID), gid(%1%), count(%2%)"
             ) % gid % count);
 
-        mutex_type::scoped_lock lock(gva_cache_mtx_);
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
         const gva_cache_key key(gid, count);
 
@@ -1699,7 +1716,7 @@ void addressing_service::clear_cache(
     try {
         LAS_(warning) << "clearing cache";
 
-        mutex_type::scoped_lock lock(gva_cache_mtx_);
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
         gva_cache_.clear();
 
@@ -1737,6 +1754,15 @@ namespace detail
         {
             if (p.countername_ == component_namespace_services[i].name_)
                 return component_namespace_services[i].code_;
+        }
+
+        // locality_ns
+        for (std::size_t i = 0;
+             i < num_locality_namespace_services;
+             ++i)
+        {
+            if (p.countername_ == locality_namespace_services[i].name_)
+                return locality_namespace_services[i].code_;
         }
 
         // primary_ns
@@ -1788,6 +1814,15 @@ namespace detail
                 return component_namespace_services[i].service_code_;
         }
 
+        // locality_ns
+        for (std::size_t i = 0;
+             i < num_locality_namespace_services;
+             ++i)
+        {
+            if (p.countername_ == locality_namespace_services[i].name_)
+                return locality_namespace_services[i].service_code_;
+        }
+
         // primary_ns
         for (std::size_t i = 0;
              i < num_primary_namespace_services;
@@ -1829,7 +1864,7 @@ bool addressing_service::retrieve_statistics_counter(
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server.service(req, ec);
+            rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
             rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
@@ -1850,25 +1885,25 @@ bool addressing_service::retrieve_statistics_counter(
 // Helper functions to access the current cache statistics
 std::size_t addressing_service::get_cache_hits(bool reset)
 {
-    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_.get_statistics().hits(reset);
 }
 
 std::size_t addressing_service::get_cache_misses(bool reset)
 {
-    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_.get_statistics().misses(reset);
 }
 
 std::size_t addressing_service::get_cache_evictions(bool reset)
 {
-    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_.get_statistics().evictions(reset);
 }
 
 std::size_t addressing_service::get_cache_insertions(bool reset)
 {
-    mutex_type::scoped_lock lock(gva_cache_mtx_);
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_.get_statistics().insertions(reset);
 }
 
@@ -1923,14 +1958,21 @@ void addressing_service::register_counter_types()
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-    // now install counters for services
-    server::primary_namespace::register_counter_types();
-    server::component_namespace::register_counter_types();
-    server::symbol_namespace::register_counter_types();
-
     if (is_bootstrap()) {
-        // always register as 'root' server, for now
-        bootstrap->register_server_instance("root");
+        // install counters for services
+        bootstrap->register_counter_types();
+
+        // always register root server as 'locality#0'
+        bootstrap->register_server_instance("locality#0");
+    }
+    else {
+        // install counters for services
+        hosted->register_counter_types();
+
+        boost::uint32_t locality_id =
+            naming::get_locality_id_from_gid(get_local_locality());
+        std::string str("locality#" + boost::lexical_cast<std::string>(locality_id));
+        hosted->register_server_instance(str.c_str());
     }
 } // }}}
 
@@ -2004,8 +2046,10 @@ void addressing_service::send_refcnt_requests_non_blocking(
         }
 
         else
+        {
             hosted->primary_ns_.bulk_service_non_blocking
                 (requests, action_priority_);
+        }
 
         if (&ec != &throws)
             ec = make_success_code();

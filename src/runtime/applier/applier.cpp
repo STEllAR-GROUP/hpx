@@ -252,7 +252,7 @@ namespace hpx { namespace applier
 
     naming::gid_type const& applier::get_raw_locality(error_code& ec) const
     {
-        return hpx::naming::get_agas_client().local_locality(ec);
+        return hpx::naming::get_agas_client().get_local_locality(ec);
     }
 
     boost::uint32_t applier::get_locality_id(error_code& ec) const

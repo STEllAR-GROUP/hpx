@@ -21,9 +21,11 @@ system and application performance.
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
             `change_credit_non_blocking`, `change_credit_sync`, `free`,
-            `iterate_names`, `iterate_types`, `localities`, `resolve`,
-            `resolve_gid`, `resolve_id`, `resolve_locality`, `unbind`,
-            `unbind_gid`, `unbind_name`.
+            `get_component_typename`,
+            `iterate_names`, `iterate_types`, `localities`, 
+            `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
+            `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`, 
+            `route`, `unbind`, `unbind_gid`, `unbind_name`.
         ]
         [`<agas_instance>/total`
 
@@ -40,9 +42,11 @@ system and application performance.
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
             `change_credit_non_blocking`, `change_credit_sync`, `free`,
-            `iterate_names`, `iterate_types`, `localities`, `resolve`,
-            `resolve_gid`, `resolve_id`, `resolve_locality`, `unbind`,
-            `unbind_gid`, `unbind_name`.
+            `get_component_typename`,
+            `iterate_names`, `iterate_types`, `localities`, 
+            `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
+            `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`, 
+            `route`, `unbind`, `unbind_gid`, `unbind_name`.
         ]
         [`<agas_instance>/total`
 

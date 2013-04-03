@@ -16,6 +16,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
@@ -51,6 +52,9 @@ namespace hpx { namespace parcelset
             {
                 gids_[0] = apply_to;
                 addrs_[0] = addrs;
+
+                BOOST_ASSERT(components::types_are_compatible(
+                    act->get_component_type(), addrs.type_));
             }
 
             parcel_data(std::vector<naming::gid_type> const& apply_to,
@@ -69,6 +73,14 @@ namespace hpx { namespace parcelset
                     {
                         BOOST_ASSERT(dest == addrs[i].locality_);
                     }
+
+                    // all destination component types are properly matched
+                    int comptype = act->get_component_type();
+                    for (std::size_t i = 0; i < addrs.size(); ++i)
+                    {
+                        BOOST_ASSERT(components::types_are_compatible(
+                            comptype, addrs[i].type_));
+                    }
                 }
 #endif
             }
@@ -82,6 +94,9 @@ namespace hpx { namespace parcelset
             {
                 gids_[0] = apply_to;
                 addrs_[0] = addrs;
+
+                BOOST_ASSERT(components::types_are_compatible(
+                    act->get_component_type(), addrs.type_));
             }
 
             parcel_data(naming::gid_type const& apply_to,
@@ -93,6 +108,9 @@ namespace hpx { namespace parcelset
             {
                 gids_[0] = apply_to;
                 addrs_[0] = addrs;
+
+                BOOST_ASSERT(components::types_are_compatible(
+                    act->get_component_type(), addrs.type_));
             }
 
             ~parcel_data() {}

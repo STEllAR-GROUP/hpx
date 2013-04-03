@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -102,17 +102,8 @@ struct HPX_EXPORT primary_namespace :
 
     typedef boost::int32_t component_type;
 
-    // stores the locality id, next gid available to this locality, and number
-    // of OS-threads running on this locality
-    typedef boost::fusion::vector3<
-        boost::uint32_t, naming::gid_type, boost::uint32_t>
-    partition_type;
-
     typedef std::map<naming::gid_type, gva>
         gva_table_type;
-
-    typedef std::map<naming::locality, partition_type>
-        partition_table_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
@@ -123,9 +114,7 @@ struct HPX_EXPORT primary_namespace :
     // investigated carefully.
     mutex_type mutex_;
     gva_table_type gvas_;
-    partition_table_type partitions_;
     refcnt_table_type refcnts_;
-    boost::uint32_t prefix_counter_;
     std::string instance_name_;
 
     struct update_time_on_exit;
@@ -133,81 +122,57 @@ struct HPX_EXPORT primary_namespace :
     // data structure holding all counters for the omponent_namespace component
     struct counter_data :  boost::noncopyable
     {
-      typedef lcos::local::spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
-      struct api_counter_data
-      {
+        struct api_counter_data
+        {
         api_counter_data()
-          : count_(0)
-          , time_(0)
+            : count_(0)
+            , time_(0)
         {}
 
         boost::int64_t count_;
         boost::int64_t time_;
-      };
+        };
 
-      counter_data()
-      {}
+        counter_data()
+        {}
 
     public:
-      // access current counter values
-      boost::int64_t get_allocate_count(bool);
-      boost::int64_t get_bind_gid_count(bool);
-      boost::int64_t get_resolve_gid_count(bool);
-      boost::int64_t get_resolve_locality_count(bool);
-      boost::int64_t get_free_count(bool);
-      boost::int64_t get_unbind_gid_count(bool);
-      boost::int64_t get_change_credit_non_blocking_count(bool);
-      boost::int64_t get_change_credit_sync_count(bool);
-      boost::int64_t get_localities_count(bool);
-      boost::int64_t get_num_localities_count(bool);
-      boost::int64_t get_num_threads_count(bool);
-      boost::int64_t get_resolved_localities_count(bool);
+        // access current counter values
+        boost::int64_t get_route_count(bool);
+        boost::int64_t get_bind_gid_count(bool);
+        boost::int64_t get_resolve_gid_count(bool);
+        boost::int64_t get_unbind_gid_count(bool);
+        boost::int64_t get_change_credit_non_blocking_count(bool);
+        boost::int64_t get_change_credit_sync_count(bool);
 
-      boost::int64_t get_allocate_time(bool);
-      boost::int64_t get_bind_gid_time(bool);
-      boost::int64_t get_resolve_gid_time(bool);
-      boost::int64_t get_resolve_locality_time(bool);
-      boost::int64_t get_free_time(bool);
-      boost::int64_t get_unbind_gid_time(bool);
-      boost::int64_t get_change_credit_non_blocking_time(bool);
-      boost::int64_t get_change_credit_sync_time(bool);
-      boost::int64_t get_localities_time(bool);
-      boost::int64_t get_num_localities_time(bool);
-      boost::int64_t get_num_threads_time(bool);
-      boost::int64_t get_resolved_localities_time(bool);
+        boost::int64_t get_route_time(bool);
+        boost::int64_t get_bind_gid_time(bool);
+        boost::int64_t get_resolve_gid_time(bool);
+        boost::int64_t get_unbind_gid_time(bool);
+        boost::int64_t get_change_credit_non_blocking_time(bool);
+        boost::int64_t get_change_credit_sync_time(bool);
 
-      // increment counter values
-      void increment_allocate_count();
-      void increment_bind_gid_count();
-      void increment_resolve_gid_count();
-      void increment_resolve_locality_count();
-      void increment_free_count();
-      void increment_unbind_gid_count();
-      void increment_change_credit_non_blocking_count();
-      void increment_change_credit_sync_count();
-      void increment_localities_count();
-      void increment_num_localities_count();
-      void increment_num_threads_count();
-      void increment_resolved_localities_count();
+        // increment counter values
+        void increment_route_count();
+        void increment_bind_gid_count();
+        void increment_resolve_gid_count();
+        void increment_unbind_gid_count();
+        void increment_change_credit_non_blocking_count();
+        void increment_change_credit_sync_count();
 
     private:
-      friend struct update_time_on_exit;
-      friend struct primary_namespace;
+        friend struct update_time_on_exit;
+        friend struct primary_namespace;
 
-      mutable mutex_type mtx_;
-      api_counter_data allocate_;             // primary_ns_allocate
-      api_counter_data bind_gid_;             // primary_ns_bind_gid
-      api_counter_data resolve_gid_;          // primary_ns_resolve_gid
-      api_counter_data resolve_locality_;     // primary_ns_resolve_locality
-      api_counter_data free_;                 // primary_ns_free
-      api_counter_data unbind_gid_;           // primary_ns_unbind_gid
-      api_counter_data change_credit_non_blocking_;  // primary_ns_change_credit_non_blocking
-      api_counter_data change_credit_sync_;   // primary_ns_change_credit_sync
-      api_counter_data localities_;           // primary_ns_localities
-      api_counter_data num_localities_;       // primary_ns_num_localities
-      api_counter_data num_threads_;          // primary_ns_num_threads
-      api_counter_data resolved_localities_;  // primary_ns_resolved_localities
+        mutable mutex_type mtx_;
+        api_counter_data route_;                // primary_ns_
+        api_counter_data bind_gid_;             // primary_ns_bind_gid
+        api_counter_data resolve_gid_;          // primary_ns_resolve_gid
+        api_counter_data unbind_gid_;           // primary_ns_unbind_gid
+        api_counter_data change_credit_non_blocking_;  // primary_ns_change_credit_non_blocking
+        api_counter_data change_credit_sync_;   // primary_ns_change_credit_sync
     };
     counter_data counter_data_;
 
@@ -231,14 +196,6 @@ struct HPX_EXPORT primary_namespace :
     };
 
   public:
-    primary_namespace()
-      : mutex_()
-      , gvas_()
-      , partitions_()
-      , refcnts_()
-      , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
-    {}
-
     void finalize();
 
     bool remote_route(
@@ -289,7 +246,7 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
-    response allocate(
+    response route(
         request const& req
       , error_code& ec = throws
         );
@@ -300,16 +257,6 @@ struct HPX_EXPORT primary_namespace :
         );
 
     response resolve_gid(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response resolve_locality(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response free(
         request const& req
       , error_code& ec = throws
         );
@@ -325,26 +272,6 @@ struct HPX_EXPORT primary_namespace :
         );
 
     response change_credit_sync(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response localities(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response resolved_localities(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response get_num_localities(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response get_num_threads(
         request const& req
       , error_code& ec = throws
         );
@@ -415,22 +342,15 @@ struct HPX_EXPORT primary_namespace :
         // Actual actions
         namespace_service                       = primary_ns_service
       , namespace_bulk_service                  = primary_ns_bulk_service
-      , namespace_route                         = primary_ns_route
 
         // Pseudo-actions
-      , namespace_allocate                      = primary_ns_allocate
+      , namespace_route                         = primary_ns_route
       , namespace_bind_gid                      = primary_ns_bind_gid
       , namespace_resolve_gid                   = primary_ns_resolve_gid
-      , namespace_resolve_locality              = primary_ns_resolve_locality
-      , namespace_free                          = primary_ns_free
       , namespace_unbind_gid                    = primary_ns_unbind_gid
       , namespace_change_credit_non_blocking    = primary_ns_change_credit_non_blocking
       , namespace_change_credit_sync            = primary_ns_change_credit_sync
-      , namespace_localities                    = primary_ns_localities
-      , namespace_num_localities                = primary_ns_num_localities
-      , namespace_num_threads                   = primary_ns_num_threads
       , namespace_statistics_counter            = primary_ns_statistics_counter
-      , namespace_resolved_localities           = primary_ns_resolved_localities
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);

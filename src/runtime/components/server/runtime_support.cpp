@@ -653,7 +653,7 @@ namespace hpx { namespace components { namespace server
         ini.load_components();
 
         naming::resolver_client& client = get_runtime().get_agas_client();
-        bool result = load_components(ini, client.local_locality(), client);
+        bool result = load_components(ini, client.get_local_locality(), client);
 
         return load_plugins(ini) && result;
     }
