@@ -302,6 +302,14 @@ bool addressing_service::unregister_locality(
         if (ec || (success != rep.get_status()))
             return false;
 
+        if (is_bootstrap())
+            bootstrap->unregister_server_instance(ec);
+        else
+            hosted->unregister_server_instance(ec);
+
+        if (ec)
+            return false;
+
         return true;
     }
     catch (hpx::exception const& e) {
