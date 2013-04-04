@@ -196,6 +196,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             symbol_ns_server_.register_server_instance(servicename);
         }
 
+        void unregister_server_instance(error_code& ec)
+        {
+            locality_ns_server_.unregister_server_instance(ec);
+            primary_ns_server_.unregister_server_instance(ec);
+            component_ns_server_.unregister_server_instance(ec);
+            symbol_ns_server_.unregister_server_instance(ec);
+        }
+
         server::primary_namespace primary_ns_server_;
         server::locality_namespace locality_ns_server_;
         server::component_namespace component_ns_server_;
@@ -217,9 +225,15 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             server::symbol_namespace::register_counter_types();
         }
 
-        void register_server_instance(char const* servicename)
+        void register_server_instance(char const* servicename
+          , boost::uint32_t locality_id)
         {
-            primary_ns_server_.register_server_instance(servicename);
+            primary_ns_server_.register_server_instance(servicename, locality_id);
+        }
+
+        void unregister_server_instance(error_code& ec)
+        {
+            primary_ns_server_.unregister_server_instance(ec);
         }
 
         locality_namespace locality_ns_;

@@ -290,6 +290,14 @@ bool addressing_service::unregister_locality(
         if (ec || (success != rep.get_status()))
             return false;
 
+        if (is_bootstrap())
+            bootstrap->unregister_server_instance(ec);
+        else
+            hosted->unregister_server_instance(ec);
+
+        if (ec)
+            return false;
+
         return true;
     }
     catch (hpx::exception const& e) {
@@ -1749,7 +1757,7 @@ namespace detail
 
         // component_ns
         for (std::size_t i = 0;
-             i < num_component_namespace_services;
+             i != num_component_namespace_services;
              ++i)
         {
             if (p.countername_ == component_namespace_services[i].name_)
@@ -1758,7 +1766,7 @@ namespace detail
 
         // locality_ns
         for (std::size_t i = 0;
-             i < num_locality_namespace_services;
+             i != num_locality_namespace_services;
              ++i)
         {
             if (p.countername_ == locality_namespace_services[i].name_)
@@ -1767,7 +1775,7 @@ namespace detail
 
         // primary_ns
         for (std::size_t i = 0;
-             i < num_primary_namespace_services;
+             i != num_primary_namespace_services;
              ++i)
         {
             if (p.countername_ == primary_namespace_services[i].name_)
@@ -1776,7 +1784,7 @@ namespace detail
 
         // symbol_ns
         for (std::size_t i = 0;
-             i < num_symbol_namespace_services;
+             i != num_symbol_namespace_services;
              ++i)
         {
             if (p.countername_ == symbol_namespace_services[i].name_)
@@ -1807,7 +1815,7 @@ namespace detail
 
         // component_ns
         for (std::size_t i = 0;
-             i < num_component_namespace_services;
+             i != num_component_namespace_services;
              ++i)
         {
             if (p.countername_ == component_namespace_services[i].name_)
@@ -1816,7 +1824,7 @@ namespace detail
 
         // locality_ns
         for (std::size_t i = 0;
-             i < num_locality_namespace_services;
+             i != num_locality_namespace_services;
              ++i)
         {
             if (p.countername_ == locality_namespace_services[i].name_)
@@ -1825,7 +1833,7 @@ namespace detail
 
         // primary_ns
         for (std::size_t i = 0;
-             i < num_primary_namespace_services;
+             i != num_primary_namespace_services;
              ++i)
         {
             if (p.countername_ == primary_namespace_services[i].name_)
@@ -1834,7 +1842,7 @@ namespace detail
 
         // symbol_ns
         for (std::size_t i = 0;
-             i < num_symbol_namespace_services;
+             i != num_symbol_namespace_services;
              ++i)
         {
             if (p.countername_ == symbol_namespace_services[i].name_)
@@ -1972,7 +1980,7 @@ void addressing_service::register_counter_types()
         boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(get_local_locality());
         std::string str("locality#" + boost::lexical_cast<std::string>(locality_id));
-        hosted->register_server_instance(str.c_str());
+        hosted->register_server_instance(str.c_str(), locality_id);
     }
 } // }}}
 

@@ -32,13 +32,13 @@ class fixed_component;
 template <typename Component>
 class fixed_component_base : public detail::fixed_component_tag
 {
-  private:
+private:
     typedef typename boost::mpl::if_<
             boost::is_same<Component, detail::this_type>,
             fixed_component_base, Component
         >::type this_component_type;
 
-  public:
+public:
     typedef this_component_type wrapped_type;
     typedef this_component_type base_type_holder;
     typedef fixed_component<this_component_type> wrapping_type;
@@ -49,20 +49,22 @@ class fixed_component_base : public detail::fixed_component_tag
       , lsb_(lsb)
     {}
 
-    /// \brief Unbind the GID if it's not this instantiations fixed gid and is
-    ///        is not invalid.
     ~fixed_component_base()
-    {
-        if (naming::invalid_gid != gid_) 
-        {
-            error_code ec(lightweight);     // ignore errors
-            applier::unbind_gid(gid_, ec);
-        }
-    }
+    {}
 
     /// \brief finalize() will be called just before the instance gets
     ///        destructed
-    void finalize() {}
+    void finalize() 
+    {
+        /// Unbind the GID if it's not this instantiations fixed gid and is
+        /// is not invalid.
+        if (naming::invalid_gid != gid_)
+        {
+            error_code ec(lightweight);     // ignore errors
+            applier::unbind_gid(gid_, ec);
+            gid_ = naming::gid_type();      // invalidate GID
+        }
+    }
 
     // \brief This exposes the component type.
     static component_type get_component_type()
@@ -125,7 +127,21 @@ class fixed_component_base : public detail::fixed_component_tag
         return factory_none;
     }
 
-  private:
+    void set_locality_id(boost::uint32_t locality_id, error_code& ec = throws)
+    {
+        if (gid_) {
+            HPX_THROWS_IF(ec, invalid_status,
+                "fixed_component_base::set_locality_id",
+                "can't change locality_id after GID has already been registered");
+        }
+        else {
+            // erase current locality_id and replace with given one
+            msb_ &= ~naming::gid_type::locality_id_mask;
+            msb_ |= naming::get_gid_from_locality_id(locality_id).get_msb();
+        }
+    }
+
+private:
     mutable naming::gid_type gid_;
     boost::uint64_t msb_;
     boost::uint64_t lsb_;

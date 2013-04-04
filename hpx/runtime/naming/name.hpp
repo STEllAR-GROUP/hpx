@@ -58,6 +58,7 @@ namespace hpx { namespace naming
         static boost::uint64_t const credit_base_mask = 0x7ffful;
         static boost::uint64_t const credit_mask = credit_base_mask << 16;
         static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
+        static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
 
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)

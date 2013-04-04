@@ -218,6 +218,14 @@ void component_namespace::register_server_instance(
     agas::register_name(instance_name_, get_gid().get_gid(), ec);
 }
 
+void component_namespace::unregister_server_instance(
+    error_code& ec
+    )
+{
+    agas::unregister_name(instance_name_, ec);
+    this->base_type::finalize();
+}
+
 void component_namespace::finalize()
 {
     if (!instance_name_.empty())

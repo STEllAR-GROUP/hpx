@@ -170,6 +170,10 @@ struct HPX_EXPORT symbol_namespace
       , error_code& ec = throws
         );
 
+    void unregister_server_instance(
+        error_code& ec = throws
+        );
+
     response bind(
         request const& req
       , error_code& ec = throws

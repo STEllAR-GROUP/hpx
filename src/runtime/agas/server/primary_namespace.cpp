@@ -200,9 +200,16 @@ void primary_namespace::register_counter_types(
 
 void primary_namespace::register_server_instance(
     char const* servicename
+  , boost::uint32_t locality_id
   , error_code& ec
     )
 {
+    // set locality_id for this component
+    if (locality_id != naming::invalid_locality_id)
+    {
+        this->base_type::set_locality_id(locality_id);
+    }
+
     // now register this AGAS instance with AGAS :-P
     instance_name_ = agas::service_name;
     instance_name_ += agas::server::primary_namespace_service_name;
@@ -211,6 +218,14 @@ void primary_namespace::register_server_instance(
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
     agas::register_name(instance_name_, get_gid().get_gid(), ec);
+}
+
+void primary_namespace::unregister_server_instance(
+    error_code& ec
+    )
+{
+    agas::unregister_name(instance_name_, ec);
+    this->base_type::finalize();
 }
 
 void primary_namespace::finalize()

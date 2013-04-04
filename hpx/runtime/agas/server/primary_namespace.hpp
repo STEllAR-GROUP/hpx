@@ -245,7 +245,12 @@ struct HPX_EXPORT primary_namespace
 
     void register_server_instance(
         char const* servicename
+      , boost::uint32_t locality_id = naming::invalid_locality_id
       , error_code& ec = throws
+        );
+
+    void unregister_server_instance(
+        error_code& ec = throws
         );
 
     response route(

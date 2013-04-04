@@ -197,6 +197,10 @@ struct HPX_EXPORT locality_namespace
       , error_code& ec = throws
         );
 
+    void unregister_server_instance(
+        error_code& ec = throws
+        );
+
     response allocate(
         request const& req
       , error_code& ec = throws

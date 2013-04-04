@@ -196,6 +196,10 @@ struct HPX_EXPORT component_namespace
       , error_code& ec = throws
         );
 
+    void unregister_server_instance(
+        error_code& ec = throws
+        );
+
     response bind_prefix(
         request const& req
       , error_code& ec = throws
