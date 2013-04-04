@@ -7,7 +7,6 @@
 #define HPX_PARCELSET_IBVERBS_SERVER_HPP
 
 #include <hpx/runtime/parcelset/ibverbs/messages.hpp>
-#include <tcmalloc.h>
 
 namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
     struct server
