@@ -43,7 +43,7 @@ namespace hpx { namespace threads { namespace detail
         "unknown", "thread", "socket", "numanode", "core", "pu"
     };
 
-    char const* const spec_type::type_name(spec_type::type t)
+    char const* spec_type::type_name(spec_type::type t)
     {
         if (t < spec_type::unknown || t > spec_type::pu)
             return type_names[0];
