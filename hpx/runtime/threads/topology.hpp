@@ -181,7 +181,7 @@ namespace hpx { namespace threads
         struct spec_type
         {
             enum type { unknown, thread, socket, numanode, core, pu };
-            HPX_API_EXPORT static char const* const type_name(type t);
+            HPX_API_EXPORT static char const* type_name(type t);
 
             static boost::int64_t all_entities()
             {
