@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -147,6 +148,7 @@ response component_namespace::service(
         }
 
         default:
+        case locality_ns_service:
         case component_ns_service:
         case primary_ns_service:
         case symbol_ns_service:
@@ -177,7 +179,7 @@ void component_namespace::register_counter_types(
       , agas::server::component_namespace_service_name));
 
     for (std::size_t i = 0;
-          i < detail::num_component_namespace_services;
+          i != detail::num_component_namespace_services;
           ++i)
     {
         std::string name(detail::component_namespace_services[i].name_);
@@ -624,7 +626,7 @@ response component_namespace::statistics_counter(
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
-          i < detail::num_component_namespace_services;
+          i != detail::num_component_namespace_services;
           ++i)
     {
         if (p.countername_ == detail::component_namespace_services[i].name_)
@@ -678,6 +680,7 @@ response component_namespace::statistics_counter(
         }
     }
     else {
+        BOOST_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case component_ns_bind_prefix:
             get_data_func = boost::bind(&cd::get_bind_prefix_time, &counter_data_, ::_1);

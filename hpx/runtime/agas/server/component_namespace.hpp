@@ -41,14 +41,12 @@ namespace server
 // Base name used to register the component
 char const* const component_namespace_service_name = "component_namespace/";
 
-struct HPX_EXPORT component_namespace :
-    components::fixed_component_base<
-        HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB, // constant GID
-        component_namespace
-    >
+struct HPX_EXPORT component_namespace
+  : components::fixed_component_base<component_namespace>
 {
     // {{{ nested types
     typedef lcos::local::mutex mutex_type;
+    typedef components::fixed_component_base<component_namespace> base_type;
 
     typedef hpx::util::function<
         void(std::string const&, components::component_type)
@@ -81,13 +79,13 @@ struct HPX_EXPORT component_namespace :
 
         struct api_counter_data
         {
-        api_counter_data()
-            : count_(0)
-            , time_(0)
-        {}
+            api_counter_data()
+                : count_(0)
+                , time_(0)
+            {}
 
-        boost::int64_t count_;
-        boost::int64_t time_;
+            boost::int64_t count_;
+            boost::int64_t time_;
         };
 
         counter_data()
@@ -156,9 +154,7 @@ struct HPX_EXPORT component_namespace :
 
   public:
     component_namespace()
-      : mutex_()
-      , component_ids_()
-      , factories_()
+      : base_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB)
       , type_counter(components::component_first_dynamic)
     {}
 
@@ -260,9 +256,9 @@ struct HPX_EXPORT component_namespace :
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_bulk_service, bulk_service_action);
 
-    /// This is the default hook implementation for decorate_action which 
+    /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
-    static HPX_STD_FUNCTION<threads::thread_function_type> 
+    static HPX_STD_FUNCTION<threads::thread_function_type>
     wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
         naming::address::address_type)
     {

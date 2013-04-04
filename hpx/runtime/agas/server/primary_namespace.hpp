@@ -91,14 +91,12 @@ char const* const primary_namespace_service_name = "primary_namespace/";
 ///         Address of the symbol_namespace component on the bootstrap AGAS
 ///         locality.
 ///
-struct HPX_EXPORT primary_namespace :
-    components::fixed_component_base<
-        HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
-        primary_namespace
-    >
+struct HPX_EXPORT primary_namespace
+  : components::fixed_component_base<primary_namespace>
 {
     // {{{ nested types
     typedef lcos::local::mutex mutex_type;
+    typedef components::fixed_component_base<primary_namespace> base_type;
 
     typedef boost::int32_t component_type;
 
@@ -126,13 +124,13 @@ struct HPX_EXPORT primary_namespace :
 
         struct api_counter_data
         {
-        api_counter_data()
-            : count_(0)
-            , time_(0)
-        {}
+            api_counter_data()
+                : count_(0)
+                , time_(0)
+            {}
 
-        boost::int64_t count_;
-        boost::int64_t time_;
+            boost::int64_t count_;
+            boost::int64_t time_;
         };
 
         counter_data()
@@ -196,6 +194,10 @@ struct HPX_EXPORT primary_namespace :
     };
 
   public:
+    primary_namespace()
+      : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
+    {}
+
     void finalize();
 
     bool remote_route(
@@ -357,9 +359,9 @@ struct HPX_EXPORT primary_namespace :
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_route, route_action);
 
-    /// This is the default hook implementation for decorate_action which 
+    /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
-    static HPX_STD_FUNCTION<threads::thread_function_type> 
+    static HPX_STD_FUNCTION<threads::thread_function_type>
     wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
         naming::address::address_type)
     {

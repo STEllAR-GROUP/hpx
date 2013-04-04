@@ -173,6 +173,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct bootstrap_data_type
     { // {{{
+        bootstrap_data_type()
+          : primary_ns_server_()
+          , locality_ns_server_(&primary_ns_server_)
+          , component_ns_server_()
+          , symbol_ns_server_()
+        {}
 
         void register_counter_types()
         {
@@ -190,8 +196,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             symbol_ns_server_.register_server_instance(servicename);
         }
 
-        server::locality_namespace locality_ns_server_;
         server::primary_namespace primary_ns_server_;
+        server::locality_namespace locality_ns_server_;
         server::component_namespace component_ns_server_;
         server::symbol_namespace symbol_ns_server_;
     }; // }}}

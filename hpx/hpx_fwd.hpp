@@ -498,8 +498,7 @@ namespace hpx
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <boost::uint64_t MSB, boost::uint64_t LSB,
-            typename Component = detail::this_type>
+        template <typename Component = detail::this_type>
         class fixed_component_base;
 
         template <typename Component>

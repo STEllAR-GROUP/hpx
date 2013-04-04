@@ -41,14 +41,12 @@ namespace server
 // Base name used to register the component
 char const* const locality_namespace_service_name = "locality_namespace/";
 
-struct HPX_EXPORT locality_namespace :
-    components::fixed_component_base<
-        HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB, // constant GID
-        locality_namespace
-    >
+struct HPX_EXPORT locality_namespace
+  : components::fixed_component_base<locality_namespace>
 {
     // {{{ nested types
     typedef lcos::local::mutex mutex_type;
+    typedef components::fixed_component_base<locality_namespace> base_type;
 
     typedef boost::int32_t component_type;
 
@@ -70,6 +68,7 @@ struct HPX_EXPORT locality_namespace :
 
     partition_table_type partitions_;
     boost::uint32_t prefix_counter_;
+    primary_namespace* primary_;
 
     struct update_time_on_exit;
 
@@ -80,13 +79,13 @@ struct HPX_EXPORT locality_namespace :
 
         struct api_counter_data
         {
-        api_counter_data()
-            : count_(0)
-            , time_(0)
-        {}
+            api_counter_data()
+                : count_(0)
+                , time_(0)
+            {}
 
-        boost::int64_t count_;
-        boost::int64_t time_;
+            boost::int64_t count_;
+            boost::int64_t time_;
         };
 
         counter_data()
@@ -154,8 +153,10 @@ struct HPX_EXPORT locality_namespace :
     };
 
   public:
-    locality_namespace()
-      : prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
+    locality_namespace(primary_namespace* primary)
+      : base_type(HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB)
+      , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
+      , primary_(primary)
     {}
 
     void finalize();

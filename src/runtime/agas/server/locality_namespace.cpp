@@ -6,8 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -181,7 +183,7 @@ void locality_namespace::register_counter_types(
       , agas::server::locality_namespace_service_name));
 
     for (std::size_t i = 0;
-          i < detail::num_locality_namespace_services;
+          i != detail::num_locality_namespace_services;
           ++i)
     {
         std::string name(detail::locality_namespace_services[i].name_);
@@ -377,23 +379,6 @@ response locality_namespace::allocate(
             return response();
         }
 
-//         const gva g(ep, components::component_runtime_support, count);
-// 
-//         // Now that we've inserted the locality into the partition table
-//         // successfully, we need to put the locality's GID into the GVA
-//         // table so that parcels can be sent to the memory of a locality.
-//         if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
-//                 std::make_pair(id, g)))))
-//         {
-//             HPX_THROWS_IF(ec, lock_error
-//               , "locality_namespace::allocate"
-//               , boost::str(boost::format(
-//                     "GVA table insertion failed due to a locking error "
-//                     "or memory corruption, gid(%1%), gva(%2%)")
-//                     % id % g));
-//             return response();
-//         }
-
         // Generate the requested GID range
         naming::gid_type lower = lower_id + 1;
         naming::gid_type upper = lower + real_count;
@@ -403,6 +388,18 @@ response locality_namespace::allocate(
         // Set the initial credit count.
         naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
         naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+
+        // Now that we've inserted the locality into the partition table
+        // successfully, we need to put the locality's GID into the GVA
+        // table so that parcels can be sent to the memory of a locality.
+        if (primary_)
+        {
+            const gva g(ep, components::component_runtime_support, count);
+
+            request req(primary_ns_bind_gid, id, g);
+            response resp = primary_->service(req, ec);
+            if (ec) return resp;
+        }
 
         LAGAS_(info) << (boost::format(
             "locality_namespace::allocate, ep(%1%), count(%2%), "
@@ -475,24 +472,18 @@ response locality_namespace::free(
 
     if (pit != pend)
     {
-//         gva_table_type::iterator git = gvas_.find
-//             (naming::get_gid_from_locality_id(at_c<0>(pit->second)));
-//         gva_table_type::iterator gend = gvas_.end();
-// 
-//         if (HPX_UNLIKELY(git == gend))
-//         {
-//             HPX_THROWS_IF(ec, internal_server_error
-//               , "locality_namespace::free"
-//               , boost::str(boost::format(
-//                     "partition table entry has no corresponding GVA table "
-//                     "entry, endpoint(%1%)")
-//                     % ep));
-//             return response();
-//         }
-
         // Wipe the locality from the tables.
+        naming::gid_type locality =
+            naming::get_gid_from_locality_id(at_c<0>(pit->second));
+
         partitions_.erase(pit);
-//         gvas_.erase(git);
+
+        if (primary_)
+        {
+            request req(primary_ns_unbind_gid, locality, 0);
+            response resp = primary_->service(req, ec);
+            if (ec) return resp;
+        }
 
         LAGAS_(info) << (boost::format(
             "locality_namespace::free, ep(%1%)")
@@ -641,7 +632,7 @@ response locality_namespace::statistics_counter(
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
-          i < detail::num_locality_namespace_services;
+          i != detail::num_locality_namespace_services;
           ++i)
     {
         if (p.countername_ == detail::locality_namespace_services[i].name_)
@@ -695,6 +686,7 @@ response locality_namespace::statistics_counter(
         }
     }
     else {
+        BOOST_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case locality_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);

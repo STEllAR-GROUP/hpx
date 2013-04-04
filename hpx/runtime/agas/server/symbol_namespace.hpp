@@ -37,14 +37,12 @@ namespace server
 // Base name used to register the component
 char const* const symbol_namespace_service_name = "symbol_namespace/";
 
-struct HPX_EXPORT symbol_namespace :
-    components::fixed_component_base<
-        HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
-        symbol_namespace
-    >
+struct HPX_EXPORT symbol_namespace 
+  : components::fixed_component_base<symbol_namespace>
 {
     // {{{ nested types
     typedef lcos::local::mutex mutex_type;
+    typedef components::fixed_component_base<symbol_namespace> base_type;
 
     // FIXME: This signature should use id_type, not gid_type
     typedef hpx::util::function<
@@ -68,13 +66,13 @@ struct HPX_EXPORT symbol_namespace :
 
         struct api_counter_data
         {
-        api_counter_data()
-            : count_(0)
-            , time_(0)
-        {}
+            api_counter_data()
+                : count_(0)
+                , time_(0)
+            {}
 
-        boost::int64_t count_;
-        boost::int64_t time_;
+            boost::int64_t count_;
+            boost::int64_t time_;
         };
 
         counter_data()
@@ -131,8 +129,7 @@ struct HPX_EXPORT symbol_namespace :
 
   public:
     symbol_namespace()
-      : mutex_()
-      , gids_()
+      : base_type(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB)
     {}
 
     void finalize();

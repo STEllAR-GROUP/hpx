@@ -15,7 +15,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/stringstream.hpp>
 
 namespace hpx { namespace detail
@@ -26,14 +25,11 @@ namespace hpx { namespace detail
 namespace hpx { namespace components
 {
 
-template <boost::uint64_t MSB, boost::uint64_t LSB>
-struct gid_tag;
-
 template <typename Component>
 class fixed_component;
 
 ///////////////////////////////////////////////////////////////////////////
-template <boost::uint64_t MSB, boost::uint64_t LSB, typename Component>
+template <typename Component>
 class fixed_component_base : public detail::fixed_component_tag
 {
   private:
@@ -48,15 +44,20 @@ class fixed_component_base : public detail::fixed_component_tag
     typedef fixed_component<this_component_type> wrapping_type;
 
     /// \brief Construct an empty fixed_component
-    fixed_component_base()
+    fixed_component_base(boost::uint64_t msb, boost::uint64_t lsb)
+      : msb_(msb)
+      , lsb_(lsb)
     {}
 
     /// \brief Unbind the GID if it's not this instantiations fixed gid and is
     ///        is not invalid.
     ~fixed_component_base()
     {
-        if ((naming::invalid_gid != gid_) && (fixed_gid() != gid_))
-            applier::unbind_gid(gid_);
+        if (naming::invalid_gid != gid_) 
+        {
+            error_code ec(lightweight);     // ignore errors
+            applier::unbind_gid(gid_, ec);
+        }
     }
 
     /// \brief finalize() will be called just before the instance gets
@@ -84,7 +85,7 @@ class fixed_component_base : public detail::fixed_component_tag
                 components::get_component_type<wrapped_type>(),
                 std::size_t(static_cast<this_component_type const*>(this)));
 
-            gid_ = fixed_gid();
+            gid_ = naming::gid_type(msb_, lsb_);
 
             // Try to bind the preset GID first
             if (!applier::bind_gid(gid_, addr))
@@ -112,14 +113,6 @@ class fixed_component_base : public detail::fixed_component_tag
         return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
     }
 
-    static naming::gid_type const& fixed_gid()
-    {
-        util::reinitializable_static<naming::gid_type, gid_tag<MSB, LSB>, 1>
-            fixed(naming::gid_type(MSB, LSB));
-
-        return fixed.get();
-    }
-
     /// \brief  The function \a get_factory_properties is used to
     ///         determine, whether instances of the derived component can
     ///         be created in blocks (i.e. more than one instance at once).
@@ -134,6 +127,8 @@ class fixed_component_base : public detail::fixed_component_tag
 
   private:
     mutable naming::gid_type gid_;
+    boost::uint64_t msb_;
+    boost::uint64_t lsb_;
 };
 
 namespace detail
@@ -144,14 +139,12 @@ namespace detail
     {
         static Component* alloc(std::size_t count)
         {
-            BOOST_ASSERT(1 == count);
-            return static_cast<Component*>
-                (::operator new(sizeof(Component)));
+            BOOST_ASSERT(false);        // this shouldn't ever be called
+            return 0;
         }
         static void free(void* p, std::size_t count)
         {
-            BOOST_ASSERT(1 == count);
-            ::operator delete(p);
+            BOOST_ASSERT(false);        // this shouldn't ever be called
         }
     };
 }
@@ -170,19 +163,15 @@ class fixed_component : public Component
     ///         initialization of instances of the derived components.
     static Component* create(std::size_t count)
     {
-        // fixed components can be created individually only
-        BOOST_ASSERT(1 == count);
-        return new Component();
+        BOOST_ASSERT(false);        // this shouldn't ever be called
+        return 0;
     }
 
     /// \brief  The function \a destroy is used for destruction and
     ///         de-allocation of instances of the derived components.
     static void destroy(Component* p, std::size_t count = 1)
     {
-        // fixed components can be deleted individually only
-        BOOST_ASSERT(1 == count);
-        p->finalize();
-        delete p;
+        BOOST_ASSERT(false);        // this shouldn't ever be called
     }
 };
 
