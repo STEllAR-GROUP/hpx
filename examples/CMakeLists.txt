@@ -42,6 +42,7 @@ set(subdirs
     startup_shutdown
     thread_aware_timer
     throttle
+    tuplespace
    )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

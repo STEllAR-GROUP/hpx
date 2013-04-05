@@ -10,7 +10,7 @@
 
 #include <boost/serialization/access.hpp>
 
-#define ENABLE_DEBUG true
+#define ENABLE_DEBUG false
 
 ///////////////////////////////////////////////////////////////////////////////
 struct small_object
@@ -20,8 +20,13 @@ struct small_object
 
     friend class boost::serialization::access;
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned const)
+    template <
+        typename Archive
+    >
+    void serialize(
+        Archive& ar
+      , unsigned const
+        )
     {
         ar & x_;
 
@@ -32,7 +37,8 @@ struct small_object
     }
 
   public:
-    small_object() : x_(0)
+    small_object()
+      : x_(0)
     {
         if(ENABLE_DEBUG)
         {
@@ -40,7 +46,10 @@ struct small_object
         }
     }
 
-    small_object(boost::uint64_t x) : x_(x)
+    small_object(
+        boost::uint64_t x
+        )
+      : x_(x)
     {
         if(ENABLE_DEBUG)
         {
@@ -48,7 +57,10 @@ struct small_object
         }
     }
 
-    small_object(small_object const& o) : x_(o.x_)
+    small_object(
+        small_object const& o
+        )
+      : x_(o.x_)
     {
         if(ENABLE_DEBUG)
         {
@@ -56,7 +68,9 @@ struct small_object
         }
     }
 
-    small_object& operator=(small_object const& o)
+    small_object& operator=(
+        small_object const& o
+        )
     {
         x_ = o.x_;
         if(ENABLE_DEBUG)
@@ -66,7 +80,9 @@ struct small_object
         return *this;
     }
 
-    bool operator==(small_object const& o) const
+    bool operator==(
+        small_object const& o
+        ) const
     {
         if(ENABLE_DEBUG)
         {
@@ -83,7 +99,9 @@ struct small_object
         }
     }
 
-    boost::uint64_t operator()(boost::uint64_t const& z_)
+    boost::uint64_t operator()(
+        boost::uint64_t const& z_
+        )
     {
         if(ENABLE_DEBUG)
         {
@@ -93,7 +111,8 @@ struct small_object
     }
 
 
-    friend inline std::istream& operator>> (std::istream& in, small_object& obj)
+    friend inline std::istream& 
+    operator>> (std::istream& in, small_object& obj)
     {
         in >> obj.x_;
         if(ENABLE_DEBUG)
@@ -104,7 +123,8 @@ struct small_object
         return in;
     }
 
-    friend inline std::ostream& operator<< (std::ostream& out, small_object const& obj)
+    friend inline std::ostream& 
+    operator<< (std::ostream& out, small_object const& obj)
     {
         out << obj.x_;
         if(ENABLE_DEBUG)
@@ -125,8 +145,13 @@ struct big_object
 
     friend class boost::serialization::access;
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned const)
+    template <
+        typename Archive
+    >
+    void serialize(
+        Archive& ar
+      , unsigned const
+        )
     {
         ar & x_;
         ar & y_;
@@ -137,7 +162,9 @@ struct big_object
     }
 
   public:
-    big_object() : x_(0), y_(0)
+    big_object()
+      : x_(0)
+      , y_(0)
     {
         if(ENABLE_DEBUG)
         {
@@ -145,8 +172,12 @@ struct big_object
         }
     }
 
-    big_object(boost::uint64_t x, boost::uint64_t y)
-      : x_(x), y_(y)
+    big_object(
+        boost::uint64_t x
+      , boost::uint64_t y
+        )
+      : x_(x)
+      , y_(y)
     {
         if(ENABLE_DEBUG)
         {
@@ -154,8 +185,11 @@ struct big_object
         }
     }
 
-    big_object(big_object const& o)
-      : x_(o.x_), y_(o.y_)
+    big_object(
+        big_object const& o
+        )
+      : x_(o.x_)
+      , y_(o.y_)
     {
         if(ENABLE_DEBUG)
         {
@@ -163,7 +197,9 @@ struct big_object
         }
     }
 
-    big_object& operator=(big_object const& o)
+    big_object& operator=(
+        big_object const& o
+        )
     {
         x_ = o.x_;
         y_ = o.y_;
@@ -174,7 +210,9 @@ struct big_object
         return *this;
     }
 
-    bool operator==(big_object const& o) const
+    bool operator==(
+        big_object const& o
+        ) const
     {
         if(ENABLE_DEBUG)
         {
@@ -231,6 +269,5 @@ struct big_object
     }
 };
 
-#undef ENABLE_DEBUG 
-
+#undef ENABLE_DEBUG
 #endif

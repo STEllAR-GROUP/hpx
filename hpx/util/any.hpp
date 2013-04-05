@@ -426,7 +426,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_any(T const& x)
+        explicit basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -457,7 +457,7 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
+        explicit basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -724,6 +724,25 @@ namespace hpx { namespace util
             object(0)
         {
             assign(x);
+        }
+
+        template <typename T>
+        explicit basic_any(T const& x)
+          : table(detail::any::get_table<
+                      typename boost::remove_const<
+                          typename util::detail::remove_reference<T>::type
+                      >::type
+                  >::template get<void, void, Char>()),
+            object(0)
+        {
+            typedef typename boost::remove_const<
+                typename util::detail::remove_reference<T>::type
+            >::type value_type;
+
+            if (detail::any::get_table<value_type>::is_small::value)
+                new (&object) value_type(x);
+            else
+                object = new value_type(x);
         }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES

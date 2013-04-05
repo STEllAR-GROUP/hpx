@@ -60,7 +60,7 @@ namespace hpx { namespace util
             , max_alloc_count_(0L)
 #endif
         {
-            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
+            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == uint64_t(heap_size));
         }
 
         explicit one_size_heap_list(std::string const& class_name)
@@ -72,7 +72,7 @@ namespace hpx { namespace util
             , max_alloc_count_(0L)
 #endif
         {
-            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
+            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == uint64_t(heap_size));
         }
 
         ~one_size_heap_list()
