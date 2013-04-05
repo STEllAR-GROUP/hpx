@@ -964,7 +964,10 @@ public:
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
-        );
+        )
+    {
+        return is_local_address_cached(id, addr, ec);
+    }
 
     bool is_local_address_cached(
         naming::gid_type const& id

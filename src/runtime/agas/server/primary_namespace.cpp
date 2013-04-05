@@ -628,6 +628,14 @@ response primary_namespace::change_credit_sync(
     return response(primary_ns_change_credit_sync);
 }
 
+response primary_namespace::route(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ route implementation
+    return response();
+} // }}}
+
 void primary_namespace::increment(
     naming::gid_type const& lower
   , naming::gid_type const& upper
