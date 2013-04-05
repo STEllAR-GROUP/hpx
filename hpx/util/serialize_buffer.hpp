@@ -20,15 +20,31 @@ namespace hpx { namespace util
     template <typename T>
     class serialize_buffer
     {
+    private:
+        static void no_deleter(T*) {}
+
     public:
-        serialize_buffer ()
+        enum init_mode
+        {
+            copy = 0,       // constructor copies data
+            reference = 1   // constructor does not copy data and does not 
+                            // manage the lifetime of it
+        };
+
+        serialize_buffer()
           : size_(0)
         {}
 
-        serialize_buffer (T const* data, std::size_t size)
-          : data_(new T[size]), size_(size)
+        serialize_buffer (T* data, std::size_t size, init_mode mode = copy)
+          : data_(), size_(size)
         {
-            std::copy(data, data + size, data_.get());
+            if (mode == copy) {
+                data_.reset(new T[size]);
+                std::copy(data, data + size, data_.get());
+            }
+            else {
+                data_ = boost::shared_ptr<T>(data, &serialize_buffer::no_deleter);
+            }
         }
 
         void const* data() const { return data_; }
