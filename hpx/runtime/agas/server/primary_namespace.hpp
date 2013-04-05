@@ -200,18 +200,6 @@ struct HPX_EXPORT primary_namespace
 
     void finalize();
 
-    bool remote_route(
-        parcelset::parcel const& p
-        )
-    {
-        return route(p, throws);
-    }
-
-    bool route(
-        parcelset::parcel const& p
-      , error_code& ec
-        );
-
     response remote_service(
         request const& req
         )
@@ -362,7 +350,6 @@ struct HPX_EXPORT primary_namespace
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_route, route_action);
 
     /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
@@ -383,10 +370,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::route_action,
-    primary_namespace_route_action)
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

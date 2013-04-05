@@ -15,22 +15,14 @@
 namespace hpx { namespace agas { namespace server
 {
 
-response primary_namespace::route(
-    request const& req
-  , error_code& ec
-    )
-{
-    return response();
-}
-
-bool primary_namespace::route(
-    parcelset::parcel const& p
-  , error_code& ec
-    )
-{
-    // For now we just make sure that this function is not called.
-    BOOST_ASSERT(false);
-
+// bool primary_namespace::route(
+//     parcelset::parcel const& p
+//   , error_code& ec
+//     )
+// {
+//     // For now we just make sure that this function is not called.
+//     BOOST_ASSERT(false);
+// 
 //    // TODO: protection of parcel's content?
 //     naming::gid_type id = p.get_destination();
 //     naming::detail::strip_credit_from_gid(id);
@@ -59,10 +51,10 @@ bool primary_namespace::route(
 //
 //     // Assign the parcel to parcelhandler.
 //     get_runtime().get_parcel_handler().put_parcel(p_temp);
-
-    // TODO: update sender's cache for the destination id resolution
-    return true;
-}
+// 
+//     // TODO: update sender's cache for the destination id resolution
+//     return true;
+// }
 
 }}}
 

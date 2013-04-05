@@ -341,30 +341,40 @@ namespace hpx { namespace parcelset
             return;
         }
 
+        bool resolved_locally = true;
         if (1 == gids.size()) {
             if (!addrs[0])
-                resolver_.resolve(gids[0], addrs[0]);
+                resolved_locally = resolver_.resolve_cached(gids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolver_.resolve(gids, addrs, locals);
+            resolved_locally = resolver_.resolve_cached(gids, addrs, locals);
         }
 
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
 
-        // dispatch to the message handler which is associated with the
-        // encapsulated action
-        connection_type t = find_appropriate_connection_type(addrs[0].locality_);
-        policies::message_handler* mh =
-            p.get_message_handler(this, addrs[0].locality_, t);
+        // If we were able to resolve the address(es) locally we send the
+        // parcel directly to the destination.
+        if (resolved_locally) {
+            // dispatch to the message handler which is associated with the
+            // encapsulated action
+            connection_type t = find_appropriate_connection_type(addrs[0].locality_);
+            policies::message_handler* mh =
+                p.get_message_handler(this, addrs[0].locality_, t);
 
-        if (mh) {
-            mh->put_parcel(p, f);
+            if (mh) {
+                mh->put_parcel(p, f);
+                return;
+            }
+
+            find_parcelport(t)->put_parcel(p, f);
             return;
         }
 
-        find_parcelport(t)->put_parcel(p, f);
+        // At least one of the addresses is locally unknown, route the parcel
+        // to the AGAS managing the destination.
+        resolver_.route(p);
     }
 
     std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const

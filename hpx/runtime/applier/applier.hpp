@@ -155,9 +155,6 @@ namespace hpx { namespace applier
             return memory_id_;
         }
 
-        // parcel forwarding
-        bool route(parcelset::parcel const& arg0);
-
     public:
         // the TSS holds a pointer to the applier associated with a given
         // OS thread

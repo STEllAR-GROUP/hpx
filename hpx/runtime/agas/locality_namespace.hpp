@@ -15,8 +15,8 @@
 namespace hpx { namespace agas
 {
 
-struct locality_namespace :
-    components::client_base<locality_namespace, stubs::locality_namespace>
+struct locality_namespace
+  : components::client_base<locality_namespace, stubs::locality_namespace>
 {
     typedef components::client_base<locality_namespace, stubs::locality_namespace>
         base_type;

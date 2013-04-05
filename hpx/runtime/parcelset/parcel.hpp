@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
@@ -65,18 +65,18 @@ namespace hpx { namespace parcelset
             {
 #if defined(HPX_DEBUG)
                 BOOST_ASSERT(gids_.size() == addrs_.size());
-                if (!gids_.empty())
+                if (!gids_.empty() && addrs[0].locality_)
                 {
                     // all destinations have to be on the same locality
                     naming::locality dest = get_destination_locality();
-                    for (std::size_t i = 1; i < addrs.size(); ++i)
+                    for (std::size_t i = 1; i != addrs.size(); ++i)
                     {
                         BOOST_ASSERT(dest == addrs[i].locality_);
                     }
 
                     // all destination component types are properly matched
                     int comptype = act->get_component_type();
-                    for (std::size_t i = 0; i < addrs.size(); ++i)
+                    for (std::size_t i = 0; i != addrs.size(); ++i)
                     {
                         BOOST_ASSERT(components::types_are_compatible(
                             comptype, addrs[i].type_));

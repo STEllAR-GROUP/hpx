@@ -653,16 +653,6 @@ components::component_type addressing_service::register_factory(
     }
 } // }}}
 
-bool addressing_service::route_parcel(
-    parcelset::parcel const& p
-  , error_code& ec
-    )
-{
-    if (is_bootstrap())
-        return bootstrap->primary_ns_server_.route(p, ec);
-    return hosted->primary_ns_.route(p, action_priority_, ec);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 struct lock_semaphore
 {
@@ -919,45 +909,20 @@ bool addressing_service::unbind_range(
 } // }}}
 
 /// This function will test whether the given address refers to an object
-/// living on the locality of the caller.
-bool addressing_service::is_local_address(
-    naming::gid_type const& id
-  , error_code& ec
-    )
-{
-    naming::address addr;
+/// living on the locality of the caller. We rely completely on the AGAS cache
+/// assuming that everything which is not in the cache is not local.
 
-    // Resolve the address of the GID.
-    if (!resolve(id, addr, ec))
-    {
-        HPX_THROWS_IF(ec, unknown_component_address
-          , "addressing_service::is_local_address"
-          , boost::str(boost::format("cannot resolve gid(%1%)") % id));
-        return false;
-    }
-
-    if (ec)
-        return false;
-
-    return addr.locality_ == get_here();
-}
-
-bool addressing_service::is_local_address(
+bool addressing_service::is_local_address_cached(
     naming::gid_type const& id
   , naming::address& addr
   , error_code& ec
     )
 {
-    // Resolve the address of the GID.
-    if (!resolve(id, addr, ec))
-    {
-        HPX_THROWS_IF(ec, unknown_component_address
-          , "addressing_service::is_local_address"
-          , boost::str(boost::format("cannot resolve gid(%1%)") % id));
-        return false;
-    }
+    // Try to resolve the address of the GID.
 
-    if (ec)
+    // NOTE: We do not throw here for a reason; it is perfectly valid for the
+    // GID to not be found in the cache.
+    if (!resolve_cached(id, addr, ec) || ec)
         return false;
 
     return addr.locality_ == get_here();
@@ -981,41 +946,7 @@ bool addressing_service::is_local_address(
             return locals.any();      // all destinations resolved
     }
 
-    if (!resolve_full(gids, addrs, locals, ec) || ec)
-        return false;
-
     return locals.any();
-}
-
-bool addressing_service::is_local_address_cached(
-    naming::gid_type const& id
-  , error_code& ec
-    )
-{
-    naming::address addr;
-
-    // Try to resolve the address of the GID.
-    // NOTE: We do not throw here for a reason; it is perfectly valid for the
-    // GID to not be found in the cache.
-    if (!resolve_cached(id, addr, ec) || ec)
-        return false;
-
-    return addr.locality_ == get_here();
-}
-
-bool addressing_service::is_local_address_cached(
-    naming::gid_type const& id
-  , naming::address& addr
-  , error_code& ec
-    )
-{
-    // Try to resolve the address of the GID.
-    // NOTE: We do not throw here for a reason; it is perfectly valid for the
-    // GID to not be found in the cache.
-    if (!resolve_cached(id, addr, ec) || ec)
-        return false;
-
-    return addr.locality_ == get_here();
 }
 
 bool addressing_service::is_local_lva_encoded_address(
@@ -1114,12 +1045,10 @@ bool addressing_service::resolve_full(
         request req(primary_ns_resolve_gid, id);
         response rep;
 
-        {
-            if (is_bootstrap())
-                rep = bootstrap->primary_ns_server_.service(req, ec);
-            else
-                rep = hosted->primary_ns_.service(req, action_priority_, ec);
-        }
+        if (is_bootstrap())
+            rep = bootstrap->primary_ns_server_.service(req, ec);
+        else
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -1178,9 +1107,10 @@ bool addressing_service::resolve_cached(
 
     // first look up the requested item in the cache
     gva_cache_key k(id);
-    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     gva_cache_key idbase;
     gva_cache_type::entry_type e;
+
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
     // Check if the entry is currently in the cache
     if (gva_cache_.get_entry(k, idbase, e))
@@ -1201,6 +1131,8 @@ bool addressing_service::resolve_cached(
         addr.locality_ = g.endpoint;
         addr.type_ = g.type;
         addr.address_ = g.lva(id, idbase.get_gid());
+
+        lock.unlock();
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1275,7 +1207,7 @@ bool addressing_service::resolve_full(
             return false;
 
         std::size_t j = 0;
-        for (std::size_t i = 0; i < count; ++i)
+        for (std::size_t i = 0; i != count; ++i)
         {
             if (addrs[i] || locals.test(i))
                 continue;
@@ -1295,14 +1227,16 @@ bool addressing_service::resolve_full(
 
             if (caching_)
             {
-                if (range_caching_)
+                if (range_caching_) {
                     // Put the gva range into the cache.
                     // REVIEW: This may cause collisions in the cache.
                     insert_cache_entry(reps[j].get_base_gid(), reps[j].get_gva(), ec);
-                else
+                }
+                else {
                     // Put the fully resolved gva into the cache.
                     // REVIEW: This may cause collisions in the cache.
                     insert_cache_entry(gids[i], g, ec);
+                }
             }
 
             if (ec)
@@ -1335,7 +1269,7 @@ bool addressing_service::resolve_cached(
     locals.resize(count);
 
     std::size_t resolved = 0;
-    for (std::size_t i = 0; i < count; ++i)
+    for (std::size_t i = 0; i != count; ++i)
     {
         if (!addrs[i] && !locals.test(i))
         {
@@ -1350,12 +1284,36 @@ bool addressing_service::resolve_cached(
         }
 
         else if (addrs[i].locality_ == get_here())
+        {
+            ++resolved;
             locals.set(i, true);
+        }
     }
 
     return resolved == count;   // returns whether all have been resolved
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void addressing_service::route(
+    parcelset::parcel const& p
+    )
+{ // {{{ route implementation
+
+    // compose request
+    request req(primary_ns_route, p);
+//    naming::id_type const target(
+//        stubs::primary_namespace::get_service_instance(p.get_destinations()[0])
+//      , naming::id_type::unmanaged);
+
+    naming::id_type const target(bootstrap_primary_namespace_id());
+
+    // the routing is handled in a fire & forget fashion
+    stubs::primary_namespace::service_non_blocking(
+        target, req, threads::thread_priority_default);
+
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
 void addressing_service::incref(
     naming::gid_type const& lower
   , naming::gid_type const& upper

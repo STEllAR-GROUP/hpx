@@ -14,8 +14,8 @@
 namespace hpx { namespace agas
 {
 
-struct symbol_namespace :
-    components::client_base<symbol_namespace, stubs::symbol_namespace>
+struct symbol_namespace
+  : components::client_base<symbol_namespace, stubs::symbol_namespace>
 {
     // {{{ nested types
     typedef components::client_base<

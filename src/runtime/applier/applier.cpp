@@ -311,12 +311,6 @@ namespace hpx { namespace applier
         return true;
     }
 
-    // parcel forwarding.
-    bool applier::route(parcelset::parcel const& p)
-    {
-        return get_agas_client().route_parcel(p);
-    }
-
     void applier::init_tss()
     {
         if (NULL == applier::applier_.get())

@@ -136,8 +136,7 @@ public:
         }
         else {
             // erase current locality_id and replace with given one
-            msb_ &= ~naming::gid_type::locality_id_mask;
-            msb_ |= naming::get_gid_from_locality_id(locality_id).get_msb();
+            msb_ = naming::replace_locality_id(msb_, locality_id);
         }
     }
 

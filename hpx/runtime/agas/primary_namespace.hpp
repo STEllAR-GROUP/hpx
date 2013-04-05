@@ -14,8 +14,8 @@
 namespace hpx { namespace agas
 {
 
-struct primary_namespace :
-    components::client_base<primary_namespace, stubs::primary_namespace>
+struct primary_namespace
+  : components::client_base<primary_namespace, stubs::primary_namespace>
 {
     typedef components::client_base<primary_namespace, stubs::primary_namespace>
         base_type;
@@ -63,16 +63,6 @@ struct primary_namespace :
     {
         this->base_type::bulk_service_non_blocking(this->get_gid(), reqs, priority);
     }
-
-    bool route(
-        parcelset::parcel const& p
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::route(this->get_gid(), p, priority, ec);
-    }
-
 };
 
 }}

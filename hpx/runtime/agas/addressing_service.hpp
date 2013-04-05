@@ -954,18 +954,29 @@ public:
     bool is_local_address(
         naming::gid_type const& id
       , error_code& ec = throws
-        );
+        )
+    {
+        naming::address addr;
+        return is_local_address_cached(id, addr, ec);
+    }
 
     bool is_local_address(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
-        );
+        )
+    {
+        return is_local_address_cached(id, addr, ec);
+    }
 
     bool is_local_address_cached(
         naming::gid_type const& id
       , error_code& ec = throws
-        );
+        )
+    {
+        naming::address addr;
+        return is_local_address_cached(id, addr, ec);
+    }
 
     bool is_local_address_cached(
         naming::gid_type const& id
@@ -1147,6 +1158,23 @@ public:
       , std::vector<naming::address>& addrs
       , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
+        );
+
+    /// \brief Route the given parcel to the appropriate AGAS service instance
+    ///
+    /// This function sends the given parcel to the AGAS service instance which 
+    /// manages the parcel's destination GID. This service instance will resolve
+    /// the GID and either send (route) the parcel to the correct locality or
+    /// it will deliver the parcel to the local action manager.
+    ///
+    /// \param p          [in] this is the parcel which has to be routed to the
+    ///                   AGAS service instance managing the destination GID.
+    ///
+    /// \note             The route operation is asynchronous, thus it returns 
+    ///                   before the parcel has been delivered to its 
+    ///                   destination.
+    void route(
+        parcelset::parcel const& p
         );
 
     /// \brief Increment the global reference count for the given id
@@ -1533,11 +1561,6 @@ public:
     ///          may break your code if you use it.
     void clear_cache(
         error_code& ec = throws
-        );
-
-    bool route_parcel(
-        parcelset::parcel const& arg0
-      , error_code& ec = throws
         );
 
     /// \brief Retrieve statistics performance counter
