@@ -184,7 +184,7 @@ namespace hpx { namespace plugins { namespace compression
         if (compdecomp_.save(src_begin, src_begin+buffer_.size(),
                 dst_begin, dst_begin+dst_count, true))
         {
-            written = dst_begin-static_cast<char*>(dst)
+            written = dst_begin-static_cast<char*>(dst);
 //             HPX_THROW_EXCEPTION(serialization_error,
 //                 "zlib_serialization_filter::flush",
 //                 "compression failure, flushing did not reach end of data");
