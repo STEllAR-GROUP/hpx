@@ -325,7 +325,7 @@ naming::id_type get_console_locality(
     return naming::id_type(console, naming::id_type::unmanaged);
 }
 
-boost::uint32_t get_locality_id(error_code& ec)
+boost::uint32_t get_locality_id()
 {
     if (get_runtime_ptr() == 0)
         return naming::invalid_locality_id;
