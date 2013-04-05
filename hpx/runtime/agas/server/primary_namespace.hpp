@@ -114,6 +114,7 @@ struct HPX_EXPORT primary_namespace
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
     std::string instance_name_;
+    naming::locality locality_;
 
     struct update_time_on_exit;
 
@@ -279,6 +280,12 @@ struct HPX_EXPORT primary_namespace
   private:
     boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
         naming::gid_type const& gid
+      , error_code& ec
+        );
+
+    bool primary_namespace::resolve_gid_locked2(
+        naming::gid_type const& gid
+      , naming::address& addr
       , error_code& ec
         );
 

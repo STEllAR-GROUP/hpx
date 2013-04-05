@@ -374,7 +374,7 @@ namespace hpx { namespace parcelset
 
         // At least one of the addresses is locally unknown, route the parcel
         // to the AGAS managing the destination.
-        resolver_.route(p);
+        resolver_.route(p, f);
     }
 
     std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const

@@ -1162,7 +1162,7 @@ public:
 
     /// \brief Route the given parcel to the appropriate AGAS service instance
     ///
-    /// This function sends the given parcel to the AGAS service instance which 
+    /// This function sends the given parcel to the AGAS service instance which
     /// manages the parcel's destination GID. This service instance will resolve
     /// the GID and either send (route) the parcel to the correct locality or
     /// it will deliver the parcel to the local action manager.
@@ -1170,11 +1170,12 @@ public:
     /// \param p          [in] this is the parcel which has to be routed to the
     ///                   AGAS service instance managing the destination GID.
     ///
-    /// \note             The route operation is asynchronous, thus it returns 
-    ///                   before the parcel has been delivered to its 
+    /// \note             The route operation is asynchronous, thus it returns
+    ///                   before the parcel has been delivered to its
     ///                   destination.
     void route(
         parcelset::parcel const& p
+      , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const&
         );
 
     /// \brief Increment the global reference count for the given id

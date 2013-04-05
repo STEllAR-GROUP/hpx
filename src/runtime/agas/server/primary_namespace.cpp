@@ -11,7 +11,6 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -426,16 +425,13 @@ response primary_namespace::resolve_gid(
                       , no_success);
     }
 
-    else
-    {
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%)")
-            % id % at_c<0>(r) % at_c<1>(r));
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%)")
+        % id % at_c<0>(r) % at_c<1>(r));
 
-        return response(primary_ns_resolve_gid
-                      , at_c<0>(r)
-                      , at_c<1>(r));
-    }
+    return response(primary_ns_resolve_gid
+                    , at_c<0>(r)
+                    , at_c<1>(r));
 } // }}}
 
 response primary_namespace::unbind_gid(
@@ -587,14 +583,6 @@ response primary_namespace::change_credit_sync(
 
     return response(primary_ns_change_credit_sync);
 }
-
-response primary_namespace::route(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ route implementation
-    return response();
-} // }}}
 
 void primary_namespace::increment(
     naming::gid_type const& lower

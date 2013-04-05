@@ -1296,6 +1296,7 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel const& p
+  , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
     )
 { // {{{ route implementation
 
@@ -1309,7 +1310,7 @@ void addressing_service::route(
 
     // the routing is handled in a fire & forget fashion
     stubs::primary_namespace::service_non_blocking(
-        target, req, threads::thread_priority_default);
+        target, req, f, threads::thread_priority_default);
 
 } // }}}
 
