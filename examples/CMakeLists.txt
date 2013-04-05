@@ -15,7 +15,6 @@ set(subdirs
     balancing
     bcast
     bfs
-    bright_future
     cancelable_action
     dataflow
     distributed_test

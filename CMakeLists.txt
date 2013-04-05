@@ -898,6 +898,8 @@ else()
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
 
+
+
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
   hpx_use_flag_if_available(-Werror=vla LANGUAGES CXX C)
 
@@ -967,6 +969,21 @@ else()
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_use_flag_if_available(-Wno-cast-align)
+  endif()
+
+  ##############################################################################
+  # ICPC-only configuration
+  ##############################################################################
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    # Disable the following warnings:
+    # #1170: invalid redeclaration of nested class
+    # #858: type qualifier on return type is meaningless
+    # #1098: the qualifier on this friend declaration is ignored
+    # #488: template parameter not used in declaring the parameter type
+    hpx_use_flag_if_available(-wd1170)
+    hpx_use_flag_if_available(-wd858)
+    hpx_use_flag_if_available(-wd1098)
+    hpx_use_flag_if_available(-wd488)
   endif()
 
   ##############################################################################
