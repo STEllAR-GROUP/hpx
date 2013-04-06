@@ -280,12 +280,6 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec
         );
 
-    bool primary_namespace::resolve_gid_locked2(
-        naming::gid_type const& gid
-      , naming::address& addr
-      , error_code& ec
-        );
-
     void increment(
         naming::gid_type const& lower
       , naming::gid_type const& upper
