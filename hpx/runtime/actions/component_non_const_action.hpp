@@ -448,6 +448,7 @@ namespace hpx { namespace actions
     typedef typename                                                          \
         HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name      \
     /**/
+/// \endcond
 
 /// \def HPX_DEFINE_COMPONENT_CONST_ACTION(component, func, action_type)
 ///

@@ -24,7 +24,7 @@ namespace hpx { namespace agas { namespace server
         std::vector<naming::address>& addrs = p.get_destination_addrs();
         std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
 
-        // resolve destination addresses, we should be able to resolve all of 
+        // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
         {
             mutex_type::scoped_lock l(mutex_);
@@ -38,7 +38,7 @@ namespace hpx { namespace agas { namespace server
                 if (!addrs[i])
                 {
                     cache_addresses.push_back(resolve_gid_locked(gids[i], ec));
-                    boost::fusion::vector2<naming::gid_type, gva>& r = 
+                    boost::fusion::vector2<naming::gid_type, gva> const& r =
                         cache_addresses.back();
 
                     if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
@@ -78,7 +78,7 @@ namespace hpx { namespace agas { namespace server
         naming::id_type source = get_colocation_id(p.get_source());
         for (std::size_t i = 0; i != gids.size(); ++i)
         {
-            boost::fusion::vector2<naming::gid_type, gva> const& r = 
+            boost::fusion::vector2<naming::gid_type, gva> const& r =
                 cache_addresses[i];
 
             if (boost::fusion::at_c<0>(r))

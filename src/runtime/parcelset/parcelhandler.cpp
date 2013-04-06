@@ -124,7 +124,8 @@ namespace hpx { namespace parcelset
         pports_(connection_last),
         tm_(tm),
         parcels_(policy),
-        use_alternative_parcelports_(false)
+        use_alternative_parcelports_(false),
+        count_routed_(0)
     {
         BOOST_ASSERT(parcels_);
 
@@ -374,6 +375,7 @@ namespace hpx { namespace parcelset
 
         // At least one of the addresses is locally unknown, route the parcel
         // to the AGAS managing the destination.
+        ++count_routed_;
         resolver_.route(p, f);
     }
 
@@ -446,6 +448,12 @@ namespace hpx { namespace parcelset
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_parcel_send_count(reset) : 0;
+    }
+
+    // number of parcels routed
+    boost::int64_t parcelhandler::get_parcel_routed_count(bool reset)
+    {
+        return util::get_and_reset_value(count_routed_, reset);
     }
 
     // number of messages sent
@@ -564,6 +572,8 @@ namespace hpx { namespace parcelset
             boost::bind(&parcelhandler::get_incoming_queue_length, this, ::_1));
         HPX_STD_FUNCTION<boost::int64_t(bool)> outgoing_queue_length(
             boost::bind(&parcelhandler::get_outgoing_queue_length, this, ::_1));
+        HPX_STD_FUNCTION<boost::int64_t(bool)> outgoing_routed_count(
+            boost::bind(&parcelhandler::get_parcel_routed_count, this, ::_1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
@@ -582,6 +592,16 @@ namespace hpx { namespace parcelset
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, outgoing_queue_length, _2),
+              &performance_counters::locality_counter_discoverer,
+              ""
+            },
+            { "/parcels/count/routed",
+              performance_counters::counter_raw,
+              "returns the number of (outbound) parcel routed through the "
+                  "responsible AGAS service",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, outgoing_routed_count, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             }

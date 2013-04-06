@@ -378,6 +378,9 @@ namespace hpx { namespace parcelset
         // number of messages sent
         std::size_t get_message_send_count(connection_type, bool) const;
 
+        // number of parcels routed
+        boost::int64_t get_parcel_routed_count(bool);
+
         // number of parcels received
         std::size_t get_parcel_receive_count(connection_type, bool) const;
 
@@ -454,6 +457,9 @@ namespace hpx { namespace parcelset
 
         /// Store message handlers for actions
         message_handler_map handlers_;
+
+        /// Count number of (outbound) parcels routed
+        boost::atomic<boost::int64_t> count_routed_;
     };
 }}
 
