@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     lcos::future<void>
-    runtime_support::call_startup_functions_async(naming::id_type const& gid, 
+    runtime_support::call_startup_functions_async(naming::id_type const& gid,
         bool pre_startup)
     {
         typedef server::runtime_support::call_startup_functions_action action_type;
@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     lcos::future<void>
-    runtime_support::call_shutdown_functions_async(naming::id_type const& gid, 
+    runtime_support::call_shutdown_functions_async(naming::id_type const& gid,
         bool pre_shutdown)
     {
         typedef server::runtime_support::call_shutdown_functions_action action_type;
@@ -117,7 +117,7 @@ namespace hpx { namespace components { namespace stubs
 
     /// \brief Shutdown the given runtime system
     lcos::future<void>
-    runtime_support::shutdown_async(naming::id_type const& targetgid, 
+    runtime_support::shutdown_async(naming::id_type const& targetgid,
         double timeout)
     {
         // Create a promise directly and execute the required action.
@@ -131,7 +131,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     /// \brief Shutdown the runtime systems of all localities
-    void runtime_support::shutdown_all(naming::id_type const& targetgid, 
+    void runtime_support::shutdown_all(naming::id_type const& targetgid,
         double timeout)
     {
         hpx::apply<server::runtime_support::shutdown_all_action>(
@@ -178,13 +178,14 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    void runtime_support::insert_agas_cache_entry(
-        naming::id_type const& targetgid,
-        naming::gid_type const& gid, naming::address const& g)
+    void runtime_support::update_agas_cache_entry(
+        naming::id_type const& targetgid, naming::gid_type const& gid,
+        naming::address const& g, boost::uint64_t count,
+        boost::uint64_t offset)
     {
-        typedef server::runtime_support::insert_agas_cache_entry_action
+        typedef server::runtime_support::update_agas_cache_entry_action
             action_type;
-        hpx::apply<action_type>(targetgid, gid, g);
+        hpx::apply<action_type>(targetgid, gid, g, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -250,7 +251,7 @@ namespace hpx { namespace components { namespace stubs
     void runtime_support::call_shutdown_functions_async(
         naming::id_type const& gid, naming::locality const& l)
     {
-        typedef server::runtime_support::remove_from_connection_cache_action 
+        typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
         hpx::apply<action_type>(gid, l);
     }

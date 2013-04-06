@@ -154,9 +154,10 @@ namespace hpx { namespace components { namespace server
         /// \brief Retrieve configuration information
         util::section get_config();
 
-        /// \brief Insert the given name mapping into the AGAS cache of this
+        /// \brief Update the given name mapping into the AGAS cache of this
         ///        locality.
-        void insert_agas_cache_entry(naming::gid_type const&, naming::address const&);
+        void update_agas_cache_entry(naming::gid_type const&,
+            naming::address const&, boost::uint64_t, boost::uint64_t);
 
         /// \brief Load all components on this locality.
         bool load_components();
@@ -207,7 +208,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config);
 #endif
 
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, insert_agas_cache_entry);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, update_agas_cache_entry);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, get_instance_count);
@@ -417,8 +418,8 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::insert_agas_cache_entry_action,
-    insert_agas_cache_entry_action)
+    hpx::components::server::runtime_support::update_agas_cache_entry_action,
+    update_agas_cache_entry_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action)

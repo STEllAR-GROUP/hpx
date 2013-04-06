@@ -1531,10 +1531,12 @@ public:
     void insert_cache_entry(
         naming::gid_type const& gid
       , naming::address const& addr
+      , boost::uint64_t count = 0
+      , boost::uint64_t offset = 0
       , error_code& ec = throws
         )
     {
-        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        const gva g(addr.locality_, addr.type_, count, addr.address_, offset);
         insert_cache_entry(gid, g, ec);
     }
 
@@ -1551,10 +1553,12 @@ public:
     void update_cache_entry(
         naming::gid_type const& gid
       , naming::address const& addr
+      , boost::uint64_t count = 0
+      , boost::uint64_t offset = 0
       , error_code& ec = throws
         )
     {
-        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        const gva g(addr.locality_, addr.type_, count, addr.address_, offset);
         update_cache_entry(gid, g, ec);
     }
 

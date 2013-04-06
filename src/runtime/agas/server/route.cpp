@@ -16,28 +16,13 @@
 
 namespace hpx { namespace agas { namespace server
 {
-    bool primary_namespace::resolve_gid_locked2(naming::gid_type const& gid, 
-        naming::address& addr, error_code& ec)
-    {
-        boost::fusion::vector2<naming::gid_type, gva> r =
-            resolve_gid_locked(gid, ec);
-        if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
-            return false;
-
-        gva const g = boost::fusion::at_c<1>(r).resolve(gid, boost::fusion::at_c<0>(r));
-
-        addr.locality_ = g.endpoint;
-        addr.type_ = g.type;
-        addr.address_ = g.lva();
-        return true;
-    }
-
     response primary_namespace::route(request const& req, error_code& ec)
     { // {{{ route implementation
         parcelset::parcel p = req.get_parcel();
 
         std::vector<naming::gid_type> const& gids = p.get_destinations();
         std::vector<naming::address>& addrs = p.get_destination_addrs();
+        std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
 
         // resolve destination addresses, we should be able to resolve all of 
         // them, otherwise it's an error
@@ -47,15 +32,32 @@ namespace hpx { namespace agas { namespace server
             if (!locality_)
                 locality_ = get_runtime().here();
 
+            cache_addresses.reserve(gids.size());
             for (std::size_t i = 0; i != gids.size(); ++i)
             {
                 if (!addrs[i])
                 {
-                    if (!resolve_gid_locked2(gids[i], addrs[i], ec) || ec)
+                    cache_addresses.push_back(resolve_gid_locked(gids[i], ec));
+                    boost::fusion::vector2<naming::gid_type, gva>& r = 
+                        cache_addresses.back();
+
+                    if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
                     {
                         return response(primary_ns_route, naming::invalid_gid,
                             gva(), no_success);
                     }
+
+                    gva const g = boost::fusion::at_c<1>(r).resolve(
+                        gids[i], boost::fusion::at_c<0>(r));
+
+                    addrs[i].locality_ = g.endpoint;
+                    addrs[i].type_ = g.type;
+                    addrs[i].address_ = g.lva();
+                }
+                else
+                {
+                    cache_addresses.push_back(
+                        boost::fusion::make_vector(naming::gid_type(), gva()));
                 }
             }
         }
@@ -76,8 +78,17 @@ namespace hpx { namespace agas { namespace server
         naming::id_type source = get_colocation_id(p.get_source());
         for (std::size_t i = 0; i != gids.size(); ++i)
         {
-            components::stubs::runtime_support::insert_agas_cache_entry(
-                source, gids[i], addrs[i]);
+            boost::fusion::vector2<naming::gid_type, gva> const& r = 
+                cache_addresses[i];
+
+            if (boost::fusion::at_c<0>(r))
+            {
+                gva const& g = boost::fusion::at_c<1>(r);
+                naming::address addr(g.endpoint, g.type, g.lva());
+
+                components::stubs::runtime_support::update_agas_cache_entry(
+                    source, boost::fusion::at_c<0>(r), addr, g.count, g.offset);
+            }
         }
 
         return response(primary_ns_route, success);
