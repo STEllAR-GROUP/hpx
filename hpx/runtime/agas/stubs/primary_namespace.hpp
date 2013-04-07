@@ -21,9 +21,7 @@ struct HPX_EXPORT primary_namespace
     typedef server::primary_namespace server_component_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Result
-    >
+    template <typename Result>
     static lcos::future<Result> service_async(
         naming::id_type const& gid
       , request const& req
@@ -101,6 +99,12 @@ struct HPX_EXPORT primary_namespace
         boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
         naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
         return naming::replace_locality_id(service, service_locality_id);
+    }
+
+    static bool is_service_instance(naming::gid_type const& gid)
+    {
+        return gid.get_lsb() == HPX_AGAS_PRIMARY_NS_LSB &&
+            (gid.get_msb() & ~naming::gid_type::locality_id_mask) == HPX_AGAS_NS_MSB;
     }
 };
 

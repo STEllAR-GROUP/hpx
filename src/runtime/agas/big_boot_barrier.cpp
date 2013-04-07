@@ -100,6 +100,7 @@ struct registration_header
       , boost::uint64_t response_heap_ptr_
       , boost::uint64_t component_runtime_support_ptr_
       , boost::uint64_t component_memory_ptr_
+      , boost::uint64_t primary_ns_ptr_
     ) :
         locality(locality_)
       , parcelport_allocation(parcelport_allocation_)
@@ -109,6 +110,7 @@ struct registration_header
       , response_heap_ptr(response_heap_ptr_)
       , component_runtime_support_ptr(component_runtime_support_ptr_)
       , component_memory_ptr(component_memory_ptr_)
+      , primary_ns_ptr(primary_ns_ptr_)
     {}
 
     naming::locality locality;
@@ -119,6 +121,7 @@ struct registration_header
     boost::uint64_t response_heap_ptr;
     boost::uint64_t component_runtime_support_ptr;
     boost::uint64_t component_memory_ptr;
+    boost::uint64_t primary_ns_ptr;
 
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int)
@@ -131,6 +134,7 @@ struct registration_header
         ar & response_heap_ptr;
         ar & component_runtime_support_ptr;
         ar & component_memory_ptr;
+        ar & primary_ns_ptr;
     }
 };
 
@@ -286,22 +290,25 @@ void register_console(registration_header const& header)
                            , heap_lower, heap_upper);
 
     naming::gid_type runtime_support_gid(prefix.get_msb()
-                                       , header.component_runtime_support_ptr)
-                   , memory_gid(prefix.get_msb()
-                              , header.component_memory_ptr);
-
-    naming::address runtime_support_address
-        (header.locality,
-         components::get_component_type<components::server::runtime_support>(),
-         header.component_runtime_support_ptr);
-
-    naming::address memory_address
-        (header.locality,
-         components::get_component_type<components::server::memory>(),
-         header.component_memory_ptr);
-
+      , header.component_runtime_support_ptr);
+    naming::address runtime_support_address(header.locality
+      , components::get_component_type<components::server::runtime_support>()
+      , header.component_runtime_support_ptr);
     agas_client.bind(runtime_support_gid, runtime_support_address);
+
+    naming::gid_type memory_gid(prefix.get_msb()
+      , header.component_memory_ptr);
+    naming::address memory_address(header.locality
+      , components::get_component_type<components::server::memory>()
+      , header.component_memory_ptr);
     agas_client.bind(memory_gid, memory_address);
+
+    naming::gid_type primary_ns_gid(
+        stubs::primary_namespace::get_service_instance(prefix));
+    naming::address primary_ns_address(header.locality
+      , components::get_component_type<agas::server::primary_namespace>()
+      , header.primary_ns_ptr);
+    agas_client.bind(primary_ns_gid, primary_ns_address);
 
     agas_client.bind_range(heap_lower, header.response_allocation
                          , header.response_heap_address
@@ -349,13 +356,14 @@ void notify_console(notification_header const& header)
     // it's dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
-    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+    runtime& rt = get_runtime();
+    naming::resolver_client& agas_client = rt.get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.status() != starting))
     {
         hpx::util::osstream strm;
         strm << "locality "
-             << get_runtime().here()
+             << rt.here()
              << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_console",
@@ -364,7 +372,7 @@ void notify_console(notification_header const& header)
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
-    get_runtime().get_config().parse("assigned locality",
+    rt.get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
 
@@ -374,9 +382,18 @@ void notify_console(notification_header const& header)
     agas_client.component_ns_addr_ = header.component_ns_address;
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
+    // register local primary namespace component
+    naming::gid_type const primary_gid = 
+        stubs::primary_namespace::get_service_instance(
+            agas_client.get_local_locality());
+    naming::address primary_addr(rt.here()
+      , server::primary_namespace::get_component_type(),
+        agas_client.get_hosted_primary_ns_ptr());
+    agas_client.bind(primary_gid, primary_addr);
+
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
-    get_runtime().get_id_pool().set_range(header.parcelport_lower_gid
+    rt.get_id_pool().set_range(header.parcelport_lower_gid
                                         , header.parcelport_upper_gid);
 
     // assign the initial gid range to the unique id range allocator that our
@@ -398,19 +415,14 @@ void notify_console(notification_header const& header)
     // set up the future pools
     naming::resolver_client::locality_promise_pool_type& locality_promise_pool
         = agas_client.hosted->locality_promise_pool_;
-    naming::resolver_client::primary_promise_pool_type& primary_promise_pool
-        = agas_client.hosted->primary_promise_pool_;
 
-    util::runtime_configuration const& ini_ = get_runtime().get_config();
-
+    util::runtime_configuration const& ini_ = rt.get_config();
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
     {
         locality_promise_pool.enqueue(
             new lcos::packaged_action<server::locality_namespace::service_action>);
-        primary_promise_pool.enqueue(
-            new lcos::packaged_action<server::primary_namespace::service_action>);
     }
 }
 
@@ -421,7 +433,8 @@ void register_worker(registration_header const& header)
     // it's dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
-    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+    runtime& rt = get_runtime();
+    naming::resolver_client& agas_client = rt.get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.is_connecting()))
     {
@@ -441,7 +454,7 @@ void register_worker(registration_header const& header)
                    , parcel_lower, parcel_upper
                    , heap_lower, heap_upper;
 
-    util::runtime_configuration const& cfg = get_runtime().get_config();
+    util::runtime_configuration const& cfg = rt.get_config();
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
         cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
     if (!agas_client.register_locality(header.locality, prefix, num_threads))
@@ -459,37 +472,40 @@ void register_worker(registration_header const& header)
                            , heap_lower, heap_upper);
 
     naming::gid_type runtime_support_gid(prefix.get_msb()
-                                       , header.component_runtime_support_ptr)
-                   , memory_gid(prefix.get_msb()
-                              , header.component_memory_ptr);
-
-    naming::address runtime_support_address
-        (header.locality,
-         components::get_component_type<components::server::runtime_support>(),
-         header.component_runtime_support_ptr);
-
-    naming::address memory_address
-        (header.locality,
-         components::get_component_type<components::server::memory>(),
-         header.component_memory_ptr);
-
+      , header.component_runtime_support_ptr);
+    naming::address runtime_support_address(header.locality
+      , components::get_component_type<components::server::runtime_support>()
+      , header.component_runtime_support_ptr);
     agas_client.bind(runtime_support_gid, runtime_support_address);
+
+    naming::gid_type memory_gid(prefix.get_msb()
+      , header.component_memory_ptr);
+    naming::address memory_address(header.locality
+      , components::get_component_type<components::server::memory>()
+      , header.component_memory_ptr);
     agas_client.bind(memory_gid, memory_address);
+
+    naming::gid_type primary_ns_gid(
+        stubs::primary_namespace::get_service_instance(prefix));
+    naming::address primary_ns_address(header.locality
+      , components::get_component_type<agas::server::primary_namespace>()
+      , header.primary_ns_ptr);
+    agas_client.bind(primary_ns_gid, primary_ns_address);
 
     agas_client.bind_range(heap_lower, header.response_allocation
                          , header.response_heap_address
                          , header.response_heap_offset);
 
-    naming::address locality_addr(get_runtime().here(),
+    naming::address locality_addr(rt.here(),
         server::locality_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->locality_ns_server_));
-    naming::address primary_addr(get_runtime().here(),
+    naming::address primary_addr(rt.here(),
         server::primary_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->primary_ns_server_));
-    naming::address component_addr(get_runtime().here(),
+    naming::address component_addr(rt.here(),
         server::component_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->component_ns_server_));
-    naming::address symbol_addr(get_runtime().here(),
+    naming::address symbol_addr(rt.here(),
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
@@ -534,11 +550,12 @@ void notify_worker(notification_header const& header)
     // it's dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
-    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+    runtime& rt = get_runtime();
+    naming::resolver_client& agas_client = rt.get_agas_client();
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
-    get_runtime().get_config().parse("assigned locality",
+    rt.get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
 
@@ -548,9 +565,18 @@ void notify_worker(notification_header const& header)
     agas_client.component_ns_addr_ = header.component_ns_address;
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
+    // register local primary namespace component
+    naming::gid_type const primary_gid = 
+        stubs::primary_namespace::get_service_instance(
+            agas_client.get_local_locality());
+    naming::address primary_addr(rt.here()
+      , server::primary_namespace::get_component_type(),
+        agas_client.get_hosted_primary_ns_ptr());
+    agas_client.bind(primary_gid, primary_addr);
+
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
-    get_runtime().get_id_pool().set_range(header.parcelport_lower_gid
+    rt.get_id_pool().set_range(header.parcelport_lower_gid
                                         , header.parcelport_upper_gid);
 
     // assign the initial gid range to the unique id range allocator that our
@@ -572,10 +598,8 @@ void notify_worker(notification_header const& header)
     // set up the future pools
     naming::resolver_client::locality_promise_pool_type& locality_promise_pool
         = agas_client.hosted->locality_promise_pool_;
-    naming::resolver_client::primary_promise_pool_type& primary_promise_pool
-        = agas_client.hosted->primary_promise_pool_;
 
-    util::runtime_configuration const& ini_ = get_runtime().get_config();
+    util::runtime_configuration const& ini_ = rt.get_config();
 
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
@@ -583,8 +607,6 @@ void notify_worker(notification_header const& header)
     {
         locality_promise_pool.enqueue(
             new lcos::packaged_action<server::locality_namespace::service_action>);
-        primary_promise_pool.enqueue(
-            new lcos::packaged_action<server::primary_namespace::service_action>);
     }
 }
 // }}}
@@ -626,15 +648,18 @@ void big_boot_barrier::apply(
     pp.send_early_parcel(p);
 } // }}}
 
-void big_boot_barrier::wait()
+void big_boot_barrier::wait(void* primary_ns_server)
 { // {{{
     if (service_mode_bootstrap == service_type)
         spin();
 
     else
     {
+        BOOST_ASSERT(0 != primary_ns_server);
+
         // allocate our first heap
         response_heap_type::block_type* p = response_heap_type::alloc_heap();
+        runtime& rt = get_runtime();
 
         // hosted, console
         if (runtime_mode_console == runtime_type)
@@ -646,15 +671,17 @@ void big_boot_barrier::wait()
 
             apply(0, bootstrap_agas,
                 new actions::transfer_action<register_console_action>(
-                    registration_header
-                        (get_runtime().here(),
-                         HPX_INITIAL_GID_RANGE,
-                         response_heap_type::block_type::heap_step,
-                         p->get_address(),
-                         response_heap_type::block_type::heap_size,
-                         reinterpret_cast<boost::uint64_t>(p),
-                         get_runtime().get_runtime_support_lva(),
-                         get_runtime().get_memory_lva())));
+                    registration_header(
+                        rt.here()
+                      , HPX_INITIAL_GID_RANGE
+                      , response_heap_type::block_type::heap_step
+                      , p->get_address()
+                      , response_heap_type::block_type::heap_size
+                      , reinterpret_cast<boost::uint64_t>(p)
+                      , rt.get_runtime_support_lva()
+                      , rt.get_memory_lva()
+                      , reinterpret_cast<boost::uint64_t>(primary_ns_server))
+                ));
             spin();
         }
 
@@ -666,15 +693,17 @@ void big_boot_barrier::wait()
 
             apply(0, bootstrap_agas,
                 new actions::transfer_action<register_worker_action>(
-                    registration_header
-                        (get_runtime().here(),
-                         HPX_INITIAL_GID_RANGE,
-                         response_heap_type::block_type::heap_step,
-                         p->get_address(),
-                         response_heap_type::block_type::heap_size,
-                         reinterpret_cast<boost::uint64_t>(p),
-                         get_runtime().get_runtime_support_lva(),
-                         get_runtime().get_memory_lva())));
+                    registration_header(
+                        rt.here()
+                      , HPX_INITIAL_GID_RANGE
+                      , response_heap_type::block_type::heap_step
+                      , p->get_address()
+                      , response_heap_type::block_type::heap_size
+                      , reinterpret_cast<boost::uint64_t>(p)
+                      , rt.get_runtime_support_lva()
+                      , rt.get_memory_lva()
+                      , reinterpret_cast<boost::uint64_t>(primary_ns_server))
+                ));
             spin();
         }
     }

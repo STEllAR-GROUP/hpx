@@ -593,6 +593,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_AGAS_BOOTSTRAP_PREFIX   0U
+
+#define HPX_AGAS_NS_MSB             0x0000000000000001ULL
+
 #define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
 #define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
 #define HPX_AGAS_COMPONENT_NS_MSB   0x0000000100000001ULL

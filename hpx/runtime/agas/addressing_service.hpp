@@ -164,10 +164,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         lcos::packaged_action<server::locality_namespace::service_action>*
     > locality_promise_pool_type;
 
-    typedef boost::lockfree::fifo<
-        lcos::packaged_action<server::primary_namespace::service_action>*
-    > primary_promise_pool_type;
-
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
 
@@ -214,7 +210,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     { // {{{
         hosted_data_type()
           : locality_promise_pool_(16)
-          , primary_promise_pool_(16)
         {}
 
         void register_counter_types()
@@ -245,7 +240,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
         hpx::lcos::local::counting_semaphore promise_pool_semaphore_;
         locality_promise_pool_type locality_promise_pool_;
-        primary_promise_pool_type primary_promise_pool_;
     }; // }}}
 
     mutable cache_mutex_type gva_cache_mtx_;
@@ -368,6 +362,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         );
 
     naming::locality const& get_here() const;
+
+    void* get_hosted_primary_ns_ptr() const
+    {
+        BOOST_ASSERT(0 != hosted.get());
+        return &hosted->primary_ns_server_;
+    }
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
@@ -957,17 +957,14 @@ public:
         )
     {
         naming::address addr;
-        return is_local_address_cached(id, addr, ec);
+        return is_local_address(id, addr, ec);
     }
 
     bool is_local_address(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
-        )
-    {
-        return is_local_address_cached(id, addr, ec);
-    }
+        );
 
     bool is_local_address_cached(
         naming::gid_type const& id

@@ -605,11 +605,13 @@ namespace hpx { namespace components { namespace server
                 get_runtime().get_agas_client();
 
             error_code ec(lightweight);
-            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
-            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             // Drop the locality from the partition table.
             agas_client.unregister_locality(appl.here(), ec);
+
+            // unregister fixed components
+            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
+            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();

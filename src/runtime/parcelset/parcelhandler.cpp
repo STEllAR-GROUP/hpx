@@ -345,11 +345,11 @@ namespace hpx { namespace parcelset
         bool resolved_locally = true;
         if (1 == gids.size()) {
             if (!addrs[0])
-                resolved_locally = resolver_.resolve_cached(gids[0], addrs[0]);
+                resolved_locally = resolver_.resolve(gids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve_cached(gids, addrs, locals);
+            resolved_locally = resolver_.resolve(gids, addrs, locals);
         }
 
         if (!p.get_parcel_id())

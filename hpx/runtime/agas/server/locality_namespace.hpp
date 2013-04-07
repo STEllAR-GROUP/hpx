@@ -45,7 +45,7 @@ struct HPX_EXPORT locality_namespace
   : components::fixed_component_base<locality_namespace>
 {
     // {{{ nested types
-    typedef lcos::local::mutex mutex_type;
+    typedef lcos::local::spinlock mutex_type;
     typedef components::fixed_component_base<locality_namespace> base_type;
 
     typedef boost::int32_t component_type;

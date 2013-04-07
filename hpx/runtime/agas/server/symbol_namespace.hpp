@@ -41,7 +41,7 @@ struct HPX_EXPORT symbol_namespace
   : components::fixed_component_base<symbol_namespace>
 {
     // {{{ nested types
-    typedef lcos::local::mutex mutex_type;
+    typedef lcos::local::spinlock mutex_type;
     typedef components::fixed_component_base<symbol_namespace> base_type;
 
     // FIXME: This signature should use id_type, not gid_type
