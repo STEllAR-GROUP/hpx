@@ -94,7 +94,7 @@ namespace hpx { namespace plugins { namespace parcel
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
                 parcelset::parcelhandler* ph, naming::locality const& loc,    \
-                parcelset::connection_type t)                                 \
+                parcelset::connection_type t, parcelset::parcel const& p)     \
             {                                                                 \
                 return parcelset::get_message_handler(ph, action_name,        \
                     "coalescing_message_handler", num, interval, loc, t);     \
@@ -112,7 +112,7 @@ namespace hpx { namespace plugins { namespace parcel
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
                 parcelset::parcelhandler* ph, naming::locality const& loc,    \
-                parcelset::connection_type t)                                 \
+                parcelset::connection_type t, parcelset::parcel const& p)     \
             {                                                                 \
                 error_code ec(lightweight);                                   \
                 return parcelset::get_message_handler(ph, action_name,        \

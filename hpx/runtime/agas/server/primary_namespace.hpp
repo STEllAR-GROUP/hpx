@@ -357,6 +357,17 @@ struct HPX_EXPORT primary_namespace
     {
         return boost::move(f);
     }
+
+    static parcelset::policies::message_handler* get_message_handler(
+        parcelset::parcelhandler* ph
+      , naming::locality const& loc
+      , parcelset::connection_type t
+      , parcelset::parcel const& p
+        );
+
+    static util::binary_filter* get_serialization_filter(
+        parcelset::parcel const& p
+        );
 };
 
 }}}
@@ -368,6 +379,35 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
+
+namespace hpx { namespace traits
+{
+    // Parcel routing forwards the message handler request to the routed action
+    template <>
+    struct action_message_handler<agas::server::primary_namespace::service_action>
+    {
+        static parcelset::policies::message_handler* call(
+            parcelset::parcelhandler* ph
+          , naming::locality const& loc
+          , parcelset::connection_type t
+          , parcelset::parcel const& p
+            )
+        {
+            return agas::server::primary_namespace::get_message_handler(
+                ph, loc, t, p);
+        }
+    };
+
+    // Parcel routing forwards the binary filter request to the routed action
+    template <>
+    struct action_serialization_filter<agas::server::primary_namespace::service_action>
+    {
+        static util::binary_filter* call(parcelset::parcel const& p)
+        {
+            return agas::server::primary_namespace::get_serialization_filter(p);
+        }
+    };
+}}
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

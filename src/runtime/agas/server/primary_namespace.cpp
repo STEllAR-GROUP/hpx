@@ -236,6 +236,50 @@ void primary_namespace::finalize()
     }
 }
 
+// Parcel routing forwards the message handler request to the routed action
+parcelset::policies::message_handler* primary_namespace::get_message_handler(
+    parcelset::parcelhandler* ph
+  , naming::locality const& loc
+  , parcelset::connection_type t
+  , parcelset::parcel const& p
+    )
+{
+    typedef hpx::actions::transfer_action<
+        server::primary_namespace::service_action
+    > action_type;
+
+    boost::shared_ptr<action_type> act =
+        boost::static_pointer_cast<action_type>(p.get_action());
+    agas::request const& req = hpx::actions::get<0>(*act);
+
+    // only routing is handled in a special way
+    if (req.get_action_code() != primary_ns_route)
+        return 0;
+
+    parcelset::parcel routed_p = req.get_parcel();
+    return routed_p.get_message_handler(ph, loc, t);
+}
+
+util::binary_filter* primary_namespace::get_serialization_filter(
+    parcelset::parcel const& p
+    )
+{
+    typedef hpx::actions::transfer_action<
+        server::primary_namespace::service_action
+    > action_type;
+
+    boost::shared_ptr<action_type> act =
+        boost::static_pointer_cast<action_type>(p.get_action());
+    agas::request const& req = hpx::actions::get<0>(*act);
+
+    // only routing is handled in a special way
+    if (req.get_action_code() != primary_ns_route)
+        return 0;
+
+    parcelset::parcel routed_p = req.get_parcel();
+    return routed_p.get_serialization_filter();
+}
+
 // TODO: do/undo semantics (e.g. transactions)
 std::vector<response> primary_namespace::bulk_service(
     std::vector<request> const& reqs

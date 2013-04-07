@@ -190,12 +190,13 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an 
         /// instance of this action type.
-        virtual util::binary_filter* get_serialization_filter() const = 0;
+        virtual util::binary_filter* get_serialization_filter(
+            parcelset::parcel const& p) const = 0;
 
         /// Return a pointer to the message handler to be used for this action.
         virtual parcelset::policies::message_handler* get_message_handler(
             parcelset::parcelhandler* ph, naming::locality const& loc,
-            parcelset::connection_type t) const = 0;
+            parcelset::connection_type t, parcelset::parcel const& p) const = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -524,17 +525,19 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an 
         /// instance of this action type.
-        util::binary_filter* get_serialization_filter() const
+        util::binary_filter* get_serialization_filter(
+            parcelset::parcel const& p) const
         {
-            return traits::action_serialization_filter<derived_type>::call();
+            return traits::action_serialization_filter<derived_type>::call(p);
         }
 
         /// Return a pointer to the message handler to be used for this action.
         parcelset::policies::message_handler* get_message_handler(
             parcelset::parcelhandler* ph, naming::locality const& loc,
-            parcelset::connection_type t) const
+            parcelset::connection_type t, parcelset::parcel const& p) const
         {
-            return traits::action_message_handler<derived_type>::call(ph, loc, t);
+            return traits::action_message_handler<derived_type>::
+                call(ph, loc, t, p);
         }
 
     public:

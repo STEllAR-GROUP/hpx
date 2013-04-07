@@ -35,6 +35,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
+    class HPX_EXPORT parcel;
+
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////////
@@ -207,16 +209,16 @@ namespace hpx { namespace parcelset
                 parcel_id_ = id;
             }
 
-            util::binary_filter* get_serialization_filter() const
+            util::binary_filter* get_serialization_filter(parcelset::parcel const& p) const
             {
-                return action_->get_serialization_filter();
+                return action_->get_serialization_filter(p);
             }
 
             policies::message_handler* get_message_handler(
                 parcelset::parcelhandler* ph, naming::locality const& loc,
-                parcelset::connection_type t) const
+                parcelset::connection_type t, parcelset::parcel const& p) const
             {
-                return action_->get_message_handler(ph, loc, t);
+                return action_->get_message_handler(ph, loc, t, p);
             }
 
         private:
@@ -391,14 +393,14 @@ namespace hpx { namespace parcelset
 
         util::binary_filter* get_serialization_filter() const
         {
-            return data_->get_serialization_filter();
+            return data_->get_serialization_filter(*this);
         }
 
         policies::message_handler* get_message_handler(
             parcelset::parcelhandler* ph, naming::locality const& loc,
             parcelset::connection_type t) const
         {
-            return data_->get_message_handler(ph, loc, t);
+            return data_->get_message_handler(ph, loc, t, *this);
         }
 
         // generate unique parcel id
