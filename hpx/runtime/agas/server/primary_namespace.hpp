@@ -143,23 +143,20 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_bind_gid_count(bool);
         boost::int64_t get_resolve_gid_count(bool);
         boost::int64_t get_unbind_gid_count(bool);
-        boost::int64_t get_change_credit_non_blocking_count(bool);
-        boost::int64_t get_change_credit_sync_count(bool);
+        boost::int64_t get_change_credit_count(bool);
 
         boost::int64_t get_route_time(bool);
         boost::int64_t get_bind_gid_time(bool);
         boost::int64_t get_resolve_gid_time(bool);
         boost::int64_t get_unbind_gid_time(bool);
-        boost::int64_t get_change_credit_non_blocking_time(bool);
-        boost::int64_t get_change_credit_sync_time(bool);
+        boost::int64_t get_change_credit_time(bool);
 
         // increment counter values
         void increment_route_count();
         void increment_bind_gid_count();
         void increment_resolve_gid_count();
         void increment_unbind_gid_count();
-        void increment_change_credit_non_blocking_count();
-        void increment_change_credit_sync_count();
+        void increment_change_credit_count();
 
     private:
         friend struct update_time_on_exit;
@@ -170,8 +167,8 @@ struct HPX_EXPORT primary_namespace
         api_counter_data bind_gid_;             // primary_ns_bind_gid
         api_counter_data resolve_gid_;          // primary_ns_resolve_gid
         api_counter_data unbind_gid_;           // primary_ns_unbind_gid
-        api_counter_data change_credit_non_blocking_;  // primary_ns_change_credit_non_blocking
-        api_counter_data change_credit_sync_;   // primary_ns_change_credit_sync
+        api_counter_data change_credit_;        // primary_ns_change_credit_non_blocking
+                                                // primary_ns_change_credit_sync
     };
     counter_data counter_data_;
 

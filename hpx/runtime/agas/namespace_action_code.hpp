@@ -262,15 +262,10 @@ namespace detail
           , counter_target_count
           , primary_ns_unbind_gid
           , primary_ns_statistics_counter }
-      , {   "count/change_credit_non_blocking"
+      , {   "count/change_credit"
           , ""
           , counter_target_count
           , primary_ns_change_credit_non_blocking
-          , primary_ns_statistics_counter }
-      , {   "count/change_credit_sync"
-          , ""
-          , counter_target_count
-          , primary_ns_change_credit_sync
           , primary_ns_statistics_counter }
       // counters exposing API timings
       , {   "time/route"
@@ -293,15 +288,10 @@ namespace detail
           , counter_target_time
           , primary_ns_unbind_gid
           , primary_ns_statistics_counter }
-      , {   "time/change_credit_non_blocking"
+      , {   "time/change_credit"
           , "ns"
           , counter_target_time
           , primary_ns_change_credit_non_blocking
-          , primary_ns_statistics_counter }
-      , {   "time/change_credit_sync"
-          , "ns"
-          , counter_target_time
-          , primary_ns_change_credit_sync
           , primary_ns_statistics_counter }
     };
     static std::size_t const num_primary_namespace_services =

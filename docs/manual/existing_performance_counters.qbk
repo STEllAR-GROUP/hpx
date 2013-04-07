@@ -20,8 +20,7 @@ system and application performance.
 
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `change_credit_non_blocking`, `change_credit_sync`, `free`,
-            `get_component_typename`,
+            `change_credit`, `free`, `get_component_typename`,
             `iterate_names`, `iterate_types`, `localities`,
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
@@ -30,8 +29,12 @@ system and application performance.
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
-          Currently, this value will be `root` as we do not have distributed
-          AGAS services implemented yet.
+          Currently, this value will be `locality#*`, where `*` is the locality 
+          id of the locality hosting the AGAS service. Except for `<agas_service>`
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
+          the only value for `*` is `0` (only the primary AGAS service components 
+          live on all localities, whereas all other AGAS services are available 
+          on `locality#0` only).
         ]
         [None]
         [Returns the total number of invocations of the specified AGAS service
@@ -41,8 +44,7 @@ system and application performance.
 
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `change_credit_non_blocking`, `change_credit_sync`, `free`,
-            `get_component_typename`,
+            `change_credit`, `free`, `get_component_typename`,
             `iterate_names`, `iterate_types`, `localities`,
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
@@ -51,8 +53,12 @@ system and application performance.
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
-          Currently, this value will be `root` as we do not have distributed
-          AGAS services implemented yet.
+          Currently, this value will be `locality#*`, where `*` is the locality 
+          id of the locality hosting the AGAS service. Except for `<agas_service>`
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
+          the only value for `*` is `0` (only the primary AGAS service components 
+          live on all localities, whereas all other AGAS services are available 
+          on `locality#0` only).
         ]
         [None]
         [Returns the overall execution time of the specified AGAS service

@@ -85,18 +85,18 @@ response primary_namespace::service(
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.change_credit_non_blocking_.time_
+                  , counter_data_.change_credit_.time_
                 );
-                counter_data_.increment_change_credit_non_blocking_count();
+                counter_data_.increment_change_credit_count();
                 return change_credit_non_blocking(req, ec);
             }
         case primary_ns_change_credit_sync:
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.change_credit_sync_.time_
+                  , counter_data_.change_credit_.time_
                 );
-                counter_data_.increment_change_credit_sync_count();
+                counter_data_.increment_change_credit_count();
                 return change_credit_sync(req, ec);
             }
         case primary_ns_statistics_counter:
@@ -188,7 +188,7 @@ void primary_namespace::register_counter_types(
           , performance_counters::counter_raw
           , help
           , creator
-          , &performance_counters::default_counter_discoverer
+          , &performance_counters::locality_counter_discoverer
           , HPX_PERFORMANCE_COUNTER_V1
           , detail::primary_namespace_services[i].uom_
           , ec
@@ -1107,10 +1107,8 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_non_blocking:
-            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_count, &counter_data_, ::_1);
-            break;
         case primary_ns_change_credit_sync:
-            get_data_func = boost::bind(&cd::get_change_credit_sync_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_change_credit_count, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1135,10 +1133,8 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_non_blocking:
-            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_time, &counter_data_, ::_1);
-            break;
         case primary_ns_change_credit_sync:
-            get_data_func = boost::bind(&cd::get_change_credit_sync_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_change_credit_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1190,16 +1186,10 @@ boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
     return util::get_and_reset_value(unbind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_count(bool reset)
+boost::int64_t primary_namespace::counter_data::get_change_credit_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_non_blocking_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_change_credit_sync_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_sync_.count_, reset);
+    return util::get_and_reset_value(change_credit_.count_, reset);
 }
 
 // access execution time counters
@@ -1227,16 +1217,10 @@ boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
     return util::get_and_reset_value(unbind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_time(bool reset)
+boost::int64_t primary_namespace::counter_data::get_change_credit_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_non_blocking_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_change_credit_sync_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_sync_.time_, reset);
+    return util::get_and_reset_value(change_credit_.time_, reset);
 }
 
 // increment counter values
@@ -1264,16 +1248,10 @@ void primary_namespace::counter_data::increment_unbind_gid_count()
     ++unbind_gid_.count_;
 }
 
-void primary_namespace::counter_data::increment_change_credit_non_blocking_count()
+void primary_namespace::counter_data::increment_change_credit_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++change_credit_non_blocking_.count_;
-}
-
-void primary_namespace::counter_data::increment_change_credit_sync_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++change_credit_sync_.count_;
+    ++change_credit_.count_;
 }
 
 }}}

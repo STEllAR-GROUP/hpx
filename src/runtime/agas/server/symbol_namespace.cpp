@@ -167,7 +167,7 @@ void symbol_namespace::register_counter_types(
           , performance_counters::counter_raw
           , help
           , creator
-          , &performance_counters::default_counter_discoverer
+          , &performance_counters::locality0_counter_discoverer
           , HPX_PERFORMANCE_COUNTER_V1
           , detail::symbol_namespace_services[i].uom_
           , ec
