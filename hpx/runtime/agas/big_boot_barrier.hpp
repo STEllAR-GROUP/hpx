@@ -78,7 +78,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
       , actions::base_action* act
         );
 
-    void wait();
+    void wait(void* primary_ns_ptr = 0);
 
     // no-op on non-bootstrap localities
     void trigger();

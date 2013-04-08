@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,6 +31,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/gva.hpp>
@@ -58,6 +60,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef component_namespace::iterate_types_function_type
         iterate_types_function_type;
 
+    typedef hpx::lcos::local::spinlock cache_mutex_type;
     typedef hpx::lcos::local::mutex mutex_type;
     // }}}
 
@@ -158,17 +161,24 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     typedef boost::lockfree::fifo<
-        lcos::packaged_action<server::primary_namespace::service_action>*
-    > promise_pool_type;
+        lcos::packaged_action<server::locality_namespace::service_action>*
+    > locality_promise_pool_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
 
     struct bootstrap_data_type
     { // {{{
+        bootstrap_data_type()
+          : primary_ns_server_()
+          , locality_ns_server_(&primary_ns_server_)
+          , component_ns_server_()
+          , symbol_ns_server_()
+        {}
 
         void register_counter_types()
         {
+            server::locality_namespace::register_counter_types();
             server::primary_namespace::register_counter_types();
             server::component_namespace::register_counter_types();
             server::symbol_namespace::register_counter_types();
@@ -176,42 +186,65 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
         void register_server_instance(char const* servicename)
         {
-            primary_ns_server.register_server_instance(servicename);
-            component_ns_server.register_server_instance(servicename);
-            symbol_ns_server.register_server_instance(servicename);
+            locality_ns_server_.register_server_instance(servicename);
+            primary_ns_server_.register_server_instance(servicename);
+            component_ns_server_.register_server_instance(servicename);
+            symbol_ns_server_.register_server_instance(servicename);
         }
 
-        server::primary_namespace primary_ns_server;
-        server::component_namespace component_ns_server;
-        server::symbol_namespace symbol_ns_server;
+        void unregister_server_instance(error_code& ec)
+        {
+            locality_ns_server_.unregister_server_instance(ec);
+            primary_ns_server_.unregister_server_instance(ec);
+            component_ns_server_.unregister_server_instance(ec);
+            symbol_ns_server_.unregister_server_instance(ec);
+        }
+
+        server::primary_namespace primary_ns_server_;
+        server::locality_namespace locality_ns_server_;
+        server::component_namespace component_ns_server_;
+        server::symbol_namespace symbol_ns_server_;
     }; // }}}
 
     struct hosted_data_type
     { // {{{
         hosted_data_type()
-          : promise_pool_(16)
+          : locality_promise_pool_(16)
         {}
 
         void register_counter_types()
         {
+            server::locality_namespace::register_counter_types();
             server::primary_namespace::register_counter_types();
             server::component_namespace::register_counter_types();
             server::symbol_namespace::register_counter_types();
         }
 
+        void register_server_instance(char const* servicename
+          , boost::uint32_t locality_id)
+        {
+            primary_ns_server_.register_server_instance(servicename, locality_id);
+        }
+
+        void unregister_server_instance(error_code& ec)
+        {
+            primary_ns_server_.unregister_server_instance(ec);
+        }
+
+        locality_namespace locality_ns_;
         primary_namespace primary_ns_;
         component_namespace component_ns_;
         symbol_namespace symbol_ns_;
 
+        server::primary_namespace primary_ns_server_;
+
         hpx::lcos::local::counting_semaphore promise_pool_semaphore_;
-        promise_pool_type promise_pool_;
+        locality_promise_pool_type locality_promise_pool_;
     }; // }}}
 
-    // REVIEW: Does this have to be mutable?
-    mutable mutex_type gva_cache_mtx_;
+    mutable cache_mutex_type gva_cache_mtx_;
     gva_cache_type gva_cache_;
 
-    // REVIEW: Does this have to be mutable?
     mutable mutex_type console_cache_mtx_;
     boost::uint32_t console_cache_;
 
@@ -237,6 +270,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
 
+    naming::address locality_ns_addr_;
     naming::address primary_ns_addr_;
     naming::address component_ns_addr_;
     naming::address symbol_ns_addr_;
@@ -265,8 +299,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     {
         if (!hosted && !bootstrap)
             return stopping;
-        else
-            return state_.load();
+        return state_.load();
     }
 
     void status(state new_state)
@@ -274,19 +307,17 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
-    // FIXME: Better name
-    naming::gid_type const& local_locality(error_code& ec = throws) const
+    naming::gid_type const& get_local_locality(error_code& ec = throws) const
     {
         if (locality_ == naming::invalid_gid) {
             HPX_THROWS_IF(ec, invalid_status,
-                "addressing_service::local_locality",
+                "addressing_service::get_local_locality",
                 "local locality has not been initialized (yet)");
         }
         return locality_;
     }
 
-    // FIXME: Better name
-    void local_locality(naming::gid_type const& g)
+    void set_local_locality(naming::gid_type const& g)
     {
         locality_ = g;
     }
@@ -331,6 +362,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         );
 
     naming::locality const& get_here() const;
+
+    void* get_hosted_primary_ns_ptr() const
+    {
+        BOOST_ASSERT(0 != hosted.get());
+        return &hosted->primary_ns_server_;
+    }
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
@@ -917,7 +954,11 @@ public:
     bool is_local_address(
         naming::gid_type const& id
       , error_code& ec = throws
-        );
+        )
+    {
+        naming::address addr;
+        return is_local_address(id, addr, ec);
+    }
 
     bool is_local_address(
         naming::gid_type const& id
@@ -928,7 +969,11 @@ public:
     bool is_local_address_cached(
         naming::gid_type const& id
       , error_code& ec = throws
-        );
+        )
+    {
+        naming::address addr;
+        return is_local_address_cached(id, addr, ec);
+    }
 
     bool is_local_address_cached(
         naming::gid_type const& id
@@ -1110,6 +1155,24 @@ public:
       , std::vector<naming::address>& addrs
       , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
+        );
+
+    /// \brief Route the given parcel to the appropriate AGAS service instance
+    ///
+    /// This function sends the given parcel to the AGAS service instance which
+    /// manages the parcel's destination GID. This service instance will resolve
+    /// the GID and either send (route) the parcel to the correct locality or
+    /// it will deliver the parcel to the local action manager.
+    ///
+    /// \param p          [in] this is the parcel which has to be routed to the
+    ///                   AGAS service instance managing the destination GID.
+    ///
+    /// \note             The route operation is asynchronous, thus it returns
+    ///                   before the parcel has been delivered to its
+    ///                   destination.
+    void route(
+        parcelset::parcel const& p
+      , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const&
         );
 
     /// \brief Increment the global reference count for the given id
@@ -1465,10 +1528,12 @@ public:
     void insert_cache_entry(
         naming::gid_type const& gid
       , naming::address const& addr
+      , boost::uint64_t count = 0
+      , boost::uint64_t offset = 0
       , error_code& ec = throws
         )
     {
-        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        const gva g(addr.locality_, addr.type_, count, addr.address_, offset);
         insert_cache_entry(gid, g, ec);
     }
 
@@ -1485,10 +1550,12 @@ public:
     void update_cache_entry(
         naming::gid_type const& gid
       , naming::address const& addr
+      , boost::uint64_t count = 0
+      , boost::uint64_t offset = 0
       , error_code& ec = throws
         )
     {
-        const gva g(addr.locality_, addr.type_, 1, addr.address_);
+        const gva g(addr.locality_, addr.type_, count, addr.address_, offset);
         update_cache_entry(gid, g, ec);
     }
 
@@ -1496,11 +1563,6 @@ public:
     ///          may break your code if you use it.
     void clear_cache(
         error_code& ec = throws
-        );
-
-    bool route_parcel(
-        parcelset::parcel const& arg0
-      , error_code& ec = throws
         );
 
     /// \brief Retrieve statistics performance counter

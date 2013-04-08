@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
@@ -29,7 +30,7 @@
 #include <boost/fusion/include/at_c.hpp>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 13
+#define HPX_AGAS_REQUEST_SUBTYPES 14
 
 namespace hpx { namespace agas
 {
@@ -193,6 +194,16 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
+    request(
+        namespace_action_code type_
+      , parcelset::parcel const& p
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(p))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
     explicit request(
         namespace_action_code type_
         )
@@ -282,6 +293,13 @@ struct request
         ) const
     {
         return get_data<subtype_iterate_types_function, 0>(ec);
+    }
+
+    parcelset::parcel get_parcel(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_parcel, 0>(ec);
     }
 
     naming::locality get_locality(
@@ -405,6 +423,7 @@ struct request
       , subtype_iterate_names_function  = 0xa
       , subtype_iterate_types_function  = 0xb
       , subtype_void                    = 0xc
+      , subtype_parcel                  = 0xd
       // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
     };
 
@@ -492,6 +511,11 @@ struct request
         // primary_ns_localities
         // primary_ns_resolved_localities
       , boost::fusion::vector0<
+        >
+        // 0xd
+        // primary_ns_route
+      , boost::fusion::vector1<
+            parcelset::parcel
         >
     > data_type;
 

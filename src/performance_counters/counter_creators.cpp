@@ -75,6 +75,53 @@ namespace hpx { namespace performance_counters
         return true;
     }
 
+    /// Default discoverer function for AGAS performance counters; to be 
+    /// registered with the counter types. It is suitable to be used for all 
+    /// counters following the naming scheme:
+    ///
+    ///   /<objectname>{locality#0/total}/<instancename>
+    ///
+    bool locality0_counter_discoverer(counter_info const& info,
+        HPX_STD_FUNCTION<discover_counter_func> const& f,
+        discover_counters_mode mode, error_code& ec)
+    {
+        performance_counters::counter_info i = info;
+
+        // compose the counter name templates
+        performance_counters::counter_path_elements p;
+        performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        if (mode == discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality";
+                p.parentinstanceindex_ = 0;
+            }
+
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
     /// following the naming scheme:
@@ -226,16 +273,20 @@ namespace hpx { namespace performance_counters
         }
 
         // counter instance name: <agas_instance_name>/total
-        // for instance: root/total
+        // for instance: locality#0/total
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
             // find the referenced AGAS instance and dispatch the request there
-//             std::string agas_instance;
-//             performance_counters::get_counter_instance_name(paths, agas_instance, ec);
-//             if (ec) return naming::invalid_gid;
-
             std::string service(agas::service_name);
             service += service_name + paths.parentinstancename_;
+            if (-1 == paths.parentinstanceindex_) {
+                HPX_THROWS_IF(ec, bad_parameter, "agas_raw_counter_creator",
+                    "invalid parent instance index: -1");
+                return naming::invalid_gid;
+            }
+
+            service += "#";
+            service += boost::lexical_cast<std::string>(paths.parentinstanceindex_);
 
             naming::id_type id;
             bool result = agas::resolve_name(service, id, ec);
@@ -245,6 +296,7 @@ namespace hpx { namespace performance_counters
                     "invalid counter name: " + info.fullname_);
                 return naming::invalid_gid;
             }
+
             return detail::retrieve_agas_counter(info.fullname_, id, ec);
         }
 

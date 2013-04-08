@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,6 +58,7 @@ namespace hpx { namespace naming
         static boost::uint64_t const credit_base_mask = 0x7ffful;
         static boost::uint64_t const credit_mask = credit_base_mask << 16;
         static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
+        static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
 
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
@@ -274,6 +275,27 @@ namespace hpx { namespace naming
     inline gid_type get_locality_from_gid(gid_type const& id)
     {
         return get_gid_from_locality_id(get_locality_id_from_gid(id));
+    }
+
+    inline boost::uint64_t replace_locality_id(boost::uint64_t msb,
+        boost::uint32_t locality_id) HPX_PURE;
+
+    inline boost::uint64_t replace_locality_id(boost::uint64_t msb,
+        boost::uint32_t locality_id)
+    {
+        msb &= ~gid_type::locality_id_mask;
+        return msb | get_gid_from_locality_id(locality_id).get_msb();
+    }
+
+    inline gid_type replace_locality_id(gid_type const& gid,
+        boost::uint32_t locality_id) HPX_PURE;
+
+    inline gid_type replace_locality_id(gid_type const& gid,
+        boost::uint32_t locality_id)
+    {
+        boost::uint64_t msb = gid.get_msb() & ~gid_type::locality_id_mask;
+        msb |= get_gid_from_locality_id(locality_id).get_msb();
+        return gid_type(msb, gid.get_lsb());
     }
 
     boost::uint32_t const invalid_locality_id = ~0U;

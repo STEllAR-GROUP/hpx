@@ -20,7 +20,7 @@ namespace hpx { namespace traits
     struct action_serialization_filter
     {
         // return a new instance of a serialization filter
-        static util::binary_filter* call()
+        static util::binary_filter* call(parcelset::parcel const& p)
         {
             return 0;   // by default actions don't have a serialization filter
         }

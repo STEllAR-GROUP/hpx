@@ -73,7 +73,7 @@ a build system.
     [[__gmake__                  ][3.81               ][3.80            ]]
 
     [[[*Required Libraries]]]
-    [[__boost_libraries__        ][1.48.0             ][1.47.0          ]]
+    [[__boost_libraries__        ][1.48.0 or newer    ][1.47.0          ]]
     [[__eglibc__ (Debian, Ubuntu)][2.11               ][2.7             ]]
     [[__glibc__ (Redhat)         ][2.11               ][2.7             ]]
     [[__libstdcxx__              ][4.6.3              ][4.4.5           ]]
@@ -89,8 +89,13 @@ a build system.
     [[__cmake__                  ][2.8.4              ][2.8.4           ]]
 
     [[[*Required Libraries]]]
-    [[__boost__                  ][1.48.0             ][1.43.0          ]]
+    [[__boost__                  ][1.48.0 or newer    ][1.43.0          ]]
 ]
+
+[note You need to build the following Boost libraries for __hpx__: 
+      Boost.DateTime, Boost.Filesystem, Boost.ProgramOptions, Boost.Regex,
+      Boost.Serialization, Boost.System, Boost.Thread, Boost.Chrono (starting 
+      Boost 1.47.0), and Boost.Atomic (starting Boost 1.53.0).]
 
 Depending on the options you chose while building and installing __hpx__,
 you will find that __hpx__ may depend on several other libraries such as those

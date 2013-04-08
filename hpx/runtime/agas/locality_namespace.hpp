@@ -1,38 +1,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7)
-#define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
+#if !defined(HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM)
+#define HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM
 
 #include <hpx/include/client.hpp>
-#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/agas/stubs/locality_namespace.hpp>
 
 namespace hpx { namespace agas
 {
 
-struct symbol_namespace
-  : components::client_base<symbol_namespace, stubs::symbol_namespace>
+struct locality_namespace
+  : components::client_base<locality_namespace, stubs::locality_namespace>
 {
-    // {{{ nested types
-    typedef components::client_base<
-        symbol_namespace, stubs::symbol_namespace
-    > base_type;
+    typedef components::client_base<locality_namespace, stubs::locality_namespace>
+        base_type;
 
-    typedef server::symbol_namespace server_type;
+    typedef server::locality_namespace server_type;
 
-    typedef server_type::iterate_names_function_type
-        iterate_names_function_type;
-    // }}}
-
-    symbol_namespace()
-      : base_type(bootstrap_symbol_namespace_id())
+    locality_namespace()
+      : base_type(bootstrap_locality_namespace_id())
     {}
 
-    explicit symbol_namespace(naming::id_type const& id)
+    explicit locality_namespace(naming::id_type const& id)
       : base_type(id)
     {}
 
@@ -73,5 +68,5 @@ struct symbol_namespace
 
 }}
 
-#endif // HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
+#endif
 

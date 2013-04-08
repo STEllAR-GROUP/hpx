@@ -103,36 +103,10 @@ namespace hpx
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r_p_route(naming::address& addr, naming::id_type const& gid,
-            threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-
-            // create parcel
-            parcelset::parcel p(gid.get_gid(), complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
-
-            // send parcel to agas
-            return hpx::applier::get_applier().route(p);
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
         apply_r (naming::address& addr, naming::id_type const& gid,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             return apply_r_p<Action>(addr, gid,
-                actions::action_priority<Action>(),
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_r_route (naming::address& addr, naming::id_type const& gid,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            return apply_r_p_route<Action>(addr, gid,
                 actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -284,36 +258,6 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    namespace applier
-    {
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_p_route(naming::id_type const& gid,
-            threads::thread_priority priority,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (agas::is_local_address_cached(gid, addr)) {
-                return detail::apply_l_p<Action>(addr, priority,
-                    HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-            }
-
-            // apply remotely
-            return detail::apply_r_p_route<Action>(addr, gid, priority,
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_route (naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            return apply_p_route<Action>(gid,
-                actions::action_priority<Action>(),
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -340,39 +284,10 @@ namespace hpx
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r_p_route(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-
-            actions::continuation_type cont(c);
-
-            // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)), cont);
-
-            // Send the parcel to agas
-            return hpx::applier::get_applier().route(p);
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
         apply_r (naming::address& addr, actions::continuation* c,
             naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             return apply_r_p<Action>(addr, c, gid,
-                actions::action_priority<Action>(),
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_r_route (naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            return apply_r_p_route<Action>(addr, c, gid,
                 actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
@@ -448,36 +363,6 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    namespace applier
-    {
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_p_route(actions::continuation* c, naming::id_type const& gid,
-            threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            // Determine whether the gid is local or remote
-            naming::address addr;
-            if (agas::is_local_address_cached(gid, addr)) {
-                return detail::apply_l_p<Action>(c, addr, priority,
-                    HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-            }
-
-            // apply remotely
-            return detail::apply_r_p_route<Action>(addr, c, gid, priority,
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_route (actions::continuation* c, naming::id_type const& gid,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            return apply_p_route<Action>(c, gid,
-                actions::action_priority<Action>(),
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -498,21 +383,6 @@ namespace hpx
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_c_p_route(naming::address& addr, naming::id_type const& contgid,
-            naming::id_type const& gid, threads::thread_priority priority,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_r_p_route<Action>(addr,
-                new actions::typed_continuation<result_type>(contgid),
-                gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
         apply_c (naming::address& addr, naming::id_type const& contgid,
             naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
@@ -521,21 +391,6 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(addr,
-                new actions::typed_continuation<result_type>(contgid),
-                gid, actions::action_priority<Action>(),
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_c_route (naming::address& addr, naming::id_type const& contgid,
-            naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_r_p_route<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -588,38 +443,6 @@ namespace hpx
             new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Derived>(),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    namespace applier
-    {
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_c_p_route(naming::id_type const& contgid, naming::id_type const& gid,
-            threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_route<Action>(
-                new actions::typed_continuation<result_type>(contgid),
-                gid, priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        inline bool
-        apply_c_route (naming::id_type const& contgid, naming::id_type const& gid,
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_p_route<Action>(
-                new actions::typed_continuation<result_type>(contgid),
-                gid, actions::action_priority<Action>(),
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
     }
 }
 

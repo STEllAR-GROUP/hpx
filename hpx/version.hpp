@@ -32,7 +32,7 @@
 #define HPX_VERSION_DATE         20130118
 
 #if !defined(HPX_AGAS_VERSION)
-    #define HPX_AGAS_VERSION 0x21
+    #define HPX_AGAS_VERSION 0x30
 #endif
 
 #define HPX_VERSION_TAG          "-trunk"

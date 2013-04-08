@@ -619,11 +619,11 @@ struct get_remote_result<boost::uint32_t, agas::response>
         )
     {
         switch(rep.get_action_code()) {
-        case agas::primary_ns_num_localities:
+        case agas::locality_ns_num_localities:
         case agas::component_ns_num_localities:
             return rep.get_num_localities();
 
-        case agas::primary_ns_num_threads:
+        case agas::locality_ns_num_threads:
             return rep.get_num_overall_threads();
 
         default:
@@ -643,7 +643,7 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
         )
     {
         switch(rep.get_action_code()) {
-        case agas::primary_ns_num_threads:
+        case agas::locality_ns_num_threads:
             return rep.get_num_threads();
 
         default:

@@ -88,8 +88,8 @@ HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action)
 HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::insert_agas_cache_entry_action,
-    insert_agas_cache_entry_action)
+    hpx::components::server::runtime_support::update_agas_cache_entry_action,
+    update_agas_cache_entry_action)
 HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action)
@@ -434,10 +434,11 @@ namespace hpx { namespace components { namespace server
 
     /// \brief Insert the given name mapping into the AGAS cache of this
     ///        locality.
-    void runtime_support::insert_agas_cache_entry(naming::gid_type const& gid,
-        naming::address const& addr)
+    void runtime_support::update_agas_cache_entry(naming::gid_type const& gid,
+        naming::address const& addr, boost::uint64_t count,
+        boost::uint64_t offset)
     {
-        naming::get_agas_client().insert_cache_entry(gid, addr);
+        naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -604,11 +605,13 @@ namespace hpx { namespace components { namespace server
                 get_runtime().get_agas_client();
 
             error_code ec(lightweight);
-            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
-            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             // Drop the locality from the partition table.
             agas_client.unregister_locality(appl.here(), ec);
+
+            // unregister fixed components
+            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
+            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
@@ -653,7 +656,7 @@ namespace hpx { namespace components { namespace server
         ini.load_components();
 
         naming::resolver_client& client = get_runtime().get_agas_client();
-        bool result = load_components(ini, client.local_locality(), client);
+        bool result = load_components(ini, client.get_local_locality(), client);
 
         return load_plugins(ini) && result;
     }

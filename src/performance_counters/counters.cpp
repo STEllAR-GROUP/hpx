@@ -425,6 +425,11 @@ namespace hpx { namespace performance_counters
         if (p.parentinstancename_.empty()) {
             p.parentinstancename_ = "locality";
             p.parentinstanceindex_ = static_cast<boost::int64_t>(get_locality_id());
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
         }
 
         // fill with complete counter type info

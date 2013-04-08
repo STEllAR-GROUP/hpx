@@ -33,7 +33,7 @@ namespace hpx { namespace actions
     threads::thread_priority action_priority()
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        threads::thread_priority priority = 
+        threads::thread_priority priority =
             static_cast<threads::thread_priority>(
                 traits::action_priority<action_type>::value);
         if (priority == threads::thread_priority_default)
@@ -143,33 +143,9 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r_p_route(naming::address& addr, naming::id_type const& gid,
-            threads::thread_priority priority)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-
-            // Create a parcel and send it to the AGAS server
-            // New parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority));
-
-            // Send the parcel to applier to be sent to the AGAS server
-            return hpx::applier::get_applier().route(p);
-        }
-
-        template <typename Action>
-        inline bool
         apply_r (naming::address& addr, naming::id_type const& gid)
         {
             return apply_r_p<Action>(addr, gid, actions::action_priority<Action>());
-        }
-
-        template <typename Action>
-        inline bool
-        apply_r_route(naming::address& addr, naming::id_type const& gid)
-        {
-            return apply_r_p_route<Action>(addr, gid,
-                actions::action_priority<Action>());
         }
 
         // We know it is local and has to be directly executed.
@@ -232,7 +208,7 @@ namespace hpx
     // same for multiple destinations
     template <typename Action>
     inline bool
-    apply_p (std::vector<naming::id_type> const& ids, 
+    apply_p (std::vector<naming::id_type> const& ids,
         threads::thread_priority priority)
     {
         // Determine whether the gids are local or remote
@@ -284,34 +260,6 @@ namespace hpx
         return apply_p<Derived>(gids, actions::action_priority<Derived>());
     }
 
-    namespace applier
-    {
-        /// routed version
-        template <typename Action>
-        inline bool
-        apply_p_route (naming::id_type const& gid, threads::thread_priority priority)
-        {
-            // check if the address is in the local cache
-            // send a parcel to agas if address is not found in cache
-            naming::address addr;
-            if (agas::is_local_address_cached(gid, addr))
-                return detail::apply_l_p<Action>(addr, priority);   // apply locally
-
-            // since we already know the address is local and its value
-            // we can apply the function locally
-
-            // parameter addr is redundant here
-            return detail::apply_r_p_route<Action>(addr, gid, priority);
-        }
-
-        // routed version
-        template <typename Action>
-        inline bool apply_route (naming::id_type const& gid)
-        {
-            return apply_p_route<Action>(gid, actions::action_priority<Action>());
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -336,35 +284,10 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r_p_route(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-
-            actions::continuation_type cont(c);
-
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority), cont);
-
-            // send parcel to agas
-            return hpx::applier::get_applier().route(p);
-        }
-
-        template <typename Action>
-        inline bool
         apply_r (naming::address& addr, actions::continuation* c,
             naming::id_type const& gid)
         {
             return apply_r_p<Action>(addr, c, gid,
-                actions::action_priority<Action>());
-        }
-
-        template <typename Action>
-        inline bool
-        apply_r_route (naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid)
-        {
-            return apply_r_p_route<Action>(addr, c, gid,
                 actions::action_priority<Action>());
         }
 
@@ -446,28 +369,6 @@ namespace hpx
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>());
     }
 
-    namespace applier
-    {
-        template <typename Action>
-        inline bool apply_p_route(actions::continuation* c, naming::id_type const& gid,
-            threads::thread_priority priority)
-        {
-            // Determine whether gid is local or remote
-            naming::address addr;
-            if (agas::is_local_address_cached(gid, addr))
-                return detail::apply_l_p<Action>(c, addr, priority); // apply locally
-
-            // apply remotely
-            return detail::apply_r_p_route<Action>(addr, c, gid, priority);
-        }
-
-        template <typename Action>
-        inline bool apply_route (actions::continuation* c, naming::id_type const& gid)
-        {
-            return apply_p_route<Action>(c, gid, actions::action_priority<Action>());
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
@@ -487,20 +388,6 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_c_p_route(naming::address& addr, naming::id_type const& contgid,
-            naming::id_type const& gid, threads::thread_priority priority)
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_r_p_route<Action>(addr,
-                new actions::typed_continuation<result_type>(contgid),
-                gid, priority);
-        }
-
-        template <typename Action>
-        inline bool
         apply_c (naming::address& addr, naming::id_type const& contgid,
             naming::id_type const& gid)
         {
@@ -509,19 +396,6 @@ namespace hpx
                 result_type;
 
             return apply_r<Action>(addr,
-                new actions::typed_continuation<result_type>(contgid), gid);
-        }
-
-        template <typename Action>
-        inline bool
-        apply_c_route (naming::address& addr, naming::id_type const& contgid,
-            naming::id_type const& gid)
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_r_route<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid), gid);
         }
     }}
@@ -569,35 +443,6 @@ namespace hpx
         return apply_p<Derived>(
             new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Derived>());
-    }
-
-    namespace applier
-    {
-        template <typename Action>
-        inline bool
-        apply_c_p_route(naming::id_type const& contgid, naming::id_type const& gid,
-            threads::thread_priority priority)
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_p_route<Action>(
-                new actions::typed_continuation<result_type>(contgid),
-                gid, priority);
-        }
-
-        template <typename Action>
-        inline bool
-        apply_c_route (naming::id_type const& contgid, naming::id_type const& gid)
-        {
-            typedef
-                typename hpx::actions::extract_action<Action>::result_type
-                result_type;
-
-            return apply_route<Action>(
-                new actions::typed_continuation<result_type>(contgid), gid);
-        }
     }
 }
 

@@ -171,6 +171,8 @@ namespace hpx
 
         virtual naming::locality const& here() const = 0;
 
+        virtual applier::applier& get_applier() = 0;
+
         virtual boost::uint64_t get_runtime_support_lva() const = 0;
 
         virtual boost::uint64_t get_memory_lva() const = 0;

@@ -124,13 +124,14 @@ namespace hpx { namespace parcelset
         pports_(connection_last),
         tm_(tm),
         parcels_(policy),
-        use_alternative_parcelports_(false)
+        use_alternative_parcelports_(false),
+        count_routed_(0)
     {
         BOOST_ASSERT(parcels_);
 
         // AGAS v2 registers itself in the client before the parcelhandler
         // is booted.
-        locality_ = resolver_.local_locality();
+        locality_ = resolver_.get_local_locality();
 
         parcels_->set_parcelhandler(this);
 
@@ -341,30 +342,41 @@ namespace hpx { namespace parcelset
             return;
         }
 
+        bool resolved_locally = true;
         if (1 == gids.size()) {
             if (!addrs[0])
-                resolver_.resolve(gids[0], addrs[0]);
+                resolved_locally = resolver_.resolve(gids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolver_.resolve(gids, addrs, locals);
+            resolved_locally = resolver_.resolve(gids, addrs, locals);
         }
 
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
 
-        // dispatch to the message handler which is associated with the
-        // encapsulated action
-        connection_type t = find_appropriate_connection_type(addrs[0].locality_);
-        policies::message_handler* mh =
-            p.get_message_handler(this, addrs[0].locality_, t);
+        // If we were able to resolve the address(es) locally we send the
+        // parcel directly to the destination.
+        if (resolved_locally) {
+            // dispatch to the message handler which is associated with the
+            // encapsulated action
+            connection_type t = find_appropriate_connection_type(addrs[0].locality_);
+            policies::message_handler* mh =
+                p.get_message_handler(this, addrs[0].locality_, t);
 
-        if (mh) {
-            mh->put_parcel(p, f);
+            if (mh) {
+                mh->put_parcel(p, f);
+                return;
+            }
+
+            find_parcelport(t)->put_parcel(p, f);
             return;
         }
 
-        find_parcelport(t)->put_parcel(p, f);
+        // At least one of the addresses is locally unknown, route the parcel
+        // to the AGAS managing the destination.
+        ++count_routed_;
+        resolver_.route(p, f);
     }
 
     std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const
@@ -436,6 +448,12 @@ namespace hpx { namespace parcelset
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_parcel_send_count(reset) : 0;
+    }
+
+    // number of parcels routed
+    boost::int64_t parcelhandler::get_parcel_routed_count(bool reset)
+    {
+        return util::get_and_reset_value(count_routed_, reset);
     }
 
     // number of messages sent
@@ -554,6 +572,8 @@ namespace hpx { namespace parcelset
             boost::bind(&parcelhandler::get_incoming_queue_length, this, ::_1));
         HPX_STD_FUNCTION<boost::int64_t(bool)> outgoing_queue_length(
             boost::bind(&parcelhandler::get_outgoing_queue_length, this, ::_1));
+        HPX_STD_FUNCTION<boost::int64_t(bool)> outgoing_routed_count(
+            boost::bind(&parcelhandler::get_parcel_routed_count, this, ::_1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
@@ -572,6 +592,16 @@ namespace hpx { namespace parcelset
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, outgoing_queue_length, _2),
+              &performance_counters::locality_counter_discoverer,
+              ""
+            },
+            { "/parcels/count/routed",
+              performance_counters::counter_raw,
+              "returns the number of (outbound) parcel routed through the "
+                  "responsible AGAS service",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, outgoing_routed_count, _2),
               &performance_counters::locality_counter_discoverer,
               ""
             }
