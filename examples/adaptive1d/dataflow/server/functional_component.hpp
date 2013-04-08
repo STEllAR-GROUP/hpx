@@ -105,7 +105,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(functional_component, alloc_data_nonvirt, alloc_data_action);
         HPX_DEFINE_COMPONENT_ACTION(functional_component, eval_nonvirt, eval_action);
+<<<<<<< HEAD
         HPX_DEFINE_COMPONENT_ACTION(functional_component, init_nonvirt, init_action);
+=======
+        HPX_DEFINE_COMPONENT_ACTION(functional_component, init_non_virt, init_action);
+>>>>>>> Starting to fix examples
 
         /// This is the default hook implementation for decorate_action which 
         /// does no hooking at all.
