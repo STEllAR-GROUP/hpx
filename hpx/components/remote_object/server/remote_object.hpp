@@ -61,6 +61,30 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+    template <typename F>
+    struct remote_object_apply_action1
+      : hpx::actions::result_action1<
+            remote_object
+          , typename F::result_type
+          , F const &
+          , &remote_object::apply1<F>
+          , remote_object_apply_action1<F>
+        >
+    {};
+
+    template <typename F, typename A>
+    struct remote_object_apply_action2
+      : hpx::actions::result_action2<
+            remote_object
+          , typename F::result_type
+          , F const &
+          , A const &
+          , &remote_object::apply2<F, A>
+          , remote_object_apply_action2<F, A>
+        >
+    {};
+#else
     template <typename F>
     struct remote_object_apply_action1
       : hpx::actions::result_action1<
@@ -70,7 +94,6 @@ namespace hpx { namespace components { namespace server
         >
     {};
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename A>
     struct remote_object_apply_action2
       : hpx::actions::result_action2<
@@ -79,6 +102,7 @@ namespace hpx { namespace components { namespace server
           , remote_object_apply_action2<F, A>
         >
     {};
+#endif
 }}}
 
 #if defined(BOOST_MSVC)
