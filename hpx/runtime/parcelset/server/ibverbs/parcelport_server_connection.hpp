@@ -52,7 +52,7 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 parcelset::ibverbs::parcelport& parcelport)
-          : context_(io_service), in_priority_(0), in_size_(0), in_data_size_(0),
+          : context_(io_service),
             parcelport_(parcelport)
         {
             boost::system::error_code ec;
@@ -88,17 +88,6 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
                     boost::tuple<Handler>)
                 = &parcelport_connection::handle_read_data<Handler>;
 
-            in_priority_ = 0;
-            in_size_ = 0;
-            in_data_size_ = 0;
-
-            /*
-            using boost::asio::buffer;
-            std::vector<boost::asio::mutable_buffer> buffers;
-            buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
-            buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
-            buffers.push_back(buffer(&in_data_size_, sizeof(in_data_size_)));
-            */
                 
             in_buffer_.clear();
 
@@ -110,6 +99,10 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
 
     protected:
         /// Handle a completed read of message data.
+        /// message header.
+        /// The handler is passed using a tuple since boost::bind seems to have
+        /// trouble binding a function object created using boost::bind as a
+        /// parameter.
         template <typename Handler>
         void handle_read_data(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
@@ -150,7 +143,7 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
         void handle_write_ack(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
-            // Issue a read operation to handle the next parcel.
+            // Issue a read operation to read the next parcel.
             async_read(boost::get<0>(handler));
         }
 
@@ -159,9 +152,6 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
         parcelset::ibverbs::server_context context_;
 
         /// buffer for incoming data
-        boost::integer::ulittle8_t in_priority_;
-        boost::integer::ulittle64_t in_size_;
-        boost::integer::ulittle64_t in_data_size_;
         parcelset::ibverbs::data_buffer in_buffer_;
 
         /// The handler used to process the incoming request.

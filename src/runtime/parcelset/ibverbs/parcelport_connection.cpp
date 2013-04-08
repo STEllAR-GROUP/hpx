@@ -32,7 +32,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             boost::asio::io_service& io_service,
             naming::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
-      : context_(io_service), out_priority_(0), out_size_(0), out_data_size_(0),
+      : context_(io_service),
         there_(there), parcels_sent_(parcels_sent),
         archive_flags_(boost::archive::no_header)
     {
@@ -56,17 +56,13 @@ namespace hpx { namespace parcelset { namespace ibverbs
         char * mr_buffer = context_.set_buffer_size(buffer_size, ec);
 
         out_buffer_.set_mr_buffer(mr_buffer, buffer_size);
-
-        std::string sync_threshold_str = get_config_entry("hpx.parcel.ibverbs.sync_threshold", "0");
-        sync_threshold_ = boost::lexical_cast<std::size_t>(sync_threshold_str);
     }
     
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
 #if defined(HPX_DEBUG)
-        // make sure that all parcels require the same serialization filter and
-        // that all of them go to the same locality
+        // make sure that all parcels go to the same locality
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
@@ -89,13 +85,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 priority = (std::max)(p.get_thread_priority(), priority);
             }
 
-            //out_buffer_.reserve(arg_size*2);
+            out_buffer_.reserve(arg_size*2);
 
             // mark start of serialization
             util::high_resolution_timer timer;
 
             {
-                // Serialize the data
                 // Serialize the data
                 util::binary_filter* filter = pv[0].get_serialization_filter();
                 int archive_flags = archive_flags_;
@@ -149,10 +144,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     "std::exception: %s") % e.what()));
             return;
         }
-
-        out_priority_ = boost::integer::ulittle8_t(priority);
-        out_size_ = out_buffer_.size();
-        out_data_size_ = arg_size; 
 
         send_data_.num_parcels_ = pv.size();
         send_data_.bytes_ = arg_size;

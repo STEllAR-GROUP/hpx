@@ -357,12 +357,12 @@ namespace hpx { namespace parcelset
 
         void enable_alternative_parcelports()
         {
-            use_alternative_parcelports_ = true;
+            use_alternative_parcelports_.store(true);
         }
 
         void disable_alternative_parcelports()
         {
-            use_alternative_parcelports_ = false;
+            use_alternative_parcelports_.store(false);
         }
 
         /// Return the reference to an existing io_service
@@ -458,7 +458,7 @@ namespace hpx { namespace parcelset
         /// Allow to use alternative parcel-ports (this is enabled only after
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
-        bool use_alternative_parcelports_;
+        boost::atomic<bool> use_alternative_parcelports_;
 
         /// Store message handlers for actions
         message_handler_map handlers_;

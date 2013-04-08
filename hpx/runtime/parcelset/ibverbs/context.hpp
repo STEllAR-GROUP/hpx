@@ -731,10 +731,9 @@ namespace hpx { namespace parcelset { namespace ibverbs
             connection_.on_connection(id);
     
             boost::system::error_code ec;
-            //std::cout << __LINE__ << "\n";
             HPX_IBVERBS_NEXT_WC(ec, MSG_MR, 1, , true);
-            //std::cout << __LINE__ << "\n";
-            //std::cout << typeid(connection_).name() << " got MR notification ...\n";
+            HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+            connection_.post_receive();
         }
 
         void on_completion(ibv_wc * wc)
@@ -754,11 +753,31 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         void open(boost::system::error_code &ec)
         {
+            ++executing_operation_;
+            BOOST_SCOPE_EXIT(&executing_operation_) {
+                --executing_operation_;
+            } BOOST_SCOPE_EXIT_END
+
+            if (close_operation_.load()) {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return;
+            }
         }
 
         void bind(
             boost::asio::ip::tcp::endpoint const & ep, boost::system::error_code &ec)
         {
+            ++executing_operation_;
+            BOOST_SCOPE_EXIT(&executing_operation_) {
+                --executing_operation_;
+            } BOOST_SCOPE_EXIT_END
+
+            if (close_operation_.load()) {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return;
+            }
+
+            HPX_IBVERBS_RESET_EC(ec);
             if(ctx_)
             {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::already_connected);
@@ -835,6 +854,18 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         void connect(boost::asio::ip::tcp::endpoint const & there, boost::system::error_code &ec)
         {
+            ++executing_operation_;
+            BOOST_SCOPE_EXIT(&executing_operation_) {
+                --executing_operation_;
+            } BOOST_SCOPE_EXIT_END
+
+            if (close_operation_.load()) {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return;
+            }
+
+            HPX_IBVERBS_RESET_EC(ec);
+
             if(ctx_)
             {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::already_connected);
@@ -978,16 +1009,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             }
         }
 
-        
-        bool is_closed(boost::system::error_code &ec)
-        {
-            if (close_operation_.load() || !ctx_) {
-                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
-                return true;
-            }
-            return false;
-        }
-
         // read, write, and acknowledge operations
         std::size_t try_read_data(data_buffer & data, boost::system::error_code &ec)
         {
@@ -995,7 +1016,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
             BOOST_SCOPE_EXIT_TPL(&executing_operation_) {
                 --executing_operation_;
             } BOOST_SCOPE_EXIT_END
-            if(is_closed(ec)) return 0;
+            
+            if (close_operation_.load() || !ctx_) {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return 0;
+            }
                 
             //std::cout << __LINE__ << "\n";
             HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 1, 0, false);

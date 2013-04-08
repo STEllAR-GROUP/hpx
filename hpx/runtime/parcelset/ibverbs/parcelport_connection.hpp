@@ -58,10 +58,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             context_.close(ec);    // close the socket to give it back to the OS
         }
 
-        void post_receive(rdma_cm_id * id);
-    
-        void on_preconn(rdma_cm_id * id);
-
         void set_parcel (parcel const& p)
         {
             set_parcel(std::vector<parcel>(1, p));
@@ -79,21 +75,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
             /// Increment sends and begin timer.
             send_data_.time_ = timer_.elapsed_nanoseconds();
 
-            // Write the serialized data to the socket. We use "gather-write"
-            // to send both the header and the data in a single write operation.
-            /*
-            std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
-            buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
-            buffers.push_back(boost::asio::buffer(&out_data_size_, sizeof(out_data_size_)));
-            buffers.push_back(boost::asio::buffer(out_buffer_));
-            */
 
             void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
                     boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
 
-            context_.async_write(out_buffer_,//buffers,
+            context_.async_write(out_buffer_,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, ::_2,
                     boost::make_tuple(handler, parcel_postprocess)));
@@ -110,6 +97,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
+            // just call initial handler
+            boost::get<0>(handler)(e, bytes);
 
             // complete data point and push back onto gatherer
             send_data_.time_ = timer_.elapsed_nanoseconds() - send_data_.time_;
@@ -117,6 +106,13 @@ namespace hpx { namespace parcelset { namespace ibverbs
             
 
             // now handle the acknowledgment byte which is sent by the receiver
+            out_buffer_.clear();
+            
+            send_data_.bytes_ = 0;
+            send_data_.time_ = 0;
+            send_data_.serialization_time_ = 0;
+            send_data_.num_parcels_ = 0;
+            
             void (parcelport_connection::*f)(boost::system::error_code const&,
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
@@ -129,17 +125,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
         void handle_read_ack(boost::system::error_code const& e,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
-            
-            // just call initial handler
-            boost::get<0>(handler)(e, out_buffer_.size());
-
-            out_buffer_.clear();
-
-            send_data_.bytes_ = 0;
-            send_data_.time_ = 0;
-            send_data_.serialization_time_ = 0;
-            send_data_.num_parcels_ = 0;
-
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
@@ -148,14 +133,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
 
     private:
-        /// Window for the parcelport_connection.
+        /// Context for the parcelport_connection.
         parcelset::ibverbs::client_context context_;
 
         /// buffer for outgoing data
-        std::size_t sync_threshold_;
-        boost::integer::ulittle8_t out_priority_;
-        boost::integer::ulittle64_t out_size_;
-        boost::integer::ulittle64_t out_data_size_;
         data_buffer out_buffer_;
 
         /// the other (receiving) end of this connection
