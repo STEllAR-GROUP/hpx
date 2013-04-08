@@ -488,7 +488,7 @@ namespace hpx { namespace util
             }
         }
 
-        if (cache_size != ~0x0 && cache_size < 16)
+        if (cache_size != ~0x0ul && cache_size < 16ul)
             cache_size = 16;      // limit lower bound
         return cache_size;
     }
@@ -505,7 +505,7 @@ namespace hpx { namespace util
             }
         }
 
-        if (cache_size != ~0x0 && cache_size < 16)
+        if (cache_size != ~0x0ul && cache_size < 16ul)
             cache_size = 16;      // limit lower bound
         return cache_size;
     }
