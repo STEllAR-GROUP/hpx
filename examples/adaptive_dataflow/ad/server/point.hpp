@@ -37,44 +37,10 @@ namespace ad { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        typedef hpx::actions::action2<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            // Method bound to this action.
-            &point::init
-        > init_action;
-
-        typedef hpx::actions::action2<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            // Method bound to this action.
-            &point::remove_item
-        > remove_item_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            std::vector<hpx::naming::id_type> const&,
-            // Method bound to this action.
-            &point::compute
-        > compute_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            point,
-            // Return type
-            std::size_t,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::get_item
-        > get_item_action;
+        HPX_DEFINE_COMPONENT_ACTION(point, init);
+        HPX_DEFINE_COMPONENT_ACTION(point, remove_item);
+        HPX_DEFINE_COMPONENT_ACTION(point, compute);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_item);
 
     private:
         //hpx::lcos::local::mutex mtx_;

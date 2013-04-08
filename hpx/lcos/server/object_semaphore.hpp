@@ -207,9 +207,7 @@ struct object_semaphore
         }
     } // }}}
 
-    /*
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, signal, signal_action);
-    */
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
     typedef
         hpx::actions::action2<
             object_semaphore<ValueType>
@@ -217,33 +215,33 @@ struct object_semaphore
           , boost::uint64_t
           , &object_semaphore<ValueType>::signal
         > signal_action;
-    /*
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, get, get_action);
-    */
+
     typedef
         hpx::actions::action1<
             object_semaphore<ValueType>
           , naming::id_type const& // lco
           , &object_semaphore<ValueType>::get
         > get_action;
-    /*
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, abort_pending,
-        abort_pending_action);
-    */
+
     typedef
         hpx::actions::action1<
             object_semaphore<ValueType>
           , error
           , &object_semaphore<ValueType>::abort_pending
       > abort_pending_action;
-    /*
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, wait, wait_action);
-    */
+
     typedef
         hpx::actions::action0<
             object_semaphore<ValueType>
           , &object_semaphore<ValueType>::wait
         > wait_action;
+#else
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, signal, signal_action);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, get, get_action);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, abort_pending,
+        abort_pending_action);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, wait, wait_action);
+#endif
 
   private:
     value_queue_type value_queue_;

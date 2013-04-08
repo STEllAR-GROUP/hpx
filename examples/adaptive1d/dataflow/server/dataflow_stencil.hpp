@@ -53,21 +53,8 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action7<
-            dataflow_stencil, boost::shared_ptr<std::vector<naming::id_type> >,
-            std::vector<naming::id_type> const&,
-            double,
-            components::component_type,
-            std::size_t, std::size_t, components::component_type,
-            parameter const&, &dataflow_stencil::init_execute
-        > init_execute_action;
-
-        typedef hpx::actions::result_action6<
-            dataflow_stencil, std::vector<naming::id_type>,
-            std::vector<naming::id_type> const&,
-            components::component_type, std::size_t, std::size_t,
-            components::component_type, parameter const&, &dataflow_stencil::execute
-        > execute_action;
+        HPX_DEFINE_COMPONENT_ACTION(dataflow_stencil, init_execute);
+        HPX_DEFINE_COMPONENT_ACTION(dataflow_stencil, execute);
 
     protected:
         typedef

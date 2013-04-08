@@ -52,10 +52,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::result_action0<
-            stencil_value_out_adaptor, naming::id_type,
-            &stencil_value_out_adaptor::get_value
-        > get_value_action;
+        HPX_DEFINE_COMPONENT_ACTION(stencil_value_out_adaptor, get_value);
 
     private:
         callback_function_type eval_;

@@ -82,13 +82,17 @@ namespace bright_future {
                 std::vector<double> t;
                 std::swap(t, timestamps);
             }
-            
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action0<
                     remote_lse<T>
                   , &remote_lse<T>::clear_timestamps
                 >
                 clear_timestamps_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, clear_timestamps, clear_timestamps_action);
+#endif
 
             void print_timestamps()
             {
@@ -101,13 +105,17 @@ namespace bright_future {
                 }
                 hpx::cout << "Average time per update: " << acc << "\n" << hpx::flush;
             }
-            
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action0<
                     remote_lse<T>
                   , &remote_lse<T>::print_timestamps
                 >
                 print_timestamps_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, print_timestamps, print_timestamps_action);
+#endif
 
             remote_lse();
 
@@ -127,6 +135,7 @@ namespace bright_future {
               , double hy
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action6<
                     remote_lse<T>
@@ -139,6 +148,9 @@ namespace bright_future {
                   , &remote_lse<T>::init
                 >
                 init_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, init, init_action);
+#endif
 
             typedef
                 hpx::util::function<
@@ -156,6 +168,7 @@ namespace bright_future {
               , typename remote_lse<T>::size_type y
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -165,6 +178,9 @@ namespace bright_future {
                   , &remote_lse<T>::init_rhs
                 >
                 init_rhs_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, init_rhs, init_rhs_action);
+#endif
 
             void init_rhs_blocked(
                 init_func_type  f
@@ -172,6 +188,7 @@ namespace bright_future {
               , typename remote_lse<T>::range_type y
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -181,6 +198,9 @@ namespace bright_future {
                   , &remote_lse<T>::init_rhs_blocked
                 >
                 init_rhs_blocked_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, init_rhs_blocked, init_rhs_blocked_action);
+#endif
 
             void init_u(
                 init_func_type  f
@@ -188,6 +208,7 @@ namespace bright_future {
               , typename remote_lse<T>::size_type y
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -197,6 +218,9 @@ namespace bright_future {
                   , &remote_lse<T>::init_u
                 >
                 init_u_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, init_u, init_u_action);
+#endif
 
             void init_u_blocked(
                 init_func_type  f
@@ -204,6 +228,7 @@ namespace bright_future {
               , typename remote_lse<T>::range_type y
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -213,6 +238,9 @@ namespace bright_future {
                   , &remote_lse<T>::init_u_blocked
                 >
                 init_u_blocked_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, init_u_blocked, init_u_blocked_action);
+#endif
 
             typedef
                 hpx::util::function<
@@ -233,6 +261,7 @@ namespace bright_future {
               , std::vector<hpx::lcos::future<void> > dependencies
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action4<
                     remote_lse<T>
@@ -243,6 +272,9 @@ namespace bright_future {
                   , &remote_lse<T>::apply
                 >
                 apply_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, apply, apply_action);
+#endif
 
             void apply_region(
                 apply_func_type f
@@ -251,6 +283,7 @@ namespace bright_future {
               , std::vector<hpx::lcos::future<void> *> dependencies
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action4<
                     remote_lse<T>
@@ -261,13 +294,17 @@ namespace bright_future {
                   , &remote_lse<T>::apply_region
                 >
                 apply_region_action;
-            
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, apply_region, apply_region_action);
+#endif
+
             void apply_region_df(
                 apply_func_type f
               , range_type x_range
               , range_type y_range
             );
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -277,9 +314,13 @@ namespace bright_future {
                   , &remote_lse<T>::apply_region_df
                 >
                 apply_region_df_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, apply_region_df, apply_region_df_action);
+#endif
 
             std::vector<T> get_row(size_type r, range_type);
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::result_action2<
                     remote_lse<T>
@@ -289,9 +330,13 @@ namespace bright_future {
                   , &remote_lse<T>::get_row
                 >
                 get_row_action;
-            
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, get_row, get_row_action);
+#endif
+
             std::vector<T> get_col(size_type r, range_type);
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::result_action2<
                     remote_lse<T>
@@ -301,8 +346,13 @@ namespace bright_future {
                   , &remote_lse<T>::get_col
                 >
                 get_col_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, get_col, get_col_action);
+#endif
 
             void update_top_boundary(std::vector<T> const &, range_type);
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
@@ -311,8 +361,13 @@ namespace bright_future {
                   , &remote_lse<T>::update_top_boundary
                 >
                 update_top_boundary_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, update_top_boundary, update_top_boundary_action);
+#endif
 
             void update_bottom_boundary(std::vector<T> const &, range_type);
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
@@ -321,8 +376,13 @@ namespace bright_future {
                   , &remote_lse<T>::update_bottom_boundary
                 >
                 update_bottom_boundary_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, update_bottom_boundary, update_bottom_boundary_action);
+#endif
 
             void update_left_boundary(std::vector<T> const &, range_type);
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
@@ -331,8 +391,13 @@ namespace bright_future {
                   , &remote_lse<T>::update_left_boundary
                 >
                 update_left_boundary_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, update_left_boundary, update_left_boundary_action);
+#endif
 
             void update_right_boundary(std::vector<T> const &, range_type);
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
             typedef
                 hpx::actions::action2<
                     remote_lse<T>
@@ -341,6 +406,9 @@ namespace bright_future {
                   , &remote_lse<T>::update_right_boundary
                 >
                 update_right_boundary_action;
+#else
+            HPX_DEFINE_COMPONENT_ACTION_TPL(remote_lse, update_right_boundary, update_right_boundary_action);
+#endif
     };
 }}
 

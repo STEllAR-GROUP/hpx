@@ -106,119 +106,17 @@ namespace graph500 { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        typedef hpx::actions::action4<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            std::size_t,
-            double,
-            // Method bound to this action.
-            &point::init
-        > init_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            std::vector<int64_t> const&,
-            // Method bound to this action.
-            &point::root
-        > root_action;
-
-        typedef hpx::actions::action3<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            int64_t,
-            std::vector<hpx::naming::id_type> const&,
-            std::vector<std::size_t> const&,
-            // Method bound to this action.
-            &point::receive_duplicates
-        > receive_duplicates_action;
-
-        typedef hpx::actions::action3<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            int64_t,
-            int64_t,
-            std::vector<hpx::naming::id_type> const&,
-            // Method bound to this action.
-            &point::ppedge
-        > ppedge_action;
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::bfs
-        > bfs_action;
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            point,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::resolve_conflict
-        > resolve_conflict_action;
-
-        typedef hpx::actions::result_action1<
-            // Component server type.
-            point,
-            // Return type.
-            std::vector<int>,
-            // Arguments of this action.
-            std::size_t,
-            // Method bound to this action.
-            &point::distributed_validate
-        > distributed_validate_action;
-
-        typedef hpx::actions::result_action2<
-            // Component server type.
-            point,
-            // Return type.
-            std::vector<bool>,
-            // Arguments of this action.
-            int64_t,
-            std::vector<hpx::naming::id_type> const&,
-            // Method bound to this action.
-            &point::findwhohasthisedge
-        > findwhohasthisedge_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            point,
-            // Return type.
-            std::vector<int64_t>,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::get_numedges
-        > get_numedges_action;
-
-        typedef hpx::actions::result_action1<
-            // Component server type.
-            point,
-            // Return type.
-            resolvedata, 
-            // Arguments of this action.
-            int64_t,
-            // Method bound to this action.
-            &point::get_parent
-        > get_parent_action;
-
-        typedef hpx::actions::result_action1<
-            // Component server type.
-            point,
-            // Return type.
-            bool,
-            // Arguments of this action.
-            int64_t,
-            // Method bound to this action.
-            &point::has_edge
-        > has_edge_action;
+        HPX_DEFINE_COMPONENT_ACTION(point, init);
+        HPX_DEFINE_COMPONENT_ACTION(point, root);
+        HPX_DEFINE_COMPONENT_ACTION(point, receive_duplicates);
+        HPX_DEFINE_COMPONENT_ACTION(point, ppedge);
+        HPX_DEFINE_COMPONENT_ACTION(point, bfs);
+        HPX_DEFINE_COMPONENT_ACTION(point, resolve_conflict);
+        HPX_DEFINE_COMPONENT_ACTION(point, distributed_validate);
+        HPX_DEFINE_COMPONENT_ACTION(point, findwhohasthisedge);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_numedges);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_parent);
+        HPX_DEFINE_COMPONENT_ACTION(point, has_edge);
 
     private:
         hpx::lcos::local::mutex mtx_;

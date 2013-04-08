@@ -14,6 +14,7 @@
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 
 #endif
 
