@@ -8,7 +8,11 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_1_0_0 __hpx__ V1.0.0]
+[/ section:hpx_1_0_0 __hpx__ V1.0.0]
+[/ endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_6 __hpx__ V0.9.6]
 
 [heading General Changes]
 
@@ -18,6 +22,31 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 745] - apply_callback needs to invoke callback when applied locally
+* [issue 744] - CMake fixes
+* [issue 743] - Problem Building github version of HPX
+* [issue 741] - assertion 'px != 0' failed: HPX(assertion_failure) for low
+                numbers of OS threads
+* [issue 739] - Performance counters do not count to the end of the program
+                or evalution
+* [issue 738] - Dedicated AGAS server runs don't work; console ignores -a option.
+* [issue 737] - Missing bind overloads
+* [issue 736] - Performance counter wildcards do not always work
+* [issue 734] - Threads stolen performance counter total is incorrect
+* [issue 733] - Test benchmarks need to be checked and fixed
+* [issue 732] - Build fails with Mac, using mac ports clang-3.3 on latest git
+                branch
+* [issue 731] - Add global start/stop API for performance counters
+* [issue 730] - Performance counter values are apparently incorrect
+* [issue 729] - Unhandled switch
+* [issue 728] - Serialization of hpx::util::function between two localities
+                causes seg faults
+* [issue 727] - Memory counters on Mac OS X
+* [issue 725] - Restore original thread priority on resume
+* [issue 724] - Performance benchmarks do not depend on main HPX libraries
+* [issue 723] - --hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
+                does not.
+* [issue 722] - Fix binding const member functions as actions
 * [issue 718] - Add possibility to compress parcel data
 * [issue 717] - strip_credit_from_gid has misleading semantics
 * [issue 716] - Non-option arguments to programs run using `pbsdsh` must be
@@ -78,6 +107,8 @@ Here is a list of the tickets we closed for this release.
 * [issue 383] - Change result type detection for hpx::util::bind to use
                 result_of protocol
 * [issue 219] - Only copy arguments into actions once
+* [issue 177] - Implement distributed AGAS
+* [issue 43]  - Support for Darwin (Xcode + Clang)
 
 [endsect]
 

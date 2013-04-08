@@ -111,8 +111,8 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
                 --stringparam boost.image.src ${image}
-                --stringparam boost.image.w 322 
-                --stringparam boost.image.h 101
+                --stringparam boost.image.w 458
+                --stringparam boost.image.h 112
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
