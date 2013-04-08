@@ -105,7 +105,7 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        threads::mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
             return affinity_data_.get_pu_mask(topology, num_thread, numa_sensitive_);
         }
@@ -320,15 +320,14 @@ namespace hpx { namespace threads { namespace policies
                 mask_type node_mask = topology_.get_numa_node_affinity_mask(
                     num_thread, numa_sensitive_);
 
-                if (core_mask && node_mask) {
-                    mask_type m = 0x01LL;
+                if (core_mask.any() && node_mask.any()) {
                     for (std::size_t i = 0; (0 == added) && i < queues_.size();
-                         m <<= 1, ++i)
+                         ++i)
                     {
-                        if (m == core_mask || !(m & node_mask))
+                        if (m == core_mask || !(node_mask.test(i)))
                             continue;         // don't steal from ourselves
 
-                        std::size_t idx = least_significant_bit_set(m);
+                        std::size_t idx = m[m.find_first()];
                         BOOST_ASSERT(idx < queues_.size());
 
                         result = queues_[num_thread]->wait_or_add_new(idx,

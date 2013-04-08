@@ -109,7 +109,7 @@ namespace hpx { namespace threads
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
         notifier_(notifier),
-        used_processing_units_(0)
+        used_processing_units_(hardware_concurrency())
     {
         for (std::size_t i = 0; i < num_threads; ++i)
             used_processing_units_ |= scheduler_.get_pu_mask(get_topology(), i);
@@ -1806,7 +1806,7 @@ namespace hpx { namespace threads
 
         // set affinity on Linux systems or when using HWLOC
         topology const& topology_ = get_topology();
-        std::size_t mask = get_pu_mask(topology_, num_thread);
+        threads::mask_type mask = get_pu_mask(topology_, num_thread);
 
         LTM_(info) << "tfunc(" << num_thread
             << "): will run on one processing unit within this mask: "
@@ -2017,7 +2017,7 @@ namespace hpx { namespace threads
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                std::size_t mask = get_pu_mask(topology_, thread_num);
+                threads::mask_type mask = get_pu_mask(topology_, thread_num);
 
                 LTM_(info) << "run: create OS thread " << thread_num
                     << ": will run on one processing unit within this mask: "

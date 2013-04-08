@@ -14,7 +14,7 @@
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/thread.hpp>
-#include <boost/cstdint.hpp>
+#include <boost/dynamic_bitset.hpp>
 
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-    typedef boost::uint64_t mask_type;
+    typedef boost::dynamic_bitset<boost::uint64_t> mask_type;
     /// \endcond
 
     struct topology
@@ -111,7 +111,7 @@ namespace hpx { namespace threads
         /// \note  Use this function on systems where the affinity must be
         ///        set from outside the thread itself.
         virtual void set_thread_affinity_mask(boost::thread& t,
-            mask_type mask, error_code& ec = throws) const = 0;
+            mask_type const & mask, error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
         ///        thread. Each set bit corresponds to a processing unit the
@@ -123,7 +123,7 @@ namespace hpx { namespace threads
         ///
         /// \note  Use this function on systems where the affinity must be
         ///        set from inside the thread itself.
-        virtual void set_thread_affinity_mask(mask_type mask,
+        virtual void set_thread_affinity_mask(mask_type const & mask,
             error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -136,37 +136,6 @@ namespace hpx { namespace threads
         virtual mask_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
     };
-
-    /// \cond NOINTERNAL
-    inline std::size_t least_significant_bit(mask_type mask)
-    {
-        if (mask) {
-            int c = 0;    // Will count mask's trailing zero bits.
-
-            // Set mask's trailing 0s to 1s and zero rest.
-            mask = (mask ^ (mask - 1)) >> 1;
-            for (/**/; mask; ++c)
-                mask >>= 1;
-
-            return std::size_t(1) << c;
-        }
-        return std::size_t(1);
-    }
-
-    inline std::size_t least_significant_bit_set(mask_type mask)
-    {
-        if (mask) {
-            std::size_t c = 0;    // Will count mask's trailing zero bits.
-
-            // Set mask's trailing 0s to 1s and zero rest.
-            mask = (mask ^ (mask - 1)) >> 1;
-            for (/**/; mask; ++c)
-                mask >>= 1;
-
-            return c;
-        }
-        return std::size_t(-1);
-    }
 
     HPX_API_EXPORT std::size_t hardware_concurrency();
 

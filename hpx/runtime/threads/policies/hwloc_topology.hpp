@@ -71,12 +71,12 @@ namespace hpx { namespace threads
 
         void set_thread_affinity_mask(
             boost::thread&
-          , mask_type //mask
+          , mask_type const & //mask
           , error_code& ec = throws
             ) const;
 
         void set_thread_affinity_mask(
-            mask_type mask
+            mask_type const & mask
           , error_code& ec = throws
             ) const;
 
@@ -93,7 +93,7 @@ namespace hpx { namespace threads
             std::size_t num_numa_node
             ) const;
         mask_type init_core_affinity_mask_from_core(
-            std::size_t num_core, mask_type default_mask
+            std::size_t num_core, mask_type const & default_mask
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
 

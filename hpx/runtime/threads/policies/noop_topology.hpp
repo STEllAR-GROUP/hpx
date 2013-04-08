@@ -36,7 +36,7 @@ struct noop_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     }
 
     mask_type get_socket_affinity_mask(
@@ -48,7 +48,7 @@ struct noop_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     }
 
     mask_type get_numa_node_affinity_mask(
@@ -60,7 +60,7 @@ struct noop_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     }
 
     mask_type get_core_affinity_mask(
@@ -72,7 +72,7 @@ struct noop_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     }
 
     mask_type get_thread_affinity_mask(
@@ -84,12 +84,12 @@ struct noop_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     }
 
     void set_thread_affinity_mask(
         boost::thread& thrd
-      , mask_type mask
+      , mask_type const & mask
       , error_code& ec = throws
         ) const
     {
@@ -98,7 +98,7 @@ struct noop_topology : topology
     }
 
     void set_thread_affinity_mask(
-        mask_type mask
+        mask_type const & mask
       , error_code& ec = throws
         ) const
     {
@@ -114,7 +114,7 @@ struct noop_topology : topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     }
 };
 
