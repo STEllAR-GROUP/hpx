@@ -90,6 +90,8 @@
 [def __qsub__                   [@http://www.clusterresources.com/torquedocs21/commands/qsub.shtml qsub]]
 [def __qstat__                  [@http://www.clusterresources.com/torquedocs21/commands/qstat.shtml qstat]]
 [def __pbsdsh__                 [@http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml pbsdsh]]
+[def __pgas__                   [@http://www.pgas.org/]]
+[def __apgas__                  [@https://researcher.ibm.com/researcher/files/us-groved/amp2010.pdf]]
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
 

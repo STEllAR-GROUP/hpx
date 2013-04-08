@@ -1,7 +1,9 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+/// \file new_.hpp
 
 #ifndef BOOST_PP_IS_ITERATING
 
@@ -20,15 +22,38 @@
 
 namespace hpx { namespace components
 {
+#if defined(DOXYGEN)
+    /// \brief Create a new instance of the given Component type on the
+    ///        specified locality.
+    ///
+    /// This function creates a new instance of the given Component type
+    /// on the specified locality and returns a future object for the
+    /// global address which can be used to reference the new component
+    /// instance.
+    ///
+    /// \param locality  [in] The global address of the locality where the
+    ///                  new instance should be created on.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  value, by const reference or by rvalue reference)
+    ///                  which will be forwarded to the constructor of
+    ///                  the created component instance.
+    ///
+    /// \returns The function returns an \a hpx::future object instance
+    ///          which can be used to retrieve the global address of the
+    ///          newly created component.
+    template <typename Component, typename Arg0, ..., typename ArgN>
+    hpx::future<hpx::id_type>
+    new_(hpx::id_type const& locality, Arg0 arg0, ..., ArgN argN);
+#else
     template <typename Component>
     inline typename boost::enable_if<
-        traits::is_component<Component>, 
-        lcos::future<naming::id_type>
+        traits::is_component<Component>, lcos::future<naming::id_type>
     >::type
     new_(id_type const& locality)
     {
         return components::stub_base<Component>::create_async(locality);
     }
+#endif
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/components/preprocessed/new.hpp>
@@ -61,8 +86,7 @@ namespace hpx { namespace components
 
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline typename boost::enable_if<
-        traits::is_component<Component>, 
-        lcos::future<naming::id_type>
+        traits::is_component<Component>, lcos::future<naming::id_type>
     >::type
     new_(id_type const& locality, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {

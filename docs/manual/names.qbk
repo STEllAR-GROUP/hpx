@@ -1,10 +1,66 @@
 [/=============================================================================
     Copyright (C) 2012 Bryce Adelstein-Lelbach
+    Copyright (C) 2007-2013 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
 [section:names Global Names]
+
+__hpx__ implements an Active Global Address Space (AGAS) which is exposing a single
+uniform address space spanning all localities an application runs on. AGAS is a
+fundamental component of the ParalleX execution model. Conceptually, there is no rigid
+demarcation of local or global memory in AGAS; all available memory is a part of the
+same address space. AGAS enables named objects to be moved (migrated) across localities
+without having to change the object's name, i.e., no references to migrated objects
+have to be ever updated. This feature has significance for dynamic load balancing
+and in applications where the workflow is highly dynamic, allowing work to be
+migrated from heavily loaded nodes to less loaded nodes. In addition, immutability
+of names ensures that AGAS does not have to keep extra indirections ("bread crumbs")
+when objects move, hence minimizing complexity of code management for system
+developers as well as minimizing overheads in maintaining and managing aliases.
+
+The AGAS implementation in __hpx__ does not automatically expose every local
+address to the global address space. It is the responsibility of the programmer
+to explicitly define which of the objects have to be globally visible and which
+of the objects are purely local.
+
+In __hpx__ global addresses (global names) are represented using the `hpx::id_type`
+data type. This data type is conceptually very similar to `void*` pointers as
+it does not expose any type information of the object it is referring to.
+
+The only predefined global addresses are assigned to all localities. The
+following __hpx__ API functions allow to retrieve the global addresses of
+localities:
+
+* [funcref hpx::find_here() `hpx::find_here()`]: retrieve the global address
+  of the locality this function is called on.
+* [funcref hpx::find_all_localities() `hpx::find_all_localities()`]: retrieve
+  the global addresses of all localities available to this application
+  (including the locality the function is being called on).
+* [funcref hpx::find_remote_localities() `hpx::find_remote_localities()`]:
+  retrieve the global addresses of all remote localities available to this
+  application (not including the locality the function is being called on)
+* [funcref hpx::get_num_localities() `hpx::get_num_localities()`]: retrieve
+  the number of localities available to this application.
+* [funcref hpx::find_locality() `hpx::find_locality()`]: retrieve the global
+  address of any locality supporting the given component type.
+* [funcref hpx::get_colocation_id() `hpx::get_colocation_id()`]: retrieve the
+  global address of the locality currently hosting the object with the given
+  global address.
+
+Additionally, the global addresses of localities can be used to create new
+instances of components using the following __hpx__ API function:
+
+* [funcref hpx::components::new_() `hpx::new_<Component>()`]: Create a new
+  instance of the given `Component` type on the specified locality.
+
+[note __hpx__ does not expose any functionality to delete component instances. 
+      All global addresses (as represented using `hpx::id_type`) are being
+      automatically garbage collected. When the last (global) reference to 
+      a particular component instance goes out of scope the corresponding 
+      component instance is automatically deleted.]
+
 [endsect]
 

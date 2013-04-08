@@ -48,7 +48,7 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
 #define HPX_STUB_BASE_CREATE(Z, N, D)                                         \
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static lcos::future<naming::id_type>                \
+        static lcos::future<naming::id_type>                                  \
         create_async(naming::id_type const& gid,                              \
             HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
         {                                                                     \

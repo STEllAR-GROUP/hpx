@@ -635,13 +635,6 @@ namespace hpx
         return static_cast<int>(lhs) & static_cast<int>(rhs) ? true : false;
     }
 
-    /// \brief Return the list of locality ids of remote localities supporting
-    ///        the given component type. By default this function will return
-    ///        the list of all remote localities (all but the current locality).
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
-        components::component_type);
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
@@ -762,6 +755,70 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
         components::component_type type, error_code& ec = throws);
+
+    /// \brief Return the list of locality ids of remote localities supporting
+    ///        the given component type. By default this function will return
+    ///        the list of all remote localities (all but the current locality).
+    ///
+    /// The function \a find_remote_localities() can be used to retrieve the
+    /// global ids of all remote localities currently available to this
+    /// application (i.e. all localities except the current one).
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global ids representing the remote localities currently
+    ///           available to this application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
+
+    /// \brief Return the list of locality ids of remote localities supporting
+    ///        the given component type. By default this function will return
+    ///        the list of all remote localities (all but the current locality).
+    ///
+    /// The function \a find_remote_localities() can be used to retrieve the
+    /// global ids of all remote localities currently available to this
+    /// application (i.e. all localities except the current one) which
+    /// support the creation of instances of the given component type.
+    ///
+    /// \param type  [in] The type of the components for which the function should
+    ///           return the available remote localities.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global ids representing the remote localities currently
+    ///           available to this application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+        components::component_type);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing an arbitrary locality which
@@ -1101,7 +1158,7 @@ namespace hpx
     ///           line option \--hpx:print-counter)
     HPX_API_EXPORT void stop_active_counters(error_code& ec = throws);
 
-    /// \brief Evaluate and output all active performance counters, optionally 
+    /// \brief Evaluate and output all active performance counters, optionally
     ///        naming the point in code marked by this function.
     ///
     /// \param reset       [in] this is an optional flag allowing to reset
