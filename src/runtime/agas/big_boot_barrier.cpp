@@ -94,20 +94,13 @@ struct registration_header
     registration_header(
         naming::locality const& locality_
       , boost::uint64_t parcelport_allocation_
-      , boost::uint64_t response_allocation_
-      , naming::address const& response_heap_address_
-      , boost::uint64_t response_heap_offset_
-      , boost::uint64_t response_heap_ptr_
-      , boost::uint64_t component_runtime_support_ptr_
+      , boost::uint64_t response_allocation_      , boost::uint64_t component_runtime_support_ptr_
       , boost::uint64_t component_memory_ptr_
       , boost::uint64_t primary_ns_ptr_
     ) :
         locality(locality_)
       , parcelport_allocation(parcelport_allocation_)
       , response_allocation(response_allocation_)
-      , response_heap_address(response_heap_address_)
-      , response_heap_offset(response_heap_offset_)
-      , response_heap_ptr(response_heap_ptr_)
       , component_runtime_support_ptr(component_runtime_support_ptr_)
       , component_memory_ptr(component_memory_ptr_)
       , primary_ns_ptr(primary_ns_ptr_)
@@ -116,9 +109,7 @@ struct registration_header
     naming::locality locality;
     boost::uint64_t parcelport_allocation;
     boost::uint64_t response_allocation;
-    naming::address response_heap_address;
-    boost::uint64_t response_heap_offset;
-    boost::uint64_t response_heap_ptr;
+
     boost::uint64_t component_runtime_support_ptr;
     boost::uint64_t component_memory_ptr;
     boost::uint64_t primary_ns_ptr;
@@ -129,9 +120,6 @@ struct registration_header
         ar & locality;
         ar & parcelport_allocation;
         ar & response_allocation;
-        ar & response_heap_address;
-        ar & response_heap_offset;
-        ar & response_heap_ptr;
         ar & component_runtime_support_ptr;
         ar & component_memory_ptr;
         ar & primary_ns_ptr;
@@ -146,8 +134,6 @@ struct notification_header
 
     notification_header(
         naming::gid_type const& prefix_
-      , naming::address const& response_pool_address_
-      , boost::uint64_t response_heap_ptr_
       , naming::gid_type const& response_lower_gid_
       , naming::gid_type const& response_upper_gid_
       , naming::gid_type const& parcelport_lower_gid_
@@ -158,8 +144,6 @@ struct notification_header
       , naming::address const& symbol_ns_address_
     ) :
         prefix(prefix_)
-      , response_pool_address(response_pool_address_)
-      , response_heap_ptr(response_heap_ptr_)
       , response_lower_gid(response_lower_gid_)
       , response_upper_gid(response_upper_gid_)
       , parcelport_lower_gid(parcelport_lower_gid_)
@@ -171,8 +155,6 @@ struct notification_header
     {}
 
     naming::gid_type prefix;
-    naming::address response_pool_address;
-    boost::uint64_t response_heap_ptr;
     naming::gid_type response_lower_gid;
     naming::gid_type response_upper_gid;
     naming::gid_type parcelport_lower_gid;
@@ -186,8 +168,6 @@ struct notification_header
     void serialize(Archive & ar, const unsigned int)
     {
         ar & prefix;
-        ar & response_pool_address;
-        ar & response_heap_ptr;
         ar & response_lower_gid;
         ar & response_upper_gid;
         ar & parcelport_lower_gid;
@@ -275,19 +255,28 @@ void register_console(registration_header const& header)
             , "registration parcel received by non-bootstrap locality");
     }
 
-    naming::gid_type prefix
-                   , parcel_lower, parcel_upper
-                   , heap_lower, heap_upper;
-
     util::runtime_configuration const& cfg = get_runtime().get_config();
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
         cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
-    agas_client.register_locality(header.locality, prefix, num_threads);
 
+    naming::gid_type prefix;
+    if (!agas_client.register_locality(header.locality, prefix, num_threads))
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+            , "agas::register_console"
+            , boost::str(boost::format(
+                "attempt to register locality %s more than once") % 
+                    header.locality));
+        return;
+    }
+
+    naming::gid_type parcel_lower, parcel_upper;
     agas_client.get_id_range(header.locality, header.parcelport_allocation
-                           , parcel_lower, parcel_upper);
+      , parcel_lower, parcel_upper);
+
+    naming::gid_type heap_lower, heap_upper;
     agas_client.get_id_range(header.locality, header.response_allocation
-                           , heap_lower, heap_upper);
+      , heap_lower, heap_upper);
 
     naming::gid_type runtime_support_gid(prefix.get_msb()
       , header.component_runtime_support_ptr);
@@ -310,10 +299,6 @@ void register_console(registration_header const& header)
       , header.primary_ns_ptr);
     agas_client.bind(primary_ns_gid, primary_ns_address);
 
-    agas_client.bind_range(heap_lower, header.response_allocation
-                         , header.response_heap_address
-                         , header.response_heap_offset);
-
     agas::register_name("/locality(console)", prefix);
 
     naming::address locality_addr(get_runtime().here(),
@@ -332,8 +317,7 @@ void register_console(registration_header const& header)
     actions::base_action* p =
         new actions::transfer_action<notify_console_action>(
             notification_header(
-                prefix, header.response_heap_address, header.response_heap_ptr,
-                heap_lower, heap_upper, parcel_lower, parcel_upper,
+                prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
                 locality_addr, primary_addr, component_addr, symbol_addr));
 
     HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
@@ -394,23 +378,29 @@ void notify_console(notification_header const& header)
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
     rt.get_id_pool().set_range(header.parcelport_lower_gid
-                                        , header.parcelport_upper_gid);
+      , header.parcelport_upper_gid);
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
-    response_heap_type::get_heap().set_range(header.response_lower_gid
-                                           , header.response_upper_gid);
+    response_heap_type::get_heap().set_range(
+        header.response_lower_gid
+      , header.response_upper_gid);
 
-    // finish setting up the first heap.
-    response_heap_type::block_type* p
-        = reinterpret_cast<response_heap_type::block_type*>
-            (header.response_heap_ptr);
+    // allocate our first heap
+    response_heap_type::block_type* p = response_heap_type::alloc_heap();
 
     // set the base gid that we bound to this heap
     p->set_gid(header.response_lower_gid);
 
     // push the heap onto the OSHL
     response_heap_type::get_heap().add_heap(p);
+
+    // bind range of GIDs to head addresses
+    agas_client.bind_range(
+        header.response_lower_gid
+      , response_heap_type::block_type::heap_step
+      , p->get_address()
+      , response_heap_type::block_type::heap_size);
 
     // set up the future pools
     naming::resolver_client::locality_promise_pool_type& locality_promise_pool
@@ -438,25 +428,25 @@ void register_worker(registration_header const& header)
 
     if (HPX_UNLIKELY(agas_client.is_connecting()))
     {
-        HPX_THROW_EXCEPTION(internal_server_error
-            , "agas::register_worker"
-            , "runtime_mode_connect can't find running application.");
+        HPX_THROW_EXCEPTION(
+            internal_server_error
+          , "agas::register_worker"
+          , "runtime_mode_connect can't find running application.");
     }
 
     if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
     {
-        HPX_THROW_EXCEPTION(internal_server_error
-            , "agas::register_worker"
-            , "registration parcel received by non-bootstrap locality.");
+        HPX_THROW_EXCEPTION(
+            internal_server_error
+          , "agas::register_worker"
+          , "registration parcel received by non-bootstrap locality.");
     }
-
-    naming::gid_type prefix
-                   , parcel_lower, parcel_upper
-                   , heap_lower, heap_upper;
 
     util::runtime_configuration const& cfg = rt.get_config();
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
         cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
+
+    naming::gid_type prefix;
     if (!agas_client.register_locality(header.locality, prefix, num_threads))
     {
         HPX_THROW_EXCEPTION(internal_server_error
@@ -464,12 +454,16 @@ void register_worker(registration_header const& header)
             , boost::str(boost::format(
                 "attempt to register locality %s more than once") % 
                     header.locality));
+        return;
     }
 
+    naming::gid_type parcel_lower, parcel_upper;
     agas_client.get_id_range(header.locality, header.parcelport_allocation
-                           , parcel_lower, parcel_upper);
+      , parcel_lower, parcel_upper);
+
+    naming::gid_type heap_lower, heap_upper;
     agas_client.get_id_range(header.locality, header.response_allocation
-                           , heap_lower, heap_upper);
+      , heap_lower, heap_upper);
 
     naming::gid_type runtime_support_gid(prefix.get_msb()
       , header.component_runtime_support_ptr);
@@ -492,10 +486,6 @@ void register_worker(registration_header const& header)
       , header.primary_ns_ptr);
     agas_client.bind(primary_ns_gid, primary_ns_address);
 
-    agas_client.bind_range(heap_lower, header.response_allocation
-                         , header.response_heap_address
-                         , header.response_heap_offset);
-
     naming::address locality_addr(rt.here(),
         server::locality_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->locality_ns_server_));
@@ -512,8 +502,7 @@ void register_worker(registration_header const& header)
     actions::base_action* p =
         new actions::transfer_action<notify_console_action>(
             notification_header(
-                prefix, header.response_heap_address, header.response_heap_ptr,
-                heap_lower, heap_upper, parcel_lower, parcel_upper,
+                prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
                 locality_addr, primary_addr, component_addr, symbol_addr));
 
     // FIXME: This could screw with startup.
@@ -530,12 +519,13 @@ void register_worker(registration_header const& header)
 
     else // AGAS is starting up; this locality is participating in startup
     {    // synchronization.
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
-            (boost::bind(&big_boot_barrier::apply
-                       , boost::ref(get_big_boot_barrier())
-                       , naming::get_locality_id_from_gid(prefix)
-                       , naming::address(header.locality)
-                       , p));
+        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+            boost::bind(
+                &big_boot_barrier::apply
+              , boost::ref(get_big_boot_barrier())
+              , naming::get_locality_id_from_gid(prefix)
+              , naming::address(header.locality)
+              , p));
 
         get_big_boot_barrier().add_thunk(thunk);
     }
@@ -577,23 +567,28 @@ void notify_worker(notification_header const& header)
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
     rt.get_id_pool().set_range(header.parcelport_lower_gid
-                                        , header.parcelport_upper_gid);
+      , header.parcelport_upper_gid);
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
     response_heap_type::get_heap().set_range(header.response_lower_gid
-                                           , header.response_upper_gid);
+      , header.response_upper_gid);
 
-    // finish setting up the first heap.
-    response_heap_type::block_type* p
-        = reinterpret_cast<response_heap_type::block_type*>
-            (header.response_heap_ptr);
+    // allocate our first heap
+    response_heap_type::block_type* p = response_heap_type::alloc_heap();
 
     // set the base gid that we bound to this heap
     p->set_gid(header.response_lower_gid);
 
     // push the heap onto the OSHL
     response_heap_type::get_heap().add_heap(p);
+
+    // bind range of GIDs to head addresses
+    agas_client.bind_range(
+        header.response_lower_gid
+      , response_heap_type::block_type::heap_step
+      , p->get_address()
+      , response_heap_type::block_type::heap_size);
 
     // set up the future pools
     naming::resolver_client::locality_promise_pool_type& locality_promise_pool
@@ -657,8 +652,6 @@ void big_boot_barrier::wait(void* primary_ns_server)
     {
         BOOST_ASSERT(0 != primary_ns_server);
 
-        // allocate our first heap
-        response_heap_type::block_type* p = response_heap_type::alloc_heap();
         runtime& rt = get_runtime();
 
         // hosted, console
@@ -675,9 +668,6 @@ void big_boot_barrier::wait(void* primary_ns_server)
                         rt.here()
                       , HPX_INITIAL_GID_RANGE
                       , response_heap_type::block_type::heap_step
-                      , p->get_address()
-                      , response_heap_type::block_type::heap_size
-                      , reinterpret_cast<boost::uint64_t>(p)
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
                       , reinterpret_cast<boost::uint64_t>(primary_ns_server))
@@ -697,9 +687,6 @@ void big_boot_barrier::wait(void* primary_ns_server)
                         rt.here()
                       , HPX_INITIAL_GID_RANGE
                       , response_heap_type::block_type::heap_step
-                      , p->get_address()
-                      , response_heap_type::block_type::heap_size
-                      , reinterpret_cast<boost::uint64_t>(p)
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
                       , reinterpret_cast<boost::uint64_t>(primary_ns_server))
