@@ -558,7 +558,7 @@ inline void multiply_and_add(
     }
 }
 
-HPX_PLAIN_ACTION(multiply_and_add);
+HPX_PLAIN_ACTION(multiply_and_add<double>);
 
 //typedef hpx::lcos::dataflow<multiply_and_add_action> multiply_and_add_dataflow;
 
