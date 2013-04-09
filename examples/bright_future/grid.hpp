@@ -34,7 +34,7 @@
 HPX_ALWAYS_EXPORT std::size_t
     touch_mem(std::size_t, std::size_t, std::size_t, std::size_t);
 
-HPX_PLAIN_ACTION(touch_mem)
+HPX_DEFINE_PLAIN_ACTION(touch_mem);
 #endif
 
 #if !defined(BOOST_NOEXCEPT)
