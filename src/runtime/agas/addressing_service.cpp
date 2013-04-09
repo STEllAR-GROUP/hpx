@@ -680,24 +680,34 @@ struct lock_semaphore
 template <typename Pool, typename Promise>
 struct checkout_promise
 {
-    checkout_promise(Pool& pool, Promise*& promise)
-      : result_ok_(false), pool_(pool), promise_(promise)
+    checkout_promise(lcos::local::counting_semaphore& sem, Pool& pool, Promise*& promise)
+      : sem_(sem), result_ok_(false), pool_(pool), promise_(promise)
     {
-        pool_.dequeue(promise_);
-        BOOST_ASSERT(promise_);
+        {
+            // wait for the semaphore to become available
+            lock_semaphore lock(sem_);
+            pool_.dequeue(promise_);
+        }
 
-        promise_->reset(); // reset the promise
+        BOOST_ASSERT(promise_);
+        promise_->reset();          // reset the promise
     }
     ~checkout_promise()
     {
         // return the future to the pool
         if (result_ok_)
+        {
+            // wait for the semaphore to become available
+            lock_semaphore lock(sem_);
             pool_.enqueue(promise_);
+        }
     }
 
     void set_ok() { result_ok_ = true; }
 
 private:
+    // wait for the semaphore to become available
+    lcos::local::counting_semaphore& sem_;
     bool result_ok_;
     Pool& pool_;
     Promise*& promise_;
@@ -729,20 +739,22 @@ bool addressing_service::get_id_range(
             // WARNING: this deadlocks if AGAS is unresponsive and all response
             // futures are checked out and pending.
 
-            // wait for the semaphore to become available
-            lock_semaphore lock(hosted->promise_pool_semaphore_);
-
             // get a future
             typedef checkout_promise<
                 locality_promise_pool_type
               , future_type
             > checkout_promise_type;
 
-            checkout_promise_type cf(hosted->locality_promise_pool_, f);
-            if (0 == f) {
-                HPX_THROWS_IF(ec, invalid_status,
-                    "addressing_service::get_id_range",
-                    "could not check out future object instance during bootstrap");
+            checkout_promise_type cf(
+                hosted->promise_pool_semaphore_
+              , hosted->locality_promise_pool_
+              , f);
+
+            if (0 == f)
+            {
+                HPX_THROWS_IF(ec, invalid_status
+                  , "addressing_service::get_id_range"
+                  , "could not check out future object instance during bootstrap");
                 return false;
             }
 
