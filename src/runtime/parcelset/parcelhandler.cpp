@@ -234,7 +234,7 @@ namespace hpx { namespace parcelset
     }
 
     connection_type parcelhandler::find_appropriate_connection_type(
-        naming::locality dest)
+        naming::locality const& dest)
     {
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
         if (dest.get_type() == connection_tcpip) {

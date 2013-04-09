@@ -426,7 +426,7 @@ namespace hpx { namespace parcelset
 
         std::size_t get_outgoing_queue_length(bool reset) const;
 
-        connection_type find_appropriate_connection_type(naming::locality dest);
+        connection_type find_appropriate_connection_type(naming::locality const& dest);
 
         void register_counter_types(connection_type pp_type);
 
