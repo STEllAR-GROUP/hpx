@@ -76,18 +76,8 @@ namespace hpx { namespace components { namespace server
         gtrFuture** nextRight;
         gtrFuture** nextBelow;
         gtrFuture** nextDagnl;
-
-/*        //the below functions require futures and actions declared above
-        int create_left_futures(const int row, const int iter,
-            int brows,const vector<vector<id_type> > gidList);
-        typedef actions::result_action4<lublock, int, hpl_createLeft, int, int,
-            int, vector<vector<id_type> >,
-            &lublock::create_left_futures> createLeftFuture_action;
-        typedef lcos::packaged_action<server::lublock::createLeftFuture_action>
-            createLeftFuture;
-*/
     };
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
     int lublock::construct_block(const int h, const int w, const int px,

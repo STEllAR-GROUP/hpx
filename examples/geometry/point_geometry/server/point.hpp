@@ -190,52 +190,17 @@ namespace hpx { namespace geometry { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action8<
-            point, double, double,double,double,double,double,std::size_t,std::size_t, &point::init
-        > init_action;
-
-        typedef hpx::actions::result_action0<
-            point const, double, &point::get_X
-        > get_X_action;
-
-        typedef hpx::actions::result_action0<
-            point const, polygon_type, &point::get_poly
-        > get_poly_action;
-
-        typedef hpx::actions::action2<
-            point, double, double, &point::move
-        > move_action;
-
-        typedef hpx::actions::action1<
-            point, double, &point::adjust
-        > adjust_action;
-
-        typedef hpx::actions::action4<
-            point, std::vector<hpx::naming::id_type> const&,double,std::size_t,std::size_t,
-            &point::enforce
-        > enforce_action;
-
-        typedef hpx::actions::result_action0<
-            point const, double, &point::get_Y
-        > get_Y_action;
-
-        typedef hpx::actions::action1<
-            point, double, &point::set_X
-        > set_X_action;
-
-        typedef hpx::actions::action1<
-            point, double, &point::set_Y
-        > set_Y_action;
-
-        typedef hpx::actions::result_action1<
-            point, int, std::vector<hpx::naming::id_type> const&,
-            &point::search
-        > search_action;
-
-        typedef hpx::actions::action1<
-            point, std::vector<hpx::naming::id_type> const&,
-            &point::recompute
-        > recompute_action;
+        HPX_DEFINE_COMPONENT_ACTION(point, init);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_X);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_poly);
+        HPX_DEFINE_COMPONENT_ACTION(point, move);
+        HPX_DEFINE_COMPONENT_ACTION(point, adjust);
+        HPX_DEFINE_COMPONENT_ACTION(point, enforce);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_Y);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_X);
+        HPX_DEFINE_COMPONENT_ACTION(point, set_Y);
+        HPX_DEFINE_COMPONENT_ACTION(point, search);
+        HPX_DEFINE_COMPONENT_ACTION(point, recompute);
 
     private:
         //hpx::lcos::local::mutex mtx_;    // lock for this data block

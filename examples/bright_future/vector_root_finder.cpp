@@ -19,8 +19,6 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::naming::id_type;
-using hpx::actions::plain_result_action2;
-using hpx::actions::plain_result_action3;
 using hpx::async;
 using hpx::lcos::future;
 using hpx::util::high_resolution_timer;
@@ -47,17 +45,7 @@ double start_iteration(double x, double x_n, unsigned max_iterations)
     return x_n;
 }
 
-typedef
-    plain_result_action3<
-        double // result type
-      , double // arg1
-      , double // arg2
-      , unsigned // arg3
-      , start_iteration // function
-    >
-    start_iteration_action;
-
-HPX_REGISTER_PLAIN_ACTION(start_iteration_action)
+HPX_PLAIN_ACTION(start_iteration)
 
 int hpx_main(variables_map & vm)
 {

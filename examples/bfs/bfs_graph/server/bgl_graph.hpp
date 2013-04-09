@@ -53,25 +53,10 @@ namespace bfs { namespace server
         void reset();
 
         // action definitions
-        typedef hpx::actions::action3<
-            bgl_graph, graph_init,
-            std::size_t, std::size_t,
-                std::vector<std::pair<std::size_t, std::size_t> > const&,
-            &bgl_graph::init
-        > init_action;
-
-        typedef hpx::actions::result_action1<
-            bgl_graph, double, graph_bfs, std::size_t, &bgl_graph::bfs
-        > bfs_action;
-
-        typedef hpx::actions::result_action0<
-            bgl_graph, std::vector<std::size_t>, graph_get_parents,
-            &bgl_graph::get_parents
-        > get_parents_action;
-
-        typedef hpx::actions::action0<
-            bgl_graph, graph_reset, &bgl_graph::reset
-        > reset_action;
+        HPX_DEFINE_COMPONENT_ACTION(bgl_graph, init);
+        HPX_DEFINE_COMPONENT_ACTION(bgl_graph, bfs);
+        HPX_DEFINE_COMPONENT_ACTION(bgl_graph, get_parents);
+        HPX_DEFINE_COMPONENT_ACTION(bgl_graph, reset);
 
     private:
         std::size_t idx_;

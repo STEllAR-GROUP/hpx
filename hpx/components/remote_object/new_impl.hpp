@@ -23,20 +23,11 @@ namespace hpx { namespace components
           );
 
         // the action to invoke new_impl
-        typedef
-            actions::plain_result_action3<
-                naming::id_type
-              , naming::id_type const &
-              , util::function<void(void**)> const &
-              , util::function<void(void**)> const &
-              , &new_impl
-            >
-            new_impl_action;
+        HPX_DEFINE_PLAIN_ACTION(new_impl, new_impl_action);
     }
 }}
 
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(
-    hpx::components::remote_object::new_impl_action
-)
+    hpx::components::remote_object::new_impl_action)
 
 #endif

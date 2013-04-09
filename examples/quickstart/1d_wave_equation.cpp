@@ -37,8 +37,6 @@ using boost::program_options::value;
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 
-using hpx::actions::plain_result_action2;
-
 using hpx::lcos::future;
 using hpx::async;
 using hpx::lcos::wait;
@@ -110,20 +108,8 @@ double wave(boost::uint64_t t, boost::uint64_t x);
 
 // Any global function needs to be wrapped into a plain_action if it should be
 // invoked as a HPX-thread.
-typedef plain_result_action2<
-  // result type
-  double,
-
-  // arguments
-  boost::uint64_t,
-  boost::uint64_t,
-
-  // function
-  wave
-  > wave_action;
-
 // This generates the required boilerplate we need for remote invocation.
-HPX_REGISTER_PLAIN_ACTION(wave_action);
+HPX_PLAIN_ACTION(wave);
 
 double calculate_u_tplus_x(double u_t_xplus, double u_t_x, double u_t_xminus,
                            double u_tminus_x)

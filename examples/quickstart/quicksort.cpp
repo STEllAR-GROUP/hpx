@@ -25,7 +25,6 @@ using hpx::components::memory_block;
 using hpx::components::access_memory_block;
 
 using hpx::actions::manage_object_action;
-using hpx::actions::plain_action4;
 
 using hpx::applier::applier;
 using hpx::applier::get_applier;
@@ -92,10 +91,6 @@ struct quicksort_parallel
 
     static void call(id_type prefix, id_type d, std::size_t begin,
                      std::size_t end);
-
-    typedef plain_action4<
-        id_type, id_type, std::size_t, std::size_t, &quicksort_parallel::call
-    > action_type;
 };
 
 template <typename T>
@@ -135,8 +130,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
     }
 }
 
-typedef quicksort_parallel<int>::action_type quicksort_int_action;
-HPX_REGISTER_PLAIN_ACTION(quicksort_int_action);
+HPX_PLAIN_ACTION(quicksort_parallel<int>::call, quicksort_int_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)

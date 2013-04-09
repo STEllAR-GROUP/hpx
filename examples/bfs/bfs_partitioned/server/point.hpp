@@ -77,89 +77,12 @@ namespace bfs { namespace server
             point_depth_traverse = 5
         };
 
-        typedef hpx::actions::action7<
-            // Component server type.
-            point,
-            // Action code.
-            point_init,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            std::size_t,
-            std::vector<std::size_t> const&,
-            std::vector<std::size_t> const&,
-            boost::numeric::ublas::mapped_vector<std::size_t> const&,
-            std::size_t,
-            // Method bound to this action.
-            &point::init
-        > init_action;
-
-        typedef hpx::actions::action1<
-            // Component server type.
-            point,
-            // Action code.
-            point_reset_visited,
-            // Arguments of this action.
-            std::size_t,
-            // Method bound to this action.
-            &point::reset_visited
-        > reset_visited_action;
-
-        typedef hpx::actions::result_action3<
-            // Component server type.
-            point,
-            // Return type.
-            std::vector<std::size_t>,
-            // Action code.
-            point_traverse,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            std::size_t,
-            // Method bound to this action.
-            &point::traverse
-        > traverse_action;
-
-        typedef hpx::actions::result_action3<
-            // Component server type.
-            point,
-            // Return type.
-            std::vector<nodedata>,
-            // Action code.
-            point_depth_traverse,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            std::size_t,
-            // Method bound to this action.
-            &point::depth_traverse
-        > depth_traverse_action;
-
-        typedef hpx::actions::result_action1<
-            // Component server type.
-            point,
-            // Return type.
-            std::size_t,
-            // Action code.
-            point_get_parent,
-            // Arguments of this action.
-            std::size_t,
-            // Method bound to this action.
-            &point::get_parent
-        > get_parent_action;
-
-        typedef hpx::actions::result_action1<
-            // Component server type.
-            point,
-            // Return type.
-            std::size_t,
-            // Action code.
-            point_get_level,
-            // Arguments of this action.
-            std::size_t,
-            // Method bound to this action.
-            &point::get_level
-        > get_level_action;
+        HPX_DEFINE_COMPONENT_ACTION(point, init);
+        HPX_DEFINE_COMPONENT_ACTION(point, reset_visited);
+        HPX_DEFINE_COMPONENT_ACTION(point, traverse);
+        HPX_DEFINE_COMPONENT_ACTION(point, depth_traverse);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_parent);
+        HPX_DEFINE_COMPONENT_ACTION(point, get_level);
 
     private:
         hpx::lcos::local::mutex mtx_;

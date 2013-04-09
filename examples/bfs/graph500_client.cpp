@@ -80,16 +80,9 @@ std::vector<bool> whohasthisedge(int64_t edge,std::vector<hpx::naming::id_type> 
 
 // Any global function needs to be wrapped into a plain_action if it should be
 // invoked as a HPX-thread.
-typedef hpx::actions::plain_result_action2<
-    std::vector<bool>,          // result type
-    int64_t,                // argument
-    std::vector<hpx::naming::id_type> const&,    // argument
-    whohasthisedge              // function
-> whohasthisedge_action;
-
-// this is to generate the required boilerplate we need for the remote
-// invocation to work
-HPX_REGISTER_PLAIN_ACTION(whohasthisedge_action);
+// This is to generate the required boilerplate we need for the remote
+// invocation to work.
+HPX_PLAIN_ACTION(whohasthisedge);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)

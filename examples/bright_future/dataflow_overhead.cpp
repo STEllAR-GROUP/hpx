@@ -38,9 +38,6 @@ using hpx::lcos::wait;
 using hpx::naming::id_type;
 using hpx::util::high_resolution_timer;
 
-
-using hpx::actions::plain_result_action0;
-
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;

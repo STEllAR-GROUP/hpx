@@ -48,25 +48,8 @@ namespace sheneos { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action3<
-            // Component server type.
-            configuration,
-            // Arguments of this action.
-            std::string const&,
-            std::string const&,
-            std::size_t,
-            // Method bound to this action.
-            &configuration::init
-        > init_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            configuration const,
-            // Return type.
-            config_data,
-            // Method bound to this action.
-            &configuration::get
-        > get_action;
+        HPX_DEFINE_COMPONENT_ACTION(configuration, init);
+        HPX_DEFINE_COMPONENT_ACTION(configuration, get);
 
     private:
         config_data data_;
