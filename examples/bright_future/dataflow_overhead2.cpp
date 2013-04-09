@@ -51,7 +51,7 @@ double null_function(double d)
     return d;
 }
 
-HPX_PLAIN_ACTION(null)
+HPX_PLAIN_ACTION(null_function, null_action)
 
 typedef dataflow<null_action> null_dataflow;
 
