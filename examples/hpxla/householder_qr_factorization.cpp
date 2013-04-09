@@ -540,7 +540,7 @@ inline void multiply_and_add(
     }
 }
 
-HPX_PLAIN_ACTION(multiply_and_add<double>);
+HPX_PLAIN_ACTION(multiply_and_add<double>, multiply_and_add_action);
 
 template <
     typename T
