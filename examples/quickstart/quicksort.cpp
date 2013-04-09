@@ -132,6 +132,8 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
     }
 }
 
+HPX_PLAIN_ACTION(quicksort_parallel<int>::call, quicksort_int_action);
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
