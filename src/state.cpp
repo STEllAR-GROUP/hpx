@@ -21,20 +21,11 @@ namespace hpx
         // return whether thread manager is in the state described by 'mask'
         bool threadmanager_is(boost::uint8_t mask)
         {
-            // This function is called (amongst other places) while an HPX
-            // exception is thrown. If this happens from a thread which is
-            // not a HPX thread we will seg-fault here.
-            //if (0 == get_self_ptr()) {
-                // we're probably either  starting or stopping
-            //    return (mask & (starting | stopping)) ? true : false;
-            //}
-
             hpx::runtime* rt = get_runtime_ptr();
             if (NULL == rt) {
                 // we're probably either starting or stopping
                 return (mask & (starting | stopping)) ? true : false;
             }
-
             return (rt->get_thread_manager().status() & mask) ? true : false;
         }
     }
