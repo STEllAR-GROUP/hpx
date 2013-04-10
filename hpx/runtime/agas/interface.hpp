@@ -159,7 +159,7 @@ HPX_API_EXPORT bool is_local_address(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT boost::uint32_t get_locality_id();
+HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT bool is_local_address_cached(

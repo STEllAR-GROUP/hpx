@@ -478,9 +478,6 @@ namespace hpx
         catch (boost::exception const& be) {
             return get_error_locality_id(be);
         }
-        catch (...) {
-            return naming::invalid_locality_id;
-        }
     }
 
     boost::uint32_t get_error_locality_id(hpx::exception const& e)
@@ -541,9 +538,6 @@ namespace hpx
         catch (boost::exception const& be) {
             return get_error_host_name(be);
         }
-        catch (...) {
-            return std::string();
-        }
     }
 
     std::string get_error_host_name(hpx::exception const& e)
@@ -576,9 +570,6 @@ namespace hpx
         }
         catch (boost::exception const& be) {
             return get_error_process_id(be);
-        }
-        catch (...) {
-            return -1;
         }
     }
 
@@ -618,9 +609,6 @@ namespace hpx
         catch (boost::exception const& be) {
             return get_error_function_name(be);
         }
-        catch (...) {
-            return std::string();
-        }
     }
 
     std::string get_error_function_name(hpx::exception const& e)
@@ -631,79 +619,6 @@ namespace hpx
     std::string get_error_function_name(hpx::error_code const& e)
     {
         return get_error_function_name(detail::access_exception(e));
-    }
-
-    /// Return the stack backtrace at the point the exception was thrown.
-    std::string get_error_backtrace(boost::exception const& e)
-    {
-        std::string const* back_trace =
-            boost::get_error_info<hpx::detail::throw_stacktrace>(e);
-        if (back_trace && !back_trace->empty())
-            return *back_trace;
-
-        return std::string();
-    }
-
-    std::string get_error_backtrace(boost::exception_ptr const& e)
-    {
-        if (!e) return std::string();
-
-        try {
-            boost::rethrow_exception(e);
-        }
-        catch (boost::exception const& be) {
-            return get_error_backtrace(be);
-        }
-        catch (...) {
-            return std::string();
-        }
-    }
-
-    std::string get_error_backtrace(hpx::exception const& e)
-    {
-        return get_error_backtrace(dynamic_cast<boost::exception const&>(e));
-    }
-
-    std::string get_error_backtrace(hpx::error_code const& e)
-    {
-        return get_error_backtrace(detail::access_exception(e));
-    }
-
-    /// Return the environment of the OS-process at the point the exception 
-    /// was thrown.
-    std::string get_error_env(boost::exception const& e)
-    {
-        std::string const* env =
-            boost::get_error_info<hpx::detail::throw_env>(e);
-        if (env && !env->empty())
-            return *env;
-
-        return std::string();
-    }
-
-    std::string get_error_env(boost::exception_ptr const& e)
-    {
-        if (!e) return std::string();
-
-        try {
-            boost::rethrow_exception(e);
-        }
-        catch (boost::exception const& be) {
-            return get_error_env(be);
-        }
-        catch (...) {
-            return std::string();
-        }
-    }
-
-    std::string get_error_env(hpx::exception const& e)
-    {
-        return get_error_env(dynamic_cast<boost::exception const&>(e));
-    }
-
-    std::string get_error_env(hpx::error_code const& e)
-    {
-        return get_error_env(detail::access_exception(e));
     }
 
     /// Return the (source code) file name of the function from which the
@@ -732,9 +647,6 @@ namespace hpx
         }
         catch (boost::exception const& be) {
             return get_error_file_name(be);
-        }
-        catch (...) {
-            return std::string();
         }
     }
 
@@ -769,9 +681,6 @@ namespace hpx
         catch (boost::exception const& be) {
             return get_error_line_number(be);
         }
-        catch (...) {
-            return -1;
-        }
     }
 
     int get_error_line_number(hpx::exception const& e)
@@ -804,9 +713,6 @@ namespace hpx
         }
         catch (boost::exception const& be) {
             return get_error_os_thread(be);
-        }
-        catch (...) {
-            return std::size_t(-1);
         }
     }
 
@@ -841,9 +747,6 @@ namespace hpx
         catch (boost::exception const& be) {
             return get_error_thread_id(be);
         }
-        catch (...) {
-            return std::size_t(-1);
-        }
     }
 
     std::size_t get_error_thread_id(hpx::exception const& e)
@@ -876,9 +779,6 @@ namespace hpx
         }
         catch (boost::exception const& be) {
             return get_error_thread_description(be);
-        }
-        catch (...) {
-            return std::string();
         }
     }
 
