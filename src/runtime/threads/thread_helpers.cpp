@@ -463,6 +463,9 @@ namespace hpx { namespace this_thread
             statex = self.yield(state);
         }
 
+        // handle interruption, if needed
+        this_thread::interruption_point();
+
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
             threads::thread_id_type id = self.get_thread_id();
@@ -512,6 +515,9 @@ namespace hpx { namespace this_thread
             statex = self.yield(threads::suspended);
         }
 
+        // handle interruption, if needed
+        this_thread::interruption_point();
+
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
@@ -560,6 +566,9 @@ namespace hpx { namespace this_thread
             // suspend the HPX-thread
             statex = self.yield(threads::suspended);
         }
+
+        // handle interruption, if needed
+        this_thread::interruption_point();
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
