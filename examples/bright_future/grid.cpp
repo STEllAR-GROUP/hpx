@@ -30,7 +30,7 @@ std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t start, st
     return std::size_t(-1);
 }
 
-HPX_REGISTER_PLAIN_ACTION(touch_mem)
+HPX_REGISTER_PLAIN_ACTION(touch_mem_action)
 
 #endif
 
