@@ -22,6 +22,7 @@ TBD
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 747] - Create performance counters exposing arithmetic operations 
 * [issue 745] - apply_callback needs to invoke callback when applied locally
 * [issue 744] - CMake fixes
 * [issue 743] - Problem Building github version of HPX
@@ -47,6 +48,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 723] - --hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
                 does not.
 * [issue 722] - Fix binding const member functions as actions
+* [issue 719] - Create performance counter exposing compression ratio
 * [issue 718] - Add possibility to compress parcel data
 * [issue 717] - strip_credit_from_gid has misleading semantics
 * [issue 716] - Non-option arguments to programs run using `pbsdsh` must be
@@ -99,13 +101,18 @@ Here is a list of the tickets we closed for this release.
 * [issue 655] - Make HPX work with the "decltype" result_of
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
+* [issue 634] - Improve error reporting from parcel layer
 * [issue 626] - hpx/future.hpp header
 * [issue 557] - Remove action codes
+* [issue 531] - AGAS request and response classes should use switch statements
 * [issue 529] - Investigate the state of hwloc support
 * [issue 526] - Make HPX aware of hyper-threading
+* [issue 518] - Create facilities allowing to use plain arrays as action 
+                arguments
 * [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
 * [issue 383] - Change result type detection for hpx::util::bind to use
                 result_of protocol
+* [issue 341] - Consolidate route code
 * [issue 219] - Only copy arguments into actions once
 * [issue 177] - Implement distributed AGAS
 * [issue 43]  - Support for Darwin (Xcode + Clang)
