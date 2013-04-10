@@ -51,6 +51,7 @@ int hpx_main()
         }
         catch (hpx::exception const& e) {
             // Print the elements of the diagnostic information separately.
+            hpx::cout << "{what}: "        << hpx::get_error_what(e) << "\n";
             hpx::cout << "{locality-id}: " << hpx::get_error_locality_id(e) << "\n";
             hpx::cout << "{hostname}: "    << hpx::get_error_host_name(e) << "\n";
             hpx::cout << "{pid}: "         << hpx::get_error_process_id(e) << "\n";
@@ -61,6 +62,8 @@ int hpx_main()
             hpx::cout << "{thread-id}: "   << std::hex << hpx::get_error_thread_id(e) << "\n";
             hpx::cout << "{thread-description}: "
                 << hpx::get_error_thread_description(e) << "\n";
+            hpx::cout << "{stack-trace}: " << hpx::get_error_backtrace(e) << "\n";
+            hpx::cout << "{env}: "         << hpx::get_error_env(e) << "\n";
         }
         hpx::cout << hpx::flush;
         //]
@@ -110,6 +113,7 @@ int hpx_main()
 
             if (ec) {
                 // Print the elements of the diagnostic information separately.
+                hpx::cout << "{what}: "        << hpx::get_error_what(ec) << "\n";
                 hpx::cout << "{locality-id}: " << hpx::get_error_locality_id(ec) << "\n";
                 hpx::cout << "{hostname}: "    << hpx::get_error_host_name(ec) << "\n";
                 hpx::cout << "{pid}: "         << hpx::get_error_process_id(ec) << "\n";
@@ -120,6 +124,8 @@ int hpx_main()
                 hpx::cout << "{thread-id}: "   << std::hex << hpx::get_error_thread_id(ec) << "\n";
                 hpx::cout << "{thread-description}: "
                     << hpx::get_error_thread_description(ec) << "\n\n";
+                hpx::cout << "{stack-trace}: " << hpx::get_error_backtrace(ec) << "\n";
+                hpx::cout << "{env}: "         << hpx::get_error_env(ec) << "\n";
             }
 
             hpx::cout << hpx::flush;
