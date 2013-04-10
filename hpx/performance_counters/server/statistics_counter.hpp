@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -176,24 +176,24 @@ namespace hpx { namespace performance_counters { namespace server
     // given base time interval. The counter relies on querying a steadily
     // growing counter value.
     template <typename Statistic>
-    class aggregating_counter
+    class statistics_counter
       : public base_performance_counter,
         public components::managed_component_base<
-            aggregating_counter<Statistic> >
+            statistics_counter<Statistic> >
     {
         typedef components::managed_component_base<
-            aggregating_counter<Statistic> > base_type;
+            statistics_counter<Statistic> > base_type;
 
         // avoid warnings about using this in member initializer list
-        aggregating_counter* this_() { return this; }
+        statistics_counter* this_() { return this; }
 
     public:
-        typedef aggregating_counter type_holder;
+        typedef statistics_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        aggregating_counter() {}
+        statistics_counter() {}
 
-        aggregating_counter(counter_info const& info,
+        statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
             boost::uint64_t parameter1, boost::uint64_t parameter2);
 

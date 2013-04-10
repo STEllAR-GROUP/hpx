@@ -270,7 +270,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/average",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -281,7 +281,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/stddev",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -292,7 +292,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/rolling_averaging",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -303,7 +303,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/median",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -314,7 +314,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -325,7 +325,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
-               &performance_counters::detail::aggregating_counter_creator,
+               &performance_counters::detail::statistics_counter_creator,
                &performance_counters::default_counter_discoverer,
               ""
             },
@@ -353,6 +353,53 @@ namespace hpx
         performance_counters::install_counter_types(
             statistic_counter_types,
             sizeof(statistic_counter_types)/sizeof(statistic_counter_types[0]));
+
+        performance_counters::generic_counter_type_data arithmetic_counter_types[] =
+        {
+            // adding counter
+            { "/arithmetics/add", performance_counters::counter_aggregating,
+              "returns the sum of the values of the specified base counters; "
+              "pass required base counters as the parameters: "
+              "/arithmetics/add@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // minus counter
+            { "/arithmetics/subtract", performance_counters::counter_aggregating,
+              "returns the difference of the values of the specified base counters; "
+              "pass the required base counters as the parameters: "
+              "/arithmetics/subtract@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // multiply counter
+            { "/arithmetics/multiply", performance_counters::counter_aggregating,
+              "returns the product of the values of the specified base counters; "
+              "pass the required base counters as the parameters: "
+              "/arithmetics/multiply@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // divide counter
+            { "/arithmetics/divide", performance_counters::counter_aggregating,
+              "returns the result of division of the values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/divide@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+        };
+        performance_counters::install_counter_types(
+            arithmetic_counter_types,
+            sizeof(arithmetic_counter_types)/sizeof(arithmetic_counter_types[0]));
     }
 
     ///////////////////////////////////////////////////////////////////////////

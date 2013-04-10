@@ -10,7 +10,8 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
-#include <hpx/performance_counters/server/aggregating_counter.hpp>
+#include <hpx/performance_counters/server/statistics_counter.hpp>
+#include <hpx/performance_counters/server/arithmetics_counter.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/foreach.hpp>
@@ -401,10 +402,10 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
-    /// \brief Create a new aggregating performance counter instance based
+    /// \brief Create a new statistics performance counter instance based
     ///        on given base counter name and given base time interval
     ///        (milliseconds).
-    counter_status registry::create_aggregating_counter(
+    counter_status registry::create_statistics_counter(
         counter_info const& info, std::string const& base_counter_name,
         std::vector<boost::int64_t> const& parameters,
         naming::gid_type& gid, error_code& ec)
@@ -416,16 +417,16 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::create_aggregating_counter",
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_statistics_counter",
                 boost::str(boost::format("unknown counter type %s") % type_name));
             return status_counter_type_unknown;
         }
 
-        // make sure the counter type requested is supported
+        // make sure the requested counter type is supported
         if (counter_aggregating != (*it).second.info_.type_ ||
             counter_aggregating != info.type_)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::create_aggregating_counter",
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_statistics_counter",
                 "invalid counter type requested (only counter_aggregating is supported)");
             return status_counter_type_unknown;
         }
@@ -450,7 +451,7 @@ namespace hpx { namespace performance_counters
             // create base counter only if it does not exist yet
             if (p.countername_ == "average") {
                 typedef hpx::components::managed_component<
-                    hpx::performance_counters::server::aggregating_counter<
+                    hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::mean>
                 > counter_t;
                 gid = components::server::create_with_args<counter_t>(
@@ -458,7 +459,7 @@ namespace hpx { namespace performance_counters
             }
             else if (p.countername_ == "stddev") {
                 typedef hpx::components::managed_component<
-                    hpx::performance_counters::server::aggregating_counter<
+                    hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::variance>
                 > counter_t;
                 gid = components::server::create_with_args<counter_t>(
@@ -466,7 +467,7 @@ namespace hpx { namespace performance_counters
             }
             else if (p.countername_ == "rolling_average") {
                 typedef hpx::components::managed_component<
-                    hpx::performance_counters::server::aggregating_counter<
+                    hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::rolling_mean>
                 > counter_t;
 
@@ -479,7 +480,7 @@ namespace hpx { namespace performance_counters
             }
             else if (p.countername_ == "median") {
                 typedef hpx::components::managed_component<
-                    hpx::performance_counters::server::aggregating_counter<
+                    hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::median>
                 > counter_t;
                 gid = components::server::create_with_args<counter_t>(
@@ -487,7 +488,7 @@ namespace hpx { namespace performance_counters
             }
             else if (p.countername_ == "max") {
                 typedef hpx::components::managed_component<
-                    hpx::performance_counters::server::aggregating_counter<
+                    hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::max>
                 > counter_t;
                 gid = components::server::create_with_args<counter_t>(
@@ -495,7 +496,7 @@ namespace hpx { namespace performance_counters
             }
             else if (p.countername_ == "min") {
                 typedef hpx::components::managed_component<
-                    hpx::performance_counters::server::aggregating_counter<
+                    hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::min>
                 > counter_t;
                 gid = components::server::create_with_args<counter_t>(
@@ -503,8 +504,8 @@ namespace hpx { namespace performance_counters
             }
             else {
                 HPX_THROWS_IF(ec, bad_parameter,
-                    "registry::create_aggregating_counter",
-                    "invalid counter type requested");
+                    "registry::create_statistics_counter",
+                    "invalid counter type requested: " + p.countername_);
                 return status_counter_type_unknown;
             }
         }
@@ -512,6 +513,104 @@ namespace hpx { namespace performance_counters
             gid = naming::invalid_gid;        // reset result
             if (&ec == &throws)
                 throw;
+
+            ec = make_error_code(e.get_error(), e.what());
+            LPCS_(warning) << (
+                boost::format("failed to create statistics counter %s (%s)") %
+                    complemented_info.fullname_ % e.what());
+            return status_invalid_data;
+        }
+
+        LPCS_(info) << (boost::format("statistics counter %s created at %s") %
+            complemented_info.fullname_ % gid);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return status_valid_data;
+    }
+
+    /// \brief Create a new arithmetics performance counter instance based
+    ///        on given base counter name and given base time interval
+    ///        (milliseconds).
+    counter_status registry::create_arithmetics_counter(
+        counter_info const& info, std::string const& base_counter_name1,
+        std::string const& base_counter_name2,
+        naming::gid_type& gid, error_code& ec)
+    {
+        // create canonical type name
+        std::string type_name;
+        counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
+        if (!status_is_valid(status)) return status;
+
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        if (it == countertypes_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_arithmetics_counter",
+                boost::str(boost::format("unknown counter type %s") % type_name));
+            return status_counter_type_unknown;
+        }
+
+        // make sure the requested counter type is supported
+        if (counter_aggregating != (*it).second.info_.type_ ||
+            counter_aggregating != info.type_)
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_arithmetics_counter",
+                "invalid counter type requested (only counter_aggregating is supported)");
+            return status_counter_type_unknown;
+        }
+
+        // make sure parent instance name is set properly
+        counter_info complemented_info = info;
+        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        if (ec) return status_invalid_data;
+
+        // split name
+        counter_path_elements p;
+        get_counter_path_elements(complemented_info.fullname_, p, ec);
+        if (ec) return status_invalid_data;
+
+        // create the counter as requested
+        try {
+            // create base counter only if it does not exist yet
+            if (p.countername_ == "add") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::arithmetics_counter<
+                        std::plus<double> > > counter_t;
+                gid = components::server::create_with_args<counter_t>(
+                    complemented_info, base_counter_name1, base_counter_name2);
+            }
+            else if (p.countername_ == "subtract") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::arithmetics_counter<
+                        std::minus<double> > > counter_t;
+                gid = components::server::create_with_args<counter_t>(
+                    complemented_info, base_counter_name1, base_counter_name2);
+            }
+            else if (p.countername_ == "multiply") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::arithmetics_counter<
+                        std::multiplies<double> > > counter_t;
+                gid = components::server::create_with_args<counter_t>(
+                    complemented_info, base_counter_name1, base_counter_name2);
+            }
+            else if (p.countername_ == "divide") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::arithmetics_counter<
+                        std::divides<double> > > counter_t;
+                gid = components::server::create_with_args<counter_t>(
+                    complemented_info, base_counter_name1, base_counter_name2);
+            }
+            else {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "registry::create_arithmetics_counter",
+                    "invalid counter type requested: " + p.countername_);
+                return status_counter_type_unknown;
+            }
+        }
+        catch (hpx::exception const& e) {
+            gid = naming::invalid_gid;        // reset result
+            if (&ec == &throws)
+                throw;
+
             ec = make_error_code(e.get_error(), e.what());
             LPCS_(warning) << (
                 boost::format("failed to create aggregating counter %s (%s)") %

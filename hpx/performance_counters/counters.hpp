@@ -583,7 +583,12 @@ namespace hpx { namespace performance_counters
 
         // Creation function for aggregating performance counters; to be
         // registered with the counter types.
-        naming::gid_type aggregating_counter_creator(counter_info const&,
+        naming::gid_type statistics_counter_creator(counter_info const&,
+            error_code&);
+
+        // Creation function for aggregating performance counters; to be
+        // registered with the counter types.
+        naming::gid_type arithmetics_counter_creator(counter_info const&,
             error_code&);
 
         // Creation function for uptime counters.
@@ -594,12 +599,18 @@ namespace hpx { namespace performance_counters
         naming::gid_type component_instance_counter_creator(counter_info const&,
             error_code&);
 
-        // \brief Create a new aggregating performance counter instance based on
-        //        given base counter name and given base time interval
+        // \brief Create a new statistics performance counter instance based on
+        //        the given base counter name and given base time interval
         //        (milliseconds).
-        naming::gid_type create_aggregating_counter(
+        naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
             std::vector<boost::int64_t> const& parameters, error_code& ec = throws);
+
+        // \brief Create a new arithmetics performance counter instance based on
+        //        the given base counter names
+        naming::gid_type create_arithmetics_counter(
+            counter_info const& info, std::string const& base_counter_name1,
+            std::string const& base_counter_name2, error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given
         //        counter info

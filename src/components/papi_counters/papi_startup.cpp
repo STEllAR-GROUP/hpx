@@ -132,7 +132,7 @@ namespace hpx { namespace performance_counters { namespace papi
                 std::string evstr((*gi)->long_descr);
                 info.helptext_ = "returns the count of occurrences of \""+
                     evstr+"\" in "+(*it)+" instance";
-                if (!f(info, ec) || ec) return false;
+                if (!f(info, boost::ref(ec)) || ec) return false;
             }
         }
         return true;

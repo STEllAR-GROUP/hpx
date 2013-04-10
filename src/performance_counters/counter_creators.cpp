@@ -293,7 +293,8 @@ namespace hpx { namespace performance_counters
             if (!result) {
                 HPX_THROWS_IF(ec, not_implemented,
                     "agas_raw_counter_creator",
-                    "invalid counter name: " + info.fullname_);
+                    "invalid counter name: " + 
+                        remove_counter_prefix(info.fullname_));
                 return naming::invalid_gid;
             }
 

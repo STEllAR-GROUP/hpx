@@ -104,12 +104,20 @@ namespace hpx { namespace performance_counters
         counter_status create_counter(counter_info const& info,
             naming::gid_type& id, error_code& ec = throws);
 
-        /// \brief Create a new aggregating performance counter instance based
+        /// \brief Create a new statistics performance counter instance based
         ///        on given base counter name and given base time interval
         ///        (milliseconds).
-        counter_status create_aggregating_counter(counter_info const& info,
+        counter_status create_statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
             std::vector<boost::int64_t> const& parameters,
+            naming::gid_type& id, error_code& ec = throws);
+
+        /// \brief Create a new arithmetics performance counter instance based
+        ///        on given base counter name and given base time interval
+        ///        (milliseconds).
+        counter_status create_arithmetics_counter(counter_info const& info,
+            std::string const& base_counter_name1,
+            std::string const& base_counter_name2,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Add an existing performance counter instance to the registry

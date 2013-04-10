@@ -29,11 +29,11 @@ system and application performance.
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
-          Currently, this value will be `locality#*`, where `*` is the locality 
+          Currently, this value will be `locality#*`, where `*` is the locality
           id of the locality hosting the AGAS service. Except for `<agas_service>`
           `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
-          the only value for `*` is `0` (only the primary AGAS service components 
-          live on all localities, whereas all other AGAS services are available 
+          the only value for `*` is `0` (only the primary AGAS service components
+          live on all localities, whereas all other AGAS services are available
           on `locality#0` only).
         ]
         [None]
@@ -53,11 +53,11 @@ system and application performance.
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
-          Currently, this value will be `locality#*`, where `*` is the locality 
+          Currently, this value will be `locality#*`, where `*` is the locality
           id of the locality hosting the AGAS service. Except for `<agas_service>`
           `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
-          the only value for `*` is `0` (only the primary AGAS service components 
-          live on all localities, whereas all other AGAS services are available 
+          the only value for `*` is `0` (only the primary AGAS service components
+          live on all localities, whereas all other AGAS services are available
           on `locality#0` only).
         ]
         [None]
@@ -640,6 +640,43 @@ system and application performance.
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.]
+    ]
+]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[table Performance Counters for Elementary Arithmetic Operations
+    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [   [`/arithmetics/add`]
+        [Two comma separated full performance counter names. The referenced
+         performance counters are queried whenever this counter is accessed.]
+        [Returns the sum calculated based on the values queried from the 
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of 
+         two other full performance counter names.]
+    ]
+    [   [`/arithmetics/subtract`]
+        [Two comma separated full performance counter names. The referenced
+         performance counters are queried whenever this counter is accessed.]
+        [Returns the difference calculated based on the values queried from the 
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of 
+         two other full performance counter names.]
+    ]
+    [   [`/arithmetics/multiply`]
+        [Two comma separated full performance counter names. The referenced
+         performance counters are queried whenever this counter is accessed.]
+        [Returns the product calculated based on the values queried from the 
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of 
+         two other full performance counter names.]
+    ]
+    [   [`/arithmetics/divide`]
+        [Two comma separated full performance counter names. The referenced
+         performance counters are queried whenever this counter is accessed.]
+        [Returns the result of division of the values queried from the 
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of 
+         two other full performance counter names.]
     ]
 ]
 
