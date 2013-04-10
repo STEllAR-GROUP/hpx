@@ -1032,9 +1032,14 @@ namespace hpx
     ///           application is running on (as returned by
     ///           \a get_num_localities()).
     ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
     /// \note     This function needs to be executed on a HPX-thread. It will
     ///           fail otherwise (it will return -1).
-    HPX_API_EXPORT boost::uint32_t get_locality_id();
+    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently running.

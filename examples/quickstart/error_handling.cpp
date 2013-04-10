@@ -51,16 +51,16 @@ int hpx_main()
         }
         catch (hpx::exception const& e) {
             // Print the elements of the diagnostic information separately.
-            hpx::cout << "{locality-id}: " << hpx::get_locality_id(e) << "\n";
-            hpx::cout << "{hostname}: "    << hpx::get_host_name(e) << "\n";
-            hpx::cout << "{pid}: "         << hpx::get_process_id(e) << "\n";
-            hpx::cout << "{function}: "    << hpx::get_function_name(e) << "\n";
-            hpx::cout << "{file}: "        << hpx::get_file_name(e) << "\n";
-            hpx::cout << "{line}: "        << hpx::get_line_number(e) << "\n";
-            hpx::cout << "{os-thread}: "   << hpx::get_os_thread(e) << "\n";
-            hpx::cout << "{thread-id}: "   << std::hex << hpx::get_thread_id(e) << "\n";
+            hpx::cout << "{locality-id}: " << hpx::get_error_locality_id(e) << "\n";
+            hpx::cout << "{hostname}: "    << hpx::get_error_host_name(e) << "\n";
+            hpx::cout << "{pid}: "         << hpx::get_error_process_id(e) << "\n";
+            hpx::cout << "{function}: "    << hpx::get_error_function_name(e) << "\n";
+            hpx::cout << "{file}: "        << hpx::get_error_file_name(e) << "\n";
+            hpx::cout << "{line}: "        << hpx::get_error_line_number(e) << "\n";
+            hpx::cout << "{os-thread}: "   << hpx::get_error_os_thread(e) << "\n";
+            hpx::cout << "{thread-id}: "   << std::hex << hpx::get_error_thread_id(e) << "\n";
             hpx::cout << "{thread-description}: "
-                << hpx::get_thread_description(e) << "\n";
+                << hpx::get_error_thread_description(e) << "\n";
         }
         hpx::cout << hpx::flush;
         //]
@@ -110,16 +110,16 @@ int hpx_main()
 
             if (ec) {
                 // Print the elements of the diagnostic information separately.
-                hpx::cout << "{locality-id}: " << hpx::get_locality_id(ec) << "\n";
-                hpx::cout << "{hostname}: "    << hpx::get_host_name(ec) << "\n";
-                hpx::cout << "{pid}: "         << hpx::get_process_id(ec) << "\n";
-                hpx::cout << "{function}: "    << hpx::get_function_name(ec) << "\n";
-                hpx::cout << "{file}: "        << hpx::get_file_name(ec) << "\n";
-                hpx::cout << "{line}: "        << hpx::get_line_number(ec) << "\n";
-                hpx::cout << "{os-thread}: "   << hpx::get_os_thread(ec) << "\n";
-                hpx::cout << "{thread-id}: "   << std::hex << hpx::get_thread_id(ec) << "\n";
+                hpx::cout << "{locality-id}: " << hpx::get_error_locality_id(ec) << "\n";
+                hpx::cout << "{hostname}: "    << hpx::get_error_host_name(ec) << "\n";
+                hpx::cout << "{pid}: "         << hpx::get_error_process_id(ec) << "\n";
+                hpx::cout << "{function}: "    << hpx::get_error_function_name(ec) << "\n";
+                hpx::cout << "{file}: "        << hpx::get_error_file_name(ec) << "\n";
+                hpx::cout << "{line}: "        << hpx::get_error_line_number(ec) << "\n";
+                hpx::cout << "{os-thread}: "   << hpx::get_error_os_thread(ec) << "\n";
+                hpx::cout << "{thread-id}: "   << std::hex << hpx::get_error_thread_id(ec) << "\n";
                 hpx::cout << "{thread-description}: "
-                    << hpx::get_thread_description(ec) << "\n\n";
+                    << hpx::get_error_thread_description(ec) << "\n\n";
             }
 
             hpx::cout << hpx::flush;

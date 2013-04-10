@@ -661,9 +661,9 @@ namespace hpx { namespace threads
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    boost::uint32_t get_locality_id()
+    boost::uint32_t get_locality_id(error_code& ec)
     {
-        return agas::get_locality_id();
+        return agas::get_locality_id(ec);
     }
 
     std::string const* get_thread_name()
