@@ -99,20 +99,6 @@ struct response
         // TODO: verification of namespace_action_code
     }
 
-/*
-    response(
-        namespace_action_code type_
-      , components::component_type ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(ctype_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-*/
-
     response(
         namespace_action_code type_
       , std::vector<boost::uint32_t> const& prefixes_
@@ -212,19 +198,21 @@ struct response
         error_code& ec = throws
         ) const
     {
-        gva g;
+        switch (data.which())
+        {
+            case subtype_gid_gva:
+                return get_data<subtype_gid_gva, 1>(ec);
 
-        // Don't let the first attempt throw.
-        error_code first_try(lightweight);
-        g = get_data<subtype_gid_gva, 1>(first_try);
+            case subtype_gva:
+                return get_data<subtype_gva, 0>(ec);
 
-        // If the first try failed, check again.
-        if (first_try)
-            g = get_data<subtype_gva, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return g;
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "response::get_gva",
+                    "invalid operation for request type");
+                return gva();
+            }
+        }
     }
 
     std::vector<boost::uint32_t> get_localities(
@@ -276,19 +264,21 @@ struct response
         error_code& ec = throws
         ) const
     {
-        boost::uint32_t prefix;
+        switch (data.which())
+        {
+            case subtype_gid_gid_prefix:
+                return get_data<subtype_gid_gid_prefix, 2>(ec);
 
-        // Don't let the first attempt throw.
-        error_code first_try(lightweight);
-        prefix = get_data<subtype_gid_gid_prefix, 2>(first_try);
+            case subtype_prefix:
+                return get_data<subtype_prefix, 0>(ec);
 
-        // If the first try failed, check again.
-        if (first_try)
-            prefix = get_data<subtype_prefix, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return prefix;
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "response::get_locality_id",
+                    "invalid operation for request type");
+                return naming::invalid_locality_id;
+            }
+        }
     }
 
     naming::gid_type get_base_gid(
@@ -594,8 +584,8 @@ struct get_remote_result<naming::id_type, agas::response>
 
         if (naming::detail::get_credit_from_gid(raw_gid) != 0)
             return naming::id_type(raw_gid, naming::id_type::managed);
-        else
-            return naming::id_type(raw_gid, naming::id_type::unmanaged);
+
+        return naming::id_type(raw_gid, naming::id_type::unmanaged);
     }
 };
 
@@ -629,9 +619,10 @@ struct get_remote_result<boost::uint32_t, agas::response>
         default:
             break;
         }
-        HPX_THROW_EXCEPTION(bad_parameter, 
-            "get_remote_result<boost::uint32_t, agas::response>::call", 
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<boost::uint32_t, agas::response>::call",
             "unexpected action code in result conversion");
+        return 0;
     }
 };
 
@@ -649,9 +640,10 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
         default:
             break;
         }
-        HPX_THROW_EXCEPTION(bad_parameter, 
-            "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call", 
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call",
             "unexpected action code in result conversion");
+        return std::vector<boost::uint32_t>();
     }
 };
 

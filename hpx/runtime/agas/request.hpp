@@ -130,18 +130,6 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
-/*
-    request(
-        namespace_action_code type_
-      , boost::int32_t ctype_
-        )
-      : mc(type_)
-      , data(boost::fusion::make_vector(ctype_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-*/
-
     request(
         namespace_action_code type_
       , std::string const& name_
@@ -306,19 +294,21 @@ struct request
         error_code& ec = throws
         ) const
     { // {{{
-        naming::locality l;
+        switch (data.which())
+        {
+            case subtype_locality_count:
+                return get_data<subtype_locality_count, 0>(ec);
 
-        // Don't let the first attempt throw.
-        error_code first_try(lightweight);
-        l = get_data<subtype_locality_count, 0>(first_try);
+            case subtype_locality:
+                return get_data<subtype_locality, 0>(ec);
 
-        // If the first try failed, check again.
-        if (first_try)
-            l = get_data<subtype_locality, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return l;
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "request::get_locality",
+                    "invalid operation for request type");
+                return naming::locality();
+            }
+        }
     } // }}}
 
     naming::gid_type get_gid(
@@ -345,7 +335,7 @@ struct request
                     "invalid operation for request type");
                 return naming::invalid_gid;
             }
-        };
+        }
     } // }}}
 
     naming::gid_type get_lower_bound(
