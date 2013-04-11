@@ -748,9 +748,6 @@ bool addressing_service::get_id_range(
         {
             // WARNING: this deadlocks if AGAS is unresponsive and all response
             // futures are checked out and pending.
-            
-            // wait for the semaphore to become available
-            lock_semaphore lock(hosted->promise_pool_semaphore_);
 
             // get a future
             typedef checkout_promise<
@@ -771,7 +768,7 @@ bool addressing_service::get_id_range(
                 return false;
             }
 
-            // executing the action (synchronously)
+            // execute the action (synchronously)
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
             
