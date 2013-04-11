@@ -62,9 +62,9 @@ namespace {
             {
                 std::string const & prefix = boost::fusion::at_c<0>(value);
                 optional_type const & ranges = boost::fusion::at_c<1>(value);
+                bool push_now = tmp_nodes.empty();
                 if(ranges)
                 {
-                    bool push_now = tmp_nodes.empty();
                     BOOST_FOREACH(vector_type const & range, *ranges)
                     {
                         if(range.size() == 1)
@@ -94,6 +94,10 @@ namespace {
                             for(std::size_t i = begin; i <= end; ++i)
                             {
                                 std::string s(prefix);
+                                if(i < 10 && range[0].length() > 1)
+                                    s += "0";
+                                if(i < 100 && range[0].length() > 2)
+                                    s += "0";
                                 s += boost::lexical_cast<std::string>(i);
                                 if(push_now)
                                 {
@@ -122,7 +126,7 @@ namespace {
                 }
                 else
                 {
-                    if(tmp_nodes.empty())
+                    if(push_now)
                     {
                         tmp_nodes.push_back(prefix);
                     }
@@ -378,7 +382,7 @@ namespace hpx { namespace util
             namespace phoenix = boost::phoenix;
 
             qi::rule<std::string::iterator, std::string()>
-                prefix = +(qi::print - qi::char_("["));
+                prefix = +(qi::print - qi::char_("[,"));
             qi::rule<std::string::iterator, std::vector<std::string>()>
                 range = qi::as_string[*(qi::print - qi::char_("],-"))] % '-';
 
@@ -395,7 +399,7 @@ namespace hpx { namespace util
                 hostlist = (+ranges)[phoenix::bind(::construct_nodes(), phoenix::ref(nodes), qi::_1)];
             
             qi::rule<std::string::iterator>
-                nodelist = hostlist % qi::char_(", ");
+                nodelist = hostlist % ',';
 
 
             qi::parse(
