@@ -288,7 +288,7 @@ namespace hpx
     }
 
     template <typename T>
-    lcos::future<std::vector<lcos::future<T> > >
+    lcos::future<std::vector<lcos::future<T> > > //-V659
     when_all(std::vector<lcos::future<T> > const& lazy_values)
     {
         typedef std::vector<lcos::future<T> > return_type;

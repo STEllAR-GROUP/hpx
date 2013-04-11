@@ -444,7 +444,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename Result>
-        inline lcos::future<Result> make_future_from_data(
+        inline lcos::future<Result> make_future_from_data( //-V659
             BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >) p)
         {
             return lcos::future<Result>(boost::move(p));

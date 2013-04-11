@@ -71,7 +71,7 @@ namespace hpx { namespace lcos
             this->base_type::set_value_sync(this->get_gid(), boost::move(tmp));
         }
 
-        void set_value_sync(BOOST_RV_REF(RemoteType) val)
+        void set_value_sync(BOOST_RV_REF(RemoteType) val) //-V659
         {
             BOOST_ASSERT(this->get_gid());
             this->base_type::set_value_sync(this->get_gid(), val);
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos
             RemoteType tmp(val);
             this->base_type::set_value(this->get_gid(), boost::move(tmp));
         }
-        void set_value(BOOST_RV_REF(RemoteType) val)
+        void set_value(BOOST_RV_REF(RemoteType) val) //-V659
         {
             this->base_type::set_value(this->get_gid(), val);
         }

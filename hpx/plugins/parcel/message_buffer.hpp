@@ -113,7 +113,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         double fill_ratio() const
         {
-            return double(messages_.size()) / max_messages_;
+            return double(messages_.size()) / double(max_messages_);
         }
 
         void swap(message_buffer& o)

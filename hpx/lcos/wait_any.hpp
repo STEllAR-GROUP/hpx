@@ -338,7 +338,7 @@ namespace hpx
     }
 
     template <typename T>
-    lcos::future<HPX_STD_TUPLE<int, lcos::future<T> > >
+    lcos::future<HPX_STD_TUPLE<int, lcos::future<T> > > //-V659
     when_any(std::vector<lcos::future<T> > const& lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T> > return_type;

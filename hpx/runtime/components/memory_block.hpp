@@ -225,8 +225,9 @@ namespace hpx { namespace components
             BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return reinterpret_cast<target_type*>(mb_.get_ptr());
         }
-        target_type const* operator->() const
+        target_type const* operator->() const //-V659
         {
+            BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return reinterpret_cast<target_type const*>(mb_.get_ptr());
         }
 

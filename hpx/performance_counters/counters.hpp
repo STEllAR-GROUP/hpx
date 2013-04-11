@@ -30,7 +30,7 @@ namespace hpx { namespace performance_counters
         return name;
     }
 
-    inline std::string ensure_counter_prefix(std::string const& counter)
+    inline std::string ensure_counter_prefix(std::string const& counter) //-V659
     {
         std::string name(counter);
         return ensure_counter_prefix(name);
@@ -43,7 +43,7 @@ namespace hpx { namespace performance_counters
         return name;
     }
 
-    inline std::string remove_counter_prefix(std::string const& counter)
+    inline std::string remove_counter_prefix(std::string const& counter) //-V659
     {
         std::string name(counter);
         return remove_counter_prefix(name);
