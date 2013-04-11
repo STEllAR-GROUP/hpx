@@ -105,7 +105,6 @@ void addressing_service::launch_bootstrap(
     gva symbol_gva(ep,
         server::symbol_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->symbol_ns_server_));
-
     symbol_ns_addr_ = naming::address(ep,
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&bootstrap->symbol_ns_server_));
@@ -169,7 +168,7 @@ void addressing_service::adjust_local_cache_size()
             cfg.get_agas_local_cache_size_per_thread();
 
         std::size_t cache_size = (std::max)(local_cache_size,
-                local_cache_size_per_thread * get_num_overall_threads());
+                local_cache_size_per_thread * std::size_t(get_num_overall_threads()));
         if (cache_size > gva_cache_.capacity())
             gva_cache_.reserve(cache_size);
     }
@@ -332,14 +331,16 @@ bool addressing_service::get_console_locality(
             return true;
         }
 
-        mutex_type::scoped_lock lock(console_cache_mtx_);
-
-        if (console_cache_)
         {
-            prefix = naming::get_gid_from_locality_id(console_cache_);
-            if (&ec != &throws)
-                ec = make_success_code();
-            return true;
+            mutex_type::scoped_lock lock(console_cache_mtx_);
+
+            if (console_cache_)
+            {
+                prefix = naming::get_gid_from_locality_id(console_cache_);
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
         }
 
         request req(symbol_ns_resolve, std::string("/locality(console)"));
@@ -354,12 +355,21 @@ bool addressing_service::get_console_locality(
             (rep.get_status() == success))
         {
             prefix = rep.get_gid();
+            boost::uint32_t console = naming::get_locality_id_from_gid(prefix);
 
-            console_cache_ = naming::get_locality_id_from_gid(prefix);
+            {
+                mutex_type::scoped_lock lock(console_cache_mtx_);
+                if (!console_cache_) {
+                    console_cache_ = console;
+                }
+                else {
+                    BOOST_ASSERT(console_cache_ == console);
+                }
+            }
 
             LAS_(debug) <<
                 ( boost::format("caching console locality, prefix(%1%)")
-                % console_cache_);
+                % console);
 
             return true;
         }
@@ -783,9 +793,12 @@ bool addressing_service::get_id_range(
         // way, and the aforementioned code would be lengthy, and would have to
         // be meticulously exception-free. So, for now, we just allocate a new
         // future for the pool, and let the old future stay in memory.
-        if (!is_bootstrap() && f)
+        if (f && !is_bootstrap())
         {
-            hosted->locality_promise_pool_.enqueue(new future_type);
+            {
+                lock_semaphore lock(hosted->promise_pool_semaphore_);
+                hosted->locality_promise_pool_.enqueue(new future_type);
+            }
             f->set_exception(boost::current_exception());
         }
 

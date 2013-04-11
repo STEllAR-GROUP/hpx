@@ -174,9 +174,18 @@ namespace hpx { namespace components
             if (l.owns_lock() && (naming::invalid_id == prefix_))
             {
                 naming::gid_type raw_prefix;
-                naming::get_agas_client().get_console_locality(raw_prefix);
+                {
+                    util::unlock_the_lock<prefix_mutex_type::scoped_try_lock> ul(l);
+                    naming::get_agas_client().get_console_locality(raw_prefix);
+                }
+
                 BOOST_ASSERT(naming::invalid_gid != raw_prefix);
-                prefix_ = naming::id_type(raw_prefix, naming::id_type::unmanaged);
+                if (!prefix_) {
+                    prefix_ = naming::id_type(raw_prefix, naming::id_type::unmanaged);
+                }
+                else {
+                    BOOST_ASSERT(prefix_.get_gid() == raw_prefix);
+                }
             }
 
             // Someone else started getting the console prefix.

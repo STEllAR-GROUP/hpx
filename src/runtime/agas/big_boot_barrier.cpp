@@ -97,6 +97,7 @@ struct registration_header
       , boost::uint64_t response_allocation_      , boost::uint64_t component_runtime_support_ptr_
       , boost::uint64_t component_memory_ptr_
       , boost::uint64_t primary_ns_ptr_
+      , boost::uint32_t num_threads_
     ) :
         locality(locality_)
       , parcelport_allocation(parcelport_allocation_)
@@ -104,6 +105,7 @@ struct registration_header
       , component_runtime_support_ptr(component_runtime_support_ptr_)
       , component_memory_ptr(component_memory_ptr_)
       , primary_ns_ptr(primary_ns_ptr_)
+      , num_threads(num_threads_)
     {}
 
     naming::locality locality;
@@ -114,6 +116,8 @@ struct registration_header
     boost::uint64_t component_memory_ptr;
     boost::uint64_t primary_ns_ptr;
 
+    boost::uint32_t num_threads;
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int)
     {
@@ -123,6 +127,7 @@ struct registration_header
         ar & component_runtime_support_ptr;
         ar & component_memory_ptr;
         ar & primary_ns_ptr;
+        ar & num_threads;
     }
 };
 
@@ -255,12 +260,8 @@ void register_console(registration_header const& header)
             , "registration parcel received by non-bootstrap locality");
     }
 
-    util::runtime_configuration const& cfg = get_runtime().get_config();
-    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-        cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
-
     naming::gid_type prefix;
-    if (!agas_client.register_locality(header.locality, prefix, num_threads))
+    if (!agas_client.register_locality(header.locality, prefix, header.num_threads))
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_console"
@@ -442,12 +443,8 @@ void register_worker(registration_header const& header)
           , "registration parcel received by non-bootstrap locality.");
     }
 
-    util::runtime_configuration const& cfg = rt.get_config();
-    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-        cfg.get_entry("hpx.os_threads", boost::uint32_t(1)));
-
     naming::gid_type prefix;
-    if (!agas_client.register_locality(header.locality, prefix, num_threads))
+    if (!agas_client.register_locality(header.locality, prefix, header.num_threads))
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
@@ -571,7 +568,8 @@ void notify_worker(notification_header const& header)
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
-    response_heap_type::get_heap().set_range(header.response_lower_gid
+    response_heap_type::get_heap().set_range(
+        header.response_lower_gid
       , header.response_upper_gid);
 
     // allocate our first heap
@@ -653,6 +651,8 @@ void big_boot_barrier::wait(void* primary_ns_server)
         BOOST_ASSERT(0 != primary_ns_server);
 
         runtime& rt = get_runtime();
+        boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
+            rt.get_config().get_entry("hpx.os_threads", boost::uint32_t(1)));
 
         // hosted, console
         if (runtime_mode_console == runtime_type)
@@ -670,7 +670,8 @@ void big_boot_barrier::wait(void* primary_ns_server)
                       , response_heap_type::block_type::heap_step
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
-                      , reinterpret_cast<boost::uint64_t>(primary_ns_server))
+                      , reinterpret_cast<boost::uint64_t>(primary_ns_server)
+                      , num_threads)
                 ));
             spin();
         }
@@ -689,7 +690,8 @@ void big_boot_barrier::wait(void* primary_ns_server)
                       , response_heap_type::block_type::heap_step
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
-                      , reinterpret_cast<boost::uint64_t>(primary_ns_server))
+                      , reinterpret_cast<boost::uint64_t>(primary_ns_server)
+                      , num_threads)
                 ));
             spin();
         }

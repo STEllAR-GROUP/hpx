@@ -101,14 +101,15 @@ namespace hpx { namespace util
             {
                 while (HPX_UNLIKELY(!next_lower && !next_upper))
                 {
-                    LRT_(info) << "unique_ids::get_id: ran out of GIDs too "
-                                  "quickly, possibly livelocked";
-
                     // Give the TM time to process the incoming response from
                     // AGAS.
                     {
                         unlock_the_lock<mutex_type::scoped_lock> ul0(al);
                         unlock_the_lock<mutex_type::scoped_lock> ul1(ll);
+
+                        LRT_(info) << "unique_ids::get_id: ran out of GIDs too "
+                                      "quickly, possibly livelocked";
+
                         threads::get_self_ptr()->yield(threads::pending);
                     }
                 }
@@ -121,18 +122,26 @@ namespace hpx { namespace util
                     "ran out of GIDs too quickly, definitely livelocked");
             }
 
+            // Switch to the next range.
+            boost::swap(current_lower, next_lower);
+            current_i = current_lower;
+            boost::swap(current_upper, next_upper);
+
+            naming::gid_type result = current_i;
+            ++current_i;
+
+            ll.unlock();
+            al.unlock();
+
             LRT_(info) << (boost::format(
                           "unique_ids::get_id: exhausted range(%1%, %2%), "
-                          "switching to new range(%3%, %4%)")
+                          "switched to new range(%3%, %4%)")
                           % current_lower
                           % (current_upper - current_lower).get_lsb()
                           % next_lower
                           % (next_upper - next_lower).get_lsb());
 
-            // Switch to the next range.
-            boost::swap(current_lower, next_lower);
-            current_i = current_lower;
-            boost::swap(current_upper, next_upper);
+            return result;
         }
 
         naming::gid_type result = current_i;
