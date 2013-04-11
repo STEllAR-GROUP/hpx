@@ -233,6 +233,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (timestamp_ != -1) copy_value(value);
         else value.status_ = hpx::performance_counters::status_invalid_data;
 
+        if (reset) value_ = 0;
+
         value.count_ = ++invocation_count_;
 
         return value;
