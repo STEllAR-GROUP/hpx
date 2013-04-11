@@ -413,13 +413,13 @@ namespace hpx { namespace util
         basic_hold_any(BOOST_FWD_REF(T) x)
           : table(detail::hold_any::get_table<
                       typename boost::remove_const<
-                          util::detail::remove_reference<T>::type
+                          typename util::detail::remove_reference<T>::type
                       >::type
                   >::template get<IArchive, OArchive, Char>()),
             object(0)
         {
             typedef typename boost::remove_const<
-                util::detail::remove_reference<T>::type
+                typename util::detail::remove_reference<T>::type
             >::type value_type;
 
             if (detail::hold_any::get_table<value_type>::is_small::value)
@@ -470,7 +470,7 @@ namespace hpx { namespace util
         basic_hold_any& assign(BOOST_FWD_REF(T) x)
         {
             typedef typename boost::remove_const<
-                util::detail::remove_reference<T>::type
+                typename util::detail::remove_reference<T>::type
             >::type value_type;
 
             // are we copying between the same type?
@@ -693,13 +693,13 @@ namespace hpx { namespace util
         explicit basic_hold_any(BOOST_FWD_REF(T) x)
           : table(detail::hold_any::get_table<
                       typename boost::remove_const<
-                          util::detail::remove_reference<T>::type
+                          typename util::detail::remove_reference<T>::type
                       >::type
                   >::template get<void, void, Char>()),
             object(0)
         {
             typedef typename boost::remove_const<
-                util::detail::remove_reference<T>::type
+                typename util::detail::remove_reference<T>::type
             >::type value_type;
 
             if (detail::hold_any::get_table<value_type>::is_small::value)
@@ -740,7 +740,7 @@ namespace hpx { namespace util
         basic_hold_any& assign(BOOST_FWD_REF(T) x)
         {
             typedef typename boost::remove_const<
-                util::detail::remove_reference<T>::type
+                typename util::detail::remove_reference<T>::type
             >::type value_type;
 
             // are we copying between the same type?
