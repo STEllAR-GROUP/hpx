@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         hwloc_topology_destroy(topo);
-        return num_of_pus;
+        return std::size_t(num_of_pus);
     }
 }}}
 #endif

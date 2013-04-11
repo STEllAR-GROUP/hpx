@@ -544,7 +544,7 @@ namespace hpx
             typedef hpx::threads::policies::global_queue_scheduler
                 global_queue_policy;
 
-            global_queue_policy::init_parameter_type init;
+            global_queue_policy::init_parameter_type init(0);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<global_queue_policy> runtime_type;

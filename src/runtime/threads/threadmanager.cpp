@@ -2127,7 +2127,7 @@ namespace hpx { namespace threads
     {
         double const exec_time = static_cast<double>(exec_times[num_thread]);
         double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
-        double const percent = (tfunc_time != 0.) ? 1. - (exec_time / tfunc_time) : 1.;
+        double const percent = (tfunc_time != 0.) ? 1. - (exec_time / tfunc_time) : 1.; //-V550
 
         if (reset) {
             exec_times[num_thread] = 0;

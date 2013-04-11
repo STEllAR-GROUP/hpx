@@ -488,7 +488,7 @@ namespace hpx { namespace util
             }
         }
 
-        if (cache_size != ~0x0ul && cache_size < 16ul)
+        if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
             cache_size = 16;      // limit lower bound
         return cache_size;
     }
@@ -505,7 +505,7 @@ namespace hpx { namespace util
             }
         }
 
-        if (cache_size != ~0x0ul && cache_size < 16ul)
+        if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
             cache_size = 16;      // limit lower bound
         return cache_size;
     }

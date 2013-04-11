@@ -161,7 +161,7 @@ namespace hpx { namespace traits
     std::size_t
     type_size<hpx::parcelset::parcel>::call(hpx::parcelset::parcel const& parcel_)
     {
-        return sizeof(hpx::parcelset::parcel) +
+        return sizeof(hpx::parcelset::parcel) + //-V119
             type_size<std::vector<naming::gid_type> >::call(parcel_.get_destinations()) +
             type_size<std::vector<naming::address> >::call(parcel_.get_destination_addrs()) +
             parcel_.get_action()->get_type_size() +     // action

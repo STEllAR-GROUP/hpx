@@ -49,7 +49,7 @@ namespace hpx { namespace performance_counters { namespace server
             if (!evaluate_base_counter(base_counter_id1_, base_counter_name1_, base_value1) ||
                 !evaluate_base_counter(base_counter_id2_, base_counter_name2_, base_value2))
             {
-                return false;
+                return base_value1;
             }
         }
 
@@ -181,7 +181,6 @@ namespace hpx { namespace performance_counters { namespace detail
                 get_counter_path_elements(info.fullname_, paths, ec);
                 if (ec) return naming::invalid_gid;
 
-                std::vector<boost::int64_t> parameters;
                 if (!paths.parameters_.empty()) {
                     // try to interpret the additional parameter as a list of
                     // two performance counter names

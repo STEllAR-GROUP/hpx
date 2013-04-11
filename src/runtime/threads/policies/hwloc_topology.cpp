@@ -47,7 +47,7 @@ namespace hpx { namespace threads
         // routines rely on access to other pieces of topology data. The
         // compiler will optimize the loops where possible anyways.
 
-        std::size_t num_of_sockets = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
+        std::size_t num_of_sockets = std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET));
         if (num_of_sockets == 0) num_of_sockets = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -56,7 +56,7 @@ namespace hpx { namespace threads
             socket_numbers_.push_back(socket);
         }
 
-        std::size_t num_of_nodes = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
+        std::size_t num_of_nodes = std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE));
         if (num_of_nodes == 0) num_of_nodes = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -65,7 +65,7 @@ namespace hpx { namespace threads
             numa_node_numbers_.push_back(numa_node);
         }
 
-        std::size_t num_of_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        std::size_t num_of_cores = std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
         if (num_of_cores == 0) num_of_cores = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -474,7 +474,7 @@ namespace hpx { namespace threads
             return extract_node_count(socket_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }
 
     std::size_t hwloc_topology::get_number_of_numa_node_pus(
@@ -495,7 +495,7 @@ namespace hpx { namespace threads
             return extract_node_count(node_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }
 
     std::size_t hwloc_topology::get_number_of_core_pus(
@@ -516,7 +516,7 @@ namespace hpx { namespace threads
             return extract_node_count(core_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }
 
     std::size_t hwloc_topology::get_number_of_socket_cores(
@@ -558,7 +558,7 @@ namespace hpx { namespace threads
             return extract_node_count(node_obj, HWLOC_OBJ_CORE, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
     }
 
     mask_type hwloc_topology::init_machine_affinity_mask() const
