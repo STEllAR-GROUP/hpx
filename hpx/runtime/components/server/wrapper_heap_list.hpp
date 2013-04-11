@@ -36,7 +36,10 @@ namespace hpx { namespace components { namespace detail
             for (iterator it = this->heap_list_.begin(); it != end; ++it)
             {
                 if ((*it)->did_alloc(p))
+                {
+                    util::unlock_the_lock<typename base_type::unique_lock_type> ul(guard);
                     return (*it)->get_gid(id_range_, p);
+                }
             }
             return naming::invalid_gid;
         }

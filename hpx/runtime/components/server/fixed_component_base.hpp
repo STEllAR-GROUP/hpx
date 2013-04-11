@@ -17,11 +17,6 @@
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/util/stringstream.hpp>
 
-namespace hpx { namespace detail
-{
-    HPX_API_EXPORT naming::gid_type get_next_id();
-}}
-
 namespace hpx { namespace components
 {
 
@@ -92,19 +87,12 @@ public:
             // Try to bind the preset GID first
             if (!applier::bind_gid(gid_, addr))
             {
-                gid_ = hpx::detail::get_next_id();
-
-                // If we can't bind the preset GID, then try to bind the next
-                // available GID on this locality.
-                if (!applier::bind_gid(gid_, addr))
-                {
-                    hpx::util::osstream strm;
-                    strm << gid_;
-                    gid_ = naming::gid_type();   // invalidate GID
-                    HPX_THROW_EXCEPTION(duplicate_component_address,
-                        "fixed_component_base<Component>::get_base_gid",
-                        hpx::util::osstream_get_string(strm));
-                }
+                hpx::util::osstream strm;
+                strm << "could not bind_gid: " << gid_;
+                gid_ = naming::gid_type();   // invalidate GID
+                HPX_THROW_EXCEPTION(duplicate_component_address,
+                    "fixed_component_base<Component>::get_base_gid",
+                    hpx::util::osstream_get_string(strm));
             }
         }
         return gid_;

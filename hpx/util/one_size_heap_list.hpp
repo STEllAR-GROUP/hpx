@@ -256,7 +256,10 @@ namespace hpx { namespace util
             {
                 if ((*it)->did_alloc(p))
                 {
-                    (*it)->free(p, count);
+                    {
+                        util::unlock_the_lock<unique_lock_type> ull(ul);
+                        (*it)->free(p, count);
+                    }
 #if defined(HPX_DEBUG)
                     free_count_ += count;
 #endif
