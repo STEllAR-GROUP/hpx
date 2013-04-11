@@ -647,36 +647,36 @@ system and application performance.
 [table Performance Counters for Elementary Arithmetic Operations
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
     [   [`/arithmetics/add`]
-        [Two comma separated full performance counter names. The referenced
-         performance counters are queried whenever this counter is accessed.]
-        [Returns the sum calculated based on the values queried from the 
+        [None]
+        [Returns the sum calculated based on the values queried from the
          underlying counters (the ones specified as the parameters).]
-        [The parameter will be interpreted as a comma separated list of 
-         two other full performance counter names.]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
     ]
     [   [`/arithmetics/subtract`]
-        [Two comma separated full performance counter names. The referenced
-         performance counters are queried whenever this counter is accessed.]
-        [Returns the difference calculated based on the values queried from the 
+        [None]
+        [Returns the difference calculated based on the values queried from the
          underlying counters (the ones specified as the parameters).]
-        [The parameter will be interpreted as a comma separated list of 
-         two other full performance counter names.]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
     ]
     [   [`/arithmetics/multiply`]
-        [Two comma separated full performance counter names. The referenced
-         performance counters are queried whenever this counter is accessed.]
-        [Returns the product calculated based on the values queried from the 
+        [None]
+        [Returns the product calculated based on the values queried from the
          underlying counters (the ones specified as the parameters).]
-        [The parameter will be interpreted as a comma separated list of 
-         two other full performance counter names.]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
     ]
     [   [`/arithmetics/divide`]
-        [Two comma separated full performance counter names. The referenced
-         performance counters are queried whenever this counter is accessed.]
-        [Returns the result of division of the values queried from the 
+        [None]
+        [Returns the result of division of the values queried from the
          underlying counters (the ones specified as the parameters).]
-        [The parameter will be interpreted as a comma separated list of 
-         two other full performance counter names.]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
     ]
 ]
 
