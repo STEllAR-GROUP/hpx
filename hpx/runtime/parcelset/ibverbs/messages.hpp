@@ -14,7 +14,8 @@ namespace hpx { namespace parcelset { namespace ibverbs {
         MSG_RETRY = 1,
         MSG_MR = 2,
         MSG_DATA = 4,
-        MSG_DONE = 5
+        MSG_DONE = 5,
+        MSG_SHUTDOWN = 6
     };
 
     struct message

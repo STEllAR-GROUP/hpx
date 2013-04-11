@@ -8,8 +8,9 @@
 #define HPX_PARCELSET_IBVERBS_ERRORS_HPP
 
 #include <hpx/config.hpp>
-#include <boost/interprocess/errors.hpp>
 #include <boost/system/system_error.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/detail/throw_error.hpp>
 #include <boost/static_assert.hpp>
 
 #include <string>
@@ -22,7 +23,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
     {
         char const* const error_names[] =
         {
-            "foo"
+            "unkown_error"
         };
 
         class ibverbs_category : public boost::system::error_category
@@ -52,10 +53,9 @@ namespace hpx { namespace parcelset { namespace ibverbs
     make_error_code(boost::interprocess::error_code_t e)
     {
         return boost::system::error_code(
-            static_cast<int>(e), get_interprocess_category());
+            static_cast<int>(e), get_ibverbs_category());
     }
     */
-
 }}}
 
 #define HPX_IBVERBS_THROWS_IF(ec, code)                                         \
@@ -75,6 +75,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
     {                                                                           \
         message_type m = next_wc<true, N>::call(this, ec);                      \
         if(ec) return ret;                                                      \
+        if(m == MSG_SHUTDOWN)                                                   \
+        {                                                                       \
+            close_locked(ec);                                                   \
+            HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::eof);                 \
+            return ret;                                                         \
+        }                                                                       \
         if(m != state)                                                          \
         {                                                                       \
             HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);               \
@@ -87,6 +93,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
     {                                                                           \
         message_type m = next_wc<false, N>::call(this, ec);                     \
         if(ec) return ret;                                                      \
+        if(m == MSG_SHUTDOWN)                                                   \
+        {                                                                       \
+            close_locked(ec);                                                   \
+            HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::eof);                 \
+            return ret;                                                         \
+        }                                                                       \
         if(m == MSG_RETRY)                                                      \
         {                                                                       \
             return ret;                                                         \

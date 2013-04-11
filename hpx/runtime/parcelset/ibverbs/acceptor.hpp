@@ -9,10 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/ibverbs/ibverbs_errors.hpp>
-#include <hpx/runtime/parcelset/server/ibverbs/parcelport_server_connection.hpp>
-/*
-#include <hpx/runtime/parcelset/shmem/message.hpp>
-*/
 #include <hpx/runtime/parcelset/ibverbs/context.hpp>
 #include <hpx/runtime/parcelset/ibverbs/helper.hpp>
 #include <hpx/util/io_service_pool.hpp>
@@ -82,14 +78,15 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
 
         // synchronous and asynchronous accept
-        void accept(server::ibverbs::parcelport_connection_ptr conn,
+        template <typename Service>
+        void accept(basic_context<Service> & conn,
             boost::system::error_code &ec = boost::system::throws)
         {
             return this->service.accept(this->implementation, conn, ec);
         }
 
-        template <typename Handler>
-        void async_accept(server::ibverbs::parcelport_connection_ptr conn, Handler handler)
+        template <typename Service, typename Handler>
+        void async_accept(basic_context<Service> & conn, Handler handler)
         {
             this->service.async_accept(this->implementation, conn, handler);
         }
@@ -99,17 +96,17 @@ namespace hpx { namespace parcelset { namespace ibverbs
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename Handler, typename Implementation>
+        template <typename Handler, typename Implementation, typename Service>
         class accept_operation 
           : public boost::enable_shared_from_this<
-                accept_operation<Handler, Implementation> >
+                accept_operation<Handler, Implementation, Service> >
         {
             typedef boost::shared_ptr<Implementation> implementation_type;
 
         public:
             accept_operation(implementation_type &impl,
                   boost::asio::io_service &io_service,
-                  hpx::parcelset::server::ibverbs::parcelport_connection_ptr conn, Handler handler)
+                  basic_context<Service> & conn, Handler handler)
               : impl_(impl),
                 io_service_(io_service),
                 conn_(conn),
@@ -167,7 +164,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             boost::weak_ptr<Implementation> impl_;
             boost::asio::io_service &io_service_;
-            hpx::parcelset::server::ibverbs::parcelport_connection_ptr conn_;
+            basic_context<Service> & conn_;
             Handler handler_;
         };
     }
@@ -221,8 +218,9 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
 
         // synchronous and asynchronous accept
+        template <typename Service>
         void accept(implementation_type &impl,
-            server::ibverbs::parcelport_connection_ptr conn, boost::system::error_code &ec)
+            basic_context<Service> & conn, boost::system::error_code &ec)
         {
             while (!impl->try_get_connect_request(conn, ec) && !ec)
                 /* just wait for operation to succeed */;
@@ -231,11 +229,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
             boost::asio::detail::throw_error(ec);
         }
 
-        template <typename Handler>
+        template <typename Service, typename Handler>
         void async_accept(implementation_type &impl,
-            server::ibverbs::parcelport_connection_ptr conn, Handler handler)
+            basic_context<Service> & conn, Handler handler)
         {
-            typedef detail::accept_operation<Handler, Implementation>
+            typedef detail::accept_operation<Handler, Implementation, Service>
                 operation_type;
 
             boost::shared_ptr<operation_type> op(
@@ -285,19 +283,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             }
             else
             {
-                /*
-                sockaddr_in addr;
-
-                memset(&addr, 0, sizeof(addr));
-                addr.sin_port = htons(ep.port());
-                if(ep.address().is_v4())
-                {
-                    addr.sin_family = AF_INET;
-                    addr.sin_addr.s_addr = htons(ep.address().to_v4().to_ulong());
-                }
-                std::cout << ep.address().to_v4().to_string() << "\n";
-                */
-
                 event_channel_ = rdma_create_event_channel();
                 if(!event_channel_)
                 {
@@ -305,7 +290,12 @@ namespace hpx { namespace parcelset { namespace ibverbs
                     HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
                     return;
                 }
-                set_nonblocking(event_channel_->fd);
+                set_nonblocking(event_channel_->fd, ec);
+                if(ec)
+                {
+                    rdma_destroy_event_channel(event_channel_);
+                    return;
+                }
 
                 int ret = 0;
                 ret = rdma_create_id(event_channel_, &listener_, NULL, RDMA_PS_TCP);
@@ -321,7 +311,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 std::string host = ep.address().to_v4().to_string();
                 std::string port = boost::lexical_cast<std::string>(ep.port());
 
-                //std::cout << host << " " << port << "\n";
                 addrinfo *addr;
 
                 getaddrinfo(host.c_str(), port.c_str(), NULL, &addr);
@@ -367,19 +356,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             } BOOST_SCOPE_EXIT_END
 
 
-            {
-                mutex_type::scoped_lock lk(mtx_);
-                BOOST_FOREACH(server::ibverbs::parcelport_connection_ptr c,
-                    accepted_connections_)
-                {
-                    boost::system::error_code ec;
-                    parcelset::ibverbs::server_context& ctx = c->context();
-                    ctx.shutdown(ec); // shut down connection
-                    ctx.close(ec);    // close the data window to give it back to the OS
-                }
-                accepted_connections_.clear();
-            }
-
             // wait for pending operations to return
             while (executing_operation_.load())
                 ;
@@ -388,6 +364,9 @@ namespace hpx { namespace parcelset { namespace ibverbs
             {
                 rdma_destroy_event_channel(event_channel_);
                 event_channel_ = 0;
+            }
+            else {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
             }
                 
             HPX_IBVERBS_RESET_EC(ec);
@@ -423,10 +402,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 return false;
             }
 
-            return get_next_event(event_channel_, event, this);
+            return get_next_event(event_channel_, event, this, ec);
         }
 
-        bool get_connect_request(server::ibverbs::parcelport_connection_ptr conn, boost::system::error_code &ec)
+        template <typename Service>
+        bool get_connect_request(basic_context<Service> & conn, boost::system::error_code &ec)
         {
             if (close_operation_.load() || !event_channel_) {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
@@ -446,9 +426,17 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 cm_params.initiator_depth = cm_params.responder_resources = 1;
                 cm_params.rnr_retry_count = 7; // infinite retry
 
-                conn->context().build_connection(event.id, ec);
+                conn.build_connection(event.id, ec);
+                if(ec)
+                {
+                    return false;
+                }
 
-                conn->context().on_preconnect(event.id);
+                conn.on_preconnect(event.id, ec);
+                if(ec)
+                {
+                    return false;
+                }
 
                 rdma_accept(event.id, &cm_params);
                 return true;
@@ -456,7 +444,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
             return false;
         }
 
-        bool try_accept(server::ibverbs::parcelport_connection_ptr conn, boost::system::error_code &ec)
+        template <typename Service>
+        bool try_accept(basic_context<Service> & conn, boost::system::error_code &ec)
         {
             if (close_operation_.load() || !event_channel_) {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
@@ -468,12 +457,16 @@ namespace hpx { namespace parcelset { namespace ibverbs
             {
                 return false;
             }
+            if(ec)
+            {
+                return false;
+            }
             if(event.event == RDMA_CM_EVENT_ESTABLISHED)
             {
-                conn->context().on_connection(event.id);
+                conn.on_connection(event.id, ec);
+                if(ec)
                 {
-                    mutex_type::scoped_lock lk(mtx_);
-                    accepted_connections_.insert(conn);
+                    return false;
                 }
                 HPX_IBVERBS_RESET_EC(ec);
                 return true;
@@ -484,29 +477,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         void on_disconnect(rdma_cm_id * id)
         {
-            mutex_type::scoped_lock lk(mtx_);
-            BOOST_FOREACH(server::ibverbs::parcelport_connection_ptr c,
-                accepted_connections_)
-            {
-                parcelset::ibverbs::server_context& ctx = c->context();
-                if(ctx.conn_id() == id)
-                {
-                    boost::system::error_code ec;
-                    ctx.shutdown(ec); // shut down connection
-                    ctx.close(ec);    // close the context
-                }
-            }
         }
     
     private:
         rdma_event_channel *event_channel_;
         rdma_cm_id *listener_;
-
-        /// The list of accepted connections
-        typedef hpx::lcos::local::spinlock mutex_type;
-        mutex_type mtx_;
-        typedef std::set<server::ibverbs::parcelport_connection_ptr> accepted_connections_set;
-        accepted_connections_set accepted_connections_;
 
         boost::atomic<boost::uint16_t> executing_operation_;
         boost::atomic<bool> aborted_;

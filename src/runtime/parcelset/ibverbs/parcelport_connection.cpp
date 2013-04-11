@@ -77,6 +77,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         // guard against serialization errors
         try {
+            // clear and preallocate out_buffer_
             out_buffer_.clear();
 
             BOOST_FOREACH(parcel const & p, pv)

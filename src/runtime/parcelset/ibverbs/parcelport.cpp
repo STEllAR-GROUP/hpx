@@ -24,6 +24,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/placeholders.hpp>
 
+namespace {
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace ibverbs
 {
@@ -34,6 +37,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_ibverbs", "-ibverbs"),
+        io_service_index_(1),
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
@@ -75,13 +79,13 @@ namespace hpx { namespace parcelset { namespace ibverbs
             try {
                 server::ibverbs::parcelport_connection_ptr conn(
                     new server::ibverbs::parcelport_connection(
-                        io_service_pool_.get_io_service(1), *this));
+                        io_service_pool_.get_io_service(io_service_index()), *this));
 
                 boost::asio::ip::tcp::endpoint ep = *it;
 
                 acceptor_->bind(ep);
 
-                acceptor_->async_accept(conn,
+                acceptor_->async_accept(conn->context(),
                     boost::bind(&parcelport::handle_accept, this,
                         boost::asio::placeholders::error, conn));
             }
@@ -108,6 +112,19 @@ namespace hpx { namespace parcelset { namespace ibverbs
     {
         // now it's safe to take everything down
         connection_cache_.shutdown();
+        {
+            // cancel all pending read operations, close those sockets
+            util::spinlock::scoped_lock l(mtx_);
+            BOOST_FOREACH(server::ibverbs::parcelport_connection_ptr c,
+                accepted_connections_)
+            {
+                boost::system::error_code ec;
+                parcelset::ibverbs::server_context& ctx = c->context();
+                ctx.shutdown(ec); // shut down connection
+                ctx.close(ec);    // close the data window to give it back to the OS
+            }
+            accepted_connections_.clear();
+        }
 
         connection_cache_.clear();
 
@@ -138,16 +155,27 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::ibverbs::parcelport_connection(
-                io_service_pool_.get_io_service(1), *this));
+                io_service_pool_.get_io_service(io_service_index()), *this));
         
-            acceptor_->async_accept(conn,
+            acceptor_->async_accept(conn->context(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
+
+            {
+                // keep track of all the accepted connections
+                util::spinlock::scoped_lock l(mtx_);
+                accepted_connections_.insert(c);
+            }
 
             // now accept the incoming connection by starting to read from the
             // context
             c->async_read(boost::bind(&parcelport::handle_read_completion,
                 this, boost::asio::placeholders::error, c));
+        }
+        else {
+            // remove this connection from the list of known connections
+            util::spinlock::scoped_lock l(mtx_);
+            accepted_connections_.erase(conn);
         }
     }
 
@@ -163,6 +191,10 @@ namespace hpx { namespace parcelset { namespace ibverbs
             LPT_(error)
                 << "handle read operation completion: error: "
                 << e.message();
+
+            // remove this connection from the list of known connections
+            util::spinlock::scoped_lock l(mtx_);
+            accepted_connections_.erase(c);
         }
     }
 
@@ -409,7 +441,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(1), l, parcels_sent_));
+                io_service_pool_.get_io_service(io_service_index()), l, parcels_sent_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;
@@ -498,6 +530,17 @@ namespace hpx { namespace parcelset { namespace ibverbs
             "ibverbs::parcelport::get_connection_cache_statistics",
             "invalid connection cache statistics type");
         return 0;
+    }
+    
+    int parcelport::io_service_index()
+    {
+        util::spinlock::scoped_lock l(mtx_);
+        io_service_index_++;
+        if(io_service_index_ == io_service_pool_.size())
+        {
+            io_service_index_ = 1;
+        }
+        return io_service_index_;
     }
 
     ///////////////////////////////////////////////////////////////////////////

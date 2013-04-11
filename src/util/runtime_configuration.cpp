@@ -114,8 +114,7 @@ namespace hpx { namespace util
             // ibverbs related settings
             "[hpx.parcel.ibverbs]",
             "enable=${HPX_USE_IBVERBS_PARCELPORT:0}",
-            "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:4096}",
-            "sync_threshold=${HPX_PARCEL_IBVERBS_SYNC_THRESHOLD:0}",
+            "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
 
             // predefine command line aliases
             "[hpx.commandline]",

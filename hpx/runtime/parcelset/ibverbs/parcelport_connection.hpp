@@ -105,7 +105,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             parcels_sent_.add_data(send_data_);
             
 
-            // now handle the acknowledgment byte which is sent by the receiver
+            // now we can give this connection back to the cache
             out_buffer_.clear();
             
             send_data_.bytes_ = 0;
@@ -113,6 +113,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             send_data_.serialization_time_ = 0;
             send_data_.num_parcels_ = 0;
             
+            // now handle the acknowledgement byte which is sent by the receiver
             void (parcelport_connection::*f)(boost::system::error_code const&,
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;

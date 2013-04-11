@@ -140,14 +140,20 @@ namespace hpx { namespace parcelset { namespace ibverbs
             parcelport_connection_ptr const& client_connection);
 
     private:
+        int io_service_index();
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
+        int io_service_index_;
 
         /// Acceptor used to listen for incoming connections.
         acceptor* acceptor_;
 
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
+
+        /// The list of accepted connections
+        typedef std::set<server::ibverbs::parcelport_connection_ptr> accepted_connections_set;
+        accepted_connections_set accepted_connections_;
     };
 }}}
 

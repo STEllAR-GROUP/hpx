@@ -342,9 +342,6 @@ namespace hpx {
 
         // flush all parcel buffers, stop buffering parcels at this point
         parcel_handler_.flush_buffers(true);
-        
-        // Disable alternative parcelports
-        parcel_handler_.disable_alternative_parcelports();
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();

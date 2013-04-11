@@ -7,6 +7,8 @@
 #define HPX_PARCELSET_IBVERBS_SERVER_HPP
 
 #include <hpx/runtime/parcelset/ibverbs/messages.hpp>
+#include <hpx/runtime/parcelset/ibverbs/ibverbs_errors.hpp>
+#include <hpx/util/spinlock.hpp>
 
 namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
     struct server
@@ -64,6 +66,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
         void close()
         {
+            util::spinlock::scoped_lock lk(mtx_);
             if(buffer_mr_)
             {
                 ibv_dereg_mr(buffer_mr_);
@@ -89,8 +92,14 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             size_ = 0;
         }
 
-        void post_receive()
+        void post_receive(boost::system::error_code &ec)
         {
+            util::spinlock::scoped_lock lk(mtx_);
+            if(!id_)
+            {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return;
+            }
             struct ibv_recv_wr wr, *bad_wr = NULL;
             struct ibv_sge sge;
 
@@ -110,12 +119,24 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             ret = ibv_post_recv(id_->qp, &wr, &bad_wr);
             if(ret)
             {
-                // FIXME: error
+                int verrno = errno;
+                boost::system::error_code err(verrno, boost::system::system_category());
+                HPX_IBVERBS_THROWS_IF(
+                    ec
+                  , err
+                );
             }
         }
 
-        void send_message()
+        void send_message(message_type m, boost::system::error_code &ec)
         {
+            util::spinlock::scoped_lock lk(mtx_);
+            if(!id_)
+            {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return;
+            }
+
             struct ibv_send_wr wr, *bad_wr = NULL;
             struct ibv_sge sge;
                 
@@ -128,6 +149,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             wr.num_sge = 1;
             wr.send_flags = IBV_SEND_SIGNALED;
 
+            server_msg_->id = m;
             sge.addr = (uintptr_t)server_msg_;
             sge.length = sizeof(message);
             sge.lkey = server_msg_mr_->lkey;
@@ -137,68 +159,103 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             ret = ibv_post_send(id_->qp, &wr, &bad_wr);
             if(ret)
             {
-                // FIXME: error
+                int verrno = errno;
+                boost::system::error_code err(verrno, boost::system::system_category());
+                HPX_IBVERBS_THROWS_IF(
+                    ec
+                  , err
+                );
             }
         }
 
-        void send_ready()
+        void send_ready(boost::system::error_code &ec)
         {
-            server_msg_->id = MSG_DONE;
-            send_message();
+            send_message(MSG_DONE, ec);
+        }
+
+        void send_shutdown(boost::system::error_code &ec)
+        {
+            send_message(MSG_SHUTDOWN, ec);
         }
         
-        void on_preconnect(rdma_cm_id * id, ibv_pd * pd)
+        void on_preconnect(rdma_cm_id * id, ibv_pd * pd, boost::system::error_code &ec)
         {
             close();
-            BOOST_ASSERT(buffer_);
-            buffer_mr_ = ibv_reg_mr(
-                pd
-              , buffer_
-              , buffer_size_
-              , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
-            );
-            if(!buffer_mr_)
             {
-                // FIXME: error
-            }
-            server_msg_mr_ = ibv_reg_mr(
-                pd
-              , server_msg_
-              , sizeof(hpx::parcelset::ibverbs::message)
-              , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
-            );
-            if(!server_msg_mr_)
-            {
-                // FIXME: error
-            }
-            client_msg_mr_ = ibv_reg_mr(
-                pd
-              , client_msg_
-              , sizeof(hpx::parcelset::ibverbs::message)
-              , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
-            );
-            if(!client_msg_mr_)
-            {
-                // FIXME: error
-            }
+                util::spinlock::scoped_lock lk(mtx_);
+                BOOST_ASSERT(buffer_);
+                buffer_mr_ = ibv_reg_mr(
+                    pd
+                  , buffer_
+                  , buffer_size_
+                  , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+                );
+                if(!buffer_mr_)
+                {
+                    int verrno = errno;
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
+                }
+                server_msg_mr_ = ibv_reg_mr(
+                    pd
+                  , server_msg_
+                  , sizeof(hpx::parcelset::ibverbs::message)
+                  , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+                );
+                if(!server_msg_mr_)
+                {
+                    int verrno = errno;
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
+                }
+                client_msg_mr_ = ibv_reg_mr(
+                    pd
+                  , client_msg_
+                  , sizeof(hpx::parcelset::ibverbs::message)
+                  , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+                );
+                if(!client_msg_mr_)
+                {
+                    int verrno = errno;
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
+                }
 
-            id_ = id;
+                id_ = id;
+            }
 
             //post_receive();
         }
 
-        void on_connection(rdma_cm_id *id)
+        void on_connection(rdma_cm_id *id, boost::system::error_code &ec)
         {
-            id_ = id;
-            server_msg_->id = MSG_MR;
-            server_msg_->addr = (uintptr_t)buffer_mr_->addr;
-            server_msg_->rkey = buffer_mr_->rkey;
+            {
+                util::spinlock::scoped_lock lk(mtx_);
+                id_ = id;
+                server_msg_->addr = (uintptr_t)buffer_mr_->addr;
+                server_msg_->rkey = buffer_mr_->rkey;
+            }
 
-            send_message();
+            send_message(MSG_MR, ec);
         }
         
-        message_type on_completion(ibv_wc * wc)
+        message_type on_completion(ibv_wc * wc, boost::system::error_code &ec)
         {
+            util::spinlock::scoped_lock lk(mtx_);
+            if(!id_)
+            {
+                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+                return MSG_SHUTDOWN;
+            }
             /*
             std::cout << "server opcode: ";
             switch (wc->opcode)
@@ -237,6 +294,9 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 {
                     case MSG_DATA:
                         return MSG_DATA;
+                    case MSG_SHUTDOWN:
+                        std::cout << "server received shutdown ...\n";
+                        return MSG_SHUTDOWN;
                     default:
                         return MSG_INVALID;
                 }
@@ -253,9 +313,13 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                         return MSG_DATA;
                     case MSG_MR:
                         return MSG_MR;
+                    case MSG_SHUTDOWN:
+                        std::cout << "server sent shutdown ...\n";
+                        return MSG_SHUTDOWN;
                     default:
                         return MSG_INVALID;
                 }
+                return MSG_INVALID;
             }
 
             /*
@@ -278,6 +342,8 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         void on_disconnect(rdma_cm_id * id)
         {
         }
+        
+        util::spinlock mtx_;
 
         char *buffer_;
         std::size_t buffer_size_;

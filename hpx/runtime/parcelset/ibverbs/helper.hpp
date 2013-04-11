@@ -19,10 +19,18 @@
 
 namespace hpx { namespace parcelset { namespace ibverbs {
     template <typename Connection>
-    inline bool get_next_event(rdma_event_channel *event_channel, rdma_cm_event & event_copy, Connection * c)
+    inline bool get_next_event(
+        rdma_event_channel *event_channel, rdma_cm_event & event_copy, Connection * c
+      , boost::system::error_code &ec
+    )
     {
-        rdma_cm_event * event = NULL;
+        if(!event_channel)
+        {
+            HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
+            return false;
+        }
 
+        rdma_cm_event * event = NULL;
 
         pollfd pfd;
         pfd.fd = event_channel->fd;
@@ -34,7 +42,12 @@ namespace hpx { namespace parcelset { namespace ibverbs {
         if(ret == 0) return false;
         if(ret < 0)
         {
-            // FIXME: error
+            int verrno = errno;
+            boost::system::error_code err(verrno, boost::system::system_category());
+            HPX_IBVERBS_THROWS_IF(
+                ec
+              , err
+            );
             return false;
         }
 
@@ -47,17 +60,20 @@ namespace hpx { namespace parcelset { namespace ibverbs {
             if(event_copy.event == RDMA_CM_EVENT_DISCONNECTED)
             {
                 c->on_disconnect(event_copy.id);
-                return get_next_event(event_channel, event_copy, c);
+                return get_next_event(event_channel, event_copy, c, ec);
             }
 
             return true;
         }
         else
         {
-            int err = errno;
-            if(err == EBADF) return false;
-
-            //FIXME: error
+            int verrno = errno;
+            if(verrno == EBADF) return false;
+            boost::system::error_code err(verrno, boost::system::system_category());
+            HPX_IBVERBS_THROWS_IF(
+                ec
+              , err
+            );
 
             return false;
         }
@@ -65,13 +81,18 @@ namespace hpx { namespace parcelset { namespace ibverbs {
         return false;
     }
 
-    inline void set_nonblocking(int fd)
+    inline void set_nonblocking(int fd, boost::system::error_code &ec)
     {
         int flags = fcntl(fd, F_GETFL);
         int rc = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
         if(rc < 0)
         {
-            //FIXME: error:
+            int verrno = errno;
+            boost::system::error_code err(verrno, boost::system::system_category());
+            HPX_IBVERBS_THROWS_IF(
+                ec
+              , err
+            );
         }
     }
 
