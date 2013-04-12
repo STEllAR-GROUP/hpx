@@ -536,7 +536,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
     {
         util::spinlock::scoped_lock l(mtx_);
         io_service_index_++;
-        if(io_service_index_ == io_service_pool_.size())
+        if(static_cast<std::size_t>(io_service_index_) == io_service_pool_.size())
         {
             io_service_index_ = 1;
         }

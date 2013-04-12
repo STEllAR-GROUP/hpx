@@ -78,15 +78,15 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
 
         // synchronous and asynchronous accept
-        template <typename Service>
-        void accept(basic_context<Service> & conn,
+        template <typename Service_>
+        void accept(basic_context<Service_> & conn,
             boost::system::error_code &ec = boost::system::throws)
         {
             return this->service.accept(this->implementation, conn, ec);
         }
 
-        template <typename Service, typename Handler>
-        void async_accept(basic_context<Service> & conn, Handler handler)
+        template <typename Service_, typename Handler>
+        void async_accept(basic_context<Service_> & conn, Handler handler)
         {
             this->service.async_accept(this->implementation, conn, handler);
         }
