@@ -772,7 +772,7 @@ bool addressing_service::get_id_range(
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
             
-            cf->set_ok();
+            cf.set_ok();
         }
 
         error const s = rep.get_status();

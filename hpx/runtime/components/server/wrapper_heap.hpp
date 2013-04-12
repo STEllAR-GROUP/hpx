@@ -229,7 +229,7 @@ namespace hpx { namespace components { namespace detail
             free_size_ += count;
 
             // release the pool if this one was the last allocated item
-            test_release();
+            test_release(l);
         }
         bool did_alloc (void *p) const
         {
@@ -313,12 +313,12 @@ namespace hpx { namespace components { namespace detail
 
             // unbind in AGAS service
             if (base_gid_) {
-                applier::unbind_range(base_gid_, step_);
+                naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
                 {
                     hpx::util::unlock_the_lock<scoped_lock> ul(lk);
-                    applier::unbind_range(base_gid, step_);
+                    applier::unbind_range(base_gid_, step_);
                 }
             }
 
