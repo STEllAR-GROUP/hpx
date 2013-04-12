@@ -1887,8 +1887,8 @@ namespace hpx { namespace threads
 
                     write_new_state_log_debug(num_thread, thrd, state_val, "normal");
 
-                    // Re-add this work item to our list of work items if the PX
-                    // thread should be re-scheduled. If the PX thread is suspended
+                    // Re-add this work item to our list of work items if the HPX
+                    // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
                         // schedule other work
@@ -1897,8 +1897,8 @@ namespace hpx { namespace threads
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
-                        // REVIEW: Passing a specific target thread may screw
-                        // with the round robin queuing.
+                        // REVIEW: Passing a specific target thread may mess
+                        //         with the round robin queuing.
                         scheduler_.schedule_thread_last(thrd, num_thread);
                         do_some_work(num_thread);
                     }
@@ -1918,10 +1918,10 @@ namespace hpx { namespace threads
                     scheduler_.schedule_thread(thrd, num_thread);
                 }
 
-                // Remove the mapping from thread_map_ if PX thread is depleted
-                // or terminated, this will delete the PX thread as all
+                // Remove the mapping from thread_map_ if HPX thread is depleted
+                // or terminated, this will delete the HPX thread as all
                 // references go out of scope.
-                // REVIEW: what has to be done with depleted PX threads?
+                // REVIEW: what has to be done with depleted HPX threads?
                 if (state_val == depleted || state_val == terminated)
                     scheduler_.destroy_thread(thrd, busy_loop_count);
 
@@ -1930,6 +1930,7 @@ namespace hpx { namespace threads
 
             // if nothing else has to be done either wait or terminate
             else {
+                // create new threads from task descriptions, if available
                 if (scheduler_.wait_or_add_new(num_thread,
                         state_.load() == running, idle_loop_count))
                 {
@@ -1937,11 +1938,17 @@ namespace hpx { namespace threads
                     count.exit();
                     break;
                 }
+
+                if (0 == num_thread) {
+                    // do background work in parcel layer
+                    hpx::parcelset::flush_buffers();
+                }
             }
 
             // Clean up all terminated threads for all thread queues once in a
             // while.
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX) {
+                // do background work in the scheduler
                 busy_loop_count = 0;
                 scheduler_.cleanup_terminated(true);
             }

@@ -684,6 +684,15 @@ namespace hpx { namespace naming
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parcelset
+{
+    void flush_buffers()
+    {
+        get_runtime().get_parcel_handler().flush_buffers();
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
     // shortcut for get_applier().get_thread_manager()
