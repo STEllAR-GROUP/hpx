@@ -286,14 +286,19 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 event_channel_ = rdma_create_event_channel();
                 if(!event_channel_)
                 {
-                    // FIXME: better error here
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+                    int verrno = errno;
+                    close(ec);
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
                     return;
                 }
                 set_nonblocking(event_channel_->fd, ec);
                 if(ec)
                 {
-                    rdma_destroy_event_channel(event_channel_);
+                    close(ec);
                     return;
                 }
 
@@ -302,9 +307,13 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
                 if(ret)
                 {
-                    rdma_destroy_event_channel(event_channel_);
-                    // FIXME: better error here
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+                    int verrno = errno;
+                    close(ec);
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
                     return;
                 }
 
@@ -320,21 +329,25 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 freeaddrinfo(addr);
                 if(ret)
                 {
-                    int err = errno;
-                    std::cout << strerror(err) << "\n";
-                    rdma_destroy_id(listener_);
-                    rdma_destroy_event_channel(event_channel_);
-                    // FIXME: better error here
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+                    int verrno = errno;
+                    close(ec);
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
                     return;
                 }
                 ret = rdma_listen(listener_, 10); /* backlog = 10 is arbitrary */
                 if(ret)
                 {
-                    rdma_destroy_id(listener_);
-                    rdma_destroy_event_channel(event_channel_);
-                    // FIXME: better error here
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::fault);
+                    int verrno = errno;
+                    close(ec);
+                    boost::system::error_code err(verrno, boost::system::system_category());
+                    HPX_IBVERBS_THROWS_IF(
+                        ec
+                      , err
+                    );
                     return;
                 }
                 HPX_IBVERBS_RESET_EC(ec);
@@ -368,7 +381,13 @@ namespace hpx { namespace parcelset { namespace ibverbs
             else {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
             }
-                
+
+            if(listener_)
+            {
+                rdma_destroy_id(listener_);
+                listener_ = 0;
+            }
+            
             HPX_IBVERBS_RESET_EC(ec);
         }
 
