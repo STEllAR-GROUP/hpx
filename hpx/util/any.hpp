@@ -8,11 +8,11 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-    The class hpx::util::detail::hold_any is built based on boost::spirit::hold_any class.
+    The class hpx::util::any is built based on boost::spirit::hold_any class.
     It adds support for HPX serialization.
 ==============================================================================*/
-#ifndef HPX_UTIL_HOLD_ANY_HPP
-#define HPX_UTIL_HOLD_ANY_HPP
+#ifndef HPX_UTIL_ANY_HPP
+#define HPX_UTIL_ANY_HPP
 
 #if defined(_MSC_VER)
 #pragma once
@@ -70,7 +70,7 @@ namespace hpx { namespace util
         const char* to;
     };
 
-    namespace detail { namespace hold_any
+    namespace detail { namespace any
     {
         template <typename T>
         struct get_table;
@@ -121,7 +121,7 @@ namespace hpx { namespace util
             {
                 static fxn_ptr_table<IArchive, OArchive, Char> *get_ptr()
                 {
-                    return detail::hold_any::get_table<T>::
+                    return detail::any::get_table<T>::
                         template get<IArchive, OArchive, Char>();
                 }
 
@@ -185,7 +185,7 @@ namespace hpx { namespace util
             {
                 static fxn_ptr_table<IArchive, OArchive, Char> *get_ptr()
                 {
-                    return detail::hold_any::get_table<T>::
+                    return detail::any::get_table<T>::
                         template get<IArchive, OArchive, Char>();
                 }
                 static boost::detail::sp_typeinfo const& get_type()
@@ -346,16 +346,16 @@ namespace hpx { namespace util
         operator>> (std::basic_istream<Char>& i, empty&)
         {
             // If this assertion fires you tried to insert from a std istream
-            // into an empty hold_any instance. This simply can't work, because
+            // into an empty any instance. This simply can't work, because
             // there is no way to figure out what type to extract from the
             // stream.
             // The only way to make this work is to assign an arbitrary
-            // value of the required type to the hold_any instance you want to
+            // value of the required type to the any instance you want to
             // stream to. This assignment has to be executed before the actual
             // call to the operator>>().
             BOOST_ASSERT(false &&
                 "Tried to insert from a std istream into an empty "
-                "hold_any instance");
+                "any instance");
             return i;
         }
 
@@ -365,14 +365,14 @@ namespace hpx { namespace util
         {
             return o;
         }
-    }} // namespace hpx::util::detail::hold_any
+    }} // namespace hpx::util::detail::any
 }}  // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-// Make sure hold_any serialization is properly initialized
+// Make sure any serialization is properly initialized
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
-  , (hpx::util::detail::hold_any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
+  , (hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
 )
 
 namespace hpx { namespace util
@@ -382,27 +382,27 @@ namespace hpx { namespace util
         typename IArchive = portable_binary_iarchive,
         typename OArchive = portable_binary_oarchive,
         typename Char = char>
-    class basic_hold_any
+    class basic_any
     {
     private:
         // Mark this class copyable and movable
-        BOOST_COPYABLE_AND_MOVABLE(basic_hold_any)
+        BOOST_COPYABLE_AND_MOVABLE(basic_any)
 
     public:
         // constructors
-        basic_hold_any() BOOST_NOEXCEPT
-          : table(detail::hold_any::get_table<detail::hold_any::empty>::
+        basic_any() BOOST_NOEXCEPT
+          : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
             object(0)
         {
         }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        basic_hold_any(basic_hold_any& x)
+        basic_any(basic_any& x)
 #else
-        basic_hold_any(basic_hold_any const& x)
+        basic_any(basic_any const& x)
 #endif
-          : table(detail::hold_any::get_table<detail::hold_any::empty>::
+          : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
             object(0)
         {
@@ -410,8 +410,8 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_hold_any(BOOST_FWD_REF(T) x)
-          : table(detail::hold_any::get_table<
+        basic_any(BOOST_FWD_REF(T) x)
+          : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
                       >::type
@@ -422,23 +422,23 @@ namespace hpx { namespace util
                 typename util::detail::remove_reference<T>::type
             >::type value_type;
 
-            if (detail::hold_any::get_table<value_type>::is_small::value)
+            if (detail::any::get_table<value_type>::is_small::value)
                 new (&object) value_type(boost::forward<T>(x));
             else
                 object = new value_type(boost::forward<T>(x));
         }
 
         // Move constructor
-        basic_hold_any(BOOST_RV_REF(basic_hold_any) x) BOOST_NOEXCEPT
+        basic_any(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
           : table(x.table),
             object(x.object)
         {
-            x.table = detail::hold_any::get_table<detail::hold_any::empty>::
+            x.table = detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>();
             x.object = 0;
         }
 
-        ~basic_hold_any()
+        ~basic_any()
         {
             table->static_delete(&object);
         }
@@ -446,9 +446,9 @@ namespace hpx { namespace util
     private:
         // assignment
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        basic_hold_any& assign(basic_hold_any& x)
+        basic_any& assign(basic_any& x)
 #else
-        basic_hold_any& assign(basic_hold_any const& x)
+        basic_any& assign(basic_any const& x)
 #endif
         {
             if (&x != this) {
@@ -467,21 +467,21 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_hold_any& assign(BOOST_FWD_REF(T) x)
+        basic_any& assign(BOOST_FWD_REF(T) x)
         {
             typedef typename boost::remove_const<
                 typename util::detail::remove_reference<T>::type
             >::type value_type;
 
             // are we copying between the same type?
-            detail::hold_any::fxn_ptr_table<IArchive, OArchive, Char>* x_table =
-                detail::hold_any::get_table<value_type>::
+            detail::any::fxn_ptr_table<IArchive, OArchive, Char>* x_table =
+                detail::any::get_table<value_type>::
                     template get<IArchive, OArchive, Char>();
 
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
                 table->destruct(&object);    // first destruct the old content
-                if (detail::hold_any::get_table<T>::is_small::value) {
+                if (detail::any::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     new (&object) value_type(boost::forward<T>(x));
                 }
@@ -491,7 +491,7 @@ namespace hpx { namespace util
                 }
             }
             else {
-                if (detail::hold_any::get_table<T>::is_small::value) {
+                if (detail::any::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     table->destruct(&object); // first destruct the old content
                     new (&object) value_type(boost::forward<T>(x));
@@ -507,20 +507,20 @@ namespace hpx { namespace util
 
     public:
         // copy assignment operator
-        basic_hold_any& operator=(BOOST_COPY_ASSIGN_REF(basic_hold_any) x)
+        basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
         {
-            basic_hold_any(x).swap(*this);
+            basic_any(x).swap(*this);
             return this;
         }
 
         // move assignment
-        basic_hold_any& operator=(BOOST_RV_REF(basic_hold_any) x) BOOST_NOEXCEPT
+        basic_any& operator=(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
         {
             if (&x != &this) {
                 table->static_delete(&object);
                 table = x.table;
                 object = x.object;
-                x.table = detail::hold_any::get_table<detail::hold_any::empty>::
+                x.table = detail::any::get_table<detail::any::empty>::
                     template get<IArchive, OArchive, Char>();
                 x.object = 0;
             }
@@ -528,13 +528,13 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_hold_any& operator=(BOOST_FWD_REF(T) x)
+        basic_any& operator=(BOOST_FWD_REF(T) x)
         {
             return assign(boost::forward<T>(x));
         }
 
         // utility functions
-        basic_hold_any& swap(basic_hold_any& x) BOOST_NOEXCEPT
+        basic_any& swap(basic_any& x) BOOST_NOEXCEPT
         {
             std::swap(table, x.table);
             std::swap(object, x.object);
@@ -552,7 +552,7 @@ namespace hpx { namespace util
             if (type() != BOOST_SP_TYPEID(T))
               throw bad_any_cast(type(), BOOST_SP_TYPEID(T));
 
-            return detail::hold_any::get_table<T>::is_small::value ?
+            return detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
                 *reinterpret_cast<T const*>(object);
         }
@@ -566,7 +566,7 @@ namespace hpx { namespace util
 
         bool empty() const BOOST_NOEXCEPT
         {
-            return table == detail::hold_any::get_table<detail::hold_any::empty>::
+            return table == detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>();
         }
 
@@ -575,7 +575,7 @@ namespace hpx { namespace util
             if (!empty())
             {
                 table->static_delete(&object);
-                table = detail::hold_any::get_table<detail::hold_any::empty>::
+                table = detail::any::get_table<detail::any::empty>::
                     template get<IArchive, OArchive, Char>();
                 object = 0;
             }
@@ -583,12 +583,12 @@ namespace hpx { namespace util
 
         // these functions have been added in the assumption that the embedded
         // type has a corresponding operator defined, which is completely safe
-        // because spirit::hold_any is used only in contexts where these operators
+        // because hpx::uti::any is used only in contexts where these operators
         // do exist
         template <typename IArchive_, typename OArchive_, typename Char_>
         friend inline std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_hold_any<IArchive_, OArchive_, Char_>& obj)
+            basic_any<IArchive_, OArchive_, Char_>& obj)
         {
             return obj.table->stream_in(i, &obj.object);
         }
@@ -596,7 +596,7 @@ namespace hpx { namespace util
         template <typename IArchive_, typename OArchive_, typename Char_>
         friend inline std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_hold_any<IArchive_, OArchive_, Char_> const& obj)
+            basic_any<IArchive_, OArchive_, Char_> const& obj)
         {
             return obj.table->stream_out(o, &obj.object);
         }
@@ -616,7 +616,7 @@ namespace hpx { namespace util
             }
             else
             {
-                typename detail::hold_any::fxn_ptr_table<IArchive, OArchive, Char> *p = 0;
+                typename detail::any::fxn_ptr_table<IArchive, OArchive, Char> *p = 0;
                 ar >> p;
                 table = p->get_ptr();
                 delete p;
@@ -640,58 +640,58 @@ namespace hpx { namespace util
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
         template <typename T, typename IArchive_, typename OArchive_, typename Char_>
-        friend T* any_cast(basic_hold_any<IArchive_, OArchive_, Char_> *) BOOST_NOEXCEPT;
+        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) BOOST_NOEXCEPT;
 #else
     public: // types (public so any_cast can be non-friend)
 #endif
         // fields
-        detail::hold_any::fxn_ptr_table<IArchive, OArchive, Char>* table;
+        detail::any::fxn_ptr_table<IArchive, OArchive, Char>* table;
         void* object;
     };
 
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Char> // default is char
-    class basic_hold_any<void, void, Char>
+    class basic_any<void, void, Char>
     {
     private:
         // Mark this class copyable and movable
-        BOOST_COPYABLE_AND_MOVABLE(basic_hold_any)
+        BOOST_COPYABLE_AND_MOVABLE(basic_any)
 
     public:
         // constructors
-        basic_hold_any() BOOST_NOEXCEPT
-          : table(detail::hold_any::get_table<
-                detail::hold_any::empty>::template get<void, void, Char>()),
+        basic_any() BOOST_NOEXCEPT
+          : table(detail::any::get_table<
+                detail::any::empty>::template get<void, void, Char>()),
             object(0)
         {
         }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        basic_hold_any(basic_hold_any& x)
+        basic_any(basic_any& x)
 #else
-        basic_hold_any(basic_hold_any const& x)
+        basic_any(basic_any const& x)
 #endif
-          : table(detail::hold_any::get_table<
-                detail::hold_any::empty>::template get<void, void, Char>()),
+          : table(detail::any::get_table<
+                detail::any::empty>::template get<void, void, Char>()),
             object(0)
         {
             assign(x);
         }
 
         // Move constructor
-        basic_hold_any(BOOST_RV_REF(basic_hold_any) x) BOOST_NOEXCEPT
+        basic_any(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
           : table(x.table),
             object(x.object)
         {
             x.object = 0;
-            x.table = detail::hold_any::get_table<detail::hold_any::empty>::
+            x.table = detail::any::get_table<detail::any::empty>::
                 template get<void, void, Char>();
         }
 
         template <typename T>
-        explicit basic_hold_any(BOOST_FWD_REF(T) x)
-          : table(detail::hold_any::get_table<
+        explicit basic_any(BOOST_FWD_REF(T) x)
+          : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
                       >::type
@@ -702,13 +702,13 @@ namespace hpx { namespace util
                 typename util::detail::remove_reference<T>::type
             >::type value_type;
 
-            if (detail::hold_any::get_table<value_type>::is_small::value)
+            if (detail::any::get_table<value_type>::is_small::value)
                 new (&object) value_type(boost::forward<T>(x));
             else
                 object = new value_type(boost::forward<T>(x));
         }
 
-        ~basic_hold_any()
+        ~basic_any()
         {
             table->static_delete(&object);
         }
@@ -716,9 +716,9 @@ namespace hpx { namespace util
     private:
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
         // assignment
-        basic_hold_any& assign(basic_hold_any& x)
+        basic_any& assign(basic_any& x)
 #else
-        basic_hold_any& assign(basic_hold_any const& x)
+        basic_any& assign(basic_any const& x)
 #endif
         {
             if (&x != this) {
@@ -737,19 +737,19 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_hold_any& assign(BOOST_FWD_REF(T) x)
+        basic_any& assign(BOOST_FWD_REF(T) x)
         {
             typedef typename boost::remove_const<
                 typename util::detail::remove_reference<T>::type
             >::type value_type;
 
             // are we copying between the same type?
-            detail::hold_any::fxn_ptr_table<void, void, Char>* x_table =
-                detail::hold_any::get_table<T>::template get<void, void, Char>();
+            detail::any::fxn_ptr_table<void, void, Char>* x_table =
+                detail::any::get_table<T>::template get<void, void, Char>();
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
                 table->destruct(&object);    // first destruct the old content
-                if (detail::hold_any::get_table<T>::is_small::value) {
+                if (detail::any::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     new (&object) value_type(boost::forward<T>(x));
                 }
@@ -759,7 +759,7 @@ namespace hpx { namespace util
                 }
             }
             else {
-                if (detail::hold_any::get_table<T>::is_small::value) {
+                if (detail::any::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     table->destruct(&object); // first destruct the old content
                     new (&object) value_type(boost::forward<T>(x));
@@ -775,19 +775,19 @@ namespace hpx { namespace util
 
     public:
         // copy assignment operator
-        basic_hold_any& operator=(BOOST_COPY_ASSIGN_REF(basic_hold_any) x)
+        basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
         {
             return assign(x);
         }
 
         // move assignment
-        basic_hold_any& operator=(BOOST_RV_REF(basic_hold_any) x)
+        basic_any& operator=(BOOST_RV_REF(basic_any) x)
         {
             if (&x != &this) {
                 table->static_delete(&object);
                 table = x.table;
                 object = x.object;
-                x.table = detail::hold_any::get_table<detail::hold_any::empty>::
+                x.table = detail::any::get_table<detail::any::empty>::
                     template get<void, void, Char>();
                 x.object = 0;
             }
@@ -795,13 +795,13 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_hold_any& operator=(BOOST_FWD_REF(T) x)
+        basic_any& operator=(BOOST_FWD_REF(T) x)
         {
             return assign(boost::forward<T>(x));
         }
 
         // utility functions
-        basic_hold_any& swap(basic_hold_any& x) BOOST_NOEXCEPT
+        basic_any& swap(basic_any& x) BOOST_NOEXCEPT
         {
             std::swap(table, x.table);
             std::swap(object, x.object);
@@ -819,7 +819,7 @@ namespace hpx { namespace util
             if (type() != BOOST_SP_TYPEID(T))
               throw bad_any_cast(type(), BOOST_SP_TYPEID(T));
 
-            return hpx::util::detail::hold_any::get_table<T>::is_small::value ?
+            return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
                 *reinterpret_cast<T const*>(object);
         }
@@ -834,7 +834,7 @@ namespace hpx { namespace util
         bool empty() const BOOST_NOEXCEPT
         {
             return table ==
-                detail::hold_any::get_table<detail::hold_any::empty>::
+                detail::any::get_table<detail::any::empty>::
                     template get<void, void, Char>();
         }
 
@@ -843,7 +843,7 @@ namespace hpx { namespace util
             if (!empty())
             {
                 table->static_delete(&object);
-                table = detail::hold_any::get_table<detail::hold_any::empty>::
+                table = detail::any::get_table<detail::any::empty>::
                     template get<void, void, Char>();
                 object = 0;
             }
@@ -851,12 +851,12 @@ namespace hpx { namespace util
 
     // these functions have been added in the assumption that the embedded
     // type has a corresponding operator defined, which is completely safe
-    // because spirit::hold_any is used only in contexts where these operators
+    // because hpx::util::any is used only in contexts where these operators
     // do exist
         template <typename Char_>
         friend inline std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_hold_any<void, void, Char_>& obj)
+            basic_any<void, void, Char_>& obj)
         {
             return obj.table->stream_in(i, &obj.object);
         }
@@ -864,7 +864,7 @@ namespace hpx { namespace util
         template <typename Char_>
         friend inline std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_hold_any<void, void, Char_> const& obj)
+            basic_any<void, void, Char_> const& obj)
         {
             return obj.table->stream_out(o, &obj.object);
         }
@@ -872,29 +872,29 @@ namespace hpx { namespace util
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
         template <typename T, typename IArchive_, typename OArchive_, typename Char_>
-        friend T* any_cast(basic_hold_any<IArchive_, OArchive_, Char_> *) BOOST_NOEXCEPT;
+        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) BOOST_NOEXCEPT;
 #else
     public: // types (public so any_cast can be non-friend)
 #endif
         // fields
-        detail::hold_any::fxn_ptr_table<void, void, Char>* table;
+        detail::any::fxn_ptr_table<void, void, Char>* table;
         void* object;
     };
     ///////////////////////////////////////////////////////////////////////////
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    void swap(basic_hold_any<IArchive, OArchive, Char>& lhs,
-        basic_hold_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
+    void swap(basic_any<IArchive, OArchive, Char>& lhs,
+        basic_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
     {
         lhs.swap(rhs);
     }
 
     // boost::any-like casting
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    inline T* any_cast (basic_hold_any<IArchive, OArchive, Char>* operand) BOOST_NOEXCEPT
+    inline T* any_cast (basic_any<IArchive, OArchive, Char>* operand) BOOST_NOEXCEPT
     {
         if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
-            return hpx::util::detail::hold_any::get_table<T>::is_small::value ?
+            return hpx::util::detail::any::get_table<T>::is_small::value ?
                 reinterpret_cast<T*>(&operand->object) :
                 reinterpret_cast<T*>(operand->object);
         }
@@ -902,13 +902,13 @@ namespace hpx { namespace util
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    inline T const* any_cast(basic_hold_any<IArchive, OArchive, Char> const* operand) BOOST_NOEXCEPT
+    inline T const* any_cast(basic_any<IArchive, OArchive, Char> const* operand) BOOST_NOEXCEPT
     {
-        return any_cast<T>(const_cast<basic_hold_any<IArchive, OArchive, Char>*>(operand));
+        return any_cast<T>(const_cast<basic_any<IArchive, OArchive, Char>*>(operand));
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    T any_cast(basic_hold_any<IArchive, OArchive, Char>& operand)
+    T any_cast(basic_any<IArchive, OArchive, Char>& operand)
     {
         typedef BOOST_DEDUCED_TYPENAME detail::remove_reference<T>::type nonref;
 
@@ -929,7 +929,7 @@ namespace hpx { namespace util
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    T const& any_cast(basic_hold_any<IArchive, OArchive, Char> const& operand)
+    T const& any_cast(basic_any<IArchive, OArchive, Char> const& operand)
     {
         typedef BOOST_DEDUCED_TYPENAME detail::remove_reference<T>::type nonref;
 
@@ -939,16 +939,16 @@ namespace hpx { namespace util
         BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
 #endif
 
-        return any_cast<nonref const&>(const_cast<basic_hold_any<IArchive, OArchive, Char> &>(operand));
+        return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive, Char> &>(operand));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    typedef basic_hold_any<portable_binary_iarchive, portable_binary_oarchive> hold_any;
-    typedef basic_hold_any<portable_binary_iarchive, portable_binary_oarchive, wchar_t> whold_any;
+    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive> any;
+    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, wchar_t> wany;
 
-    typedef basic_hold_any<void, void, char> hold_any_nonser;
-    typedef basic_hold_any<void, void, wchar_t> whold_any_nonser;
+    typedef basic_any<void, void, char> any_nonser;
+    typedef basic_any<void, void, wchar_t> wany_nonser;
 
 }}    // namespace hpx::util
 

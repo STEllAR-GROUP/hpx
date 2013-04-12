@@ -6,15 +6,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/detail/hold_any.hpp>
+#include <hpx/util/any.hpp>
 
 #include <boost/serialization/access.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
-using hpx::util::hold_any;
-using hpx::util::hold_any_nonser;
+using hpx::util::any;
+using hpx::util::any_nonser;
 using hpx::util::any_cast;
 
 using hpx::init;
@@ -175,7 +175,7 @@ struct big_object
         )
     {
         std::cout << "big_object: call(" << x_ << ", " << y_
-                  << z_ << ", " << w_ << ")\n";
+                  << ", " << z_ << ", " << w_ << ")\n";
         return x_ + y_ + z_ + w_;
     }
 
@@ -220,9 +220,9 @@ int hpx_main(variables_map& vm)
 
             small_object const f(17);
 
-            hold_any any1(f);
-            hold_any any2(any1);
-            hold_any any3;
+            any any1(f);
+            any any2(any1);
+            any any3;
             any3 = any1;
 
             (any_cast<small_object>(any1)) (7);
@@ -238,9 +238,9 @@ int hpx_main(variables_map& vm)
 
             big_object const f(5, 12);
 
-            hold_any any1(f);
-            hold_any any2(any1);
-            hold_any any3 = any1;
+            any any1(f);
+            any any2(any1);
+            any any3 = any1;
 
             (any_cast<big_object>(any1)) (0, 1);
             (any_cast<big_object>(any2)) (1, 0);
@@ -257,9 +257,9 @@ int hpx_main(variables_map& vm)
 
             small_object const f(17);
 
-            hold_any_nonser any1_nonser(f);
-            hold_any_nonser any2_nonser(any1_nonser);
-            hold_any_nonser any3_nonser = any1_nonser;
+            any_nonser any1_nonser(f);
+            any_nonser any2_nonser(any1_nonser);
+            any_nonser any3_nonser = any1_nonser;
 
             (any_cast<small_object>(any1_nonser)) (2);
             (any_cast<small_object>(any2_nonser)) (4);
@@ -275,9 +275,9 @@ int hpx_main(variables_map& vm)
 
             big_object const f(5, 12);
 
-            hold_any_nonser any1_nonser(f);
-            hold_any_nonser any2_nonser(any1_nonser);
-            hold_any_nonser any3_nonser = any1_nonser;
+            any_nonser any1_nonser(f);
+            any_nonser any2_nonser(any1_nonser);
+            any_nonser any3_nonser = any1_nonser;
 
             (any_cast<big_object>(any1_nonser)) (3,4);
             (any_cast<big_object>(any2_nonser)) (5,6);

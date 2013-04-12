@@ -18,7 +18,7 @@ namespace std
 #endif
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/detail/hold_any.hpp>
+#include <hpx/util/any.hpp>
 
 #include "serialization_test_tools.hpp"
 
@@ -29,7 +29,7 @@ namespace std
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
-using hpx::util::basic_hold_any;
+using hpx::util::basic_any;
 
 using hpx::init;
 using hpx::finalize;
@@ -251,7 +251,7 @@ int hpx_main(variables_map& vm)
 
         small_object const f(17);
 
-        basic_hold_any<test_iarchive, test_oarchive> any(f);
+        basic_any<test_iarchive, test_oarchive> any(f);
 
         out(testfile, any);
         in(testfile, any);
@@ -265,7 +265,7 @@ int hpx_main(variables_map& vm)
 
         big_object const f(5, 12);
 
-        basic_hold_any<test_iarchive, test_oarchive> any(f);
+        basic_any<test_iarchive, test_oarchive> any(f);
 
         out(testfile, any);
         in(testfile, any);
