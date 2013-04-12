@@ -256,46 +256,14 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                 return MSG_SHUTDOWN;
             }
-            /*
-            std::cout << "server opcode: ";
-            switch (wc->opcode)
-            {
-                case IBV_WC_SEND:
-                    std::cout << "IBV_WC_SEND\n";
-                    break;
-                case IBV_WC_RDMA_WRITE:
-                    std::cout << "IBV_WC_RDMA_WRITE\n";
-                    break;
-                case IBV_WC_RDMA_READ:
-                    std::cout << "IBV_WC_RDMA_READ\n";
-                    break;
-                case IBV_WC_COMP_SWAP:
-                    std::cout << "IBV_WC_COMP_SWAP\n";
-                    break;
-                case IBV_WC_FETCH_ADD:
-                    std::cout << "IBV_WC_FETCH_ADD\n";
-                    break;
-                case IBV_WC_BIND_MW:
-                    std::cout << "IBV_WC_BIND_MW\n";
-                    break;
-                case IBV_WC_RECV:
-                    std::cout << "IBV_WC_RECV\n";
-                    break;
-                case IBV_WC_RECV_RDMA_WITH_IMM:
-                    std::cout << "IBV_WC_RDMA_WRITE\n";
-                    break;
-            }
-            */
 
             if(wc->opcode == IBV_WC_RECV)
             {
-                //std::cout << client_msg_->id << "\n";
                 switch(client_msg_->id)
                 {
                     case MSG_DATA:
                         return MSG_DATA;
                     case MSG_SHUTDOWN:
-                        std::cout << "server received shutdown ...\n";
                         return MSG_SHUTDOWN;
                     default:
                         return MSG_INVALID;
@@ -304,7 +272,6 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             if(wc->opcode == IBV_WC_SEND)
             {
-                //std::cout << server_msg_->id << "\n";
                 switch(server_msg_->id)
                 {
                     case MSG_DONE:
@@ -314,7 +281,6 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     case MSG_MR:
                         return MSG_MR;
                     case MSG_SHUTDOWN:
-                        std::cout << "server sent shutdown ...\n";
                         return MSG_SHUTDOWN;
                     default:
                         return MSG_INVALID;
@@ -322,20 +288,6 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 return MSG_INVALID;
             }
 
-            /*
-            if(wc->opcode == IBV_WC_RECV_RDMA_WITH_IMM)
-            {
-                //std::cout << "server IBV_WC_RECV: " << client_msg_->id << "\n";
-                switch(client_msg_->id)
-                {
-                    case MSG_DATA:
-                        return MSG_DATA;
-                    default:
-                        return MSG_INVALID;
-                }
-            }
-            */
-            //post_receive();
             return MSG_RETRY;
         }
         

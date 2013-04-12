@@ -287,40 +287,9 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
                 return MSG_SHUTDOWN;
             }
-            /*
-            std::cout << "client opcode: ";
-            switch (wc->opcode)
-            {
-                case IBV_WC_SEND:
-                    std::cout << "IBV_WC_SEND\n";
-                    break;
-                case IBV_WC_RDMA_WRITE:
-                    std::cout << "IBV_WC_RDMA_WRITE\n";
-                    break;
-                case IBV_WC_RDMA_READ:
-                    std::cout << "IBV_WC_RDMA_READ\n";
-                    break;
-                case IBV_WC_COMP_SWAP:
-                    std::cout << "IBV_WC_COMP_SWAP\n";
-                    break;
-                case IBV_WC_FETCH_ADD:
-                    std::cout << "IBV_WC_FETCH_ADD\n";
-                    break;
-                case IBV_WC_BIND_MW:
-                    std::cout << "IBV_WC_BIND_MW\n";
-                    break;
-                case IBV_WC_RECV:
-                    std::cout << "IBV_WC_RECV\n";
-                    break;
-                case IBV_WC_RECV_RDMA_WITH_IMM:
-                    std::cout << "IBV_WC_RDMA_WRITE\n";
-                    break;
-            }
-            */
 
             if(wc->opcode == IBV_WC_RECV)
             {
-                //std::cout << server_msg_->id << "\n";
                 switch(server_msg_->id)
                 {
                     case MSG_MR:
@@ -332,7 +301,6 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                     case MSG_DONE:
                         return MSG_DONE;
                     case MSG_SHUTDOWN:
-                        std::cout << "client received shutdown ...\n";
                         return MSG_SHUTDOWN;
                 }
                 return MSG_INVALID;
@@ -340,18 +308,9 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             if(wc->opcode == IBV_WC_SEND && client_msg_->id == MSG_SHUTDOWN)
             {
-                std::cout << "client sent shutdown ...\n";
                 return MSG_SHUTDOWN;
             }
             
-            /*
-            if(wc->opcode == IBV_WC_RDMA_WRITE)
-            {
-                return MSG_DATA;
-            }
-            */
-
-            //post_receive();
             return MSG_RETRY;
         }
         
