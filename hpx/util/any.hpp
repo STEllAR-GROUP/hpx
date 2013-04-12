@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2011 Hartmut Kaiser
+    Copyright (c) 2007-2013 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -9,7 +9,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
     The class hpx::util::any is built based on boost::spirit::hold_any class.
-    It adds support for HPX serialization.
+    It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 #ifndef HPX_UTIL_ANY_HPP
 #define HPX_UTIL_ANY_HPP
@@ -85,6 +85,7 @@ namespace hpx { namespace util
             void (*destruct)(void**);
             void (*clone)(void* const*, void**);
             void (*copy)(void* const*, void**);
+            bool (*equal_to)(void* const*, void* const*);
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
             std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
 
@@ -105,6 +106,7 @@ namespace hpx { namespace util
             void (*destruct)(void**);
             void (*clone)(void* const*, void**);
             void (*copy)(void* const*, void**);
+            bool (*equal_to)(void* const*, void* const*);
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
             std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
         };
@@ -160,6 +162,10 @@ namespace hpx { namespace util
                 {
                     *reinterpret_cast<T*>(dest) =
                         *reinterpret_cast<T const*>(src);
+                }
+                static bool equal_to(void* const* x, void* const* y)
+                {
+                    return (get(x) == get(y));
                 }
                 static std::basic_istream<Char>&
                 stream_in (std::basic_istream<Char>& i, void** obj)
@@ -224,6 +230,10 @@ namespace hpx { namespace util
                     **reinterpret_cast<T**>(dest) =
                         **reinterpret_cast<T* const*>(src);
                 }
+                static bool equal_to(void* const* x, void* const* y)
+                {
+                    return (get(x) == get(y));
+                }
                 static std::basic_istream<Char>&
                 stream_in(std::basic_istream<Char>& i, void** obj)
                 {
@@ -253,6 +263,7 @@ namespace hpx { namespace util
                 base_type::destruct = Vtable::destruct;
                 base_type::clone = Vtable::clone;
                 base_type::copy = Vtable::copy;
+                base_type::equal_to = Vtable::equal_to;
                 base_type::stream_in = Vtable::stream_in;
                 base_type::stream_out = Vtable::stream_out;
 
@@ -299,6 +310,7 @@ namespace hpx { namespace util
                 base_type::destruct = Vtable::destruct;
                 base_type::clone = Vtable::clone;
                 base_type::copy = Vtable::copy;
+                base_type::equal_to = Vtable::equal_to;
                 base_type::stream_in = Vtable::stream_in;
                 base_type::stream_out = Vtable::stream_out;
             }
@@ -339,6 +351,10 @@ namespace hpx { namespace util
         {
             template <typename Archive>
             void serialize(Archive & ar, unsigned) {}
+            bool operator==(empty const&) const 
+            {
+                return false; // always unequal
+            }
         };
 
         template <typename Char>
@@ -531,6 +547,46 @@ namespace hpx { namespace util
         basic_any& operator=(BOOST_FWD_REF(T) x)
         {
             return assign(boost::forward<T>(x));
+        }
+
+        // equality operator
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+        bool operator==(basic_any& x)
+#else
+        bool operator==(basic_any const& x)
+#endif
+        {
+            if (&x == this) // equal to self
+            {
+                return true;
+            }
+
+            if ((table == x.table) // same type
+               )
+            {
+                return table->equal_to(&object, &x.object); // equal value?
+            }
+
+            return false;
+
+        }
+
+        // equality operator
+        template <typename T>
+        bool operator==(BOOST_FWD_REF(T) x)
+        {
+            typedef typename boost::remove_const<
+                typename util::detail::remove_reference<T>::type
+            >::type value_type;
+
+            if ((type() == BOOST_SP_TYPEID(value_type)) // same type
+               )
+            {
+                value_type val = cast<value_type>();
+                return val == x;
+            }
+
+            return false;
         }
 
         // utility functions
@@ -798,6 +854,46 @@ namespace hpx { namespace util
         basic_any& operator=(BOOST_FWD_REF(T) x)
         {
             return assign(boost::forward<T>(x));
+        }
+
+        // equality operator
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+        bool operator==(basic_any& x)
+#else
+        bool operator==(basic_any const& x)
+#endif
+        {
+            if (&x == this) // equal to self
+            {
+                return true;
+            }
+
+            if ((table == x.table) // same type
+               )
+            {
+                return table->equal_to(&object, &x.object); // equal value?
+            }
+
+            return false;
+
+        }
+
+        // equality operator
+        template <typename T>
+        bool operator==(BOOST_FWD_REF(T) x)
+        {
+            typedef typename boost::remove_const<
+                typename util::detail::remove_reference<T>::type
+            >::type value_type;
+
+            if ((type() == BOOST_SP_TYPEID(value_type)) // same type
+               )
+            {
+                value_type val = cast<value_type>();
+                return val == x;
+            }
+
+            return false;
         }
 
         // utility functions
