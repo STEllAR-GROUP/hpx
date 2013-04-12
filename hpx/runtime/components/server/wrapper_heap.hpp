@@ -318,7 +318,7 @@ namespace hpx { namespace components { namespace detail
 
                 {
                     hpx::util::unlock_the_lock<scoped_lock> ul(lk);
-                    applier::unbind_range(base_gid, step_);
+                    applier::unbind_range(base_gid_, step_);
                 }
             }
 

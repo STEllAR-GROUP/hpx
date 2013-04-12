@@ -208,7 +208,7 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return mask_type();
     } // }}}
 
     mask_type hwloc_topology::get_numa_node_affinity_mask(
@@ -232,7 +232,7 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return mask_type();
     } // }}}
 
     mask_type hwloc_topology::get_core_affinity_mask(
@@ -256,7 +256,7 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return mask_type();
     }
 
     mask_type hwloc_topology::get_thread_affinity_mask(
@@ -280,13 +280,13 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return mask_type();
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
     void hwloc_topology::set_thread_affinity_mask(
         boost::thread&
-      , mask_type //mask
+      , mask_type const & //mask
       , error_code& ec
         ) const
     {
@@ -295,15 +295,15 @@ namespace hpx { namespace threads
     }
 
     void hwloc_topology::set_thread_affinity_mask(
-        mask_type mask
+        mask_type const & mask
       , error_code& ec
         ) const
     { // {{{
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
-        for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+        for (std::size_t i = 0; i < mask.size(); ++i)
         {
-            if (mask & (static_cast<std::size_t>(1) << i))
+            if (mask.test(i))
             {
                 hwloc_bitmap_set(cpuset, static_cast<unsigned int>(i));
             }
@@ -349,7 +349,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+        return mask_type();
     } // }}}
 
     std::size_t hwloc_topology::init_node_number(
@@ -403,7 +403,7 @@ namespace hpx { namespace threads
             if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
             {
                 do {
-                    mask |= (static_cast<mask_type>(1) << obj->os_index);
+                    mask.set(obj->os_index);
                     {
                         scoped_lock lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
@@ -563,7 +563,7 @@ namespace hpx { namespace threads
 
     mask_type hwloc_topology::init_machine_affinity_mask() const
     { // {{{
-        mask_type machine_affinity_mask = 0;
+        mask_type machine_affinity_mask(hardware_concurrency());
 
         hwloc_obj_t machine_obj;
         {
@@ -579,7 +579,7 @@ namespace hpx { namespace threads
         HPX_THROW_EXCEPTION(kernel_error
           , "hpx::threads::hwloc_topology::init_machine_affinity_mask"
           , "failed to initialize machine affinity mask");
-        return 0;
+        return mask_type();
     } // }}}
 
     mask_type hwloc_topology::init_socket_affinity_mask_from_socket(
@@ -601,7 +601,7 @@ namespace hpx { namespace threads
 
         if (socket_obj)
         {
-            mask_type socket_affinity_mask = 0;
+            mask_type socket_affinity_mask(hardware_concurrency());
             extract_node_mask(socket_obj, socket_affinity_mask);
             return socket_affinity_mask;
         }
@@ -630,7 +630,7 @@ namespace hpx { namespace threads
 
         if (numa_node_obj)
         {
-            mask_type node_affinity_mask = 0;
+            mask_type node_affinity_mask(hardware_concurrency());
             extract_node_mask(numa_node_obj, node_affinity_mask);
             return node_affinity_mask;
         }
@@ -639,7 +639,7 @@ namespace hpx { namespace threads
     } // }}}
 
     mask_type hwloc_topology::init_core_affinity_mask_from_core(
-        std::size_t core, mask_type default_mask
+        std::size_t core, mask_type const & default_mask
         ) const
     { // {{{
         if (std::size_t(-1) == core)
@@ -655,7 +655,7 @@ namespace hpx { namespace threads
 
         if (core_obj)
         {
-            mask_type core_affinity_mask = 0;
+            mask_type core_affinity_mask(hardware_concurrency());
             extract_node_mask(core_obj, core_affinity_mask);
             return core_affinity_mask;
         }
@@ -688,9 +688,9 @@ namespace hpx { namespace threads
             return get_core_affinity_mask(num_thread, false);
         }
 
-        mask_type mask = 0x0u;
+        mask_type mask(hardware_concurrency());
 
-        mask |= (static_cast<mask_type>(1) << obj->os_index);
+        mask.set(obj->os_index);
 
         return mask;
     } // }}}

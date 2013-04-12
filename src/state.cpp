@@ -40,7 +40,7 @@ namespace hpx
                 // we're probably either starting or stopping
                 return (mask & (starting | stopping)) ? true : false;
             }
-            return (rt->get_agas_client().status() & mask) ? true : false;
+            return (rt->get_agas_client().get_status() & mask) ? true : false;
         }
     }
 }

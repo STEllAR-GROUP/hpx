@@ -145,7 +145,7 @@ void addressing_service::launch_bootstrap(
 
     get_big_boot_barrier().wait();
 
-    state_.store(running);
+    set_status(running);
 } // }}}
 
 void addressing_service::launch_hosted()
@@ -154,7 +154,7 @@ void addressing_service::launch_hosted()
 
     get_big_boot_barrier().wait(&hosted->primary_ns_server_);
 
-    state_.store(running);
+    set_status(running);
 } // }}}
 
 void addressing_service::adjust_local_cache_size()
@@ -316,7 +316,7 @@ bool addressing_service::get_console_locality(
     )
 { // {{{
     try {
-        if (status() != running)
+        if (get_status() != running)
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -744,6 +744,9 @@ bool addressing_service::get_id_range(
         if (is_bootstrap())
             rep = bootstrap->locality_ns_server_.service(req, ec);
 
+        else if (get_status() == running)
+            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+
         else
         {
             // WARNING: this deadlocks if AGAS is unresponsive and all response
@@ -771,7 +774,7 @@ bool addressing_service::get_id_range(
             // execute the action (synchronously)
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
-
+            
             cf.set_ok();
         }
 
@@ -786,15 +789,15 @@ bool addressing_service::get_id_range(
         return success == s;
     }
     catch (hpx::exception const& e) {
-        // Replace the future in the pool. To be able to return the future to
-        // the pool, we'd have to ensure that all threads (pending, suspended,
-        // active, or in flight) that might read/write from it are aborted.
-        // There's no guarantee that the future isn't corrupted in some other
-        // way, and the aforementioned code would be lengthy, and would have to
-        // be meticulously exception-free. So, for now, we just allocate a new
-        // future for the pool, and let the old future stay in memory.
         if (f && !is_bootstrap())
         {
+            // Replace the future in the pool. To be able to return the future to
+            // the pool, we'd have to ensure that all threads (pending, suspended,
+            // active, or in flight) that might read/write from it are aborted.
+            // There's no guarantee that the future isn't corrupted in some other
+            // way, and the aforementioned code would be lengthy, and would have to
+            // be meticulously exception-free. So, for now, we just allocate a new
+            // future for the pool, and let the old future stay in memory.
             {
                 lock_semaphore lock(hosted->promise_pool_semaphore_);
                 hosted->locality_promise_pool_.enqueue(new future_type);

@@ -16,9 +16,4 @@ if(HPX_HAVE_CXX11_LAMBDAS)
       HEADER_GLOB "*.h*"
       ${jacobi_component_FLAGS}
       FOLDER "Examples/Jacobi")
-
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-      set_target_properties(jacobi_component PROPERTIES COMPILE_FLAGS "-fPIC")
-  endif()
-
 endif()

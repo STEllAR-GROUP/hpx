@@ -102,6 +102,7 @@ namespace hpx
             connection_tcpip = 0,
             connection_shmem = 1,
             connection_portals4 = 2,
+            connection_ibverbs = 3,
             connection_last
         };
 
@@ -129,6 +130,8 @@ namespace hpx
             parcelhandler* ph, char const* name, char const* type, std::size_t num,
             std::size_t interval, naming::locality const& l, connection_type t,
             error_code& ec = throws);
+
+        HPX_API_EXPORT void flush_buffers();
     }
 
     /// \namespace threads

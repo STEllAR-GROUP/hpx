@@ -125,10 +125,19 @@ macro(add_hpx_executable name)
     endif()
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-    target_link_libraries(${name}_exe
-      ${${name}_DEPENDENCIES}
-      ${${name}_COMPONENT_DEPENDENCIES}
-      ${hpx_libs})
+
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+      target_link_libraries(${name}_exe
+        ${${name}_DEPENDENCIES}
+        ${${name}_COMPONENT_DEPENDENCIES}
+        ${hpx_libs}
+        imf svml irng intlc)
+    else()
+      target_link_libraries(${name}_exe
+        ${${name}_DEPENDENCIES}
+        ${${name}_COMPONENT_DEPENDENCIES}
+        ${hpx_libs})
+    endif()
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_PREFIX=\"${HPX_PREFIX}\""

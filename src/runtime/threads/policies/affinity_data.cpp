@@ -10,12 +10,19 @@
 #include <algorithm>
 
 #include <boost/format.hpp>
+#include <boost/foreach.hpp>
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
     inline std::size_t count_initialized(std::vector<mask_type> const& masks)
     {
-        return masks.size() - std::count(masks.begin(), masks.end(), 0);
+        std::size_t count = 0;
+        BOOST_FOREACH(mask_type const & m, masks)
+        {
+            if(!m.any())
+                ++count;
+        }
+        return count;
     }
 
     affinity_data::affinity_data(std::size_t num_threads, 
@@ -26,7 +33,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
 #if defined(HPX_HAVE_HWLOC)
         if (!affinity_desc.empty()) {
-            affinity_masks_.resize(num_threads, 0);
+            affinity_masks_.resize(num_threads);
             parse_affinity_options(affinity_desc, affinity_masks_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);

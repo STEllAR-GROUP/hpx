@@ -295,14 +295,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     void adjust_local_cache_size();
 
-    state status() const
+    state get_status() const
     {
         if (!hosted && !bootstrap)
             return stopping;
         return state_.load();
     }
 
-    void status(state new_state)
+    void set_status(state new_state)
     {
         state_.store(new_state);
     }
