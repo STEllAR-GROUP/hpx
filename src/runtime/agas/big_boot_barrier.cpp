@@ -321,12 +321,13 @@ void register_console(registration_header const& header)
                 prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
                 locality_addr, primary_addr, component_addr, symbol_addr));
 
-    HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
-        (boost::bind(&big_boot_barrier::apply
-                   , boost::ref(get_big_boot_barrier())
-                   , naming::get_locality_id_from_gid(prefix)
-                   , naming::address(header.locality)
-                   , p));
+    HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        boost::bind(
+            &big_boot_barrier::apply
+          , boost::ref(get_big_boot_barrier())
+          , naming::get_locality_id_from_gid(prefix)
+          , naming::address(header.locality)
+          , p));
 
     get_big_boot_barrier().add_thunk(thunk);
 }
@@ -344,7 +345,7 @@ void notify_console(notification_header const& header)
     runtime& rt = get_runtime();
     naming::resolver_client& agas_client = rt.get_agas_client();
 
-    if (HPX_UNLIKELY(agas_client.status() != starting))
+    if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
         hpx::util::osstream strm;
         strm << "locality "
@@ -506,12 +507,12 @@ void register_worker(registration_header const& header)
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
-    if (agas_client.status() != starting)
+    if (agas_client.get_status() != starting)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
         get_big_boot_barrier().apply(naming::get_locality_id_from_gid(prefix)
-                                   , naming::address(header.locality), p);
+          , naming::address(header.locality), p);
     }
 
     else // AGAS is starting up; this locality is participating in startup
