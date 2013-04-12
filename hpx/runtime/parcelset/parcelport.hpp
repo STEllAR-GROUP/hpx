@@ -15,6 +15,7 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <string>
 #include <map>
@@ -260,7 +261,7 @@ namespace hpx { namespace parcelset
 
         std::size_t get_pending_parcels_count(bool /*reset*/)
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             return pending_parcels_.size();
         }
 
@@ -288,7 +289,7 @@ namespace hpx { namespace parcelset
 
     protected:
         /// mutex for all of the member data
-        mutable util::spinlock mtx_;
+        mutable lcos::local::spinlock mtx_;
 
         /// The handler for all incoming requests.
         server::parcelport_queue parcels_;

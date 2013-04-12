@@ -110,7 +110,7 @@ namespace hpx { namespace parcelset
         // to be sent anymore (some other thread already picked them up)
         // or if there are parcels, but the parcel we were about to sent
         // has been already processed.
-        util::spinlock::scoped_lock l(mtx_);
+        lcos::local::spinlock::scoped_lock l(mtx_);
 
         iterator it = pending_parcels_.find(locality_id);
         if (it != pending_parcels_.end())

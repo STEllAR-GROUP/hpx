@@ -116,7 +116,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         {
             // cancel all pending read operations, close those sockets
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             BOOST_FOREACH(server::shmem::parcelport_connection_ptr c,
                 accepted_connections_)
             {
@@ -166,7 +166,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             {
                 // keep track of all the accepted connections
-                util::spinlock::scoped_lock l(mtx_);
+                lcos::local::spinlock::scoped_lock l(mtx_);
                 accepted_connections_.insert(c);
             }
 
@@ -177,7 +177,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
         else {
             // remove this connection from the list of known connections
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             accepted_connections_.erase(conn);
         }
     }
@@ -196,7 +196,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 << e.message();
 
             // remove this connection from the list of known connections
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             accepted_connections_.erase(c);
         }
     }
@@ -212,7 +212,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         // enqueue the incoming parcel ...
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
 
             mapped_type& e = pending_parcels_[locality_id];
             e.first.push_back(p);
@@ -238,7 +238,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::vector<write_handler_type> handlers;
 
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
             if (it != pending_parcels_.end())
@@ -274,7 +274,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::vector<write_handler_type> handlers;
 
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
             if (it != pending_parcels_.end())

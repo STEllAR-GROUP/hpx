@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         connection_cache_.shutdown();
         {
             // cancel all pending read operations, close those sockets
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             BOOST_FOREACH(server::ibverbs::parcelport_connection_ptr c,
                 accepted_connections_)
             {
@@ -163,7 +163,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             {
                 // keep track of all the accepted connections
-                util::spinlock::scoped_lock l(mtx_);
+                lcos::local::spinlock::scoped_lock l(mtx_);
                 accepted_connections_.insert(c);
             }
 
@@ -174,7 +174,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
         else {
             // remove this connection from the list of known connections
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             accepted_connections_.erase(conn);
         }
     }
@@ -193,7 +193,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 << e.message();
 
             // remove this connection from the list of known connections
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             accepted_connections_.erase(c);
         }
     }
@@ -225,7 +225,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         // enqueue the outgoing parcels ...
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
 
             mapped_type& e = pending_parcels_[locality_id];
             for (std::size_t i = 0; i != parcels.size(); ++i)
@@ -264,7 +264,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         // enqueue the outgoing parcel ...
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
 
             mapped_type& e = pending_parcels_[locality_id];
             e.first.push_back(p);
@@ -300,7 +300,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         std::vector<write_handler_type> handlers;
 
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
             if (it != pending_parcels_.end())
@@ -336,7 +336,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         std::vector<write_handler_type> handlers;
 
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
             if (it != pending_parcels_.end())
@@ -534,7 +534,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
     
     int parcelport::io_service_index()
     {
-        util::spinlock::scoped_lock l(mtx_);
+        lcos::local::spinlock::scoped_lock l(mtx_);
         io_service_index_++;
         if(static_cast<std::size_t>(io_service_index_) == io_service_pool_.size())
         {
