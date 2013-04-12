@@ -257,6 +257,14 @@ if(CMAKE_Fortran_COMPILER)
   endif()
 endif()
 
+# If we are compiling with an intel compiler, we need to override the default
+# boost compiler config in order to have proper C++11 detection for more
+# recent intel compiler versions (>12.0)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    hpx_add_definitions(-DBOOST_COMPILER_CONFIG="${CMAKE_SOURCE_DIR}/hpx/config/boost/compiler/intel.hpp")
+endif()
+
+
 hpx_include(CompilerFlags)
 
 ################################################################################
@@ -304,6 +312,19 @@ if(${BOOST_MINOR_VERSION} GREATER 51)
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_SHMEM)
   endif()
 endif()
+
+################################################################################
+# Decide whether to use rdma based ibverbs parcelport
+################################################################################
+find_package(HPX_Ibverbs)
+find_package(HPX_Rdmacm)
+if(IBVERBS_FOUND AND RDMACM_FOUND)
+  hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+  if(HPX_USE_PARCELPORT_IBVERBS)
+    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_IBVERBS)
+  endif()
+endif()
+
 
 ################################################################################
 # Logging configuration
@@ -877,6 +898,8 @@ else()
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
 
+
+
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
   hpx_use_flag_if_available(-Werror=vla LANGUAGES CXX C)
 
@@ -946,6 +969,40 @@ else()
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_use_flag_if_available(-Wno-cast-align)
+  endif()
+
+  ##############################################################################
+  # ICPC-only configuration
+  ##############################################################################
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    # Disable the following warnings:
+    # #1170: invalid redeclaration of nested class
+    # #858: type qualifier on return type is meaningless
+    # #1098: the qualifier on this friend declaration is ignored
+    # #488: template parameter not used in declaring the parameter type
+    hpx_use_flag_if_available(-wd1170)
+    hpx_use_flag_if_available(-wd858)
+    hpx_use_flag_if_available(-wd1098)
+    hpx_use_flag_if_available(-wd488)
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+      ## FIXME: figure out which flags can be used with HPX
+      #hpx_use_flag_if_available(-opt-calloc)
+      #hpx_use_flag_if_available(-inline-calloc)
+      #hpx_use_flag_if_available(-ip)
+      #hpx_use_flag_if_available(-ipo)
+      #hpx_use_flag_if_available(-opt-class-analysis)
+      #hpx_use_flag_if_available(-opt-multi-version-aggressive)
+      #hpx_use_flag_if_available(-xHost)
+      #hpx_use_flag_if_available(-fno-alias)
+      #hpx_use_flag_if_available(-fbuiltin)
+      #hpx_use_flag_if_available(-finline)
+      #hpx_use_flag_if_available(-fma)
+      #hpx_use_flag_if_available(-fno-implicit-inline-templates)
+      #hpx_use_flag_if_available(-fno-implicit-templates)
+      #hpx_use_flag_if_available(-ftls-model=initial-exec)
+    endif()
   endif()
 
   ##############################################################################
@@ -1432,7 +1489,14 @@ foreach(library ${BOOST_LIBRARIES})
     "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
 endforeach()
 
-get_directory_property(external_definitions DEFINITIONS)
+get_directory_property(definitions DEFINITIONS)
+
+set(external_definitions "")
+
+foreach(definition ${definitions})
+    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
+    set(external_definitions "${external_definitions} ${definition}")
+endforeach()
 
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 

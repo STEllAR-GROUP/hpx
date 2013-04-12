@@ -29,6 +29,7 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
     // received vector in
     if (--counter == 0) return;
 
+
     // send it to remote locality (to), and wait until it is received
     std::vector<double> data(in);
 
@@ -61,8 +62,17 @@ int hpx_main(boost::program_options::variables_map &b_arg)
     std::size_t const vsize = b_arg["vsize"].as<std::size_t>();
     std::size_t const numiter = b_arg["numiter"].as<std::size_t>() * 2;
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    hpx::naming::id_type to = localities.back(); // send to last element
+    std::vector<hpx::naming::id_type> localities = hpx::find_remote_localities();
+
+    hpx::naming::id_type to;
+    if(localities.size() == 0)
+    {
+        to = hpx::find_here();
+    }
+    else
+    {
+        to = localities[0]; // send to first remote locality
+    }
 
     // test sending messages back and forth using a larger vector as one of 
     // the arguments
@@ -78,12 +88,16 @@ int hpx_main(boost::program_options::variables_map &b_arg)
 
         double time = timer1.elapsed();
 
-        std::cout << "[hpx_pingpong]:total_time(secs)=" << time << ":vsize="
-                  << vsize << ":localities=" << localities.size()
+        std::cout << "[hpx_pingpong]"
+                  << ":total_time(secs)=" << time
+                  << ":vsize=" << vsize
+                  << ":bandwidth(GB/s)=" << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024
+                  << ":localities=" << localities.size()
                   << ":numiter=" << numiter << std::endl;
     }
 
     // do the same but with a wrapped vector
+    /*
     {
         boost::shared_ptr<std::vector<double> > data(
             boost::make_shared<std::vector<double> >(vsize, double(3.11)));
@@ -97,10 +111,14 @@ int hpx_main(boost::program_options::variables_map &b_arg)
 
         double time = timer1.elapsed();
 
-        std::cout << "[hpx_pingpong]:total_time_ind(secs)=" << time << ":vsize="
-                  << vsize << ":localities=" << localities.size()
+        std::cout << "[hpx_pingpong]"
+                  << ":total_time(secs)=" << time
+                  << ":vsize=" << vsize
+                  << ":bandwidth(GB/s)=" << (vsize * sizeof(double) * numiter) / (time * 1024 * 1024)
+                  << ":localities=" << localities.size()
                   << ":numiter=" << numiter << std::endl;
     }
+    */
 
     hpx::finalize();
     return 0;

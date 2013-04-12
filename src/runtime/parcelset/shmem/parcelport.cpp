@@ -10,6 +10,7 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -24,32 +25,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace shmem
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        struct call_for_each
-        {
-            typedef void result_type;
-
-            typedef std::vector<parcelport::write_handler_type> data_type;
-            data_type fv_;
-
-            call_for_each(data_type const& fv)
-              : fv_(fv)
-            {}
-
-            result_type operator()(
-                boost::system::error_code const& e,
-                std::size_t bytes_written) const
-            {
-                BOOST_FOREACH(parcelport::write_handler_type f, fv_)
-                {
-                    f(e, bytes_written);
-                }
-            }
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
@@ -141,7 +116,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         {
             // cancel all pending read operations, close those sockets
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             BOOST_FOREACH(server::shmem::parcelport_connection_ptr c,
                 accepted_connections_)
             {
@@ -191,7 +166,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             {
                 // keep track of all the accepted connections
-                util::spinlock::scoped_lock l(mtx_);
+                lcos::local::spinlock::scoped_lock l(mtx_);
                 accepted_connections_.insert(c);
             }
 
@@ -202,7 +177,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
         else {
             // remove this connection from the list of known connections
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             accepted_connections_.erase(conn);
         }
     }
@@ -221,7 +196,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 << e.message();
 
             // remove this connection from the list of known connections
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             accepted_connections_.erase(c);
         }
     }
@@ -237,7 +212,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         // enqueue the incoming parcel ...
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
 
             mapped_type& e = pending_parcels_[locality_id];
             e.first.push_back(p);
@@ -263,7 +238,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::vector<write_handler_type> handlers;
 
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
             if (it != pending_parcels_.end())
@@ -299,7 +274,7 @@ namespace hpx { namespace parcelset { namespace shmem
         std::vector<write_handler_type> handlers;
 
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(locality_id);
 
             if (it != pending_parcels_.end())
@@ -339,7 +314,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         // ... start an asynchronous write operation now.
         client_connection->async_write(
-            detail::call_for_each(handlers),
+            hpx::parcelset::detail::call_for_each(handlers),
             boost::bind(&parcelport::send_pending_parcels_trampoline, this,
                 boost::asio::placeholders::error, ::_2, ::_3));
     }
@@ -445,7 +420,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "tcp::parcelport::get_connection_cache_statistics",
+            "shmem::parcelport::get_connection_cache_statistics",
             "invalid connection cache statistics type");
         return 0;
     }

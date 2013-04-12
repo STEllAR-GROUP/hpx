@@ -76,7 +76,7 @@ struct deque_anchor
     typedef typename node::tag_t tag_t;
 
     typedef tagged_ptr_pair<node, node> pair;
-    typedef atomic<pair> atomic_pair;
+    typedef boost::atomic<pair> atomic_pair;
 
   private:
     atomic_pair pair_;

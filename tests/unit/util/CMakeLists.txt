@@ -9,6 +9,7 @@ set(tests
     hold_any
     hold_any_serialization
     merging_map
+    parse_slurm_nodelist
    )
 
 set(merging_map_FLAGS NOLIBS)

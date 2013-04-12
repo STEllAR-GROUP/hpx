@@ -774,7 +774,7 @@ bool addressing_service::get_id_range(
             // execute the action (synchronously)
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
-
+            
             cf.set_ok();
         }
 

@@ -174,7 +174,7 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        threads::mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
             return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
         }
@@ -184,7 +184,7 @@ namespace hpx { namespace threads { namespace policies
             return num_thread;
         }
 
-        std::size_t get_num_stolen_threads(std::size_t num_thread, bbool reset) const
+        std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset) const
         {
             return 0;
         }

@@ -30,6 +30,11 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#if defined(_POSIX_VERSION)
+#include <sys/syscall.h>
+#include <sys/resource.h>
+#endif
+
 #include <numeric>
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
@@ -104,7 +109,7 @@ namespace hpx { namespace threads
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
         notifier_(notifier),
-        used_processing_units_(0)
+        used_processing_units_(hardware_concurrency())
     {
         for (std::size_t i = 0; i < num_threads; ++i)
             used_processing_units_ |= scheduler_.get_pu_mask(get_topology(), i);
@@ -1106,6 +1111,22 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         tfunc(std::size_t num_thread)
     {
+        
+        // Setting priority of worker threads to a lower priority, this needs to
+        // be done in order to give the parcel pool threads higher priority
+#if defined(_POSIX_VERSION)
+        {
+            pid_t tid;
+            tid = syscall(SYS_gettid);
+            int ret = setpriority(PRIO_PROCESS, tid, 19);
+            if(ret != 0)
+            {
+                HPX_THROW_EXCEPTION(no_success,
+                    "threadmanager_impl::run", "setpriority returned an error");
+            }
+        }
+#endif
+
         // wait for all threads to start up before before starting px work
         startup_->wait();
 
@@ -1785,7 +1806,7 @@ namespace hpx { namespace threads
 
         // set affinity on Linux systems or when using HWLOC
         topology const& topology_ = get_topology();
-        std::size_t mask = get_pu_mask(topology_, num_thread);
+        threads::mask_type mask = get_pu_mask(topology_, num_thread);
 
         LTM_(info) << "tfunc(" << num_thread
             << "): will run on one processing unit within this mask: "
@@ -1926,6 +1947,9 @@ namespace hpx { namespace threads
                     scheduler_.destroy_thread(thrd, busy_loop_count);
 
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
+                // If we idle for some time, yield control to the OS scheduler
+                // so other threads (like for example the parcelpool threads)
+                // may be scheduled
             }
 
             // if nothing else has to be done either wait or terminate
@@ -1977,6 +2001,7 @@ namespace hpx { namespace threads
                 "threadmanager_impl::run", "number of threads is zero");
         }
 
+
         mutex_type::scoped_lock lk(mtx_);
         if (!threads_.empty() || (state_.load() == running))
             return true;    // do nothing if already running
@@ -1999,7 +2024,7 @@ namespace hpx { namespace threads
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                std::size_t mask = get_pu_mask(topology_, thread_num);
+                threads::mask_type mask = get_pu_mask(topology_, thread_num);
 
                 LTM_(info) << "run: create OS thread " << thread_num
                     << ": will run on one processing unit within this mask: "
