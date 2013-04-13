@@ -6,6 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/static.hpp>
 
@@ -17,7 +18,7 @@
 
 #if !defined(HPX_HAVE_HWLOC)
 
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
     mask_type noop_topology::empty_mask = mask_type();
 }}
