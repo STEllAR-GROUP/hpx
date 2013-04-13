@@ -32,6 +32,7 @@
 #include <boost/throw_exception.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/assert.hpp>
 #include <boost/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 
@@ -550,21 +551,16 @@ namespace hpx { namespace util
         }
 
         // equality operator
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        bool operator==(basic_any& x)
-#else
-        bool operator==(basic_any const& x)
-#endif
+        friend bool operator==(basic_any const& x, basic_any const& y)
         {
-            if (&x == this) // equal to self
+            if (&x == &y) // same object
             {
                 return true;
             }
 
-            if ((table == x.table) // same type
-               )
+            if (x.table == y.table) // same type
             {
-                return table->equal_to(&object, &x.object); // equal value?
+                return x.table->equal_to(&x.object, &y.object); // equal value?
             }
 
             return false;
@@ -573,20 +569,24 @@ namespace hpx { namespace util
 
         // equality operator
         template <typename T>
-        bool operator==(BOOST_FWD_REF(T) x)
+        friend bool operator==(basic_any const& b, const T& x)
         {
             typedef typename boost::remove_const<
                 typename util::detail::remove_reference<T>::type
             >::type value_type;
 
-            if ((type() == BOOST_SP_TYPEID(value_type)) // same type
-               )
+            if (b.type() == BOOST_SP_TYPEID(value_type)) // same type
             {
-                value_type val = cast<value_type>();
-                return val == x;
+                return b.cast<value_type>() == x;
             }
 
             return false;
+        }
+
+        template <typename T>
+        friend bool operator==(const T& x, basic_any const& b)
+        {
+            return b == x;
         }
 
         // utility functions
@@ -857,21 +857,16 @@ namespace hpx { namespace util
         }
 
         // equality operator
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        bool operator==(basic_any& x)
-#else
-        bool operator==(basic_any const& x)
-#endif
+        friend bool operator==(basic_any const& x, basic_any const& y)
         {
-            if (&x == this) // equal to self
+            if (&x == &y) // same object
             {
                 return true;
             }
 
-            if ((table == x.table) // same type
-               )
+            if (x.table == y.table) // same type
             {
-                return table->equal_to(&object, &x.object); // equal value?
+                return x.table->equal_to(&x.object, &y.object); // equal value?
             }
 
             return false;
@@ -880,20 +875,24 @@ namespace hpx { namespace util
 
         // equality operator
         template <typename T>
-        bool operator==(BOOST_FWD_REF(T) x)
+        friend bool operator==(basic_any const& b, const T& x)
         {
             typedef typename boost::remove_const<
                 typename util::detail::remove_reference<T>::type
             >::type value_type;
 
-            if ((type() == BOOST_SP_TYPEID(value_type)) // same type
-               )
+            if (b.type() == BOOST_SP_TYPEID(value_type)) // same type
             {
-                value_type val = cast<value_type>();
-                return val == x;
+                return b.cast<value_type>() == x;
             }
 
             return false;
+        }
+
+        template <typename T>
+        friend bool operator==(const T& x, basic_any const& b)
+        {
+            return b == x;
         }
 
         // utility functions
