@@ -353,7 +353,11 @@ namespace hpx { namespace util
             void serialize(Archive & ar, unsigned) {}
             bool operator==(empty const&) const 
             {
-                return false; // always unequal
+                return false; // undefined
+            }
+            bool operator!=(empty const&) const 
+            {
+                return false; // undefined
             }
         };
 
@@ -566,9 +570,8 @@ namespace hpx { namespace util
 
         }
 
-        // equality operator
         template <typename T>
-        friend bool operator==(basic_any const& b, const T& x)
+        friend bool operator==(basic_any const& b, T const& x)
         {
             typedef typename boost::remove_const<
                 typename util::detail::remove_reference<T>::type
@@ -583,9 +586,27 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        friend bool operator==(const T& x, basic_any const& b)
+        friend bool operator==(T const& x, basic_any const& b)
         {
             return b == x;
+        }
+
+        // inequality operator
+        friend bool operator!=(basic_any const& x, basic_any const& y)
+        {
+            return !(x==y);
+        }
+
+        template <typename T>
+        friend bool operator!=(basic_any const& b, T const& x)
+        {
+            return !(b==x);
+        }
+
+        template <typename T>
+        friend bool operator!=(T const& x, basic_any const& b)
+        {
+            return !(b==x);
         }
 
         // utility functions
