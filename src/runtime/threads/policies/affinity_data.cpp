@@ -19,13 +19,13 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::size_t count = 0;
         BOOST_FOREACH(mask_type const & m, masks)
         {
-            if(!m.any())
+            if(!any(m))
                 ++count;
         }
         return count;
     }
 
-    affinity_data::affinity_data(std::size_t num_threads, 
+    affinity_data::affinity_data(std::size_t num_threads,
             std::size_t pu_offset, std::size_t pu_step,
             std::string const& affinity_domain, std::string const& affinity_desc)
       : pu_offset_(pu_offset), pu_step_(pu_step),
@@ -49,7 +49,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 #endif
     }
 
-    mask_type affinity_data::get_pu_mask(topology const& topology, 
+    mask_cref_type affinity_data::get_pu_mask(topology const& topology,
         std::size_t num_thread, bool numa_sensitive) const
     {
         // if we have individual, predefined affinity masks, return those

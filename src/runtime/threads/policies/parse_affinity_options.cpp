@@ -528,7 +528,7 @@ namespace hpx { namespace threads { namespace detail
 
             // set each thread affinity only once
             BOOST_ASSERT(*it < static_cast<boost::int64_t>(affinities.size()));
-            if (affinities[*it].any())
+            if (any(affinities[*it]))
             {
                 HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
                     boost::str(boost::format("affinity mask for thread %1% has "

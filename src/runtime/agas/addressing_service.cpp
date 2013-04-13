@@ -774,7 +774,7 @@ bool addressing_service::get_id_range(
             // execute the action (synchronously)
             f->apply(bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
-            
+
             cf.set_ok();
         }
 
@@ -2086,7 +2086,7 @@ void addressing_service::send_refcnt_requests_sync(
         if (success != rep.get_status())
         {
             HPX_THROWS_IF(ec, rep.get_status(),
-                "addressing_service::send_refcnt_requests_sync", 
+                "addressing_service::send_refcnt_requests_sync",
                 "could not decrement reference count");
             return;
         }

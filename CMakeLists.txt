@@ -176,6 +176,15 @@ else()
 endif()
 
 ###############################################################################
+# Configure upper limit for number of threads, this is important for XeonPhi
+###############################################################################
+hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
+    "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
+if(HPX_USE_MORE_THAN_64_THREADS)
+  hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
+endif()
+
+###############################################################################
 # Configure compression and other plugins
 ###############################################################################
 add_hpx_pseudo_target(plugins)

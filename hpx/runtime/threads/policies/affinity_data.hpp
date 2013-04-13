@@ -27,8 +27,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             std::size_t pu_step, std::string const& affinity_domain, 
             std::string const& affinity_desc);
 
-        mask_type get_pu_mask(topology const& topology, std::size_t num_thread,
-            bool numa_sensitive) const;
+        mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread, bool numa_sensitive) const;
 
         std::size_t get_pu_num(std::size_t num_thread) const;
 

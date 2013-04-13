@@ -314,24 +314,21 @@ namespace hpx { namespace threads { namespace policies
 
             if (0 == added) {
                 // steal work items: first try to steal from other cores in the
-                // same numa node
-                mask_type core_mask = topology_.get_thread_affinity_mask(
+                // same NUMA node
+                mask_cref_type core_mask = topology_.get_thread_affinity_mask(
                     num_thread, numa_sensitive_);
-                mask_type node_mask = topology_.get_numa_node_affinity_mask(
+                mask_cref_type node_mask = topology_.get_numa_node_affinity_mask(
                     num_thread, numa_sensitive_);
 
-                if (core_mask.any() && node_mask.any()) {
+                if (any(core_mask) && any(node_mask)) {
                     for (std::size_t i = 0; (0 == added) && i < queues_.size();
                          ++i)
                     {
-                        if (m == core_mask || !(node_mask.test(i)))
+                        if (i == num_thread || !test(node_mask, i))
                             continue;         // don't steal from ourselves
 
-                        std::size_t idx = m[m.find_first()];
-                        BOOST_ASSERT(idx < queues_.size());
-
-                        result = queues_[num_thread]->wait_or_add_new(idx,
-                            running, idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(i,
+                            running, idle_loop_count, added, queues_[i]) && result;
                         if (0 != added)
                         {
                             queues_[num_thread]->increment_num_stolen_threads(added);
