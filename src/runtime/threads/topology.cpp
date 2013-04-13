@@ -63,7 +63,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     mask_type topology::get_service_affinity_mask(
-        mask_type used_processing_units, error_code& ec) const
+        mask_cref_type used_processing_units, error_code& ec) const
     {
         // We bind the service threads to the first NUMA domain. This is useful
         // as the first NUMA domain is likely to have the PCI controllers etc.

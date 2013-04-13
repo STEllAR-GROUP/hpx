@@ -17,7 +17,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     inline std::size_t count_initialized(std::vector<mask_type> const& masks)
     {
         std::size_t count = 0;
-        BOOST_FOREACH(mask_type const & m, masks)
+        BOOST_FOREACH(mask_cref_type m, masks)
         {
             if(!any(m))
                 ++count;
@@ -29,7 +29,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             std::size_t pu_offset, std::size_t pu_step,
             std::string const& affinity_domain, std::string const& affinity_desc)
       : pu_offset_(pu_offset), pu_step_(pu_step),
-        affinity_domain_(affinity_domain), affinity_masks_()
+        affinity_domain_(affinity_domain), affinity_masks_(), pu_nums_()
     {
 #if defined(HPX_HAVE_HWLOC)
         if (!affinity_desc.empty()) {
@@ -47,6 +47,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             }
         }
 #endif
+        std::size_t num_system_pus = hardware_concurrency();
+        pu_nums_.reserve(num_threads);
+        for (std::size_t i = 0; i != num_threads; ++i)
+            pu_nums_.push_back(init_pu_num(i, num_system_pus));
     }
 
     mask_cref_type affinity_data::get_pu_mask(topology const& topology,
@@ -82,14 +86,15 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topology.get_machine_affinity_mask();
     }
 
-    std::size_t affinity_data::get_pu_num(std::size_t num_thread) const
+    std::size_t affinity_data::init_pu_num(std::size_t num_thread,
+        std::size_t hardware_concurrency) const
     {
         // The offset shouldn't be larger than the number of available
         // processing units.
-        BOOST_ASSERT(pu_offset_ < hardware_concurrency());
+        BOOST_ASSERT(pu_offset_ < hardware_concurrency);
 
         // The distance between assigned processing units shouldn't be zero
-        BOOST_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency());
+        BOOST_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency);
 
         // We 'scale' the thread number to compute the corresponding
         // processing unit number.
@@ -102,10 +107,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         // pu number would get larger than the number of available
         // processing units. Note that it does not make sense to 'roll over'
         // farther than the given pu-step.
-        std::size_t offset = (num_pu / hardware_concurrency()) % pu_step_;
+        std::size_t offset = (num_pu / hardware_concurrency) % pu_step_;
 
         // The resulting pu number has to be smaller than the available
         // number of processing units.
-        return (num_pu + offset) % hardware_concurrency();
+        return (num_pu + offset) % hardware_concurrency;
     }
 }}}}

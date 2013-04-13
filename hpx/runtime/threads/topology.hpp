@@ -157,7 +157,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_service_affinity_mask(
-            mask_type used_processing_units, error_code& ec = throws) const;
+            mask_cref_type used_processing_units, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
