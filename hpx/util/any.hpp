@@ -32,7 +32,6 @@
 #include <boost/throw_exception.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/assert.hpp>
 #include <boost/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 
