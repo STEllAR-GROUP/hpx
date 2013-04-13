@@ -530,13 +530,13 @@ namespace hpx { namespace util
         basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
         {
             basic_any(x).swap(*this);
-            return this;
+            return *this;
         }
 
         // move assignment
         basic_any& operator=(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
         {
-            if (&x != &this) {
+            if (&x != this) {
                 table->static_delete(&object);
                 table = x.table;
                 object = x.object;
@@ -585,12 +585,6 @@ namespace hpx { namespace util
             return false;
         }
 
-        template <typename T>
-        friend bool operator==(T const& x, basic_any const& b)
-        {
-            return b == x;
-        }
-
         // inequality operator
         friend bool operator!=(basic_any const& x, basic_any const& y)
         {
@@ -599,12 +593,6 @@ namespace hpx { namespace util
 
         template <typename T>
         friend bool operator!=(basic_any const& b, T const& x)
-        {
-            return !(b==x);
-        }
-
-        template <typename T>
-        friend bool operator!=(T const& x, basic_any const& b)
         {
             return !(b==x);
         }
@@ -854,13 +842,13 @@ namespace hpx { namespace util
         basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
         {
             basic_any(x).swap(*this);
-            return this;
+            return *this;
         }
 
         // move assignment
         basic_any& operator=(BOOST_RV_REF(basic_any) x)
         {
-            if (&x != &this) {
+            if (&x != this) {
                 table->static_delete(&object);
                 table = x.table;
                 object = x.object;
@@ -909,12 +897,6 @@ namespace hpx { namespace util
             return false;
         }
 
-        template <typename T>
-        friend bool operator==(T const& x, basic_any const& b)
-        {
-            return b == x;
-        }
-
         // inequality operator
         friend bool operator!=(basic_any const& x, basic_any const& y)
         {
@@ -923,12 +905,6 @@ namespace hpx { namespace util
 
         template <typename T>
         friend bool operator!=(basic_any const& b, T const& x)
-        {
-            return !(b==x);
-        }
-
-        template <typename T>
-        friend bool operator!=(T const& x, basic_any const& b)
         {
             return !(b==x);
         }
