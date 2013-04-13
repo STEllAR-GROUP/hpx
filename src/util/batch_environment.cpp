@@ -35,7 +35,7 @@ namespace {
 
         typedef std::vector<std::string> vector_type;
 
-        typedef 
+        typedef
             boost::optional<
                 std::vector<
                     vector_type
@@ -371,13 +371,13 @@ namespace hpx { namespace util
                 std::cerr << "SLURM nodelist found: " << slurm_nodelist_env
                           << std::endl;
             }
-            
+
             std::string nodelist_str(slurm_nodelist_env);
             std::string::iterator begin = nodelist_str.begin();
             std::string::iterator end = nodelist_str.end();
-            
+
             std::vector<std::string> nodes;
-            
+
             namespace qi = boost::spirit::qi;
             namespace phoenix = boost::phoenix;
 
@@ -386,7 +386,11 @@ namespace hpx { namespace util
             qi::rule<std::string::iterator, std::vector<std::string>()>
                 range = qi::as_string[*(qi::print - qi::char_("],-"))] % '-';
 
-            qi::rule<std::string::iterator, boost::fusion::vector<std::string, boost::optional<std::vector<std::vector<std::string> > > >()>
+            qi::rule<std::string::iterator,
+                    boost::fusion::vector<
+                        std::string,
+                        boost::optional<std::vector<std::vector<std::string> > >
+                    >()>
                 ranges = (prefix >> -(
                         "["
                             >> (
@@ -394,10 +398,13 @@ namespace hpx { namespace util
                                ) >>
                         "]"))
                         ;
-            
+
             qi::rule<std::string::iterator>
-                hostlist = (+ranges)[phoenix::bind(::construct_nodes(), phoenix::ref(nodes), qi::_1)];
-            
+                hostlist = (+ranges)[
+                                phoenix::bind(::construct_nodes(),
+                                    phoenix::ref(nodes), qi::_1)
+                           ];
+
             qi::rule<std::string::iterator>
                 nodelist = hostlist % ',';
 
