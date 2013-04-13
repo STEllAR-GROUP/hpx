@@ -267,7 +267,7 @@ namespace hpx { namespace components { namespace detail
 
                 // register the global ids and the base address of this heap
                 // with the AGAS
-                if (!applier::bind_range(base_gid_, step_,
+                if (!applier::bind_range(base_gid, step_,
                         naming::address(appl.here(),
                             components::get_component_type<typename value_type::type_holder>(),
                             addr),
