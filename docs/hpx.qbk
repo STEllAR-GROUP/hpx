@@ -87,6 +87,8 @@
 [def __blas__                   [@http://math-atlas.sourceforge.net/ Basic Linear Algebra Subroutines 3 (BLAS)]]
 [def __gsl__                    [@http://www.gnu.org/software/gsl/ GNU Scientific Library (GSL)]]
 [def __zlib__                   [@http://www.zlib.net/ ZLib]]
+[def __bzip2__                  [@http://www.bzip.org/ BZip2]]
+[def __snappy__                 [@http://code.google.com/p/snappy/ Snappy]]
 [def __qsub__                   [@http://www.clusterresources.com/torquedocs21/commands/qsub.shtml qsub]]
 [def __qstat__                  [@http://www.clusterresources.com/torquedocs21/commands/qstat.shtml qstat]]
 [def __pbsdsh__                 [@http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml pbsdsh]]

@@ -10,14 +10,14 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(IBVERBS
-  LIBRARIES ibverbs
-  LIBRARY_PATHS lib
-  HEADERS infiniband/verbs.h
-  HEADER_PATHS include)
+    LIBRARIES ibverbs
+    LIBRARY_PATHS lib
+    HEADERS infiniband/verbs.h
+    HEADER_PATHS include)
 
 if(IBVERBS_FOUND)
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${IBVERBS_LIBRARY})
-  hpx_include_sys_directories(${IBVERBS_INCLUDE_DIR})
-  hpx_link_sys_directories(${IBVERBS_LIBRARY_DIR})
-  add_definitions(-DHPX_HAVE_IBVERBS)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${IBVERBS_LIBRARY})
+    hpx_include_sys_directories(${IBVERBS_INCLUDE_DIR})
+    hpx_link_sys_directories(${IBVERBS_LIBRARY_DIR})
+    add_definitions(-DHPX_HAVE_IBVERBS)
 endif()
