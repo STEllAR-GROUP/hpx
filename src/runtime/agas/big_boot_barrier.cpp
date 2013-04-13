@@ -379,7 +379,8 @@ void notify_console(notification_header const& header)
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
-    rt.get_id_pool().set_range(header.parcelport_lower_gid
+    rt.get_id_pool().set_range(
+        header.parcelport_lower_gid
       , header.parcelport_upper_gid);
 
     // assign the initial gid range to the unique id range allocator that our
