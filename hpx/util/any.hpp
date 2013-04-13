@@ -821,7 +821,7 @@ namespace hpx { namespace util
 
             // are we copying between the same type?
             detail::any::fxn_ptr_table<void, void, Char>* x_table =
-                detail::any::get_table<T>::template get<void, void, Char>();
+                detail::any::get_table<value_type>::template get<void, void, Char>();
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
                 table->destruct(&object);    // first destruct the old content
@@ -853,7 +853,8 @@ namespace hpx { namespace util
         // copy assignment operator
         basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
         {
-            return assign(x);
+            basic_any(x).swap(*this);
+            return this;
         }
 
         // move assignment
@@ -893,9 +894,8 @@ namespace hpx { namespace util
 
         }
 
-        // equality operator
         template <typename T>
-        friend bool operator==(basic_any const& b, const T& x)
+        friend bool operator==(basic_any const& b, T const& x)
         {
             typedef typename boost::remove_const<
                 typename util::detail::remove_reference<T>::type
@@ -910,9 +910,27 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        friend bool operator==(const T& x, basic_any const& b)
+        friend bool operator==(T const& x, basic_any const& b)
         {
             return b == x;
+        }
+
+        // inequality operator
+        friend bool operator!=(basic_any const& x, basic_any const& y)
+        {
+            return !(x==y);
+        }
+
+        template <typename T>
+        friend bool operator!=(basic_any const& b, T const& x)
+        {
+            return !(b==x);
+        }
+
+        template <typename T>
+        friend bool operator!=(T const& x, basic_any const& b)
+        {
+            return !(b==x);
         }
 
         // utility functions

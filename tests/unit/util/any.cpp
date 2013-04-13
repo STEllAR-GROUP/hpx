@@ -94,6 +94,35 @@ int hpx_main(variables_map& vm)
     }
     // non serializable version
     {
+        // test equality
+        {
+            any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10), any4_nonser(std::string("seven"));
+
+            HPX_TEST_EQ(any1_nonser, 7);
+            HPX_TEST_NEQ(any1_nonser, 10);
+            HPX_TEST_NEQ(any1_nonser, 10.0f);
+            HPX_TEST_EQ(any1_nonser, any1_nonser);
+            HPX_TEST_EQ(any1_nonser, any2_nonser);
+            HPX_TEST_NEQ(any1_nonser, any3_nonser);
+            HPX_TEST_NEQ(any1_nonser, any4_nonser);
+
+            std::string long_str = 
+                std::string("This is a looooooooooooooooooooooooooong string"); 
+            std::string other_str = std::string("a different string");
+            any1_nonser = long_str;
+            any2_nonser = any1_nonser;
+            any3_nonser = other_str;
+            any4_nonser = 10.0f;
+
+            HPX_TEST_EQ(any1_nonser, long_str);
+            HPX_TEST_NEQ(any1_nonser, other_str);
+            HPX_TEST_NEQ(any1_nonser, 10.0f);
+            HPX_TEST_EQ(any1_nonser, any1_nonser);
+            HPX_TEST_EQ(any1_nonser, any2_nonser);
+            HPX_TEST_NEQ(any1_nonser, any3_nonser);
+            HPX_TEST_NEQ(any1_nonser, any4_nonser);
+        }
+
         {
             if (sizeof(small_object) <= sizeof(void*))
                 std::cout << "object is small\n";
